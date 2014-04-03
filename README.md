@@ -1,4 +1,4 @@
-website
-=======
+Website for CoBUG
+=================
 
-Website for cobug.org
+Nitrogen (erlang web framework) website for CoBUG!
