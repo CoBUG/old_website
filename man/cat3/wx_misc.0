@@ -1,0 +1,200 @@
+wx_misc(3)                 Erlang Module Definition                 wx_misc(3)
+
+
+
+NNAAMMEE
+       wx_misc - See external documentation: Misc.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: Misc.
+
+EEXXPPOORRTTSS
+       ggeettKKeeyySSttaattee((KKeeyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Key = wx_enum() (see module wx)
+
+              See external documentation.
+              Key = ?WXK_BACK | ?WXK_TAB | ?WXK_RETURN | ?WXK_ESCAPE |
+              ?WXK_SPACE | ?WXK_DELETE | ?WXK_START | ?WXK_LBUTTON |
+              ?WXK_RBUTTON | ?WXK_CANCEL | ?WXK_MBUTTON | ?WXK_CLEAR |
+              ?WXK_SHIFT | ?WXK_ALT | ?WXK_CONTROL | ?WXK_MENU | ?WXK_PAUSE |
+              ?WXK_CAPITAL | ?WXK_END | ?WXK_HOME | ?WXK_LEFT | ?WXK_UP |
+              ?WXK_RIGHT | ?WXK_DOWN | ?WXK_SELECT | ?WXK_PRINT | ?WXK_EXECUTE
+              | ?WXK_SNAPSHOT | ?WXK_INSERT | ?WXK_HELP | ?WXK_NUMPAD0 |
+              ?WXK_NUMPAD1 | ?WXK_NUMPAD2 | ?WXK_NUMPAD3 | ?WXK_NUMPAD4 |
+              ?WXK_NUMPAD5 | ?WXK_NUMPAD6 | ?WXK_NUMPAD7 | ?WXK_NUMPAD8 |
+              ?WXK_NUMPAD9 | ?WXK_MULTIPLY | ?WXK_ADD | ?WXK_SEPARATOR |
+              ?WXK_SUBTRACT | ?WXK_DECIMAL | ?WXK_DIVIDE | ?WXK_F1 | ?WXK_F2 |
+              ?WXK_F3 | ?WXK_F4 | ?WXK_F5 | ?WXK_F6 | ?WXK_F7 | ?WXK_F8 |
+              ?WXK_F9 | ?WXK_F10 | ?WXK_F11 | ?WXK_F12 | ?WXK_F13 | ?WXK_F14 |
+              ?WXK_F15 | ?WXK_F16 | ?WXK_F17 | ?WXK_F18 | ?WXK_F19 | ?WXK_F20
+              | ?WXK_F21 | ?WXK_F22 | ?WXK_F23 | ?WXK_F24 | ?WXK_NUMLOCK |
+              ?WXK_SCROLL | ?WXK_PAGEUP | ?WXK_PAGEDOWN | ?WXK_NUMPAD_SPACE |
+              ?WXK_NUMPAD_TAB | ?WXK_NUMPAD_ENTER | ?WXK_NUMPAD_F1 |
+              ?WXK_NUMPAD_F2 | ?WXK_NUMPAD_F3 | ?WXK_NUMPAD_F4 |
+              ?WXK_NUMPAD_HOME | ?WXK_NUMPAD_LEFT | ?WXK_NUMPAD_UP |
+              ?WXK_NUMPAD_RIGHT | ?WXK_NUMPAD_DOWN | ?WXK_NUMPAD_PAGEUP |
+              ?WXK_NUMPAD_PAGEDOWN | ?WXK_NUMPAD_END | ?WXK_NUMPAD_BEGIN |
+              ?WXK_NUMPAD_INSERT | ?WXK_NUMPAD_DELETE | ?WXK_NUMPAD_EQUAL |
+              ?WXK_NUMPAD_MULTIPLY | ?WXK_NUMPAD_ADD | ?WXK_NUMPAD_SEPARATOR |
+              ?WXK_NUMPAD_SUBTRACT | ?WXK_NUMPAD_DECIMAL | ?WXK_NUMPAD_DIVIDE
+              | ?WXK_WINDOWS_LEFT | ?WXK_WINDOWS_RIGHT | ?WXK_WINDOWS_MENU |
+              ?WXK_COMMAND | ?WXK_SPECIAL1 | ?WXK_SPECIAL2 | ?WXK_SPECIAL3 |
+              ?WXK_SPECIAL4 | ?WXK_SPECIAL5 | ?WXK_SPECIAL6 | ?WXK_SPECIAL7 |
+              ?WXK_SPECIAL8 | ?WXK_SPECIAL9 | ?WXK_SPECIAL10 | ?WXK_SPECIAL11
+              | ?WXK_SPECIAL12 | ?WXK_SPECIAL13 | ?WXK_SPECIAL14 |
+              ?WXK_SPECIAL15 | ?WXK_SPECIAL16 | ?WXK_SPECIAL17 |
+              ?WXK_SPECIAL18 | ?WXK_SPECIAL19 | ?WXK_SPECIAL20
+
+       ggeettMMoouusseePPoossiittiioonn(()) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              See external documentation.
+
+       ggeettMMoouusseeSSttaattee(()) -->> wwxx__wwxxMMoouusseeSSttaattee(()) ((sseeee mmoodduullee wwxx))
+
+              See external documentation.
+
+       sseettDDeetteeccttaabblleeAAuuttooRReeppeeaatt((FFllaagg)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Flag = boolean()
+
+              See external documentation.
+
+       bbeellll(()) -->> ookk
+
+              See external documentation.
+
+       ffiinnddMMeennuuIItteemmIIdd((FFrraammee,, MMeennuuSSttrriinngg,, IItteemmSSttrriinngg)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 Frame = wxFrame() (see module wxFrame)
+                 MenuString = chardata() (see module unicode)
+                 ItemString = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeenneerriiccFFiinnddWWiinnddoowwAAttPPooiinntt((PPtt)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ffiinnddWWiinnddoowwAAttPPooiinntt((PPtt)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       bbeeggiinnBBuussyyCCuurrssoorr(()) -->> ookk
+
+              Equivalent to bbeeggiinnBBuussyyCCuurrssoorr(([[]])).
+
+       bbeeggiinnBBuussyyCCuurrssoorr((OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 Option = {cursor, wxCursor() (see module wxCursor)}
+
+              See external documentation.
+
+       eennddBBuussyyCCuurrssoorr(()) -->> ookk
+
+              See external documentation.
+
+       iissBBuussyy(()) -->> bboooolleeaann(())
+
+              See external documentation.
+
+       sshhuuttddoowwnn((WWFFllaaggss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 WFlags = wx_enum() (see module wx)
+
+              See external documentation.
+              WFlags = ?wxSHUTDOWN_POWEROFF | ?wxSHUTDOWN_REBOOT
+
+       sshheellll(()) -->> bboooolleeaann(())
+
+              Equivalent to sshheellll(([[]])).
+
+       sshheellll((OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 Option = {command, chardata() (see module unicode)}
+
+              See external documentation.
+
+       llaauunncchhDDeeffaauullttBBrroowwsseerr((UUrrll)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Url = chardata() (see module unicode)
+
+              Equivalent to llaauunncchhDDeeffaauullttBBrroowwsseerr((UUrrll,, [[]])).
+
+       llaauunncchhDDeeffaauullttBBrroowwsseerr((UUrrll,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 Url = chardata() (see module unicode)
+                 Option = {flags, integer()}
+
+              See external documentation.
+
+       ggeettEEmmaaiillAAddddrreessss(()) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              See external documentation.
+
+       ggeettUUsseerrIIdd(()) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              See external documentation.
+
+       ggeettHHoommeeDDiirr(()) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              See external documentation.
+
+       nneewwIIdd(()) -->> iinntteeggeerr(())
+
+              See external documentation.
+
+       rreeggiisstteerrIIdd((IIdd)) -->> ookk
+
+              Types:
+
+                 Id = integer()
+
+              See external documentation.
+
+       ggeettCCuurrrreennttIIdd(()) -->> iinntteeggeerr(())
+
+              See external documentation.
+
+       ggeettOOssDDeessccrriippttiioonn(()) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              See external documentation.
+
+       iissPPllaattffoorrmmLLiittttlleeEEnnddiiaann(()) -->> bboooolleeaann(())
+
+              See external documentation.
+
+       iissPPllaattffoorrmm6644BBiitt(()) -->> bboooolleeaann(())
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wx_misc(3)

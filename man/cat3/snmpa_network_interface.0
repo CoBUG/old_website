@@ -1,0 +1,104 @@
+snmpa_network_interface(3) Erlang Module Definition snmpa_network_interface(3)
+
+
+
+NNAAMMEE
+       snmpa_network_interface - Behaviour module for the SNMP agent network
+       interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the agent network interface. A
+       _s_n_m_p_a___n_e_t_w_o_r_k___i_n_t_e_r_f_a_c_e compliant module must export the following
+       functions:
+
+         * ssttaarrtt__lliinnkk//44
+
+         * iinnffoo//11
+
+         * ggeett__lloogg__ttyyppee//11
+
+         * sseett__lloogg__ttyyppee//22
+
+         * vveerrbboossiittyy//22
+
+       The semantics of them and their exact signatures are explained below.
+
+       But this is not enough. There is also a set of _m_a_n_d_a_t_o_r_y messages which
+       the network interface entity must be able to receive and be able to
+       send. This is described in chapter ssnnmmpp__aaggeenntt__nneettiiff.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__lliinnkk((PPrriioo,, NNootteeSSttoorree,, MMaasstteerrAAggeenntt,, OOppttss)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Prio = priority()
+                 NoteStore = pid()
+                 MasterAgent = pid()
+                 Opts = [opt()]
+                 opt() = {verbosity, verbosity()} | {versions, versions()} |
+                 term()
+                 versions() = [version()]
+                 version() = v1 | v2 | v3
+
+              Start-link the network interface process.
+
+              _N_o_t_e_S_t_o_r_e is the pid of the note-store process and _M_a_s_t_e_r_A_g_e_n_t
+              is the pid of the master-agent process.
+
+              _O_p_t_s is an (basically) implementation dependent list of options
+              to the network interface process. There are however a number of
+              options which _m_u_s_t be handled: _v_e_r_s_i_o_n_s and _v_e_r_b_o_s_i_t_y.
+
+       iinnffoo((PPiidd)) -->> [[{{KKeeyy,, VVaalluuee}}]]
+
+              Types:
+
+                 Pid = pid()
+
+              The info returned is basically up to the implementer to decide.
+              This implementation provided by the application provides info
+              about memory allocation and various socket information.
+
+              The info returned by this function is returned together with
+              other info collected by the agent when the iinnffoo function is
+              called (tagged with with the key _n_e_t___i_f).
+
+       vveerrbboossiittyy((PPiidd,, VVeerrbboossiittyy)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+                 Verbosity = verbosity()
+
+              Change the verbosity of a running network interface process.
+
+       ggeett__lloogg__ttyyppee((PPiidd)) -->> {{ookk,, LLooggTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 LogType = atl_type()
+                 Reason = term()
+
+              The Audit Trail Log is managed by the network interface process.
+              So, it is this process that has to retrieve the actual log-type.
+
+       sseett__lloogg__ttyyppee((PPiidd,, NNeewwTTyyppee)) -->> {{ookk,, OOllddTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 NewType = OldType = atl_type()
+                 Reason = term()
+
+              The Audit Trail Log is managed by the network interface process.
+              So, it is this process that has to do the actual changing of the
+              type.
+
+              See sseett__lloogg__ttyyppee for more info.
+
+
+
+Ericsson AB                       snmp 4.22.1       snmpa_network_interface(3)

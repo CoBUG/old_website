@@ -1,0 +1,1073 @@
+diameter(3)                Erlang Module Definition                diameter(3)
+
+
+
+NNAAMMEE
+       diameter - Main API of the diameter application.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides the interface with which a user can implement a
+       Diameter node that sends and receives messages using the Diameter
+       protocol as defined in RFC 3588.
+
+       Basic usage consists of creating a representation of a locally
+       implemented Diameter node and its capabilities with ssttaarrtt__sseerrvviiccee//22,
+       adding transport capability using aadddd__ttrraannssppoorrtt//22 and sending Diameter
+       requests and receiving Diameter answers with ccaallll//44. Incoming Diameter
+       requests are communicated as callbacks to a ddiiaammeetteerr__aapppp((33)) callback
+       modules as specified in the service configuration.
+
+       Beware the difference between _d_i_a_m_e_t_e_r (not capitalised) and _D_i_a_m_e_t_e_r
+       (capitalised). The former refers to the Erlang application named
+       diameter whose main api is defined here, the latter to Diameter
+       protocol in the sense of RFC 3588.
+
+       The diameter application must be started before calling most functions
+       in this module.
+
+DDAATTAA TTYYPPEESS
+         _A_d_d_r_e_s_s_(_):
+
+
+         _D_i_a_m_e_t_e_r_I_d_e_n_t_i_t_y_(_):
+
+
+         _G_r_o_u_p_e_d_(_):
+
+
+         _O_c_t_e_t_S_t_r_i_n_g_(_):
+
+
+         _T_i_m_e_(_):
+
+
+         _U_n_s_i_g_n_e_d_3_2_(_):
+
+
+         _U_T_F_8_S_t_r_i_n_g_(_):
+           Types corresponding to RFC 3588 AVP Data Formats. Defined in
+           ddiiaammeetteerr__ddiicctt((44)).
+
+         _a_p_p_l_i_c_a_t_i_o_n___a_l_i_a_s_(_) _= _t_e_r_m_(_):
+           A name identifying a Diameter application in service configuration.
+           Passed to ccaallll//44 when sending requests defined by the application.
+
+         _a_p_p_l_i_c_a_t_i_o_n___m_o_d_u_l_e_(_) _= _M_o_d _| _[_M_o_d _| _E_x_t_r_a_A_r_g_s_] _|
+         _#_d_i_a_m_e_t_e_r___c_a_l_l_b_a_c_k_{_}:
+
+
+         Mod = atom()
+         ExtraArgs = list()
+
+
+           A module implementing the callback interface defined in
+           ddiiaammeetteerr__aapppp((33)), along with any extra arguments to be appended to
+           those documented for the interface. Note that extra arguments
+           specific to an outgoing request can be specified to ccaallll//44, in
+           which case those are are appended to any module-specific extra
+           arguments.
+
+           Specifying a _#_d_i_a_m_e_t_e_r___c_a_l_l_b_a_c_k_{_} record allows individual
+           functions to be configured in place of the usual ddiiaammeetteerr__aapppp((33))
+           callbacks. See that module for details.
+
+         _a_p_p_l_i_c_a_t_i_o_n___o_p_t_(_):
+           Options defining a Diameter application. Has one the following
+           types.
+
+           _{_a_l_i_a_s_, aapppplliiccaattiioonn__aalliiaass(())}:
+             An unique identifier for the application in the scope of the
+             service. Defaults to the value of the _d_i_c_t_i_o_n_a_r_y option if
+             unspecified.
+
+           _{_d_i_c_t_i_o_n_a_r_y_, _a_t_o_m_(_)_}:
+             The name of an encode/decode module for the Diameter messages
+             defined by the application. These modules are generated from a
+             specification file whose format is documented in
+             ddiiaammeetteerr__ddiicctt((44)).
+
+           _{_m_o_d_u_l_e_, aapppplliiccaattiioonn__mmoodduullee(())}:
+             The callback module with which messages of the Diameter
+             application are handled. See ddiiaammeetteerr__aapppp((33)) for the required
+             interface and semantics.
+
+           _{_s_t_a_t_e_, _t_e_r_m_(_)_}:
+             The initial callback state. The prevailing state is passed to
+             some ddiiaammeetteerr__aapppp((33)) callbacks, which can then return a new
+             state. Defaults to the value of the _a_l_i_a_s option if unspecified.
+
+           _{_c_a_l_l___m_u_t_a_t_e_s___s_t_a_t_e_, _t_r_u_e_|_f_a_l_s_e_}:
+             Specifies whether or not the ppiicckk__ppeeeerr//44 application callback can
+             modify the application state, Defaults to _f_a_l_s_e if unspecified.
+
+       NNoottee::
+           ppiicckk__ppeeeerr callbacks are serialized when these are allowed to modify
+           state, which is a potential performance bottleneck. A simple
+           Diameter client may suffer no ill effects from using mutable state
+           but a server or agent that responds to incoming request should
+           probably avoid it.
+
+
+           _{_a_n_s_w_e_r___e_r_r_o_r_s_, _c_a_l_l_b_a_c_k_|_r_e_p_o_r_t_|_d_i_s_c_a_r_d_}:
+             Determines the manner in which incoming answer messages
+             containing decode errors are handled. If _c_a_l_l_b_a_c_k then errors
+             result in a hhaannddllee__aannsswweerr//44 callback in the same fashion as for
+             hhaannddllee__rreeqquueesstt//33, with errors communicated in the _e_r_r_o_r_s field of
+             the _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_} record passed to the callback. If _r_e_p_o_r_t
+             then an answer containing errors is discarded without a callback
+             and a warning report is written to the log. If _d_i_s_c_a_r_d then an
+             answer containing errors is silently discarded without a
+             callback. In both the _r_e_p_o_r_t and _d_i_s_c_a_r_d cases the return value
+             for the ccaallll//44 invocation in question is as if a callback had
+             taken place and returned _{_e_r_r_o_r_, _f_a_i_l_u_r_e_}.
+
+             Defaults to _r_e_p_o_r_t if unspecified.
+
+         _c_a_l_l___o_p_t_(_):
+           Options available to ccaallll//44 when sending an outgoing Diameter
+           request. Has one of the following types.
+
+           _{_e_x_t_r_a_, _l_i_s_t_(_)_}:
+             Extra arguments to append to callbacks to the callback module in
+             question. These are appended to any extra arguments configured on
+             the callback itself. Multiple options append to the argument
+             list.
+
+           _{_f_i_l_t_e_r_, ppeeeerr__ffiilltteerr(())}:
+             A filter to apply to the list of available peers before passing
+             them to the ppiicckk__ppeeeerr//44 callback for the application in question.
+             Multiple options are equivalent a single _a_l_l filter on the
+             corresponding list of filters. Defaults to _n_o_n_e.
+
+           _{_t_i_m_e_o_u_t_, UUnnssiiggnneedd3322(())}:
+             The number of milliseconds after which the request should
+             timeout. Defaults to 5000.
+
+           _d_e_t_a_c_h:
+             Causes ccaallll//44 to return _o_k as soon as the request in question has
+             been encoded instead of waiting for and returning the result from
+             a subsequent hhaannddllee__aannsswweerr//44 or hhaannddllee__eerrrroorr//44 callback.
+
+           An invalid option will cause ccaallll//44 to fail.
+
+         _c_a_p_a_b_i_l_i_t_y_(_):
+           AVP values sent in outgoing CER or CEA messages during capabilities
+           exchange. Can be configured both on a service and a transport,
+           values specified on the latter taking precedence over any specified
+           on the former. Has one of the following types.
+
+           _{_'_O_r_i_g_i_n_-_H_o_s_t_'_, DDiiaammeetteerrIIddeennttiittyy(())}:
+
+
+           _{_'_O_r_i_g_i_n_-_R_e_a_l_m_'_, DDiiaammeetteerrIIddeennttiittyy(())}:
+
+
+           _{_'_H_o_s_t_-_I_P_-_A_d_d_r_e_s_s_'_, _[AAddddrreessss(())]}:
+             An address list is available to the start function of a ttrraannssppoorrtt
+             mmoodduullee, which can return a new list for use in the subsequent CER
+             or CEA. Host-IP-Address need not be specified if the transport
+             start function returns an address list.
+
+           _{_'_V_e_n_d_o_r_-_I_d_'_, UUnnssiiggnneedd3322(())}:
+
+
+           _{_'_P_r_o_d_u_c_t_-_N_a_m_e_'_, UUTTFF88SSttrriinngg(())}:
+
+
+           _{_'_O_r_i_g_i_n_-_S_t_a_t_e_-_I_d_'_, UUnnssiiggnneedd3322(())}:
+             Origin-State-Id is optional but will be included in outgoing
+             messages sent by diameter itself: CER/CEA, DWR/DWA and DPR/DPA.
+             Setting a value of _0 (zero) is equivalent to not setting a value
+             as documented in RFC 3588. The function oorriiggiinn__ssttaattee__iidd//00 can be
+             used as to retrieve a value that is computed when the diameter
+             application is started.
+
+           _{_'_S_u_p_p_o_r_t_e_d_-_V_e_n_d_o_r_-_I_d_'_, _[UUnnssiiggnneedd3322(())]}:
+
+
+           _{_'_A_u_t_h_-_A_p_p_l_i_c_a_t_i_o_n_-_I_d_'_, _[UUnnssiiggnneedd3322(())]}:
+
+
+           _{_'_I_n_b_a_n_d_-_S_e_c_u_r_i_t_y_-_I_d_'_, _[UUnnssiiggnneedd3322(())]}:
+             Inband-Security-Id defaults to the empty list, which is
+             equivalent to a list containing only 0 (= NO_INBAND_SECURITY). If
+             1 (= TLS) is specified then TLS is selected if the CER/CEA
+             received from the peer offers it.
+
+           _{_'_A_c_c_t_-_A_p_p_l_i_c_a_t_i_o_n_-_I_d_'_, _[UUnnssiiggnneedd3322(())]}:
+
+
+           _{_'_V_e_n_d_o_r_-_S_p_e_c_i_f_i_c_-_A_p_p_l_i_c_a_t_i_o_n_-_I_d_'_, _[GGrroouuppeedd(())]}:
+
+
+           _{_'_F_i_r_m_w_a_r_e_-_R_e_v_i_s_i_o_n_'_, UUnnssiiggnneedd3322(())}:
+
+
+           Note that each tuple communicates one or more AVP values. It is an
+           error to specify duplicate tuples.
+
+         _e_v_a_l_u_a_b_l_e_(_) _= _{_M_,_F_,_A_} _| _f_u_n_(_) _| _[_e_v_a_l_u_a_b_l_e_(_) _| _A_]:
+           An expression that can be evaluated as a function in the following
+           sense.
+
+         eval([{M,F,A} | T]) ->
+             apply(M, F, T ++ A);
+         eval([[F|A] | T]) ->
+             eval([F | T ++ A]);
+         eval([F|A]) ->
+             apply(F, A);
+         eval(F) ->
+             eval([F]).
+
+
+           Applying an eevvaalluuaabbllee(()) _E to an argument list _A is meant in the
+           sense of _e_v_a_l_(_[_E_|_A_]_).
+
+     WWaarrnniinngg::
+         Beware of using fun expressions of the form _f_u_n _N_a_m_e_/_A_r_i_t_y (not fun
+         Mod:Name/Arity) in situations in which the fun is not short-lived and
+         code is to be upgraded at runtime since any processes retaining such
+         a fun will have a reference to old code.
+
+
+         _p_e_e_r___f_i_l_t_e_r_(_) _= _t_e_r_m_(_):
+           A filter passed to ccaallll//44 in order to select candidate peers for a
+           ppiicckk__ppeeeerr//44 callback. Has one of the following types.
+
+           _n_o_n_e:
+             Matches any peer. This is a convenience that provides a filter
+             equivalent to no filter at all.
+
+           _h_o_s_t:
+             Matches only those peers whose _O_r_i_g_i_n_-_H_o_s_t has the same value as
+             _D_e_s_t_i_n_a_t_i_o_n_-_H_o_s_t in the outgoing request in question, or any peer
+             if the request does not contain a _D_e_s_t_i_n_a_t_i_o_n_-_H_o_s_t AVP.
+
+           _r_e_a_l_m:
+             Matches only those peers whose _O_r_i_g_i_n_-_R_e_a_l_m has the same value as
+             _D_e_s_t_i_n_a_t_i_o_n_-_R_e_a_l_m in the outgoing request in question, or any
+             peer if the request does not contain a _D_e_s_t_i_n_a_t_i_o_n_-_R_e_a_l_m AVP.
+
+           _{_h_o_s_t_, _a_n_y_|DDiiaammeetteerrIIddeennttiittyy(())}:
+             Matches only those peers whose _O_r_i_g_i_n_-_H_o_s_t has the specified
+             value, or all peers if the atom _a_n_y.
+
+           _{_r_e_a_l_m_, _a_n_y_|DDiiaammeetteerrIIddeennttiittyy(()):
+             Matches only those peers whose _O_r_i_g_i_n_-_R_e_a_l_m has the specified
+             value, or all peers if the atom _a_n_y.
+
+           _{_e_v_a_l_, eevvaalluuaabbllee(())}:
+             Matches only those peers for which the specified eevvaalluuaabbllee(())
+             returns _t_r_u_e on the connection's _d_i_a_m_e_t_e_r___c_a_p_s record. Any other
+             return value or exception is equivalent to _f_a_l_s_e.
+
+           _{_n_e_g_, ppeeeerr__ffiilltteerr(())}:
+             Matches only those peers not matched by the specified filter.
+
+           _{_a_l_l_, _[ppeeeerr__ffiilltteerr(())]}:
+             Matches only those peers matched by each filter in the specified
+             list.
+
+           _{_a_n_y_, _[ppeeeerr__ffiilltteerr(())]}:
+             Matches only those peers matched by at least one filter in the
+             specified list.
+
+           An invalid filter is equivalent to _{_a_n_y_,_[_]_}, a filter that matches
+           no peer.
+
+     NNoottee::
+         The _h_o_s_t and _r_e_a_l_m filters examine the outgoing request as passed to
+         ccaallll//44, assuming that this is a record- or list-valued
+         ddiiaammeetteerr__aapppp::mmeessssaaggee(()), and that the message contains at most one of
+         each AVP. If this is not the case then the _{_h_o_s_t_|_r_e_a_l_m_,
+         DDiiaammeetteerrIIddeennttiittyy(())} filters must be used to achieve the desired
+         result. An empty DDiiaammeetteerrIIddeennttiittyy(()) (which should not be typical)
+         matches all hosts/realms for the purposes of filtering.
+
+
+     WWaarrnniinngg::
+         A _h_o_s_t filter is not typically desirable when setting Destination-
+         Host since it will remove peer agents from the candidates list.
+
+
+         _s_e_r_v_i_c_e___e_v_e_n_t_(_) _= _#_d_i_a_m_e_t_e_r___e_v_e_n_t_{_}:
+           An event message sent to processes that have subscribed to these
+           using ssuubbssccrriibbee//11.
+
+           The _i_n_f_o field of the event record can have one of the following
+           types.
+
+           _{_u_p_, _R_e_f_, _P_e_e_r_, _C_o_n_f_i_g_, _P_k_t_}:
+
+
+           _{_u_p_, _R_e_f_, _P_e_e_r_, _C_o_n_f_i_g_}:
+
+
+           _{_d_o_w_n_, _R_e_f_, _P_e_e_r_, _C_o_n_f_i_g_}:
+
+
+           Ref    = ttrraannssppoorrtt__rreeff(())
+           Peer   = ddiiaammeetteerr__aapppp::ppeeeerr(())
+           Config = {connect|listen, [ttrraannssppoorrtt__oopptt(())]}
+           Pkt    = #diameter_packet{}
+
+
+             The RFC 3539 watchdog state machine has transitioned into (_u_p) or
+             out of (_d_o_w_n) the OKAY state. If a _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_} record is
+             present in an _u_p event then there has been a capabilties exchange
+             on a newly established transport connection and the record
+             contains the received CER or CEA. Otherwise a connection has
+             reestablished without the loss or connectivity.
+
+             Note that a single _u_p/_d_o_w_n event for a given peer corresponds to
+             one ppeeeerr__uupp//ppeeeerr__ddoowwnn callback for each of the Diameter
+             applications negotiated during capablilities exchange. That is,
+             the event communicates connectivity with the peer as a whole
+             while the callbacks communicate connectivity with respect to
+             individual Diameter applications.
+
+           _{_r_e_c_o_n_n_e_c_t_, _R_e_f_, _O_p_t_s_}:
+
+
+           Ref  = ttrraannssppoorrtt__rreeff(())
+           Opts = [ttrraannssppoorrtt__oopptt(())]
+
+
+             A connecting transport is attempting to establish/reestablish a
+             transport connection with a peer following rreeccoonnnneecctt__ttiimmeerr or
+             wwaattcchhddoogg__ttiimmeerr expiry.
+
+           _{_c_l_o_s_e_d_, _R_e_f_, _R_e_a_s_o_n_, _C_o_n_f_i_g_}:
+
+
+           Ref = ttrraannssppoorrtt__rreeff(())
+           Config = {connect|listen, [ttrraannssppoorrtt__oopptt(())]}
+
+
+             Capabilities exchange has failed. _R_e_a_s_o_n can have one of the
+             following types.
+
+             _{_'_C_E_R_'_, _R_e_s_u_l_t_, _C_a_p_s_, _P_k_t_}:
+
+
+             Result = ResultCode | {capabilities_cb, CB, ResultCode|discard}
+             Caps = #diameter_caps{}
+             Pkt  = #diameter_packet{}
+             ResultCode = integer()
+             CB = eevvaalluuaabbllee(())
+
+
+               An incoming CER has been answered with the indicated result
+               code or discarded. _C_a_p_s contains pairs of values for the the
+               local node and remote peer. _P_k_t contains the CER in question.
+               In the case of rejection by a capabilities callback, the tuple
+               contains the rejecting callback.
+
+             _{_'_C_E_R_'_, _C_a_p_s_, _{_R_e_s_u_l_t_C_o_d_e_, _P_k_t_}_}:
+
+
+             ResultCode = integer()
+             Caps = #diameter_caps{}
+             Pkt  = #diameter_packet{}
+
+
+               An incoming CER contained errors and has been answered with the
+               indicated result code. _C_a_p_s contains only values for the the
+               local node. _P_k_t contains the CER in question.
+
+             _{_'_C_E_A_'_, _R_e_s_u_l_t_, _C_a_p_s_, _P_k_t_}:
+
+
+             Result = integer() | atom() | {capabilities_cb, CB, ResultCode|discard}
+             Caps = #diameter_caps{}
+             Pkt  = #diameter_packet{}
+             ResultCode = integer()
+
+
+               An incoming CEA has been rejected for the indicated reason. An
+               integer-valued _R_e_s_u_l_t indicates the result code sent by the
+               peer. _C_a_p_s contains pairs of values for the the local node and
+               remote peer. _P_k_t contains the CEA in question. In the case of
+               rejection by a capabilities callback, the tuple contains the
+               rejecting callback.
+
+             _{_'_C_E_A_'_, _C_a_p_s_, _P_k_t_}:
+
+
+             Caps = #diameter_caps{}
+             Pkt  = #diameter_packet{}
+
+
+               An incoming CEA contained errors and has been rejected. _C_a_p_s
+               contains only values for the the local node. _P_k_t contains the
+               CEA in question.
+
+           _{_w_a_t_c_h_d_o_g_, _R_e_f_, _P_e_e_r_R_e_f_, _{_F_r_o_m_, _T_o_}_, _C_o_n_f_i_g_}:
+
+
+           Ref = ttrraannssppoorrtt__rreeff(())
+           PeerRef  = ddiiaammeetteerr__aapppp::ppeeeerr__rreeff(())
+           From, To = initial | okay | suspect | down | reopen
+           Config = {connect|listen, [transport_opt()]}
+
+
+             An RFC 3539 watchdog state machine has changed state.
+
+           For forward compatibility, a subscriber should be prepared to
+           receive info fields of forms other than the above.
+
+         _s_e_r_v_i_c_e___n_a_m_e_(_) _= _t_e_r_m_(_):
+           The name of a service as passed to ssttaarrtt__sseerrvviiccee//22 and with which
+           the service is identified. There can be at most one service with a
+           given name on a given node. Note that eerrllaanngg::mmaakkee__rreeff//00 can be used
+           to generate a service name that is somewhat unique.
+
+         _s_e_r_v_i_c_e___o_p_t_(_):
+           An option passed to ssttaarrtt__sseerrvviiccee//22. Can be any ccaappaabbiilliittyy(()) as
+           well as the following.
+
+           _{_a_p_p_l_i_c_a_t_i_o_n_, _[aapppplliiccaattiioonn__oopptt(())]}:
+             Defines a Diameter application supported by the service.
+
+             A service must configure one _a_p_p_l_i_c_a_t_i_o_n for each Diameter
+             application it intends to support. For an outgoing Diameter
+             request, the relevant aapppplliiccaattiioonn__aalliiaass(()) is passed to ccaallll//44,
+             while for an incoming request the application identifier in the
+             message header determines the application, the identifier being
+             specified in the application's ddiiccttiioonnaarryy file.
+
+         _t_r_a_n_s_p_o_r_t___o_p_t_(_):
+           An option passed to aadddd__ttrraannssppoorrtt//22. Has one of the following
+           types.
+
+           _{_t_r_a_n_s_p_o_r_t___m_o_d_u_l_e_, _a_t_o_m_(_)_}:
+             A module implementing a transport process as defined in
+             ddiiaammeetteerr__ttrraannssppoorrtt((33)). Defaults to _d_i_a_m_e_t_e_r___t_c_p if unspecified.
+
+             Multiple _t_r_a_n_s_p_o_r_t___m_o_d_u_l_e and _t_r_a_n_s_p_o_r_t___c_o_n_f_i_g options are
+             allowed. The order of these is significant in this case (and only
+             in this case), a _t_r_a_n_s_p_o_r_t___m_o_d_u_l_e being paired with the first
+             _t_r_a_n_s_p_o_r_t___c_o_n_f_i_g following it in the options list, or the default
+             value for trailing modules. Transport starts will be attempted
+             with each of the modules in order until one establishes a
+             connection within the corresponding timeout (see below) or all
+             fail.
+
+           _{_t_r_a_n_s_p_o_r_t___c_o_n_f_i_g_, _t_e_r_m_(_)_}:
+
+
+           _{_t_r_a_n_s_p_o_r_t___c_o_n_f_i_g_, _t_e_r_m_(_)_, UUnnssiiggnneedd3322(())}:
+             A term passed as the third argument to the ssttaarrtt//33 function of
+             the relevant _t_r_a_n_s_p_o_r_t___m_o_d_u_l_e in order to start a transport
+             process. Defaults to the empty list if unspecified.
+
+             The 3-tuple form additionally specifies an interval, in
+             milliseconds, after which a started transport process should be
+             terminated if it has not yet established a connection. For
+             example, the following options on a connecting transport request
+             a connection with one peer over SCTP or another (typically the
+             same) over TCP.
+
+           {transport_module, diameter_sctp}
+           {transport_config, SctpOpts, 5000}
+           {transport_module, diameter_tcp}
+           {transport_config, TcpOpts}
+
+
+             To listen on both SCTP and TCP, define one transport for each.
+
+           _{_a_p_p_l_i_c_a_t_i_o_n_s_, _[aapppplliiccaattiioonn__aalliiaass(())]}:
+             The list of Diameter applications to which the transport should
+             be restricted. Defaults to all applications configured on the
+             service in question. Applications not configured on the service
+             in question are ignored.
+
+           _{_c_a_p_a_b_i_l_i_t_i_e_s_, _[ccaappaabbiilliittyy(())]}:
+             AVP's used to construct outgoing CER/CEA messages. Values take
+             precedence over any specified on the service in question.
+
+             Specifying a capability as a transport option may be particularly
+             appropriate for Inband-Security-Id, in case TLS is desired over
+             TCP as implemented by ddiiaammeetteerr__ttccpp((33)).
+
+           _{_c_a_p_a_b_i_l_i_t_i_e_s___c_b_, eevvaalluuaabbllee(())}:
+             A callback invoked upon reception of CER/CEA during capabilities
+             exchange in order to ask whether or not the connection should be
+             accepted. Applied to the relevant ttrraannssppoorrtt__rreeff(()) and the
+             _#_d_i_a_m_e_t_e_r___c_a_p_s_{_} record of the connection. Returning _o_k accepts
+             the connection. Returning _i_n_t_e_g_e_r_(_) causes an incoming CER to be
+             answered with the specified Result-Code. Returning _d_i_s_c_a_r_d causes
+             an incoming CER to be discarded. Returning _u_n_k_n_o_w_n is equivalent
+             to returning _3_0_1_0, DIAMETER_UNKNOWN_PEER. Returning anything but
+             _o_k or a 2xxx series result code causes the transport connection
+             to be broken.
+
+             Multiple _c_a_p_a_b_i_l_i_t_i_e_s___c_b options can be specified, in which case
+             the corresponding callbacks are applied until either all return
+             _o_k or one does not.
+
+           _{_w_a_t_c_h_d_o_g___t_i_m_e_r_, _T_w_I_n_i_t_}:
+
+
+           TwInit = UUnnssiiggnneedd3322(())
+                  | {M,F,A}
+
+
+             The RFC 3539 watchdog timer. An integer value is interpreted as
+             the RFC's TwInit in milliseconds, a jitter of +/- 2 seconds being
+             added at each rearming of the timer to compute the RFC's Tw. An
+             MFA is expected to return the RFC's Tw directly, with jitter
+             applied, allowing the jitter calculation to be performed by the
+             callback.
+
+             An integer value must be at least 6000 as required by RFC 3539.
+             Defaults to 30000 if unspecified.
+
+           _{_r_e_c_o_n_n_e_c_t___t_i_m_e_r_, _T_c_}:
+
+
+           Tc = UUnnssiiggnneedd3322(())
+
+
+             For a connecting transport, the RFC 3588 Tc timer, in
+             milliseconds. Note that this timer determines the frequency with
+             which a transport will attempt to establish a connection with its
+             peer only _b_e_f_o_r_e an initial connection is established: once there
+             is an initial connection it's watchdog_timer that determines the
+             frequency of reconnection attempts, as required by RFC 3539.
+
+             For a listening transport, the timer specifies the time after
+             which a previously connected peer will be forgotten: a connection
+             after this time is regarded as an initial connection rather than
+             a reestablishment, causing the RFC 3539 state machine to pass to
+             state OPEN rather than REOPEN. Note that these semantics are not
+             goverened by the RFC and that a listening transport's
+             _r_e_c_o_n_n_e_c_t___t_i_m_e_r should be greater than its peer's Tw plus jitter.
+
+             Defaults to 30000 for a connecting transport and 60000 for a
+             listening transport.
+
+           Unrecognized options are silently ignored but are returned
+           unmodified by sseerrvviiccee__iinnffoo//22 and can be referred to in predicate
+           functions passed to rreemmoovvee__ttrraannssppoorrtt//22.
+
+         _t_r_a_n_s_p_o_r_t___r_e_f_(_) _= _r_e_f_e_r_e_n_c_e_(_):
+           An reference returned by aadddd__ttrraannssppoorrtt//22 that identifies the
+           configuration.
+
+EEXXPPOORRTTSS
+       aadddd__ttrraannssppoorrtt((SSvvccNNaammee,, {{ccoonnnneecctt||lliisstteenn,, [[OOpptt]]}})) -->> {{ookk,, RReeff}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+                 Opt = ttrraannssppoorrtt__oopptt(())
+                 Ref = ttrraannssppoorrtt__rreeff(())
+                 Reason = term()
+
+              Add transport capability to a service.
+
+              The service will start transport processes as required in order
+              to establish a connection with the peer, either by connecting to
+              the peer (_c_o_n_n_e_c_t) or by accepting incoming connection requests
+              (_l_i_s_t_e_n). A connecting transport establishes transport
+              connections with at most one peer, an listening transport
+              potentially with many.
+
+              The diameter application takes responsibility for exchanging
+              CER/CEA with the peer. Upon successful completion of
+              capabilities exchange the service calls each relevant
+              application module's ppeeeerr__uupp//33 callback after which the caller
+              can exchange Diameter messages with the peer over the transport.
+              In addition to CER/CEA, the service takes responsibility for the
+              handling of DWR/DWA and required by RFC 3539, as well as for
+              DPR/DPA.
+
+              The returned reference uniquely identifies the transport within
+              the scope of the service. Note that the function returns before
+              a transport connection has been established.
+
+          NNoottee::
+              It is not an error to add a transport to a service that has not
+              yet been configured: a service can be started after configuring
+              its transports.
+
+
+       ccaallll((SSvvccNNaammee,, AApppp,, RReeqquueesstt,, [[OOpptt]])) -->> AAnnsswweerr || ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+                 App = aapppplliiccaattiioonn__aalliiaass(())
+                 Request = ddiiaammeetteerr__aapppp::mmeessssaaggee(())
+                 Answer = term()
+                 Opt = ccaallll__oopptt(())
+
+              Send a Diameter request message.
+
+              _A_p_p specifies the Diameter application in which the request is
+              defined and callbacks to the corresponding callback module will
+              follow as described below and in ddiiaammeetteerr__aapppp((33)). Unless the
+              _d_e_t_a_c_h option is specified, the call returns either when an
+              answer message is received from the peer or an error occurs. In
+              the answer case, the return value is as returned by a
+              hhaannddllee__aannsswweerr//44 callback. In the error case, whether or not the
+              error is returned directly by diameter or from a hhaannddllee__eerrrroorr//44
+              callback depends on whether or not the outgoing request is
+              successfully encoded for transmission to the peer, the cases
+              being documented below.
+
+              If there are no suitable peers, or if ppiicckk__ppeeeerr//44 rejects them
+              by returning _f_a_l_s_e, then _{_e_r_r_o_r_,_n_o___c_o_n_n_e_c_t_i_o_n_} is returned.
+              Otherwise ppiicckk__ppeeeerr//44 is followed by a pprreeppaarree__rreeqquueesstt//33
+              callback, the message is encoded and then sent.
+
+              There are several error cases which may prevent an answer from
+              being received and passed to a hhaannddllee__aannsswweerr//44 callback:
+
+                * If the initial encode of the outgoing request fails, then
+                  the request process fails and _{_e_r_r_o_r_,_e_n_c_o_d_e_} is returned.
+
+                * If the request is successfully encoded and sent but the
+                  answer times out then a hhaannddllee__eerrrroorr//44 callback takes place
+                  with _R_e_a_s_o_n _= _t_i_m_e_o_u_t.
+
+                * If the request is successfully encoded and sent but the
+                  service in question is stopped before an answer is received
+                  then a hhaannddllee__eerrrroorr//44 callback takes place with _R_e_a_s_o_n _=
+                  _c_a_n_c_e_l.
+
+                * If the transport connection with the peer goes down after
+                  the request has been sent but before an answer has been
+                  received then an attempt is made to resend the request to an
+                  alternate peer. If no such peer is available, or if the
+                  subsequent ppiicckk__ppeeeerr//44 callback rejects the candidates, then
+                  a hhaannddllee__eerrrroorr//44 callback takes place with _R_e_a_s_o_n _=
+                  _f_a_i_l_o_v_e_r. If a peer is selected then a pprreeppaarree__rreettrraannssmmiitt//33
+                  callback takes place, after which the semantics are the same
+                  as following an initial  pprreeppaarree__rreeqquueesstt//33 callback.
+
+                * If an encode error takes place during retransmission then
+                  the request process fails and _{_e_r_r_o_r_,_f_a_i_l_u_r_e_} is returned.
+
+                * If an application callback made in processing the request
+                  fails (pick_peer, prepare_request, prepare_retransmit,
+                  handle_answer or handle_error) then either _{_e_r_r_o_r_,_e_n_c_o_d_e_} or
+                  _{_e_r_r_o_r_,_f_a_i_l_u_r_e_} is returned depending on whether or not
+                  there has been an attempt to send the request over the
+                  transport.
+
+              Note that _{_e_r_r_o_r_,_e_n_c_o_d_e_} is the only return value which
+              guarantees that the request has _n_o_t been sent over the transport
+              connection.
+
+       oorriiggiinn__ssttaattee__iidd(()) -->> UUnnssiiggnneedd3322(())
+
+              Return a reasonable value for use as Origin-State-Id in outgoing
+              messages.
+
+              The value returned is the number of seconds since
+              19680120T031408Z, the first value that can be encoded as a
+              Diameter TTiimmee(()), at the time the diameter application was
+              started.
+
+       rreemmoovvee__ttrraannssppoorrtt((SSvvccNNaammee,, PPrreedd)) -->> ookk
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+                 Pred = Fun | MFA | ttrraannssppoorrtt__rreeff(()) | list() | true | false
+
+                 Fun = fun((ttrraannssppoorrtt__rreeff(()), connect|listen, list()) ->
+                 boolean())
+                  | fun((ttrraannssppoorrtt__rreeff(()), list()) -> boolean())
+                  | fun((list()) -> boolean())
+                 MFA = {atom(), atom(), list()}
+
+              Remove previously added transports.
+
+              _P_r_e_d determines which transports to remove. An arity-3-valued
+              _P_r_e_d removes all transports for which _P_r_e_d_(_R_e_f_, _T_y_p_e_, _O_p_t_s_)
+              returns _t_r_u_e, where _T_y_p_e and _O_p_t_s are as passed to
+              aadddd__ttrraannssppoorrtt//22 and _R_e_f is as returned by it. The remaining
+              forms are equivalent to an arity-3 fun as follows.
+
+              Pred = fun(transport_ref(), list()):  fun(Ref, _, Opts) -> Pred(Ref, Opts) end
+              Pred = fun(list()):                   fun(_, _, Opts) -> Pred(Opts) end
+              Pred = transport_ref():               fun(Ref, _, _)  -> Pred == Ref end
+              Pred = list():                        fun(_, _, Opts) -> [] == Pred -- Opts end
+              Pred = true:                          fun(_, _, _) -> true end
+              Pred = false:                         fun(_, _, _) -> false end
+              Pred = {M,F,A}:  fun(Ref, Type, Opts) -> apply(M, F, [Ref, Type, Opts | A]) end
+
+
+              Removing a transport causes all associated transport connections
+              to be broken. A DPR message with Disconnect-Cause
+              _D_O___N_O_T___W_A_N_T___T_O___T_A_L_K___T_O___Y_O_U will be sent to each connected peer
+              before disassociating the transport configuration from the
+              service and terminating the transport upon reception of DPA or
+              timeout.
+
+       sseerrvviiccee__iinnffoo((SSvvccNNaammee,, IInnffoo)) -->> tteerrmm(())
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+                 Info = Item | [Info]
+                 Item = atom()
+
+              Return information about a started service. _I_t_e_m can be one of
+              the following.
+
+                _'_O_r_i_g_i_n_-_H_o_s_t_':
+
+
+                _'_O_r_i_g_i_n_-_R_e_a_l_m_':
+
+
+                _'_V_e_n_d_o_r_-_I_d_':
+
+
+                _'_P_r_o_d_u_c_t_-_N_a_m_e_':
+
+
+                _'_O_r_i_g_i_n_-_S_t_a_t_e_-_I_d_':
+
+
+                _'_H_o_s_t_-_I_P_-_A_d_d_r_e_s_s_':
+
+
+                _'_S_u_p_p_o_r_t_e_d_-_V_e_n_d_o_r_':
+
+
+                _'_A_u_t_h_-_A_p_p_l_i_c_a_t_i_o_n_-_I_d_':
+
+
+                _'_I_n_b_a_n_d_-_S_e_c_u_r_i_t_y_-_I_d_':
+
+
+                _'_A_c_c_t_-_A_p_p_l_i_c_a_t_i_o_n_-_I_d_':
+
+
+                _'_V_e_n_d_o_r_-_S_p_e_c_i_f_i_c_-_A_p_p_l_i_c_a_t_i_o_n_-_I_d_':
+
+
+                _'_F_i_r_m_w_a_r_e_-_R_e_v_i_s_i_o_n_':
+                  Return a capability value as configured with
+                  ssttaarrtt__sseerrvviiccee//22.
+
+                _a_p_p_l_i_c_a_t_i_o_n_s:
+                  Return the list of applications as configured with
+                  ssttaarrtt__sseerrvviiccee//22.
+
+                _c_a_p_a_b_i_l_i_t_i_e_s:
+                  Return a tagged list of all capabilities values as
+                  configured with ssttaarrtt__sseerrvviiccee//22.
+
+                _t_r_a_n_s_p_o_r_t:
+                  Return a list containing one entry for each of the service's
+                  transport as configured with aadddd__ttrraannssppoorrtt//22. Each entry is
+                  a tagged list containing both configuration and information
+                  about established peer connections. An example return value
+                  with for a client service with Origin-Host
+                  "client.example.com" configured with a single transport
+                  connected to "server.example.com" might look as follows.
+
+                [[{ref,#Ref<0.0.0.93>},
+                  {type,connect},
+                  {options,[{transport_module,diameter_tcp},
+                            {transport_config,[{ip,{127,0,0,1}},
+                                               {raddr,{127,0,0,1}},
+                                               {rport,3868},
+                                               {reuseaddr,true}]}]},
+                  {watchdog,{<0.66.0>,{1346,171491,996448},okay}},
+                  {peer,{<0.67.0>,{1346,171491,999906}}},
+                  {apps,[{0,common}]},
+                  {caps,[{origin_host,{"client.example.com","server.example.com"}},
+                         {origin_realm,{"example.com","example.com"}},
+                         {host_ip_address,{[{127,0,0,1}],[{127,0,0,1}]}},
+                         {vendor_id,{0,193}},
+                         {product_name,{"Client","Server"}},
+                         {origin_state_id,{[],[]}},
+                         {supported_vendor_id,{[],[]}},
+                         {auth_application_id,{[0],[0]}},
+                         {inband_security_id,{[],[0]}},
+                         {acct_application_id,{[],[]}},
+                         {vendor_specific_application_id,{[],[]}},
+                         {firmware_revision,{[],[]}},
+                         {avp,{[],[]}}]},
+                  {port,[{owner,<0.69.0>},
+                         {module,diameter_tcp},
+                         {socket,{{127,0,0,1},48758}},
+                         {peer,{{127,0,0,1},3868}},
+                         {statistics,[{recv_oct,656},
+                                      {recv_cnt,6},
+                                      {recv_max,148},
+                                      {recv_avg,109},
+                                      {recv_dvi,19},
+                                      {send_oct,836},
+                                      {send_cnt,6},
+                                      {send_max,184},
+                                      {send_avg,139},
+                                      {send_pend,0}]}]},
+                  {statistics,[{{{0,258,0},recv},3},
+                               {{{0,258,1},send},3},
+                               {{{0,257,0},recv},1},
+                               {{{0,257,1},send},1},
+                               {{{0,258,0},recv,{'Result-Code',2001}},3},
+                               {{{0,280,1},recv},2},
+                               {{{0,280,0},send},2}]}]]
+
+
+                  Here _r_e_f is a ttrraannssppoorrtt__rreeff(()) and _o_p_t_i_o_n_s the corresponding
+                  ttrraannssppoorrtt__oopptt(()) list passed to aadddd__ttrraannssppoorrtt//22. The _w_a_t_c_h_d_o_g
+                  entry shows the state of a connection's RFC 3539 watchdog
+                  state machine. The _p_e_e_r entry identifies the
+                  ddiiaammeetteerr__aapppp::ppeeeerr__rreeff(()) for which there will have been
+                  ppeeeerr__uupp callbacks for the Diameter applications identified
+                  by the _a_p_p_s entry, _c_o_m_m_o_n being the aapppplliiccaattiioonn__aalliiaass(()). The
+                  _c_a_p_s entry identifies the capabilities sent by the local
+                  node and received from the peer during capabilities
+                  exchange. The _p_o_r_t entry displays socket-level information
+                  about the transport connection. The _s_t_a_t_i_s_t_i_c_s entry
+                  presents Diameter-level counters, an entry like
+                  _{_{_{_0_,_2_8_0_,_1_}_,_r_e_c_v_}_,_2_} saying that the client has received 2
+                  DWR messages: _{_0_,_2_8_0_,_1_} _= _{_A_p_p_l_i_c_a_t_i_o_n___I_d_, _C_o_m_m_a_n_d___C_o_d_e_,
+                  _R___F_l_a_g_}.
+
+                  Note that _w_a_t_c_h_d_o_g, _p_e_e_r, _a_p_p_s, _c_a_p_s and _p_o_r_t entries depend
+                  on connectivity with the peer and may not be present. Note
+                  also that the _s_t_a_t_i_s_t_i_c_s entry presents values acuumulated
+                  during the lifetime of the transport configuration.
+
+                  A listening transport presents its information slightly
+                  differently since there may be multiple accepted connections
+                  for the same ttrraannssppoorrtt__rreeff(()). The _t_r_a_n_s_p_o_r_t info returned by
+                  a server with a single client connection might look as
+                  follows.
+
+                [[{ref,#Ref<0.0.0.61>},
+                  {type,listen},
+                  {options,[{transport_module,diameter_tcp},
+                            {transport_config,[{reuseaddr,true},
+                                               {ip,{127,0,0,1}},
+                                               {port,3868}]}]},
+                  {accept,[[{watchdog,{<0.56.0>,{1346,171481,226895},okay}},
+                            {peer,{<0.58.0>,{1346,171491,999511}}},
+                            {apps,[{0,common}]},
+                            {caps,[{origin_host,{"server.example.com","client.example.com"}},
+                                   {origin_realm,{"example.com","example.com"}},
+                                   {host_ip_address,{[{127,0,0,1}],[{127,0,0,1}]}},
+                                   {vendor_id,{193,0}},
+                                   {product_name,{"Server","Client"}},
+                                   {origin_state_id,{[],[]}},
+                                   {supported_vendor_id,{[],[]}},
+                                   {auth_application_id,{[0],[0]}},
+                                   {inband_security_id,{[],[]}},
+                                   {acct_application_id,{[],[]}},
+                                   {vendor_specific_application_id,{[],[]}},
+                                   {firmware_revision,{[],[]}},
+                                   {avp,{[],[]}}]},
+                            {port,[{owner,<0.62.0>},
+                                   {module,diameter_tcp},
+                                   {socket,{{127,0,0,1},3868}},
+                                   {peer,{{127,0,0,1},48758}},
+                                   {statistics,[{recv_oct,1576},
+                                                {recv_cnt,16},
+                                                {recv_max,184},
+                                                {recv_avg,98},
+                                                {recv_dvi,26},
+                                                {send_oct,1396},
+                                                {send_cnt,16},
+                                                {send_max,148},
+                                                {send_avg,87},
+                                                {send_pend,0}]}]}],
+                           [{watchdog,{<0.72.0>,{1346,171491,998404},initial}}]]},
+                  {statistics,[{{{0,280,0},recv},7},
+                               {{{0,280,1},send},7},
+                               {{{0,258,0},send,{'Result-Code',2001}},3},
+                               {{{0,258,1},recv},3},
+                               {{{0,258,0},send},3},
+                               {{{0,280,1},recv},5},
+                               {{{0,280,0},send},5},
+                               {{{0,257,1},recv},1},
+                               {{{0,257,0},send},1}]}]]
+
+
+                  The information presented here is as in the _c_o_n_n_e_c_t case
+                  except that the client connections are grouped under an
+                  _a_c_c_e_p_t tuple.
+
+                _c_o_n_n_e_c_t_i_o_n_s:
+                  Return a list containing one entry for every established
+                  transport connection whose watchdog state machine is not in
+                  the _d_o_w_n state. This is a flat view of _t_r_a_n_s_p_o_r_t info which
+                  lists only active connections and for which Diameter-level
+                  statistics are accumulated only for the lifetime of the
+                  transport connection. A return value for the server above
+                  might look as follows.
+
+                [[{ref,#Ref<0.0.0.61>},
+                  {type,accept},
+                  {options,[{transport_module,diameter_tcp},
+                            {transport_config,[{reuseaddr,true},
+                                               {ip,{127,0,0,1}},
+                                               {port,3868}]}]},
+                  {watchdog,{<0.56.0>,{1346,171481,226895},okay}},
+                  {peer,{<0.58.0>,{1346,171491,999511}}},
+                  {apps,[{0,common}]},
+                  {caps,[{origin_host,{"server.example.com","client.example.com"}},
+                         {origin_realm,{"example.com","example.com"}},
+                         {host_ip_address,{[{127,0,0,1}],[{127,0,0,1}]}},
+                         {vendor_id,{193,0}},
+                         {product_name,{"Server","Client"}},
+                         {origin_state_id,{[],[]}},
+                         {supported_vendor_id,{[],[]}},
+                         {auth_application_id,{[0],[0]}},
+                         {inband_security_id,{[],[]}},
+                         {acct_application_id,{[],[]}},
+                         {vendor_specific_application_id,{[],[]}},
+                         {firmware_revision,{[],[]}},
+                         {avp,{[],[]}}]},
+                  {port,[{owner,<0.62.0>},
+                         {module,diameter_tcp},
+                         {socket,{{127,0,0,1},3868}},
+                         {peer,{{127,0,0,1},48758}},
+                         {statistics,[{recv_oct,10124},
+                                      {recv_cnt,132},
+                                      {recv_max,184},
+                                      {recv_avg,76},
+                                      {recv_dvi,9},
+                                      {send_oct,10016},
+                                      {send_cnt,132},
+                                      {send_max,148},
+                                      {send_avg,75},
+                                      {send_pend,0}]}]},
+                  {statistics,[{{{0,280,0},recv},62},
+                               {{{0,280,1},send},62},
+                               {{{0,258,0},send,{'Result-Code',2001}},3},
+                               {{{0,258,1},recv},3},
+                               {{{0,258,0},send},3},
+                               {{{0,280,1},recv},66},
+                               {{{0,280,0},send},66},
+                               {{{0,257,1},recv},1},
+                               {{{0,257,0},send},1}]}]]
+
+
+                  Note that there may be multiple entries with the same _r_e_f,
+                  in contrast to _t_r_a_n_s_p_o_r_t info.
+
+                _s_t_a_t_i_s_t_i_c_s:
+                  Return a _{_{_C_o_u_n_t_e_r_, _R_e_f_}_, _n_o_n___n_e_g___i_n_t_e_g_e_r_(_)_} list of counter
+                  values. _R_e_f can be either a ttrraannssppoorrtt__rreeff(()) or a
+                  ddiiaammeetteerr__aapppp::ppeeeerr__rreeff(()). Entries for the latter are folded
+                  into corresponding entries for the former as peer
+                  connections go down. Entries for both are removed at
+                  rreemmoovvee__ttrraannssppoorrtt//22. The Diameter-level statistics returned
+                  by _t_r_a_n_s_p_o_r_t and _c_o_n_n_e_c_t_i_o_n_s info are based upon these
+                  entries.
+
+              Requesting info for an unknown service causes _u_n_d_e_f_i_n_e_d to be
+              returned. Requesting a list of items causes a tagged list to be
+              returned.
+
+       sseerrvviicceess(()) -->> [[SSvvccNNaammee]]
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+
+              Return the list of started services.
+
+       sseessssiioonn__iidd((IIddeenntt)) -->> OOcctteettSSttrriinngg(())
+
+              Types:
+
+                 Ident = DDiiaammeetteerrIIddeennttiittyy(())
+
+              Return a value for a Session-Id AVP.
+
+              The value has the form required by section 8.8 of RFC 3588.
+              Ident should be the Origin-Host of the peer from which the
+              message containing the returned value will be sent.
+
+       ssttaarrtt(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Start the diameter application.
+
+              The diameter application must be started before starting a
+              service. In a production system this is typically accomplished
+              by a boot file, not by calling _s_t_a_r_t_/_0 explicitly.
+
+       ssttaarrtt__sseerrvviiccee((SSvvccNNaammee,, OOppttiioonnss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+                 Options = [sseerrvviiccee__oopptt(())]
+                 Reason = term()
+
+              Start a diameter service.
+
+              A service defines a locally-implemented Diameter node,
+              specifying the capabilities to be advertised during capabilities
+              exchange. Transports are added to a service using
+              aadddd__ttrraannssppoorrtt//22.
+
+          NNoottee::
+              A transport can both override its service's capabilities and
+              restrict its supported Diameter applications so "service =
+              Diameter node as identified by Origin-Host" is not necessarily
+              the case.
+
+
+       ssttoopp(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Stop the diameter application.
+
+       ssttoopp__sseerrvviiccee((SSvvccNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+                 Reason = term()
+
+              Stop a diameter service.
+
+              Stopping a service causes all associated transport connections
+              to be broken. A DPR message with be sent as in the case of
+              rreemmoovvee__ttrraannssppoorrtt//22.
+
+          NNoottee::
+              Stopping a transport does not remove any associated transports:
+              rreemmoovvee__ttrraannssppoorrtt//22 must be called to remove transport
+              configuration.
+
+
+       ssuubbssccrriibbee((SSvvccNNaammee)) -->> ttrruuee
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+
+              Subscribe to sseerrvviiccee__eevveenntt(()) messages from a service.
+
+              It is not an error to subscribe to events from a service that
+              does not yet exist. Doing so before adding transports is
+              required to guarantee the reception of all related events.
+
+       uunnssuubbssccrriibbee((SSvvccNNaammee)) -->> ttrruuee
+
+              Types:
+
+                 SvcName = sseerrvviiccee__nnaammee(())
+
+              Unsubscribe to event messages from a service.
+
+SSEEEE AALLSSOO
+       ddiiaammeetteerr__aapppp((33)), ddiiaammeetteerr__ttrraannssppoorrtt((33)), ddiiaammeetteerr__ddiicctt((44))
+
+
+
+Ericsson AB                      diameter 1.2                      diameter(3)

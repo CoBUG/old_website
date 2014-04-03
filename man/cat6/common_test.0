@@ -1,0 +1,472 @@
+common_test(3)             Erlang Module Definition             common_test(3)
+
+
+
+NNAAMMEE
+       common_test - A framework for automated testing of arbitrary target
+       nodes
+
+DDEESSCCRRIIPPTTIIOONN
+       The _C_o_m_m_o_n _T_e_s_t framework is an environment for implementing and
+       performing automatic and semi-automatic execution of test cases. Common
+       Test uses the OTP Test Server as engine for test case execution and
+       logging.
+
+       In brief, Common Test supports:
+
+         * Automated execution of test suites (sets of test cases).
+
+         * Logging of the events during execution.
+
+         * HTML presentation of test suite results.
+
+         * HTML presentation of test suite code.
+
+         * Support functions for test suite authors.
+
+         * Step by step execution of test cases.
+
+       The following sections describe the mandatory and optional test suite
+       functions Common Test will call during test execution. For more details
+       see CCoommmmoonn TTeesstt UUsseerr''ss GGuuiiddee..
+
+TTEESSTT CCAASSEE CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following functions define the callback interface for a test suite.
+
+EEXXPPOORRTTSS
+       MMoodduullee::aallll(()) -->> TTeessttss || {{sskkiipp,,RReeaassoonn}}
+
+              Types:
+
+                 Tests = [TestCase | {group,GroupName} |
+                 {group,GroupName,Properties} |
+                 {group,GroupName,Properties,SubGroups}]
+                 TestCase = atom()
+                 GroupName = atom()
+                 Properties = [parallel | sequence | Shuffle | {RepeatType,N}]
+                 | default
+                 SubGroups = [{GroupName,Properties} |
+                 {GroupName,Properties,SubGroups}]
+                 Shuffle = shuffle | {shuffle,Seed}
+                 Seed = {integer(),integer(),integer()}
+                 RepeatType = repeat | repeat_until_all_ok |
+                 repeat_until_all_fail | repeat_until_any_ok |
+                 repeat_until_any_fail
+                 N = integer() | forever
+                 Reason = term()
+
+              MANDATORY
+
+              This function must return the list of all test cases and test
+              case groups in the test suite module that are to be executed.
+              This list also specifies the order the cases and groups will be
+              executed by Common Test. A test case is represented by an atom,
+              the name of the test case function. A test case group is
+              represented by a _g_r_o_u_p tuple, where _G_r_o_u_p_N_a_m_e, an atom, is the
+              name of the group (defined in ggrroouuppss//00). Execution properties
+              for groups may also be specified, both for a top level group and
+              for any of its sub-groups. Group execution properties specified
+              here, will override properties in the group definition (see
+              ggrroouuppss//00). (With value _d_e_f_a_u_l_t, the group definition properties
+              will be used).
+
+              If _{_s_k_i_p_,_R_e_a_s_o_n_} is returned, all test cases in the module will
+              be skipped, and the _R_e_a_s_o_n will be printed on the HTML result
+              page.
+
+              For details on groups, see TTeesstt ccaassee ggrroouuppss in the User's Guide.
+
+       MMoodduullee::ggrroouuppss(()) -->> GGrroouuppDDeeffss
+
+              Types:
+
+                 GroupDefs = [Group]
+                 Group = {GroupName,Properties,GroupsAndTestCases}
+                 GroupName = atom()
+                 Properties = [parallel | sequence | Shuffle | {RepeatType,N}]
+                 GroupsAndTestCases = [Group | {group,GroupName} | TestCase]
+                 TestCase = atom()
+                 Shuffle = shuffle | {shuffle,Seed}
+                 Seed = {integer(),integer(),integer()}
+                 RepeatType = repeat | repeat_until_all_ok |
+                 repeat_until_all_fail | repeat_until_any_ok |
+                 repeat_until_any_fail
+                 N = integer() | forever
+
+              OPTIONAL
+
+              Function for defining test case groups. Please see TTeesstt ccaassee
+              ggrroouuppss in the User's Guide for details.
+
+       MMoodduullee::ssuuiittee(()) -->> [[IInnffoo]]
+
+              Types:
+
+                  Info = {timetrap,Time} | {require,Required} |
+                 {require,Name,Required} | {userdata,UserData} |
+                 {silent_connections,Conns} | {stylesheet,CSSFile} |
+                 {ct_hooks, CTHs}
+                  Time = TimeVal | TimeFunc
+                  TimeVal = MilliSec | {seconds,integer()} |
+                 {minutes,integer()} | {hours,integer()}
+                  TimeFunc = {Mod,Func,Args} | Fun
+                  MilliSec = integer()
+                  Mod = atom()
+                  Func = atom()
+                  Args = list()
+                  Fun = fun()
+                  Required = Key | {Key,SubKeys} | {Key,SubKey} |
+                 {Key,SubKey,SubKeys}
+                  Key = atom()
+                  SubKeys = SubKey | [SubKey]
+                  SubKey = atom()
+                  Name = atom()
+                  UserData = term()
+                  Conns = [atom()]
+                  CSSFile = string()
+                  CTHs = [CTHModule | {CTHModule, CTHInitArgs} | {CTHModule,
+                 CTHInitArgs, CTHPriority}]
+                  CTHModule = atom()
+                  CTHInitArgs = term()
+
+              OPTIONAL
+
+              This is the test suite info function. It is supposed to return a
+              list of tagged tuples that specify various properties related to
+              the execution of this test suite (common for all test cases in
+              the suite).
+
+              The _t_i_m_e_t_r_a_p tag sets the maximum time each test case is allowed
+              to execute (including iinniitt__ppeerr__tteessttccaassee//22 and
+              eenndd__ppeerr__tteessttccaassee//22). If the timetrap time is exceeded, the test
+              case fails with reason _t_i_m_e_t_r_a_p___t_i_m_e_o_u_t. A _T_i_m_e_F_u_n_c function can
+              be used to set a new timetrap by returning a _T_i_m_e_V_a_l. It may
+              also be used to trigger a timetrap timeout by, at some point,
+              returning a value other than a _T_i_m_e_V_a_l. (See the UUsseerr''ss GGuuiiddee
+              for details).
+
+              The _r_e_q_u_i_r_e tag specifies configuration variables that are
+              required by test cases (and/or configuration functions) in the
+              suite. If the required configuration variables are not found in
+              any of the configuration files, all test cases are skipped. For
+              more information about the 'require' functionality, see the
+              reference manual for the function cctt::rreeqquuiirree//11//22.
+
+              With _u_s_e_r_d_a_t_a, it is possible for the user to specify arbitrary
+              test suite related information which can be read by calling
+              cctt::uusseerrddaattaa//22.
+
+              The _c_t___h_o_o_k_s tag specifies which CCoommmmoonn TTeesstt HHooookkss are to be run
+              together with this suite.
+
+              Other tuples than the ones defined will simply be ignored.
+
+              For more information about the test suite info function, see
+              TTeesstt ssuuiittee iinnffoo ffuunnccttiioonn in the User's Guide.
+
+       MMoodduullee::iinniitt__ppeerr__ssuuiittee((CCoonnffiigg)) -->> NNeewwCCoonnffiigg || {{sskkiipp,,RReeaassoonn}} ||
+       {{sskkiipp__aanndd__ssaavvee,,RReeaassoonn,,SSaavveeCCoonnffiigg}}
+
+              Types:
+
+                  Config = NewConfig = SaveConfig = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+                  Reason = term()
+
+              OPTIONAL
+
+              This configuration function is called as the first function in
+              the suite. It typically contains initializations which are
+              common for all test cases in the suite, and which shall only be
+              done once. The _C_o_n_f_i_g parameter is the configuration data which
+              can be modified here. Whatever is returned from this function is
+              given as _C_o_n_f_i_g to all configuration functions and test cases in
+              the suite. If _{_s_k_i_p_,_R_e_a_s_o_n_} is returned, all test cases in the
+              suite will be skipped and _R_e_a_s_o_n printed in the overview log for
+              the suite.
+
+              For information on _s_a_v_e___c_o_n_f_i_g and _s_k_i_p___a_n_d___s_a_v_e, please see
+              DDeeppeennddeenncciieess bbeettwweeeenn TTeesstt CCaasseess aanndd SSuuiitteess in the User's Guide.
+
+       MMoodduullee::eenndd__ppeerr__ssuuiittee((CCoonnffiigg)) -->> vvooiidd(()) || {{ssaavvee__ccoonnffiigg,,SSaavveeCCoonnffiigg}}
+
+              Types:
+
+                  Config = SaveConfig = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+
+              OPTIONAL
+
+              This function is called as the last test case in the suite. It
+              is meant to be used for cleaning up after iinniitt__ppeerr__ssuuiittee//11. For
+              information on _s_a_v_e___c_o_n_f_i_g, please see DDeeppeennddeenncciieess bbeettwweeeenn TTeesstt
+              CCaasseess aanndd SSuuiitteess in the User's Guide.
+
+       MMoodduullee::ggrroouupp((GGrroouuppNNaammee)) -->> [[IInnffoo]]
+
+              Types:
+
+                  Info = {timetrap,Time} | {require,Required} |
+                 {require,Name,Required} | {userdata,UserData} |
+                 {silent_connections,Conns} | {stylesheet,CSSFile} |
+                 {ct_hooks, CTHs}
+                  Time = TimeVal | TimeFunc
+                  TimeVal = MilliSec | {seconds,integer()} |
+                 {minutes,integer()} | {hours,integer()}
+                  TimeFunc = {Mod,Func,Args} | Fun
+                  MilliSec = integer()
+                  Mod = atom()
+                  Func = atom()
+                  Args = list()
+                  Fun = fun()
+                  Required = Key | {Key,SubKeys} | {Key,Subkey} |
+                 {Key,Subkey,SubKeys}
+                  Key = atom()
+                  SubKeys = SubKey | [SubKey]
+                  SubKey = atom()
+                  Name = atom()
+                  UserData = term()
+                  Conns = [atom()]
+                  CSSFile = string()
+                  CTHs = [CTHModule | {CTHModule, CTHInitArgs} | {CTHModule,
+                 CTHInitArgs, CTHPriority}]
+                  CTHModule = atom()
+                  CTHInitArgs = term()
+
+              OPTIONAL
+
+              This is the test case group info function. It is supposed to
+              return a list of tagged tuples that specify various properties
+              related to the execution of a test case group (i.e. its test
+              cases and sub-groups). Properties set by ggrroouupp//11 override
+              properties with the same key that have been previously set by
+              ssuuiittee//00.
+
+              The _t_i_m_e_t_r_a_p tag sets the maximum time each test case is allowed
+              to execute (including iinniitt__ppeerr__tteessttccaassee//22 and
+              eenndd__ppeerr__tteessttccaassee//22). If the timetrap time is exceeded, the test
+              case fails with reason _t_i_m_e_t_r_a_p___t_i_m_e_o_u_t. A _T_i_m_e_F_u_n_c function can
+              be used to set a new timetrap by returning a _T_i_m_e_V_a_l. It may
+              also be used to trigger a timetrap timeout by, at some point,
+              returning a value other than a _T_i_m_e_V_a_l. (See the UUsseerr''ss GGuuiiddee
+              for details).
+
+              The _r_e_q_u_i_r_e tag specifies configuration variables that are
+              required by test cases (and/or configuration functions) in the
+              suite. If the required configuration variables are not found in
+              any of the configuration files, all test cases in this group are
+              skipped. For more information about the 'require' functionality,
+              see the reference manual for the function cctt::rreeqquuiirree//11//22.
+
+              With _u_s_e_r_d_a_t_a, it is possible for the user to specify arbitrary
+              test case group related information which can be read by calling
+              cctt::uusseerrddaattaa//22.
+
+              The _c_t___h_o_o_k_s tag specifies which CCoommmmoonn TTeesstt HHooookkss are to be run
+              together with this suite.
+
+              Other tuples than the ones defined will simply be ignored.
+
+              For more information about the test case group info function,
+              see TTeesstt ccaassee ggrroouupp iinnffoo ffuunnccttiioonn in the User's Guide.
+
+       MMoodduullee::iinniitt__ppeerr__ggrroouupp((GGrroouuppNNaammee,, CCoonnffiigg)) -->> NNeewwCCoonnffiigg || {{sskkiipp,,RReeaassoonn}}
+
+              Types:
+
+                  GroupName = atom()
+                  Config = NewConfig = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+                  Reason = term()
+
+              OPTIONAL
+
+              This configuration function is called before execution of a test
+              case group. It typically contains initializations which are
+              common for all test cases and sub-groups in the group, and which
+              shall only be performed once. _G_r_o_u_p_N_a_m_e is the name of the
+              group, as specified in the group definition (see ggrroouuppss//00). The
+              _C_o_n_f_i_g parameter is the configuration data which can be modified
+              here. The return value of this function is given as _C_o_n_f_i_g to
+              all test cases and sub-groups in the group. If _{_s_k_i_p_,_R_e_a_s_o_n_} is
+              returned, all test cases in the group will be skipped and _R_e_a_s_o_n
+              printed in the overview log for the group.
+
+              For information about test case groups, please see TTeesstt ccaassee
+              ggrroouuppss chapter in the User's Guide.
+
+       MMoodduullee::eenndd__ppeerr__ggrroouupp((GGrroouuppNNaammee,, CCoonnffiigg)) -->> vvooiidd(()) ||
+       {{rreettuurrnn__ggrroouupp__rreessuulltt,,SSttaattuuss}}
+
+              Types:
+
+                  GroupName = atom()
+                  Config = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+                  Status = ok | skipped | failed
+
+              OPTIONAL
+
+              This function is called after the execution of a test case group
+              is finished. It is meant to be used for cleaning up after
+              iinniitt__ppeerr__ggrroouupp//22. By means of _{_r_e_t_u_r_n___g_r_o_u_p___r_e_s_u_l_t_,_S_t_a_t_u_s_}, it
+              is possible to return a status value for a nested sub-group. The
+              status can be retrieved in eenndd__ppeerr__ggrroouupp//22 for the group on the
+              level above. The status will also be used by Common Test for
+              deciding if execution of a group should proceed in case the
+              property _s_e_q_u_e_n_c_e or _r_e_p_e_a_t___u_n_t_i_l___* is set.
+
+              For more information about test case groups, please see TTeesstt
+              ccaassee ggrroouuppss chapter in the User's Guide.
+
+       MMoodduullee::iinniitt__ppeerr__tteessttccaassee((TTeessttCCaassee,, CCoonnffiigg)) -->> NNeewwCCoonnffiigg || {{ffaaiill,,RReeaassoonn}}
+       || {{sskkiipp,,RReeaassoonn}}
+
+              Types:
+
+                  TestCase = atom()
+                  Config = NewConfig = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+                  Reason = term()
+
+              OPTIONAL
+
+              This function is called before each test case. The _T_e_s_t_C_a_s_e
+              argument is the name of the test case, and _C_o_n_f_i_g (list of key-
+              value tuples) is the configuration data that can be modified
+              here. The _N_e_w_C_o_n_f_i_g list returned from this function is given as
+              _C_o_n_f_i_g to the test case. If _{_f_a_i_l_,_R_e_a_s_o_n_} is returned, the test
+              case is marked as failed without being executed. If
+              _{_s_k_i_p_,_R_e_a_s_o_n_} is returned, the test case will be skipped and
+              _R_e_a_s_o_n printed in the overview log for the suite.
+
+       MMoodduullee::eenndd__ppeerr__tteessttccaassee((TTeessttCCaassee,, CCoonnffiigg)) -->> vvooiidd(()) || {{ffaaiill,,RReeaassoonn}} ||
+       {{ssaavvee__ccoonnffiigg,,SSaavveeCCoonnffiigg}}
+
+              Types:
+
+                  TestCase = atom()
+                  Config = SaveConfig = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+                  Reason = term()
+
+              OPTIONAL
+
+              This function is called after each test case, and can be used to
+              clean up after iinniitt__ppeerr__tteessttccaassee//22 and the test case. Any return
+              value (besides _{_f_a_i_l_,_R_e_a_s_o_n_} and _{_s_a_v_e___c_o_n_f_i_g_,_S_a_v_e_C_o_n_f_i_g_}) is
+              ignored. By returning _{_f_a_i_l_,_R_e_a_s_o_n_}, _T_e_s_t_C_a_s_e will be marked as
+              failed (even though it was actually successful in the sense that
+              it returned a value instead of terminating). For information on
+              _s_a_v_e___c_o_n_f_i_g, please see DDeeppeennddeenncciieess bbeettwweeeenn TTeesstt CCaasseess aanndd
+              SSuuiitteess in the User's Guide
+
+       MMoodduullee::TTeessttccaassee(()) -->> [[IInnffoo]]
+
+              Types:
+
+                  Info = {timetrap,Time} | {require,Required} |
+                 {require,Name,Required} | {userdata,UserData} |
+                 {silent_connections,Conns}
+                  Time = TimeVal | TimeFunc
+                  TimeVal = MilliSec | {seconds,integer()} |
+                 {minutes,integer()} | {hours,integer()}
+                  TimeFunc = {Mod,Func,Args} | Fun
+                  MilliSec = integer()
+                  Mod = atom()
+                  Func = atom()
+                  Args = list()
+                  Fun = fun()
+                  Required = Key | {Key,SubKeys} | {Key,Subkey} |
+                 {Key,Subkey,SubKeys}
+                  Key = atom()
+                  SubKeys = SubKey | [SubKey]
+                  SubKey = atom()
+                  Name = atom()
+                  UserData = term()
+                  Conns = [atom()]
+
+              OPTIONAL
+
+              This is the test case info function. It is supposed to return a
+              list of tagged tuples that specify various properties related to
+              the execution of this particular test case. Properties set by
+              TTeessttccaassee//00 override properties that have been previously set for
+              the test case by ggrroouupp//11 or ssuuiittee//00.
+
+              The _t_i_m_e_t_r_a_p tag sets the maximum time the test case is allowed
+              to execute. If the timetrap time is exceeded, the test case
+              fails with reason _t_i_m_e_t_r_a_p___t_i_m_e_o_u_t. iinniitt__ppeerr__tteessttccaassee//22 and
+              eenndd__ppeerr__tteessttccaassee//22 are included in the timetrap time. A _T_i_m_e_F_u_n_c
+              function can be used to set a new timetrap by returning a
+              _T_i_m_e_V_a_l. It may also be used to trigger a timetrap timeout by,
+              at some point, returning a value other than a _T_i_m_e_V_a_l. (See the
+              UUsseerr''ss GGuuiiddee for details).
+
+              The _r_e_q_u_i_r_e tag specifies configuration variables that are
+              required by the test case (and/or _i_n_i_t_/_e_n_d___p_e_r___t_e_s_t_c_a_s_e_/_2). If
+              the required configuration variables are not found in any of the
+              configuration files, the test case is skipped. For more
+              information about the 'require' functionality, see the reference
+              manual for the function cctt::rreeqquuiirree//11//22.
+
+              If _t_i_m_e_t_r_a_p and/or _r_e_q_u_i_r_e is not set, the default values
+              specified by ssuuiittee//00 (or ggrroouupp//11) will be used.
+
+              With _u_s_e_r_d_a_t_a, it is possible for the user to specify arbitrary
+              test case related information which can be read by calling
+              cctt::uusseerrddaattaa//33.
+
+              Other tuples than the ones defined will simply be ignored.
+
+              For more information about the test case info function, see TTeesstt
+              ccaassee iinnffoo ffuunnccttiioonn in the User's Guide.
+
+       MMoodduullee::TTeessttccaassee((CCoonnffiigg)) -->> vvooiidd(()) || {{sskkiipp,,RReeaassoonn}} || {{ccoommmmeenntt,,CCoommmmeenntt}} ||
+       {{ssaavvee__ccoonnffiigg,,SSaavveeCCoonnffiigg}} || {{sskkiipp__aanndd__ssaavvee,,RReeaassoonn,,SSaavveeCCoonnffiigg}} || eexxiitt(())
+
+              Types:
+
+                  Config = SaveConfig = [{Key,Value}]
+                  Key = atom()
+                  Value = term()
+                  Reason = term()
+                  Comment = string()
+
+              MANDATORY
+
+              This is the implementation of a test case. Here you must call
+              the functions you want to test, and do whatever you need to
+              check the result. If something fails, make sure the function
+              causes a runtime error, or call cctt::ffaaiill//11//22 (which also causes
+              the test case process to terminate).
+
+              Elements from the _C_o_n_f_i_g list can e.g. be read with
+              _p_r_o_p_l_i_s_t_s_:_g_e_t___v_a_l_u_e_/_2 (or the macro _?_c_o_n_f_i_g defined in _c_t_._h_r_l).
+
+              You can return _{_s_k_i_p_,_R_e_a_s_o_n_} if you decide not to run the test
+              case after all. _R_e_a_s_o_n will then be printed in 'Comment' field
+              on the HTML result page.
+
+              You can return _{_c_o_m_m_e_n_t_,_C_o_m_m_e_n_t_} if you wish to print some
+              information in the 'Comment' field on the HTML result page.
+
+              If the function returns anything else, the test case is
+              considered successful. (The return value always gets printed in
+              the test case log file).
+
+              For more information about test case implementation, please see
+              TTeesstt ccaasseess in the User's Guide.
+
+              For information on _s_a_v_e___c_o_n_f_i_g and _s_k_i_p___a_n_d___s_a_v_e, please see
+              DDeeppeennddeenncciieess bbeettwweeeenn TTeesstt CCaasseess aanndd SSuuiitteess in the User's Guide.
+
+
+
+Ericsson AB                    common_test 1.6.2                common_test(3)

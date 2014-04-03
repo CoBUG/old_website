@@ -1,0 +1,2125 @@
+erl_syntax(3)              Erlang Module Definition              erl_syntax(3)
+
+
+
+NNAAMMEE
+       erl_syntax - Abstract Erlang syntax trees.
+
+DDEESSCCRRIIPPTTIIOONN
+       Abstract Erlang syntax trees.
+
+       This module defines an abstract data type for representing Erlang
+       source code as syntax trees, in a way that is backwards compatible with
+       the data structures created by the Erlang standard library parser
+       module _e_r_l___p_a_r_s_e (often referred to as "parse trees", which is a bit of
+       a misnomer). This means that all _e_r_l___p_a_r_s_e trees are valid abstract
+       syntax trees, but the reverse is not true: abstract syntax trees can in
+       general not be used as input to functions expecting an _e_r_l___p_a_r_s_e tree.
+       However, as long as an abstract syntax tree represents a correct Erlang
+       program, the function rreevveerrtt//11 should be able to transform it to the
+       corresponding _e_r_l___p_a_r_s_e representation.
+
+       A recommended starting point for the first-time user is the
+       documentation of the ssyynnttaaxxTTrreeee(()) data type, and the function ttyyppee//11.
+
+       NNOOTTEESS::
+
+       This module deals with the composition and decomposition of _s_y_n_t_a_c_t_i_c
+       entities (as opposed to semantic ones); its purpose is to hide all
+       direct references to the data structures used to represent these
+       entities. With few exceptions, the functions in this module perform no
+       semantic interpretation of their inputs, and in general, the user is
+       assumed to pass type-correct arguments - if this is not done, the
+       effects are not defined.
+
+       With the exception of the eerrll__ppaarrssee(()) data structures, the internal
+       representations of abstract syntax trees are subject to change without
+       notice, and should not be documented outside this module. Furthermore,
+       we do not give any guarantees on how an abstract syntax tree may or may
+       not be represented, _w_i_t_h _t_h_e _f_o_l_l_o_w_i_n_g _e_x_c_e_p_t_i_o_n_s: no syntax tree is
+       represented by a single atom, such as _n_o_n_e, by a list constructor _[_X _|
+       _Y_], or by the empty list _[_]. This can be relied on when writing
+       functions that operate on syntax trees.
+
+DDAATTAA TTYYPPEESS
+         _e_r_l___p_a_r_s_e_(_) _= _a_b_s_t_r_a_c_t___f_o_r_m_(_) _(_s_e_e _m_o_d_u_l_e _e_r_l___p_a_r_s_e_) _|
+         _a_b_s_t_r_a_c_t___e_x_p_r_(_) _(_s_e_e _m_o_d_u_l_e _e_r_l___p_a_r_s_e_):
+
+
+           The representation built by the Erlang standard library parser
+           _e_r_l___p_a_r_s_e. This is a subset of the ssyynnttaaxxTTrreeee(()) type.
+
+         _f_o_r_m_s_(_) _= _s_y_n_t_a_x_T_r_e_e_(_) _| _[_s_y_n_t_a_x_T_r_e_e_(_)_]:
+
+
+         _g_u_a_r_d_(_) _= _n_o_n_e _| _s_y_n_t_a_x_T_r_e_e_(_) _| _[_s_y_n_t_a_x_T_r_e_e_(_)_] _| _[_[_s_y_n_t_a_x_T_r_e_e_(_)_]_]:
+
+
+         _p_a_d_d_i_n_g_(_) _= _n_o_n_e _| _i_n_t_e_g_e_r_(_):
+
+
+         _s_y_n_t_a_x_T_r_e_e_(_):
+
+
+           An abstract syntax tree. The eerrll__ppaarrssee(()) "parse tree"
+           representation is a proper subset of the _s_y_n_t_a_x_T_r_e_e_(_)
+           representation.
+
+           Every abstract syntax tree node has a _t_y_p_e, given by the function
+           ttyyppee//11. Each node also has associated _a_t_t_r_i_b_u_t_e_s; see ggeett__aattttrrss//11
+           for details. The functions mmaakkee__ttrreeee//22 and ssuubbttrreeeess//11 are generic
+           constructor/decomposition functions for abstract syntax trees. The
+           functions aabbssttrraacctt//11 and ccoonnccrreettee//11 convert between constant Erlang
+           terms and their syntactic representations. The set of syntax tree
+           nodes is extensible through the ttrreeee//22 function.
+
+           A syntax tree can be transformed to the eerrll__ppaarrssee(()) representation
+           with the rreevveerrtt//11 function.
+
+         _s_y_n_t_a_x_T_r_e_e_A_t_t_r_i_b_u_t_e_s_(_):
+
+
+           This is an abstract representation of syntax tree node attributes;
+           see the function ggeett__aattttrrss//11.
+
+EEXXPPOORRTTSS
+       aabbssttrraacctt((TT::::tteerrmm(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the syntax tree corresponding to an Erlang term. _T_e_r_m
+              must be a literal term, i.e., one that can be represented as a
+              source code literal. Thus, it may not contain a process
+              identifier, port, reference, binary or function value as a
+              subterm. The function recognises printable strings, in order to
+              get a compact and readable representation. Evaluation fails with
+              reason _b_a_d_a_r_g if _T_e_r_m is not a literal term.
+
+              _S_e_e _a_l_s_o_: ccoonnccrreettee//11, iiss__lliitteerraall//11.
+
+       aadddd__aannnn((AA::::tteerrmm(()),, NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Appends the term _A_n_n_o_t_a_t_i_o_n to the list of user annotations of
+              _N_o_d_e.
+
+              Note: this is equivalent to _s_e_t___a_n_n_(_N_o_d_e_, _[_A_n_n_o_t_a_t_i_o_n _|
+              _g_e_t___a_n_n_(_N_o_d_e_)_]_), but potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ggeett__aannnn//11, sseett__aannnn//22.
+
+       aadddd__ppoossttccoommmmeennttss((CCss::::[[ssyynnttaaxxTTrreeee(())]],, NNooddee::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Appends _C_o_m_m_e_n_t_s to the post-comments of _N_o_d_e.
+
+              Note: This is equivalent to _s_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_N_o_d_e_,
+              _g_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_N_o_d_e_) _+_+ _C_o_m_m_e_n_t_s_), but potentially more
+              efficient.
+
+              _S_e_e _a_l_s_o_: aadddd__pprreeccoommmmeennttss//22, ccoommmmeenntt//22, ggeett__ppoossttccoommmmeennttss//11,
+              jjooiinn__ccoommmmeennttss//22, sseett__ppoossttccoommmmeennttss//22.
+
+       aadddd__pprreeccoommmmeennttss((CCss::::[[ssyynnttaaxxTTrreeee(())]],, NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Appends _C_o_m_m_e_n_t_s to the pre-comments of _N_o_d_e.
+
+              Note: This is equivalent to _s_e_t___p_r_e_c_o_m_m_e_n_t_s_(_N_o_d_e_,
+              _g_e_t___p_r_e_c_o_m_m_e_n_t_s_(_N_o_d_e_) _+_+ _C_o_m_m_e_n_t_s_), but potentially more
+              efficient.
+
+              _S_e_e _a_l_s_o_: aadddd__ppoossttccoommmmeennttss//22, ccoommmmeenntt//22, ggeett__pprreeccoommmmeennttss//11,
+              jjooiinn__ccoommmmeennttss//22, sseett__pprreeccoommmmeennttss//22.
+
+       aapppplliiccaattiioonn((OOppeerraattoorr::::ssyynnttaaxxTTrreeee(()),, AArrgguummeennttss::::[[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract function application expression. If
+              _A_r_g_u_m_e_n_t_s is _[_A_1_, _._._._, _A_n_], the result represents "_O_p_e_r_a_t_o_r_(_A_1_,
+              _._._._, _A_n_)".
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//33, aapppplliiccaattiioonn__aarrgguummeennttss//11,
+              aapppplliiccaattiioonn__ooppeerraattoorr//11.
+
+       aapppplliiccaattiioonn((MMoodduullee::::nnoonnee || ssyynnttaaxxTTrreeee(()),, NNaammee::::ssyynnttaaxxTTrreeee(()),,
+       AArrgguummeennttss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract function application expression. If _M_o_d_u_l_e
+              is _n_o_n_e, this is call is equivalent to _a_p_p_l_i_c_a_t_i_o_n_(_F_u_n_c_t_i_o_n_,
+              _A_r_g_u_m_e_n_t_s_), otherwise it is equivalent to
+              _a_p_p_l_i_c_a_t_i_o_n_(_m_o_d_u_l_e___q_u_a_l_i_f_i_e_r_(_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_)_, _A_r_g_u_m_e_n_t_s_).
+
+              (This is a utility function.)
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//22, mmoodduullee__qquuaalliiffiieerr//22.
+
+       aapppplliiccaattiioonn__aarrgguummeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of argument subtrees of an _a_p_p_l_i_c_a_t_i_o_n node.
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//22.
+
+       aapppplliiccaattiioonn__ooppeerraattoorr((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the operator subtree of an _a_p_p_l_i_c_a_t_i_o_n node.
+
+              Note: if _N_o_d_e represents "_M_:_F_(_._._._)", then the result is the
+              subtree representing "_M_:_F".
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//22, mmoodduullee__qquuaalliiffiieerr//22.
+
+       aarriittyy__qquuaalliiffiieerr((BBooddyy::::ssyynnttaaxxTTrreeee(()),, AArriittyy::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract arity qualifier. The result represents
+              "_B_o_d_y_/_A_r_i_t_y".
+
+              _S_e_e _a_l_s_o_: aarriittyy__qquuaalliiffiieerr__aarrgguummeenntt//11, aarriittyy__qquuaalliiffiieerr__bbooddyy//11.
+
+       aarriittyy__qquuaalliiffiieerr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument (the arity) subtree of an _a_r_i_t_y___q_u_a_l_i_f_i_e_r
+              node.
+
+              _S_e_e _a_l_s_o_: aarriittyy__qquuaalliiffiieerr//22.
+
+       aarriittyy__qquuaalliiffiieerr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of an _a_r_i_t_y___q_u_a_l_i_f_i_e_r node.
+
+              _S_e_e _a_l_s_o_: aarriittyy__qquuaalliiffiieerr//22.
+
+       aattoomm((NNaammee::::aattoomm(()) || ssttrriinngg(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract atom literal. The print name of the atom is
+              the character sequence represented by _N_a_m_e.
+
+              _S_e_e _a_l_s_o_: aattoomm__lliitteerraall//11, aattoomm__nnaammee//11, aattoomm__vvaalluuee//11, iiss__aattoomm//22.
+
+       aattoomm__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the literal string represented by an _a_t_o_m node. This
+              includes surrounding single-quote characters if necessary.
+
+              Note that e.g. the result of _a_t_o_m_(_"_x_\_n_y_"_) represents any and all
+              of `x\ny'', `x\12y'', `x\012y'' and `x\^Jy\''; see ssttrriinngg//11.
+
+              _S_e_e _a_l_s_o_: aattoomm//11, ssttrriinngg//11.
+
+       aattoomm__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the printname of an _a_t_o_m node.
+
+              _S_e_e _a_l_s_o_: aattoomm//11.
+
+       aattoomm__vvaalluuee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> aattoomm(())
+
+              Returns the value represented by an _a_t_o_m node.
+
+              _S_e_e _a_l_s_o_: aattoomm//11.
+
+       aattttrriibbuuttee((NNaammee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to aattttrriibbuuttee((NNaammee,, nnoonnee)).
+
+       aattttrriibbuuttee((NNaammee::::ssyynnttaaxxTTrreeee(()),, AArrggss::::nnoonnee || [[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract program attribute. If _A_r_g_u_m_e_n_t_s is _[_A_1_, _._._._,
+              _A_n_], the result represents "_-_N_a_m_e_(_A_1_, _._._._, _A_n_)_.". Otherwise, if
+              _A_r_g_u_m_e_n_t_s is _n_o_n_e, the result represents "_-_N_a_m_e_.". The latter
+              form makes it possible to represent preprocessor directives such
+              as "_-_e_n_d_i_f_.". Attributes are source code forms.
+
+              Note: The preprocessor macro definition directive "_-_d_e_f_i_n_e_(_N_a_m_e_,
+              _B_o_d_y_)_." has relatively few requirements on the syntactical form
+              of _B_o_d_y (viewed as a sequence of tokens). The _t_e_x_t node type can
+              be used for a _B_o_d_y that is not a normal Erlang construct.
+
+              _S_e_e _a_l_s_o_: aattttrriibbuuttee//11, aattttrriibbuuttee__aarrgguummeennttss//11, aattttrriibbuuttee__nnaammee//11,
+              iiss__ffoorrmm//11, tteexxtt//11.
+
+       aattttrriibbuuttee__aarrgguummeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of argument subtrees of an _a_t_t_r_i_b_u_t_e node, if
+              any. If _N_o_d_e represents "_-_N_a_m_e_.", the result is _n_o_n_e. Otherwise,
+              if _N_o_d_e represents "_-_N_a_m_e_(_E_1_, _._._._, _E_n_)_.", _[_E_1_, _._._._, _E_1_] is
+              returned.
+
+              _S_e_e _a_l_s_o_: aattttrriibbuuttee//11.
+
+       aattttrriibbuuttee__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the name subtree of an _a_t_t_r_i_b_u_t_e node.
+
+              _S_e_e _a_l_s_o_: aattttrriibbuuttee//11.
+
+       bbiinnaarryy((LLiisstt::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract binary-object template. If _F_i_e_l_d_s is _[_F_1_,
+              _._._._, _F_n_], the result represents "_<_<_F_1_, _._._._, _F_n_>_>".
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ffiieelldd//22, bbiinnaarryy__ffiieellddss//11.
+
+       bbiinnaarryy__ccoommpp((TTeemmppllaattee::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::[[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract binary comprehension. If _B_o_d_y is _[_E_1_, _._._._,
+              _E_n_], the result represents "_<_<_T_e_m_p_l_a_t_e _|_| _E_1_, _._._._, _E_n_>_>".
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ccoommpp__bbooddyy//11, bbiinnaarryy__ccoommpp__tteemmppllaattee//11,
+              ggeenneerraattoorr//22.
+
+       bbiinnaarryy__ccoommpp__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of body subtrees of a _b_i_n_a_r_y___c_o_m_p node.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ccoommpp//22.
+
+       bbiinnaarryy__ccoommpp__tteemmppllaattee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the template subtree of a _b_i_n_a_r_y___c_o_m_p node.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ccoommpp//22.
+
+       bbiinnaarryy__ffiieelldd((BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to bbiinnaarryy__ffiieelldd((BBooddyy,, [[]])).
+
+       bbiinnaarryy__ffiieelldd((BBooddyy::::ssyynnttaaxxTTrreeee(()),, TTyyppeess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract binary template field. If _T_y_p_e_s is the empty
+              list, the result simply represents "_B_o_d_y", otherwise, if _T_y_p_e_s
+              is _[_T_1_, _._._._, _T_n_], the result represents "_B_o_d_y_/_T_1_-_._._._-_T_n".
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy//11, bbiinnaarryy__ffiieelldd//11, bbiinnaarryy__ffiieelldd//33,
+              bbiinnaarryy__ffiieelldd__bbooddyy//11, bbiinnaarryy__ffiieelldd__ssiizzee//11, bbiinnaarryy__ffiieelldd__ttyyppeess//11.
+
+       bbiinnaarryy__ffiieelldd((BBooddyy::::ssyynnttaaxxTTrreeee(()),, SSiizzee::::nnoonnee || ssyynnttaaxxTTrreeee(()),,
+       TTyyppeess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract binary template field. If _S_i_z_e is _n_o_n_e, this
+              is equivalent to "_b_i_n_a_r_y___f_i_e_l_d_(_B_o_d_y_, _T_y_p_e_s_)", otherwise it is
+              equivalent to "_b_i_n_a_r_y___f_i_e_l_d_(_s_i_z_e___q_u_a_l_i_f_i_e_r_(_B_o_d_y_, _S_i_z_e_)_, _T_y_p_e_s_)".
+
+              (This is a utility function.)
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy//11, bbiinnaarryy__ffiieelldd//22, ssiizzee__qquuaalliiffiieerr//22.
+
+       bbiinnaarryy__ffiieelldd__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _b_i_n_a_r_y___f_i_e_l_d.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ffiieelldd//22.
+
+       bbiinnaarryy__ffiieelldd__ssiizzee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the size specifier subtree of a _b_i_n_a_r_y___f_i_e_l_d node, if
+              any. If _N_o_d_e represents "_B_o_d_y_:_S_i_z_e" or "_B_o_d_y_:_S_i_z_e_/_T_1_, _._._._, _T_n",
+              the result is _S_i_z_e, otherwise _n_o_n_e is returned.
+
+              (This is a utility function.)
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ffiieelldd//22, bbiinnaarryy__ffiieelldd//33.
+
+       bbiinnaarryy__ffiieelldd__ttyyppeess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of type-specifier subtrees of a _b_i_n_a_r_y___f_i_e_l_d
+              node. If _N_o_d_e represents "_._._._/_T_1_, _._._._, _T_n", the result is _[_T_1_,
+              _._._._, _T_n_], otherwise the result is the empty list.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ffiieelldd//22.
+
+       bbiinnaarryy__ffiieellddss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of field subtrees of a _b_i_n_a_r_y node.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy//11, bbiinnaarryy__ffiieelldd//22.
+
+       bbiinnaarryy__ggeenneerraattoorr((PPaatttteerrnn::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract binary_generator. The result represents
+              "_P_a_t_t_e_r_n _<_- _B_o_d_y".
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ccoommpp//22, bbiinnaarryy__ggeenneerraattoorr__bbooddyy//11,
+              bbiinnaarryy__ggeenneerraattoorr__ppaatttteerrnn//11, lliisstt__ccoommpp//22.
+
+       bbiinnaarryy__ggeenneerraattoorr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _g_e_n_e_r_a_t_o_r node.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ggeenneerraattoorr//22.
+
+       bbiinnaarryy__ggeenneerraattoorr__ppaatttteerrnn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the pattern subtree of a _g_e_n_e_r_a_t_o_r node.
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ggeenneerraattoorr//22.
+
+       bblloocckk__eexxpprr((BBooddyy::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract block expression. If _B_o_d_y is _[_B_1_, _._._._, _B_n_],
+              the result represents "_b_e_g_i_n _B_1_, _._._._, _B_n _e_n_d".
+
+              _S_e_e _a_l_s_o_: bblloocckk__eexxpprr__bbooddyy//11.
+
+       bblloocckk__eexxpprr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of body subtrees of a _b_l_o_c_k___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: bblloocckk__eexxpprr//11.
+
+       ccaassee__eexxpprr((AArrgguummeenntt::::ssyynnttaaxxTTrreeee(()),, CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract case-expression. If _C_l_a_u_s_e_s is _[_C_1_, _._._._,
+              _C_n_], the result represents "_c_a_s_e _A_r_g_u_m_e_n_t _o_f _C_1_; _._._._; _C_n _e_n_d".
+              More exactly, if each _C_i represents "_(_P_i_) _G_i _-_> _B_i", then the
+              result represents "_c_a_s_e _A_r_g_u_m_e_n_t _o_f _P_1 _G_1 _-_> _B_1_; _._._._; _P_n _G_n _-_>
+              _B_n _e_n_d".
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr__aarrgguummeenntt//11, ccaassee__eexxpprr__ccllaauusseess//11, ccllaauussee//33,
+              ccoonndd__eexxpprr//11, iiff__eexxpprr//11.
+
+       ccaassee__eexxpprr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument subtree of a _c_a_s_e___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr//22.
+
+       ccaassee__eexxpprr__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of a _c_a_s_e___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr//22.
+
+       ccaattcchh__eexxpprr((EExxpprr::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract catch-expression. The result represents
+              "_c_a_t_c_h _E_x_p_r".
+
+              _S_e_e _a_l_s_o_: ccaattcchh__eexxpprr__bbooddyy//11.
+
+       ccaattcchh__eexxpprr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _c_a_t_c_h___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ccaattcchh__eexxpprr//11.
+
+       cchhaarr((CChhaarr::::cchhaarr(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract character literal. The result represents
+              "_$_N_a_m_e", where _N_a_m_e corresponds to _V_a_l_u_e.
+
+              Note: the literal corresponding to a particular character value
+              is not uniquely defined. E.g., the character "_a" can be written
+              both as "_$_a" and "_$_\_1_4_1", and a Tab character can be written as
+              "_$_\_1_1", "_$_\_0_1_1" or "_$_\_t".
+
+              _S_e_e _a_l_s_o_: cchhaarr__lliitteerraall//11, cchhaarr__vvaalluuee//11, iiss__cchhaarr//22.
+
+       cchhaarr__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonneemmppttyy__ssttrriinngg(())
+
+              Returns the literal string represented by a _c_h_a_r node. This
+              includes the leading "_$" character.
+
+              _S_e_e _a_l_s_o_: cchhaarr//11.
+
+       cchhaarr__vvaalluuee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> cchhaarr(())
+
+              Returns the value represented by a _c_h_a_r node.
+
+              _S_e_e _a_l_s_o_: cchhaarr//11.
+
+       ccllaassss__qquuaalliiffiieerr((CCllaassss::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract class qualifier. The result represents
+              "_C_l_a_s_s_:_B_o_d_y".
+
+              _S_e_e _a_l_s_o_: ccllaassss__qquuaalliiffiieerr__aarrgguummeenntt//11, ccllaassss__qquuaalliiffiieerr__bbooddyy//11,
+              ttrryy__eexxpprr//44.
+
+       ccllaassss__qquuaalliiffiieerr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument (the class) subtree of a _c_l_a_s_s___q_u_a_l_i_f_i_e_r
+              node.
+
+              _S_e_e _a_l_s_o_: ccllaassss__qquuaalliiffiieerr//22.
+
+       ccllaassss__qquuaalliiffiieerr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _c_l_a_s_s___q_u_a_l_i_f_i_e_r node.
+
+              _S_e_e _a_l_s_o_: ccllaassss__qquuaalliiffiieerr//22.
+
+       ccllaauussee((GGuuaarrdd::::gguuaarrdd(()),, BBooddyy::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to ccllaauussee(([[]],, GGuuaarrdd,, BBooddyy)).
+
+       ccllaauussee((PPaatttteerrnnss::::[[ssyynnttaaxxTTrreeee(())]],, GGuuaarrdd::::gguuaarrdd(()),, BBooddyy::::[[ssyynnttaaxxTTrreeee(())]]))
+       -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract clause. If _P_a_t_t_e_r_n_s is _[_P_1_, _._._._, _P_n_] and
+              _B_o_d_y is _[_B_1_, _._._._, _B_m_], then if _G_u_a_r_d is _n_o_n_e, the result
+              represents "_(_P_1_, _._._._, _P_n_) _-_> _B_1_, _._._._, _B_m", otherwise, unless
+              _G_u_a_r_d is a list, the result represents "_(_P_1_, _._._._, _P_n_) _w_h_e_n _G_u_a_r_d
+              _-_> _B_1_, _._._._, _B_m".
+
+              For simplicity, the _G_u_a_r_d argument may also be any of the
+              following:
+
+                * An empty list _[_]. This is equivalent to passing _n_o_n_e.
+
+                * A nonempty list _[_E_1_, _._._._, _E_j_] of syntax trees. This is
+                  equivalent to passing _c_o_n_j_u_n_c_t_i_o_n_(_[_E_1_, _._._._, _E_j_]_).
+
+                * A nonempty list of lists of syntax trees _[_[_E_1___1_, _._._._,
+                  _E_1___k_1_]_, _._._._, _[_E_j___1_, _._._._, _E_j___k_j_]_], which is equivalent to
+                  passing _d_i_s_j_u_n_c_t_i_o_n_(_[_c_o_n_j_u_n_c_t_i_o_n_(_[_E_1___1_, _._._._, _E_1___k_1_]_)_, _._._._,
+                  _c_o_n_j_u_n_c_t_i_o_n_(_[_E_j___1_, _._._._, _E_j___k_j_]_)_]_).
+
+              _S_e_e _a_l_s_o_: ccllaauussee//22, ccllaauussee__bbooddyy//11, ccllaauussee__gguuaarrdd//11,
+              ccllaauussee__ppaatttteerrnnss//11.
+
+       ccllaauussee__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Return the list of body subtrees of a _c_l_a_u_s_e node.
+
+              _S_e_e _a_l_s_o_: ccllaauussee//33.
+
+       ccllaauussee__gguuaarrdd((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the guard subtree of a _c_l_a_u_s_e node, if any. If _N_o_d_e
+              represents "_(_P_1_, _._._._, _P_n_) _w_h_e_n _G_u_a_r_d _-_> _B_1_, _._._._, _B_m", _G_u_a_r_d is
+              returned. Otherwise, the result is _n_o_n_e.
+
+              _S_e_e _a_l_s_o_: ccllaauussee//33.
+
+       ccllaauussee__ppaatttteerrnnss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of pattern subtrees of a _c_l_a_u_s_e node.
+
+              _S_e_e _a_l_s_o_: ccllaauussee//33.
+
+       ccoommmmeenntt((SSttrriinnggss::::[[ssttrriinngg(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to ccoommmmeenntt((nnoonnee,, SSttrriinnggss)).
+
+       ccoommmmeenntt((PPaadd::::ppaaddddiinngg(()),, SSttrriinnggss::::[[ssttrriinngg(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract comment with the given padding and text. If
+              _S_t_r_i_n_g_s is a (possibly empty) list _[_"_T_x_t_1_"_, _._._._, _"_T_x_t_N_"_], the
+              result represents the source code text
+
+                   %Txt1
+                   ...
+                   %TxtN
+
+              _P_a_d_d_i_n_g states the number of empty character positions to the
+              left of the comment separating it horizontally from source code
+              on the same line (if any). If _P_a_d_d_i_n_g is _n_o_n_e, a default
+              positive number is used. If _P_a_d_d_i_n_g is an integer less than 1,
+              there should be no separating space. Comments are in themselves
+              regarded as source program forms.
+
+              _S_e_e _a_l_s_o_: ccoommmmeenntt//11, iiss__ffoorrmm//11.
+
+       ccoommmmeenntt__ppaaddddiinngg((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ppaaddddiinngg(())
+
+              Returns the amount of padding before the comment, or _n_o_n_e. The
+              latter means that a default padding may be used.
+
+              _S_e_e _a_l_s_o_: ccoommmmeenntt//22.
+
+       ccoommmmeenntt__tteexxtt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssttrriinngg(())]]
+
+              Returns the lines of text of the abstract comment.
+
+              _S_e_e _a_l_s_o_: ccoommmmeenntt//22.
+
+       ccoommppaacctt__lliisstt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Yields the most compact form for an abstract list skeleton. The
+              result either represents "_[_E_1_, _._._._, _E_n _| _T_a_i_l_]", where _T_a_i_l is
+              not a list skeleton, or otherwise simply "_[_E_1_, _._._._, _E_n_]".
+              Annotations on subtrees of _N_o_d_e that represent list skeletons
+              may be lost, but comments will be propagated to the result.
+              Returns _N_o_d_e itself if _N_o_d_e does not represent a list skeleton.
+
+              _S_e_e _a_l_s_o_: lliisstt//22, nnoorrmmaalliizzee__lliisstt//11.
+
+       ccoonnccrreettee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              Returns the Erlang term represented by a syntax tree. Evaluation
+              fails with reason _b_a_d_a_r_g if _N_o_d_e does not represent a literal
+              term.
+
+              Note: Currently, the set of syntax trees which have a concrete
+              representation is larger than the set of trees which can be
+              built using the function aabbssttrraacctt//11. An abstract character will
+              be concretised as an integer, while aabbssttrraacctt//11 does not at
+              present yield an abstract character for any input. (Use the
+              cchhaarr//11 function to explicitly create an abstract character.)
+
+              _S_e_e _a_l_s_o_: aabbssttrraacctt//11, cchhaarr//11, iiss__lliitteerraall//11.
+
+       ccoonndd__eexxpprr((CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract cond-expression. If _C_l_a_u_s_e_s is _[_C_1_, _._._._,
+              _C_n_], the result represents "_c_o_n_d _C_1_; _._._._; _C_n _e_n_d". More exactly,
+              if each _C_i represents "_(_) _E_i _-_> _B_i", then the result represents
+              "_c_o_n_d _E_1 _-_> _B_1_; _._._._; _E_n _-_> _B_n _e_n_d".
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr//22, ccllaauussee//33, ccoonndd__eexxpprr__ccllaauusseess//11.
+
+       ccoonndd__eexxpprr__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of a _c_o_n_d___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ccoonndd__eexxpprr//11.
+
+       ccoonnjjuunnccttiioonn((TTeessttss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract conjunction. If _L_i_s_t is _[_E_1_, _._._._, _E_n_], the
+              result represents "_E_1_, _._._._, _E_n".
+
+              _S_e_e _a_l_s_o_: ccoonnjjuunnccttiioonn__bbooddyy//11, ddiissjjuunnccttiioonn//11.
+
+       ccoonnjjuunnccttiioonn__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of body subtrees of a _c_o_n_j_u_n_c_t_i_o_n node.
+
+              _S_e_e _a_l_s_o_: ccoonnjjuunnccttiioonn//11.
+
+       ccoonnss((HHeeaadd::::ssyynnttaaxxTTrreeee(()),, TTaaiill::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              "Optimising" list skeleton cons operation. Creates an abstract
+              list skeleton whose first element is _H_e_a_d and whose tail
+              corresponds to _T_a_i_l. This is similar to _l_i_s_t_(_[_H_e_a_d_]_, _T_a_i_l_),
+              except that _T_a_i_l may not be _n_o_n_e, and that the result does not
+              necessarily represent exactly "_[_H_e_a_d _| _T_a_i_l_]", but may depend on
+              the _T_a_i_l subtree. E.g., if _T_a_i_l represents _[_X_, _Y_], the result
+              may represent "_[_H_e_a_d_, _X_, _Y_]", rather than "_[_H_e_a_d _| _[_X_, _Y_]_]".
+              Annotations on _T_a_i_l itself may be lost if _T_a_i_l represents a list
+              skeleton, but comments on _T_a_i_l are propagated to the result.
+
+              _S_e_e _a_l_s_o_: lliisstt//22, lliisstt__hheeaadd//11, lliisstt__ttaaiill//11.
+
+       ccooppyy__aannnn((SSoouurrccee::::ssyynnttaaxxTTrreeee(()),, TTaarrggeett::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Copies the list of user annotations from _S_o_u_r_c_e to _T_a_r_g_e_t.
+
+              Note: this is equivalent to _s_e_t___a_n_n_(_T_a_r_g_e_t_, _g_e_t___a_n_n_(_S_o_u_r_c_e_)_),
+              but potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ggeett__aannnn//11, sseett__aannnn//22.
+
+       ccooppyy__aattttrrss((SS::::ssyynnttaaxxTTrreeee(()),, TT::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Copies the attributes from _S_o_u_r_c_e to _T_a_r_g_e_t.
+
+              Note: this is equivalent to _s_e_t___a_t_t_r_s_(_T_a_r_g_e_t_,
+              _g_e_t___a_t_t_r_s_(_S_o_u_r_c_e_)_), but potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ggeett__aattttrrss//11, sseett__aattttrrss//22.
+
+       ccooppyy__ccoommmmeennttss((SSoouurrccee::::ssyynnttaaxxTTrreeee(()),, TTaarrggeett::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Copies the pre- and postcomments from _S_o_u_r_c_e to _T_a_r_g_e_t.
+
+              Note: This is equivalent to
+              _s_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_s_e_t___p_r_e_c_o_m_m_e_n_t_s_(_T_a_r_g_e_t_,
+              _g_e_t___p_r_e_c_o_m_m_e_n_t_s_(_S_o_u_r_c_e_)_)_, _g_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_S_o_u_r_c_e_)_), but
+              potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ccoommmmeenntt//22, ggeett__ppoossttccoommmmeennttss//11, ggeett__pprreeccoommmmeennttss//11,
+              sseett__ppoossttccoommmmeennttss//22, sseett__pprreeccoommmmeennttss//22.
+
+       ccooppyy__ppooss((SSoouurrccee::::ssyynnttaaxxTTrreeee(()),, TTaarrggeett::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Copies the position information from _S_o_u_r_c_e to _T_a_r_g_e_t.
+
+              This is equivalent to _s_e_t___p_o_s_(_T_a_r_g_e_t_, _g_e_t___p_o_s_(_S_o_u_r_c_e_)_), but
+              potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ggeett__ppooss//11, sseett__ppooss//22.
+
+       ddaattaa((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              _F_o_r _s_p_e_c_i_a_l _p_u_r_p_o_s_e_s _o_n_l_y. Returns the associated data of a
+              syntax tree node. Evaluation fails with reason _b_a_d_a_r_g if
+              _i_s___t_r_e_e_(_N_o_d_e_) does not yield _t_r_u_e.
+
+              _S_e_e _a_l_s_o_: ttrreeee//22.
+
+       ddiissjjuunnccttiioonn((TTeessttss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract disjunction. If _L_i_s_t is _[_E_1_, _._._._, _E_n_], the
+              result represents "_E_1_; _._._._; _E_n".
+
+              _S_e_e _a_l_s_o_: ccoonnjjuunnccttiioonn//11, ddiissjjuunnccttiioonn__bbooddyy//11.
+
+       ddiissjjuunnccttiioonn__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of body subtrees of a _d_i_s_j_u_n_c_t_i_o_n node.
+
+              _S_e_e _a_l_s_o_: ddiissjjuunnccttiioonn//11.
+
+       eeooff__mmaarrkkeerr(()) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract end-of-file marker. This represents the end
+              of input when reading a sequence of source code forms. An end-
+              of-file marker is itself regarded as a source code form (namely,
+              the last in any sequence in which it occurs). It has no defined
+              lexical form.
+
+              Note: this is retained only for backwards compatibility with
+              existing parsers and tools.
+
+              _S_e_e _a_l_s_o_: eerrrroorr__mmaarrkkeerr//11, iiss__ffoorrmm//11, wwaarrnniinngg__mmaarrkkeerr//11.
+
+       eerrrroorr__mmaarrkkeerr((EErrrroorr::::tteerrmm(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract error marker. The result represents an
+              occurrence of an error in the source code, with an associated
+              Erlang I/O ErrorInfo structure given by _E_r_r_o_r (see module iioo((33))
+              for details). Error markers are regarded as source code forms,
+              but have no defined lexical form.
+
+              Note: this is supported only for backwards compatibility with
+              existing parsers and tools.
+
+              _S_e_e _a_l_s_o_: eeooff__mmaarrkkeerr//00, eerrrroorr__mmaarrkkeerr__iinnffoo//11, iiss__ffoorrmm//11,
+              wwaarrnniinngg__mmaarrkkeerr//11.
+
+       eerrrroorr__mmaarrkkeerr__iinnffoo((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              Returns the ErrorInfo structure of an _e_r_r_o_r___m_a_r_k_e_r node.
+
+              _S_e_e _a_l_s_o_: eerrrroorr__mmaarrkkeerr//11.
+
+       ffllaatttteenn__ffoorrmm__lliisstt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Flattens sublists of a _f_o_r_m___l_i_s_t node. Returns _N_o_d_e with all
+              subtrees of type _f_o_r_m___l_i_s_t recursively expanded, yielding a
+              single "flat" abstract form sequence.
+
+              _S_e_e _a_l_s_o_: ffoorrmm__lliisstt//11.
+
+       ffllooaatt((VVaalluuee::::ffllooaatt(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract floating-point literal. The lexical
+              representation is the decimal floating-point numeral of _V_a_l_u_e.
+
+              _S_e_e _a_l_s_o_: ffllooaatt__lliitteerraall//11, ffllooaatt__vvaalluuee//11.
+
+       ffllooaatt__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the numeral string represented by a _f_l_o_a_t node.
+
+              _S_e_e _a_l_s_o_: ffllooaatt//11.
+
+       ffllooaatt__vvaalluuee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ffllooaatt(())
+
+              Returns the value represented by a _f_l_o_a_t node. Note that
+              floating-point values should usually not be compared for
+              equality.
+
+              _S_e_e _a_l_s_o_: ffllooaatt//11.
+
+       ffoorrmm__lliisstt((FFoorrmmss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract sequence of "source code forms". If _F_o_r_m_s is
+              _[_F_1_, _._._._, _F_n_], where each _F_i is a form (see iiss__ffoorrmm//11, the
+              result represents
+
+                   F1
+                   ...
+                   Fn
+
+              where the _F_i are separated by one or more line breaks. A node of
+              type _f_o_r_m___l_i_s_t is itself regarded as a source code form; see
+              ffllaatttteenn__ffoorrmm__lliisstt//11.
+
+              Note: this is simply a way of grouping source code forms as a
+              single syntax tree, usually in order to form an Erlang module
+              definition.
+
+              _S_e_e _a_l_s_o_: ffllaatttteenn__ffoorrmm__lliisstt//11, ffoorrmm__lliisstt__eelleemmeennttss//11, iiss__ffoorrmm//11.
+
+       ffoorrmm__lliisstt__eelleemmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of subnodes of a _f_o_r_m___l_i_s_t node.
+
+              _S_e_e _a_l_s_o_: ffoorrmm__lliisstt//11.
+
+       ffuunn__eexxpprr((CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract fun-expression. If _C_l_a_u_s_e_s is _[_C_1_, _._._._, _C_n_],
+              the result represents "_f_u_n _C_1_; _._._._; _C_n _e_n_d". More exactly, if
+              each _C_i represents "_(_P_i_1_, _._._._, _P_i_m_) _G_i _-_> _B_i", then the result
+              represents "_f_u_n _(_P_1_1_, _._._._, _P_1_m_) _G_1 _-_> _B_1_; _._._._; _(_P_n_1_, _._._._, _P_n_m_)
+              _G_n _-_> _B_n _e_n_d".
+
+              _S_e_e _a_l_s_o_: ffuunn__eexxpprr__aarriittyy//11, ffuunn__eexxpprr__ccllaauusseess//11.
+
+       ffuunn__eexxpprr__aarriittyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> aarriittyy(())
+
+              Returns the arity of a _f_u_n___e_x_p_r node. The result is the number
+              of parameter patterns in the first clause of the fun-expression;
+              subsequent clauses are ignored.
+
+              An exception is thrown if _f_u_n___e_x_p_r___c_l_a_u_s_e_s_(_N_o_d_e_) returns an
+              empty list, or if the first element of that list is not a syntax
+              tree _C of type _c_l_a_u_s_e such that _c_l_a_u_s_e___p_a_t_t_e_r_n_s_(_C_) is a nonempty
+              list.
+
+              _S_e_e _a_l_s_o_: ccllaauussee//33, ccllaauussee__ppaatttteerrnnss//11, ffuunn__eexxpprr//11,
+              ffuunn__eexxpprr__ccllaauusseess//11.
+
+       ffuunn__eexxpprr__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of a _f_u_n___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ffuunn__eexxpprr//11.
+
+       ffuunnccttiioonn((NNaammee::::ssyynnttaaxxTTrreeee(()),, CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract function definition. If _C_l_a_u_s_e_s is _[_C_1_, _._._._,
+              _C_n_], the result represents "_N_a_m_e _C_1_; _._._._; _N_a_m_e _C_n_.". More
+              exactly, if each _C_i represents "_(_P_i_1_, _._._._, _P_i_m_) _G_i _-_> _B_i", then
+              the result represents "_N_a_m_e_(_P_1_1_, _._._._, _P_1_m_) _G_1 _-_> _B_1_; _._._._;
+              _N_a_m_e_(_P_n_1_, _._._._, _P_n_m_) _G_n _-_> _B_n_.". Function definitions are source
+              code forms.
+
+              _S_e_e _a_l_s_o_: ffuunnccttiioonn__aarriittyy//11, ffuunnccttiioonn__ccllaauusseess//11, ffuunnccttiioonn__nnaammee//11,
+              iiss__ffoorrmm//11, rruullee//22.
+
+       ffuunnccttiioonn__aarriittyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> aarriittyy(())
+
+              Returns the arity of a _f_u_n_c_t_i_o_n node. The result is the number
+              of parameter patterns in the first clause of the function;
+              subsequent clauses are ignored.
+
+              An exception is thrown if _f_u_n_c_t_i_o_n___c_l_a_u_s_e_s_(_N_o_d_e_) returns an
+              empty list, or if the first element of that list is not a syntax
+              tree _C of type _c_l_a_u_s_e such that _c_l_a_u_s_e___p_a_t_t_e_r_n_s_(_C_) is a nonempty
+              list.
+
+              _S_e_e _a_l_s_o_: ccllaauussee//33, ccllaauussee__ppaatttteerrnnss//11, ffuunnccttiioonn//22,
+              ffuunnccttiioonn__ccllaauusseess//11.
+
+       ffuunnccttiioonn__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of a _f_u_n_c_t_i_o_n node.
+
+              _S_e_e _a_l_s_o_: ffuunnccttiioonn//22.
+
+       ffuunnccttiioonn__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the name subtree of a _f_u_n_c_t_i_o_n node.
+
+              _S_e_e _a_l_s_o_: ffuunnccttiioonn//22.
+
+       ggeenneerraattoorr((PPaatttteerrnn::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract generator. The result represents "_P_a_t_t_e_r_n _<_-
+              _B_o_d_y".
+
+              _S_e_e _a_l_s_o_: bbiinnaarryy__ccoommpp//22, ggeenneerraattoorr__bbooddyy//11, ggeenneerraattoorr__ppaatttteerrnn//11,
+              lliisstt__ccoommpp//22.
+
+       ggeenneerraattoorr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _g_e_n_e_r_a_t_o_r node.
+
+              _S_e_e _a_l_s_o_: ggeenneerraattoorr//22.
+
+       ggeenneerraattoorr__ppaatttteerrnn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the pattern subtree of a _g_e_n_e_r_a_t_o_r node.
+
+              _S_e_e _a_l_s_o_: ggeenneerraattoorr//22.
+
+       ggeett__aannnn((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> [[tteerrmm(())]]
+
+              Returns the list of user annotations associated with a syntax
+              tree node. For a newly created node, this is the empty list. The
+              annotations may be any terms.
+
+              _S_e_e _a_l_s_o_: ggeett__aattttrrss//11, sseett__aannnn//22.
+
+       ggeett__aattttrrss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeeeAAttttrriibbuutteess(())
+
+              Returns a representation of the attributes associated with a
+              syntax tree node. The attributes are all the extra information
+              that can be attached to a node. Currently, this includes
+              position information, source code comments, and user
+              annotations. The result of this function cannot be inspected
+              directly; only attached to another node (see sseett__aattttrrss//22).
+
+              For accessing individual attributes, see ggeett__ppooss//11, ggeett__aannnn//11,
+              ggeett__pprreeccoommmmeennttss//11 and ggeett__ppoossttccoommmmeennttss//11.
+
+              _S_e_e _a_l_s_o_: ggeett__aannnn//11, ggeett__ppooss//11, ggeett__ppoossttccoommmmeennttss//11,
+              ggeett__pprreeccoommmmeennttss//11, sseett__aattttrrss//22.
+
+       ggeett__ppooss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              Returns the position information associated with _N_o_d_e. This is
+              usually a nonnegative integer (indicating the source code line
+              number), but may be any term. By default, all new tree nodes
+              have their associated position information set to the integer
+              zero.
+
+              _S_e_e _a_l_s_o_: ggeett__aattttrrss//11, sseett__ppooss//22.
+
+       ggeett__ppoossttccoommmmeennttss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the associated post-comments of a node. This is a
+              possibly empty list of abstract comments, in top-down textual
+              order. When the code is formatted, post-comments are typically
+              displayed to the right of and/or below the node. For example:
+
+                   {foo, X, Y}     % Post-comment of tuple
+
+              If possible, the comment should be moved past any following
+              separator characters on the same line, rather than placing the
+              separators on the following line. E.g.:
+
+                   foo([X | Xs], Y) ->
+                       foo(Xs, bar(X));     % Post-comment of 'bar(X)' node
+                    ...
+
+              (where the comment is moved past the rightmost "_)" and the "_;").
+
+              _S_e_e _a_l_s_o_: ccoommmmeenntt//22, ggeett__aattttrrss//11, ggeett__pprreeccoommmmeennttss//11,
+              sseett__ppoossttccoommmmeennttss//22.
+
+       ggeett__pprreeccoommmmeennttss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the associated pre-comments of a node. This is a
+              possibly empty list of abstract comments, in top-down textual
+              order. When the code is formatted, pre-comments are typically
+              displayed directly above the node. For example:
+
+                   % Pre-comment of function
+                   foo(X) -> {bar, X}.
+
+              If possible, the comment should be moved before any preceding
+              separator characters on the same line. E.g.:
+
+                   foo([X | Xs]) ->
+                       % Pre-comment of 'bar(X)' node
+                       [bar(X) | foo(Xs)];
+                   ...
+
+              (where the comment is moved before the "_[").
+
+              _S_e_e _a_l_s_o_: ccoommmmeenntt//22, ggeett__aattttrrss//11, ggeett__ppoossttccoommmmeennttss//11,
+              sseett__pprreeccoommmmeennttss//22.
+
+       hhaass__ccoommmmeennttss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Yields _f_a_l_s_e if the node has no associated comments, and _t_r_u_e
+              otherwise.
+
+              Note: This is equivalent to _(_g_e_t___p_r_e_c_o_m_m_e_n_t_s_(_N_o_d_e_) _=_= _[_]_) _a_n_d
+              _(_g_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_N_o_d_e_) _=_= _[_]_), but potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ggeett__ppoossttccoommmmeennttss//11, ggeett__pprreeccoommmmeennttss//11,
+              rreemmoovvee__ccoommmmeennttss//11.
+
+       iiff__eexxpprr((CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract if-expression. If _C_l_a_u_s_e_s is _[_C_1_, _._._._, _C_n_],
+              the result represents "_i_f _C_1_; _._._._; _C_n _e_n_d". More exactly, if
+              each _C_i represents "_(_) _G_i _-_> _B_i", then the result represents "_i_f
+              _G_1 _-_> _B_1_; _._._._; _G_n _-_> _B_n _e_n_d".
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr//22, ccllaauussee//33, iiff__eexxpprr__ccllaauusseess//11.
+
+       iiff__eexxpprr__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of an _i_f___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: iiff__eexxpprr//11.
+
+       iimmpplliicciitt__ffuunn((NNaammee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract "implicit fun" expression. The result
+              represents "_f_u_n _N_a_m_e". _N_a_m_e should represent either _F_/_A or _M_:_F_/_A
+
+              _S_e_e _a_l_s_o_: aarriittyy__qquuaalliiffiieerr//22, iimmpplliicciitt__ffuunn//22, iimmpplliicciitt__ffuunn//33,
+              iimmpplliicciitt__ffuunn__nnaammee//11, mmoodduullee__qquuaalliiffiieerr//22.
+
+       iimmpplliicciitt__ffuunn((NNaammee::::ssyynnttaaxxTTrreeee(()),, AArriittyy::::nnoonnee || ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract "implicit fun" expression. If _A_r_i_t_y is _n_o_n_e,
+              this is equivalent to _i_m_p_l_i_c_i_t___f_u_n_(_N_a_m_e_), otherwise it is
+              equivalent to _i_m_p_l_i_c_i_t___f_u_n_(_a_r_i_t_y___q_u_a_l_i_f_i_e_r_(_N_a_m_e_, _A_r_i_t_y_)_).
+
+              (This is a utility function.)
+
+              _S_e_e _a_l_s_o_: iimmpplliicciitt__ffuunn//11, iimmpplliicciitt__ffuunn//33.
+
+       iimmpplliicciitt__ffuunn((MMoodduullee::::nnoonnee || ssyynnttaaxxTTrreeee(()),, NNaammee::::ssyynnttaaxxTTrreeee(()),,
+       AArriittyy::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract module-qualified "implicit fun" expression.
+              If _M_o_d_u_l_e is _n_o_n_e, this is equivalent to _i_m_p_l_i_c_i_t___f_u_n_(_N_a_m_e_,
+              _A_r_i_t_y_), otherwise it is equivalent to
+              _i_m_p_l_i_c_i_t___f_u_n_(_m_o_d_u_l_e___q_u_a_l_i_f_i_e_r_(_M_o_d_u_l_e_, _a_r_i_t_y___q_u_a_l_i_f_i_e_r_(_N_a_m_e_,
+              _A_r_i_t_y_)_).
+
+              (This is a utility function.)
+
+              _S_e_e _a_l_s_o_: iimmpplliicciitt__ffuunn//11, iimmpplliicciitt__ffuunn//22.
+
+       iimmpplliicciitt__ffuunn__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the name subtree of an _i_m_p_l_i_c_i_t___f_u_n node.
+
+              Note: if _N_o_d_e represents "_f_u_n _N_/_A" or "_f_u_n _M_:_N_/_A", then the
+              result is the subtree representing "_N_/_A" or "_M_:_N_/_A",
+              respectively.
+
+              _S_e_e _a_l_s_o_: aarriittyy__qquuaalliiffiieerr//22, iimmpplliicciitt__ffuunn//11, mmoodduullee__qquuaalliiffiieerr//22.
+
+       iinnffiixx__eexxpprr((LLeefftt::::ssyynnttaaxxTTrreeee(()),, OOppeerraattoorr::::ssyynnttaaxxTTrreeee(()),,
+       RRiigghhtt::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract infix operator expression. The result
+              represents "_L_e_f_t _O_p_e_r_a_t_o_r _R_i_g_h_t".
+
+              _S_e_e _a_l_s_o_: iinnffiixx__eexxpprr__lleefftt//11, iinnffiixx__eexxpprr__ooppeerraattoorr//11,
+              iinnffiixx__eexxpprr__rriigghhtt//11, pprreeffiixx__eexxpprr//22.
+
+       iinnffiixx__eexxpprr__lleefftt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the left argument subtree of an _i_n_f_i_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: iinnffiixx__eexxpprr//33.
+
+       iinnffiixx__eexxpprr__ooppeerraattoorr((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the operator subtree of an _i_n_f_i_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: iinnffiixx__eexxpprr//33.
+
+       iinnffiixx__eexxpprr__rriigghhtt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the right argument subtree of an _i_n_f_i_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: iinnffiixx__eexxpprr//33.
+
+       iinntteeggeerr((VVaalluuee::::iinntteeggeerr(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract integer literal. The lexical representation
+              is the canonical decimal numeral of _V_a_l_u_e.
+
+              _S_e_e _a_l_s_o_: iinntteeggeerr__lliitteerraall//11, iinntteeggeerr__vvaalluuee//11, iiss__iinntteeggeerr//22.
+
+       iinntteeggeerr__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the numeral string represented by an _i_n_t_e_g_e_r node.
+
+              _S_e_e _a_l_s_o_: iinntteeggeerr//11.
+
+       iinntteeggeerr__vvaalluuee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> iinntteeggeerr(())
+
+              Returns the value represented by an _i_n_t_e_g_e_r node.
+
+              _S_e_e _a_l_s_o_: iinntteeggeerr//11.
+
+       iiss__aattoomm((NNooddee::::ssyynnttaaxxTTrreeee(()),, VVaalluuee::::aattoomm(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e has type _a_t_o_m and represents _V_a_l_u_e,
+              otherwise _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: aattoomm//11.
+
+       iiss__cchhaarr((NNooddee::::ssyynnttaaxxTTrreeee(()),, VVaalluuee::::cchhaarr(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e has type _c_h_a_r and represents _V_a_l_u_e,
+              otherwise _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: cchhaarr//11.
+
+       iiss__ffoorrmm((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e is a syntax tree representing a so-called
+              "source code form", otherwise _f_a_l_s_e. Forms are the Erlang source
+              code units which, placed in sequence, constitute an Erlang
+              program. Current form types are:
+
+              _a_t_t_r_i_b_u_t_e _c_o_m_m_e_n_t _e_r_r_o_r___m_a_r_k_e_r _e_o_f___m_a_r_k_e_r _f_o_r_m___l_i_s_t
+              _f_u_n_c_t_i_o_n _r_u_l_e _w_a_r_n_i_n_g___m_a_r_k_e_r _t_e_x_t
+
+
+              _S_e_e _a_l_s_o_: aattttrriibbuuttee//22, ccoommmmeenntt//22, eeooff__mmaarrkkeerr//00, eerrrroorr__mmaarrkkeerr//11,
+              ffoorrmm__lliisstt//11, ffuunnccttiioonn//22, rruullee//22, ttyyppee//11, wwaarrnniinngg__mmaarrkkeerr//11.
+
+       iiss__iinntteeggeerr((NNooddee::::ssyynnttaaxxTTrreeee(()),, VVaalluuee::::iinntteeggeerr(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e has type _i_n_t_e_g_e_r and represents _V_a_l_u_e,
+              otherwise _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: iinntteeggeerr//11.
+
+       iiss__lleeaaff((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e is a leaf node, otherwise _f_a_l_s_e. The
+              currently recognised leaf node types are:
+
+              _a_t_o_m _c_h_a_r _c_o_m_m_e_n_t _e_o_f___m_a_r_k_e_r _e_r_r_o_r___m_a_r_k_e_r
+              _f_l_o_a_t _i_n_t_e_g_e_r _n_i_l _o_p_e_r_a_t_o_r _s_t_r_i_n_g
+              _t_e_x_t _u_n_d_e_r_s_c_o_r_e _v_a_r_i_a_b_l_e _w_a_r_n_i_n_g___m_a_r_k_e_r
+
+
+              A node of type _t_u_p_l_e is a leaf node if and only if its arity is
+              zero.
+
+              Note: not all literals are leaf nodes, and vice versa. E.g.,
+              tuples with nonzero arity and nonempty lists may be literals,
+              but are not leaf nodes. Variables, on the other hand, are leaf
+              nodes but not literals.
+
+              _S_e_e _a_l_s_o_: iiss__lliitteerraall//11, ttyyppee//11.
+
+       iiss__lliisstt__sskkeelleettoonn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e has type _l_i_s_t or _n_i_l, otherwise _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: lliisstt//22, nniill//00.
+
+       iiss__lliitteerraall((TT::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e represents a literal term, otherwise _f_a_l_s_e.
+              This function returns _t_r_u_e if and only if the value of
+              _c_o_n_c_r_e_t_e_(_N_o_d_e_) is defined.
+
+              _S_e_e _a_l_s_o_: aabbssttrraacctt//11, ccoonnccrreettee//11.
+
+       iiss__pprrooppeerr__lliisstt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e represents a proper list, and _f_a_l_s_e
+              otherwise. A proper list is a list skeleton either on the form
+              "_[_]" or "_[_E_1_, _._._._, _E_n_]", or "_[_._._. _| _T_a_i_l_]" where recursively
+              _T_a_i_l also represents a proper list.
+
+              Note: Since _N_o_d_e is a syntax tree, the actual run-time values
+              corresponding to its subtrees may often be partially or
+              completely unknown. Thus, if _N_o_d_e represents e.g. "_[_._._. _| _N_s_]"
+              (where _N_s is a variable), then the function will return _f_a_l_s_e,
+              because it is not known whether _N_s will be bound to a list at
+              run-time. If _N_o_d_e instead represents e.g. "_[_1_, _2_, _3_]" or "_[_A _|
+              _[_]_]", then the function will return _t_r_u_e.
+
+              _S_e_e _a_l_s_o_: lliisstt//22.
+
+       iiss__ssttrriinngg((NNooddee::::ssyynnttaaxxTTrreeee(()),, VVaalluuee::::ssttrriinngg(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _N_o_d_e has type _s_t_r_i_n_g and represents _V_a_l_u_e,
+              otherwise _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: ssttrriinngg//11.
+
+       iiss__ttrreeee((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              _F_o_r _s_p_e_c_i_a_l _p_u_r_p_o_s_e_s _o_n_l_y. Returns _t_r_u_e if _T_r_e_e is an abstract
+              syntax tree and _f_a_l_s_e otherwise.
+
+              _N_o_t_e: this function yields _f_a_l_s_e for all "old-style" _e_r_l___p_a_r_s_e-
+              compatible "parse trees".
+
+              _S_e_e _a_l_s_o_: ttrreeee//22.
+
+       jjooiinn__ccoommmmeennttss((SSoouurrccee::::ssyynnttaaxxTTrreeee(()),, TTaarrggeett::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Appends the comments of _S_o_u_r_c_e to the current comments of
+              _T_a_r_g_e_t.
+
+              Note: This is equivalent to
+              _a_d_d___p_o_s_t_c_o_m_m_e_n_t_s_(_g_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_S_o_u_r_c_e_)_,
+              _a_d_d___p_r_e_c_o_m_m_e_n_t_s_(_g_e_t___p_r_e_c_o_m_m_e_n_t_s_(_S_o_u_r_c_e_)_, _T_a_r_g_e_t_)_), but
+              potentially more efficient.
+
+              _S_e_e _a_l_s_o_: aadddd__ppoossttccoommmmeennttss//22, aadddd__pprreeccoommmmeennttss//22, ccoommmmeenntt//22,
+              ggeett__ppoossttccoommmmeennttss//11, ggeett__pprreeccoommmmeennttss//11.
+
+       lliisstt((LLiisstt::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to lliisstt((LLiisstt,, nnoonnee)).
+
+       lliisstt((EElleemmeennttss::::[[ssyynnttaaxxTTrreeee(())]],, TTaaiill::::nnoonnee || ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Constructs an abstract list skeleton. The result has type _l_i_s_t
+              or _n_i_l. If _L_i_s_t is a nonempty list _[_E_1_, _._._._, _E_n_], the result has
+              type _l_i_s_t and represents either "_[_E_1_, _._._._, _E_n_]", if _T_a_i_l is
+              _n_o_n_e, or otherwise "_[_E_1_, _._._._, _E_n _| _T_a_i_l_]". If _L_i_s_t is the empty
+              list, _T_a_i_l _m_u_s_t be _n_o_n_e, and in that case the result has type
+              _n_i_l and represents "_[_]" (see nniill//00).
+
+              The difference between lists as semantic objects (built up of
+              individual "cons" and "nil" terms) and the various syntactic
+              forms for denoting lists may be bewildering at first. This
+              module provides functions both for exact control of the
+              syntactic representation as well as for the simple composition
+              and deconstruction in terms of cons and head/tail operations.
+
+              Note: in _l_i_s_t_(_E_l_e_m_e_n_t_s_, _n_o_n_e_), the "nil" list terminator is
+              implicit and has no associated information (see ggeett__aattttrrss//11),
+              while in the seemingly equivalent _l_i_s_t_(_E_l_e_m_e_n_t_s_, _T_a_i_l_) when _T_a_i_l
+              has type _n_i_l, the list terminator subtree _T_a_i_l may have attached
+              attributes such as position, comments, and annotations, which
+              will be preserved in the result.
+
+              _S_e_e _a_l_s_o_: ccoommppaacctt__lliisstt//11, ccoonnss//22, ggeett__aattttrrss//11,
+              iiss__lliisstt__sskkeelleettoonn//11, iiss__pprrooppeerr__lliisstt//11, lliisstt//11, lliisstt__eelleemmeennttss//11,
+              lliisstt__hheeaadd//11, lliisstt__lleennggtthh//11, lliisstt__pprreeffiixx//11, lliisstt__ssuuffffiixx//11,
+              lliisstt__ttaaiill//11, nniill//00, nnoorrmmaalliizzee__lliisstt//11.
+
+       lliisstt__ccoommpp((TTeemmppllaattee::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract list comprehension. If _B_o_d_y is _[_E_1_, _._._._,
+              _E_n_], the result represents "_[_T_e_m_p_l_a_t_e _|_| _E_1_, _._._._, _E_n_]".
+
+              _S_e_e _a_l_s_o_: ggeenneerraattoorr//22, lliisstt__ccoommpp__bbooddyy//11, lliisstt__ccoommpp__tteemmppllaattee//11.
+
+       lliisstt__ccoommpp__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of body subtrees of a _l_i_s_t___c_o_m_p node.
+
+              _S_e_e _a_l_s_o_: lliisstt__ccoommpp//22.
+
+       lliisstt__ccoommpp__tteemmppllaattee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the template subtree of a _l_i_s_t___c_o_m_p node.
+
+              _S_e_e _a_l_s_o_: lliisstt__ccoommpp//22.
+
+       lliisstt__eelleemmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of element subtrees of a list skeleton. _N_o_d_e
+              must represent a proper list. E.g., if _N_o_d_e represents "_[_X_1_, _X_2
+              _| _[_X_3_, _X_4 _| _[_]_]", then _l_i_s_t___e_l_e_m_e_n_t_s_(_N_o_d_e_) yields the list _[_X_1_,
+              _X_2_, _X_3_, _X_4_].
+
+              _S_e_e _a_l_s_o_: iiss__pprrooppeerr__lliisstt//11, lliisstt//22.
+
+       lliisstt__hheeaadd((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the head element subtree of a _l_i_s_t node. If _N_o_d_e
+              represents "_[_H_e_a_d _._._._]", the result will represent "_H_e_a_d".
+
+              _S_e_e _a_l_s_o_: ccoonnss//22, lliisstt//22, lliisstt__ttaaiill//11.
+
+       lliisstt__lleennggtthh((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonn__nneegg__iinntteeggeerr(())
+
+              Returns the number of element subtrees of a list skeleton. _N_o_d_e
+              must represent a proper list. E.g., if _N_o_d_e represents "_[_X_1 _|
+              _[_X_2_, _X_3 _| _[_X_4_, _X_5_, _X_6_]_]_]", then _l_i_s_t___l_e_n_g_t_h_(_N_o_d_e_) returns the
+              integer 6.
+
+              Note: this is equivalent to _l_e_n_g_t_h_(_l_i_s_t___e_l_e_m_e_n_t_s_(_N_o_d_e_)_), but
+              potentially more efficient.
+
+              _S_e_e _a_l_s_o_: iiss__pprrooppeerr__lliisstt//11, lliisstt//22, lliisstt__eelleemmeennttss//11.
+
+       lliisstt__pprreeffiixx((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the prefix element subtrees of a _l_i_s_t node. If _N_o_d_e
+              represents "_[_E_1_, _._._._, _E_n_]" or "_[_E_1_, _._._._, _E_n _| _T_a_i_l_]", the
+              returned value is _[_E_1_, _._._._, _E_n_].
+
+              _S_e_e _a_l_s_o_: lliisstt//22.
+
+       lliisstt__ssuuffffiixx((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the suffix subtree of a _l_i_s_t node, if one exists. If
+              _N_o_d_e represents "_[_E_1_, _._._._, _E_n _| _T_a_i_l_]", the returned value is
+              _T_a_i_l, otherwise, i.e., if _N_o_d_e represents "_[_E_1_, _._._._, _E_n_]", _n_o_n_e
+              is returned.
+
+              Note that even if this function returns some _T_a_i_l that is not
+              _n_o_n_e, the type of _T_a_i_l can be _n_i_l, if the tail has been given
+              explicitly, and the list skeleton has not been compacted (see
+              ccoommppaacctt__lliisstt//11).
+
+              _S_e_e _a_l_s_o_: ccoommppaacctt__lliisstt//11, lliisstt//22, nniill//00.
+
+       lliisstt__ttaaiill((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the tail of a _l_i_s_t node. If _N_o_d_e represents a single-
+              element list "_[_E_]", then the result has type _n_i_l, representing
+              "_[_]". If _N_o_d_e represents "_[_E_1_, _E_2 _._._._]", the result will
+              represent "_[_E_2 _._._._]", and if _N_o_d_e represents "_[_H_e_a_d _| _T_a_i_l_]",
+              the result will represent "_T_a_i_l".
+
+              _S_e_e _a_l_s_o_: ccoonnss//22, lliisstt//22, lliisstt__hheeaadd//11.
+
+       mmaaccrroo((NNaammee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to mmaaccrroo((NNaammee,, nnoonnee)).
+
+       mmaaccrroo((NNaammee::::ssyynnttaaxxTTrreeee(()),, AArrgguummeennttss::::nnoonnee || [[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract macro application. If _A_r_g_u_m_e_n_t_s is _n_o_n_e, the
+              result represents "_?_N_a_m_e", otherwise, if _A_r_g_u_m_e_n_t_s is _[_A_1_, _._._._,
+              _A_n_], the result represents "_?_N_a_m_e_(_A_1_, _._._._, _A_n_)".
+
+              Notes: if _A_r_g_u_m_e_n_t_s is the empty list, the result will thus
+              represent "_?_N_a_m_e_(_)", including a pair of matching parentheses.
+
+              The only syntactical limitation imposed by the preprocessor on
+              the arguments to a macro application (viewed as sequences of
+              tokens) is that they must be balanced with respect to
+              parentheses, brackets, _b_e_g_i_n _._._. _e_n_d, _c_a_s_e _._._. _e_n_d, etc. The
+              _t_e_x_t node type can be used to represent arguments which are not
+              regular Erlang constructs.
+
+              _S_e_e _a_l_s_o_: mmaaccrroo//11, mmaaccrroo__aarrgguummeennttss//11, mmaaccrroo__nnaammee//11, tteexxtt//11.
+
+       mmaaccrroo__aarrgguummeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of argument subtrees of a _m_a_c_r_o node, if any.
+              If _N_o_d_e represents "_?_N_a_m_e", _n_o_n_e is returned. Otherwise, if _N_o_d_e
+              represents "_?_N_a_m_e_(_A_1_, _._._._, _A_n_)", _[_A_1_, _._._._, _A_n_] is returned.
+
+              _S_e_e _a_l_s_o_: mmaaccrroo//22.
+
+       mmaaccrroo__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the name subtree of a _m_a_c_r_o node.
+
+              _S_e_e _a_l_s_o_: mmaaccrroo//22.
+
+       mmaakkee__ttrreeee((XX11::::aattoomm(()),, XX22::::[[[[ssyynnttaaxxTTrreeee(())]]]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates a syntax tree with the given type and subtrees. _T_y_p_e
+              must be a node type name (see ttyyppee//11) that does not denote a
+              leaf node type (see iiss__lleeaaff//11). _G_r_o_u_p_s must be a _n_o_n_e_m_p_t_y list
+              of groups of syntax trees, representing the subtrees of a node
+              of the given type, in left-to-right order as they would occur in
+              the printed program text, grouped by category as done by
+              ssuubbttrreeeess//11.
+
+              The result of _c_o_p_y___a_t_t_r_s_(_N_o_d_e_, _m_a_k_e___t_r_e_e_(_t_y_p_e_(_N_o_d_e_)_,
+              _s_u_b_t_r_e_e_s_(_N_o_d_e_)_)_) (see uuppddaattee__ttrreeee//22) represents the same source
+              code text as the original _N_o_d_e, assuming that _s_u_b_t_r_e_e_s_(_N_o_d_e_)
+              yields a nonempty list. However, it does not necessarily have
+              the same data representation as _N_o_d_e.
+
+              _S_e_e _a_l_s_o_: ccooppyy__aattttrrss//22, iiss__lleeaaff//11, ssuubbttrreeeess//11, ttyyppee//11,
+              uuppddaattee__ttrreeee//22.
+
+       mmaattcchh__eexxpprr((PPaatttteerrnn::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract match-expression. The result represents
+              "_P_a_t_t_e_r_n _= _B_o_d_y".
+
+              _S_e_e _a_l_s_o_: mmaattcchh__eexxpprr__bbooddyy//11, mmaattcchh__eexxpprr__ppaatttteerrnn//11.
+
+       mmaattcchh__eexxpprr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _m_a_t_c_h___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: mmaattcchh__eexxpprr//22.
+
+       mmaattcchh__eexxpprr__ppaatttteerrnn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the pattern subtree of a _m_a_t_c_h___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: mmaattcchh__eexxpprr//22.
+
+       mmeettaa((TT::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates a meta-representation of a syntax tree. The result
+              represents an Erlang expression "_M_e_t_a_T_r_e_e" which, if evaluated,
+              will yield a new syntax tree representing the same source code
+              text as _T_r_e_e (although the actual data representation may be
+              different). The expression represented by _M_e_t_a_T_r_e_e is
+              _i_m_p_l_e_m_e_n_t_a_t_i_o_n _i_n_d_e_p_e_n_d_e_n_t with regard to the data structures
+              used by the abstract syntax tree implementation. Comments
+              attached to nodes of _T_r_e_e will be preserved, but other
+              attributes are lost.
+
+              Any node in _T_r_e_e whose node type is _v_a_r_i_a_b_l_e (see ttyyppee//11), and
+              whose list of annotations (see ggeett__aannnn//11) contains the atom
+              _m_e_t_a___v_a_r, will remain unchanged in the resulting tree, except
+              that exactly one occurrence of _m_e_t_a___v_a_r is removed from its
+              annotation list.
+
+              The main use of the function _m_e_t_a_/_1 is to transform a data
+              structure _T_r_e_e, which represents a piece of program code, into a
+              form that is _r_e_p_r_e_s_e_n_t_a_t_i_o_n _i_n_d_e_p_e_n_d_e_n_t _w_h_e_n _p_r_i_n_t_e_d. E.g.,
+              suppose _T_r_e_e represents a variable named "V". Then (assuming a
+              function _p_r_i_n_t_/_1 for printing syntax trees), evaluating
+              _p_r_i_n_t_(_a_b_s_t_r_a_c_t_(_T_r_e_e_)_) - simply using aabbssttrraacctt//11 to map the
+              actual data structure onto a syntax tree representation - would
+              output a string that might look something like "_{_t_r_e_e_, _v_a_r_i_a_b_l_e_,
+              _._._._, _"_V_"_, _._._._}", which is obviously dependent on the
+              implementation of the abstract syntax trees. This could e.g. be
+              useful for caching a syntax tree in a file. However, in some
+              situations like in a program generator generator (with two
+              "generator"), it may be unacceptable. Using _p_r_i_n_t_(_m_e_t_a_(_T_r_e_e_)_)
+              instead would output a _r_e_p_r_e_s_e_n_t_a_t_i_o_n _i_n_d_e_p_e_n_d_e_n_t syntax tree
+              generating expression; in the above case, something like
+              "_e_r_l___s_y_n_t_a_x_:_v_a_r_i_a_b_l_e_(_"_V_"_)".
+
+              _S_e_e _a_l_s_o_: aabbssttrraacctt//11, ggeett__aannnn//11, ttyyppee//11.
+
+       mmoodduullee__qquuaalliiffiieerr((MMoodduullee::::ssyynnttaaxxTTrreeee(()),, BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract module qualifier. The result represents
+              "_M_o_d_u_l_e_:_B_o_d_y".
+
+              _S_e_e _a_l_s_o_: mmoodduullee__qquuaalliiffiieerr__aarrgguummeenntt//11, mmoodduullee__qquuaalliiffiieerr__bbooddyy//11.
+
+       mmoodduullee__qquuaalliiffiieerr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument (the module) subtree of a _m_o_d_u_l_e___q_u_a_l_i_f_i_e_r
+              node.
+
+              _S_e_e _a_l_s_o_: mmoodduullee__qquuaalliiffiieerr//22.
+
+       mmoodduullee__qquuaalliiffiieerr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _m_o_d_u_l_e___q_u_a_l_i_f_i_e_r node.
+
+              _S_e_e _a_l_s_o_: mmoodduullee__qquuaalliiffiieerr//22.
+
+       nniill(()) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract empty list. The result represents "_[_]". The
+              empty list is traditionally called "nil".
+
+              _S_e_e _a_l_s_o_: iiss__lliisstt__sskkeelleettoonn//11, lliisstt//22.
+
+       nnoorrmmaalliizzee__lliisstt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Expands an abstract list skeleton to its most explicit form. If
+              _N_o_d_e represents "_[_E_1_, _._._._, _E_n _| _T_a_i_l_]", the result represents
+              "_[_E_1 _| _._._. _[_E_n _| _T_a_i_l_1_] _._._. _]", where _T_a_i_l_1 is the result of
+              _n_o_r_m_a_l_i_z_e___l_i_s_t_(_T_a_i_l_). If _N_o_d_e represents "_[_E_1_, _._._._, _E_n_]", the
+              result simply represents "_[_E_1 _| _._._. _[_E_n _| _[_]_] _._._. _]". If _N_o_d_e
+              does not represent a list skeleton, _N_o_d_e itself is returned.
+
+              _S_e_e _a_l_s_o_: ccoommppaacctt__lliisstt//11, lliisstt//22.
+
+       ooppeerraattoorr((NNaammee::::aattoomm(()) || ssttrriinngg(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract operator. The name of the operator is the
+              character sequence represented by _N_a_m_e. This is analogous to the
+              print name of an atom, but an operator is never written within
+              single-quotes; e.g., the result of _o_p_e_r_a_t_o_r_(++')' represents
+              "_+_+" rather than "`++''".
+
+              _S_e_e _a_l_s_o_: aattoomm//11, ooppeerraattoorr__lliitteerraall//11, ooppeerraattoorr__nnaammee//11.
+
+       ooppeerraattoorr__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the literal string represented by an _o_p_e_r_a_t_o_r node. This
+              is simply the operator name as a string.
+
+              _S_e_e _a_l_s_o_: ooppeerraattoorr//11.
+
+       ooppeerraattoorr__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> aattoomm(())
+
+              Returns the name of an _o_p_e_r_a_t_o_r node. Note that the name is
+              returned as an atom.
+
+              _S_e_e _a_l_s_o_: ooppeerraattoorr//11.
+
+       ppaarreenntthheesseess((EExxpprr::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract parenthesised expression. The result
+              represents "_(_B_o_d_y_)", independently of the context.
+
+              _S_e_e _a_l_s_o_: ppaarreenntthheesseess__bbooddyy//11.
+
+       ppaarreenntthheesseess__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _p_a_r_e_n_t_h_e_s_e_s node.
+
+              _S_e_e _a_l_s_o_: ppaarreenntthheesseess//11.
+
+       pprreeffiixx__eexxpprr((OOppeerraattoorr::::ssyynnttaaxxTTrreeee(()),, AArrgguummeenntt::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract prefix operator expression. The result
+              represents "_O_p_e_r_a_t_o_r _A_r_g_u_m_e_n_t".
+
+              _S_e_e _a_l_s_o_: iinnffiixx__eexxpprr//33, pprreeffiixx__eexxpprr__aarrgguummeenntt//11,
+              pprreeffiixx__eexxpprr__ooppeerraattoorr//11.
+
+       pprreeffiixx__eexxpprr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument subtree of a _p_r_e_f_i_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: pprreeffiixx__eexxpprr//22.
+
+       pprreeffiixx__eexxpprr__ooppeerraattoorr((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the operator subtree of a _p_r_e_f_i_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: pprreeffiixx__eexxpprr//22.
+
+       qquuaalliiffiieedd__nnaammee((SSeeggmmeennttss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract qualified name. The result represents
+              "_S_1_._S_2_. _._._. _._S_n", if _S_e_g_m_e_n_t_s is _[_S_1_, _S_2_, _._._._, _S_n_].
+
+              _S_e_e _a_l_s_o_: qquuaalliiffiieedd__nnaammee__sseeggmmeennttss//11.
+
+       qquuaalliiffiieedd__nnaammee__sseeggmmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of name segments of a _q_u_a_l_i_f_i_e_d___n_a_m_e node.
+
+              _S_e_e _a_l_s_o_: qquuaalliiffiieedd__nnaammee//11.
+
+       qquueerryy__eexxpprr((BBooddyy::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract Mnemosyne query expression. The result
+              represents "_q_u_e_r_y _B_o_d_y _e_n_d".
+
+              _S_e_e _a_l_s_o_: qquueerryy__eexxpprr__bbooddyy//11, rreeccoorrdd__aacccceessss//22, rruullee//22.
+
+       qquueerryy__eexxpprr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _q_u_e_r_y___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: qquueerryy__eexxpprr//11.
+
+       rreecceeiivvee__eexxpprr((CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to rreecceeiivvee__eexxpprr((CCllaauusseess,, nnoonnee,, [[]])).
+
+       rreecceeiivvee__eexxpprr((CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]],, TTiimmeeoouutt::::nnoonnee || ssyynnttaaxxTTrreeee(()),,
+       AAccttiioonn::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract receive-expression. If _T_i_m_e_o_u_t is _n_o_n_e, the
+              result represents "_r_e_c_e_i_v_e _C_1_; _._._._; _C_n _e_n_d" (the _A_c_t_i_o_n argument
+              is ignored). Otherwise, if _C_l_a_u_s_e_s is _[_C_1_, _._._._, _C_n_] and _A_c_t_i_o_n
+              is _[_A_1_, _._._._, _A_m_], the result represents "_r_e_c_e_i_v_e _C_1_; _._._._; _C_n
+              _a_f_t_e_r _T_i_m_e_o_u_t _-_> _A_1_, _._._._, _A_m _e_n_d". More exactly, if each _C_i
+              represents "_(_P_i_) _G_i _-_> _B_i", then the result represents "_r_e_c_e_i_v_e
+              _P_1 _G_1 _-_> _B_1_; _._._._; _P_n _G_n _-_> _B_n _._._. _e_n_d".
+
+              Note that in Erlang, a receive-expression must have at least one
+              clause if no timeout part is specified.
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr//22, ccllaauussee//33, rreecceeiivvee__eexxpprr//11,
+              rreecceeiivvee__eexxpprr__aaccttiioonn//11, rreecceeiivvee__eexxpprr__ccllaauusseess//11,
+              rreecceeiivvee__eexxpprr__ttiimmeeoouutt//11.
+
+       rreecceeiivvee__eexxpprr__aaccttiioonn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of action body subtrees of a _r_e_c_e_i_v_e___e_x_p_r node.
+              If _N_o_d_e represents "_r_e_c_e_i_v_e _C_1_; _._._._; _C_n _e_n_d", this is the empty
+              list.
+
+              _S_e_e _a_l_s_o_: rreecceeiivvee__eexxpprr//33.
+
+       rreecceeiivvee__eexxpprr__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of a _r_e_c_e_i_v_e___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: rreecceeiivvee__eexxpprr//33.
+
+       rreecceeiivvee__eexxpprr__ttiimmeeoouutt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the timeout subtree of a _r_e_c_e_i_v_e___e_x_p_r node, if any. If
+              _N_o_d_e represents "_r_e_c_e_i_v_e _C_1_; _._._._; _C_n _e_n_d", _n_o_n_e is returned.
+              Otherwise, if _N_o_d_e represents "_r_e_c_e_i_v_e _C_1_; _._._._; _C_n _a_f_t_e_r _T_i_m_e_o_u_t
+              _-_> _._._. _e_n_d", _T_i_m_e_o_u_t is returned.
+
+              _S_e_e _a_l_s_o_: rreecceeiivvee__eexxpprr//33.
+
+       rreeccoorrdd__aacccceessss((AArrgguummeenntt::::ssyynnttaaxxTTrreeee(()),, FFiieelldd::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Equivalent to rreeccoorrdd__aacccceessss((AArrgguummeenntt,, nnoonnee,, FFiieelldd)).
+
+       rreeccoorrdd__aacccceessss((AArrgguummeenntt::::ssyynnttaaxxTTrreeee(()),, TTyyppee::::nnoonnee || ssyynnttaaxxTTrreeee(()),,
+       FFiieelldd::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract record field access expression. If _T_y_p_e is
+              not _n_o_n_e, the result represents "_A_r_g_u_m_e_n_t_#_T_y_p_e_._F_i_e_l_d".
+
+              If _T_y_p_e is _n_o_n_e, the result represents "_A_r_g_u_m_e_n_t_._F_i_e_l_d". This is
+              a special form only allowed within Mnemosyne queries.
+
+              _S_e_e _a_l_s_o_: qquueerryy__eexxpprr//11, rreeccoorrdd__aacccceessss//22,
+              rreeccoorrdd__aacccceessss__aarrgguummeenntt//11, rreeccoorrdd__aacccceessss__ffiieelldd//11,
+              rreeccoorrdd__aacccceessss__ttyyppee//11, rreeccoorrdd__eexxpprr//33.
+
+       rreeccoorrdd__aacccceessss__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument subtree of a _r_e_c_o_r_d___a_c_c_e_s_s node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__aacccceessss//33.
+
+       rreeccoorrdd__aacccceessss__ffiieelldd((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the field subtree of a _r_e_c_o_r_d___a_c_c_e_s_s node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__aacccceessss//33.
+
+       rreeccoorrdd__aacccceessss__ttyyppee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the type subtree of a _r_e_c_o_r_d___a_c_c_e_s_s node, if any. If
+              _N_o_d_e represents "_A_r_g_u_m_e_n_t_._F_i_e_l_d", _n_o_n_e is returned, otherwise if
+              _N_o_d_e represents "_A_r_g_u_m_e_n_t_#_T_y_p_e_._F_i_e_l_d", _T_y_p_e is returned.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__aacccceessss//33.
+
+       rreeccoorrdd__eexxpprr((TTyyppee::::ssyynnttaaxxTTrreeee(()),, FFiieellddss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to rreeccoorrdd__eexxpprr((nnoonnee,, TTyyppee,, FFiieellddss)).
+
+       rreeccoorrdd__eexxpprr((AArrgguummeenntt::::nnoonnee || ssyynnttaaxxTTrreeee(()),, TTyyppee::::ssyynnttaaxxTTrreeee(()),,
+       FFiieellddss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract record expression. If _F_i_e_l_d_s is _[_F_1_, _._._._,
+              _F_n_], then if _A_r_g_u_m_e_n_t is _n_o_n_e, the result represents "_#_T_y_p_e_{_F_1_,
+              _._._._, _F_n_}", otherwise it represents "_A_r_g_u_m_e_n_t_#_T_y_p_e_{_F_1_, _._._._, _F_n_}".
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__aacccceessss//33, rreeccoorrdd__eexxpprr//22,
+              rreeccoorrdd__eexxpprr__aarrgguummeenntt//11, rreeccoorrdd__eexxpprr__ffiieellddss//11,
+              rreeccoorrdd__eexxpprr__ttyyppee//11, rreeccoorrdd__ffiieelldd//22, rreeccoorrdd__iinnddeexx__eexxpprr//22.
+
+       rreeccoorrdd__eexxpprr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the argument subtree of a _r_e_c_o_r_d___e_x_p_r node, if any. If
+              _N_o_d_e represents "_#_T_y_p_e_{_._._._}", _n_o_n_e is returned. Otherwise, if
+              _N_o_d_e represents "_A_r_g_u_m_e_n_t_#_T_y_p_e_{_._._._}", _A_r_g_u_m_e_n_t is returned.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__eexxpprr//33.
+
+       rreeccoorrdd__eexxpprr__ffiieellddss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of field subtrees of a _r_e_c_o_r_d___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__eexxpprr//33.
+
+       rreeccoorrdd__eexxpprr__ttyyppee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the type subtree of a _r_e_c_o_r_d___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__eexxpprr//33.
+
+       rreeccoorrdd__ffiieelldd((NNaammee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to rreeccoorrdd__ffiieelldd((NNaammee,, nnoonnee)).
+
+       rreeccoorrdd__ffiieelldd((NNaammee::::ssyynnttaaxxTTrreeee(()),, VVaalluuee::::nnoonnee || ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract record field specification. If _V_a_l_u_e is
+              _n_o_n_e, the result represents simply "_N_a_m_e", otherwise it
+              represents "_N_a_m_e _= _V_a_l_u_e".
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__eexxpprr//33, rreeccoorrdd__ffiieelldd__nnaammee//11,
+              rreeccoorrdd__ffiieelldd__vvaalluuee//11.
+
+       rreeccoorrdd__ffiieelldd__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the name subtree of a _r_e_c_o_r_d___f_i_e_l_d node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__ffiieelldd//22.
+
+       rreeccoorrdd__ffiieelldd__vvaalluuee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonnee || ssyynnttaaxxTTrreeee(())
+
+              Returns the value subtree of a _r_e_c_o_r_d___f_i_e_l_d node, if any. If
+              _N_o_d_e represents "_N_a_m_e", _n_o_n_e is returned. Otherwise, if _N_o_d_e
+              represents "_N_a_m_e _= _V_a_l_u_e", _V_a_l_u_e is returned.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__ffiieelldd//22.
+
+       rreeccoorrdd__iinnddeexx__eexxpprr((TTyyppee::::ssyynnttaaxxTTrreeee(()),, FFiieelldd::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract record field index expression. The result
+              represents "_#_T_y_p_e_._F_i_e_l_d".
+
+              (Note: the function name _r_e_c_o_r_d___i_n_d_e_x_/_2 is reserved by the
+              Erlang compiler, which is why that name could not be used for
+              this constructor.)
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__eexxpprr//33, rreeccoorrdd__iinnddeexx__eexxpprr__ffiieelldd//11,
+              rreeccoorrdd__iinnddeexx__eexxpprr__ttyyppee//11.
+
+       rreeccoorrdd__iinnddeexx__eexxpprr__ffiieelldd((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the field subtree of a _r_e_c_o_r_d___i_n_d_e_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__iinnddeexx__eexxpprr//22.
+
+       rreeccoorrdd__iinnddeexx__eexxpprr__ttyyppee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the type subtree of a _r_e_c_o_r_d___i_n_d_e_x___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: rreeccoorrdd__iinnddeexx__eexxpprr//22.
+
+       rreemmoovvee__ccoommmmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Clears the associated comments of _N_o_d_e.
+
+              Note: This is equivalent to
+              _s_e_t___p_r_e_c_o_m_m_e_n_t_s_(_s_e_t___p_o_s_t_c_o_m_m_e_n_t_s_(_N_o_d_e_, _[_]_)_, _[_]_), but potentially
+              more efficient.
+
+              _S_e_e _a_l_s_o_: sseett__ppoossttccoommmmeennttss//22, sseett__pprreeccoommmmeennttss//22.
+
+       rreevveerrtt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns an _e_r_l___p_a_r_s_e-compatible representation of a syntax tree,
+              if possible. If _T_r_e_e represents a well-formed Erlang program or
+              expression, the conversion should work without problems.
+              Typically, iiss__ttrreeee//11 yields _t_r_u_e if conversion failed (i.e., the
+              result is still an abstract syntax tree), and _f_a_l_s_e otherwise.
+
+              The iiss__ttrreeee//11 test is not completely foolproof. For a few
+              special node types (e.g. _a_r_i_t_y___q_u_a_l_i_f_i_e_r), if such a node occurs
+              in a context where it is not expected, it will be left unchanged
+              as a non-reverted subtree of the result. This can only happen if
+              _T_r_e_e does not actually represent legal Erlang code.
+
+              _S_e_e _a_l_s_o_: eerrll__ppaarrssee((33)), rreevveerrtt__ffoorrmmss//11.
+
+       rreevveerrtt__ffoorrmmss((FFoorrmmss::::ffoorrmmss(()))) -->> [[eerrll__ppaarrssee(())]]
+
+              Reverts a sequence of Erlang source code forms. The sequence can
+              be given either as a _f_o_r_m___l_i_s_t syntax tree (possibly nested), or
+              as a list of "program form" syntax trees. If successful, the
+              corresponding flat list of _e_r_l___p_a_r_s_e-compatible syntax trees is
+              returned (see rreevveerrtt//11). If some program form could not be
+              reverted, _{_e_r_r_o_r_, _F_o_r_m_} is thrown. Standalone comments in the
+              form sequence are discarded.
+
+              _S_e_e _a_l_s_o_: ffoorrmm__lliisstt//11, iiss__ffoorrmm//11, rreevveerrtt//11.
+
+       rruullee((NNaammee::::ssyynnttaaxxTTrreeee(()),, CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract Mnemosyne rule. If _C_l_a_u_s_e_s is _[_C_1_, _._._._, _C_n_],
+              the results represents "_N_a_m_e _C_1_; _._._._; _N_a_m_e _C_n_.". More exactly,
+              if each _C_i represents "_(_P_i_1_, _._._._, _P_i_m_) _G_i _-_> _B_i", then the
+              result represents "_N_a_m_e_(_P_1_1_, _._._._, _P_1_m_) _G_1 _:_- _B_1_; _._._._; _N_a_m_e_(_P_n_1_,
+              _._._._, _P_n_m_) _G_n _:_- _B_n_.". Rules are source code forms.
+
+              _S_e_e _a_l_s_o_: ffuunnccttiioonn//22, iiss__ffoorrmm//11, rruullee__aarriittyy//11, rruullee__ccllaauusseess//11,
+              rruullee__nnaammee//11.
+
+       rruullee__aarriittyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> aarriittyy(())
+
+              Returns the arity of a _r_u_l_e node. The result is the number of
+              parameter patterns in the first clause of the rule; subsequent
+              clauses are ignored.
+
+              An exception is thrown if _r_u_l_e___c_l_a_u_s_e_s_(_N_o_d_e_) returns an empty
+              list, or if the first element of that list is not a syntax tree
+              _C of type _c_l_a_u_s_e such that _c_l_a_u_s_e___p_a_t_t_e_r_n_s_(_C_) is a nonempty
+              list.
+
+              _S_e_e _a_l_s_o_: ccllaauussee//33, ccllaauussee__ppaatttteerrnnss//11, rruullee//22, rruullee__ccllaauusseess//11.
+
+       rruullee__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of clause subtrees of a _r_u_l_e node.
+
+              _S_e_e _a_l_s_o_: rruullee//22.
+
+       rruullee__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the name subtree of a _r_u_l_e node.
+
+              _S_e_e _a_l_s_o_: rruullee//22.
+
+       sseett__aannnn((NNooddee::::ssyynnttaaxxTTrreeee(()),, AAss::::[[tteerrmm(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Sets the list of user annotations of _N_o_d_e to _A_n_n_o_t_a_t_i_o_n_s.
+
+              _S_e_e _a_l_s_o_: aadddd__aannnn//22, ccooppyy__aannnn//22, ggeett__aannnn//11.
+
+       sseett__aattttrrss((NNooddee::::ssyynnttaaxxTTrreeee(()),, AAttttrr::::ssyynnttaaxxTTrreeeeAAttttrriibbuutteess(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Sets the attributes of _N_o_d_e to _A_t_t_r_i_b_u_t_e_s.
+
+              _S_e_e _a_l_s_o_: ccooppyy__aattttrrss//22, ggeett__aattttrrss//11.
+
+       sseett__ppooss((NNooddee::::ssyynnttaaxxTTrreeee(()),, PPooss::::tteerrmm(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Sets the position information of _N_o_d_e to _P_o_s.
+
+              _S_e_e _a_l_s_o_: ccooppyy__ppooss//22, ggeett__ppooss//11.
+
+       sseett__ppoossttccoommmmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()),, CCss::::[[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Sets the post-comments of _N_o_d_e to _C_o_m_m_e_n_t_s. _C_o_m_m_e_n_t_s should be a
+              possibly empty list of abstract comments, in top-down textual
+              order
+
+              _S_e_e _a_l_s_o_: aadddd__ppoossttccoommmmeennttss//22, ccoommmmeenntt//22, ccooppyy__ccoommmmeennttss//22,
+              ggeett__ppoossttccoommmmeennttss//11, jjooiinn__ccoommmmeennttss//22, rreemmoovvee__ccoommmmeennttss//11,
+              sseett__pprreeccoommmmeennttss//22.
+
+       sseett__pprreeccoommmmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()),, CCss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Sets the pre-comments of _N_o_d_e to _C_o_m_m_e_n_t_s. _C_o_m_m_e_n_t_s should be a
+              possibly empty list of abstract comments, in top-down textual
+              order.
+
+              _S_e_e _a_l_s_o_: aadddd__pprreeccoommmmeennttss//22, ccoommmmeenntt//22, ccooppyy__ccoommmmeennttss//22,
+              ggeett__pprreeccoommmmeennttss//11, jjooiinn__ccoommmmeennttss//22, rreemmoovvee__ccoommmmeennttss//11,
+              sseett__ppoossttccoommmmeennttss//22.
+
+       ssiizzee__qquuaalliiffiieerr((BBooddyy::::ssyynnttaaxxTTrreeee(()),, SSiizzee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract size qualifier. The result represents
+              "_B_o_d_y_:_S_i_z_e".
+
+              _S_e_e _a_l_s_o_: ssiizzee__qquuaalliiffiieerr__aarrgguummeenntt//11, ssiizzee__qquuaalliiffiieerr__bbooddyy//11.
+
+       ssiizzee__qquuaalliiffiieerr__aarrgguummeenntt((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the argument subtree (the size) of a _s_i_z_e___q_u_a_l_i_f_i_e_r
+              node.
+
+              _S_e_e _a_l_s_o_: ssiizzee__qquuaalliiffiieerr//22.
+
+       ssiizzee__qquuaalliiffiieerr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Returns the body subtree of a _s_i_z_e___q_u_a_l_i_f_i_e_r node.
+
+              _S_e_e _a_l_s_o_: ssiizzee__qquuaalliiffiieerr//22.
+
+       ssttrriinngg((SSttrriinngg::::ssttrriinngg(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract string literal. The result represents _"_T_e_x_t_"
+              (including the surrounding double-quotes), where _T_e_x_t
+              corresponds to the sequence of characters in _V_a_l_u_e, but not
+              representing a _s_p_e_c_i_f_i_c string literal.
+
+              For example, the result of _s_t_r_i_n_g_(_"_x_\_n_y_"_) represents any and all
+              of _"_x_\_n_y_", _"_x_\_1_2_y_", _"_x_\_0_1_2_y_" and _"_x_\_^_J_y_"; see cchhaarr//11.
+
+              _S_e_e _a_l_s_o_: cchhaarr//11, iiss__ssttrriinngg//22, ssttrriinngg__lliitteerraall//11, ssttrriinngg__vvaalluuee//11.
+
+       ssttrriinngg__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonneemmppttyy__ssttrriinngg(())
+
+              Returns the literal string represented by a _s_t_r_i_n_g node. This
+              includes surrounding double-quote characters.
+
+              _S_e_e _a_l_s_o_: ssttrriinngg//11.
+
+       ssttrriinngg__vvaalluuee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the value represented by a _s_t_r_i_n_g node.
+
+              _S_e_e _a_l_s_o_: ssttrriinngg//11.
+
+       ssuubbttrreeeess((TT::::ssyynnttaaxxTTrreeee(()))) -->> [[[[ssyynnttaaxxTTrreeee(())]]]]
+
+              Returns the grouped list of all subtrees of a syntax tree. If
+              _N_o_d_e is a leaf node (see iiss__lleeaaff//11), this is the empty list,
+              otherwise the result is always a nonempty list, containing the
+              lists of subtrees of _N_o_d_e, in left-to-right order as they occur
+              in the printed program text, and grouped by category. Often,
+              each group contains only a single subtree.
+
+              Depending on the type of _N_o_d_e, the size of some groups may be
+              variable (e.g., the group consisting of all the elements of a
+              tuple), while others always contain the same number of elements
+              - usually exactly one (e.g., the group containing the argument
+              expression of a case-expression). Note, however, that the exact
+              structure of the returned list (for a given node type) should in
+              general not be depended upon, since it might be subject to
+              change without notice.
+
+              The function ssuubbttrreeeess//11 and the constructor functions
+              mmaakkee__ttrreeee//22 and uuppddaattee__ttrreeee//22 can be a great help if one wants
+              to traverse a syntax tree, visiting all its subtrees, but treat
+              nodes of the tree in a uniform way in most or all cases. Using
+              these functions makes this simple, and also assures that your
+              code is not overly sensitive to extensions of the syntax tree
+              data type, because any node types not explicitly handled by your
+              code can be left to a default case.
+
+              For example:
+
+                   postorder(F, Tree) ->
+                      F(case subtrees(Tree) of
+                          [] -> Tree;
+                          List -> update_tree(Tree,
+                                              [[postorder(F, Subtree)
+                                                || Subtree &lt;- Group]
+                                               || Group &lt;- List])
+                        end).
+
+              maps the function _F on _T_r_e_e and all its subtrees, doing a post-
+              order traversal of the syntax tree. (Note the use of
+              uuppddaattee__ttrreeee//22 to preserve node attributes.) For a simple
+              function like:
+
+                   f(Node) ->
+                      case type(Node) of
+                          atom -> atom("a_" ++ atom_name(Node));
+                          _ -> Node
+                      end.
+
+              the call _p_o_s_t_o_r_d_e_r_(_f_u_n _f_/_1_, _T_r_e_e_) will yield a new
+              representation of _T_r_e_e in which all atom names have been
+              extended with the prefix "a_", but nothing else (including
+              comments, annotations and line numbers) has been changed.
+
+              _S_e_e _a_l_s_o_: ccooppyy__aattttrrss//22, iiss__lleeaaff//11, mmaakkee__ttrreeee//22, ttyyppee//11.
+
+       tteexxtt((SSttrriinngg::::ssttrriinngg(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract piece of source code text. The result
+              represents exactly the sequence of characters in _S_t_r_i_n_g. This is
+              useful in cases when one wants full control of the resulting
+              output, e.g., for the appearance of floating-point numbers or
+              macro definitions.
+
+              _S_e_e _a_l_s_o_: tteexxtt__ssttrriinngg//11.
+
+       tteexxtt__ssttrriinngg((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the character sequence represented by a _t_e_x_t node.
+
+              _S_e_e _a_l_s_o_: tteexxtt//11.
+
+       ttrreeee((TTyyppee::::aattoomm(()))) -->> ##ttrreeee{{}}
+
+              Equivalent to ttrreeee((TTyyppee,, [[]])).
+
+       ttrreeee((TTyyppee::::aattoomm(()),, DDaattaa::::tteerrmm(()))) -->> ##ttrreeee{{}}
+
+              _F_o_r _s_p_e_c_i_a_l _p_u_r_p_o_s_e_s _o_n_l_y. Creates an abstract syntax tree node
+              with type tag _T_y_p_e and associated data _D_a_t_a.
+
+              This function and the related iiss__ttrreeee//11 and ddaattaa//11 provide a
+              uniform way to extend the set of _e_r_l___p_a_r_s_e node types. The
+              associated data is any term, whose format may depend on the type
+              tag.
+
+              NNootteess::
+
+                * Any nodes created outside of this module must have type tags
+                  distinct from those currently defined by this module; see
+                  ttyyppee//11 for a complete list.
+
+                * The type tag of a syntax tree node may also be used as a
+                  primary tag by the _e_r_l___p_a_r_s_e representation; in that case,
+                  the selector functions for that node type _m_u_s_t handle both
+                  the abstract syntax tree and the _e_r_l___p_a_r_s_e form. The
+                  function _t_y_p_e_(_T_) should return the correct type tag
+                  regardless of the representation of _T, so that the user sees
+                  no difference between _e_r_l___s_y_n_t_a_x and _e_r_l___p_a_r_s_e nodes.
+
+              _S_e_e _a_l_s_o_: ddaattaa//11, iiss__ttrreeee//11, ttyyppee//11.
+
+       ttrryy__aafftteerr__eexxpprr((BBooddyy::::[[ssyynnttaaxxTTrreeee(())]],, AAfftteerr::::[[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Equivalent to ttrryy__eexxpprr((BBooddyy,, [[]],, [[]],, AAfftteerr)).
+
+       ttrryy__eexxpprr((BBooddyy::::[[ssyynnttaaxxTTrreeee(())]],, HHaannddlleerrss::::[[ssyynnttaaxxTTrreeee(())]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Equivalent to ttrryy__eexxpprr((BBooddyy,, [[]],, HHaannddlleerrss)).
+
+       ttrryy__eexxpprr((BBooddyy::::[[ssyynnttaaxxTTrreeee(())]],, CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]],,
+       HHaannddlleerrss::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to ttrryy__eexxpprr((BBooddyy,, CCllaauusseess,, HHaannddlleerrss,, [[]])).
+
+       ttrryy__eexxpprr((BBooddyy::::[[ssyynnttaaxxTTrreeee(())]],, CCllaauusseess::::[[ssyynnttaaxxTTrreeee(())]],,
+       HHaannddlleerrss::::[[ssyynnttaaxxTTrreeee(())]],, AAfftteerr::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract try-expression. If _B_o_d_y is _[_B_1_, _._._._, _B_n_],
+              _C_l_a_u_s_e_s is _[_C_1_, _._._._, _C_j_], _H_a_n_d_l_e_r_s is _[_H_1_, _._._._, _H_k_], and _A_f_t_e_r
+              is _[_A_1_, _._._._, _A_m_], the result represents "_t_r_y _B_1_, _._._._, _B_n _o_f _C_1_;
+              _._._._; _C_j _c_a_t_c_h _H_1_; _._._._; _H_k _a_f_t_e_r _A_1_, _._._._, _A_m _e_n_d". More exactly,
+              if each _C_i represents "_(_C_P_i_) _C_G_i _-_> _C_B_i", and each _H_i represents
+              "_(_H_P_i_) _H_G_i _-_> _H_B_i", then the result represents "_t_r_y _B_1_, _._._._, _B_n
+              _o_f _C_P_1 _C_G_1 _-_> _C_B_1_; _._._._; _C_P_j _C_G_j _-_> _C_B_j _c_a_t_c_h _H_P_1 _H_G_1 _-_> _H_B_1_;
+              _._._._; _H_P_k _H_G_k _-_> _H_B_k _a_f_t_e_r _A_1_, _._._._, _A_m _e_n_d"; see ccaassee__eexxpprr//22. If
+              _C_l_a_u_s_e_s is the empty list, the _o_f _._._. section is left out. If
+              _A_f_t_e_r is the empty list, the _a_f_t_e_r _._._. section is left out. If
+              _H_a_n_d_l_e_r_s is the empty list, and _A_f_t_e_r is nonempty, the _c_a_t_c_h _._._.
+              section is left out.
+
+              _S_e_e _a_l_s_o_: ccaassee__eexxpprr//22, ccllaassss__qquuaalliiffiieerr//22, ccllaauussee//33,
+              ttrryy__aafftteerr__eexxpprr//22, ttrryy__eexxpprr//22, ttrryy__eexxpprr//33, ttrryy__eexxpprr__aafftteerr//11,
+              ttrryy__eexxpprr__bbooddyy//11, ttrryy__eexxpprr__ccllaauusseess//11, ttrryy__eexxpprr__hhaannddlleerrss//11.
+
+       ttrryy__eexxpprr__aafftteerr((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of "after" subtrees of a _t_r_y___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ttrryy__eexxpprr//44.
+
+       ttrryy__eexxpprr__bbooddyy((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of body subtrees of a _t_r_y___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ttrryy__eexxpprr//44.
+
+       ttrryy__eexxpprr__ccllaauusseess((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of case-clause subtrees of a _t_r_y___e_x_p_r node. If
+              _N_o_d_e represents "_t_r_y _B_o_d_y _c_a_t_c_h _H_1_; _._._._; _H_n _e_n_d", the result is
+              the empty list.
+
+              _S_e_e _a_l_s_o_: ttrryy__eexxpprr//44.
+
+       ttrryy__eexxpprr__hhaannddlleerrss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of handler-clause subtrees of a _t_r_y___e_x_p_r node.
+
+              _S_e_e _a_l_s_o_: ttrryy__eexxpprr//44.
+
+       ttuuppllee((LLiisstt::::[[ssyynnttaaxxTTrreeee(())]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract tuple. If _E_l_e_m_e_n_t_s is _[_X_1_, _._._._, _X_n_], the
+              result represents "_{_X_1_, _._._._, _X_n_}".
+
+              Note: The Erlang language has distinct 1-tuples, i.e., _{_X_} is
+              always distinct from _X itself.
+
+              _S_e_e _a_l_s_o_: ttuuppllee__eelleemmeennttss//11, ttuuppllee__ssiizzee//11.
+
+       ttuuppllee__eelleemmeennttss((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Returns the list of element subtrees of a _t_u_p_l_e node.
+
+              _S_e_e _a_l_s_o_: ttuuppllee//11.
+
+       ttuuppllee__ssiizzee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> nnoonn__nneegg__iinntteeggeerr(())
+
+              Returns the number of elements of a _t_u_p_l_e node.
+
+              Note: this is equivalent to _l_e_n_g_t_h_(_t_u_p_l_e___e_l_e_m_e_n_t_s_(_N_o_d_e_)_), but
+              potentially more efficient.
+
+              _S_e_e _a_l_s_o_: ttuuppllee//11, ttuuppllee__eelleemmeennttss//11.
+
+       ttyyppee((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> aattoomm(())
+
+              Returns the type tag of _N_o_d_e. If _N_o_d_e does not represent a
+              syntax tree, evaluation fails with reason _b_a_d_a_r_g. Node types
+              currently defined by this module are:
+
+              application arity_qualifier atom attribute
+              binary binary_field block_expr case_expr
+              catch_expr char class_qualifier clause
+              comment cond_expr conjunction disjunction
+              eof_marker error_marker float form_list
+              fun_expr function generator if_expr
+              implicit_fun infix_expr integer list
+              list_comp macro match_expr module_qualifier
+              nil operator parentheses prefix_expr
+              qualified_name query_expr receive_expr record_access
+              record_expr record_field record_index_expr rule
+              size_qualifier string text try_expr
+              tuple underscore variable warning_marker
+
+
+              The user may (for special purposes) create additional nodes with
+              other type tags, using the ttrreeee//22 function.
+
+              Note: The primary constructor functions for a node type should
+              always have the same name as the node type itself.
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//33, aarriittyy__qquuaalliiffiieerr//22, aattoomm//11, aattttrriibbuuttee//22,
+              bbiinnaarryy//11, bbiinnaarryy__ffiieelldd//22, bblloocckk__eexxpprr//11, ccaassee__eexxpprr//22,
+              ccaattcchh__eexxpprr//11, cchhaarr//11, ccllaassss__qquuaalliiffiieerr//22, ccllaauussee//33, ccoommmmeenntt//22,
+              ccoonndd__eexxpprr//11, ccoonnjjuunnccttiioonn//11, ddiissjjuunnccttiioonn//11, eeooff__mmaarrkkeerr//00,
+              eerrrroorr__mmaarrkkeerr//11, ffllooaatt//11, ffoorrmm__lliisstt//11, ffuunn__eexxpprr//11, ffuunnccttiioonn//22,
+              ggeenneerraattoorr//22, iiff__eexxpprr//11, iimmpplliicciitt__ffuunn//22, iinnffiixx__eexxpprr//33, iinntteeggeerr//11,
+              lliisstt//22, lliisstt__ccoommpp//22, mmaaccrroo//22, mmaattcchh__eexxpprr//22, mmoodduullee__qquuaalliiffiieerr//22,
+              nniill//00, ooppeerraattoorr//11, ppaarreenntthheesseess//11, pprreeffiixx__eexxpprr//22,
+              qquuaalliiffiieedd__nnaammee//11, qquueerryy__eexxpprr//11, rreecceeiivvee__eexxpprr//33, rreeccoorrdd__aacccceessss//33,
+              rreeccoorrdd__eexxpprr//22, rreeccoorrdd__ffiieelldd//22, rreeccoorrdd__iinnddeexx__eexxpprr//22, rruullee//22,
+              ssiizzee__qquuaalliiffiieerr//22, ssttrriinngg//11, tteexxtt//11, ttrreeee//22, ttrryy__eexxpprr//33, ttuuppllee//11,
+              uunnddeerrssccoorree//00, vvaarriiaabbllee//11, wwaarrnniinngg__mmaarrkkeerr//11.
+
+       uunnddeerrssccoorree(()) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract universal pattern ("__"). The lexical
+              representation is a single underscore character. Note that this
+              is _n_o_t a variable, lexically speaking.
+
+              _S_e_e _a_l_s_o_: vvaarriiaabbllee//11.
+
+       uuppddaattee__ttrreeee((NNooddee::::ssyynnttaaxxTTrreeee(()),, GGrroouuppss::::[[[[ssyynnttaaxxTTrreeee(())]]]])) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Creates a syntax tree with the same type and attributes as the
+              given tree. This is equivalent to _c_o_p_y___a_t_t_r_s_(_N_o_d_e_,
+              _m_a_k_e___t_r_e_e_(_t_y_p_e_(_N_o_d_e_)_, _G_r_o_u_p_s_)_).
+
+              _S_e_e _a_l_s_o_: ccooppyy__aattttrrss//22, mmaakkee__ttrreeee//22, ttyyppee//11.
+
+       vvaarriiaabbllee((NNaammee::::aattoomm(()) || ssttrriinngg(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract variable with the given name. _N_a_m_e may be
+              any atom or string that represents a lexically valid variable
+              name, but _n_o_t a single underscore character; see uunnddeerrssccoorree//00.
+
+              Note: no checking is done whether the character sequence
+              represents a proper variable name, i.e., whether or not its
+              first character is an uppercase Erlang character, or whether it
+              does not contain control characters, whitespace, etc.
+
+              _S_e_e _a_l_s_o_: uunnddeerrssccoorree//00, vvaarriiaabbllee__lliitteerraall//11, vvaarriiaabbllee__nnaammee//11.
+
+       vvaarriiaabbllee__lliitteerraall((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> ssttrriinngg(())
+
+              Returns the name of a _v_a_r_i_a_b_l_e node as a string.
+
+              _S_e_e _a_l_s_o_: vvaarriiaabbllee//11.
+
+       vvaarriiaabbllee__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> aattoomm(())
+
+              Returns the name of a _v_a_r_i_a_b_l_e node as an atom.
+
+              _S_e_e _a_l_s_o_: vvaarriiaabbllee//11.
+
+       wwaarrnniinngg__mmaarrkkeerr((WWaarrnniinngg::::tteerrmm(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Creates an abstract warning marker. The result represents an
+              occurrence of a possible problem in the source code, with an
+              associated Erlang I/O ErrorInfo structure given by _E_r_r_o_r (see
+              module iioo((33)) for details). Warning markers are regarded as
+              source code forms, but have no defined lexical form.
+
+              Note: this is supported only for backwards compatibility with
+              existing parsers and tools.
+
+              _S_e_e _a_l_s_o_: eeooff__mmaarrkkeerr//00, eerrrroorr__mmaarrkkeerr//11, iiss__ffoorrmm//11,
+              wwaarrnniinngg__mmaarrkkeerr__iinnffoo//11.
+
+       wwaarrnniinngg__mmaarrkkeerr__iinnffoo((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              Returns the ErrorInfo structure of a _w_a_r_n_i_n_g___m_a_r_k_e_r node.
+
+              _S_e_e _a_l_s_o_: wwaarrnniinngg__mmaarrkkeerr//11.
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                              syntax_tools 1.6.9                 erl_syntax(3)

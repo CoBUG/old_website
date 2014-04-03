@@ -1,0 +1,77 @@
+CosNotifyFilter_FilterAdmin(E3r)lang Module DefinitiCoonsNotifyFilter_FilterAdmin(3)
+
+
+
+NNAAMMEE
+       CosNotifyFilter_FilterAdmin - This module implements the OMG
+       CosNotifyFilter::FilterAdmin interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       All objects, which inherit this interface, export functions described
+       in this module.
+
+EEXXPPOORRTTSS
+       aadddd__ffiilltteerr((OObbjjeecctt,, FFiilltteerr)) -->> FFiilltteerrIIDD
+
+              Types:
+
+                 Object = #objref
+                 Filter = #objref
+                 FilterID = long()
+
+              This operation connects a new _F_i_l_t_e_r to the target object. This
+              _F_i_l_t_e_r will, together with other associated _F_i_l_t_e_r_s, be used to
+              select events to forward. A unique Id is returned and should be
+              used if we no longer want to consult the given _F_i_l_t_e_r.
+
+       rreemmoovvee__ffiilltteerr((OObbjjeecctt,, FFiilltteerrIIDD)) -->> ookk
+
+              Types:
+
+                 Object = #objref
+                 FilterID = long()
+
+              If a certain _F_i_l_t_e_r no longer should be associated with the
+              target object this operation must be used. Events will no longer
+              be tested against the _F_i_l_t_e_r associated with the given Id.
+
+       ggeett__ffiilltteerr((OObbjjeecctt,, FFiilltteerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 Object = #objref
+                 FilterID = long()
+                 Reply = Filter | {'EXCEPTION',
+                 #'CosNotifyFilter_FilterNotFound'{}}
+                 Filter = #objref
+
+              If the target object is associated with a _F_i_l_t_e_r matching the
+              given Id the reference will be returned. If no such _F_i_l_t_e_r is
+              known by the target object an exception is raised.
+
+       ggeett__aallll__ffiilltteerrss((OObbjjeecctt)) -->> FFiilltteerrIIDDSSeeqq
+
+              Types:
+
+                 Object = #objref
+                 FilterIDSeq = [FilterID]
+                 FilterID = long()
+
+              Id's for all _F_i_l_t_e_r objects associated with the target object is
+              returned by this operation.
+
+       rreemmoovvee__aallll__ffiilltteerrss((OObbjjeecctt)) -->> ookk
+
+              Types:
+
+                 Object = #objref
+
+              If we want to remove all _F_i_l_t_e_r_s associated with the target
+              object we can use this function.
+
+
+
+Ericsson AB                 cosNotification 1.1.1C8osNotifyFilter_FilterAdmin(3)

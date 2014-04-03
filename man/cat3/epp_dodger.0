@@ -1,0 +1,243 @@
+epp_dodger(3)              Erlang Module Definition              epp_dodger(3)
+
+
+
+NNAAMMEE
+       epp_dodger - epp_dodger - bypasses the Erlang preprocessor.
+
+DDEESSCCRRIIPPTTIIOONN
+       _e_p_p___d_o_d_g_e_r - bypasses the Erlang preprocessor.
+
+       This module tokenises and parses most Erlang source code without
+       expanding preprocessor directives and macro applications, as long as
+       these are syntactically "well-behaved". Because the normal parse trees
+       of the _e_r_l___p_a_r_s_e module cannot represent these things (normally, they
+       are expanded by the Erlang preprocessor eepppp((33)) before the parser sees
+       them), an extended syntax tree is created, using the eerrll__ssyynnttaaxx module.
+
+DDAATTAA TTYYPPEESS
+         _e_r_r_o_r_i_n_f_o_(_) _= _{_E_r_r_o_r_L_i_n_e_:_:_i_n_t_e_g_e_r_(_)_, _M_o_d_u_l_e_:_:_a_t_o_m_(_)_,
+         _D_e_s_c_r_i_p_t_o_r_:_:_t_e_r_m_(_)_}:
+
+
+           This is a so-called Erlang I/O ErrorInfo structure; see the iioo((33))
+           module for details.
+
+EEXXPPOORRTTSS
+       ppaarrssee((DDeevv::::IIOODDeevviiccee)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Equivalent to ppaarrssee((IIOODDeevviiccee,, 11)).
+
+       ppaarrssee((DDeevv::::IIOODDeevviiccee,, LL::::SSttaarrttLLiinnee)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,,
+       eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Equivalent to ppaarrssee((IIOODDeevviiccee,, SSttaarrttLLiinnee,, [[]])).
+
+              _S_e_e _a_l_s_o_: ppaarrssee//11.
+
+       ppaarrssee((DDeevv::::IIOODDeevviiccee,, LL00::::SSttaarrttLLiinnee,, OOppttiioonnss)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,,
+       eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Options = [term()]
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Reads and parses program text from an I/O stream. Characters are
+              read from _I_O_D_e_v_i_c_e until end-of-file; apart from this, the
+              behaviour is the same as for ppaarrssee__ffiillee//22. _S_t_a_r_t_L_i_n_e is the
+              initial line number, which should be a positive integer.
+
+              _S_e_e _a_l_s_o_: ppaarrssee//22, ppaarrssee__ffiillee//22, ppaarrssee__ffoorrmm//22, qquuiicckk__ppaarrssee//33.
+
+       ppaarrssee__ffiillee((FFiillee)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 File = filename() (see module file)
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Equivalent to ppaarrssee__ffiillee((FFiillee,, [[]])).
+
+       ppaarrssee__ffiillee((FFiillee,, OOppttiioonnss)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 File = filename() (see module file)
+                 Options = [term()]
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Reads and parses a file. If successful, _{_o_k_, _F_o_r_m_s_} is returned,
+              where _F_o_r_m_s is a list of abstract syntax trees representing the
+              "program forms" of the file (cf. _e_r_l___s_y_n_t_a_x_:_i_s___f_o_r_m_/_1).
+              Otherwise, _{_e_r_r_o_r_, _e_r_r_o_r_i_n_f_o_(_)_} is returned, typically if the
+              file could not be opened. Note that parse errors show up as
+              error markers in the returned list of forms; they do not cause
+              this function to fail or return _{_e_r_r_o_r_, _e_r_r_o_r_i_n_f_o_(_)_}.
+
+              Options:
+
+                _{_n_o___f_a_i_l_, _b_o_o_l_e_a_n_(_)_}:
+                  If _t_r_u_e, this makes _e_p_p___d_o_d_g_e_r replace any program forms
+                  that could not be parsed with nodes of type _t_e_x_t (see
+                  eerrll__ssyynnttaaxx::tteexxtt//11), representing the raw token sequence of
+                  the form, instead of reporting a parse error. The default
+                  value is _f_a_l_s_e.
+
+                _{_c_l_e_v_e_r_, _b_o_o_l_e_a_n_(_)_}:
+                  If set to _t_r_u_e, this makes _e_p_p___d_o_d_g_e_r try to repair the
+                  source code as it seems fit, in certain cases where parsing
+                  would otherwise fail. Currently, it inserts _+_+-operators
+                  between string literals and macros where it looks like
+                  concatenation was intended. The default value is _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: ppaarrssee//22, qquuiicckk__ppaarrssee__ffiillee//11, eerrll__ssyynnttaaxx::iiss__ffoorrmm//11.
+
+       ppaarrssee__ffoorrmm((DDeevv::::IIOODDeevviiccee,, LL00::::SSttaarrttLLiinnee)) -->> {{ookk,, FFoorrmm,, LLiinneeNNoo}} || {{eeooff,,
+       LLiinneeNNoo}} || {{eerrrroorr,, eerrrroorriinnffoo(()),, LLiinneeNNoo}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Form = syntaxTree() (see module erl_syntax)
+                 LineNo = integer()
+
+              Equivalent to ppaarrssee__ffoorrmm((IIOODDeevviiccee,, SSttaarrttLLiinnee,, [[]])).
+
+              _S_e_e _a_l_s_o_: qquuiicckk__ppaarrssee__ffoorrmm//22.
+
+       ppaarrssee__ffoorrmm((DDeevv::::IIOODDeevviiccee,, LL00::::SSttaarrttLLiinnee,, OOppttiioonnss)) -->> {{ookk,, FFoorrmm,, LLiinneeNNoo}}
+       || {{eeooff,, LLiinneeNNoo}} || {{eerrrroorr,, eerrrroorriinnffoo(()),, LLiinneeNNoo}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Options = [term()]
+                 Form = syntaxTree() (see module erl_syntax)
+                 LineNo = integer()
+
+              Reads and parses a single program form from an I/O stream.
+              Characters are read from _I_O_D_e_v_i_c_e until an end-of-form marker is
+              found (a period character followed by whitespace), or until end-
+              of-file; apart from this, the behaviour is similar to that of
+              _p_a_r_s_e_/_3, except that the return values also contain the final
+              line number given that _S_t_a_r_t_L_i_n_e is the initial line number, and
+              that _{_e_o_f_, _L_i_n_e_N_o_} may be returned.
+
+              _S_e_e _a_l_s_o_: ppaarrssee//33, ppaarrssee__ffoorrmm//22, qquuiicckk__ppaarrssee__ffoorrmm//33.
+
+       qquuiicckk__ppaarrssee((DDeevv::::IIOODDeevviiccee)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Equivalent to qquuiicckk__ppaarrssee((IIOODDeevviiccee,, 11)).
+
+       qquuiicckk__ppaarrssee((DDeevv::::IIOODDeevviiccee,, LL::::SSttaarrttLLiinnee)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,,
+       eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Equivalent to qquuiicckk__ppaarrssee((IIOODDeevviiccee,, SSttaarrttLLiinnee,, [[]])).
+
+              _S_e_e _a_l_s_o_: qquuiicckk__ppaarrssee//11.
+
+       qquuiicckk__ppaarrssee((DDeevv::::IIOODDeevviiccee,, LL00::::SSttaarrttLLiinnee,, OOppttiioonnss)) -->> {{ookk,, FFoorrmmss}} ||
+       {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Options = [term()]
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Similar to ppaarrssee//33, but does a more quick-and-dirty processing
+              of the code. See qquuiicckk__ppaarrssee__ffiillee//22 for details.
+
+              _S_e_e _a_l_s_o_: ppaarrssee//33, qquuiicckk__ppaarrssee//22, qquuiicckk__ppaarrssee__ffiillee//22,
+              qquuiicckk__ppaarrssee__ffoorrmm//22.
+
+       qquuiicckk__ppaarrssee__ffiillee((FFiillee)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 File = filename() (see module file)
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Equivalent to qquuiicckk__ppaarrssee__ffiillee((FFiillee,, [[]])).
+
+       qquuiicckk__ppaarrssee__ffiillee((FFiillee,, OOppttiioonnss)) -->> {{ookk,, FFoorrmmss}} || {{eerrrroorr,, eerrrroorriinnffoo(())}}
+
+              Types:
+
+                 File = filename() (see module file)
+                 Options = [term()]
+                 Forms = [syntaxTree() (see module erl_syntax)]
+
+              Similar to ppaarrssee__ffiillee//22, but does a more quick-and-dirty
+              processing of the code. Macro definitions and other preprocessor
+              directives are discarded, and all macro calls are replaced with
+              atoms. This is useful when only the main structure of the code
+              is of interest, and not the details. Furthermore, the quick-
+              parse method can usually handle more strange cases than the
+              normal, more exact parsing.
+
+              Options: see ppaarrssee__ffiillee//22. Note however that for
+              _q_u_i_c_k___p_a_r_s_e___f_i_l_e_/_2, the option _n_o___f_a_i_l is _t_r_u_e by default.
+
+              _S_e_e _a_l_s_o_: ppaarrssee__ffiillee//22, qquuiicckk__ppaarrssee//22.
+
+       qquuiicckk__ppaarrssee__ffoorrmm((DDeevv::::IIOODDeevviiccee,, LL00::::SSttaarrttLLiinnee)) -->> {{ookk,, FFoorrmm,, LLiinneeNNoo}} ||
+       {{eeooff,, LLiinneeNNoo}} || {{eerrrroorr,, eerrrroorriinnffoo(()),, LLiinneeNNoo}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Form = syntaxTree() (see module erl_syntax) | none
+                 LineNo = integer()
+
+              Equivalent to qquuiicckk__ppaarrssee__ffoorrmm((IIOODDeevviiccee,, SSttaarrttLLiinnee,, [[]])).
+
+              _S_e_e _a_l_s_o_: ppaarrssee__ffoorrmm//22.
+
+       qquuiicckk__ppaarrssee__ffoorrmm((DDeevv::::IIOODDeevviiccee,, LL00::::SSttaarrttLLiinnee,, OOppttiioonnss)) -->> {{ookk,, FFoorrmm,,
+       LLiinneeNNoo}} || {{eeooff,, LLiinneeNNoo}} || {{eerrrroorr,, eerrrroorriinnffoo(()),, LLiinneeNNoo}}
+
+              Types:
+
+                 IODevice = pid()
+                 StartLine = integer()
+                 Options = [term()]
+                 Form = syntaxTree() (see module erl_syntax)
+                 LineNo = integer()
+
+              Similar to ppaarrssee__ffoorrmm//33, but does a more quick-and-dirty
+              processing of the code. See qquuiicckk__ppaarrssee__ffiillee//22 for details.
+
+              _S_e_e _a_l_s_o_: ppaarrssee//33, ppaarrssee__ffoorrmm//33, qquuiicckk__ppaarrssee__ffoorrmm//22.
+
+       ttookkeennss__ttoo__ssttrriinngg((TTookkeennss::::[[tteerrmm(())]])) -->> ssttrriinngg(())
+
+              Generates a string corresponding to the given token sequence.
+              The string can be re-tokenized to yield the same token list
+              again.
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                              syntax_tools 1.6.9                 epp_dodger(3)

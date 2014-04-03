@@ -1,0 +1,339 @@
+wxBitmap(3)                Erlang Module Definition                wxBitmap(3)
+
+
+
+NNAAMMEE
+       wxBitmap - See external documentation: wxBitmap.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxBitmap.
+
+DDAATTAA TTYYPPEESS
+         _w_x_B_i_t_m_a_p_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxBBiittmmaapp(())
+
+              See external documentation.
+
+       nneeww((FFiilleennaammee)) -->> wwxxBBiittmmaapp(())
+
+              Types:
+
+                 Filename = chardata() (see module unicode)
+
+              See external documentation.
+              Also:
+              new(Image) -> wxBitmap() when
+              Image::wxImage:wxImage().
+
+
+              Type = ?wxBITMAP_TYPE_INVALID | ?wxBITMAP_TYPE_BMP |
+              ?wxBITMAP_TYPE_BMP_RESOURCE | ?wxBITMAP_TYPE_RESOURCE |
+              ?wxBITMAP_TYPE_ICO | ?wxBITMAP_TYPE_ICO_RESOURCE |
+              ?wxBITMAP_TYPE_CUR | ?wxBITMAP_TYPE_CUR_RESOURCE |
+              ?wxBITMAP_TYPE_XBM | ?wxBITMAP_TYPE_XBM_DATA |
+              ?wxBITMAP_TYPE_XPM | ?wxBITMAP_TYPE_XPM_DATA |
+              ?wxBITMAP_TYPE_TIF | ?wxBITMAP_TYPE_TIF_RESOURCE |
+              ?wxBITMAP_TYPE_GIF | ?wxBITMAP_TYPE_GIF_RESOURCE |
+              ?wxBITMAP_TYPE_PNG | ?wxBITMAP_TYPE_PNG_RESOURCE |
+              ?wxBITMAP_TYPE_JPEG | ?wxBITMAP_TYPE_JPEG_RESOURCE |
+              ?wxBITMAP_TYPE_PNM | ?wxBITMAP_TYPE_PNM_RESOURCE |
+              ?wxBITMAP_TYPE_PCX | ?wxBITMAP_TYPE_PCX_RESOURCE |
+              ?wxBITMAP_TYPE_PICT | ?wxBITMAP_TYPE_PICT_RESOURCE |
+              ?wxBITMAP_TYPE_ICON | ?wxBITMAP_TYPE_ICON_RESOURCE |
+              ?wxBITMAP_TYPE_ANI | ?wxBITMAP_TYPE_IFF | ?wxBITMAP_TYPE_TGA |
+              ?wxBITMAP_TYPE_MACCURSOR | ?wxBITMAP_TYPE_MACCURSOR_RESOURCE |
+              ?wxBITMAP_TYPE_ANY
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt)) -->> wwxxBBiittmmaapp(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              new(Filename, [Option]) -> wxBitmap() when
+              Filename::unicode:chardata(),
+              Option :: {type, wx:wx_enum()};
+              (Image, [Option]) -> wxBitmap() when
+              Image::wxImage:wxImage(),
+              Option :: {depth, integer()}.
+
+
+              Type = ?wxBITMAP_TYPE_INVALID | ?wxBITMAP_TYPE_BMP |
+              ?wxBITMAP_TYPE_BMP_RESOURCE | ?wxBITMAP_TYPE_RESOURCE |
+              ?wxBITMAP_TYPE_ICO | ?wxBITMAP_TYPE_ICO_RESOURCE |
+              ?wxBITMAP_TYPE_CUR | ?wxBITMAP_TYPE_CUR_RESOURCE |
+              ?wxBITMAP_TYPE_XBM | ?wxBITMAP_TYPE_XBM_DATA |
+              ?wxBITMAP_TYPE_XPM | ?wxBITMAP_TYPE_XPM_DATA |
+              ?wxBITMAP_TYPE_TIF | ?wxBITMAP_TYPE_TIF_RESOURCE |
+              ?wxBITMAP_TYPE_GIF | ?wxBITMAP_TYPE_GIF_RESOURCE |
+              ?wxBITMAP_TYPE_PNG | ?wxBITMAP_TYPE_PNG_RESOURCE |
+              ?wxBITMAP_TYPE_JPEG | ?wxBITMAP_TYPE_JPEG_RESOURCE |
+              ?wxBITMAP_TYPE_PNM | ?wxBITMAP_TYPE_PNM_RESOURCE |
+              ?wxBITMAP_TYPE_PCX | ?wxBITMAP_TYPE_PCX_RESOURCE |
+              ?wxBITMAP_TYPE_PICT | ?wxBITMAP_TYPE_PICT_RESOURCE |
+              ?wxBITMAP_TYPE_ICON | ?wxBITMAP_TYPE_ICON_RESOURCE |
+              ?wxBITMAP_TYPE_ANI | ?wxBITMAP_TYPE_IFF | ?wxBITMAP_TYPE_TGA |
+              ?wxBITMAP_TYPE_MACCURSOR | ?wxBITMAP_TYPE_MACCURSOR_RESOURCE |
+              ?wxBITMAP_TYPE_ANY
+
+       nneeww((BBiittss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxBBiittmmaapp(())
+
+              Types:
+
+                 Bits = binary()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              new(Width, Height, [Option]) -> wxBitmap() when
+              Width::integer(), Height::integer(),
+              Option :: {depth, integer()}.
+
+
+       nneeww((BBiittss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBiittmmaapp(())
+
+              Types:
+
+                 Bits = binary()
+                 Width = integer()
+                 Height = integer()
+                 Option = {depth, integer()}
+
+              See external documentation.
+
+       ccoonnvveerrttTTooIImmaaggee((TThhiiss)) -->> wwxxIImmaaggee(()) ((sseeee mmoodduullee wwxxIImmaaggee))
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ccooppyyFFrroommIIccoonn((TThhiiss,, IIccoonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Icon = wxIcon() (see module wxIcon)
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Width = integer()
+                 Height = integer()
+                 Option = {depth, integer()}
+
+              See external documentation.
+
+       ggeettDDeepptthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ggeettHHeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ggeettPPaalleettttee((TThhiiss)) -->> wwxxPPaalleettttee(()) ((sseeee mmoodduullee wwxxPPaalleettttee))
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ggeettMMaasskk((TThhiiss)) -->> wwxxMMaasskk(()) ((sseeee mmoodduullee wwxxMMaasskk))
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ggeettWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ggeettSSuubbBBiittmmaapp((TThhiiss,, RReecctt)) -->> wwxxBBiittmmaapp(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       llooaaddFFiillee((TThhiiss,, NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Name = chardata() (see module unicode)
+
+              Equivalent to llooaaddFFiillee((TThhiiss,, NNaammee,, [[]])).
+
+       llooaaddFFiillee((TThhiiss,, NNaammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Name = chardata() (see module unicode)
+                 Option = {type, wx_enum() (see module wx)}
+
+              See external documentation.
+              Type = ?wxBITMAP_TYPE_INVALID | ?wxBITMAP_TYPE_BMP |
+              ?wxBITMAP_TYPE_BMP_RESOURCE | ?wxBITMAP_TYPE_RESOURCE |
+              ?wxBITMAP_TYPE_ICO | ?wxBITMAP_TYPE_ICO_RESOURCE |
+              ?wxBITMAP_TYPE_CUR | ?wxBITMAP_TYPE_CUR_RESOURCE |
+              ?wxBITMAP_TYPE_XBM | ?wxBITMAP_TYPE_XBM_DATA |
+              ?wxBITMAP_TYPE_XPM | ?wxBITMAP_TYPE_XPM_DATA |
+              ?wxBITMAP_TYPE_TIF | ?wxBITMAP_TYPE_TIF_RESOURCE |
+              ?wxBITMAP_TYPE_GIF | ?wxBITMAP_TYPE_GIF_RESOURCE |
+              ?wxBITMAP_TYPE_PNG | ?wxBITMAP_TYPE_PNG_RESOURCE |
+              ?wxBITMAP_TYPE_JPEG | ?wxBITMAP_TYPE_JPEG_RESOURCE |
+              ?wxBITMAP_TYPE_PNM | ?wxBITMAP_TYPE_PNM_RESOURCE |
+              ?wxBITMAP_TYPE_PCX | ?wxBITMAP_TYPE_PCX_RESOURCE |
+              ?wxBITMAP_TYPE_PICT | ?wxBITMAP_TYPE_PICT_RESOURCE |
+              ?wxBITMAP_TYPE_ICON | ?wxBITMAP_TYPE_ICON_RESOURCE |
+              ?wxBITMAP_TYPE_ANI | ?wxBITMAP_TYPE_IFF | ?wxBITMAP_TYPE_TGA |
+              ?wxBITMAP_TYPE_MACCURSOR | ?wxBITMAP_TYPE_MACCURSOR_RESOURCE |
+              ?wxBITMAP_TYPE_ANY
+
+       ookk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+
+              See external documentation.
+
+       ssaavveeFFiillee((TThhiiss,, NNaammee,, TTyyppee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Name = chardata() (see module unicode)
+                 Type = wx_enum() (see module wx)
+
+              Equivalent to ssaavveeFFiillee((TThhiiss,, NNaammee,, TTyyppee,, [[]])).
+
+       ssaavveeFFiillee((TThhiiss,, NNaammee,, TTyyppee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmap()
+                 Name = chardata() (see module unicode)
+                 Type = wx_enum() (see module wx)
+                 Option = {palette, wxPalette() (see module wxPalette)}
+
+              See external documentation.
+              Type = ?wxBITMAP_TYPE_INVALID | ?wxBITMAP_TYPE_BMP |
+              ?wxBITMAP_TYPE_BMP_RESOURCE | ?wxBITMAP_TYPE_RESOURCE |
+              ?wxBITMAP_TYPE_ICO | ?wxBITMAP_TYPE_ICO_RESOURCE |
+              ?wxBITMAP_TYPE_CUR | ?wxBITMAP_TYPE_CUR_RESOURCE |
+              ?wxBITMAP_TYPE_XBM | ?wxBITMAP_TYPE_XBM_DATA |
+              ?wxBITMAP_TYPE_XPM | ?wxBITMAP_TYPE_XPM_DATA |
+              ?wxBITMAP_TYPE_TIF | ?wxBITMAP_TYPE_TIF_RESOURCE |
+              ?wxBITMAP_TYPE_GIF | ?wxBITMAP_TYPE_GIF_RESOURCE |
+              ?wxBITMAP_TYPE_PNG | ?wxBITMAP_TYPE_PNG_RESOURCE |
+              ?wxBITMAP_TYPE_JPEG | ?wxBITMAP_TYPE_JPEG_RESOURCE |
+              ?wxBITMAP_TYPE_PNM | ?wxBITMAP_TYPE_PNM_RESOURCE |
+              ?wxBITMAP_TYPE_PCX | ?wxBITMAP_TYPE_PCX_RESOURCE |
+              ?wxBITMAP_TYPE_PICT | ?wxBITMAP_TYPE_PICT_RESOURCE |
+              ?wxBITMAP_TYPE_ICON | ?wxBITMAP_TYPE_ICON_RESOURCE |
+              ?wxBITMAP_TYPE_ANI | ?wxBITMAP_TYPE_IFF | ?wxBITMAP_TYPE_TGA |
+              ?wxBITMAP_TYPE_MACCURSOR | ?wxBITMAP_TYPE_MACCURSOR_RESOURCE |
+              ?wxBITMAP_TYPE_ANY
+
+       sseettDDeepptthh((TThhiiss,, DDeepptthh)) -->> ookk
+
+              Types:
+
+                 This = wxBitmap()
+                 Depth = integer()
+
+              See external documentation.
+
+       sseettHHeeiigghhtt((TThhiiss,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxBitmap()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettMMaasskk((TThhiiss,, MMaasskk)) -->> ookk
+
+              Types:
+
+                 This = wxBitmap()
+                 Mask = wxMask() (see module wxMask)
+
+              See external documentation.
+
+       sseettPPaalleettttee((TThhiiss,, PPaalleettttee)) -->> ookk
+
+              Types:
+
+                 This = wxBitmap()
+                 Palette = wxPalette() (see module wxPalette)
+
+              See external documentation.
+
+       sseettWWiiddtthh((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxBitmap()
+                 Width = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxBBiittmmaapp(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                       wxBitmap(3)

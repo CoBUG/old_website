@@ -1,0 +1,702 @@
+gen_event(3)               Erlang Module Definition               gen_event(3)
+
+
+
+NNAAMMEE
+       gen_event - Generic Event Handling Behaviour
+
+DDEESSCCRRIIPPTTIIOONN
+       A behaviour module for implementing event handling functionality. The
+       OTP event handling model consists of a generic event manager process
+       with an arbitrary number of event handlers which are added and deleted
+       dynamically.
+
+       An event manager implemented using this module will have a standard set
+       of interface functions and include functionality for tracing and error
+       reporting. It will also fit into an OTP supervision tree. Refer to _O_T_P
+       _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s for more information.
+
+       Each event handler is implemented as a callback module exporting a pre-
+       defined set of functions. The relationship between the behaviour
+       functions and the callback functions can be illustrated as follows:
+
+       gen_event module                   Callback module
+       ----------------                   ---------------
+       gen_event:start_link       ----->  -
+
+       gen_event:add_handler
+       gen_event:add_sup_handler  ----->  Module:init/1
+
+       gen_event:notify
+       gen_event:sync_notify      ----->  Module:handle_event/2
+
+       gen_event:call             ----->  Module:handle_call/2
+
+       -                          ----->  Module:handle_info/2
+
+       gen_event:delete_handler   ----->  Module:terminate/2
+
+       gen_event:swap_handler
+       gen_event:swap_sup_handler ----->  Module1:terminate/2
+                                          Module2:init/1
+
+       gen_event:which_handlers   ----->  -
+
+       gen_event:stop             ----->  Module:terminate/2
+
+       -                          ----->  Module:code_change/3
+
+       Since each event handler is one callback module, an event manager will
+       have several callback modules which are added and deleted dynamically.
+       Therefore _g_e_n___e_v_e_n_t is more tolerant of callback module errors than the
+       other behaviours. If a callback function for an installed event handler
+       fails with _R_e_a_s_o_n, or returns a bad value _T_e_r_m, the event manager will
+       not fail. It will delete the event handler by calling the callback
+       function _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_/_2 (see below), giving as argument
+       _{_e_r_r_o_r_,_{_'_E_X_I_T_'_,_R_e_a_s_o_n_}_} or _{_e_r_r_o_r_,_T_e_r_m_}, respectively. No other event
+       handler will be affected.
+
+       A gen_event process handles system messages as documented in ssyyss((33)).
+       The _s_y_s module can be used for debugging an event manager.
+
+       Note that an event manager _d_o_e_s trap exit signals automatically.
+
+       The gen_event process can go into hibernation (see eerrllaanngg((33))) if a
+       callback function in a handler module specifies _'_h_i_b_e_r_n_a_t_e_' in its
+       return value. This might be useful if the server is expected to be idle
+       for a long time. However this feature should be used with care as
+       hibernation implies at least two garbage collections (when hibernating
+       and shortly after waking up) and is not something you'd want to do
+       between each event handled by a busy event manager.
+
+       It's also worth noting that when multiple event handlers are invoked,
+       it's sufficient that one single event handler returns a _'_h_i_b_e_r_n_a_t_e_'
+       request for the whole event manager to go into hibernation.
+
+       Unless otherwise stated, all functions in this module fail if the
+       specified event manager does not exist or if bad arguments are given.
+
+DDAATTAA TTYYPPEESS
+       hhaannddlleerr(()) = atom() | {atom(), term()}
+
+       hhaannddlleerr__aarrggss(()) = term()
+
+       aadddd__hhaannddlleerr__rreett(()) = ok | term() | {'EXIT', term()}
+
+       ddeell__hhaannddlleerr__rreett(()) = ok | term() | {'EXIT', term()}
+
+EEXXPPOORRTTSS
+       ssttaarrtt__lliinnkk(()) -->> RReessuulltt
+       ssttaarrtt__lliinnkk((EEvveennttMMggrrNNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 EventMgrName = {local,Name} | {global,GlobalName} |
+                 {via,Module,ViaName}
+                  Name = atom()
+                  GlobalName = ViaName = term()
+                 Result = {ok,Pid} | {error,{already_started,Pid}}
+                  Pid = pid()
+
+              Creates an event manager process as part of a supervision tree.
+              The function should be called, directly or indirectly, by the
+              supervisor. It will, among other things, ensure that the event
+              manager is linked to the supervisor.
+
+              If _E_v_e_n_t_M_g_r_N_a_m_e_=_{_l_o_c_a_l_,_N_a_m_e_}, the event manager is registered
+              locally as _N_a_m_e using _r_e_g_i_s_t_e_r_/_2. If
+              _E_v_e_n_t_M_g_r_N_a_m_e_=_{_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_}, the event manager is
+              registered globally as _G_l_o_b_a_l_N_a_m_e using _g_l_o_b_a_l_:_r_e_g_i_s_t_e_r___n_a_m_e_/_2.
+              If no name is provided, the event manager is not registered. If
+              _E_v_e_n_t_M_g_r_N_a_m_e_=_{_v_i_a_,_M_o_d_u_l_e_,_V_i_a_N_a_m_e_}, the event manager will
+              register with the registry represented by _M_o_d_u_l_e. The _M_o_d_u_l_e
+              callback should export the functions _r_e_g_i_s_t_e_r___n_a_m_e_/_2,
+              _u_n_r_e_g_i_s_t_e_r___n_a_m_e_/_1, _w_h_e_r_e_i_s___n_a_m_e_/_1 and _s_e_n_d_/_2, which should
+              behave like the corresponding functions in _g_l_o_b_a_l. Thus,
+              _{_v_i_a_,_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_} is a valid reference.
+
+              If the event manager is successfully created the function
+              returns _{_o_k_,_P_i_d_}, where _P_i_d is the pid of the event manager. If
+              there already exists a process with the specified _E_v_e_n_t_M_g_r_N_a_m_e
+              the function returns _{_e_r_r_o_r_,_{_a_l_r_e_a_d_y___s_t_a_r_t_e_d_,_P_i_d_}_}, where _P_i_d is
+              the pid of that process.
+
+       ssttaarrtt(()) -->> RReessuulltt
+       ssttaarrtt((EEvveennttMMggrrNNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 EventMgrName = {local,Name} | {global,GlobalName} |
+                 {via,Module,ViaName}
+                  Name = atom()
+                  GlobalName = ViaName = term()
+                 Result = {ok,Pid} | {error,{already_started,Pid}}
+                  Pid = pid()
+
+              Creates a stand-alone event manager process, i.e. an event
+              manager which is not part of a supervision tree and thus has no
+              supervisor.
+
+              See _s_t_a_r_t___l_i_n_k_/_0_,_1 for a description of arguments and return
+              values.
+
+       aadddd__hhaannddlleerr((EEvveennttMMggrrRReeff,, HHaannddlleerr,, AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 EventMgr = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+                 Args = term()
+                 Result = ok | {'EXIT',Reason} | term()
+                  Reason = term()
+
+              Adds a new event handler to the event manager _E_v_e_n_t_M_g_r_R_e_f. The
+              event manager will call _M_o_d_u_l_e_:_i_n_i_t_/_1 to initiate the event
+              handler and its internal state.
+
+              _E_v_e_n_t_M_g_r_R_e_f can be:
+
+                * the pid,
+
+                * _N_a_m_e, if the event manager is locally registered,
+
+                * _{_N_a_m_e_,_N_o_d_e_}, if the event manager is locally registered at
+                  another node, or
+
+                * _{_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_}, if the event manager is globally
+                  registered.
+
+                * _{_v_i_a_,_M_o_d_u_l_e_,_V_i_a_N_a_m_e_}, if the event manager is registered
+                  through an alternative process registry.
+
+              _H_a_n_d_l_e_r is the name of the callback module _M_o_d_u_l_e or a tuple
+              _{_M_o_d_u_l_e_,_I_d_}, where _I_d is any term. The _{_M_o_d_u_l_e_,_I_d_}
+              representation makes it possible to identify a specific event
+              handler when there are several event handlers using the same
+              callback module.
+
+              _A_r_g_s is an arbitrary term which is passed as the argument to
+              _M_o_d_u_l_e_:_i_n_i_t_/_1.
+
+              If _M_o_d_u_l_e_:_i_n_i_t_/_1 returns a correct value indicating successful
+              completion, the event manager adds the event handler and this
+              function returns _o_k. If _M_o_d_u_l_e_:_i_n_i_t_/_1 fails with _R_e_a_s_o_n or
+              returns _{_e_r_r_o_r_,_R_e_a_s_o_n_}, the event handler is ignored and this
+              function returns _{_'_E_X_I_T_'_,_R_e_a_s_o_n_} or _{_e_r_r_o_r_,_R_e_a_s_o_n_},
+              respectively.
+
+       aadddd__ssuupp__hhaannddlleerr((EEvveennttMMggrrRReeff,, HHaannddlleerr,, AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 EventMgr = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+                 Args = term()
+                 Result = ok | {'EXIT',Reason} | term()
+                  Reason = term()
+
+              Adds a new event handler in the same way as _a_d_d___h_a_n_d_l_e_r_/_3 but
+              will also supervise the connection between the event handler and
+              the calling process.
+
+                * If the calling process later terminates with _R_e_a_s_o_n, the
+                  event manager will delete the event handler by calling
+                  _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_/_2 with _{_s_t_o_p_,_R_e_a_s_o_n_} as argument.
+
+                * If the event handler later is deleted, the event manager
+                  sends a message_{_g_e_n___e_v_e_n_t___E_X_I_T_,_H_a_n_d_l_e_r_,_R_e_a_s_o_n_} to the
+                  calling process. _R_e_a_s_o_n is one of the following:
+
+                  * _n_o_r_m_a_l, if the event handler has been removed due to a
+                    call to _d_e_l_e_t_e___h_a_n_d_l_e_r_/_3, or _r_e_m_o_v_e___h_a_n_d_l_e_r has been
+                    returned by a callback function (see below).
+
+                  * _s_h_u_t_d_o_w_n, if the event handler has been removed because
+                    the event manager is terminating.
+
+                  * _{_s_w_a_p_p_e_d_,_N_e_w_H_a_n_d_l_e_r_,_P_i_d_}, if the process _P_i_d has replaced
+                    the event handler with another event handler _N_e_w_H_a_n_d_l_e_r
+                    using a call to _s_w_a_p___h_a_n_d_l_e_r_/_3 or _s_w_a_p___s_u_p___h_a_n_d_l_e_r_/_3.
+
+                  * a term, if the event handler is removed due to an error.
+                    Which term depends on the error.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of the arguments and return
+              values.
+
+       nnoottiiffyy((EEvveennttMMggrrRReeff,, EEvveenntt)) -->> ookk
+       ssyynncc__nnoottiiffyy((EEvveennttMMggrrRReeff,, EEvveenntt)) -->> ookk
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Event = term()
+
+              Sends an event notification to the event manager _E_v_e_n_t_M_g_r_R_e_f.
+              The event manager will call _M_o_d_u_l_e_:_h_a_n_d_l_e___e_v_e_n_t_/_2 for each
+              installed event handler to handle the event.
+
+              _n_o_t_i_f_y is asynchronous and will return immediately after the
+              event notification has been sent. _s_y_n_c___n_o_t_i_f_y is synchronous in
+              the sense that it will return _o_k after the event has been
+              handled by all event handlers.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of _E_v_e_n_t_M_g_r_R_e_f.
+
+              _E_v_e_n_t is an arbitrary term which is passed as one of the
+              arguments to _M_o_d_u_l_e_:_h_a_n_d_l_e___e_v_e_n_t_/_2.
+
+              _n_o_t_i_f_y will not fail even if the specified event manager does
+              not exist, unless it is specified as _N_a_m_e.
+
+       ccaallll((EEvveennttMMggrrRReeff,, HHaannddlleerr,, RReeqquueesstt)) -->> RReessuulltt
+       ccaallll((EEvveennttMMggrrRReeff,, HHaannddlleerr,, RReeqquueesstt,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+                 Request = term()
+                 Timeout = int()>0 | infinity
+                 Result = Reply | {error,Error}
+                  Reply = term()
+                  Error = bad_module | {'EXIT',Reason} | term()
+                  Reason = term()
+
+              Makes a synchronous call to the event handler _H_a_n_d_l_e_r installed
+              in the event manager _E_v_e_n_t_M_g_r_R_e_f by sending a request and
+              waiting until a reply arrives or a timeout occurs. The event
+              manager will call _M_o_d_u_l_e_:_h_a_n_d_l_e___c_a_l_l_/_2 to handle the request.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of _E_v_e_n_t_M_g_r_R_e_f and _H_a_n_d_l_e_r.
+
+              _R_e_q_u_e_s_t is an arbitrary term which is passed as one of the
+              arguments to _M_o_d_u_l_e_:_h_a_n_d_l_e___c_a_l_l_/_2.
+
+              _T_i_m_e_o_u_t is an integer greater than zero which specifies how many
+              milliseconds to wait for a reply, or the atom _i_n_f_i_n_i_t_y to wait
+              indefinitely. Default value is 5000. If no reply is received
+              within the specified time, the function call fails.
+
+              The return value _R_e_p_l_y is defined in the return value of
+              _M_o_d_u_l_e_:_h_a_n_d_l_e___c_a_l_l_/_2. If the specified event handler is not
+              installed, the function returns _{_e_r_r_o_r_,_b_a_d___m_o_d_u_l_e_}. If the
+              callback function fails with _R_e_a_s_o_n or returns an unexpected
+              value _T_e_r_m, this function returns _{_e_r_r_o_r_,_{_'_E_X_I_T_'_,_R_e_a_s_o_n_}_} or
+              _{_e_r_r_o_r_,_T_e_r_m_}, respectively.
+
+       ddeelleettee__hhaannddlleerr((EEvveennttMMggrrRReeff,, HHaannddlleerr,, AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+                 Args = term()
+                 Result = term() | {error,module_not_found} | {'EXIT',Reason}
+                  Reason = term()
+
+              Deletes an event handler from the event manager _E_v_e_n_t_M_g_r_R_e_f. The
+              event manager will call _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_/_2 to terminate the
+              event handler.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of _E_v_e_n_t_M_g_r_R_e_f and _H_a_n_d_l_e_r.
+
+              _A_r_g_s is an arbitrary term which is passed as one of the
+              arguments to _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_/_2.
+
+              The return value is the return value of _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_/_2. If
+              the specified event handler is not installed, the function
+              returns _{_e_r_r_o_r_,_m_o_d_u_l_e___n_o_t___f_o_u_n_d_}. If the callback function fails
+              with _R_e_a_s_o_n, the function returns _{_'_E_X_I_T_'_,_R_e_a_s_o_n_}.
+
+       sswwaapp__hhaannddlleerr((EEvveennttMMggrrRReeff,, {{HHaannddlleerr11,,AArrggss11}},, {{HHaannddlleerr22,,AArrggss22}})) -->> RReessuulltt
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler1 = Handler2 = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+                 Args1 = Args2 = term()
+                 Result = ok | {error,Error}
+                  Error = {'EXIT',Reason} | term()
+                  Reason = term()
+
+              Replaces an old event handler with a new event handler in the
+              event manager _E_v_e_n_t_M_g_r_R_e_f.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of the arguments.
+
+              First the old event handler _H_a_n_d_l_e_r_1 is deleted. The event
+              manager calls _M_o_d_u_l_e_1_:_t_e_r_m_i_n_a_t_e_(_A_r_g_s_1_, _._._._), where _M_o_d_u_l_e_1 is
+              the callback module of _H_a_n_d_l_e_r_1, and collects the return value.
+
+              Then the new event handler _H_a_n_d_l_e_r_2 is added and initiated by
+              calling _M_o_d_u_l_e_2_:_i_n_i_t_(_{_A_r_g_s_2_,_T_e_r_m_}_), where _M_o_d_u_l_e_2 is the
+              callback module of _H_a_n_d_l_e_r_2 and _T_e_r_m the return value of
+              _M_o_d_u_l_e_1_:_t_e_r_m_i_n_a_t_e_/_2. This makes it possible to transfer
+              information from _H_a_n_d_l_e_r_1 to _H_a_n_d_l_e_r_2.
+
+              The new handler will be added even if the the specified old
+              event handler is not installed in which case _T_e_r_m_=_e_r_r_o_r, or if
+              _M_o_d_u_l_e_1_:_t_e_r_m_i_n_a_t_e_/_2 fails with _R_e_a_s_o_n in which case
+              _T_e_r_m_=_{_'_E_X_I_T_'_,_R_e_a_s_o_n_}. The old handler will be deleted even if
+              _M_o_d_u_l_e_2_:_i_n_i_t_/_1 fails.
+
+              If there was a supervised connection between _H_a_n_d_l_e_r_1 and a
+              process _P_i_d, there will be a supervised connection between
+              _H_a_n_d_l_e_r_2 and _P_i_d instead.
+
+              If _M_o_d_u_l_e_2_:_i_n_i_t_/_1 returns a correct value, this function returns
+              _o_k. If _M_o_d_u_l_e_2_:_i_n_i_t_/_1 fails with _R_e_a_s_o_n or returns an unexpected
+              value _T_e_r_m, this this function returns _{_e_r_r_o_r_,_{_'_E_X_I_T_'_,_R_e_a_s_o_n_}_}
+              or _{_e_r_r_o_r_,_T_e_r_m_}, respectively.
+
+       sswwaapp__ssuupp__hhaannddlleerr((EEvveennttMMggrrRReeff,, {{HHaannddlleerr11,,AArrggss11}},, {{HHaannddlleerr22,,AArrggss22}})) -->>
+       RReessuulltt
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler1 = Handler 2 = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+                 Args1 = Args2 = term()
+                 Result = ok | {error,Error}
+                  Error = {'EXIT',Reason} | term()
+                  Reason = term()
+
+              Replaces an event handler in the event manager _E_v_e_n_t_M_g_r_R_e_f in
+              the same way as _s_w_a_p___h_a_n_d_l_e_r_/_3 but will also supervise the
+              connection between _H_a_n_d_l_e_r_2 and the calling process.
+
+              See _s_w_a_p___h_a_n_d_l_e_r_/_3 for a description of the arguments and return
+              values.
+
+       wwhhiicchh__hhaannddlleerrss((EEvveennttMMggrrRReeff)) -->> [[HHaannddlleerr]]
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Handler = Module | {Module,Id}
+                  Module = atom()
+                  Id = term()
+
+              Returns a list of all event handlers installed in the event
+              manager _E_v_e_n_t_M_g_r_R_e_f.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of _E_v_e_n_t_M_g_r_R_e_f and _H_a_n_d_l_e_r.
+
+       ssttoopp((EEvveennttMMggrrRReeff)) -->> ookk
+
+              Types:
+
+                 EventMgrRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                 Name = Node = atom()
+                 GlobalName = ViaName = term()
+
+              Terminates the event manager _E_v_e_n_t_M_g_r_R_e_f. Before terminating,
+              the event manager will call _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_(_s_t_o_p_,_._._._) for each
+              installed event handler.
+
+              See _a_d_d___h_a_n_d_l_e_r_/_3 for a description of the argument.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following functions should be exported from a _g_e_n___e_v_e_n_t callback
+       module.
+
+EEXXPPOORRTTSS
+       MMoodduullee::iinniitt((IInniittAArrggss)) -->> {{ookk,,SSttaattee}} || {{ookk,,SSttaattee,,hhiibbeerrnnaattee}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 InitArgs = Args | {Args,Term}
+                  Args = Term = term()
+                 State = term()
+                 Reason = term()
+
+              Whenever a new event handler is added to an event manager, this
+              function is called to initialize the event handler.
+
+              If the event handler is added due to a call to
+              _g_e_n___e_v_e_n_t_:_a_d_d___h_a_n_d_l_e_r_/_3 or _g_e_n___e_v_e_n_t_:_a_d_d___s_u_p___h_a_n_d_l_e_r_/_3, _I_n_i_t_A_r_g_s
+              is the _A_r_g_s argument of these functions.
+
+              If the event handler is replacing another event handler due to a
+              call to _g_e_n___e_v_e_n_t_:_s_w_a_p___h_a_n_d_l_e_r_/_3 or
+              _g_e_n___e_v_e_n_t_:_s_w_a_p___s_u_p___h_a_n_d_l_e_r_/_3, or due to a _s_w_a_p return tuple from
+              one of the other callback functions, _I_n_i_t_A_r_g_s is a tuple
+              _{_A_r_g_s_,_T_e_r_m_} where _A_r_g_s is the argument provided in the function
+              call/return tuple and _T_e_r_m is the result of terminating the old
+              event handler, see _g_e_n___e_v_e_n_t_:_s_w_a_p___h_a_n_d_l_e_r_/_3.
+
+              If successful, the function should return _{_o_k_,_S_t_a_t_e_} or
+              _{_o_k_,_S_t_a_t_e_,_h_i_b_e_r_n_a_t_e_} where _S_t_a_t_e is the initial internal state
+              of the event handler.
+
+              If _{_o_k_,_S_t_a_t_e_,_h_i_b_e_r_n_a_t_e_} is returned, the event manager will go
+              into hibernation (by calling pprroocc__lliibb::hhiibbeerrnnaattee//33), waiting for
+              the next event to occur.
+
+       MMoodduullee::hhaannddllee__eevveenntt((EEvveenntt,, SSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 Event = term()
+                 State = term()
+                 Result = {ok,NewState} | {ok,NewState,hibernate}
+                  | {swap_handler,Args1,NewState,Handler2,Args2} |
+                 remove_handler
+                  NewState = term()
+                  Args1 = Args2 = term()
+                  Handler2 = Module2 | {Module2,Id}
+                  Module2 = atom()
+                  Id = term()
+
+              Whenever an event manager receives an event sent using
+              _g_e_n___e_v_e_n_t_:_n_o_t_i_f_y_/_2 or _g_e_n___e_v_e_n_t_:_s_y_n_c___n_o_t_i_f_y_/_2, this function is
+              called for each installed event handler to handle the event.
+
+              _E_v_e_n_t is the _E_v_e_n_t argument of _n_o_t_i_f_y/_s_y_n_c___n_o_t_i_f_y.
+
+              _S_t_a_t_e is the internal state of the event handler.
+
+              If the function returns _{_o_k_,_N_e_w_S_t_a_t_e_} or _{_o_k_,_N_e_w_S_t_a_t_e_,_h_i_b_e_r_n_a_t_e_}
+              the event handler will remain in the event manager with the
+              possible updated internal state _N_e_w_S_t_a_t_e.
+
+              If _{_o_k_,_N_e_w_S_t_a_t_e_,_h_i_b_e_r_n_a_t_e_} is returned, the event manager will
+              also go into hibernation (by calling pprroocc__lliibb::hhiibbeerrnnaattee//33),
+              waiting for the next event to occur. It is sufficient that one
+              of the event handlers return _{_o_k_,_N_e_w_S_t_a_t_e_,_h_i_b_e_r_n_a_t_e_} for the
+              whole event manager process to hibernate.
+
+              If the function returns
+              _{_s_w_a_p___h_a_n_d_l_e_r_,_A_r_g_s_1_,_N_e_w_S_t_a_t_e_,_H_a_n_d_l_e_r_2_,_A_r_g_s_2_} the event handler
+              will be replaced by _H_a_n_d_l_e_r_2 by first calling
+              _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_(_A_r_g_s_1_,_N_e_w_S_t_a_t_e_) and then
+              _M_o_d_u_l_e_2_:_i_n_i_t_(_{_A_r_g_s_2_,_T_e_r_m_}_) where _T_e_r_m is the return value of
+              _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_/_2. See _g_e_n___e_v_e_n_t_:_s_w_a_p___h_a_n_d_l_e_r_/_3 for more
+              information.
+
+              If the function returns _r_e_m_o_v_e___h_a_n_d_l_e_r the event handler will be
+              deleted by calling _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_(_r_e_m_o_v_e___h_a_n_d_l_e_r_,_S_t_a_t_e_).
+
+       MMoodduullee::hhaannddllee__ccaallll((RReeqquueesstt,, SSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 Request = term()
+                 State = term()
+                 Result = {ok,Reply,NewState} | {ok,Reply,NewState,hibernate}
+                  | {swap_handler,Reply,Args1,NewState,Handler2,Args2}
+                  | {remove_handler, Reply}
+                  Reply = term()
+                  NewState = term()
+                  Args1 = Args2 = term()
+                  Handler2 = Module2 | {Module2,Id}
+                  Module2 = atom()
+                  Id = term()
+
+              Whenever an event manager receives a request sent using
+              _g_e_n___e_v_e_n_t_:_c_a_l_l_/_3_,_4, this function is called for the specified
+              event handler to handle the request.
+
+              _R_e_q_u_e_s_t is the _R_e_q_u_e_s_t argument of _c_a_l_l.
+
+              _S_t_a_t_e is the internal state of the event handler.
+
+              The return values are the same as for _h_a_n_d_l_e___e_v_e_n_t_/_2 except they
+              also contain a term _R_e_p_l_y which is the reply given back to the
+              client as the return value of _c_a_l_l.
+
+       MMoodduullee::hhaannddllee__iinnffoo((IInnffoo,, SSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 Info = term()
+                 State = term()
+                 Result = {ok,NewState} | {ok,NewState,hibernate}
+                  | {swap_handler,Args1,NewState,Handler2,Args2} |
+                 remove_handler
+                  NewState = term()
+                  Args1 = Args2 = term()
+                  Handler2 = Module2 | {Module2,Id}
+                  Module2 = atom()
+                  Id = term()
+
+              This function is called for each installed event handler when an
+              event manager receives any other message than an event or a
+              synchronous request (or a system message).
+
+              _I_n_f_o is the received message.
+
+              See _M_o_d_u_l_e_:_h_a_n_d_l_e___e_v_e_n_t_/_2 for a description of State and
+              possible return values.
+
+       MMoodduullee::tteerrmmiinnaattee((AArrgg,, SSttaattee)) -->> tteerrmm(())
+
+              Types:
+
+                 Arg = Args | {stop,Reason} | stop | remove_handler
+                  | {error,{'EXIT',Reason}} | {error,Term}
+                  Args = Reason = Term = term()
+
+              Whenever an event handler is deleted from an event manager, this
+              function is called. It should be the opposite of _M_o_d_u_l_e_:_i_n_i_t_/_1
+              and do any necessary cleaning up.
+
+              If the event handler is deleted due to a call to
+              _g_e_n___e_v_e_n_t_:_d_e_l_e_t_e___h_a_n_d_l_e_r, _g_e_n___e_v_e_n_t_:_s_w_a_p___h_a_n_d_l_e_r_/_3 or
+              _g_e_n___e_v_e_n_t_:_s_w_a_p___s_u_p___h_a_n_d_l_e_r_/_3, _A_r_g is the _A_r_g_s argument of this
+              function call.
+
+              _A_r_g_=_{_s_t_o_p_,_R_e_a_s_o_n_} if the event handler has a supervised
+              connection to a process which has terminated with reason _R_e_a_s_o_n.
+
+              _A_r_g_=_s_t_o_p if the event handler is deleted because the event
+              manager is terminating.
+
+              The event manager will terminate if it is part of a supervision
+              tree and it is ordered by its supervisor to terminate. Even if
+              it is _n_o_t part of a supervision tree, it will terminate if it
+              receives an _'_E_X_I_T_' message from its parent.
+
+              _A_r_g_=_r_e_m_o_v_e___h_a_n_d_l_e_r if the event handler is deleted because
+              another callback function has returned _r_e_m_o_v_e___h_a_n_d_l_e_r or
+              _{_r_e_m_o_v_e___h_a_n_d_l_e_r_,_R_e_p_l_y_}.
+
+              _A_r_g_=_{_e_r_r_o_r_,_T_e_r_m_} if the event handler is deleted because a
+              callback function returned an unexpected value _T_e_r_m, or
+              _A_r_g_=_{_e_r_r_o_r_,_{_'_E_X_I_T_'_,_R_e_a_s_o_n_}_} if a callback function failed.
+
+              _S_t_a_t_e is the internal state of the event handler.
+
+              The function may return any term. If the event handler is
+              deleted due to a call to _g_e_n___e_v_e_n_t_:_d_e_l_e_t_e___h_a_n_d_l_e_r, the return
+              value of that function will be the return value of this
+              function. If the event handler is to be replaced with another
+              event handler due to a swap, the return value will be passed to
+              the _i_n_i_t function of the new event handler. Otherwise the return
+              value is ignored.
+
+       MMoodduullee::ccooddee__cchhaannggee((OOllddVVssnn,, SSttaattee,, EExxttrraa)) -->> {{ookk,, NNeewwSSttaattee}}
+
+              Types:
+
+                 OldVsn = Vsn | {down, Vsn}
+                  Vsn = term()
+                 State = NewState = term()
+                 Extra = term()
+
+              This function is called for an installed event handler which
+              should update its internal state during a release
+              upgrade/downgrade, i.e. when the instruction
+              _{_u_p_d_a_t_e_,_M_o_d_u_l_e_,_C_h_a_n_g_e_,_._._._} where _C_h_a_n_g_e_=_{_a_d_v_a_n_c_e_d_,_E_x_t_r_a_} is
+              given in the _._a_p_p_u_p file. See _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s for more
+              information.
+
+              In the case of an upgrade, _O_l_d_V_s_n is _V_s_n, and in the case of a
+              downgrade, _O_l_d_V_s_n is _{_d_o_w_n_,_V_s_n_}. _V_s_n is defined by the _v_s_n
+              attribute(s) of the old version of the callback module _M_o_d_u_l_e.
+              If no such attribute is defined, the version is the checksum of
+              the BEAM file.
+
+              _S_t_a_t_e is the internal state of the event handler.
+
+              _E_x_t_r_a is passed as-is from the _{_a_d_v_a_n_c_e_d_,_E_x_t_r_a_} part of the
+              update instruction.
+
+              The function should return the updated internal state.
+
+       MMoodduullee::ffoorrmmaatt__ssttaattuuss((OOpptt,, [[PPDDiicctt,, SSttaattee]])) -->> SSttaattuuss
+
+              Types:
+
+                 Opt = normal | terminate
+                 PDict = [{Key, Value}]
+                 State = term()
+                 Status = term()
+
+          NNoottee::
+              This callback is optional, so event handler modules need not
+              export it. If a handler does not export this function, the
+              gen_event module uses the handler state directly for the
+              purposes described below.
+
+
+              This function is called by a gen_event process when:
+
+                * One of ssyyss::ggeett__ssttaattuuss//11,,22 is invoked to get the gen_event
+                  status. _O_p_t is set to the atom _n_o_r_m_a_l for this case.
+
+                * The event handler terminates abnormally and gen_event logs
+                  an error. _O_p_t is set to the atom _t_e_r_m_i_n_a_t_e for this case.
+
+              This function is useful for customising the form and appearance
+              of the event handler state for these cases. An event handler
+              callback module wishing to customise the _s_y_s_:_g_e_t___s_t_a_t_u_s_/_1_,_2
+              return value as well as how its state appears in termination
+              error logs exports an instance of _f_o_r_m_a_t___s_t_a_t_u_s_/_2 that returns a
+              term describing the current state of the event handler.
+
+              _P_D_i_c_t is the current value of the gen_event's process
+              dictionary.
+
+              _S_t_a_t_e is the internal state of the event handler.
+
+              The function should return _S_t_a_t_u_s, a term that customises the
+              details of the current state of the event handler. Any term is
+              allowed for _S_t_a_t_u_s. The gen_event module uses _S_t_a_t_u_s as follows:
+
+                * When _s_y_s_:_g_e_t___s_t_a_t_u_s_/_1_,_2 is called, gen_event ensures that
+                  its return value contains _S_t_a_t_u_s in place of the event
+                  handler's actual state term.
+
+                * When an event handler terminates abnormally, gen_event logs
+                  _S_t_a_t_u_s in place of the event handler's actual state term.
+
+              One use for this function is to return compact alternative state
+              representations to avoid having large state terms printed in
+              logfiles.
+
+SSEEEE AALLSSOO
+       ssuuppeerrvviissoorr((33)), ssyyss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                    gen_event(3)

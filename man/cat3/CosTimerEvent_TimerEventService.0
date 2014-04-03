@@ -1,0 +1,50 @@
+CosTimerEvent_TimerEventServEirclea(n3g)Module DefiCnoistTiiomnerEvent_TimerEventService(3)
+
+
+
+NNAAMMEE
+       CosTimerEvent_TimerEventService - This module implements the OMG
+       CosTimerEvent::TimerEventService interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_i_m_e_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       rreeggiisstteerr((TTiimmeerrEEvveennttSSeerrvviiccee,, CCoossEEvveennttCCoommmmPPuusshhCCoonnssuummeerr,, DDaattaa)) -->>
+       TTiimmeerrEEvveennttHHaannddlleerr
+
+              Types:
+
+                 TimerEventService = CosEventCommPushConsumer =
+                 TimerEventHandler = #objref
+                 Data = #any
+
+              This operation will create a new _T_i_m_e_r_E_v_e_n_t_H_a_n_d_l_e_r object which
+              will push given _D_a_t_a to given _C_o_s_E_v_e_n_t_C_o_m_m_P_u_s_h_C_o_n_s_u_m_e_r after the
+              timer have been set.
+
+       uunnrreeggiisstteerr((TTiimmeerrEEvveennttSSeerrvviiccee,, TTiimmeerrEEvveennttHHaannddlleerr)) -->> ookk
+
+              Types:
+
+                 TimerEventService = TimerEventHandler = #objref
+
+              This operation will terminate the given TimerEventHandler.
+
+       eevveenntt__ttiimmee((TTiimmeerrEEvveennttSSeerrvviiccee,, TTiimmeerrEEvveenntt)) -->> UUTTOO
+
+              Types:
+
+                 TimerEventService = #objref
+                 TimerEvent = #'CosTimerEvent_TimerEvent'{utc, event_data}
+                 utc =
+                 event_data = #any}
+                 UTO = #objref
+
+              This operation returns a UTO containing the time at which the
+              associated event was triggered.
+
+
+
+Ericsson AB                     cosTime 1.1.1C2osTimerEvent_TimerEventService(3)

@@ -1,0 +1,2186 @@
+erl_driver(3)                 C Library Functions                erl_driver(3)
+
+
+
+NNAAMMEE
+       erl_driver - API functions for an Erlang driver
+
+DDEESSCCRRIIPPTTIIOONN
+       As of erts version 5.5.3 the driver interface has been extended (see
+       eexxtteennddeedd mmaarrkkeerr). The extended interface introduce vveerrssiioonn mmaannaaggeemmeenntt,
+       the possibility to pass capability flags (see ddrriivveerr ffllaaggss) to the
+       runtime system at driver initialization, and some new driver API
+       functions.
+
+   NNoottee::
+       As of erts version 5.9 old drivers have to be recompiled and have to
+       use the extended interface. They also have to be adjusted to the 6644--bbiitt
+       ccaappaabbllee ddrriivveerr iinntteerrffaaccee..
+
+
+       The driver calls back to the emulator, using the API functions declared
+       in _e_r_l___d_r_i_v_e_r_._h. They are used for outputting data from the driver,
+       using timers, etc.
+
+       A driver is a library with a set of function that the emulator calls,
+       in response to Erlang functions and message sending. There may be
+       multiple instances of a driver, each instance is connected to an Erlang
+       port. Every port has a port owner process. Communication with the port
+       is normally done through the port owner process.
+
+       Most of the functions take the _p_o_r_t handle as an argument. This
+       identifies the driver instance. Note that this port handle must be
+       stored by the driver, it is not given when the driver is called from
+       the emulator (see ddrriivveerr__eennttrryy).
+
+       Some of the functions take a parameter of type _E_r_l_D_r_v_B_i_n_a_r_y, a driver
+       binary. It should be both allocated and freed by the caller. Using a
+       binary directly avoids one extra copying of data.
+
+       Many of the output functions have a "header buffer", with _h_b_u_f and _h_l_e_n
+       parameters. This buffer is sent as a list before the binary (or list,
+       depending on port mode) that is sent. This is convenient when matching
+       on messages received from the port. (Although in the latest versions of
+       Erlang, there is the binary syntax, that enables you to match on the
+       beginning of a binary.)
+
+       In the runtime system with SMP support, drivers are locked either on
+       driver level or port level (driver instance level). By default driver
+       level locking will be used, i.e., only one emulator thread will execute
+       code in the driver at a time. If port level locking is used, multiple
+       emulator threads may execute code in the driver at the same time. There
+       will only be one thread at a time calling driver call-backs
+       corresponding to the same port, though. In order to enable port level
+       locking set the _E_R_L___D_R_V___F_L_A_G___U_S_E___P_O_R_T___L_O_C_K_I_N_G ddrriivveerr ffllaagg in the
+       ddrriivveerr__eennttrryy used by the driver. When port level locking is used it is
+       the responsibility of the driver writer to synchronize all accesses to
+       data shared by the ports (driver instances).
+
+       Most drivers written before the runtime system with SMP support existed
+       will be able to run in the runtime system with SMP support without
+       being rewritten if driver level locking is used.
+
+   NNoottee::
+       It is assumed that drivers do not access other drivers. If drivers
+       should access each other they have to provide their own mechanism for
+       thread safe synchronization. Such "inter driver communication" is
+       strongly discouraged.
+
+
+       Previously, in the runtime system without SMP support, specific driver
+       call-backs were always called from the same thread. This is _n_o_t the
+       case in the runtime system with SMP support. Regardless of locking
+       scheme used, calls to driver call-backs may be made from different
+       threads, e.g., two consecutive calls to exactly the same call-back for
+       exactly the same port may be made from two different threads. This will
+       for _m_o_s_t drivers not be a problem, but it might. Drivers that depend on
+       all call-backs being called in the same thread, _h_a_v_e to be rewritten
+       before being used in the runtime system with SMP support.
+
+   NNoottee::
+       Regardless of locking scheme used, calls to driver call-backs may be
+       made from different threads.
+
+
+       Most functions in this API are _n_o_t thread-safe, i.e., they may _n_o_t be
+       called from an arbitrary thread. Functions that are not documented as
+       thread-safe may only be called from driver call-backs or function calls
+       descending from a driver call-back call. Note that driver call-backs
+       may be called from different threads. This, however, is not a problem
+       for any function in this API, since the emulator has control over these
+       threads.
+
+   NNoottee::
+       Functions not explicitly documented as thread-safe are _n_o_t thread-safe.
+       Also note that some functions are _o_n_l_y thread safe when used in a
+       runtime system with SMP support.
+
+
+FFUUNNCCTTIIOONNAALLIITTYY
+       All functions that a driver needs to do with Erlang are performed
+       through driver API functions. There are functions for the following
+       functionality:
+
+         TTiimmeerr ffuunnccttiioonnss::
+           Timer functions are used to control the timer that a driver may
+           use. The timer will have the emulator call the ttiimmeeoouutt entry
+           function after a specified time. Only one timer is available for
+           each driver instance.
+
+         QQuueeuuee hhaannddlliinngg::
+           Every driver instance has an associated queue. This queue is a
+           _S_y_s_I_O_V_e_c that works as a buffer. It's mostly used for the driver to
+           buffer data that should be written to a device, it is a byte
+           stream. If the port owner process closes the driver, and the queue
+           is not empty, the driver will not be closed. This enables the
+           driver to flush its buffers before closing.
+
+           The queue can be manipulated from arbitrary threads if a port data
+           lock is used. See documentation of the EErrllDDrrvvPPDDLL type for more
+           information.
+
+         OOuuttppuutt ffuunnccttiioonnss::
+           With the output functions, the driver sends data back to the
+           emulator. They will be received as messages by the port owner
+           process, see _o_p_e_n___p_o_r_t_/_2. The vector function and the function
+           taking a driver binary are faster, because they avoid copying the
+           data buffer. There is also a fast way of sending terms from the
+           driver, without going through the binary term format.
+
+         FFaaiilluurree::
+           The driver can exit and signal errors up to Erlang. This is only
+           for severe errors, when the driver can't possibly keep open.
+
+         AAssyynncchhrroonnoouuss ccaallllss::
+           The latest Erlang versions (R7B and later) has provision for
+           asynchronous function calls, using a thread pool provided by
+           Erlang. There is also a select call, that can be used for
+           asynchronous drivers.
+
+         MMuullttii--tthhrreeaaddiinngg:
+           A POSIX thread like API for multi-threading is provided. The Erlang
+           driver thread API only provide a subset of the functionality
+           provided by the POSIX thread API. The subset provided is more or
+           less the basic functionality needed for multi-threaded programming:
+
+           * TThhrreeaaddss
+
+           * MMuutteexxeess
+
+           * CCoonnddiittiioonn vvaarriiaabblleess
+
+           * RReeaadd//WWrriittee lloocckkss
+
+           * TThhrreeaadd ssppeecciiffiicc ddaattaa
+
+           The Erlang driver thread API can be used in conjunction with the
+           POSIX thread API on UN-ices and with the Windows native thread API
+           on Windows. The Erlang driver thread API has the advantage of being
+           portable, but there might exist situations where you want to use
+           functionality from the POSIX thread API or the Windows native
+           thread API.
+
+           The Erlang driver thread API only returns error codes when it is
+           reasonable to recover from an error condition. If it isn't
+           reasonable to recover from an error condition, the whole runtime
+           system is terminated. For example, if a create mutex operation
+           fails, an error code is returned, but if a lock operation on a
+           mutex fails, the whole runtime system is terminated.
+
+           Note that there exists no "condition variable wait with timeout" in
+           the Erlang driver thread API. This is due to issues with
+           _p_t_h_r_e_a_d___c_o_n_d___t_i_m_e_d_w_a_i_t_(_). When the system clock suddenly is
+           changed, it isn't always guaranteed that you will wake up from the
+           call as expected. An Erlang runtime system has to be able to cope
+           with sudden changes of the system clock. Therefore, we have omitted
+           it from the Erlang driver thread API. In the Erlang driver case,
+           timeouts can and should be handled with the timer functionality of
+           the Erlang driver API.
+
+           In order for the Erlang driver thread API to function, thread
+           support has to be enabled in the runtime system. An Erlang driver
+           can check if thread support is enabled by use of
+           ddrriivveerr__ssyysstteemm__iinnffoo(()). Note that some functions in the Erlang driver
+           API are thread-safe only when the runtime system has SMP support,
+           also this information can be retrieved via ddrriivveerr__ssyysstteemm__iinnffoo(()).
+           Also note that a lot of functions in the Erlang driver API are _n_o_t
+           thread-safe regardless of whether SMP support is enabled or not. If
+           a function isn't documented as thread-safe it is _n_o_t thread-safe.
+
+           _N_O_T_E: When executing in an emulator thread, it is _v_e_r_y _i_m_p_o_r_t_a_n_t
+           that you unlock _a_l_l locks you have locked before letting the thread
+           out of your control; otherwise, you are _v_e_r_y _l_i_k_e_l_y to deadlock the
+           whole emulator. If you need to use thread specific data in an
+           emulator thread, only have the thread specific data set while the
+           thread is under your control, and clear the thread specific data
+           before you let the thread out of your control.
+
+           In the future there will probably be debug functionality integrated
+           with the Erlang driver thread API. All functions that create
+           entities take a _n_a_m_e argument. Currently the _n_a_m_e argument is
+           unused, but it will be used when the debug functionality has been
+           implemented. If you name all entities created well, the debug
+           functionality will be able to give you better error reports.
+
+         AAddddiinngg // rreemmoovviinngg ddrriivveerrss::
+           A driver can add and later remove drivers.
+
+         MMoonniittoorriinngg pprroocceesssseess::
+           A driver can monitor a process that does not own a port.
+
+         VVeerrssiioonn mmaannaaggeemmeenntt:
+           Version management is enabled for drivers that have set the
+           eexxtteennddeedd__mmaarrkkeerr field of their ddrriivveerr__eennttrryy to
+           _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_R_K_E_R. _e_r_l___d_r_i_v_e_r_._h defines
+           _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_R_K_E_R, _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_J_O_R___V_E_R_S_I_O_N, and
+           _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_I_N_O_R___V_E_R_S_I_O_N. _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_J_O_R___V_E_R_S_I_O_N will
+           be incremented when driver incompatible changes are made to the
+           Erlang runtime system. Normally it will suffice to recompile
+           drivers when the _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_J_O_R___V_E_R_S_I_O_N has changed, but it
+           could, under rare circumstances, mean that drivers have to be
+           slightly modified. If so, this will of course be documented.
+           _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_I_N_O_R___V_E_R_S_I_O_N will be incremented when new
+           features are added. The runtime system uses the minor version of
+           the driver to determine what features to use. The runtime system
+           will refuse to load a driver if the major versions differ, or if
+           the major versions are equal and the minor version used by the
+           driver is greater than the one used by the runtime system.
+
+           The emulator will refuse to load a driver that does not use the
+           extended driver interface since, to allow for 64-bit capable
+           drivers, incompatible type changes for the callbacks oouuttppuutt,
+           ccoonnttrrooll and ccaallll were introduced in release R15B. A driver written
+           with the old types would compile with warnings and when called
+           return garbage sizes to the emulator causing it to read random
+           memory and create huge incorrect result blobs.
+
+           Therefore it is not enough to just recompile drivers written with
+           version management for pre-R15B types; the types have to be changed
+           in the driver suggesting other rewrites especially regarding size
+           variables. Investigate all warnings when recompiling!
+
+           Also, the API driver functions _d_r_i_v_e_r___o_u_t_p_u_t_*, _d_r_i_v_e_r___v_e_c___t_o___b_u_f,
+           _d_r_i_v_e_r___a_l_l_o_c_/_r_e_a_l_l_o_c_* and the _d_r_i_v_e_r___* queue functions were changed
+           to have larger length arguments and return values. This is a lesser
+           problem since code that passes smaller types will get them auto
+           converted in the calls and as long as the driver does not handle
+           sizes that overflow an _i_n_t all will work as before.
+
+
+             REWRITES FOR 64-BIT DRIVER INTERFACE
+           "
+
+
+       For erts-5.9 two new integer types EErrllDDrrvvSSiizzeeTT and EErrllDDrrvvSSSSiizzeeTT were
+       introduced that can hold 64-bit sizes if necessary.
+
+       To not update a driver and just recompile it probably works when
+       building for a 32-bit machine creating a false sense of security.
+       Hopefully that will generate many important warnings. But when
+       recompiling the same driver later on for a 64-bit machine there _w_i_l_l be
+       warnings and almost certainly crashes. So it is a BAD idea to postpone
+       updating the driver and not fixing the warnings!
+
+       When recompiling with _g_c_c use the _-_W_s_t_r_i_c_t_-_p_r_o_t_o_t_y_p_e_s flag to get
+       better warnings. Try to find a similar flag if you are using some other
+       compiler.
+
+       Here follows a checklist for rewriting a pre erts-5.9 driver, most
+       important first.
+
+         RReettuurrnn ttyyppeess ffoorr ddrriivveerr ccaallllbbaacckkss::
+           Rewrite driver callback ccoonnttrrooll to use return type _E_r_l_D_r_v_S_S_i_z_e_T
+           instead of _i_n_t.
+
+           Rewrite driver callback ccaallll to use return type _E_r_l_D_r_v_S_S_i_z_e_T
+           instead of _i_n_t.
+
+     NNoottee::
+         These changes are essential to not crash the emulator or worse cause
+         malfunction. Without them a driver may return garbage in the high 32
+         bits to the emulator causing it to build a huge result from random
+         bytes either crashing on memory allocation or succeeding with a
+         random result from the driver call.
+
+
+         AArrgguummeennttss ttoo ddrriivveerr ccaallllbbaacckkss::
+           Driver callback oouuttppuutt now gets _E_r_l_D_r_v_S_i_z_e_T as 3rd argument instead
+           of previously _i_n_t.
+
+           Driver callback ccoonnttrrooll now gets _E_r_l_D_r_v_S_i_z_e_T as 4th and 6th
+           arguments instead of previously _i_n_t.
+
+           Driver callback ccaallll now gets _E_r_l_D_r_v_S_i_z_e_T as 4th and 6th arguments
+           instead of previously _i_n_t.
+
+           Sane compiler's calling conventions probably make these changes
+           necessary only for a driver to handle data chunks that require
+           64-bit size fields (mostly larger than 2 GB since that is what an
+           _i_n_t of 32 bits can hold). But it is possible to think of non-sane
+           calling conventions that would make the driver callbacks mix up the
+           arguments causing malfunction.
+
+     NNoottee::
+         The argument type change is from signed to unsigned which may cause
+         problems for e.g. loop termination conditions or error conditions if
+         you just change the types all over the place.
+
+
+         LLaarrggeerr _s_i_z_e field in _E_r_l_I_O_V_e_c:
+           The _s_i_z_e field in _E_r_l_I_O_V_e_c has been changed to _E_r_l_D_r_v_S_i_z_e_T from
+           _i_n_t. Check all code that use that field.
+
+           Automatic type casting probably makes these changes necessary only
+           for a driver that encounters sizes larger than 32 bits.
+
+     NNoottee::
+         The _s_i_z_e field changed from signed to unsigned which may cause
+         problems for e.g. loop termination conditions or error conditions if
+         you just change the types all over the place.
+
+
+         AArrgguummeennttss aanndd rreettuurrnn vvaalluueess iinn tthhee ddrriivveerr AAPPII::
+           Many driver API functions have changed argument type and/or return
+           value to _E_r_l_D_r_v_S_i_z_e_T from mostly _i_n_t. Automatic type casting
+           probably makes these changes necessary only for a driver that
+           encounters sizes larger than 32 bits.
+
+           ddrriivveerr__oouuttppuutt:
+             3rd argument
+
+           ddrriivveerr__oouuttppuutt22:
+             3rd and 5th arguments
+
+           ddrriivveerr__oouuttppuutt__bbiinnaarryy:
+             3rd 5th and 6th arguments
+
+           ddrriivveerr__oouuttppuuttvv:
+             3rd and 5th arguments
+
+           ddrriivveerr__vveecc__ttoo__bbuuff:
+             3rd argument and return value
+
+           ddrriivveerr__aalllloocc:
+             1st argument
+
+           ddrriivveerr__rreeaalllloocc:
+             2nd argument
+
+           ddrriivveerr__aalllloocc__bbiinnaarryy:
+             1st argument
+
+           ddrriivveerr__rreeaalllloocc__bbiinnaarryy:
+             2nd argument
+
+           ddrriivveerr__eennqq:
+             3rd argument
+
+           ddrriivveerr__ppuusshhqq:
+             3rd argument
+
+           ddrriivveerr__ddeeqq:
+             2nd argument and return value
+
+           ddrriivveerr__ssiizzeeqq:
+             return value
+
+           ddrriivveerr__eennqq__bbiinn:
+             3rd and 4th argument
+
+           ddrriivveerr__ppuusshhqq__bbiinn:
+             3rd and 4th argument
+
+           ddrriivveerr__eennqqvv:
+             3rd argument
+
+           ddrriivveerr__ppuusshhqqvv:
+             3rd argument
+
+           ddrriivveerr__ppeeeekkqqvv:
+             return value
+
+     NNoottee::
+         This is a change from signed to unsigned which may cause problems for
+         e.g. loop termination conditions and error conditions if you just
+         change the types all over the place.
+
+
+DDAATTAA TTYYPPEESS
+         EErrllDDrrvvSSiizzeeTT::
+           An unsigned integer type to be used as _s_i_z_e___t
+
+         EErrllDDrrvvSSSSiizzeeTT::
+           A signed integer type the size of _E_r_l_D_r_v_S_i_z_e_T
+
+         EErrllDDrrvvSSyyssIInnffoo::
+
+
+         typedef struct ErlDrvSysInfo {
+            int driver_major_version;
+            int driver_minor_version;
+            char *erts_version;
+            char *otp_release;
+            int thread_support;
+            int smp_support;
+            int async_threads;
+            int scheduler_threads;
+            int nif_major_version;
+            int nif_minor_version;
+         } ErlDrvSysInfo;
+
+
+           The _E_r_l_D_r_v_S_y_s_I_n_f_o structure is used for storage of information
+           about the Erlang runtime system. ddrriivveerr__ssyysstteemm__iinnffoo(()) will write
+           the system information when passed a reference to a _E_r_l_D_r_v_S_y_s_I_n_f_o
+           structure. A description of the fields in the structure follows:
+
+           _d_r_i_v_e_r___m_a_j_o_r___v_e_r_s_i_o_n:
+             The value of EERRLL__DDRRVV__EEXXTTEENNDDEEDD__MMAAJJOORR__VVEERRSSIIOONN when the runtime
+             system was compiled. This value is the same as the value of
+             EERRLL__DDRRVV__EEXXTTEENNDDEEDD__MMAAJJOORR__VVEERRSSIIOONN used when compiling the driver;
+             otherwise, the runtime system would have refused to load the
+             driver.
+
+           _d_r_i_v_e_r___m_i_n_o_r___v_e_r_s_i_o_n:
+             The value of EERRLL__DDRRVV__EEXXTTEENNDDEEDD__MMIINNOORR__VVEERRSSIIOONN when the runtime
+             system was compiled. This value might differ from the value of
+             EERRLL__DDRRVV__EEXXTTEENNDDEEDD__MMIINNOORR__VVEERRSSIIOONN used when compiling the driver.
+
+           _e_r_t_s___v_e_r_s_i_o_n:
+             A string containing the version number of the runtime system (the
+             same as returned by eerrllaanngg::ssyysstteemm__iinnffoo((vveerrssiioonn))).
+
+           _o_t_p___r_e_l_e_a_s_e:
+             A string containing the OTP release number (the same as returned
+             by eerrllaanngg::ssyysstteemm__iinnffoo((oottpp__rreelleeaassee))).
+
+           _t_h_r_e_a_d___s_u_p_p_o_r_t:
+             A value _!_= _0 if the runtime system has thread support; otherwise,
+             _0.
+
+           _s_m_p___s_u_p_p_o_r_t:
+             A value _!_= _0 if the runtime system has SMP support; otherwise, _0.
+
+           _a_s_y_n_c___t_h_r_e_a_d_s:
+             The number of async threads in the async thread pool used by
+             ddrriivveerr__aassyynncc(()) (the same as returned by
+             eerrllaanngg::ssyysstteemm__iinnffoo((tthhrreeaadd__ppooooll__ssiizzee))).
+
+           _s_c_h_e_d_u_l_e_r___t_h_r_e_a_d_s:
+             The number of scheduler threads used by the runtime system (the
+             same as returned by eerrllaanngg::ssyysstteemm__iinnffoo((sscchheedduulleerrss))).
+
+           _n_i_f___m_a_j_o_r___v_e_r_s_i_o_n:
+             The value of _E_R_L___N_I_F___M_A_J_O_R___V_E_R_S_I_O_N when the runtime system was
+             compiled.
+
+           _n_i_f___m_i_n_o_r___v_e_r_s_i_o_n:
+             The value of _E_R_L___N_I_F___M_I_N_O_R___V_E_R_S_I_O_N when the runtime system was
+             compiled.
+
+         EErrllDDrrvvBBiinnaarryy::
+
+
+         typedef struct ErlDrvBinary {
+            ErlDrvSint orig_size;
+            char orig_bytes[];
+         } ErlDrvBinary;
+
+
+           The _E_r_l_D_r_v_B_i_n_a_r_y structure is a binary, as sent between the
+           emulator and the driver. All binaries are reference counted; when
+           _d_r_i_v_e_r___b_i_n_a_r_y___f_r_e_e is called, the reference count is decremented,
+           when it reaches zero, the binary is deallocated. The _o_r_i_g___s_i_z_e is
+           the size of the binary, and _o_r_i_g___b_y_t_e_s is the buffer. The
+           _E_r_l_D_r_v_B_i_n_a_r_y does not have a fixed size, its size is _o_r_i_g___s_i_z_e _+ _2
+           _* _s_i_z_e_o_f_(_i_n_t_).
+
+     NNoottee::
+         The _r_e_f_c field has been removed. The reference count of an
+         _E_r_l_D_r_v_B_i_n_a_r_y is now stored elsewhere. The reference count of an
+         _E_r_l_D_r_v_B_i_n_a_r_y can be accessed via ddrriivveerr__bbiinnaarryy__ggeett__rreeffcc(()),
+         ddrriivveerr__bbiinnaarryy__iinncc__rreeffcc(()), and ddrriivveerr__bbiinnaarryy__ddeecc__rreeffcc(()).
+
+
+           Some driver calls, such as _d_r_i_v_e_r___e_n_q___b_i_n_a_r_y, increment the driver
+           reference count, and others, such as _d_r_i_v_e_r___d_e_q decrement it.
+
+           Using a driver binary instead of a normal buffer, is often faster,
+           since the emulator doesn't need to copy the data, only the pointer
+           is used.
+
+           A driver binary allocated in the driver, with _d_r_i_v_e_r___a_l_l_o_c___b_i_n_a_r_y,
+           should be freed in the driver (unless otherwise stated), with
+           _d_r_i_v_e_r___f_r_e_e___b_i_n_a_r_y. (Note that this doesn't necessarily deallocate
+           it, if the driver is still referred in the emulator, the ref-count
+           will not go to zero.)
+
+           Driver binaries are used in the _d_r_i_v_e_r___o_u_t_p_u_t_2 and _d_r_i_v_e_r___o_u_t_p_u_t_v
+           calls, and in the queue. Also the driver call-back oouuttppuuttvv uses
+           driver binaries.
+
+           If the driver for some reason or another, wants to keep a driver
+           binary around, in a static variable for instance, the reference
+           count should be incremented, and the binary can later be freed in
+           the ssttoopp call-back, with _d_r_i_v_e_r___f_r_e_e___b_i_n_a_r_y.
+
+           Note that since a driver binary is shared by the driver and the
+           emulator, a binary received from the emulator or sent to the
+           emulator, must not be changed by the driver.
+
+           Since erts version 5.5 (OTP release R11B), orig_bytes is guaranteed
+           to be properly aligned for storage of an array of doubles (usually
+           8-byte aligned).
+
+         EErrllDDrrvvDDaattaa::
+           The _E_r_l_D_r_v_D_a_t_a is a handle to driver-specific data, passed to the
+           driver call-backs. It is a pointer, and is most often type casted
+           to a specific pointer in the driver.
+
+         SSyyssIIOOVVeecc::
+           This is a system I/O vector, as used by _w_r_i_t_e_v on unix and _W_S_A_S_e_n_d
+           on Win32. It is used in _E_r_l_I_O_V_e_c.
+
+         EErrllIIOOVVeecc::
+
+
+         typedef struct ErlIOVec {
+           int vsize;
+           ErlDrvSizeT size;
+           SysIOVec* iov;
+           ErlDrvBinary** binv;
+         } ErlIOVec;
+
+
+           The I/O vector used by the emulator and drivers, is a list of
+           binaries, with a _S_y_s_I_O_V_e_c pointing to the buffers of the binaries.
+           It is used in _d_r_i_v_e_r___o_u_t_p_u_t_v and the oouuttppuuttvv driver call-back.
+           Also, the driver queue is an _E_r_l_I_O_V_e_c.
+
+         EErrllDDrrvvMMoonniittoorr::
+           When a driver creates a monitor for a process, a _E_r_l_D_r_v_M_o_n_i_t_o_r is
+           filled in. This is an opaque data-type which can be assigned to but
+           not compared without using the supplied compare function (i.e. it
+           behaves like a struct).
+
+           The driver writer should provide the memory for storing the monitor
+           when calling ddrriivveerr__mmoonniittoorr__pprroocceessss. The address of the data is not
+           stored outside of the driver, so the _E_r_l_D_r_v_M_o_n_i_t_o_r can be used as
+           any other datum, it can be copied, moved in memory, forgotten etc.
+
+         EErrllDDrrvvNNoowwDDaattaa::
+           The _E_r_l_D_r_v_N_o_w_D_a_t_a structure holds a timestamp consisting of three
+           values measured from some arbitrary point in the past. The three
+           structure members are:
+
+           mmeeggaasseeccss::
+             The number of whole megaseconds elapsed since the arbitrary point
+             in time
+
+           sseeccss::
+             The number of whole seconds elapsed since the arbitrary point in
+             time
+
+           mmiiccrroosseeccss::
+             The number of whole microseconds elapsed since the arbitrary
+             point in time
+
+         EErrllDDrrvvPPDDLL::
+           If certain port specific data have to be accessed from other
+           threads than those calling the driver call-backs, a port data lock
+           can be used in order to synchronize the operations on the data.
+           Currently, the only port specific data that the emulator associates
+           with the port data lock is the driver queue.
+
+           Normally a driver instance does not have a port data lock. If the
+           driver instance wants to use a port data lock, it has to create the
+           port data lock by calling ddrriivveerr__ppddll__ccrreeaattee(()). _N_O_T_E: Once the port
+           data lock has been created, every access to data associated with
+           the port data lock has to be done while having the port data lock
+           locked. The port data lock is locked, and unlocked, respectively,
+           by use of ddrriivveerr__ppddll__lloocckk(()), and ddrriivveerr__ppddll__uunnlloocckk(()).
+
+           A port data lock is reference counted, and when the reference count
+           reaches zero, it will be destroyed. The emulator will at least
+           increment the reference count once when the lock is created and
+           decrement it once when the port associated with the lock
+           terminates. The emulator will also increment the reference count
+           when an async job is enqueued and decrement it after an async job
+           has been invoked, or canceled. Besides this, it is the
+           responsibility of the driver to ensure that the reference count
+           does not reach zero before the last use of the lock by the driver
+           has been made. The reference count can be read, incremented, and
+           decremented, respectively, by use of ddrriivveerr__ppddll__ggeett__rreeffcc(()),
+           ddrriivveerr__ppddll__iinncc__rreeffcc(()), and ddrriivveerr__ppddll__ddeecc__rreeffcc(()).
+
+         EErrllDDrrvvTTiidd::
+           Thread identifier.
+
+           See also: eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee(()), eerrll__ddrrvv__tthhrreeaadd__eexxiitt(()),
+           eerrll__ddrrvv__tthhrreeaadd__jjooiinn(()), eerrll__ddrrvv__tthhrreeaadd__sseellff(()), and
+           eerrll__ddrrvv__eeqquuaall__ttiiddss(()).
+
+         EErrllDDrrvvTThhrreeaaddOOppttss::
+
+
+              int suggested_stack_size;
+
+
+           Thread options structure passed to eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee(()).
+           Currently the following fields exist:
+
+           ssuuggggeesstteedd__ssttaacckk__ssiizzee::
+             A suggestion, in kilo-words, on how large a stack to use. A value
+             less than zero means default size.
+
+           See also: eerrll__ddrrvv__tthhrreeaadd__ooppttss__ccrreeaattee(()),
+           eerrll__ddrrvv__tthhrreeaadd__ooppttss__ddeessttrrooyy(()), and eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee(()).
+
+         EErrllDDrrvvMMuutteexx::
+           Mutual exclusion lock. Used for synchronizing access to shared
+           data. Only one thread at a time can lock a mutex.
+
+           See also: eerrll__ddrrvv__mmuutteexx__ccrreeaattee(()), eerrll__ddrrvv__mmuutteexx__ddeessttrrooyy(()),
+           eerrll__ddrrvv__mmuutteexx__lloocckk(()), eerrll__ddrrvv__mmuutteexx__ttrryylloocckk(()), and
+           eerrll__ddrrvv__mmuutteexx__uunnlloocckk(()).
+
+         EErrllDDrrvvCCoonndd::
+           Condition variable. Used when threads need to wait for a specific
+           condition to appear before continuing execution. Condition
+           variables need to be used with associated mutexes.
+
+           See also: eerrll__ddrrvv__ccoonndd__ccrreeaattee(()), eerrll__ddrrvv__ccoonndd__ddeessttrrooyy(()),
+           eerrll__ddrrvv__ccoonndd__ssiiggnnaall(()), eerrll__ddrrvv__ccoonndd__bbrrooaaddccaasstt(()), and
+           eerrll__ddrrvv__ccoonndd__wwaaiitt(()).
+
+         EErrllDDrrvvRRWWLLoocckk::
+           Read/write lock. Used to allow multiple threads to read shared data
+           while only allowing one thread to write the same data. Multiple
+           threads can read lock an rwlock at the same time, while only one
+           thread can read/write lock an rwlock at a time.
+
+           See also: eerrll__ddrrvv__rrwwlloocckk__ccrreeaattee(()), eerrll__ddrrvv__rrwwlloocckk__ddeessttrrooyy(()),
+           eerrll__ddrrvv__rrwwlloocckk__rrlloocckk(()), eerrll__ddrrvv__rrwwlloocckk__ttrryyrrlloocckk(()),
+           eerrll__ddrrvv__rrwwlloocckk__rruunnlloocckk(()), eerrll__ddrrvv__rrwwlloocckk__rrwwlloocckk(()),
+           eerrll__ddrrvv__rrwwlloocckk__ttrryyrrwwlloocckk(()), and eerrll__ddrrvv__rrwwlloocckk__rrwwuunnlloocckk(()).
+
+         EErrllDDrrvvTTSSDDKKeeyy::
+           Key which thread specific data can be associated with.
+
+           See also: eerrll__ddrrvv__ttssdd__kkeeyy__ccrreeaattee(()), eerrll__ddrrvv__ttssdd__kkeeyy__ddeessttrrooyy(()),
+           eerrll__ddrrvv__ttssdd__sseett(()), and eerrll__ddrrvv__ttssdd__ggeett(()).
+
+EEXXPPOORRTTSS
+       vvooiidd ddrriivveerr__ssyysstteemm__iinnffoo((EErrllDDrrvvSSyyssIInnffoo **ssyyss__iinnffoo__ppttrr,, ssiizzee__tt ssiizzee))
+
+              This function will write information about the Erlang runtime
+              system into the EErrllDDrrvvSSyyssIInnffoo structure referred to by the first
+              argument. The second argument should be the size of the
+              EErrllDDrrvvSSyyssIInnffoo structure, i.e., _s_i_z_e_o_f_(_E_r_l_D_r_v_S_y_s_I_n_f_o_).
+
+              See the documentation of the EErrllDDrrvvSSyyssIInnffoo structure for
+              information about specific fields.
+
+       iinntt ddrriivveerr__oouuttppuutt((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr **bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              The _d_r_i_v_e_r___o_u_t_p_u_t function is used to send data from the driver
+              up to the emulator. The data will be received as terms or binary
+              data, depending on how the driver port was opened.
+
+              The data is queued in the port owner process' message queue.
+              Note that this does not yield to the emulator. (Since the driver
+              and the emulator run in the same thread.)
+
+              The parameter _b_u_f points to the data to send, and _l_e_n is the
+              number of bytes.
+
+              The return value for all output functions is 0. (Unless the
+              driver is used for distribution, in which case it can fail and
+              return -1. For normal use, the output function always returns
+              0.)
+
+       iinntt ddrriivveerr__oouuttppuutt22((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr **hhbbuuff,, EErrllDDrrvvSSiizzeeTT hhlleenn,, cchhaarr
+       **bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              The _d_r_i_v_e_r___o_u_t_p_u_t_2 function first sends _h_b_u_f (length in _h_l_e_n)
+              data as a list, regardless of port settings. Then _b_u_f is sent as
+              a binary or list. E.g. if _h_l_e_n is 3 then the port owner process
+              will receive _[_H_1_, _H_2_, _H_3 _| _T_].
+
+              The point of sending data as a list header, is to facilitate
+              matching on the data received.
+
+              The return value is 0 for normal use.
+
+       iinntt ddrriivveerr__oouuttppuutt__bbiinnaarryy((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr **hhbbuuff,, EErrllDDrrvvSSiizzeeTT hhlleenn,,
+       EErrllDDrrvvBBiinnaarryy** bbiinn,, EErrllDDrrvvSSiizzeeTT ooffffsseett,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              This function sends data to port owner process from a driver
+              binary, it has a header buffer (_h_b_u_f and _h_l_e_n) just like
+              _d_r_i_v_e_r___o_u_t_p_u_t_2. The _h_b_u_f parameter can be _N_U_L_L.
+
+              The parameter _o_f_f_s_e_t is an offset into the binary and _l_e_n is the
+              number of bytes to send.
+
+              Driver binaries are created with _d_r_i_v_e_r___a_l_l_o_c___b_i_n_a_r_y.
+
+              The data in the header is sent as a list and the binary as an
+              Erlang binary in the tail of the list.
+
+              E.g. if _h_l_e_n is 2, then the port owner process will receive _[_H_1_,
+              _H_2 _| _<_<_T_>_>_].
+
+              The return value is 0 for normal use.
+
+              Note that, using the binary syntax in Erlang, the driver
+              application can match the header directly from the binary, so
+              the header can be put in the binary, and hlen can be set to 0.
+
+       iinntt ddrriivveerr__oouuttppuuttvv((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr** hhbbuuff,, EErrllDDrrvvSSiizzeeTT hhlleenn,,
+       EErrllIIOOVVeecc **eevv,, EErrllDDrrvvSSiizzeeTT sskkiipp))
+
+              This function sends data from an IO vector, _e_v, to the port
+              owner process. It has a header buffer (_h_b_u_f and _h_l_e_n), just like
+              _d_r_i_v_e_r___o_u_t_p_u_t_2.
+
+              The _s_k_i_p parameter is a number of bytes to skip of the _e_v vector
+              from the head.
+
+              You get vectors of _E_r_l_I_O_V_e_c type from the driver queue (see
+              below), and the oouuttppuuttvv driver entry function. You can also make
+              them yourself, if you want to send several _E_r_l_D_r_v_B_i_n_a_r_y buffers
+              at once. Often it is faster to use _d_r_i_v_e_r___o_u_t_p_u_t or
+              _d_r_i_v_e_r___o_u_t_p_u_t___b_i_n_a_r_y.
+
+              E.g. if _h_l_e_n is 2 and _e_v points to an array of three binaries,
+              the port owner process will receive _[_H_1_, _H_2_, _<_<_B_1_>_>_, _<_<_B_2_>_> _|
+              _<_<_B_3_>_>_].
+
+              The return value is 0 for normal use.
+
+              The comment for _d_r_i_v_e_r___o_u_t_p_u_t___b_i_n_a_r_y applies for _d_r_i_v_e_r___o_u_t_p_u_t_v
+              too.
+
+       EErrllDDrrvvSSiizzeeTT ddrriivveerr__vveecc__ttoo__bbuuff((EErrllIIOOVVeecc **eevv,, cchhaarr **bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              This function collects several segments of data, referenced by
+              _e_v, by copying them in order to the buffer _b_u_f, of the size _l_e_n.
+
+              If the data is to be sent from the driver to the port owner
+              process, it is faster to use _d_r_i_v_e_r___o_u_t_p_u_t_v.
+
+              The return value is the space left in the buffer, i.e. if the _e_v
+              contains less than _l_e_n bytes it's the difference, and if _e_v
+              contains _l_e_n bytes or more, it's 0. This is faster if there is
+              more than one header byte, since the binary syntax can construct
+              integers directly from the binary.
+
+       iinntt ddrriivveerr__sseett__ttiimmeerr((EErrllDDrrvvPPoorrtt ppoorrtt,, uunnssiiggnneedd lloonngg ttiimmee))
+
+              This function sets a timer on the driver, which will count down
+              and call the driver when it is timed out. The _t_i_m_e parameter is
+              the time in milliseconds before the timer expires.
+
+              When the timer reaches 0 and expires, the driver entry function
+              ttiimmeeoouutt is called.
+
+              Note that there is only one timer on each driver instance;
+              setting a new timer will replace an older one.
+
+              Return value is 0 (-1 only when the _t_i_m_e_o_u_t driver function is
+              _N_U_L_L).
+
+       iinntt ddrriivveerr__ccaanncceell__ttiimmeerr((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function cancels a timer set with _d_r_i_v_e_r___s_e_t___t_i_m_e_r.
+
+              The return value is 0.
+
+       iinntt ddrriivveerr__rreeaadd__ttiimmeerr((EErrllDDrrvvPPoorrtt ppoorrtt,, uunnssiiggnneedd lloonngg **ttiimmee__lleefftt))
+
+              This function reads the current time of a timer, and places the
+              result in _t_i_m_e___l_e_f_t. This is the time in milliseconds, before
+              the timeout will occur.
+
+              The return value is 0.
+
+       iinntt ddrriivveerr__ggeett__nnooww((EErrllDDrrvvNNoowwDDaattaa **nnooww))
+
+              This function reads a timestamp into the memory pointed to by
+              the parameter _n_o_w. See the description of EErrllDDrrvvNNoowwDDaattaa for
+              specification of its fields.
+
+              The return value is 0 unless the _n_o_w pointer is not valid, in
+              which case it is < 0.
+
+       iinntt ddrriivveerr__sseelleecctt((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvEEvveenntt eevveenntt,, iinntt mmooddee,, iinntt oonn))
+
+              This function is used by drivers to provide the emulator with
+              events to check for. This enables the emulator to call the
+              driver when something has happened asynchronously.
+
+              The _e_v_e_n_t argument identifies an OS-specific event object. On
+              Unix systems, the functions _s_e_l_e_c_t/_p_o_l_l are used. The event
+              object must be a socket or pipe (or other object that
+              _s_e_l_e_c_t/_p_o_l_l can use). On windows, the Win32 API function
+              _W_a_i_t_F_o_r_M_u_l_t_i_p_l_e_O_b_j_e_c_t_s is used. This places other restrictions
+              on the event object. Refer to the Win32 SDK documentation.
+
+              The _o_n parameter should be _1 for setting events and _0 for
+              clearing them.
+
+              The _m_o_d_e argument is a bitwise-or combination of _E_R_L___D_R_V___R_E_A_D,
+              _E_R_L___D_R_V___W_R_I_T_E and _E_R_L___D_R_V___U_S_E. The first two specify whether to
+              wait for read events and/or write events. A fired read event
+              will call rreeaaddyy__iinnppuutt while a fired write event will call
+              rreeaaddyy__oouuttppuutt.
+
+          NNoottee::
+              Some OS (Windows) do not differentiate between read and write
+              events. The call-back for a fired event then only depends on the
+              value of _m_o_d_e.
+
+
+              _E_R_L___D_R_V___U_S_E specifies if we are using the event object or if we
+              want to close it. On an emulator with SMP support, it is not
+              safe to clear all events and then close the event object after
+              _d_r_i_v_e_r___s_e_l_e_c_t has returned. Another thread may still be using
+              the event object internally. To safely close an event object
+              call _d_r_i_v_e_r___s_e_l_e_c_t with _E_R_L___D_R_V___U_S_E and _o_n_=_=_0. That will clear
+              all events and then call ssttoopp__sseelleecctt when it is safe to close
+              the event object. _E_R_L___D_R_V___U_S_E should be set together with the
+              first event for an event object. It is harmless to set
+              _E_R_L___D_R_V___U_S_E even though it already has been done. Clearing all
+              events but keeping _E_R_L___D_R_V___U_S_E set will indicate that we are
+              using the event object and probably will set events for it
+              again.
+
+          NNoottee::
+              ERL_DRV_USE was added in OTP release R13. Old drivers will still
+              work as before. But it is recommended to update them to use
+              _E_R_L___D_R_V___U_S_E and _s_t_o_p___s_e_l_e_c_t to make sure that event objects are
+              closed in a safe way.
+
+
+              The return value is 0 (failure, -1, only if the
+              _r_e_a_d_y___i_n_p_u_t/_r_e_a_d_y___o_u_t_p_u_t is _N_U_L_L).
+
+       vvooiidd **ddrriivveerr__aalllloocc((EErrllDDrrvvSSiizzeeTT ssiizzee))
+
+              This function allocates a memory block of the size specified in
+              _s_i_z_e, and returns it. This only fails on out of memory, in that
+              case _N_U_L_L is returned. (This is most often a wrapper for
+              _m_a_l_l_o_c).
+
+              Memory allocated must be explicitly freed with a corresponding
+              call to _d_r_i_v_e_r___f_r_e_e (unless otherwise stated).
+
+              This function is thread-safe.
+
+       vvooiidd **ddrriivveerr__rreeaalllloocc((vvooiidd **ppttrr,, EErrllDDrrvvSSiizzeeTT ssiizzee))
+
+              This function resizes a memory block, either in place, or by
+              allocating a new block, copying the data and freeing the old
+              block. A pointer is returned to the reallocated memory. On
+              failure (out of memory), _N_U_L_L is returned. (This is most often a
+              wrapper for _r_e_a_l_l_o_c.)
+
+              This function is thread-safe.
+
+       vvooiidd ddrriivveerr__ffrreeee((vvooiidd **ppttrr))
+
+              This function frees the memory pointed to by _p_t_r. The memory
+              should have been allocated with _d_r_i_v_e_r___a_l_l_o_c. All allocated
+              memory should be deallocated, just once. There is no garbage
+              collection in drivers.
+
+              This function is thread-safe.
+
+       EErrllDDrrvvBBiinnaarryy **ddrriivveerr__aalllloocc__bbiinnaarryy((EErrllDDrrvvSSiizzeeTT ssiizzee))
+
+              This function allocates a driver binary with a memory block of
+              at least _s_i_z_e bytes, and returns a pointer to it, or NULL on
+              failure (out of memory). When a driver binary has been sent to
+              the emulator, it must not be altered. Every allocated binary
+              should be freed by a corresponding call to _d_r_i_v_e_r___f_r_e_e___b_i_n_a_r_y
+              (unless otherwise stated).
+
+              Note that a driver binary has an internal reference counter,
+              this means that calling _d_r_i_v_e_r___f_r_e_e___b_i_n_a_r_y it may not actually
+              dispose of it. If it's sent to the emulator, it may be
+              referenced there.
+
+              The driver binary has a field, _o_r_i_g___b_y_t_e_s, which marks the start
+              of the data in the binary.
+
+              This function is thread-safe.
+
+       EErrllDDrrvvBBiinnaarryy **ddrriivveerr__rreeaalllloocc__bbiinnaarryy((EErrllDDrrvvBBiinnaarryy **bbiinn,, EErrllDDrrvvSSiizzeeTT
+       ssiizzee))
+
+              This function resizes a driver binary, while keeping the data.
+              The resized driver binary is returned. On failure (out of
+              memory), _N_U_L_L is returned.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used.
+
+       vvooiidd ddrriivveerr__ffrreeee__bbiinnaarryy((EErrllDDrrvvBBiinnaarryy **bbiinn))
+
+              This function frees a driver binary _b_i_n, allocated previously
+              with _d_r_i_v_e_r___a_l_l_o_c___b_i_n_a_r_y. Since binaries in Erlang are reference
+              counted, the binary may still be around.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used.
+
+       lloonngg ddrriivveerr__bbiinnaarryy__ggeett__rreeffcc((EErrllDDrrvvBBiinnaarryy **bbiinn))
+
+              Returns current reference count on _b_i_n.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used.
+
+       lloonngg ddrriivveerr__bbiinnaarryy__iinncc__rreeffcc((EErrllDDrrvvBBiinnaarryy **bbiinn))
+
+              Increments the reference count on _b_i_n and returns the reference
+              count reached after the increment.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used.
+
+       lloonngg ddrriivveerr__bbiinnaarryy__ddeecc__rreeffcc((EErrllDDrrvvBBiinnaarryy **bbiinn))
+
+              Decrements the reference count on _b_i_n and returns the reference
+              count reached after the decrement.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used.
+
+          NNoottee::
+              You should normally decrement the reference count of a driver
+              binary by calling ddrriivveerr__ffrreeee__bbiinnaarryy(()). _d_r_i_v_e_r___b_i_n_a_r_y___d_e_c___r_e_f_c_(_)
+              does _n_o_t free the binary if the reference count reaches zero.
+              _O_n_l_y use _d_r_i_v_e_r___b_i_n_a_r_y___d_e_c___r_e_f_c_(_) when you are sure _n_o_t to reach
+              a reference count of zero.
+
+
+       iinntt ddrriivveerr__eennqq((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr** bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              This function enqueues data in the driver queue. The data in _b_u_f
+              is copied (_l_e_n bytes) and placed at the end of the driver queue.
+              The driver queue is normally used in a FIFO way.
+
+              The driver queue is available to queue output from the emulator
+              to the driver (data from the driver to the emulator is queued by
+              the emulator in normal erlang message queues). This can be
+              useful if the driver has to wait for slow devices etc, and wants
+              to yield back to the emulator. The driver queue is implemented
+              as an ErlIOVec.
+
+              When the queue contains data, the driver won't close, until the
+              queue is empty.
+
+              The return value is 0.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       iinntt ddrriivveerr__ppuusshhqq((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr** bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              This function puts data at the head of the driver queue. The
+              data in _b_u_f is copied (_l_e_n bytes) and placed at the beginning of
+              the queue.
+
+              The return value is 0.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       EErrllDDrrvvSSiizzeeTT ddrriivveerr__ddeeqq((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvSSiizzeeTT ssiizzee))
+
+              This function dequeues data by moving the head pointer forward
+              in the driver queue by _s_i_z_e bytes. The data in the queue will be
+              deallocated.
+
+              The return value is the number of bytes remaining in the queue
+              or -1 on failure.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       EErrllDDrrvvSSiizzeeTT ddrriivveerr__ssiizzeeqq((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function returns the number of bytes currently in the
+              driver queue.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       iinntt ddrriivveerr__eennqq__bbiinn((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvBBiinnaarryy **bbiinn,, EErrllDDrrvvSSiizzeeTT
+       ooffffsseett,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              This function enqueues a driver binary in the driver queue. The
+              data in _b_i_n at _o_f_f_s_e_t with length _l_e_n is placed at the end of
+              the queue. This function is most often faster than _d_r_i_v_e_r___e_n_q,
+              because the data doesn't have to be copied.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+              The return value is 0.
+
+       iinntt ddrriivveerr__ppuusshhqq__bbiinn((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvBBiinnaarryy **bbiinn,, EErrllDDrrvvSSiizzeeTT
+       ooffffsseett,, EErrllDDrrvvSSiizzeeTT lleenn))
+
+              This function puts data in the binary _b_i_n, at _o_f_f_s_e_t with length
+              _l_e_n at the head of the driver queue. It is most often faster
+              than _d_r_i_v_e_r___p_u_s_h_q, because the data doesn't have to be copied.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+              The return value is 0.
+
+       EErrllDDrrvvSSiizzeeTT ddrriivveerr__ppeeeekkqqvv((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllIIOOVVeecc **eevv))
+
+              This function retrieves the driver queue into a supplied
+              _E_r_l_I_O_V_e_c _e_v. It also returns the queue size. This is one of two
+              ways to get data out of the queue.
+
+              If _e_v is _N_U_L_L all ones i.e. _-_1 type cast to _E_r_l_D_r_v_S_i_z_e_T is
+              returned.
+
+              Nothing is removed from the queue by this function, that must be
+              done with _d_r_i_v_e_r___d_e_q.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       SSyyssIIOOVVeecc **ddrriivveerr__ppeeeekkqq((EErrllDDrrvvPPoorrtt ppoorrtt,, iinntt **vvlleenn))
+
+              This function retrieves the driver queue as a pointer to an
+              array of _S_y_s_I_O_V_e_cs. It also returns the number of elements in
+              _v_l_e_n. This is one of two ways to get data out of the queue.
+
+              Nothing is removed from the queue by this function, that must be
+              done with _d_r_i_v_e_r___d_e_q.
+
+              The returned array is suitable to use with the Unix system call
+              _w_r_i_t_e_v.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       iinntt ddrriivveerr__eennqqvv((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllIIOOVVeecc **eevv,, EErrllDDrrvvSSiizzeeTT sskkiipp))
+
+              This function enqueues the data in _e_v, skipping the first _s_k_i_p
+              bytes of it, at the end of the driver queue. It is faster than
+              _d_r_i_v_e_r___e_n_q, because the data doesn't have to be copied.
+
+              The return value is 0.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       iinntt ddrriivveerr__ppuusshhqqvv((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllIIOOVVeecc **eevv,, EErrllDDrrvvSSiizzeeTT sskkiipp))
+
+              This function puts the data in _e_v, skipping the first _s_k_i_p bytes
+              of it, at the head of the driver queue. It is faster than
+              _d_r_i_v_e_r___p_u_s_h_q, because the data doesn't have to be copied.
+
+              The return value is 0.
+
+              This function can be called from an arbitrary thread if a ppoorrtt
+              ddaattaa lloocckk associated with the _p_o_r_t is locked by the calling
+              thread during the call.
+
+       EErrllDDrrvvPPDDLL ddrriivveerr__ppddll__ccrreeaattee((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function creates a port data lock associated with the _p_o_r_t.
+              _N_O_T_E: Once a port data lock has been created, it has to be
+              locked during all operations on the driver queue of the _p_o_r_t.
+
+              On success a newly created port data lock is returned. On
+              failure _N_U_L_L is returned. _d_r_i_v_e_r___p_d_l___c_r_e_a_t_e_(_) will fail if _p_o_r_t
+              is invalid or if a port data lock already has been associated
+              with the _p_o_r_t.
+
+       vvooiidd ddrriivveerr__ppddll__lloocckk((EErrllDDrrvvPPDDLL ppddll))
+
+              This function locks the port data lock passed as argument (_p_d_l).
+
+              This function is thread-safe.
+
+       vvooiidd ddrriivveerr__ppddll__uunnlloocckk((EErrllDDrrvvPPDDLL ppddll))
+
+              This function unlocks the port data lock passed as argument
+              (_p_d_l).
+
+              This function is thread-safe.
+
+       lloonngg ddrriivveerr__ppddll__ggeett__rreeffcc((EErrllDDrrvvPPDDLL ppddll))
+
+              This function returns the current reference count of the port
+              data lock passed as argument (_p_d_l).
+
+              This function is thread-safe.
+
+       lloonngg ddrriivveerr__ppddll__iinncc__rreeffcc((EErrllDDrrvvPPDDLL ppddll))
+
+              This function increments the reference count of the port data
+              lock passed as argument (_p_d_l).
+
+              The current reference count after the increment has been
+              performed is returned.
+
+              This function is thread-safe.
+
+       lloonngg ddrriivveerr__ppddll__ddeecc__rreeffcc((EErrllDDrrvvPPDDLL ppddll))
+
+              This function decrements the reference count of the port data
+              lock passed as argument (_p_d_l).
+
+              The current reference count after the decrement has been
+              performed is returned.
+
+              This function is thread-safe.
+
+       iinntt ddrriivveerr__mmoonniittoorr__pprroocceessss((EErrllDDrrvvPPoorrtt ppoorrtt,,  EErrllDDrrvvTTeerrmmDDaattaa pprroocceessss,,
+       EErrllDDrrvvMMoonniittoorr **mmoonniittoorr))
+
+              Start monitoring a process from a driver. When a process is
+              monitored, a process exit will result in a call to the provided
+              pprroocceessss__eexxiitt call-back in the EErrllDDrrvvEEnnttrryy structure. The
+              _E_r_l_D_r_v_M_o_n_i_t_o_r structure is filled in, for later removal or
+              compare.
+
+              The _p_r_o_c_e_s_s parameter should be the return value of an earlier
+              call to ddrriivveerr__ccaalllleerr or ddrriivveerr__ccoonnnneecctteedd call.
+
+              The function returns 0 on success, < 0 if no call-back is
+              provided and > 0 if the process is no longer alive.
+
+       iinntt ddrriivveerr__ddeemmoonniittoorr__pprroocceessss((EErrllDDrrvvPPoorrtt ppoorrtt,,  ccoonnsstt EErrllDDrrvvMMoonniittoorr
+       **mmoonniittoorr))
+
+              This function cancels a monitor created earlier.
+
+              The function returns 0 if a monitor was removed and > 0 if the
+              monitor did no longer exist.
+
+       EErrllDDrrvvTTeerrmmDDaattaa ddrriivveerr__ggeett__mmoonniittoorreedd__pprroocceessss((EErrllDDrrvvPPoorrtt ppoorrtt,,  ccoonnsstt
+       EErrllDDrrvvMMoonniittoorr **mmoonniittoorr))
+
+              The function returns the process id associated with a living
+              monitor. It can be used in the _p_r_o_c_e_s_s___e_x_i_t call-back to get the
+              process identification for the exiting process.
+
+              The function returns _d_r_i_v_e_r___t_e_r_m___n_i_l if the monitor no longer
+              exists.
+
+       iinntt ddrriivveerr__ccoommppaarree__mmoonniittoorrss((ccoonnsstt EErrllDDrrvvMMoonniittoorr **mmoonniittoorr11,, ccoonnsstt
+       EErrllDDrrvvMMoonniittoorr **mmoonniittoorr22))
+
+              This function is used to compare two _E_r_l_D_r_v_M_o_n_i_t_o_rs. It can also
+              be used to imply some artificial order on monitors, for whatever
+              reason.
+
+              The function returns 0 if _m_o_n_i_t_o_r_1 and _m_o_n_i_t_o_r_2 are equal, < 0
+              if _m_o_n_i_t_o_r_1 is less than _m_o_n_i_t_o_r_2 and > 0 if _m_o_n_i_t_o_r_1 is greater
+              than _m_o_n_i_t_o_r_2.
+
+       vvooiidd aadddd__ddrriivveerr__eennttrryy((EErrllDDrrvvEEnnttrryy **ddee))
+
+              This function adds a driver entry to the list of drivers known
+              by Erlang. The iinniitt function of the _d_e parameter is called.
+
+          NNoottee::
+              To use this function for adding drivers residing in dynamically
+              loaded code is dangerous. If the driver code for the added
+              driver resides in the same dynamically loaded module (i.e. _._s_o
+              file) as a normal dynamically loaded driver (loaded with the
+              _e_r_l___d_d_l_l interface), the caller should call ddrriivveerr__lloocckk__ddrriivveerr
+              before adding driver entries.
+
+              Use of this function is generally deprecated.
+
+
+       iinntt rreemmoovvee__ddrriivveerr__eennttrryy((EErrllDDrrvvEEnnttrryy **ddee))
+
+              This function removes a driver entry _d_e previously added with
+              _a_d_d___d_r_i_v_e_r___e_n_t_r_y.
+
+              Driver entries added by the _e_r_l___d_d_l_l erlang interface can not be
+              removed by using this interface.
+
+       cchhaarr **eerrll__eerrrrnnoo__iidd((iinntt eerrrroorr))
+
+              This function returns the atom name of the erlang error, given
+              the error number in _e_r_r_o_r. Error atoms are: _e_i_n_v_a_l, _e_n_o_e_n_t, etc.
+              It can be used to make error terms from the driver.
+
+       vvooiidd sseett__bbuussyy__ppoorrtt((EErrllDDrrvvPPoorrtt ppoorrtt,, iinntt oonn))
+
+              This function set and resets the busy status of the port. If _o_n
+              is 1, the port is set to busy, if it's 0 the port is set to not
+              busy.
+
+              When the port is busy, sending to it with _P_o_r_t _! _D_a_t_a or
+              _p_o_r_t___c_o_m_m_a_n_d_/_2, will block the port owner process, until the
+              port is signaled as not busy.
+
+              If the EERRLL__DDRRVV__FFLLAAGG__SSOOFFTT__BBUUSSYY has been set in the ddrriivveerr__eennttrryy,
+              data can be forced into the driver via ppoorrtt__ccoommmmaanndd((PPoorrtt,, DDaattaa,,
+              [[ffoorrccee]])) even though the driver has signaled that it is busy.
+
+       vvooiidd sseett__ppoorrtt__ccoonnttrrooll__ffllaaggss((EErrllDDrrvvPPoorrtt ppoorrtt,, iinntt ffllaaggss))
+
+              This function sets flags for how the ccoonnttrrooll driver entry
+              function will return data to the port owner process. (The
+              _c_o_n_t_r_o_l function is called from _p_o_r_t___c_o_n_t_r_o_l_/_3 in erlang.)
+
+              Currently there are only two meaningful values for _f_l_a_g_s: 0
+              means that data is returned in a list, and
+              _P_O_R_T___C_O_N_T_R_O_L___F_L_A_G___B_I_N_A_R_Y means data is returned as a binary from
+              _c_o_n_t_r_o_l.
+
+       iinntt ddrriivveerr__ffaaiilluurree__eeooff((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function signals to erlang that the driver has encountered
+              an EOF and should be closed, unless the port was opened with the
+              _e_o_f option, in that case eof is sent to the port. Otherwise, the
+              port is closed and an _'_E_X_I_T_' message is sent to the port owner
+              process.
+
+              The return value is 0.
+
+       iinntt ddrriivveerr__ffaaiilluurree__aattoomm((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr **ssttrriinngg))
+       iinntt ddrriivveerr__ffaaiilluurree__ppoossiixx((EErrllDDrrvvPPoorrtt ppoorrtt,, iinntt eerrrroorr))
+       iinntt ddrriivveerr__ffaaiilluurree((EErrllDDrrvvPPoorrtt ppoorrtt,, iinntt eerrrroorr))
+
+              These functions signal to Erlang that the driver has encountered
+              an error and should be closed. The port is closed and the tuple
+              _{_'_E_X_I_T_'_, _e_r_r_o_r_, _E_r_r_}, is sent to the port owner process, where
+              error is an error atom (_d_r_i_v_e_r___f_a_i_l_u_r_e___a_t_o_m and
+              _d_r_i_v_e_r___f_a_i_l_u_r_e___p_o_s_i_x), or an integer (_d_r_i_v_e_r___f_a_i_l_u_r_e).
+
+              The driver should fail only when in severe error situations,
+              when the driver cannot possibly keep open, for instance buffer
+              allocation gets out of memory. For normal errors it is more
+              appropriate to send error codes with _d_r_i_v_e_r___o_u_t_p_u_t.
+
+              The return value is 0.
+
+       EErrllDDrrvvTTeerrmmDDaattaa ddrriivveerr__ccoonnnneecctteedd((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function returns the port owner process.
+
+       EErrllDDrrvvTTeerrmmDDaattaa ddrriivveerr__ccaalllleerr((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function returns the process id of the process that made
+              the current call to the driver. The process id can be used with
+              _d_r_i_v_e_r___s_e_n_d___t_e_r_m to send back data to the caller.
+              _d_r_i_v_e_r___c_a_l_l_e_r_(_) only returns valid data when currently executing
+              in one of the following driver callbacks:
+
+                ssttaarrtt:
+                  Called from _o_p_e_n___p_o_r_t_/_2.
+
+                oouuttppuutt:
+                  Called from _e_r_l_a_n_g_:_s_e_n_d_/_2, and _e_r_l_a_n_g_:_p_o_r_t___c_o_m_m_a_n_d_/_2
+
+                oouuttppuuttvv:
+                  Called from _e_r_l_a_n_g_:_s_e_n_d_/_2, and _e_r_l_a_n_g_:_p_o_r_t___c_o_m_m_a_n_d_/_2
+
+                ccoonnttrrooll:
+                  Called from _e_r_l_a_n_g_:_p_o_r_t___c_o_n_t_r_o_l_/_3
+
+                ccaallll:
+                  Called from _e_r_l_a_n_g_:_p_o_r_t___c_a_l_l_/_3
+
+       iinntt ddrriivveerr__oouuttppuutt__tteerrmm((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvTTeerrmmDDaattaa** tteerrmm,, iinntt nn))
+
+              This functions sends data in the special driver term format.
+              This is a fast way to deliver term data from a driver. It also
+              needs no binary conversion, so the port owner process receives
+              data as normal Erlang terms.
+
+              The _t_e_r_m parameter points to an array of _E_r_l_D_r_v_T_e_r_m_D_a_t_a, with _n
+              elements. This array contains terms described in the driver term
+              format. Every term consists of one to four elements in the
+              array. The term first has a term type, and then arguments.
+
+              Tuple and lists (with the exception of strings, see below), are
+              built in reverse polish notation, so that to build a tuple, the
+              elements are given first, and then the tuple term, with a count.
+              Likewise for lists.
+
+              A tuple must be specified with the number of elements. (The
+              elements precede the _E_R_L___D_R_V___T_U_P_L_E term.)
+
+              A list must be specified with the number of elements, including
+              the tail, which is the last term preceding _E_R_L___D_R_V___L_I_S_T.
+
+              The special term _E_R_L___D_R_V___S_T_R_I_N_G___C_O_N_S is used to "splice" in a
+              string in a list, a string given this way is not a list per se,
+              but the elements are elements of the surrounding list.
+
+              Term type            Argument(s)
+              ===========================================
+              ERL_DRV_NIL
+              ERL_DRV_ATOM         ErlDrvTermData atom (from driver_mk_atom(char *string))
+              ERL_DRV_INT          ErlDrvSInt integer
+              ERL_DRV_UINT         ErlDrvUInt integer
+              ERL_DRV_INT64        ErlDrvSInt64 *integer_ptr
+              ERL_DRV_UINT64       ErlDrvUInt64 *integer_ptr
+              ERL_DRV_PORT         ErlDrvTermData port (from driver_mk_port(ErlDrvPort port))
+              ERL_DRV_BINARY       ErlDrvBinary *bin, ErlDrvUInt len, ErlDrvUInt offset
+              ERL_DRV_BUF2BINARY   char *buf, ErlDrvUInt len
+              ERL_DRV_STRING       char *str, int len
+              ERL_DRV_TUPLE        int sz
+              ERL_DRV_LIST         int sz
+              ERL_DRV_PID          ErlDrvTermData pid (from driver_connected(ErlDrvPort port) or driver_caller(ErlDrvPort port))
+              ERL_DRV_STRING_CONS  char *str, int len
+              ERL_DRV_FLOAT        double *dbl
+              ERL_DRV_EXT2TERM     char *buf, ErlDrvUInt len
+
+
+              The unsigned integer data type _E_r_l_D_r_v_U_I_n_t and the signed integer
+              data type _E_r_l_D_r_v_S_I_n_t are 64 bits wide on a 64 bit runtime system
+              and 32 bits wide on a 32 bit runtime system. They were
+              introduced in erts version 5.6, and replaced some of the _i_n_t
+              arguments in the list above.
+
+              The unsigned integer data type _E_r_l_D_r_v_U_I_n_t_6_4 and the signed
+              integer data type _E_r_l_D_r_v_S_I_n_t_6_4 are always 64 bits wide. They
+              were introduced in erts version 5.7.4.
+
+              To build the tuple _{_t_c_p_, _P_o_r_t_, _[_1_0_0 _| _B_i_n_a_r_y_]_}, the following
+              call could be made.
+
+                  ErlDrvBinary* bin = ...
+                  ErlDrvPort port = ...
+                  ErlDrvTermData spec[] = {
+                      ERL_DRV_ATOM, driver_mk_atom("tcp"),
+                      ERL_DRV_PORT, driver_mk_port(port),
+                          ERL_DRV_INT, 100,
+                          ERL_DRV_BINARY, bin, 50, 0,
+                          ERL_DRV_LIST, 2,
+                      ERL_DRV_TUPLE, 3,
+                  };
+                  driver_output_term(port, spec, sizeof(spec) / sizeof(spec[0]));
+
+
+
+              Where _b_i_n is a driver binary of length at least 50 and _p_o_r_t is a
+              port handle. Note that the _E_R_L___D_R_V___L_I_S_T comes after the elements
+              of the list, likewise the _E_R_L___D_R_V___T_U_P_L_E.
+
+              The term _E_R_L___D_R_V___S_T_R_I_N_G___C_O_N_S is a way to construct strings. It
+              works differently from how _E_R_L___D_R_V___S_T_R_I_N_G works.
+              _E_R_L___D_R_V___S_T_R_I_N_G___C_O_N_S builds a string list in reverse order, (as
+              opposed to how _E_R_L___D_R_V___L_I_S_T works), concatenating the strings
+              added to a list. The tail must be given before
+              _E_R_L___D_R_V___S_T_R_I_N_G___C_O_N_S.
+
+              The _E_R_L___D_R_V___S_T_R_I_N_G constructs a string, and ends it. (So it's
+              the same as _E_R_L___D_R_V___N_I_L followed by _E_R_L___D_R_V___S_T_R_I_N_G___C_O_N_S.)
+
+                  /* to send [x, "abc", y] to the port: */
+                  ErlDrvTermData spec[] = {
+                      ERL_DRV_ATOM, driver_mk_atom("x"),
+                      ERL_DRV_STRING, (ErlDrvTermData)"abc", 3,
+                      ERL_DRV_ATOM, driver_mk_atom("y"),
+                      ERL_DRV_NIL,
+                      ERL_DRV_LIST, 4
+                  };
+                  driver_output_term(port, spec, sizeof(spec) / sizeof(spec[0]));
+
+
+                  /* to send "abc123" to the port: */
+                  ErlDrvTermData spec[] = {
+                      ERL_DRV_NIL,        /* with STRING_CONS, the tail comes first */
+                      ERL_DRV_STRING_CONS, (ErlDrvTermData)"123", 3,
+                      ERL_DRV_STRING_CONS, (ErlDrvTermData)"abc", 3,
+                  };
+                  driver_output_term(port, spec, sizeof(spec) / sizeof(spec[0]));
+
+
+              The _E_R_L___D_R_V___E_X_T_2_T_E_R_M term type is used for passing a term
+              encoded with the eexxtteerrnnaall ffoorrmmaatt, i.e., a term that has been
+              encoded by eerrllaanngg::tteerrmm__ttoo__bbiinnaarryy, eerrll__iinntteerrffaaccee, etc. For
+              example, if _b_i_n_p is a pointer to an _E_r_l_D_r_v_B_i_n_a_r_y that contains
+              the term _{_1_7_, _4_7_1_1_} encoded with the eexxtteerrnnaall ffoorrmmaatt and you
+              want to wrap it in a two tuple with the tag _m_y___t_a_g, i.e.,
+              _{_m_y___t_a_g_, _{_1_7_, _4_7_1_1_}_}, you can do as follows:
+
+                  ErlDrvTermData spec[] = {
+                          ERL_DRV_ATOM, driver_mk_atom("my_tag"),
+                          ERL_DRV_EXT2TERM, (ErlDrvTermData) binp->orig_bytes, binp->orig_size
+                      ERL_DRV_TUPLE, 2,
+                  };
+                  driver_output_term(port, spec, sizeof(spec) / sizeof(spec[0]));
+
+
+              If you want to pass a binary and don't already have the content
+              of the binary in an _E_r_l_D_r_v_B_i_n_a_r_y, you can benefit from using
+              _E_R_L___D_R_V___B_U_F_2_B_I_N_A_R_Y instead of creating an _E_r_l_D_r_v_B_i_n_a_r_y via
+              _d_r_i_v_e_r___a_l_l_o_c___b_i_n_a_r_y_(_) and then pass the binary via
+              _E_R_L___D_R_V___B_I_N_A_R_Y. The runtime system will often allocate binaries
+              smarter if _E_R_L___D_R_V___B_U_F_2_B_I_N_A_R_Y is used. However, if the content
+              of the binary to pass already resides in an _E_r_l_D_r_v_B_i_n_a_r_y, it is
+              normally better to pass the binary using _E_R_L___D_R_V___B_I_N_A_R_Y and the
+              _E_r_l_D_r_v_B_i_n_a_r_y in question.
+
+              The _E_R_L___D_R_V___U_I_N_T, _E_R_L___D_R_V___B_U_F_2_B_I_N_A_R_Y, and _E_R_L___D_R_V___E_X_T_2_T_E_R_M term
+              types were introduced in the 5.6 version of erts.
+
+              Note that this function is _n_o_t thread-safe, not even when the
+              emulator with SMP support is used.
+
+       EErrllDDrrvvTTeerrmmDDaattaa ddrriivveerr__mmkk__aattoomm((cchhaarr** ssttrriinngg))
+
+              This function returns an atom given a name _s_t_r_i_n_g. The atom is
+              created and won't change, so the return value may be saved and
+              reused, which is faster than looking up the atom several times.
+
+       EErrllDDrrvvTTeerrmmDDaattaa ddrriivveerr__mmkk__ppoorrtt((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function converts a port handle to the erlang term format,
+              usable in the _d_r_i_v_e_r___o_u_t_p_u_t___s_e_n_d function.
+
+       iinntt ddrriivveerr__sseenndd__tteerrmm((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvTTeerrmmDDaattaa rreecceeiivveerr,,
+       EErrllDDrrvvTTeerrmmDDaattaa** tteerrmm,, iinntt nn))
+
+              This function is the only way for a driver to send data to _o_t_h_e_r
+              processes than the port owner process. The _r_e_c_e_i_v_e_r parameter
+              specifies the process to receive the data.
+
+              The parameters _t_e_r_m and _n do the same thing as in
+              ddrriivveerr__oouuttppuutt__tteerrmm.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used.
+
+       lloonngg ddrriivveerr__aassyynncc ((EErrllDDrrvvPPoorrtt ppoorrtt,, uunnssiiggnneedd iinntt** kkeeyy,, vvooiidd
+       ((**aassyynncc__iinnvvookkee))((vvooiidd**)),, vvooiidd** aassyynncc__ddaattaa,, vvooiidd ((**aassyynncc__ffrreeee))((vvooiidd**))))
+
+              This function performs an asynchronous call. The function
+              _a_s_y_n_c___i_n_v_o_k_e is invoked in a thread separate from the emulator
+              thread. This enables the driver to perform time-consuming,
+              blocking operations without blocking the emulator.
+
+              Erlang is by default started without an async thread pool. The
+              number of async threads that the runtime system should use is
+              specified by the ++AA command line argument of eerrll((11)). If no async
+              thread pool is available, the call is made synchronously in the
+              thread calling _d_r_i_v_e_r___a_s_y_n_c_(_). The current number of async
+              threads in the async thread pool can be retrieved via
+              ddrriivveerr__ssyysstteemm__iinnffoo(()).
+
+              If there is a thread pool available, a thread will be used. If
+              the _k_e_y argument is null, the threads from the pool are used in
+              a round-robin way, each call to _d_r_i_v_e_r___a_s_y_n_c uses the next
+              thread in the pool. With the _k_e_y argument set, this behaviour is
+              changed. The two same values of _*_k_e_y always get the same thread.
+
+              To make sure that a driver instance always uses the same thread,
+              the following call can be used:
+
+                  unsigned int myKey = (unsigned int) myPort;
+
+                  r = driver_async(myPort, &myKey, myData, myFunc);
+
+
+              It is enough to initialize _m_y_K_e_y once for each driver instance.
+
+              If a thread is already working, the calls will be queued up and
+              executed in order. Using the same thread for each driver
+              instance ensures that the calls will be made in sequence.
+
+              The _a_s_y_n_c___d_a_t_a is the argument to the functions _a_s_y_n_c___i_n_v_o_k_e and
+              _a_s_y_n_c___f_r_e_e. It's typically a pointer to a structure that
+              contains a pipe or event that can be used to signal that the
+              async operation completed. The data should be freed in
+              _a_s_y_n_c___f_r_e_e, because it's called if _d_r_i_v_e_r___a_s_y_n_c___c_a_n_c_e_l is
+              called.
+
+              When the async operation is done, rreeaaddyy__aassyynncc driver entry
+              function is called. If _a_s_y_n_c___r_e_a_d_y is null in the driver entry,
+              the _a_s_y_n_c___f_r_e_e function is called instead.
+
+              The return value is a handle to the asynchronous task, which can
+              be used as argument to _d_r_i_v_e_r___a_s_y_n_c___c_a_n_c_e_l.
+
+          NNoottee::
+              As of erts version 5.5.4.3 the default stack size for threads in
+              the async-thread pool is 16 kilowords, i.e., 64 kilobyte on
+              32-bit architectures. This small default size has been chosen
+              since the amount of async-threads might be quite large. The
+              default stack size is enough for drivers delivered with
+              Erlang/OTP, but might not be sufficiently large for other
+              dynamically linked in drivers that use the driver_async()
+              functionality. A suggested stack size for threads in the async-
+              thread pool can be configured via the ++aa command line argument
+              of eerrll((11)).
+
+
+       iinntt ddrriivveerr__aassyynncc__ccaanncceell((lloonngg iidd))
+
+              This function used to cancel a scheduled asynchronous operation,
+              if it was still in the queue. It returned 1 if it succeeded, and
+              0 if it failed.
+
+              Since it could not guarantee success, it was more or less
+              useless. The user had to implement synchronization of
+              cancellation anyway. It also unnecessarily complicated the
+              implementation. Therefore, as of OTP-R15B _d_r_i_v_e_r___a_s_y_n_c___c_a_n_c_e_l_(_)
+              is deprecated, and scheduled for removal in OTP-R16. It will
+              currently always fail, and return 0.
+
+          WWaarrnniinngg::
+              _d_r_i_v_e_r___a_s_y_n_c___c_a_n_c_e_l_(_) is deferred and will be removed in the
+              OTP-R16 release.
+
+
+       iinntt ddrriivveerr__lloocckk__ddrriivveerr((EErrllDDrrvvPPoorrtt ppoorrtt))
+
+              This function locks the driver used by the port _p_o_r_t in memory
+              for the rest of the emulator process' lifetime. After this call,
+              the driver behaves as one of Erlang's statically linked in
+              drivers.
+
+       EErrllDDrrvvPPoorrtt ddrriivveerr__ccrreeaattee__ppoorrtt((EErrllDDrrvvPPoorrtt ppoorrtt,, EErrllDDrrvvTTeerrmmDDaattaa
+       oowwnneerr__ppiidd,, cchhaarr** nnaammee,, EErrllDDrrvvDDaattaa ddrrvv__ddaattaa))
+
+              This function creates a new port executing the same driver code
+              as the port creating the new port. A short description of the
+              arguments:
+
+                _p_o_r_t:
+                  The port handle of the port (driver instance) creating the
+                  new port.
+
+                _o_w_n_e_r___p_i_d:
+                  The process id of the Erlang process which will be owner of
+                  the new port. This process will be linked to the new port.
+                  You usually want to use _d_r_i_v_e_r___c_a_l_l_e_r_(_p_o_r_t_) as _o_w_n_e_r___p_i_d.
+
+                _n_a_m_e:
+                  The port name of the new port. You usually want to use the
+                  same port name as the driver name (ddrriivveerr__nnaammee field of the
+                  ddrriivveerr__eennttrryy).
+
+                _d_r_v___d_a_t_a:
+                  The driver defined handle that will be passed in subsequent
+                  calls to driver call-backs. Note, that the ddrriivveerr ssttaarrtt
+                  ccaallll--bbaacckk will not be called for this new driver instance.
+                  The driver defined handle is normally created in the ddrriivveerr
+                  ssttaarrtt ccaallll--bbaacckk when a port is created via
+                  eerrllaanngg::ooppeenn__ppoorrtt//22.
+
+              The caller of _d_r_i_v_e_r___c_r_e_a_t_e___p_o_r_t_(_) is allowed to manipulate the
+              newly created port when _d_r_i_v_e_r___c_r_e_a_t_e___p_o_r_t_(_) has returned. When
+              ppoorrtt lleevveell lloocckkiinngg is used, the creating port is, however, only
+              allowed to manipulate the newly created port until the current
+              driver call-back that was called by the emulator returns.
+
+          NNoottee::
+              When ppoorrtt lleevveell lloocckkiinngg is used, the creating port is only
+              allowed to manipulate the newly created port until the current
+              driver call-back returns.
+
+
+       iinntt eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee((cchhaarr **nnaammee,,
+       ErlDrvTid *tid,                           void * (*func)(void *),
+                                 void *arg,
+       ErlDrvThreadOpts *opts)
+
+              Arguments:
+
+                _n_a_m_e:
+                  A string identifying the created thread. It will be used to
+                  identify the thread in planned future debug functionality.
+
+                _t_i_d:
+                  A pointer to a thread identifier variable.
+
+                _f_u_n_c:
+                  A pointer to a function to execute in the created thread.
+
+                _a_r_g:
+                  A pointer to argument to the _f_u_n_c function.
+
+                _o_p_t_s:
+                  A pointer to thread options to use or _N_U_L_L.
+
+              This function creates a new thread. On success _0 is returned;
+              otherwise, an _e_r_r_n_o value is returned to indicate the error. The
+              newly created thread will begin executing in the function
+              pointed to by _f_u_n_c, and _f_u_n_c will be passed _a_r_g as argument.
+              When _e_r_l___d_r_v___t_h_r_e_a_d___c_r_e_a_t_e_(_) returns the thread identifier of
+              the newly created thread will be available in _*_t_i_d. _o_p_t_s can be
+              either a _N_U_L_L pointer, or a pointer to an EErrllDDrrvvTThhrreeaaddOOppttss
+              structure. If _o_p_t_s is a _N_U_L_L pointer, default options will be
+              used; otherwise, the passed options will be used.
+
+          WWaarrnniinngg::
+              You are not allowed to allocate the EErrllDDrrvvTThhrreeaaddOOppttss structure
+              by yourself. It has to be allocated and initialized by
+              eerrll__ddrrvv__tthhrreeaadd__ooppttss__ccrreeaattee(()).
+
+
+              The created thread will terminate either when _f_u_n_c returns or if
+              eerrll__ddrrvv__tthhrreeaadd__eexxiitt(()) is called by the thread. The exit value of
+              the thread is either returned from _f_u_n_c or passed as argument to
+              eerrll__ddrrvv__tthhrreeaadd__eexxiitt(()). The driver creating the thread has the
+              responsibility of joining the thread, via eerrll__ddrrvv__tthhrreeaadd__jjooiinn(()),
+              before the driver is unloaded. It is not possible to create
+              "detached" threads, i.e., threads that don't need to be joined.
+
+          WWaarrnniinngg::
+              All created threads need to be joined by the driver before it is
+              unloaded. If the driver fails to join all threads created before
+              it is unloaded, the runtime system will most likely crash when
+              the code of the driver is unloaded.
+
+
+              This function is thread-safe.
+
+       EErrllDDrrvvTThhrreeaaddOOppttss **eerrll__ddrrvv__tthhrreeaadd__ooppttss__ccrreeaattee((cchhaarr **nnaammee))
+
+              Arguments:
+
+                _n_a_m_e:
+                  A string identifying the created thread options. It will be
+                  used to identify the thread options in planned future debug
+                  functionality.
+
+              This function allocates and initialize a thread option
+              structure. On failure _N_U_L_L is returned. A thread option
+              structure is used for passing options to
+              eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee(()). If the structure isn't modified before
+              it is passed to eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee(()), the default values will
+              be used.
+
+          WWaarrnniinngg::
+              You are not allowed to allocate the EErrllDDrrvvTThhrreeaaddOOppttss structure
+              by yourself. It has to be allocated and initialized by
+              _e_r_l___d_r_v___t_h_r_e_a_d___o_p_t_s___c_r_e_a_t_e_(_).
+
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__tthhrreeaadd__ooppttss__ddeessttrrooyy((EErrllDDrrvvTThhrreeaaddOOppttss **ooppttss))
+
+              Arguments:
+
+                _o_p_t_s:
+                  A pointer to thread options to destroy.
+
+              This function destroys thread options previously created by
+              eerrll__ddrrvv__tthhrreeaadd__ooppttss__ccrreeaattee(()).
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__tthhrreeaadd__eexxiitt((vvooiidd **eexxiitt__vvaalluuee))
+
+              Arguments:
+
+                _e_x_i_t___v_a_l_u_e:
+                  A pointer to an exit value or _N_U_L_L.
+
+              This function terminates the calling thread with the exit value
+              passed as argument. You are only allowed to terminate threads
+              created with eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee(()). The exit value can later
+              be retrieved by another thread via eerrll__ddrrvv__tthhrreeaadd__jjooiinn(()).
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__tthhrreeaadd__jjooiinn((EErrllDDrrvvTTiidd ttiidd,, vvooiidd ****eexxiitt__vvaalluuee))
+
+              Arguments:
+
+                _t_i_d:
+                  The thread identifier of the thread to join.
+
+                _e_x_i_t___v_a_l_u_e:
+                  A pointer to a pointer to an exit value, or _N_U_L_L.
+
+              This function joins the calling thread with another thread,
+              i.e., the calling thread is blocked until the thread identified
+              by _t_i_d has terminated. On success _0 is returned; otherwise, an
+              _e_r_r_n_o value is returned to indicate the error. A thread can only
+              be joined once. The behavior of joining more than once is
+              undefined, an emulator crash is likely. If _e_x_i_t___v_a_l_u_e _=_= _N_U_L_L,
+              the exit value of the terminated thread will be ignored;
+              otherwise, the exit value of the terminated thread will be
+              stored at _*_e_x_i_t___v_a_l_u_e.
+
+              This function is thread-safe.
+
+       EErrllDDrrvvTTiidd eerrll__ddrrvv__tthhrreeaadd__sseellff((vvooiidd))
+
+              This function returns the thread identifier of the calling
+              thread.
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__eeqquuaall__ttiiddss((EErrllDDrrvvTTiidd ttiidd11,, EErrllDDrrvvTTiidd ttiidd22))
+
+              Arguments:
+
+                _t_i_d_1:
+                  A thread identifier.
+
+                _t_i_d_2:
+                  A thread identifier.
+
+              This function compares two thread identifiers for equality, and
+              returns _0 it they aren't equal, and a value not equal to _0 if
+              they are equal.
+
+          NNoottee::
+              A Thread identifier may be reused very quickly after a thread
+              has terminated. Therefore, if a thread corresponding to one of
+              the involved thread identifiers has terminated since the thread
+              identifier was saved, the result of _e_r_l___d_r_v___e_q_u_a_l___t_i_d_s_(_) might
+              not give the expected result.
+
+
+              This function is thread-safe.
+
+       EErrllDDrrvvMMuutteexx **eerrll__ddrrvv__mmuutteexx__ccrreeaattee((cchhaarr **nnaammee))
+
+              Arguments:
+
+                _n_a_m_e:
+                  A string identifying the created mutex. It will be used to
+                  identify the mutex in planned future debug functionality.
+
+              This function creates a mutex and returns a pointer to it. On
+              failure _N_U_L_L is returned. The driver creating the mutex has the
+              responsibility of destroying it before the driver is unloaded.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__mmuutteexx__ddeessttrrooyy((EErrllDDrrvvMMuutteexx **mmttxx))
+
+              Arguments:
+
+                _m_t_x:
+                  A pointer to a mutex to destroy.
+
+              This function destroys a mutex previously created by
+              eerrll__ddrrvv__mmuutteexx__ccrreeaattee(()). The mutex has to be in an unlocked state
+              before being destroyed.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__mmuutteexx__lloocckk((EErrllDDrrvvMMuutteexx **mmttxx))
+
+              Arguments:
+
+                _m_t_x:
+                  A pointer to a mutex to lock.
+
+              This function locks a mutex. The calling thread will be blocked
+              until the mutex has been locked. A thread which currently has
+              locked the mutex may _n_o_t lock the same mutex again.
+
+          WWaarrnniinngg::
+              If you leave a mutex locked in an emulator thread when you let
+              the thread out of your control, you will _v_e_r_y _l_i_k_e_l_y deadlock
+              the whole emulator.
+
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__mmuutteexx__ttrryylloocckk((EErrllDDrrvvMMuutteexx **mmttxx))
+
+              Arguments:
+
+                _m_t_x:
+                  A pointer to a mutex to try to lock.
+
+              This function tries to lock a mutex. If successful _0, is
+              returned; otherwise, _E_B_U_S_Y is returned. A thread which currently
+              has locked the mutex may _n_o_t try to lock the same mutex again.
+
+          WWaarrnniinngg::
+              If you leave a mutex locked in an emulator thread when you let
+              the thread out of your control, you will _v_e_r_y _l_i_k_e_l_y deadlock
+              the whole emulator.
+
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__mmuutteexx__uunnlloocckk((EErrllDDrrvvMMuutteexx **mmttxx))
+
+              Arguments:
+
+                _m_t_x:
+                  A pointer to a mutex to unlock.
+
+              This function unlocks a mutex. The mutex currently has to be
+              locked by the calling thread.
+
+              This function is thread-safe.
+
+       EErrllDDrrvvCCoonndd **eerrll__ddrrvv__ccoonndd__ccrreeaattee((cchhaarr **nnaammee))
+
+              Arguments:
+
+                _n_a_m_e:
+                  A string identifying the created condition variable. It will
+                  be used to identify the condition variable in planned future
+                  debug functionality.
+
+              This function creates a condition variable and returns a pointer
+              to it. On failure _N_U_L_L is returned. The driver creating the
+              condition variable has the responsibility of destroying it
+              before the driver is unloaded.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__ccoonndd__ddeessttrrooyy((EErrllDDrrvvCCoonndd **ccnndd))
+
+              Arguments:
+
+                _c_n_d:
+                  A pointer to a condition variable to destroy.
+
+              This function destroys a condition variable previously created
+              by eerrll__ddrrvv__ccoonndd__ccrreeaattee(()).
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__ccoonndd__ssiiggnnaall((EErrllDDrrvvCCoonndd **ccnndd))
+
+              Arguments:
+
+                _c_n_d:
+                  A pointer to a condition variable to signal on.
+
+              This function signals on a condition variable. That is, if other
+              threads are waiting on the condition variable being signaled,
+              _o_n_e of them will be woken.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__ccoonndd__bbrrooaaddccaasstt((EErrllDDrrvvCCoonndd **ccnndd))
+
+              Arguments:
+
+                _c_n_d:
+                  A pointer to a condition variable to broadcast on.
+
+              This function broadcasts on a condition variable. That is, if
+              other threads are waiting on the condition variable being
+              broadcasted on, _a_l_l of them will be woken.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__ccoonndd__wwaaiitt((EErrllDDrrvvCCoonndd **ccnndd,, EErrllDDrrvvMMuutteexx **mmttxx))
+
+              Arguments:
+
+                _c_n_d:
+                  A pointer to a condition variable to wait on.
+
+                _m_t_x:
+                  A pointer to a mutex to unlock while waiting.
+
+                :
+
+
+              This function waits on a condition variable. The calling thread
+              is blocked until another thread wakes it by signaling or
+              broadcasting on the condition variable. Before the calling
+              thread is blocked it unlocks the mutex passed as argument, and
+              when the calling thread is woken it locks the same mutex before
+              returning. That is, the mutex currently has to be locked by the
+              calling thread when calling this function.
+
+          NNoottee::
+              _e_r_l___d_r_v___c_o_n_d___w_a_i_t_(_) might return even though no-one has signaled
+              or broadcasted on the condition variable. Code calling
+              _e_r_l___d_r_v___c_o_n_d___w_a_i_t_(_) should always be prepared for
+              _e_r_l___d_r_v___c_o_n_d___w_a_i_t_(_) returning even though the condition that the
+              thread was waiting for hasn't occurred. That is, when returning
+              from _e_r_l___d_r_v___c_o_n_d___w_a_i_t_(_) always check if the condition has
+              occurred, and if not call _e_r_l___d_r_v___c_o_n_d___w_a_i_t_(_) again.
+
+
+              This function is thread-safe.
+
+       EErrllDDrrvvRRWWLLoocckk **eerrll__ddrrvv__rrwwlloocckk__ccrreeaattee((cchhaarr **nnaammee))
+
+              Arguments:
+
+                _n_a_m_e:
+                  A string identifying the created rwlock. It will be used to
+                  identify the rwlock in planned future debug functionality.
+
+              This function creates an rwlock and returns a pointer to it. On
+              failure _N_U_L_L is returned. The driver creating the rwlock has the
+              responsibility of destroying it before the driver is unloaded.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__rrwwlloocckk__ddeessttrrooyy((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to destroy.
+
+              This function destroys an rwlock previously created by
+              eerrll__ddrrvv__rrwwlloocckk__ccrreeaattee(()). The rwlock has to be in an unlocked
+              state before being destroyed.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__rrwwlloocckk__rrlloocckk((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to read lock.
+
+              This function read locks an rwlock. The calling thread will be
+              blocked until the rwlock has been read locked. A thread which
+              currently has read or read/write locked the rwlock may _n_o_t lock
+              the same rwlock again.
+
+          WWaarrnniinngg::
+              If you leave an rwlock locked in an emulator thread when you let
+              the thread out of your control, you will _v_e_r_y _l_i_k_e_l_y deadlock
+              the whole emulator.
+
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__rrwwlloocckk__ttrryyrrlloocckk((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to try to read lock.
+
+              This function tries to read lock an rwlock. If successful _0, is
+              returned; otherwise, _E_B_U_S_Y is returned. A thread which currently
+              has read or read/write locked the rwlock may _n_o_t try to lock the
+              same rwlock again.
+
+          WWaarrnniinngg::
+              If you leave an rwlock locked in an emulator thread when you let
+              the thread out of your control, you will _v_e_r_y _l_i_k_e_l_y deadlock
+              the whole emulator.
+
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__rrwwlloocckk__rruunnlloocckk((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to read unlock.
+
+              This function read unlocks an rwlock. The rwlock currently has
+              to be read locked by the calling thread.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__rrwwlloocckk__rrwwlloocckk((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to read/write lock.
+
+              This function read/write locks an rwlock. The calling thread
+              will be blocked until the rwlock has been read/write locked. A
+              thread which currently has read or read/write locked the rwlock
+              may _n_o_t lock the same rwlock again.
+
+          WWaarrnniinngg::
+              If you leave an rwlock locked in an emulator thread when you let
+              the thread out of your control, you will _v_e_r_y _l_i_k_e_l_y deadlock
+              the whole emulator.
+
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__rrwwlloocckk__ttrryyrrwwlloocckk((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to try to read/write lock.
+
+              This function tries to read/write lock an rwlock. If successful
+              _0, is returned; otherwise, _E_B_U_S_Y is returned. A thread which
+              currently has read or read/write locked the rwlock may _n_o_t try
+              to lock the same rwlock again.
+
+          WWaarrnniinngg::
+              If you leave an rwlock locked in an emulator thread when you let
+              the thread out of your control, you will _v_e_r_y _l_i_k_e_l_y deadlock
+              the whole emulator.
+
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__rrwwlloocckk__rrwwuunnlloocckk((EErrllDDrrvvRRWWLLoocckk **rrwwllcckk))
+
+              Arguments:
+
+                _r_w_l_c_k:
+                  A pointer to an rwlock to read/write unlock.
+
+              This function read/write unlocks an rwlock. The rwlock currently
+              has to be read/write locked by the calling thread.
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__ttssdd__kkeeyy__ccrreeaattee((cchhaarr **nnaammee,, EErrllDDrrvvTTSSDDKKeeyy **kkeeyy))
+
+              Arguments:
+
+                _n_a_m_e:
+                  A string identifying the created key. It will be used to
+                  identify the key in planned future debug functionality.
+
+                _k_e_y:
+                  A pointer to a thread specific data key variable.
+
+              This function creates a thread specific data key. On success _0
+              is returned; otherwise, an _e_r_r_n_o value is returned to indicate
+              the error. The driver creating the key has the responsibility of
+              destroying it before the driver is unloaded.
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__ttssdd__kkeeyy__ddeessttrrooyy((EErrllDDrrvvTTSSDDKKeeyy kkeeyy))
+
+              Arguments:
+
+                _k_e_y:
+                  A thread specific data key to destroy.
+
+              This function destroys a thread specific data key previously
+              created by eerrll__ddrrvv__ttssdd__kkeeyy__ccrreeaattee(()). All thread specific data
+              using this key in all threads have to be cleared (see
+              eerrll__ddrrvv__ttssdd__sseett(())) prior to the call to
+              _e_r_l___d_r_v___t_s_d___k_e_y___d_e_s_t_r_o_y_(_).
+
+          WWaarrnniinngg::
+              A destroyed key is very likely to be reused soon. Therefore, if
+              you fail to clear the thread specific data using this key in a
+              thread prior to destroying the key, you will _v_e_r_y _l_i_k_e_l_y get
+              unexpected errors in other parts of the system.
+
+
+              This function is thread-safe.
+
+       vvooiidd eerrll__ddrrvv__ttssdd__sseett((EErrllDDrrvvTTSSDDKKeeyy kkeeyy,, vvooiidd **ddaattaa))
+
+              Arguments:
+
+                _k_e_y:
+                  A thread specific data key.
+
+                _d_a_t_a:
+                  A pointer to data to associate with _k_e_y in calling thread.
+
+              This function sets thread specific data associated with _k_e_y for
+              the calling thread. You are only allowed to set thread specific
+              data for threads while they are fully under your control. For
+              example, if you set thread specific data in a thread calling a
+              driver call-back function, it has to be cleared, i.e. set to
+              _N_U_L_L, before returning from the driver call-back function.
+
+          WWaarrnniinngg::
+              If you fail to clear thread specific data in an emulator thread
+              before letting it out of your control, you might not ever be
+              able to clear this data with later unexpected errors in other
+              parts of the system as a result.
+
+
+              This function is thread-safe.
+
+       vvooiidd **eerrll__ddrrvv__ttssdd__ggeett((EErrllDDrrvvTTSSDDKKeeyy kkeeyy))
+
+              Arguments:
+
+                _k_e_y:
+                  A thread specific data key.
+
+              This function returns the thread specific data associated with
+              _k_e_y for the calling thread. If no data has been associated with
+              _k_e_y for the calling thread, _N_U_L_L is returned.
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__ppuutteennvv((cchhaarr **kkeeyy,, cchhaarr **vvaalluuee))
+
+              Arguments:
+
+                _k_e_y:
+                  A null terminated string containing the name of the
+                  environment variable.
+
+                _v_a_l_u_e:
+                  A null terminated string containing the new value of the
+                  environment variable.
+
+              This function sets the value of an environment variable. It
+              returns _0 on success, and a value _!_= _0 on failure.
+
+          NNoottee::
+              The result of passing the empty string ("") as a value is
+              platform dependent. On some platforms the value of the variable
+              is set to the empty string, on others, the environment variable
+              is removed.
+
+
+          WWaarrnniinngg::
+              Do _n_o_t use libc's _p_u_t_e_n_v or similar C library interfaces from a
+              driver.
+
+
+              This function is thread-safe.
+
+       iinntt eerrll__ddrrvv__ggeetteennvv((cchhaarr **kkeeyy,, cchhaarr **vvaalluuee,, ssiizzee__tt **vvaalluuee__ssiizzee))
+
+              Arguments:
+
+                _k_e_y:
+                  A null terminated string containing the name of the
+                  environment variable.
+
+                _v_a_l_u_e:
+                  A pointer to an output buffer.
+
+                _v_a_l_u_e___s_i_z_e:
+                  A pointer to an integer. The integer is both used for
+                  passing input and output sizes (see below).
+
+              This function retrieves the value of an environment variable.
+              When called, _*_v_a_l_u_e___s_i_z_e should contain the size of the _v_a_l_u_e
+              buffer. On success _0 is returned, the value of the environment
+              variable has been written to the _v_a_l_u_e buffer, and _*_v_a_l_u_e___s_i_z_e
+              contains the string length (excluding the terminating null
+              character) of the value written to the _v_a_l_u_e buffer. On failure,
+              i.e., no such environment variable was found, a value less than
+              _0 is returned. When the size of the _v_a_l_u_e buffer is too small, a
+              value greater than _0 is returned and _*_v_a_l_u_e___s_i_z_e has been set to
+              the buffer size needed.
+
+          WWaarrnniinngg::
+              Do _n_o_t use libc's _g_e_t_e_n_v or similar C library interfaces from a
+              driver.
+
+
+              This function is thread-safe.
+
+SSEEEE AALLSSOO
+       ddrriivveerr__eennttrryy((33)), eerrll__ddddllll((33)), eerrllaanngg((33))
+
+       An Alternative Distribution Driver (ERTS User's Guide Ch. 3)
+
+
+
+Ericsson AB                       erts 5.9.2                     erl_driver(3)

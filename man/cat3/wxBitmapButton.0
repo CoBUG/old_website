@@ -1,0 +1,155 @@
+wxBitmapButton(3)          Erlang Module Definition          wxBitmapButton(3)
+
+
+
+NNAAMMEE
+       wxBitmapButton - See external documentation: wxBitmapButton.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxBitmapButton.
+
+       This class is derived (and can use functions) from:
+       wwxxBBuuttttoonn
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_B_i_t_m_a_p_B_u_t_t_o_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxBBiittmmaappBBuuttttoonn(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, BBiittmmaapp)) -->> wwxxBBiittmmaappBBuuttttoonn(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, BBiittmmaapp,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, BBiittmmaapp,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBiittmmaappBBuuttttoonn(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, BBiittmmaapp)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmapButton()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, BBiittmmaapp,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, BBiittmmaapp,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBitmapButton()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ggeettBBiittmmaappDDiissaabblleedd((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxBitmapButton()
+
+              See external documentation.
+
+       ggeettBBiittmmaappFFooccuuss((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxBitmapButton()
+
+              See external documentation.
+
+       ggeettBBiittmmaappLLaabbeell((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxBitmapButton()
+
+              See external documentation.
+
+       ggeettBBiittmmaappSSeelleecctteedd((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxBitmapButton()
+
+              See external documentation.
+
+       sseettBBiittmmaappDDiissaabblleedd((TThhiiss,, DDiissaabblleedd)) -->> ookk
+
+              Types:
+
+                 This = wxBitmapButton()
+                 Disabled = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       sseettBBiittmmaappFFooccuuss((TThhiiss,, FFooccuuss)) -->> ookk
+
+              Types:
+
+                 This = wxBitmapButton()
+                 Focus = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       sseettBBiittmmaappLLaabbeell((TThhiiss,, BBiittmmaapp)) -->> ookk
+
+              Types:
+
+                 This = wxBitmapButton()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       sseettBBiittmmaappSSeelleecctteedd((TThhiiss,, SSeell)) -->> ookk
+
+              Types:
+
+                 This = wxBitmapButton()
+                 Sel = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxBBiittmmaappBBuuttttoonn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxBitmapButton(3)

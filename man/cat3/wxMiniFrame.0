@@ -1,0 +1,85 @@
+wxMiniFrame(3)             Erlang Module Definition             wxMiniFrame(3)
+
+
+
+NNAAMMEE
+       wxMiniFrame - See external documentation: wxMiniFrame.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMiniFrame.
+
+       This class is derived (and can use functions) from:
+       wwxxFFrraammee
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_i_n_i_F_r_a_m_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMiinniiFFrraammee(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee)) -->> wwxxMMiinniiFFrraammee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMiinniiFFrraammee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMiniFrame()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMiniFrame()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMiinniiFFrraammee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxMiniFrame(3)

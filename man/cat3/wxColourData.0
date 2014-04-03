@@ -1,0 +1,94 @@
+wxColourData(3)            Erlang Module Definition            wxColourData(3)
+
+
+
+NNAAMMEE
+       wxColourData - See external documentation: wxColourData.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxColourData.
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_o_l_o_u_r_D_a_t_a_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCCoolloouurrDDaattaa(())
+
+              See external documentation.
+
+       nneeww((DDaattaa)) -->> wwxxCCoolloouurrDDaattaa(())
+
+              Types:
+
+                 Data = wxColourData()
+
+              See external documentation.
+
+       ggeettCChhoooosseeFFuullll((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxColourData()
+
+              See external documentation.
+
+       ggeettCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxColourData()
+
+              See external documentation.
+
+       ggeettCCuussttoommCCoolloouurr((TThhiiss,, II)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxColourData()
+                 I = integer()
+
+              See external documentation.
+
+       sseettCChhoooosseeFFuullll((TThhiiss,, FFllaagg)) -->> ookk
+
+              Types:
+
+                 This = wxColourData()
+                 Flag = boolean()
+
+              See external documentation.
+
+       sseettCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxColourData()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCuussttoommCCoolloouurr((TThhiiss,, II,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxColourData()
+                 I = integer()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxCCoolloouurrDDaattaa(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxColourData(3)

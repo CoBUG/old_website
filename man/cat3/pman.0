@@ -1,0 +1,58 @@
+pman(3)                    Erlang Module Definition                    pman(3)
+
+
+
+NNAAMMEE
+       pman - A graphical process manager.
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       The Pman application has been superseded by the Observer application.
+       Pman will be removed in R16.
+
+
+       A graphical tool used to inspect the Erlang processes executing either
+       locally or on remote nodes. It is also possible to trace events in the
+       individual processes.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(())
+       ssttaarrtt((EExxcclluuddeedd))
+       ssttaarrtt__nnoottiimmeeoouutt(())
+       ssttaarrtt__nnoottiimmeeoouutt((EExxcclluuddeedd))
+
+              Types:
+
+                 Excluded = [Module]
+                  Module = atom()
+
+              Starts Pman. It will use the previously saved trace settings in
+              _H_O_M_E_/_._e_r_l_a_n_g___t_o_o_l_s_/_p_m_a_n_._o_p_t_s, where _H_O_M_E is the user's home
+              directory, if such a file exists. Otherwise standard trace
+              settings will be used. The return value should be ignored.
+
+              _E_x_c_l_u_d_e_d is a list of module names. If the argument is present,
+              processes currently executing in any of these modules will not
+              be shown by Pman.
+
+              _s_t_a_r_t_/_0_,_1 will fail unless the start-up succeeds within 20
+              seconds, whereas _s_t_a_r_t___n_o_t_i_m_e_o_u_t_/_0_,_1 will wait indefinitely.
+
+       pprroocc((PPrroocceessss))
+       pprroocc((AA,, BB,, CC))
+
+              Types:
+
+                 Process = pid() | atom()
+                 A = B = C = integer()
+
+              Starts a Pman trace window for the specified process. The return
+              value should be ignored.
+
+              The process to trace is given either by its pid or by its
+              registered name. It is also possible to use _p_r_o_c_/_3 to trace the
+              pid represented as _<_A_,_B_,_C_>.
+
+
+
+Ericsson AB                      pman 2.7.1.2                          pman(3)

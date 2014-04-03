@@ -1,0 +1,184 @@
+wxCaret(3)                 Erlang Module Definition                 wxCaret(3)
+
+
+
+NNAAMMEE
+       wxCaret - See external documentation: wxCaret.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCaret.
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_a_r_e_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((WWiinnddooww,, SSiizzee)) -->> wwxxCCaarreett(())
+
+              Types:
+
+                 Window = wxWindow() (see module wxWindow)
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       nneeww((WWiinnddooww,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxCCaarreett(())
+
+              Types:
+
+                 Window = wxWindow() (see module wxWindow)
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, WWiinnddooww,, SSiizzee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCaret()
+                 Window = wxWindow() (see module wxWindow)
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, WWiinnddooww,, WWiiddtthh,, HHeeiigghhtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCaret()
+                 Window = wxWindow() (see module wxWindow)
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       ggeettBBlliinnkkTTiimmee(()) -->> iinntteeggeerr(())
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxCaret()
+
+              See external documentation.
+
+       ggeettSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxCaret()
+
+              See external documentation.
+
+       ggeettWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxCaret()
+
+              See external documentation.
+
+       hhiiddee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCaret()
+
+              See external documentation.
+
+       iissVViissiibbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCaret()
+
+              See external documentation.
+
+       mmoovvee((TThhiiss,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       mmoovvee((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettBBlliinnkkTTiimmee((MMiilllliisseeccoonnddss)) -->> ookk
+
+              Types:
+
+                 Milliseconds = integer()
+
+              See external documentation.
+
+       sseettSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettSSiizzee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sshhooww((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+
+              Equivalent to sshhooww((TThhiiss,, [[]])).
+
+       sshhooww((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxCaret()
+                 Option = {show, boolean()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxCCaarreett(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxCaret(3)

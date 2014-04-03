@@ -1,0 +1,216 @@
+CosNotifyFilter_MappingFilteErr(l3a)ng Module DefiniCtoisoNnotifyFilter_MappingFilter(3)
+
+
+
+NNAAMMEE
+       CosNotifyFilter_MappingFilter - This module implements the OMG
+       CosNotifyFilter::MappingFilter interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       The main purpose of this module is to match events against associated
+       constraints and return the value for the first constraint that returns
+       true for the given event. If all constraints return false the default
+       value will be returned.
+
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       __ggeett__ccoonnssttrraaiinntt__ggrraammmmaarr((MMaappppiinnggFFiilltteerr)) -->> GGrraammmmaarr
+
+              Types:
+
+                 MappingFilter = #objref
+                 Grammar = string()
+
+              This operation returns which type of Grammar the MappingFilter
+              uses. Currently, only _"_E_X_T_E_N_D_E_D___T_C_L_" is supported.
+
+       __ggeett__vvaalluuee__ttyyppee((MMaappppiinnggFFiilltteerr)) -->> CCOORRBBAA::::TTyyppeeCCooddee
+
+              Types:
+
+                 MappingFilter = #objref
+
+              This readonly attribute maintains the _C_O_R_B_A_:_:_T_y_p_e_C_o_d_e of the
+              default value associated with the target object.
+
+       __ggeett__ddeeffaauulltt__vvaalluuee((MMaappppiinnggFFiilltteerr)) -->> ##aannyy
+
+              Types:
+
+                 MappingFilter = #objref
+
+              This readonly attribute maintains the _#_a_n_y_{_} default value
+              associated with the target object.
+
+       aadddd__mmaappppiinngg__ccoonnssttrraaiinnttss((MMaappppiinnggFFiilltteerr,, MMaappppiinnggCCoonnssttrraaiinnttPPaaiirrSSeeqq)) -->>
+       RReeppllyy
+
+              Types:
+
+                 MappingFilter = #objref
+                 MappingConstraintPairSeq = [MappingConstraintPair]
+                 MappingConstraintPair =
+                 #'CosNotifyFilter_MappingConstraintPair'{constraint_expression,
+                 result_to_set}
+                 constraint_expression =
+                 #'CosNotifyFilter_ConstraintExp'{event_types,
+                 constraint_expr}
+                 event_types = #'CosNotification_EventTypeSeq'{}
+                 constraint_expr = string()
+                 result_to_set = #any
+                 Reply = MappingConstraintInfoSeq | {'EXCEPTION',
+                 #'CosNotifyFilter_InvalidConstraint'{constr}} | {'EXCEPTION',
+                 #'CosNotifyFilter_InvalidValue'{constr, value}}
+                 constr = ConstraintExp
+                 ConstraintExp = #'CosNotifyFilter_ConstraintExp'{event_types,
+                 constraint_expr}
+                 event_types = #'CosNotification_EventTypeSeq'{}
+                 constraint_expr = string()
+                 MappingConstraintInfoSeq = [MappingConstraintInfo]
+                 MappingConstraintInfo =
+                 #'CosNotifyFilter_MappingConstraintInfo'{constraint_expression,
+                 constraint_id, value}
+                 constraint_expression = ConstraintExp
+                 constraint_id = long()
+                 value = #any
+
+              This operation add new mapping constraints, which will be used
+              when trying to override Quality of Service settings defined in
+              the given event. If a constraint return true the associated
+              value will be returned, otherwise the default value.
+
+       mmooddiiffyy__ccoonnssttrraaiinnttss((MMaappppiinnggFFiilltteerr,, CCoonnssttrraaiinnttIIDDSSeeqq,,
+       MMaappppiinnggCCoonnssttrraaiinnttIInnffooSSeeqq)) -->> RReeppllyy
+
+              Types:
+
+                 MappingFilter = #objref
+                 ConstraintIDSeq = [ConstraintID]
+                 ConstraintID = long()
+                 MappingConstraintInfoSeq = [MappingConstraintInfo]
+                 MappingConstraintInfo =
+                 #'CosNotifyFilter_MappingConstraintInfo'{constraint_expression,
+                 constraint_id, value}
+                 constraint_expression = ConstraintExp
+                 constraint_id = long()
+                 value = #any
+                 ConstraintInfoSeq = [ConstraintInfo]
+                 ConstraintInfo =
+                 #'CosNotifyFilter_ConstraintInfo'{constraint_expression,
+                 constraint_id}
+                 constraint_expression = ConstraintExp
+                 constraint_id = long()
+                 Reply = ok | {'EXCEPTION',
+                 #'CosNotifyFilter_InvalidConstraint'{constr}} | {'EXCEPTION',
+                 #'CosNotifyFilter_ConstraintNotFound'{id}} | {'EXCEPTION',
+                 #'CosNotifyFilter_InvalidValue'{constr, value}}
+                 constr = ConstraintExp
+                 id = long()
+                 value = #any
+                 ConstraintExp = #'CosNotifyFilter_ConstraintExp'{event_types,
+                 constraint_expr}
+                 event_types = #'CosNotification_EventTypeSeq'{}
+                 constraint_expr = string()
+
+              The _C_o_n_s_t_r_a_i_n_t_I_D_S_e_q supplied should relate to constraints the
+              caller wishes to remove. If any of the supplied Id's are not
+              found an exception will be raised. This operation also accepts a
+              sequence of _M_a_p_p_i_n_g_C_o_n_s_t_r_a_i_n_t_I_n_f_o which will be added. If the
+              target object cannot modify the constraints as requested an
+              exception is raised describing which constraint, and why, could
+              not be updated.
+
+       ggeett__mmaappppiinngg__ccoonnssttrraaiinnttss((MMaappppiinnggFFiilltteerr,, CCoonnssttrraaiinnttIIDDSSeeqq)) -->> RReeppllyy
+
+              Types:
+
+                 MappingFilter = #objref
+                 ConstraintIDSeq = [ConstraintID]
+                 ConstraintID = long()
+                 Reply = MappingConstraintInfoSeq | {'EXCEPTION',
+                 #'CosNotifyFilter_ConstraintNotFound'{id}}
+                 MappingConstraintInfoSeq = [MappingConstraintInfo]
+                 MappingConstraintInfo =
+                 #'CosNotifyFilter_MappingConstraintInfo'{constraint_expression,
+                 constraint_id, value}
+                 constraint_expression = ConstraintExp
+                 ConstraintExp = #'CosNotifyFilter_ConstraintExp'{event_types,
+                 constraint_expr}
+                 event_types = #'CosNotification_EventTypeSeq'{}
+                 constraint_expr = string()
+                 constraint_id = id = long()
+                 value = #any
+
+              When adding a new constraint a unique Id is returned, which is
+              accepted as input for this operation. The associated constraint
+              is returned, but if no such Id exists an exception is raised.
+
+       ggeett__aallll__mmaappppiinngg__ccoonnssttrraaiinnttss((MMaappppiinnggFFiilltteerr)) -->> MMaappppiinnggCCoonnssttrraaiinnttIInnffooSSeeqq
+
+              Types:
+
+                 MappingFilter = #objref
+                 MappingConstraintInfoSeq = [MappingConstraintInfo]
+                 MappingConstraintInfo =
+                 #'CosNotifyFilter_MappingConstraintInfo'{constraint_expression,
+                 constraint_id, value}
+                 constraint_expression = ConstraintExp
+                 ConstraintExp = #'CosNotifyFilter_ConstraintExp'{event_types,
+                 constraint_expr}
+                 event_types = #'CosNotification_EventTypeSeq'{}
+                 constraint_expr = string()
+                 constraint_id = long()
+                 value = #any
+
+              This operation returns a sequence of all unique Id's associated
+              with the target object. If no constraint have been added the
+              sequence will be empty.
+
+       rreemmoovvee__aallll__mmaappppiinngg__ccoonnssttrraaiinnttss((MMaappppiinnggFFiilltteerr)) -->> ookk
+
+              Types:
+
+                 MappingFilter = #objref
+
+              This operation removes all constraints associated with the
+              target object.
+
+       ddeessttrrooyy((MMaappppiinnggFFiilltteerr)) -->> ookk
+
+              Types:
+
+                 MappingFilter = #objref
+
+              This operation terminates the target object. Remember to remove
+              this Filter from the objects it have been associated with.
+
+       mmaattcchh((MMaappppiinnggFFiilltteerr,, EEvveenntt)) -->> RReeppllyy
+
+              Types:
+
+                 MappingFilter = #objref
+                 Event = #any
+                 Reply = {boolean(), #any} | {'EXCEPTION',
+                 #'CosNotifyFilter_UnsupportedFilterableData'{}}
+
+              This operation evaluates _A_n_y events with the Filter's
+              constraints, and returns the value to use. The value is the
+              default value if all constraints returns false and the value
+              associated with the first constraint returning true.
+
+       mmaattcchh__ssttrruuccttuurreedd((MMaappppiinnggFFiilltteerr,, EEvveenntt)) -->> RReeppllyy
+
+              Types:
+
+                 MappingFilter = #objref
+                 Event = #'CosNotification_StructuredEvent'{}
+                 Reply = {boolean(), #any} | {'EXCEPTION',
+                 #'CosNotifyFilter_UnsupportedFilterableData'{}}
+
+              Similar to _m_a_t_c_h_/_2 but accepts a structured event as input.
+
+
+
+Ericsson AB                 cosNotification 1.1C.o1s8NotifyFilter_MappingFilter(3)

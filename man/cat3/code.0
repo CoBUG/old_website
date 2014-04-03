@@ -1,0 +1,703 @@
+code(3)                    Erlang Module Definition                    code(3)
+
+
+
+NNAAMMEE
+       code - Erlang Code Server
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains the interface to the Erlang _c_o_d_e _s_e_r_v_e_r, which
+       deals with the loading of compiled code into a running Erlang runtime
+       system.
+
+       The runtime system can be started in either _e_m_b_e_d_d_e_d or _i_n_t_e_r_a_c_t_i_v_e
+       mode. Which one is decided by the command line flag _-_m_o_d_e.
+
+       % erl -mode interactive
+
+       Default mode is _i_n_t_e_r_a_c_t_i_v_e.
+
+         * In embedded mode, all code is loaded during system start-up
+           according to the boot script. (Code can also be loaded later by
+           explicitly ordering the code server to do so).
+
+         * In interactive mode, only some code is loaded during system
+           startup-up, basically the modules needed by the runtime system
+           itself. Other code is dynamically loaded when first referenced.
+           When a call to a function in a certain module is made, and the
+           module is not loaded, the code server searches for and tries to
+           load the module.
+
+       To prevent accidentally reloading modules affecting the Erlang runtime
+       system itself, the _k_e_r_n_e_l, _s_t_d_l_i_b and _c_o_m_p_i_l_e_r directories are
+       considered _s_t_i_c_k_y. This means that the system issues a warning and
+       rejects the request if a user tries to reload a module residing in any
+       of them. The feature can be disabled by using the command line flag
+       _-_n_o_s_t_i_c_k.
+
+CCOODDEE PPAATTHH
+       In interactive mode, the code server maintains a search path -- usually
+       called the _c_o_d_e _p_a_t_h -- consisting of a list of directories, which it
+       searches sequentially when trying to load a module.
+
+       Initially, the code path consists of the current working directory and
+       all Erlang object code directories under the library directory
+       _$_O_T_P_R_O_O_T_/_l_i_b, where _$_O_T_P_R_O_O_T is the installation directory of
+       Erlang/OTP, _c_o_d_e_:_r_o_o_t___d_i_r_(_). Directories can be named _N_a_m_e_[_-_V_s_n_] and
+       the code server, by default, chooses the directory with the highest
+       version number among those which have the same _N_a_m_e. The _-_V_s_n suffix is
+       optional. If an _e_b_i_n directory exists under _N_a_m_e_[_-_V_s_n_], it is this
+       directory which is added to the code path.
+
+       The environment variable _E_R_L___L_I_B_S (defined in the operating system) can
+       be used to define additional library directories that will be handled
+       in the same way as the standard OTP library directory described above,
+       except that directories that do not have an _e_b_i_n directory will be
+       ignored.
+
+       All application directories found in the additional directories will
+       appear before the standard OTP applications, except for the Kernel and
+       STDLIB applications, which will be placed before any additional
+       applications. In other words, modules found in any of the additional
+       library directories will override modules with the same name in OTP,
+       except for modules in Kernel and STDLIB.
+
+       The environment variable _E_R_L___L_I_B_S (if defined) should contain a colon-
+       separated (for Unix-like systems) or semicolon-separated (for Windows)
+       list of additional libraries.
+
+       Example: On an Unix-like system, _E_R_L___L_I_B_S could be set to
+       _/_u_s_r_/_l_o_c_a_l_/_j_u_n_g_e_r_l_:_/_h_o_m_e_/_s_o_m_e___u_s_e_r_/_m_y___e_r_l_a_n_g___l_i_b. (On Windows, use
+       semi-colon as separator.)
+
+CCOODDEE PPAATTHH CCAACCHHEE
+       The code server incorporates a code path cache. The cache functionality
+       is disabled by default. To activate it, start the emulator with the
+       command line flag _-_c_o_d_e___p_a_t_h___c_a_c_h_e or call _c_o_d_e_:_r_e_h_a_s_h_(_). When the
+       cache is created (or updated), the code server searches for modules in
+       the code path directories. This may take some time if the the code path
+       is long. After the cache creation, the time for loading modules in a
+       large system (one with a large directory structure) is significantly
+       reduced compared to having the cache disabled. The code server is able
+       to look up the location of a module from the cache in constant time
+       instead of having to search through the code path directories.
+
+       Application resource files (_._a_p_p files) are also stored in the code
+       path cache. This feature is used by the application controller (see
+       aapppplliiccaattiioonn((33))) to load applications efficiently in large systems.
+
+       Note that when the code path cache is created (or updated), any
+       relative directory names in the code path are converted to absolute.
+
+LLOOAADDIINNGG OOFF CCOODDEE FFRROOMM AARRCCHHIIVVEE FFIILLEESS
+   WWaarrnniinngg::
+       The support for loading of code from archive files is experimental. The
+       sole purpose of releasing it before it is ready is to obtain early
+       feedback. The file format, semantics, interfaces etc. may be changed in
+       a future release. The function _l_i_b___d_i_r_/_2 and the flag _-_c_o_d_e___p_a_t_h___c_h_o_i_c_e
+       are also experimental.
+
+
+       In the current implementation, Erlang archives are _Z_I_P files with _._e_z
+       extension. Erlang archives may also be enclosed in _e_s_c_r_i_p_t files whose
+       file extension is arbitrary.
+
+       Erlang archive files may contain entire Erlang applications or parts of
+       applications. The structure in an archive file is the same as the
+       directory structure for an application. If you for example would create
+       an archive of _m_n_e_s_i_a_-_4_._4_._7, the archive file must be named
+       _m_n_e_s_i_a_-_4_._4_._7_._e_z and it must contain a top directory with the name
+       _m_n_e_s_i_a_-_4_._4_._7. If the version part of the name is omitted, it must also
+       be omitted in the archive. That is, a _m_n_e_s_i_a_._e_z archive must contain a
+       _m_n_e_s_i_a top directory.
+
+       An archive file for an application may for example be created like
+       this:
+
+          zip:create("mnesia-4.4.7.ez",
+                     ["mnesia-4.4.7"],
+                     [{cwd, code:lib_dir()},
+                      {compress, all},
+                      {uncompress,[".beam",".app"]}]).
+
+       Any file in the archive may be compressed, but in order to speed up the
+       access of frequently read files, it may be a good idea to store _b_e_a_m
+       and _a_p_p files uncompressed in the archive.
+
+       Normally the top directory of an application is located either in the
+       library directory _$_O_T_P_R_O_O_T_/_l_i_b or in a directory referred to by the
+       environment variable _E_R_L___L_I_B_S. At startup when the initial code path is
+       computed, the code server will also look for archive files in these
+       directories and possibly add _e_b_i_n directories in archives to the code
+       path. The code path will then contain paths to directories that looks
+       like _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_._e_z_/_m_n_e_s_i_a_/_e_b_i_n or
+       _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_._e_z_/_m_n_e_s_i_a_-_4_._4_._7_/_e_b_i_n.
+
+       The code server uses the module _e_r_l___p_r_i_m___l_o_a_d_e_r (possibly via the
+       _e_r_l___b_o_o_t___s_e_r_v_e_r) to read code files from archives. But the functions in
+       _e_r_l___p_r_i_m___l_o_a_d_e_r may also be used by other applications to read files
+       from archives. For example, the call _e_r_l___p_r_i_m___l_o_a_d_e_r_:_l_i_s_t___d_i_r_(
+       _"_/_o_t_p_/_r_o_o_t_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_._e_z_/_m_n_e_s_i_a_-_4_._4_._7_/_e_x_a_m_p_l_e_s_/_b_e_n_c_h_)_" would list
+       the contents of a directory inside an archive. See eerrll__pprriimm__llooaaddeerr((33)).
+
+       An application archive file and a regular application directory may
+       coexist. This may be useful when there is a need of having parts of the
+       application as regular files. A typical case is the _p_r_i_v directory
+       which must reside as a regular directory in order to be able to
+       dynamically link in drivers and start port programs. For other
+       applications that do not have this need, the _p_r_i_v directory may reside
+       in the archive and the files under the _p_r_i_v directory may be read via
+       the _e_r_l___p_r_i_m___l_o_a_d_e_r.
+
+       At the time point when a directory is added to the code path as well as
+       when the entire code path is (re)set, the code server will decide which
+       subdirectories in an application that shall be read from the archive
+       and which that shall be read as regular files. If directories are added
+       or removed afterwards, the file access may fail if the code path is not
+       updated (possibly to the same path as before in order to trigger the
+       directory resolution update). For each directory on the second level
+       (ebin, priv, src etc.) in the application archive, the code server will
+       firstly choose the regular directory if it exists and secondly from the
+       archive. The function _c_o_d_e_:_l_i_b___d_i_r_/_2 returns the path to the
+       subdirectory. For example _c_o_d_e_:_l_i_b___d_i_r_(_m_e_g_a_c_o_,_e_b_i_n_) may return
+       _/_o_t_p_/_r_o_o_t_/_l_i_b_/_m_e_g_a_c_o_-_3_._9_._1_._1_._e_z_/_m_e_g_a_c_o_-_3_._9_._1_._1_/_e_b_i_n while
+       _c_o_d_e_:_l_i_b___d_i_r_(_m_e_g_a_c_o_,_p_r_i_v_) may return _/_o_t_p_/_r_o_o_t_/_l_i_b_/_m_e_g_a_c_o_-_3_._9_._1_._1_/_p_r_i_v.
+
+       When an _e_s_c_r_i_p_t file contains an archive, there are neither
+       restrictions on the name of the _e_s_c_r_i_p_t nor on how many applications
+       that may be stored in the embedded archive. Single _b_e_a_m files may also
+       reside on the top level in the archive. At startup, both the top
+       directory in the embedded archive as well as all (second level) _e_b_i_n
+       directories in the embedded archive are added to the code path. See
+       eessccrriipptt((11))
+
+       When the choice of directories in the code path is _s_t_r_i_c_t, the
+       directory that ends up in the code path will be exactly the stated one.
+       This means that if for example the directory
+       _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_/_e_b_i_n is explicitly added to the code path,
+       the code server will not load files from
+       _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_._e_z_/_m_n_e_s_i_a_-_4_._4_._7_/_e_b_i_n and vice versa.
+
+       This behavior can be controlled via the command line flag
+       _-_c_o_d_e___p_a_t_h___c_h_o_i_c_e _C_h_o_i_c_e. If the flag is set to _r_e_l_a_x_e_d, the code
+       server will instead choose a suitable directory depending on the actual
+       file structure. If there exists a regular application ebin
+       directory,situation it will be chosen. But if it does not exist, the
+       ebin directory in the archive is chosen if it exists. If neither of
+       them exists the original directory will be chosen.
+
+       The command line flag _-_c_o_d_e___p_a_t_h___c_h_o_i_c_e _C_h_o_i_c_e does also affect how
+       _i_n_i_t interprets the _b_o_o_t _s_c_r_i_p_t. The interpretation of the explicit
+       code paths in the _b_o_o_t _s_c_r_i_p_t may be _s_t_r_i_c_t or _r_e_l_a_x_e_d. It is
+       particular useful to set the flag to _r_e_l_a_x_e_d when you want to elaborate
+       with code loading from archives without editing the _b_o_o_t _s_c_r_i_p_t. The
+       default is _r_e_l_a_x_e_d. See iinniitt((33))
+
+CCUURRRREENNTT AANNDD OOLLDD CCOODDEE
+       The code of a module can exists in two variants in a system: _c_u_r_r_e_n_t
+       _c_o_d_e and _o_l_d _c_o_d_e. When a module is loaded into the system for the
+       first time, the code of the module becomes 'current' and the global
+       _e_x_p_o_r_t _t_a_b_l_e is updated with references to all functions exported from
+       the module.
+
+       If then a new instance of the module is loaded (perhaps because of the
+       correction of an error), then the code of the previous instance becomes
+       'old', and all export entries referring to the previous instance are
+       removed. After that the new instance is loaded as if it was loaded for
+       the first time, as described above, and becomes 'current'.
+
+       Both old and current code for a module are valid, and may even be
+       evaluated concurrently. The difference is that exported functions in
+       old code are unavailable. Hence there is no way to make a global call
+       to an exported function in old code, but old code may still be
+       evaluated because of processes lingering in it.
+
+       If a third instance of the module is loaded, the code server will
+       remove (purge) the old code and any processes lingering in it will be
+       terminated. Then the third instance becomes 'current' and the
+       previously current code becomes 'old'.
+
+       For more information about old and current code, and how to make a
+       process switch from old to current code, refer to EErrllaanngg RReeffeerreennccee
+       MMaannuuaall.
+
+AARRGGUUMMEENNTT TTYYPPEESS AANNDD IINNVVAALLIIDD AARRGGUUMMEENNTTSS
+       Generally, module and application names are atoms, while file and
+       directory names are strings. For backward compatibility reasons, some
+       functions accept both strings and atoms, but a future release will
+       probably only allow the arguments that are documented.
+
+       From the R12B release, functions in this module will generally fail
+       with an exception if they are passed an incorrect type (for instance,
+       an integer or a tuple where an atom was expected). An error tuple will
+       be returned if type of argument was correct, but there was some other
+       error (for instance, a non-existing directory given to _s_e_t___p_a_t_h_/_1.
+
+DDAATTAA TTYYPPEESS
+       llooaadd__rreett(()) = {error, What :: llooaadd__eerrrroorr__rrssnn(())}
+                  | {module, Module :: module()}
+
+       llooaadd__eerrrroorr__rrssnn(()) = badfile
+                        | native_code
+                        | nofile
+                        | not_purged
+                        | on_load
+                        | sticky_directory
+
+EEXXPPOORRTTSS
+       sseett__ppaatthh((PPaatthh)) -->> ttrruuee || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Path = [Dir :: ffiillee::ffiilleennaammee(())]
+                 What = bad_directory | bad_path
+
+              Sets the code path to the list of directories _P_a_t_h.
+
+              Returns _t_r_u_e if successful, or _{_e_r_r_o_r_, _b_a_d___d_i_r_e_c_t_o_r_y_} if any _D_i_r
+              is not the name of a directory, or _{_e_r_r_o_r_, _b_a_d___p_a_t_h_} if the
+              argument is invalid.
+
+       ggeett__ppaatthh(()) -->> PPaatthh
+
+              Types:
+
+                 Path = [Dir :: ffiillee::ffiilleennaammee(())]
+
+              Returns the code path
+
+       aadddd__ppaatthh((DDiirr)) -->> aadddd__ppaatthh__rreett(())
+
+       aadddd__ppaatthhzz((DDiirr)) -->> aadddd__ppaatthh__rreett(())
+
+              Types:
+
+                 Dir = ffiillee::ffiilleennaammee(())
+                 aadddd__ppaatthh__rreett(()) = true | {error, bad_directory}
+
+              Adds _D_i_r to the code path. The directory is added as the last
+              directory in the new path. If _D_i_r already exists in the path, it
+              is not added.
+
+              Returns _t_r_u_e if successful, or _{_e_r_r_o_r_, _b_a_d___d_i_r_e_c_t_o_r_y_} if _D_i_r is
+              not the name of a directory.
+
+       aadddd__ppaatthhaa((DDiirr)) -->> aadddd__ppaatthh__rreett(())
+
+              Types:
+
+                 Dir = ffiillee::ffiilleennaammee(())
+                 aadddd__ppaatthh__rreett(()) = true | {error, bad_directory}
+
+              Adds _D_i_r to the beginning of the code path. If _D_i_r already
+              exists, it is removed from the old position in the code path.
+
+              Returns _t_r_u_e if successful, or _{_e_r_r_o_r_, _b_a_d___d_i_r_e_c_t_o_r_y_} if _D_i_r is
+              not the name of a directory.
+
+       aadddd__ppaatthhss((DDiirrss)) -->> ookk
+
+       aadddd__ppaatthhsszz((DDiirrss)) -->> ookk
+
+              Types:
+
+                 Dirs = [Dir :: ffiillee::ffiilleennaammee(())]
+
+              Adds the directories in _D_i_r_s to the end of the code path. If a
+              _D_i_r already exists, it is not added. This function always
+              returns _o_k, regardless of the validity of each individual _D_i_r.
+
+       aadddd__ppaatthhssaa((DDiirrss)) -->> ookk
+
+              Types:
+
+                 Dirs = [Dir :: ffiillee::ffiilleennaammee(())]
+
+              Adds the directories in _D_i_r_s to the beginning of the code path.
+              If a _D_i_r already exists, it is removed from the old position in
+              the code path. This function always returns _o_k, regardless of
+              the validity of each individual _D_i_r.
+
+       ddeell__ppaatthh((NNaammeeOOrrDDiirr)) -->> bboooolleeaann(()) || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 NameOrDir = Name | Dir
+                 Name = atom()
+                 Dir = ffiillee::ffiilleennaammee(())
+                 What = bad_name
+
+              Deletes a directory from the code path. The argument can be an
+              atom _N_a_m_e, in which case the directory with the name
+              _._._._/_N_a_m_e_[_-_V_s_n_]_[_/_e_b_i_n_] is deleted from the code path. It is also
+              possible to give the complete directory name _D_i_r as argument.
+
+              Returns _t_r_u_e if successful, or _f_a_l_s_e if the directory is not
+              found, or _{_e_r_r_o_r_, _b_a_d___n_a_m_e_} if the argument is invalid.
+
+       rreeppllaaccee__ppaatthh((NNaammee,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Name = atom()
+                 Dir = ffiillee::ffiilleennaammee(())
+                 What = bad_directory | bad_name | {badarg, term()}
+
+              This function replaces an old occurrence of a directory named
+              _._._._/_N_a_m_e_[_-_V_s_n_]_[_/_e_b_i_n_], in the code path, with _D_i_r. If _N_a_m_e does
+              not exist, it adds the new directory _D_i_r last in the code path.
+              The new directory must also be named _._._._/_N_a_m_e_[_-_V_s_n_]_[_/_e_b_i_n_]. This
+              function should be used if a new version of the directory
+              (library) is added to a running system.
+
+              Returns _t_r_u_e if successful, or _{_e_r_r_o_r_, _b_a_d___n_a_m_e_} if _N_a_m_e is not
+              found, or _{_e_r_r_o_r_, _b_a_d___d_i_r_e_c_t_o_r_y_} if _D_i_r does not exist, or
+              _{_e_r_r_o_r_, _{_b_a_d_a_r_g_, _[_N_a_m_e_, _D_i_r_]_}_} if _N_a_m_e or _D_i_r is invalid.
+
+       llooaadd__ffiillee((MMoodduullee)) -->> llooaadd__rreett(())
+
+              Types:
+
+                 Module = module()
+                 llooaadd__rreett(()) = {error, What :: llooaadd__eerrrroorr__rrssnn(())}
+                            | {module, Module :: module()}
+
+              Tries to load the Erlang module _M_o_d_u_l_e, using the code path. It
+              looks for the object code file with an extension that
+              corresponds to the Erlang machine used, for example _M_o_d_u_l_e_._b_e_a_m.
+              The loading fails if the module name found in the object code
+              differs from the name _M_o_d_u_l_e. llooaadd__bbiinnaarryy//33 must be used to load
+              object code with a module name that is different from the file
+              name.
+
+              Returns _{_m_o_d_u_l_e_, _M_o_d_u_l_e_} if successful, or _{_e_r_r_o_r_, _n_o_f_i_l_e_} if no
+              object code is found, or _{_e_r_r_o_r_, _s_t_i_c_k_y___d_i_r_e_c_t_o_r_y_} if the object
+              code resides in a sticky directory. Also if the loading fails,
+              an error tuple is returned. See eerrllaanngg::llooaadd__mmoodduullee//22 for
+              possible values of _W_h_a_t.
+
+       llooaadd__aabbss((FFiilleennaammee)) -->> llooaadd__rreett(())
+
+              Types:
+
+                 Filename = ffiillee::ffiilleennaammee(())
+                 llooaadd__rreett(()) = {error, What :: llooaadd__eerrrroorr__rrssnn(())}
+                            | {module, Module :: module()}
+                 llooaaddeedd__ffiilleennaammee(()) = (Filename :: ffiillee::ffiilleennaammee(()))
+                                   | llooaaddeedd__rreett__aattoommss(())
+                 llooaaddeedd__rreett__aattoommss(()) = cover_compiled | preloaded
+
+              Does the same as _l_o_a_d___f_i_l_e_(_M_o_d_u_l_e_), but _F_i_l_e_n_a_m_e is either an
+              absolute file name, or a relative file name. The code path is
+              not searched. It returns a value in the same way as llooaadd__ffiillee//11.
+              Note that _F_i_l_e_n_a_m_e should not contain the extension (for example
+              _"_._b_e_a_m_"); _l_o_a_d___a_b_s_/_1 adds the correct extension itself.
+
+       eennssuurree__llooaaddeedd((MMoodduullee)) -->> {{mmoodduullee,, MMoodduullee}} || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Module = module()
+                 What = embedded | badfile | native_code | nofile | on_load
+
+              Tries to to load a module in the same way as llooaadd__ffiillee//11, unless
+              the module is already loaded. In embedded mode, however, it does
+              not load a module which is not already loaded, but returns
+              _{_e_r_r_o_r_, _e_m_b_e_d_d_e_d_} instead.
+
+       llooaadd__bbiinnaarryy((MMoodduullee,, FFiilleennaammee,, BBiinnaarryy)) -->>
+                      {{mmoodduullee,, MMoodduullee}} || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Module = module()
+                 Filename = llooaaddeedd__ffiilleennaammee(())
+                 Binary = binary()
+                 What = badarg | llooaadd__eerrrroorr__rrssnn(())
+                 llooaaddeedd__ffiilleennaammee(()) = (Filename :: ffiillee::ffiilleennaammee(()))
+                                   | llooaaddeedd__rreett__aattoommss(())
+                 llooaaddeedd__rreett__aattoommss(()) = cover_compiled | preloaded
+
+              This function can be used to load object code on remote Erlang
+              nodes. The argument _B_i_n_a_r_y must contain object code for _M_o_d_u_l_e.
+              _F_i_l_e_n_a_m_e is only used by the code server to keep a record of
+              from which file the object code for _M_o_d_u_l_e comes. Accordingly,
+              _F_i_l_e_n_a_m_e is not opened and read by the code server.
+
+              Returns _{_m_o_d_u_l_e_, _M_o_d_u_l_e_} if successful, or _{_e_r_r_o_r_,
+              _s_t_i_c_k_y___d_i_r_e_c_t_o_r_y_} if the object code resides in a sticky
+              directory, or _{_e_r_r_o_r_, _b_a_d_a_r_g_} if any argument is invalid. Also
+              if the loading fails, an error tuple is returned. See
+              eerrllaanngg::llooaadd__mmoodduullee//22 for possible values of _W_h_a_t.
+
+       ddeelleettee((MMoodduullee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Module = module()
+
+              Removes the current code for _M_o_d_u_l_e, that is, the current code
+              for _M_o_d_u_l_e is made old. This means that processes can continue
+              to execute the code in the module, but that no external function
+              calls can be made to it.
+
+              Returns _t_r_u_e if successful, or _f_a_l_s_e if there is old code for
+              _M_o_d_u_l_e which must be purged first, or if _M_o_d_u_l_e is not a
+              (loaded) module.
+
+       ppuurrggee((MMoodduullee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Module = module()
+
+              Purges the code for _M_o_d_u_l_e, that is, removes code marked as old.
+              If some processes still linger in the old code, these processes
+              are killed before the code is removed.
+
+              Returns _t_r_u_e if successful and any process needed to be killed,
+              otherwise _f_a_l_s_e.
+
+       ssoofftt__ppuurrggee((MMoodduullee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Module = module()
+
+              Purges the code for _M_o_d_u_l_e, that is, removes code marked as old,
+              but only if no processes linger in it.
+
+              Returns _f_a_l_s_e if the module could not be purged due to processes
+              lingering in old code, otherwise _t_r_u_e.
+
+       iiss__llooaaddeedd((MMoodduullee)) -->> {{ffiillee,, LLooaaddeedd}} || ffaallssee
+
+              Types:
+
+                 Module = module()
+                 Loaded = llooaaddeedd__ffiilleennaammee(())
+                 llooaaddeedd__ffiilleennaammee(()) = (Filename :: ffiillee::ffiilleennaammee(()))
+                                   | llooaaddeedd__rreett__aattoommss(())
+                   _F_i_l_e_n_a_m_e is an absolute filename
+                 llooaaddeedd__rreett__aattoommss(()) = cover_compiled | preloaded
+
+              Checks if _M_o_d_u_l_e is loaded. If it is, _{_f_i_l_e_, _L_o_a_d_e_d_} is
+              returned, otherwise _f_a_l_s_e.
+
+              Normally, _L_o_a_d_e_d is the absolute file name _F_i_l_e_n_a_m_e from which
+              the code was obtained. If the module is preloaded (see
+              ssccrriipptt((44))), _L_o_a_d_e_d_=_=_p_r_e_l_o_a_d_e_d. If the module is Cover compiled
+              (see ccoovveerr((33))), _L_o_a_d_e_d_=_=_c_o_v_e_r___c_o_m_p_i_l_e_d.
+
+       aallll__llooaaddeedd(()) -->> [[{{MMoodduullee,, LLooaaddeedd}}]]
+
+              Types:
+
+                 Module = module()
+                 Loaded = llooaaddeedd__ffiilleennaammee(())
+                 llooaaddeedd__ffiilleennaammee(()) = (Filename :: ffiillee::ffiilleennaammee(()))
+                                   | llooaaddeedd__rreett__aattoommss(())
+                   _F_i_l_e_n_a_m_e is an absolute filename
+                 llooaaddeedd__rreett__aattoommss(()) = cover_compiled | preloaded
+
+              Returns a list of tuples _{_M_o_d_u_l_e_, _L_o_a_d_e_d_} for all loaded
+              modules. _L_o_a_d_e_d is normally the absolute file name, as described
+              for iiss__llooaaddeedd//11.
+
+       wwhhiicchh((MMoodduullee)) -->> WWhhiicchh
+
+              Types:
+
+                 Module = module()
+                 Which = ffiillee::ffiilleennaammee(()) | llooaaddeedd__rreett__aattoommss(()) | non_existing
+                 llooaaddeedd__rreett__aattoommss(()) = cover_compiled | preloaded
+
+              If the module is not loaded, this function searches the code
+              path for the first file which contains object code for _M_o_d_u_l_e
+              and returns the absolute file name. If the module is loaded, it
+              returns the name of the file which contained the loaded object
+              code. If the module is pre-loaded, _p_r_e_l_o_a_d_e_d is returned. If the
+              module is Cover compiled, _c_o_v_e_r___c_o_m_p_i_l_e_d is returned.
+              _n_o_n___e_x_i_s_t_i_n_g is returned if the module cannot be found.
+
+       ggeett__oobbjjeecctt__ccooddee((MMoodduullee)) -->> {{MMoodduullee,, BBiinnaarryy,, FFiilleennaammee}} || eerrrroorr
+
+              Types:
+
+                 Module = module()
+                 Binary = binary()
+                 Filename = ffiillee::ffiilleennaammee(())
+
+              Searches the code path for the object code of the module _M_o_d_u_l_e.
+              It returns _{_M_o_d_u_l_e_, _B_i_n_a_r_y_, _F_i_l_e_n_a_m_e_} if successful, and _e_r_r_o_r
+              if not. _B_i_n_a_r_y is a binary data object which contains the object
+              code for the module. This can be useful if code is to be loaded
+              on a remote node in a distributed system. For example, loading
+              module _M_o_d_u_l_e on a node _N_o_d_e is done as follows:
+
+              {_Module, Binary, Filename} = code:get_object_code(Module),
+              rpc:call(Node, code, load_binary, [Module, Filename, Binary]),
+
+       rroooott__ddiirr(()) -->> ffiillee::ffiilleennaammee(())
+
+              Returns the root directory of Erlang/OTP, which is the directory
+              where it is installed.
+
+              > code:root_dir().
+              "/usr/local/otp"
+
+       lliibb__ddiirr(()) -->> ffiillee::ffiilleennaammee(())
+
+              Returns the library directory, _$_O_T_P_R_O_O_T_/_l_i_b, where _$_O_T_P_R_O_O_T is
+              the root directory of Erlang/OTP.
+
+              > code:lib_dir().
+              "/usr/local/otp/lib"
+
+       lliibb__ddiirr((NNaammee)) -->> ffiillee::ffiilleennaammee(()) || {{eerrrroorr,, bbaadd__nnaammee}}
+
+              Types:
+
+                 Name = atom()
+
+              This function is mainly intended for finding out the path for
+              the "library directory", the top directory, for an application
+              _N_a_m_e located under _$_O_T_P_R_O_O_T_/_l_i_b or on a directory referred to
+              via the _E_R_L___L_I_B_S environment variable.
+
+              If there is a regular directory called _N_a_m_e or _N_a_m_e_-_V_s_n in the
+              code path with an _e_b_i_n subdirectory, the path to this directory
+              is returned (not the _e_b_i_n directory). If the directory refers to
+              a directory in an archive, the archive name is stripped away
+              before the path is returned. For example, if the directory
+              _/_u_s_r_/_l_o_c_a_l_/_o_t_p_/_l_i_b_/_m_n_e_s_i_a_-_4_._2_._2_._e_z_/_m_n_e_s_i_a_-_4_._2_._2_/_e_b_i_n is in the
+              path, _/_u_s_r_/_l_o_c_a_l_/_o_t_p_/_l_i_b_/_m_n_e_s_i_a_-_4_._2_._2_/_e_b_i_n will be returned.
+              This means that the library directory for an application is the
+              same, regardless of whether the application resides in an
+              archive or not.
+
+              > code:lib_dir(mnesia).
+              "/usr/local/otp/lib/mnesia-4.2.2"
+
+              Returns _{_e_r_r_o_r_, _b_a_d___n_a_m_e_} if _N_a_m_e is not the name of an
+              application under _$_O_T_P_R_O_O_T_/_l_i_b or on a directory referred to via
+              the _E_R_L___L_I_B_S environment variable. Fails with an exception if
+              _N_a_m_e has the wrong type.
+
+          WWaarrnniinngg::
+              For backward compatibility, _N_a_m_e is also allowed to be a string.
+              That will probably change in a future release.
+
+
+       lliibb__ddiirr((NNaammee,, SSuubbDDiirr)) -->> ffiillee::ffiilleennaammee(()) || {{eerrrroorr,, bbaadd__nnaammee}}
+
+              Types:
+
+                 Name = SubDir = atom()
+
+              Returns the path to a subdirectory directly under the top
+              directory of an application. Normally the subdirectories resides
+              under the top directory for the application, but when
+              applications at least partly resides in an archive the situation
+              is different. Some of the subdirectories may reside as regular
+              directories while other resides in an archive file. It is not
+              checked if this directory really exists.
+
+              > code:lib_dir(megaco, priv).
+              "/usr/local/otp/lib/megaco-3.9.1.1/priv"
+
+              Fails with an exception if _N_a_m_e or _S_u_b_D_i_r has the wrong type.
+
+       ccoommppiilleerr__ddiirr(()) -->> ffiillee::ffiilleennaammee(())
+
+              Returns the compiler library directory. Equivalent to
+              _c_o_d_e_:_l_i_b___d_i_r_(_c_o_m_p_i_l_e_r_).
+
+       pprriivv__ddiirr((NNaammee)) -->> ffiillee::ffiilleennaammee(()) || {{eerrrroorr,, bbaadd__nnaammee}}
+
+              Types:
+
+                 Name = atom()
+
+              Returns the path to the _p_r_i_v directory in an application.
+              Equivalent to _c_o_d_e_:_l_i_b___d_i_r_(_N_a_m_e_, _p_r_i_v_)_..
+
+          WWaarrnniinngg::
+              For backward compatibility, _N_a_m_e is also allowed to be a string.
+              That will probably change in a future release.
+
+
+       oobbjjffiillee__eexxtteennssiioonn(()) -->> nnoonneemmppttyy__ssttrriinngg(())
+
+              Returns the object code file extension that corresponds to the
+              Erlang machine used, namely _"_._b_e_a_m_".
+
+       ssttiicckk__ddiirr((DDiirr)) -->> ookk || eerrrroorr
+
+              Types:
+
+                 Dir = ffiillee::ffiilleennaammee(())
+
+              This function marks _D_i_r as sticky.
+
+              Returns _o_k if successful or _e_r_r_o_r if not.
+
+       uunnssttiicckk__ddiirr((DDiirr)) -->> ookk || eerrrroorr
+
+              Types:
+
+                 Dir = ffiillee::ffiilleennaammee(())
+
+              This function unsticks a directory which has been marked as
+              sticky.
+
+              Returns _o_k if successful or _e_r_r_o_r if not.
+
+       iiss__ssttiicckkyy((MMoodduullee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Module = module()
+
+              This function returns _t_r_u_e if _M_o_d_u_l_e is the name of a module
+              that has been loaded from a sticky directory (or in other words:
+              an attempt to reload the module will fail), or _f_a_l_s_e if _M_o_d_u_l_e
+              is not a loaded module or is not sticky.
+
+       rreehhaasshh(()) -->> ookk
+
+              This function creates or rehashes the code path cache.
+
+       wwhheerree__iiss__ffiillee((FFiilleennaammee)) -->> nnoonn__eexxiissttiinngg || AAbbssnnaammee
+
+              Types:
+
+                 Filename = Absname = ffiillee::ffiilleennaammee(())
+
+              Searches the code path for _F_i_l_e_n_a_m_e, a file of arbitrary type.
+              If found, the full name is returned. _n_o_n___e_x_i_s_t_i_n_g is returned if
+              the file cannot be found. The function can be useful, for
+              example, to locate application resource files. If the code path
+              cache is used, the code server will efficiently read the full
+              name from the cache, provided that _F_i_l_e_n_a_m_e is an object code
+              file or an _._a_p_p file.
+
+       ccllaasshh(()) -->> ookk
+
+              Searches the entire code space for module names with identical
+              names and writes a report to _s_t_d_o_u_t.
+
+       iiss__mmoodduullee__nnaattiivvee((MMoodduullee)) -->> bboooolleeaann(()) || uunnddeeffiinneedd
+
+              Types:
+
+                 Module = module()
+
+              This function returns _t_r_u_e if _M_o_d_u_l_e is name of a loaded module
+              that has native code loaded, and _f_a_l_s_e if _M_o_d_u_l_e is loaded but
+              does not have native. If _M_o_d_u_l_e is not loaded, this function
+              returns _u_n_d_e_f_i_n_e_d.
+
+
+
+Ericsson AB                      kernel 2.15.2                         code(3)

@@ -1,0 +1,301 @@
+wxChoicebook(3)            Erlang Module Definition            wxChoicebook(3)
+
+
+
+NNAAMMEE
+       wxChoicebook - See external documentation: wxChoicebook.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxChoicebook.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_h_o_i_c_e_b_o_o_k_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCChhooiicceebbooookk(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxCChhooiicceebbooookk(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxCChhooiicceebbooookk(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       aaddddPPaaggee((TThhiiss,, PPaaggee,, TTeexxtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 Page = wxWindow() (see module wxWindow)
+                 Text = chardata() (see module unicode)
+
+              Equivalent to aaddddPPaaggee((TThhiiss,, PPaaggee,, TTeexxtt,, [[]])).
+
+       aaddddPPaaggee((TThhiiss,, PPaaggee,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 Page = wxWindow() (see module wxWindow)
+                 Text = chardata() (see module unicode)
+                 Option = {bSelect, boolean()} | {imageId, integer()}
+
+              See external documentation.
+
+       aaddvvaanncceeSSeelleeccttiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxChoicebook()
+
+              Equivalent to aaddvvaanncceeSSeelleeccttiioonn((TThhiiss,, [[]])).
+
+       aaddvvaanncceeSSeelleeccttiioonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxChoicebook()
+                 Option = {forward, boolean()}
+
+              See external documentation.
+
+       aassssiiggnnIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxChoicebook()
+                 ImageList = wxImageList() (see module wxImageList)
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ddeelleetteeAAllllPPaaggeess((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+
+              See external documentation.
+
+       ddeelleetteePPaaggee((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       rreemmoovveePPaaggee((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettCCuurrrreennttPPaaggee((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxChoicebook()
+
+              See external documentation.
+
+       ggeettIImmaaggeeLLiisstt((TThhiiss)) -->> wwxxIImmaaggeeLLiisstt(()) ((sseeee mmoodduullee wwxxIImmaaggeeLLiisstt))
+
+              Types:
+
+                 This = wxChoicebook()
+
+              See external documentation.
+
+       ggeettPPaaggee((TThhiiss,, NN)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettPPaaggeeCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxChoicebook()
+
+              See external documentation.
+
+       ggeettPPaaggeeIImmaaggee((TThhiiss,, NN)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettPPaaggeeTTeexxtt((TThhiiss,, NN)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxChoicebook()
+
+              See external documentation.
+
+       hhiittTTeesstt((TThhiiss,, PPtt)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::integer(), Flags::integer()}
+                 This = wxChoicebook()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       iinnsseerrttPPaaggee((TThhiiss,, NN,, PPaaggee,, TTeexxtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+                 Page = wxWindow() (see module wxWindow)
+                 Text = chardata() (see module unicode)
+
+              Equivalent to iinnsseerrttPPaaggee((TThhiiss,, NN,, PPaaggee,, TTeexxtt,, [[]])).
+
+       iinnsseerrttPPaaggee((TThhiiss,, NN,, PPaaggee,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+                 Page = wxWindow() (see module wxWindow)
+                 Text = chardata() (see module unicode)
+                 Option = {bSelect, boolean()} | {imageId, integer()}
+
+              See external documentation.
+
+       sseettIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxChoicebook()
+                 ImageList = wxImageList() (see module wxImageList)
+
+              See external documentation.
+
+       sseettPPaaggeeSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxChoicebook()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettPPaaggeeIImmaaggee((TThhiiss,, NN,, IImmaaggeeIIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+                 ImageId = integer()
+
+              See external documentation.
+
+       sseettPPaaggeeTTeexxtt((TThhiiss,, NN,, SSttrrTTeexxtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+                 StrText = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, NN)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       cchhaannggeeSSeelleeccttiioonn((TThhiiss,, NN)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxChoicebook()
+                 N = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxCChhooiicceebbooookk(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxChoicebook(3)

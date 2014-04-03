@@ -1,0 +1,655 @@
+ms_transform(3)            Erlang Module Definition            ms_transform(3)
+
+
+
+NNAAMMEE
+       ms_transform - Parse_transform that translates fun syntax into match
+       specifications.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements the parse_transform that makes calls to _e_t_s and
+       _d_b_g:_f_u_n_2_m_s_/_1 translate into literal match specifications. It also
+       implements the back end for the same functions when called from the
+       Erlang shell.
+
+       The translations from fun's to match_specs is accessed through the two
+       "pseudo functions" _e_t_s_:_f_u_n_2_m_s_/_1 and _d_b_g_:_f_u_n_2_m_s_/_1.
+
+       Actually this introduction is more or less an introduction to the whole
+       concept of match specifications. Since everyone trying to use
+       _e_t_s_:_s_e_l_e_c_t or _d_b_g seems to end up reading this page, it seems in good
+       place to explain a little more than just what this module does.
+
+       There are some caveats one should be aware of, please read through the
+       whole manual page if it's the first time you're using the
+       transformations.
+
+       Match specifications are used more or less as filters. They resemble
+       usual Erlang matching in a list comprehension or in a _f_u_n used in
+       conjunction with _l_i_s_t_s_:_f_o_l_d_l etc. The syntax of pure match
+       specifications is somewhat awkward though, as they are made up purely
+       by Erlang terms and there is no syntax in the language to make the
+       match specifications more readable.
+
+       As the match specifications execution and structure is quite like that
+       of a fun, it would for most programmers be more straight forward to
+       simply write it using the familiar fun syntax and having that
+       translated into a match specification automatically. Of course a real
+       fun is more powerful than the match specifications allow, but bearing
+       the match specifications in mind, and what they can do, it's still more
+       convenient to write it all as a fun. This module contains the code that
+       simply translates the fun syntax into match_spec terms.
+
+       Let's start with an ets example. Using _e_t_s_:_s_e_l_e_c_t and a match
+       specification, one can filter out rows of a table and construct a list
+       of tuples containing relevant parts of the data in these rows. Of
+       course one could use _e_t_s_:_f_o_l_d_l instead, but the select call is far more
+       efficient. Without the translation, one has to struggle with writing
+       match specifications terms to accommodate this, or one has to resort to
+       the less powerful _e_t_s_:_m_a_t_c_h_(___o_b_j_e_c_t_) calls, or simply give up and use
+       the more inefficient method of _e_t_s_:_f_o_l_d_l. Using the _e_t_s_:_f_u_n_2_m_s
+       transformation, a _e_t_s_:_s_e_l_e_c_t call is at least as easy to write as any
+       of the alternatives.
+
+       As an example, consider a simple table of employees:
+
+       -record(emp, {empno,     %Employee number as a string, the key
+                     surname,   %Surname of the employee
+                     givenname, %Given name of employee
+                     dept,      %Department one of {dev,sales,prod,adm}
+                     empyear}). %Year the employee was employed
+
+       We create the table using:
+
+       ets:new(emp_tab,[{keypos,#emp.empno},named_table,ordered_set]).
+
+       Let's also fill it with some randomly chosen data for the examples:
+
+       [{emp,"011103","Black","Alfred",sales,2000},
+        {emp,"041231","Doe","John",prod,2001},
+        {emp,"052341","Smith","John",dev,1997},
+        {emp,"076324","Smith","Ella",sales,1995},
+        {emp,"122334","Weston","Anna",prod,2002},
+        {emp,"535216","Chalker","Samuel",adm,1998},
+        {emp,"789789","Harrysson","Joe",adm,1996},
+        {emp,"963721","Scott","Juliana",dev,2003},
+        {emp,"989891","Brown","Gabriel",prod,1999}]
+
+       Now, the amount of data in the table is of course to small to justify
+       complicated ets searches, but on real tables, using _s_e_l_e_c_t to get
+       exactly the data you want will increase efficiency remarkably.
+
+       Lets say for example that we'd want the employee numbers of everyone in
+       the sales department. One might use _e_t_s_:_m_a_t_c_h in such a situation:
+
+       1> ets:match(emp_tab, {'_', '$1', '_', '_', sales, '_'}).
+       [["011103"],["076324"]]
+
+       Even though _e_t_s_:_m_a_t_c_h does not require a full match specification, but
+       a simpler type, it's still somewhat unreadable, and one has little
+       control over the returned result, it's always a list of lists. OK, one
+       might use _e_t_s_:_f_o_l_d_l or _e_t_s_:_f_o_l_d_r instead:
+
+       ets:foldr(fun(#emp{empno = E, dept = sales},Acc) -> [E | Acc];
+                    (_,Acc) -> Acc
+                 end,
+                 [],
+                 emp_tab).
+
+       Running that would result in _[_"_0_1_1_1_0_3_"_,_"_0_7_6_3_2_4_"_] , which at least gets
+       rid of the extra lists. The fun is also quite straightforward, so the
+       only problem is that all the data from the table has to be transferred
+       from the table to the calling process for filtering. That's inefficient
+       compared to the _e_t_s_:_m_a_t_c_h call where the filtering can be done "inside"
+       the emulator and only the result is transferred to the process.
+       Remember that ets tables are all about efficiency, if it wasn't for
+       efficiency all of ets could be implemented in Erlang, as a process
+       receiving requests and sending answers back. One uses ets because one
+       wants performance, and therefore one wouldn't want all of the table
+       transferred to the process for filtering. OK, let's look at a pure
+       _e_t_s_:_s_e_l_e_c_t call that does what the _e_t_s_:_f_o_l_d_r does:
+
+       ets:select(emp_tab,[{#emp{empno = '$1', dept = sales, _='_'},[],['$1']}]).
+
+       Even though the record syntax is used, it's still somewhat hard to read
+       and even harder to write. The first element of the tuple, _#_e_m_p_{_e_m_p_n_o _=
+       _'_$_1_'_, _d_e_p_t _= _s_a_l_e_s_, ___=_'___'_} tells what to match, elements not matching
+       this will not be returned at all, as in the _e_t_s_:_m_a_t_c_h example. The
+       second element, the empty list is a list of guard expressions, which we
+       need none, and the third element is the list of expressions
+       constructing the return value (in ets this almost always is a list
+       containing one single term). In our case _'_$_1_' is bound to the employee
+       number in the head (first element of tuple), and hence it is the
+       employee number that is returned. The result is _[_"_0_1_1_1_0_3_"_,_"_0_7_6_3_2_4_"_],
+       just as in the _e_t_s_:_f_o_l_d_r example, but the result is retrieved much more
+       efficiently in terms of execution speed and memory consumption.
+
+       We have one efficient but hardly readable way of doing it and one
+       inefficient but fairly readable (at least to the skilled Erlang
+       programmer) way of doing it. With the use of _e_t_s_:_f_u_n_2_m_s, one could have
+       something that is as efficient as possible but still is written as a
+       filter using the fun syntax:
+
+       -include_lib("stdlib/include/ms_transform.hrl").
+
+       % ...
+
+       ets:select(emp_tab, ets:fun2ms(
+                             fun(#emp{empno = E, dept = sales}) ->
+                                     E
+                             end)).
+
+       This may not be the shortest of the expressions, but it requires no
+       special knowledge of match specifications to read. The fun's head
+       should simply match what you want to filter out and the body returns
+       what you want returned. As long as the fun can be kept within the
+       limits of the match specifications, there is no need to transfer all
+       data of the table to the process for filtering as in the _e_t_s_:_f_o_l_d_r
+       example. In fact it's even easier to read then the _e_t_s_:_f_o_l_d_r example,
+       as the select call in itself discards anything that doesn't match,
+       while the fun of the _f_o_l_d_r call needs to handle both the elements
+       matching and the ones not matching.
+
+       It's worth noting in the above _e_t_s_:_f_u_n_2_m_s example that one needs to
+       include _m_s___t_r_a_n_s_f_o_r_m_._h_r_l in the source code, as this is what triggers
+       the parse transformation of the _e_t_s_:_f_u_n_2_m_s call to a valid match
+       specification. This also implies that the transformation is done at
+       compile time (except when called from the shell of course) and
+       therefore will take no resources at all in runtime. So although you use
+       the more intuitive fun syntax, it gets as efficient in runtime as
+       writing match specifications by hand.
+
+       Let's look at some more _e_t_s examples. Let's say one wants to get all
+       the employee numbers of any employee hired before the year 2000. Using
+       _e_t_s_:_m_a_t_c_h isn't an alternative here as relational operators cannot be
+       expressed there. Once again, an _e_t_s_:_f_o_l_d_r could do it (slowly, but
+       correct):
+
+       ets:foldr(fun(#emp{empno = E, empyear = Y},Acc) when Y < 2000 -> [E | Acc];
+                         (_,Acc) -> Acc
+                 end,
+                 [],
+                 emp_tab).
+
+       The result will be _[_"_0_5_2_3_4_1_"_,_"_0_7_6_3_2_4_"_,_"_5_3_5_2_1_6_"_,_"_7_8_9_7_8_9_"_,_"_9_8_9_8_9_1_"_], as
+       expected. Now the equivalent expression using a handwritten match
+       specification would look something like this:
+
+       ets:select(emp_tab,[{#emp{empno = '$1', empyear = '$2', _='_'},
+                            [{'<', '$2', 2000}],
+                            ['$1']}]).
+
+       This gives the same result, the _[_{_'_<_'_, _'_$_2_'_, _2_0_0_0_}_] is in the guard
+       part and therefore discards anything that does not have a empyear
+       (bound to '$2' in the head) less than 2000, just as the guard in the
+       _f_o_l_d_l example. Lets jump on to writing it using _e_t_s_:_f_u_n_2_m_s
+
+       -include_lib("stdlib/include/ms_transform.hrl").
+
+       % ...
+
+       ets:select(emp_tab, ets:fun2ms(
+                             fun(#emp{empno = E, empyear = Y}) when Y < 2000 ->
+                                     E
+                             end)).
+
+       Obviously readability is gained by using the parse transformation.
+
+       I'll show some more examples without the tiresome comparing-to-
+       alternatives stuff. Let's say we'd want the whole object matching
+       instead of only one element. We could of course assign a variable to
+       every part of the record and build it up once again in the body of the
+       _f_u_n, but it's easier to do like this:
+
+       ets:select(emp_tab, ets:fun2ms(
+                             fun(Obj = #emp{empno = E, empyear = Y})
+                                when Y < 2000 ->
+                                     Obj
+                             end)).
+
+       Just as in ordinary Erlang matching, you can bind a variable to the
+       whole matched object using a "match in then match", i.e. a _=.
+       Unfortunately this is not general in _f_u_n_'_s translated to match
+       specifications, only on the "top level", i.e. matching the _w_h_o_l_e object
+       arriving to be matched into a separate variable, is it allowed. For the
+       one's used to writing match specifications by hand, I'll have to
+       mention that the variable A will simply be translated into '$_'. It's
+       not general, but it has very common usage, why it is handled as a
+       special, but useful, case. If this bothers you, the pseudo function
+       _o_b_j_e_c_t also returns the whole matched object, see the part about
+       caveats and limitations below.
+
+       Let's do something in the _f_u_n's body too: Let's say that someone
+       realizes that there are a few people having an employee number
+       beginning with a zero (_0), which shouldn't be allowed. All those should
+       have their numbers changed to begin with a one (_1) instead and one
+       wants the list _[_{_<_O_l_d _e_m_p_n_o_>_,_<_N_e_w _e_m_p_n_o_>_}_] created:
+
+       ets:select(emp_tab, ets:fun2ms(
+                             fun(#emp{empno = [$0 | Rest] }) ->
+                                     {[$0|Rest],[$1|Rest]}
+                             end)).
+
+       As a matter of fact, this query hits the feature of partially bound
+       keys in the table type _o_r_d_e_r_e_d___s_e_t, so that not the whole table need be
+       searched, only the part of the table containing keys beginning with _0
+       is in fact looked into.
+
+       The fun of course can have several clauses, so that if one could do the
+       following: For each employee, if he or she is hired prior to 1997,
+       return the tuple _{_i_n_v_e_n_t_o_r_y_, _<_e_m_p_l_o_y_e_e _n_u_m_b_e_r_>_}, for each hired 1997 or
+       later, but before 2001, return _{_r_o_o_k_i_e_, _<_e_m_p_l_o_y_e_e _n_u_m_b_e_r_>_}, for all
+       others return _{_n_e_w_b_i_e_, _<_e_m_p_l_o_y_e_e _n_u_m_b_e_r_>_}. All except for the ones
+       named _S_m_i_t_h as they would be affronted by anything other than the tag
+       _g_u_r_u and that is also what's returned for their numbers; _{_g_u_r_u_,
+       _<_e_m_p_l_o_y_e_e _n_u_m_b_e_r_>_}:
+
+       ets:select(emp_tab, ets:fun2ms(
+                             fun(#emp{empno = E, surname = "Smith" }) ->
+                                     {guru,E};
+                                (#emp{empno = E, empyear = Y}) when Y < 1997  ->
+                                     {inventory, E};
+                                (#emp{empno = E, empyear = Y}) when Y > 2001  ->
+                                     {newbie, E};
+                                (#emp{empno = E, empyear = Y}) -> % 1997 -- 2001
+                                     {rookie, E}
+                             end)).
+
+       The result will be:
+
+       [{rookie,"011103"},
+        {rookie,"041231"},
+        {guru,"052341"},
+        {guru,"076324"},
+        {newbie,"122334"},
+        {rookie,"535216"},
+        {inventory,"789789"},
+        {newbie,"963721"},
+        {rookie,"989891"}]
+
+       and so the Smith's will be happy...
+
+       So, what more can you do? Well, the simple answer would be; look in the
+       documentation of match specifications in ERTS users guide. However
+       let's briefly go through the most useful "built in functions" that you
+       can use when the _f_u_n is to be translated into a match specification by
+       _e_t_s_:_f_u_n_2_m_s (it's worth mentioning, although it might be obvious to
+       some, that calling other functions than the one's allowed in match
+       specifications cannot be done. No "usual" Erlang code can be executed
+       by the _f_u_n being translated by _f_u_n_2_m_s, the _f_u_n is after all limited
+       exactly to the power of the match specifications, which is unfortunate,
+       but the price one has to pay for the execution speed of an _e_t_s_:_s_e_l_e_c_t
+       compared to _e_t_s_:_f_o_l_d_l_/_f_o_l_d_r).
+
+       The head of the _f_u_n is obviously a head matching (or mismatching) _o_n_e
+       parameter, one object of the table we _s_e_l_e_c_t from. The object is always
+       a single variable (can be __) or a tuple, as that's what's in _e_t_s_, _d_e_t_s
+       and _m_n_e_s_i_a tables (the match specification returned by _e_t_s_:_f_u_n_2_m_s can
+       of course be used with _d_e_t_s_:_s_e_l_e_c_t and _m_n_e_s_i_a_:_s_e_l_e_c_t as well as with
+       _e_t_s_:_s_e_l_e_c_t). The use of _= in the head is allowed (and encouraged) on
+       the top level.
+
+       The guard section can contain any guard expression of Erlang. Even the
+       "old" type test are allowed on the toplevel of the guard (_i_n_t_e_g_e_r_(_X_)
+       instead of _i_s___i_n_t_e_g_e_r_(_X_)). As the new type tests (the _i_s__ tests) are in
+       practice just guard bif's they can also be called from within the body
+       of the fun, but so they can in ordinary Erlang code. Also arithmetics
+       is allowed, as well as ordinary guard bif's. Here's a list of bif's and
+       expressions:
+
+         * The type tests: is_atom, is_float, is_integer, is_list, is_number,
+           is_pid, is_port, is_reference, is_tuple, is_binary, is_function,
+           is_record
+
+         * The boolean operators: not, and, or, andalso, orelse
+
+         * The relational operators: >, >=, <, =<, =:=, ==, =/=, /=
+
+         * Arithmetics: +, -, *, div, rem
+
+         * Bitwise operators: band, bor, bxor, bnot, bsl, bsr
+
+         * The guard bif's: abs, element, hd, length, node, round, size, tl,
+           trunc, self
+
+         * The obsolete type test (only in guards): atom, float, integer,
+           list, number, pid, port, reference, tuple, binary, function, record
+
+       Contrary to the fact with "handwritten" match specifications, the
+       _i_s___r_e_c_o_r_d guard works as in ordinary Erlang code.
+
+       Semicolons (_;) in guards are allowed, the result will be (as expected)
+       one "match_spec-clause" for each semicolon-separated part of the guard.
+       The semantics being identical to the Erlang semantics.
+
+       The body of the _f_u_n is used to construct the resulting value. When
+       selecting from tables one usually just construct a suiting term here,
+       using ordinary Erlang term construction, like tuple parentheses, list
+       brackets and variables matched out in the head, possibly in conjunction
+       with the occasional constant. Whatever expressions are allowed in
+       guards are also allowed here, but there are no special functions except
+       _o_b_j_e_c_t and _b_i_n_d_i_n_g_s (see further down), which returns the whole matched
+       object and all known variable bindings respectively.
+
+       The _d_b_g variants of match specifications have an imperative approach to
+       the match specification body, the ets dialect hasn't. The fun body for
+       _e_t_s_:_f_u_n_2_m_s returns the result without side effects, and as matching (_=)
+       in the body of the match specifications is not allowed (for performance
+       reasons) the only thing left, more or less, is term construction...
+
+       Let's move on to the _d_b_g dialect, the slightly different match
+       specifications translated by _d_b_g_:_f_u_n_2_m_s.
+
+       The same reasons for using the parse transformation applies to _d_b_g,
+       maybe even more so as filtering using Erlang code is simply not a good
+       idea when tracing (except afterwards, if you trace to file). The
+       concept is similar to that of _e_t_s_:_f_u_n_2_m_s except that you usually use it
+       directly from the shell (which can also be done with _e_t_s_:_f_u_n_2_m_s).
+
+       Let's manufacture a toy module to trace on
+
+       -module(toy).
+
+       -export([start/1, store/2, retrieve/1]).
+
+       start(Args) ->
+           toy_table = ets:new(toy_table,Args).
+
+       store(Key, Value) ->
+           ets:insert(toy_table,{Key,Value}).
+
+       retrieve(Key) ->
+           [{Key, Value}] = ets:lookup(toy_table,Key),
+           Value.
+
+       During model testing, the first test bails out with a _{_b_a_d_m_a_t_c_h_,_1_6_} in
+       _{_t_o_y_,_s_t_a_r_t_,_1_}, why?
+
+       We suspect the ets call, as we match hard on the return value, but want
+       only the particular _n_e_w call with _t_o_y___t_a_b_l_e as first parameter. So we
+       start a default tracer on the node:
+
+       1> dbg:tracer().
+       {ok,<0.88.0>}
+
+       And so we turn on call tracing for all processes, we are going to make
+       a pretty restrictive trace pattern, so there's no need to call trace
+       only a few processes (it usually isn't):
+
+       2> dbg:p(all,call).
+       {ok,[{matched,nonode@nohost,25}]}
+
+       It's time to specify the filter. We want to view calls that resemble
+       _e_t_s_:_n_e_w_(_t_o_y___t_a_b_l_e_,_<_s_o_m_e_t_h_i_n_g_>_):
+
+       3> dbg:tp(ets,new,dbg:fun2ms(fun([toy_table,_]) -> true end)).
+       {ok,[{matched,nonode@nohost,1},{saved,1}]}
+
+       As can be seen, the _f_u_n's used with _d_b_g_:_f_u_n_2_m_s takes a single list as
+       parameter instead of a single tuple. The list matches a list of the
+       parameters to the traced function. A single variable may also be used
+       of course. The body of the fun expresses in a more imperative way
+       actions to be taken if the fun head (and the guards) matches. I return
+       _t_r_u_e here, but it's only because the body of a fun cannot be empty, the
+       return value will be discarded.
+
+       When we run the test of our module now, we get the following trace
+       output:
+
+       (<0.86.0>) call ets:new(toy_table,[ordered_set])
+
+       Let's play we haven't spotted the problem yet, and want to see what
+       _e_t_s_:_n_e_w returns. We do a slightly different trace pattern:
+
+       4> dbg:tp(ets,new,dbg:fun2ms(fun([toy_table,_]) -> return_trace() end)).
+
+       Resulting in the following trace output when we run the test:
+
+       (<0.86.0>) call ets:new(toy_table,[ordered_set])
+       (<0.86.0>) returned from ets:new/2 -> 24
+
+       The call to _r_e_t_u_r_n___t_r_a_c_e, makes a trace message appear when the
+       function returns. It applies only to the specific function call
+       triggering the match specification (and matching the head/guards of the
+       match specification). This is the by far the most common call in the
+       body of a _d_b_g match specification.
+
+       As the test now fails with _{_b_a_d_m_a_t_c_h_,_2_4_}, it's obvious that the
+       badmatch is because the atom _t_o_y___t_a_b_l_e does not match the number
+       returned for an unnamed table. So we spotted the problem, the table
+       should be named and the arguments supplied by our test program does not
+       include _n_a_m_e_d___t_a_b_l_e. We rewrite the start function to:
+
+       start(Args) ->
+           toy_table = ets:new(toy_table,[named_table |Args]).
+
+       And with the same tracing turned on, we get the following trace output:
+
+       (<0.86.0>) call ets:new(toy_table,[named_table,ordered_set])
+       (<0.86.0>) returned from ets:new/2 -> toy_table
+
+       Very well. Let's say the module now passes all testing and goes into
+       the system. After a while someone realizes that the table _t_o_y___t_a_b_l_e
+       grows while the system is running and that for some reason there are a
+       lot of elements with atom's as keys. You had expected only integer keys
+       and so does the rest of the system. Well, obviously not all of the
+       system. You turn on call tracing and try to see calls to your module
+       with an atom as the key:
+
+       1> dbg:tracer().
+       {ok,<0.88.0>}
+       2> dbg:p(all,call).
+       {ok,[{matched,nonode@nohost,25}]}
+       3> dbg:tpl(toy,store,dbg:fun2ms(fun([A,_]) when is_atom(A) -> true end)).
+       {ok,[{matched,nonode@nohost,1},{saved,1}]}
+
+       We use _d_b_g_:_t_p_l here to make sure to catch local calls (let's say the
+       module has grown since the smaller version and we're not sure this
+       inserting of atoms is not done locally...). When in doubt always use
+       local call tracing.
+
+       Let's say nothing happens when we trace in this way. Our function is
+       never called with these parameters. We make the conclusion that someone
+       else (some other module) is doing it and we realize that we must trace
+       on ets:insert and want to see the calling function. The calling
+       function may be retrieved using the match specification function _c_a_l_l_e_r
+       and to get it into the trace message, one has to use the match spec
+       function _m_e_s_s_a_g_e. The filter call looks like this (looking for calls to
+       _e_t_s_:_i_n_s_e_r_t):
+
+       4> dbg:tpl(ets,insert,dbg:fun2ms(fun([toy_table,{A,_}]) when is_atom(A) ->
+        message(caller())
+        end)).
+       {ok,[{matched,nonode@nohost,1},{saved,2}]}
+
+       The caller will now appear in the "additional message" part of the
+       trace output, and so after a while, the following output comes:
+
+       (<0.86.0>) call ets:insert(toy_table,{garbage,can}) ({evil_mod,evil_fun,2})
+
+       You have found out that the function _e_v_i_l___f_u_n of the module _e_v_i_l___m_o_d,
+       with arity _2, is the one causing all this trouble.
+
+       This was just a toy example, but it illustrated the most used calls in
+       match specifications for _d_b_g The other, more esotheric calls are listed
+       and explained in the _U_s_e_r_s _g_u_i_d_e _o_f _t_h_e _E_R_T_S _a_p_p_l_i_c_a_t_i_o_n, they really
+       are beyond the scope of this document.
+
+       To end this chatty introduction with something more precise, here
+       follows some parts about caveats and restrictions concerning the fun's
+       used in conjunction with _e_t_s_:_f_u_n_2_m_s and _d_b_g_:_f_u_n_2_m_s:
+
+   WWaarrnniinngg::
+       To use the pseudo functions triggering the translation, one _h_a_s _t_o
+       include the header file _m_s___t_r_a_n_s_f_o_r_m_._h_r_l in the source code. Failure to
+       do so will possibly result in runtime errors rather than compile time,
+       as the expression may be valid as a plain Erlang program without
+       translation.
+
+
+   WWaarrnniinngg::
+       The _f_u_n has to be literally constructed inside the parameter list to
+       the pseudo functions. The _f_u_n cannot be bound to a variable first and
+       then passed to _e_t_s_:_f_u_n_2_m_s or _d_b_g_:_f_u_n_2_m_s, i.e this will work:
+       _e_t_s_:_f_u_n_2_m_s_(_f_u_n_(_A_) _-_> _A _e_n_d_) but not this: _F _= _f_u_n_(_A_) _-_> _A _e_n_d_,
+       _e_t_s_:_f_u_n_2_m_s_(_F_). The later will result in a compile time error if the
+       header is included, otherwise a runtime error. Even if the later
+       construction would ever appear to work, it really doesn't, so don't
+       ever use it.
+
+
+       Several restrictions apply to the fun that is being translated into a
+       match_spec. To put it simple you cannot use anything in the fun that
+       you cannot use in a match_spec. This means that, among others, the
+       following restrictions apply to the fun itself:
+
+         * Functions written in Erlang cannot be called, neither local
+           functions, global functions or real fun's
+
+         * Everything that is written as a function call will be translated
+           into a match_spec call to a builtin function, so that the call
+           _i_s___l_i_s_t_(_X_) will be translated to _{_'_i_s___l_i_s_t_'_, _'_$_1_'_} (_'_$_1_' is just an
+           example, the numbering may vary). If one tries to call a function
+           that is not a match_spec builtin, it will cause an error.
+
+         * Variables occurring in the head of the _f_u_n will be replaced by
+           match_spec variables in the order of occurrence, so that the
+           fragment _f_u_n_(_{_A_,_B_,_C_}_) will be replaced by _{_'_$_1_'_, _'_$_2_'_, _'_$_3_'_} etc.
+           Every occurrence of such a variable later in the match_spec will be
+           replaced by a match_spec variable in the same way, so that the fun
+           _f_u_n_(_{_A_,_B_}_) _w_h_e_n _i_s___a_t_o_m_(_A_) _-_> _B _e_n_d will be translated into
+           _[_{_{_'_$_1_'_,_'_$_2_'_}_,_[_{_i_s___a_t_o_m_,_'_$_1_'_}_]_,_[_'_$_2_'_]_}_].
+
+         * Variables that are not appearing in the head are imported from the
+           environment and made into match_spec _c_o_n_s_t expressions. Example
+           from the shell:
+
+         1> X = 25.
+         25
+         2> ets:fun2ms(fun({A,B}) when A > X -> B end).
+         [{{'$1','$2'},[{'>','$1',{const,25}}],['$2']}]
+
+         * Matching with _= cannot be used in the body. It can only be used on
+           the top level in the head of the fun. Example from the shell again:
+
+         1> ets:fun2ms(fun({A,[B|C]} = D) when A > B -> D end).
+         [{{'$1',['$2'|'$3']},[{'>','$1','$2'}],['$_']}]
+         2> ets:fun2ms(fun({A,[B|C]=D}) when A > B -> D end).
+         Error: fun with head matching ('=' in head) cannot be translated into
+         match_spec
+         {error,transform_error}
+         3> ets:fun2ms(fun({A,[B|C]}) when A > B -> D = [B|C], D end).
+         Error: fun with body matching ('=' in body) is illegal as match_spec
+         {error,transform_error}
+
+           All variables are bound in the head of a match_spec, so the
+           translator can not allow multiple bindings. The special case when
+           matching is done on the top level makes the variable bind to _'_$___'
+           in the resulting match_spec, it is to allow a more natural access
+           to the whole matched object. The pseudo function _o_b_j_e_c_t_(_) could be
+           used instead, see below. The following expressions are translated
+           equally:
+
+         ets:fun2ms(fun({a,_} = A) -> A end).
+         ets:fun2ms(fun({a,_}) -> object() end).
+
+         * The special match_spec variables _'_$___' and _'_$_*_' can be accessed
+           through the pseudo functions _o_b_j_e_c_t_(_) (for _'_$___') and _b_i_n_d_i_n_g_s_(_)
+           (for _'_$_*_'). as an example, one could translate the following
+           _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_2 call to a _e_t_s_:_s_e_l_e_c_t call:
+
+         ets:match_object(Table, {'$1',test,'$2'}).
+
+           ...is the same as...
+
+         ets:select(Table, ets:fun2ms(fun({A,test,B}) -> object() end)).
+
+           (This was just an example, in this simple case the former
+           expression is probably preferable in terms of readability). The
+           _e_t_s_:_s_e_l_e_c_t_/_2 call will conceptually look like this in the resulting
+           code:
+
+         ets:select(Table, [{{'$1',test,'$2'},[],['$_']}]).
+
+           Matching on the top level of the fun head might feel like a more
+           natural way to access _'_$___', see above.
+
+         * Term constructions/literals are translated as much as is needed to
+           get them into valid match_specs, so that tuples are made into
+           match_spec tuple constructions (a one element tuple containing the
+           tuple) and constant expressions are used when importing variables
+           from the environment. Records are also translated into plain tuple
+           constructions, calls to element etc. The guard test _i_s___r_e_c_o_r_d_/_2 is
+           translated into match_spec code using the three parameter version
+           that's built into match_specs, so that _i_s___r_e_c_o_r_d_(_A_,_t_) is translated
+           into _{_i_s___r_e_c_o_r_d_,_'_$_1_'_,_t_,_5_} given that the record size of record type
+           _t is 5.
+
+         * Language constructions like _c_a_s_e, _i_f, _c_a_t_c_h etc that are not
+           present in match_specs are not allowed.
+
+         * If the header file _m_s___t_r_a_n_s_f_o_r_m_._h_r_l is not included, the fun won't
+           be translated, which may result in a _r_u_n_t_i_m_e _e_r_r_o_r (depending on if
+           the fun is valid in a pure Erlang context). Be absolutely sure that
+           the header is included when using _e_t_s and _d_b_g_:_f_u_n_2_m_s_/_1 in compiled
+           code.
+
+         * If the pseudo function triggering the translation is _e_t_s_:_f_u_n_2_m_s_/_1,
+           the fun's head must contain a single variable or a single tuple. If
+           the pseudo function is _d_b_g_:_f_u_n_2_m_s_/_1 the fun's head must contain a
+           single variable or a single list.
+
+       The translation from fun's to match_specs is done at compile time, so
+       runtime performance is not affected by using these pseudo functions.
+       The compile time might be somewhat longer though.
+
+       For more information about match_specs, please read about them in _E_R_T_S
+       _u_s_e_r_s _g_u_i_d_e.
+
+EEXXPPOORRTTSS
+       ppaarrssee__ttrraannssffoorrmm((FFoorrmmss,, OOppttiioonnss)) -->> FFoorrmmss
+
+              Types:
+
+                 Forms = [eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())]
+                 Options = term()
+                   Option list, required but not used.
+
+              Implements the actual transformation at compile time. This
+              function is called by the compiler to do the source code
+              transformation if and when the _m_s___t_r_a_n_s_f_o_r_m_._h_r_l header file is
+              included in your source code. See the _e_t_s and _d_b_g:_f_u_n_2_m_s_/_1
+              function manual pages for documentation on how to use this
+              parse_transform, see the _m_a_t_c_h___s_p_e_c chapter in _E_R_T_S users guide
+              for a description of match specifications.
+
+       ttrraannssffoorrmm__ffrroomm__sshheellll((DDiiaalleecctt,, CCllaauusseess,, BBoouunnddEEnnvviirroonnmmeenntt)) -->> tteerrmm(())
+
+              Types:
+
+                 Dialect = ets | dbg
+                 Clauses = [eerrll__ppaarrssee::aabbssttrraacctt__ccllaauussee(())]
+                 BoundEnvironment = eerrll__eevvaall::bbiinnddiinngg__ssttrruucctt(())
+                   List of variable bindings in the shell environment.
+
+              Implements the actual transformation when the _f_u_n_2_m_s functions
+              are called from the shell. In this case the abstract form is for
+              one single fun (parsed by the Erlang shell), and all imported
+              variables should be in the key-value list passed as
+              _B_o_u_n_d_E_n_v_i_r_o_n_m_e_n_t. The result is a term, normalized, i.e. not in
+              abstract format.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorr)) -->> CChhaarrss
+
+              Types:
+
+                 Error = {error, module(), term()}
+                 Chars = iioo__lliibb::cchhaarrss(())
+
+              Takes an error code returned by one of the other functions in
+              the module and creates a textual description of the error.
+              Fairly uninteresting function actually.
+
+
+
+Ericsson AB                      stdlib 1.18.2                 ms_transform(3)

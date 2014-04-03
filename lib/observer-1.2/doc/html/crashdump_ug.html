@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- Crashdump Viewer</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/observer-1.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Observer</strong><br><strong>User's Guide</strong><br><small>Version 1.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Chapters</strong></small></p>
+<ul class="flipMenu" imagepath="../../../../doc/js/flipmenu">
+<li id="no" title="Observer" expanded="false">Observer<ul>
+<li><a href="observer_ug.html">
+              Top of chapter
+            </a></li>
+<li title="Introduction"><a href="observer_ug.html#id61816">Introduction</a></li>
+<li title="General"><a href="observer_ug.html#id59918">General</a></li>
+<li title="Applications"><a href="observer_ug.html#id61007">Applications</a></li>
+<li title="Processes"><a href="observer_ug.html#id61053">Processes</a></li>
+<li title="Table Viewer"><a href="observer_ug.html#id60982">Table Viewer</a></li>
+<li title="Trace Overview"><a href="observer_ug.html#id57312">Trace Overview</a></li>
+</ul>
+</li>
+<li id="no" title="Trace Tool Builder" expanded="false">Trace Tool Builder<ul>
+<li><a href="ttb_ug.html">
+              Top of chapter
+            </a></li>
+<li title="Introduction"><a href="ttb_ug.html#id62484">Introduction</a></li>
+<li title="Getting Started"><a href="ttb_ug.html#id60668">Getting Started</a></li>
+<li title="Running the Trace Tool Builder against a remote node"><a href="ttb_ug.html#id59808">Running the Trace Tool Builder against a remote node</a></li>
+<li title="Additional tracing options"><a href="ttb_ug.html#id64390">Additional tracing options</a></li>
+<li title="Trace Information and the .ti File"><a href="ttb_ug.html#id61792">Trace Information and the .ti File</a></li>
+<li title="Wrap Logs"><a href="ttb_ug.html#id62350">Wrap Logs</a></li>
+<li title="Formatting"><a href="ttb_ug.html#id62389">Formatting</a></li>
+<li title="Automatically collect and format logs from all nodes"><a href="ttb_ug.html#id62799">Automatically collect and format logs from all nodes</a></li>
+<li title="History and Configuration Files"><a href="ttb_ug.html#id62844">History and Configuration Files</a></li>
+<li title="Sequential Tracing"><a href="ttb_ug.html#id63093">Sequential Tracing</a></li>
+<li title="Example: Multipurpose trace tool"><a href="ttb_ug.html#id63225">Example: Multipurpose trace tool</a></li>
+</ul>
+</li>
+<li id="no" title="Erlang Top" expanded="false">Erlang Top<ul>
+<li><a href="etop_ug.html">
+              Top of chapter
+            </a></li>
+<li title="Introduction"><a href="etop_ug.html#id63365">Introduction</a></li>
+<li title="Output"><a href="etop_ug.html#id63384">Output</a></li>
+<li title="Start"><a href="etop_ug.html#id64600">Start</a></li>
+<li title="Configuration"><a href="etop_ug.html#id64636">Configuration</a></li>
+<li title="Print to file"><a href="etop_ug.html#id64789">Print to file</a></li>
+<li title="Stop"><a href="etop_ug.html#id64817">Stop</a></li>
+</ul>
+</li>
+<li id="loadscrollpos" title="Crashdump Viewer" expanded="true">Crashdump Viewer<ul>
+<li><a href="crashdump_ug.html">
+              Top of chapter
+            </a></li>
+<li title="Introduction"><a href="crashdump_ug.html#id64895">Introduction</a></li>
+<li title="Getting Started"><a href="crashdump_ug.html#id64907">Getting Started</a></li>
+<li title="Navigating"><a href="crashdump_ug.html#id64987">Navigating</a></li>
+<li title="Help"><a href="crashdump_ug.html#id65017">Help</a></li>
+</ul>
+</li>
+</ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<h1>4 Crashdump Viewer</h1>
+  
+
+  <h3><a name="id64895">4.1 
+        Introduction</a></h3>
+    
+    <p>The Crashdump Viewer is an HTML based tool for browsing Erlang
+      crashdumps. Crashdump Viewer runs under the WebTool application.
+      </p>
+  
+
+  <h3><a name="id64907">4.2 
+        Getting Started</a></h3>
+    
+
+    <p>The easiest way to start Crashdump Viewer is to use the
+    provided shell script named <span class="code">cdv</span> with the full path to the
+    erlang crashdump as an argument. The script can be found in the
+    priv directory of the <span class="code">observer</span> application. This starts
+    WebTool, Crashdump Viewer and a web browser, and loads the given
+    file. The browser should then display a page named General
+    Information which shows a short summary of the information in
+    the crashdump.</p>
+
+    <p>The default browser is Internet Explorer on Windows or else
+    Firefox. To use another browser, give the browser's start command
+    as the second argument to <span class="code">cdv</span>. If the given browser name is
+    not known to Crashdump Viewer, the browser argument is executed as
+    a command with the start URL as the only argument.</p>
+
+    <p>Under Windows the batch file <span class="code">cdv.bat</span> can be used.</p>
+
+    <p>It is also possible to start the Crashdump Viewer from within
+    an erlang node by calling <span class="bold_code"><a href="crashdump_viewer.html#start-0">crashdump_viewer:start/0</a></span>. This
+    will automatically start WebTool and display the web address where
+    WebTool can be found. See the documentation for the WebTool
+    application for further information about how to use WebTool.</p>
+
+    <p>Point your web browser to the address displayed, and you should
+      now see the start page of WebTool. At the top of the page, you
+      will see a link to "CrashDumpViewer". Click this link to get to
+      the start page for Crashdump Viewer. (Note that if webtool is on
+      localhost, you must configure your web browser to have direct
+      connection to the internet, or you must set no proxy for
+      localhost.)
+      </p>
+    <p>From the start page of Crashdump Viewer, push the "Load
+      Crashdump" button to load a crashdump into the tool. Then enter
+      the filename of the crashdump in the entry field and push the
+      "Ok" button. This will bring you to the General Information
+      page, i.e. the same page as the <span class="code">cdv</span> script will open in
+      the browser.
+      </p>
+    <p>Crashdumps generated by OTP R9C and later are loaded directly
+      into the Crashdump Viewer, while dumps from earlier releases first
+      are translated by the Crashdump Translater. The Crashdump
+      Translater creates a new file with the same name as the original
+      crashdump, but with the extension <span class="code">.translated</span>. If there is
+      no write access to the directory of the original file, you will be
+      asked to enter a new path and filename for the translated file.
+      </p>
+  
+
+  <h3><a name="id64987">4.3 
+        Navigating</a></h3>
+    
+    <p>The lefthand frame contains a menu. Menu folders can be
+      expanded and collapsed by clicking the folder picture. When a menu
+      item is clicked, the item information is shown in the big
+      information frame. 
+      </p>
+    <p>The filename frame above the information frame shows the full
+      name of the currently viewed Erlang crashdump.
+      </p>
+    <p>To load a new crashdump, click the "Load New Crashdump" button
+      in the menu frame.
+      </p>
+    <p>The various information shown in the information frame will
+      contain links to process identifiers (PIDs) and port
+      identifiers. Clicking one of these links will take you to the
+      detailed information page for the process or port in question. Use
+      the "Back" button in your browser to get back to the
+      startingpoint. If the process or port resided on a remote node,
+      there will be no information available. Clicking the link will
+      then take you to the information about the remote node.
+      </p>
+  
+
+  <h3><a name="id65017">4.4 
+        Help</a></h3>
+    
+    <p>Further help on how to use the Crashdump Viewer tool can be
+      found in the tool's menu under 'Documentation':
+      </p>
+    <p>'Crashdump Viewer help' is a short document describing each
+      information page and any additional information that might occur,
+      compared to the raw dump described in 'How to interpret Erlang
+      crashdumps'.
+      </p>
+    <p>'How to interpret Erlang crashdumps' is a document from the
+      Erlang runtime system describing details in the raw
+      crashdumps. Here you will also find information about each single
+      field in the different information pages. This document can also
+      be found directly in the OTP online documentation, via the Erlang
+      runtime system user's guide.
+      </p>
+  
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 2002-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

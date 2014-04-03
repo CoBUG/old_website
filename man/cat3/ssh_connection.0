@@ -1,0 +1,221 @@
+ssh_connection(3)          Erlang Module Definition          ssh_connection(3)
+
+
+
+NNAAMMEE
+       ssh_connection - This module provides an API to the ssh connection
+       protocol.
+
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides an API to the ssh connection protocol. Not all
+       features of the connection protocol are officially supported yet. Only
+       the ones supported are documented here.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module and/or
+       abstractions to indicate the intended use of the data type:
+
+       _b_o_o_l_e_a_n_(_) _= _t_r_u_e _| _f_a_l_s_e
+
+       _s_t_r_i_n_g_(_) _= _l_i_s_t _o_f _A_S_C_I_I _c_h_a_r_a_c_t_e_r_s
+
+       _t_i_m_e_o_u_t_(_) _= _i_n_f_i_n_i_t_y _| _i_n_t_e_g_e_r_(_) _- _i_n _m_i_l_l_i_s_e_c_o_n_d_s_.
+
+       _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_) _- _o_p_a_q_u_e _t_o _t_h_e _u_s_e_r _r_e_t_u_r_n_e_d _b_y _s_s_h_:_c_o_n_n_e_c_t_/_3 _o_r
+       _s_e_n_t _t_o _a _s_s_h _c_h_a_n_n_e_l _p_r_o_c_e_s_s_e_s
+
+       _s_s_h___c_h_a_n_n_e_l___i_d_(_) _= _i_n_t_e_g_e_r_(_)
+
+       _s_s_h___d_a_t_a___t_y_p_e___c_o_d_e_(_) _= _1 _(_"_s_t_d_e_r_r_"_) _| _0 _(_"_n_o_r_m_a_l_"_) _a_r_e _c_u_r_r_e_n_t_l_y _v_a_l_i_d
+       _v_a_l_u_e_s _s_e_e _R_F_C _4_2_5_4 _s_e_c_t_i_o_n _5_._2_.
+
+       _s_s_h___r_e_q_u_e_s_t___s_t_a_t_u_s_(_) _= _s_u_c_c_e_s_s _| _f_a_i_l_u_r_e
+
+MMEESSSSAAGGEESS SSEENNTT TTOO CCHHAANNNNEELL PPRROOCCEESSSSEESS
+       As a result of the ssh connection protocol messages on the form
+       _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _t_e_r_m_(_)_} will be sent to a channel
+       process. The term will contain information regarding the ssh connection
+       protocol event, for details see the ssh channel behavior callback
+       hhaannddllee__sssshh__mmssgg//22
+
+EEXXPPOORRTTSS
+       aaddjjuusstt__wwiinnddooww((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, NNuummOOffBByytteess)) -->> ookk
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+                  NumOfBytes = integer()
+
+              Adjusts the ssh flowcontrol window.
+
+          NNoottee::
+              This will be taken care of by the ssh_channel behavior when the
+              callback  hhaannddllee__sssshh__mmssgg//22  has returned after processing a
+              {ssh_cm, ssh_connection_ref(), {data, ssh_channel_id(),
+              ssh_data_type_code(), binary()}} message, and should normally
+              not be called explicitly.
+
+
+       cclloossee((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd)) -->> ookk
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+
+              Sends a close message on the channel _C_h_a_n_n_e_l_I_d
+
+          NNoottee::
+              This function will be called by the ssh channel behavior when
+              the channel is terminated see  sssshh__cchhaannnneell((33))  and should
+              normally not be called explicitly.
+
+
+       eexxeecc((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, CCoommmmaanndd,, TTiimmeeOOuutt)) -->>
+       sssshh__rreeqquueesstt__ssttaattuuss(())
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+                  Command = string()
+                 Timeout = timeout()
+
+              Will request that the server start the execution of the given
+              command, the result will be received as:
+
+                 _N _X _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_d_a_t_a_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _s_s_h___d_a_t_a___t_y_p_e___c_o_d_e_(_)_, _b_i_n_a_r_y_(_) _= _D_a_t_a_}_} :
+                  The result of executing the command may be only one line or
+                  thousands of lines depending on the command.
+
+                 _1 _X _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_o_f_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_}_}:
+                  Indicates that no more data will be sent.
+
+                _0 _o_r _1 _X _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_x_i_t___s_i_g_n_a_l_,
+                _s_s_h___c_h_a_n_n_e_l___i_d_(_)_, _s_t_r_i_n_g_(_) _= _E_x_i_t_S_i_g_n_a_l_, _s_t_r_i_n_g_(_) _= _E_r_r_o_r_M_s_g_,
+                _s_t_r_i_n_g_(_) _= _L_a_n_g_u_a_g_e_S_t_r_i_n_g_}_}:
+                  Not all systems send signals. For details on valid string
+                  values see RFC 4254 section 6.10
+
+                _0 _o_r _1 _X _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_x_i_t___s_t_a_t_u_s_,
+                _s_s_h___c_h_a_n_n_e_l___i_d_(_)_, _i_n_t_e_g_e_r_(_) _= _E_x_i_t_S_t_a_t_u_s_}_}:
+                  It is recommended by the _s_s_h _c_o_n_n_e_c_t_i_o_n _p_r_o_t_o_c_o_l that this
+                  message shall be sent, but that may not always be the case.
+
+                 _1 _X _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_c_l_o_s_e_d_,
+                _s_s_h___c_h_a_n_n_e_l___i_d_(_)_}_}:
+                  Indicates that the ssh channel started for the execution of
+                  the command has now been shutdown.
+
+              These message should be handled by the client. The sssshh cchhaannnneell
+              bbeehhaavviioorr can be used when writing a client.
+
+       eexxiitt__ssttaattuuss((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, SSttaattuuss)) -->> ookk
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+                  Status = integer()
+
+              Sends the exit status of a command to the client.
+
+       rreeppllyy__rreeqquueesstt((CCoonnnneeccttiioonnRReeff,, WWaannttRReeppllyy,, SSttaattuuss,, CCaannnneellIIdd)) -->> ookk
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  WantReply = boolean()
+                  Status = ssh_request_status()
+                  ChannelId = ssh_channel_id()
+
+              Sends status replies to requests where the requester has stated
+              that they want a status report e.i . _W_a_n_t_R_e_p_l_y _= _t_r_u_e, if
+              _W_a_n_t_R_e_p_l_y is false calling this function will be a "noop".
+              Should be called after handling an ssh connection protocol
+              message containing a _W_a_n_t_R_e_p_l_y boolean value. See the
+              ssh_channel behavior callback  hhaannddllee__sssshh__mmssgg//22
+
+       sseenndd((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, DDaattaa)) -->>
+       sseenndd((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, DDaattaa,, TTiimmeeoouutt)) -->>
+       sseenndd((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, TTyyppee,, DDaattaa)) -->>
+       sseenndd((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, TTyyppee,, DDaattaa,, TTiimmeeOOuutt)) -->> ookk || {{eerrrroorr,,
+       ttiimmeeoouutt}}
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+                  Data = binary()
+                  Type = ssh_data_type_code()
+                  Timeout = timeout()
+
+              Sends channel data.
+
+       sseenndd__eeooff((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd)) -->> ookk
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+
+              Sends eof on the channel _C_h_a_n_n_e_l_I_d.
+
+       sseessssiioonn__cchhaannnneell((CCoonnnneeccttiioonnRReeff,, TTiimmeeoouutt)) -->>
+       sseessssiioonn__cchhaannnneell((CCoonnnneeccttiioonnRReeff,, IInniittiiaallWWiinnddoowwSSiizzee,, MMaaxxPPaacckkeettSSiizzee,,
+       TTiimmeeoouutt)) -->> {{ookk,, sssshh__cchhaannnneell__iidd(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  InitialWindowSize = integer()
+                  MaxPacketSize = integer()
+                  Timeout = timeout()
+                  Reason = term()
+
+              Opens a channel for a ssh session. A session is a remote
+              execution of a program. The program may be a shell, an
+              application, a system command, or some built-in subsystem.
+
+       sseetteennvv((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, VVaarr,, VVaalluuee,, TTiimmeeOOuutt)) -->>
+       sssshh__rreeqquueesstt__ssttaattuuss(())
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+                  Var = string()
+                  Value = string()
+                  Timeout = timeout()
+
+              Environment variables may be passed to the shell/command to be
+              started later.
+
+       sshheellll((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd)) -->> sssshh__rreeqquueesstt__ssttaattuuss(())
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+
+              Will request that the user's default shell (typically defined in
+              /etc/passwd in UNIX systems) be started at the other end.
+
+       ssuubbssyysstteemm((CCoonnnneeccttiioonnRReeff,, CChhaannnneellIIdd,, SSuubbssyysstteemm,, TTiimmeeoouutt)) -->>
+       sssshh__rreeqquueesstt__ssttaattuuss(())
+
+              Types:
+
+                  ConnectionRef = ssh_connection_ref()
+                  ChannelId = ssh_channel_id()
+                  Subsystem = string()
+                  Timeout = timeout()
+
+              Sends a request to execute a predefined subsystem.
+
+
+
+Ericsson AB                        ssh 2.1.1                 ssh_connection(3)

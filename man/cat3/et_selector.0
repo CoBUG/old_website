@@ -1,0 +1,116 @@
+et_selector(3)             Erlang Module Definition             et_selector(3)
+
+
+
+NNAAMMEE
+       et_selector - Define event transforms and trace patterns
+
+DDEESSCCRRIIPPTTIIOONN
+EEXXPPOORRTTSS
+       mmaakkee__ppaatttteerrnn((RRaawwPPaatttteerrnn)) -->> TTrraacceePPaatttteerrnn
+
+              Types:
+
+                 RawPattern = detail_level()
+                 TracePattern = erlang_trace_pattern_match_spec()
+                 detail_level() = min | max | integer(X) when X >= 0, X =< 100
+
+              Makes a trace pattern suitable to feed change_pattern/1
+
+              Min detail level deactivates tracing of calls to _e_t_:_t_r_a_c_e___m_e_/_4_,_5
+
+              Max detail level activates tracing of all calls to
+              _e_t_:_t_r_a_c_e___m_e_/_4_,_5
+
+              integer(X) detail level activates tracing of all calls to
+              _e_t_:_t_r_a_c_e___m_e_/_4_,_5 whose detail level argument is lesser than X.
+
+              See also _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_2 for more info about its
+              _m_a_t_c_h___s_p_e_c_(_)
+
+       cchhaannggee__ppaatttteerrnn((PPaatttteerrnn)) -->> ookk
+
+              Types:
+
+                 Pattern = detail_level() | empty_match_spec() |
+                 erlang_trace_pattern_match_spec()
+                 detail_level() = min | max | integer(X) when X >= 0, X =< 100
+                 empty_match_spec() = []
+
+              Activates/deactivates tracing by changing the current trace
+              pattern.
+
+              _m_i_n detail level deactivates tracing of calls to _e_t_:_t_r_a_c_e___m_e_/_4_,_5
+
+              _m_a_x detail level activates tracing of all calls to
+              _e_t_:_t_r_a_c_e___m_e_/_4_,_5
+
+              _i_n_t_e_g_e_r_(_X_) detail level activates tracing of all calls to
+              _e_t_:_t_r_a_c_e___m_e_/_4_,_5 whose detail level argument is lesser than _X.
+
+              An empty match spec deactivates tracing of calls to
+              _e_t_:_t_r_a_c_e___m_e_/_4_,_5
+
+              Other match specs activates tracing of calls to _e_t_:_t_r_a_c_e___m_e_/_4_,_5
+              accordingly with _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_2.
+
+       ppaarrssee__eevveenntt((MMoodd,, VVaalliiddTTrraacceeDDaattaa)) -->> ffaallssee || ttrruuee || {{ttrruuee,, EEvveenntt}}
+
+              Types:
+
+                 Mod = module_name() | undefined <v>module_name() = atom()
+                 <v>ValidTraceData = erlang_trace_data() | record(event)
+                 erlang_trace_data() = {trace, Pid, Label, Info} | {trace,
+                 Pid, Label, Info, Extra} | {trace_ts, Pid, Label, Info,
+                 ReportedTS} | {trace_ts, Pid, Label, Info, Extra, ReportedTS}
+                 | {seq_trace, Label, Info} | {seq_trace, Label, Info,
+                 ReportedTS} | {drop, NumberOfDroppedItems}
+
+              Transforms trace data and makes an event record out of it.
+
+              See _e_r_l_a_n_g_:_t_r_a_c_e_/_3 for more info about the semantics of the
+              trace data.
+
+              An event record consists of the following fields:
+
+                _d_e_t_a_i_l___l_e_v_e_l:
+                  Noise has a high level as opposed to essentials.
+
+                _t_r_a_c_e___t_s:
+                  Time when the trace was generated. Same as event_ts if
+                  omitted in trace data.
+
+                _e_v_e_n_t___t_s:
+                  Time when the event record was created.
+
+                _f_r_o_m:
+                  From actor, such as sender of a message.
+
+                _t_o:
+                  To actor, such as receiver of message.
+
+                _l_a_b_e_l:
+                  Label intended to provide a brief event summary.
+
+                _c_o_n_t_e_n_t_s:
+                  All nitty gritty details of the event.
+
+              See _e_t_:_t_r_a_c_e___m_e_/_4and _e_t_:_t_r_a_c_e___m_e_/_5 for details.
+
+              Returns:
+
+                _{_t_r_u_e_, _E_v_e_n_t_}:
+                  where Event is an #event{} record representing the trace
+                  data
+
+                _t_r_u_e:
+                  means that the trace data already is an event record and
+                  that it is valid as it is. No transformation is needed.
+
+                _f_a_l_s_e:
+                  means that the trace data is uninteresting and should be
+                  dropped
+
+
+
+Ericsson AB                       et 1.4.4.2                    et_selector(3)

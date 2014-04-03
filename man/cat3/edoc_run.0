@@ -1,0 +1,90 @@
+edoc_run(3)                Erlang Module Definition                edoc_run(3)
+
+
+
+NNAAMMEE
+       edoc_run - Interface for calling EDoc from Erlang startup options.
+
+DDEESSCCRRIIPPTTIIOONN
+       Interface for calling EDoc from Erlang startup options.
+
+       The following is an example of typical usage in a Makefile:
+
+            docs:
+                    erl -noshell -run edoc_run application "'$(APP_NAME)'" \
+                      '"."' '[{def,{vsn,"$(VSN)"}}]'
+
+       (note the single-quotes to avoid shell expansion, and the double-quotes
+       enclosing the strings).
+
+       _N_e_w _f_e_a_t_u_r_e _i_n _v_e_r_s_i_o_n _0_._6_._9: It is no longer necessary to write _-_s
+       _i_n_i_t _s_t_o_p last on the command line in order to make the execution
+       terminate. The termination (signalling success or failure to the
+       operating system) is now built into these functions.
+
+EEXXPPOORRTTSS
+       aapppplliiccaattiioonn((AArrggss::::[[ssttrriinngg(())]])) -->> nnoonnee(())
+
+              Calls eeddoocc::aapppplliiccaattiioonn//33 with the corresponding arguments. The
+              strings in the list are parsed as Erlang constant terms. The
+              list can be either _[_A_p_p_], _[_A_p_p_, _O_p_t_i_o_n_s_] or _[_A_p_p_, _D_i_r_, _O_p_t_i_o_n_s_].
+              In the first case eeddoocc::aapppplliiccaattiioonn//11 is called instead; in the
+              second case, eeddoocc::aapppplliiccaattiioonn//22 is called.
+
+              The function call never returns; instead, the emulator is
+              automatically terminated when the call has completed, signalling
+              success or failure to the operating system.
+
+       ffiillee((AArrggss::::[[ssttrriinngg(())]])) -->> nnoonnee(())
+
+              _T_h_i_s _f_u_n_c_t_i_o_n _i_s _d_e_p_r_e_c_a_t_e_d_: This is part of the old interface
+              to EDoc and is mainly kept for backwards compatibility. The
+              preferred way of generating documentation is through one of the
+              functions aapppplliiccaattiioonn//11, ppaacckkaaggeess//11 and ffiilleess//11.
+
+              Calls eeddoocc::ffiillee//22 with the corresponding arguments. The strings
+              in the list are parsed as Erlang constant terms. The list can be
+              either _[_F_i_l_e_] or _[_F_i_l_e_, _O_p_t_i_o_n_s_]. In the first case, an empty
+              list of options is passed to eeddoocc::ffiillee//22.
+
+              The following is an example of typical usage in a Makefile:
+
+                   $(DOCDIR)/%.html:%.erl
+                           erl -noshell -run edoc_run file '"$<"' '[{dir,"$(DOCDIR)"}]' \
+                             -s init stop
+
+              The function call never returns; instead, the emulator is
+              automatically terminated when the call has completed, signalling
+              success or failure to the operating system.
+
+       ffiilleess((AArrggss::::[[ssttrriinngg(())]])) -->> nnoonnee(())
+
+              Calls eeddoocc::ffiilleess//22 with the corresponding arguments. The strings
+              in the list are parsed as Erlang constant terms. The list can be
+              either _[_F_i_l_e_s_] or _[_F_i_l_e_s_, _O_p_t_i_o_n_s_]. In the first case,
+              eeddoocc::ffiilleess//11 is called instead.
+
+              The function call never returns; instead, the emulator is
+              automatically terminated when the call has completed, signalling
+              success or failure to the operating system.
+
+       ppaacckkaaggeess((AArrggss::::[[ssttrriinngg(())]])) -->> nnoonnee(())
+
+              Calls eeddoocc::aapppplliiccaattiioonn//22 with the corresponding arguments. The
+              strings in the list are parsed as Erlang constant terms. The
+              list can be either _[_P_a_c_k_a_g_e_s_] or _[_P_a_c_k_a_g_e_s_, _O_p_t_i_o_n_s_]. In the
+              first case eeddoocc::aapppplliiccaattiioonn//11 is called instead.
+
+              The function call never returns; instead, the emulator is
+              automatically terminated when the call has completed, signalling
+              success or failure to the operating system.
+
+SSEEEE AALLSSOO
+       eeddoocc
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  edoc 0.7.10                      edoc_run(3)

@@ -1,0 +1,669 @@
+erl_eterm(3)                  C Library Functions                 erl_eterm(3)
+
+
+
+NNAAMMEE
+       erl_eterm - Functions for Erlang Term Construction
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for creating and manipulating Erlang
+       terms.
+
+       An Erlang term is represented by a C structure of type _E_T_E_R_M.
+       Applications should not reference any fields in this structure
+       directly, because it may be changed in future releases to provide
+       faster and more compact term storage. Instead, applications should us
+       the macros and functions provided.
+
+       The following macros each take a single ETERM pointer as an argument.
+       They return a non-zero value if the test is true, and 0 otherwise:
+
+         _E_R_L___I_S___I_N_T_E_G_E_R_(_t_):
+           True if _t is an integer.
+
+         _E_R_L___I_S___U_N_S_I_G_N_E_D___I_N_T_E_G_E_R_(_t_):
+           True if _t is an integer.
+
+         _E_R_L___I_S___F_L_O_A_T_(_t_):
+           True if _t is a floating point number.
+
+         _E_R_L___I_S___A_T_O_M_(_t_):
+           True if _t is an atom.
+
+         _E_R_L___I_S___P_I_D_(_t_):
+           True if _t is a Pid (process identifier).
+
+         _E_R_L___I_S___P_O_R_T_(_t_):
+           True if _t is a port.
+
+         _E_R_L___I_S___R_E_F_(_t_):
+           True if _t is a reference.
+
+         _E_R_L___I_S___T_U_P_L_E_(_t_):
+           True if _t is a tuple.
+
+         _E_R_L___I_S___B_I_N_A_R_Y_(_t_):
+           True if _t is a binary.
+
+         _E_R_L___I_S___L_I_S_T_(_t_):
+           True if _t is a list with zero or more elements.
+
+         _E_R_L___I_S___E_M_P_T_Y___L_I_S_T_(_t_):
+           True if _t is an empty list.
+
+         _E_R_L___I_S___C_O_N_S_(_t_):
+           True if _t is a list with at least one element.
+
+       The following macros can be used for retrieving parts of Erlang terms.
+       None of these do any type checking; results are undefined if you pass
+       an ETERM* containing the wrong type. For example, passing a tuple to
+       ERL_ATOM_PTR() will likely result in garbage.
+
+         _c_h_a_r _*_E_R_L___A_T_O_M___P_T_R_(_t_):
+           A string representing atom _t.
+
+         _i_n_t _E_R_L___A_T_O_M___S_I_Z_E_(_t_):
+           The length (in characters) of atom t.
+
+         _v_o_i_d _*_E_R_L___B_I_N___P_T_R_(_t_):
+           A pointer to the contents of _t
+
+         _i_n_t _E_R_L___B_I_N___S_I_Z_E_(_t_):
+           The length (in bytes) of binary object _t.
+
+         _i_n_t _E_R_L___I_N_T___V_A_L_U_E_(_t_):
+           The integer of _t.
+
+         _u_n_s_i_g_n_e_d _i_n_t _E_R_L___I_N_T___U_V_A_L_U_E_(_t_):
+           The unsigned integer value of _t.
+
+         _d_o_u_b_l_e _E_R_L___F_L_O_A_T___V_A_L_U_E_(_t_):
+           The floating point value of _t.
+
+         _E_T_E_R_M _*_E_R_L___P_I_D___N_O_D_E_(_t_):
+           The Node in pid _t.
+
+         _i_n_t _E_R_L___P_I_D___N_U_M_B_E_R_(_t_):
+           The sequence number in pid _t.
+
+         _i_n_t _E_R_L___P_I_D___S_E_R_I_A_L_(_t_):
+           The serial number in pid _t.
+
+         _i_n_t _E_R_L___P_I_D___C_R_E_A_T_I_O_N_(_t_):
+           The creation number in pid _t.
+
+         _i_n_t _E_R_L___P_O_R_T___N_U_M_B_E_R_(_t_):
+           The sequence number in port _t.
+
+         _i_n_t _E_R_L___P_O_R_T___C_R_E_A_T_I_O_N_(_t_):
+           The creation number in port _t.
+
+         _E_T_E_R_M _*_E_R_L___P_O_R_T___N_O_D_E_(_t_):
+           The node in port _t.
+
+         _i_n_t _E_R_L___R_E_F___N_U_M_B_E_R_(_t_):
+           The first part of the reference number in ref _t. Use only for
+           compatibility.
+
+         _i_n_t _E_R_L___R_E_F___N_U_M_B_E_R_S_(_t_):
+           Pointer to the array of reference numbers in ref _t.
+
+         _i_n_t _E_R_L___R_E_F___L_E_N_(_t_):
+           The number of used reference numbers in ref _t.
+
+         _i_n_t _E_R_L___R_E_F___C_R_E_A_T_I_O_N_(_t_):
+           The creation number in ref _t.
+
+         _i_n_t _E_R_L___T_U_P_L_E___S_I_Z_E_(_t_):
+           The number of elements in tuple _t.
+
+         _E_T_E_R_M _*_E_R_L___C_O_N_S___H_E_A_D_(_t_):
+           The head element of list _t.
+
+         _E_T_E_R_M _*_E_R_L___C_O_N_S___T_A_I_L_(_t_):
+           A List representing the tail elements of list _t.
+
+EEXXPPOORRTTSS
+       EETTEERRMM **eerrll__ccoonnss((hheeaadd,, ttaaiill))
+
+              Types:
+
+                 ETERM *head;
+                 ETERM *tail;
+
+              This function concatenates two Erlang terms, prepending _h_e_a_d
+              onto _t_a_i_l and thereby creating a _c_o_n_s cell. To make a proper
+              list, _t_a_i_l should always be a list or an empty list. Note that
+              NULL is not a valid list.
+
+              _h_e_a_d is the new term to be added.
+
+              _t_a_i_l is the existing list to which _h_e_a_d will be concatenated.
+
+              The function returns a new list.
+
+              _E_R_L___C_O_N_S___H_E_A_D_(_l_i_s_t_) and _E_R_L___C_O_N_S___T_A_I_L_(_l_i_s_t_) can be used to
+              retrieve the head and tail components from the list.
+              _e_r_l___h_d_(_l_i_s_t_) and _e_r_l___t_l_(_l_i_s_t_) will do the same thing, but check
+              that the argument really is a list.
+
+              For example:
+
+              ETERM *list,*anAtom,*anInt;
+              anAtom = erl_mk_atom("madonna");
+              anInt  = erl_mk_int(21);
+              list   = erl_mk_empty_list();
+              list   = erl_cons(anAtom, list);
+              list   = erl_cons(anInt, list);
+               ... /* do some work */
+              erl_free_compound(list);
+
+
+       EETTEERRMM **eerrll__ccooppyy__tteerrmm((tteerrmm))
+
+              Types:
+
+                 ETERM *term;
+
+              This function creates and returns a copy of the Erlang term
+              _t_e_r_m.
+
+       EETTEERRMM **eerrll__eelleemmeenntt((ppoossiittiioonn,, ttuuppllee))
+
+              Types:
+
+                 int position;
+                 ETERM *tuple;
+
+              This function extracts a specified element from an Erlang tuple.
+
+              _p_o_s_i_t_i_o_n specifies which element to retrieve from _t_u_p_l_e. The
+              elements are numbered starting from 1.
+
+              _t_u_p_l_e is an Erlang term containing at least _p_o_s_i_t_i_o_n elements.
+
+              The function returns a new Erlang term corresponding to the
+              requested element, or NULL if _p_o_s_i_t_i_o_n was greater than the
+              arity of _t_u_p_l_e.
+
+       vvooiidd eerrll__iinniitt((NNUULLLL,, 00))
+
+              Types:
+
+                 void *NULL;
+                 int 0;
+
+              This function must be called before any of the others in the
+              _e_r_l___i_n_t_e_r_f_a_c_e library in order to initialize the library
+              functions. The arguments must be specified as _e_r_l___i_n_i_t_(_N_U_L_L_,_0_).
+
+       EETTEERRMM **eerrll__hhdd((lliisstt))
+
+              Types:
+
+                 ETERM *list;
+
+              Extracts the first element from a list.
+
+              _l_i_s_t is an Erlang term containing a list.
+
+              The function returns an Erlang term corresponding to the head
+              element in the list, or a NULL pointer if _l_i_s_t was not a list.
+
+       EETTEERRMM **eerrll__iioolliisstt__ttoo__bbiinnaarryy((tteerrmm))
+
+              Types:
+
+                 ETERM *list;
+
+              This function converts an IO list to a binary term.
+
+              _l_i_s_t is an Erlang term containing a list.
+
+              This function an Erlang binary term, or NULL if _l_i_s_t was not an
+              IO list.
+
+              Informally, an IO list is a deep list of characters and binaries
+              which can be sent to an Erlang port. In BNF, an IO list is
+              formally defined as follows:
+
+              iolist ::= []
+                      |   Binary
+                      |   [iohead | iolist]
+                      ;
+              iohead ::= Binary
+                      |   Byte (integer in the range [0..255])
+                      |   iolist
+                      ;
+
+
+       cchhaarr **eerrll__iioolliisstt__ttoo__ssttrriinngg((lliisstt))
+
+              Types:
+
+                 ETERM *list;
+
+              This function converts an IO list to a '\0' terminated C string.
+
+              _l_i_s_t is an Erlang term containing an IO list. The IO list must
+              not contain the integer 0, since C strings may not contain this
+              value except as a terminating marker.
+
+              This function returns a pointer to a dynamically allocated
+              buffer containing a string. If _l_i_s_t is not an IO list, or if
+              _l_i_s_t contains the integer 0, NULL is returned. It is the
+              caller's responsibility free the allocated buffer with
+              _e_r_l___f_r_e_e_(_).
+
+              Refer to _e_r_l___i_o_l_i_s_t___t_o___b_i_n_a_r_y_(_) for the definition of an IO
+              list.
+
+       iinntt eerrll__iioolliisstt__lleennggtthh((lliisstt))
+
+              Types:
+
+                 ETERM *list;
+
+              Returns the length of an IO list.
+
+              _l_i_s_t is an Erlang term containing an IO list.
+
+              The function returns the length of _l_i_s_t, or -1 if _l_i_s_t is not an
+              IO list.
+
+              Refer to _e_r_l___i_o_l_i_s_t___t_o___b_i_n_a_r_y_(_) for the definition of an IO
+              list.
+
+       iinntt eerrll__lleennggtthh((lliisstt))
+
+              Types:
+
+                 ETERM *list;
+
+              Determines the length of a proper list.
+
+              _l_i_s_t is an Erlang term containing proper list. In a proper list,
+              all tails except the last point to another list cell, and the
+              last tail points to an empty list.
+
+              Returns -1 if _l_i_s_t is not a proper list.
+
+       EETTEERRMM **eerrll__mmkk__aattoomm((ssttrriinngg))
+
+              Types:
+
+                 char *string;
+
+              Creates an atom.
+
+              _s_t_r_i_n_g is the sequence of characters that will be used to create
+              the atom.
+
+              Returns an Erlang term containing an atom. Note that it is the
+              callers responsibility to make sure that _s_t_r_i_n_g contains a valid
+              name for an atom.
+
+              _E_R_L___A_T_O_M___P_T_R_(_a_t_o_m_) can be used to retrieve the atom name (as a
+              string). Note that the string is not 0-terminated in the atom.
+              _E_R_L___A_T_O_M___S_I_Z_E_(_a_t_o_m_)returns the length of the atom name.
+
+       EETTEERRMM **eerrll__mmkk__bbiinnaarryy((bbppttrr,, ssiizzee))
+
+              Types:
+
+                 char *bptr;
+                 int size;
+
+              This function produces an Erlang binary object from a buffer
+              containing a sequence of bytes.
+
+              _b_p_t_r is a pointer to a buffer containing data to be converted.
+
+              _s_i_z_e indicates the length of _b_p_t_r.
+
+              The function returns an Erlang binary object.
+
+              _E_R_L___B_I_N___P_T_R_(_b_i_n_) retrieves a pointer to the binary data.
+              _E_R_L___B_I_N___S_I_Z_E_(_b_i_n_) retrieves the size.
+
+       EETTEERRMM **eerrll__mmkk__eemmppttyy__lliisstt(())
+
+              This function creates and returns an empty Erlang list. Note
+              that NULL is not used to represent an empty list; Use this
+              function instead.
+
+       EETTEERRMM **eerrll__mmkk__eessttrriinngg((ssttrriinngg,, lleenn))
+
+              Types:
+
+                 char *string;
+                 int len;
+
+              This function creates a list from a sequence of bytes.
+
+              _s_t_r_i_n_g is a buffer containing a sequence of bytes. The buffer
+              does not need to be zero-terminated.
+
+              _l_e_n is the length of _s_t_r_i_n_g.
+
+              The function returns an Erlang list object corresponding to the
+              character sequence in _s_t_r_i_n_g.
+
+       EETTEERRMM **eerrll__mmkk__ffllooaatt((ff))
+
+              Types:
+
+                 double f;
+
+              Creates an Erlang float.
+
+              _f is a value to be converted to an Erlang float.
+
+              The function returns an Erlang float object with the value
+              specified in _f.
+
+              _E_R_L___F_L_O_A_T___V_A_L_U_E_(_t_) can be used to retrieve the value from an
+              Erlang float.
+
+       EETTEERRMM **eerrll__mmkk__iinntt((nn))
+
+              Types:
+
+                 int n;
+
+              Creates an Erlang integer.
+
+              _n is a value to be converted to an Erlang integer.
+
+              The function returns an Erlang integer object with the value
+              specified in _n.
+
+              _E_R_L___I_N_T___V_A_L_U_E_(_t_) can be used to retrieve the value value from an
+              Erlang integer.
+
+       EETTEERRMM **eerrll__mmkk__lliisstt((aarrrraayy,, aarrrrssiizzee))
+
+              Types:
+
+                 ETERM **array;
+                 int arrsize;
+
+              Creates an Erlang list from an array of Erlang terms, such that
+              each element in the list corresponds to one element in the
+              array.
+
+              _a_r_r_a_y is an array of Erlang terms.
+
+              _a_r_r_s_i_z_e is the number of elements in _a_r_r_a_y.
+
+              The function creates an Erlang list object, whose length _a_r_r_s_i_z_e
+              and whose elements are taken from the terms in _a_r_r_a_y.
+
+       EETTEERRMM **eerrll__mmkk__ppiidd((nnooddee,, nnuummbbeerr,, sseerriiaall,, ccrreeaattiioonn))
+
+              Types:
+
+                 const char *node;
+                 unsigned int number;
+                 unsigned int serial;
+                 unsigned int creation;
+
+              This function creates an Erlang process identifier. The
+              resulting pid can be used by Erlang processes wishing to
+              communicate with the C node.
+
+              _n_o_d_e is the name of the C node.
+
+              _n_u_m_b_e_r, _s_e_r_i_a_l and _c_r_e_a_t_i_o_n are arbitrary numbers. Note though,
+              that these are limited in precision, so only the low 15, 3 and 2
+              bits of these numbers are actually used.
+
+              The function returns an Erlang pid object.
+
+              _E_R_L___P_I_D___N_O_D_E_(_p_i_d_), _E_R_L___P_I_D___N_U_M_B_E_R_(_p_i_d_), _E_R_L___P_I_D___S_E_R_I_A_L_(_p_i_d_) and
+              _E_R_L___P_I_D___C_R_E_A_T_I_O_N_(_p_i_d_) can be used to retrieve the four values
+              used to create the pid.
+
+       EETTEERRMM **eerrll__mmkk__ppoorrtt((nnooddee,, nnuummbbeerr,, ccrreeaattiioonn))
+
+              Types:
+
+                 const char *node;
+                 unsigned int number;
+                 unsigned int creation;
+
+              This function creates an Erlang port identifier.
+
+              _n_o_d_e is the name of the C node.
+
+              _n_u_m_b_e_r and _c_r_e_a_t_i_o_n are arbitrary numbers. Note though, that
+              these are limited in precision, so only the low 18 and 2 bits of
+              these numbers are actually used.
+
+              The function returns an Erlang port object.
+
+              _E_R_L___P_O_R_T___N_O_D_E_(_p_o_r_t_), _E_R_L___P_O_R_T___N_U_M_B_E_R_(_p_o_r_t_) and _E_R_L___P_O_R_T___C_R_E_A_T_I_O_N
+              can be used to retrieve the three values used to create the
+              port.
+
+       EETTEERRMM **eerrll__mmkk__rreeff((nnooddee,, nnuummbbeerr,, ccrreeaattiioonn))
+
+              Types:
+
+                 const char *node;
+                 unsigned int number;
+                 unsigned int creation;
+
+              This function creates an old Erlang reference, with only 18 bits
+              - use _e_r_l___m_k___l_o_n_g___r_e_f instead.
+
+              _n_o_d_e is the name of the C node.
+
+              _n_u_m_b_e_r should be chosen uniquely for each reference created for
+              a given C node.
+
+              _c_r_e_a_t_i_o_n is an arbitrary number.
+
+              Note that _n_u_m_b_e_r and _c_r_e_a_t_i_o_n are limited in precision, so only
+              the low 18 and 2 bits of these numbers are actually used.
+
+              The function returns an Erlang reference object.
+
+              _E_R_L___R_E_F___N_O_D_E_(_r_e_f_), _E_R_L___R_E_F___N_U_M_B_E_R_(_r_e_f_), and
+              _E_R_L___R_E_F___C_R_E_A_T_I_O_N_(_r_e_f_) to retrieve the three values used to
+              create the reference.
+
+       EETTEERRMM **eerrll__mmkk__lloonngg__rreeff((nnooddee,, nn11,, nn22,, nn33,, ccrreeaattiioonn))
+
+              Types:
+
+                 const char *node;
+                 unsigned int n1, n2, n3;
+                 unsigned int creation;
+
+              This function creates an Erlang reference, with 82 bits.
+
+              _n_o_d_e is the name of the C node.
+
+              _n_1, _n_2 and _n_3 can be seen as one big number _n_1_*_2_^_6_4_+_n_2_*_2_^_3_2_+_n_3
+              which should be chosen uniquely for each reference created for a
+              given C node.
+
+              _c_r_e_a_t_i_o_n is an arbitrary number.
+
+              Note that _n_3 and _c_r_e_a_t_i_o_n are limited in precision, so only the
+              low 18 and 2 bits of these numbers are actually used.
+
+              The function returns an Erlang reference object.
+
+              _E_R_L___R_E_F___N_O_D_E_(_r_e_f_), _E_R_L___R_E_F___N_U_M_B_E_R_S_(_r_e_f_), _E_R_L___R_E_F___L_E_N_(_r_e_f_) and
+              _E_R_L___R_E_F___C_R_E_A_T_I_O_N_(_r_e_f_) to retrieve the values used to create the
+              reference.
+
+       EETTEERRMM **eerrll__mmkk__ssttrriinngg((ssttrriinngg))
+
+              Types:
+
+                 char *string;
+
+              This function creates a list from a zero terminated string.
+
+              _s_t_r_i_n_g is the zero-terminated sequence of characters (i.e. a C
+              string) from which the list will be created.
+
+              The function returns an Erlang list.
+
+       EETTEERRMM **eerrll__mmkk__ttuuppllee((aarrrraayy,, aarrrrssiizzee))
+
+              Types:
+
+                 ETERM **array;
+                 int arrsize;
+
+              Creates an Erlang tuple from an array of Erlang terms.
+
+              _a_r_r_a_y is an array of Erlang terms.
+
+              _a_r_r_s_i_z_e is the number of elements in _a_r_r_a_y.
+
+              The function creates an Erlang tuple, whose arity is _s_i_z_e and
+              whose elements are taken from the terms in _a_r_r_a_y.
+
+              To retrieve the size of a tuple, either use the _e_r_l___s_i_z_e
+              function (which checks the type of the checked term and works
+              for a binary as well as for a tuple), or the
+              _E_R_L___T_U_P_L_E___S_I_Z_E_(_t_u_p_l_e_) returns the arity of a tuple. _e_r_l___s_i_z_e_(_)
+              will do the same thing, but it checks that the argument really
+              is a tuple. _e_r_l___e_l_e_m_e_n_t_(_i_n_d_e_x_,_t_u_p_l_e_) returns the element
+              corresponding to a given position in the tuple.
+
+       EETTEERRMM **eerrll__mmkk__uuiinntt((nn))
+
+              Types:
+
+                 unsigned int n;
+
+              Creates an Erlang unsigned integer.
+
+              _n is a value to be converted to an Erlang unsigned integer.
+
+              The function returns an Erlang unsigned integer object with the
+              value specified in _n.
+
+              _E_R_L___I_N_T___U_V_A_L_U_E_(_t_) can be used to retrieve the value from an
+              Erlang unsigned integer.
+
+       EETTEERRMM **eerrll__mmkk__vvaarr((nnaammee))
+
+              Types:
+
+                 char *name;
+
+              This function creates an unbound Erlang variable. The variable
+              can later be bound through pattern matching or assignment.
+
+              _n_a_m_e specifies a name for the variable.
+
+              The function returns an Erlang variable object with the name
+              _n_a_m_e.
+
+       iinntt eerrll__pprriinntt__tteerrmm((ssttrreeaamm,, tteerrmm))
+
+              Types:
+
+                 FILE *stream;
+                 ETERM *term;
+
+              This function prints the specified Erlang term to the given
+              output stream.
+
+              _s_t_r_e_a_m indicates where the function should send its output.
+
+              _t_e_r_m is the Erlang term to print.
+
+              The function returns the number of characters written, or a
+              negative value if there was an error.
+
+       vvooiidd eerrll__sseett__ccoommppaatt__rreell((rreelleeaassee__nnuummbbeerr))
+
+              Types:
+
+                 unsigned release_number;
+
+              By default, the _e_r_l___i_n_t_e_r_f_a_c_e library is only guaranteed to be
+              compatible with other Erlang/OTP components from the same
+              release as the _e_r_l___i_n_t_e_r_f_a_c_e library itself. For example,
+              _e_r_l___i_n_t_e_r_f_a_c_e from the OTP R10 release is not compatible with an
+              Erlang emulator from the OTP R9 release by default.
+
+              A call to _e_r_l___s_e_t___c_o_m_p_a_t___r_e_l_(_r_e_l_e_a_s_e___n_u_m_b_e_r_) sets the
+              _e_r_l___i_n_t_e_r_f_a_c_e library in compatibility mode of release
+              _r_e_l_e_a_s_e___n_u_m_b_e_r. Valid range of _r_e_l_e_a_s_e___n_u_m_b_e_r is [7, current
+              release]. This makes it possible to communicate with Erlang/OTP
+              components from earlier releases.
+
+          NNoottee::
+              If this function is called, it may only be called once directly
+              after the call to the eerrll__iinniitt(()) function.
+
+
+          WWaarrnniinngg::
+              You may run into trouble if this feature is used carelessly.
+              Always make sure that all communicating components are either
+              from the same Erlang/OTP release, or from release X and release
+              Y where all components from release Y are in compatibility mode
+              of release X.
+
+
+       iinntt eerrll__ssiizzee((tteerrmm))
+
+              Types:
+
+                 ETERM *term;
+
+              Returns the arity of an Erlang tuple, or the number of bytes in
+              an Erlang binary object.
+
+              _t_e_r_m is an Erlang tuple or an Erlang binary object.
+
+              The function returns the size of _t_e_r_m as described above, or -1
+              if _t_e_r_m is not one of the two supported types.
+
+       EETTEERRMM **eerrll__ttll((lliisstt))
+
+              Types:
+
+                 ETERM *list;
+
+              Extracts the tail from a list.
+
+              _l_i_s_t is an Erlang term containing a list.
+
+              The function returns an Erlang list corresponding to the
+              original list minus the first element, or NULL pointer if _l_i_s_t
+              was not a list.
+
+       EETTEERRMM **eerrll__vvaarr__ccoonntteenntt((tteerrmm,, nnaammee))
+
+              Types:
+
+                 ETERM *term;
+                 char *name;
+
+              This function returns the contents of the specified variable in
+              an Erlang term.
+
+              _t_e_r_m is an Erlang term. In order for this function to succeed,
+              _t_e_r_m must be an Erlang variable with the specified name, or it
+              must be an Erlang list or tuple containing a variable with the
+              specified name. Other Erlang types cannot contain variables.
+
+              _n_a_m_e is the name of an Erlang variable.
+
+              Returns the Erlang object corresponding to the value of _n_a_m_e in
+              _t_e_r_m. If no variable with the name _n_a_m_e was found in _t_e_r_m, or if
+              _t_e_r_m is not a valid Erlang term, NULL is returned.
+
+
+
+Ericsson AB                   erl_interface 3.7.8                 erl_eterm(3)

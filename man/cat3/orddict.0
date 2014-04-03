@@ -1,0 +1,275 @@
+orddict(3)                 Erlang Module Definition                 orddict(3)
+
+
+
+NNAAMMEE
+       orddict - Key-Value Dictionary as Ordered List
+
+DDEESSCCRRIIPPTTIIOONN
+       _O_r_d_d_i_c_t implements a _K_e_y - _V_a_l_u_e dictionary. An _o_r_d_d_i_c_t is a
+       representation of a dictionary, where a list of pairs is used to store
+       the keys and values. The list is ordered after the keys.
+
+       This module provides exactly the same interface as the module _d_i_c_t but
+       with a defined representation. One difference is that while _d_i_c_t
+       considers two keys as different if they do not match (_=_:_=), this module
+       considers two keys as different if and only if they do not compare
+       equal (_=_=).
+
+DDAATTAA TTYYPPEESS
+       oorrddddiicctt(()) = [{Key :: term(), Value :: term()}]
+
+              As returned by new/0.
+
+EEXXPPOORRTTSS
+       aappppeenndd((KKeeyy,, VVaalluuee,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = Value = term()
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              This function appends a new _V_a_l_u_e to the current list of values
+              associated with _K_e_y. An exception is generated if the initial
+              value associated with _K_e_y is not a list of values.
+
+       aappppeenndd__lliisstt((KKeeyy,, VVaallLLiisstt,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = term()
+                 ValList = [Value :: term()]
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              This function appends a list of values _V_a_l_L_i_s_t to the current
+              list of values associated with _K_e_y. An exception is generated if
+              the initial value associated with _K_e_y is not a list of values.
+
+       eerraassee((KKeeyy,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = term()
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              This function erases all items with a given key from a
+              dictionary.
+
+       ffeettcchh((KKeeyy,, OOrrddddiicctt)) -->> VVaalluuee
+
+              Types:
+
+                 Key = Value = term()
+                 Orddict = oorrddddiicctt(())
+
+              This function returns the value associated with _K_e_y in the
+              dictionary _O_r_d_d_i_c_t. _f_e_t_c_h assumes that the _K_e_y is present in the
+              dictionary and an exception is generated if _K_e_y is not in the
+              dictionary.
+
+       ffeettcchh__kkeeyyss((OOrrddddiicctt)) -->> KKeeyyss
+
+              Types:
+
+                 Orddict = oorrddddiicctt(())
+                 Keys = [term()]
+
+              This function returns a list of all keys in the dictionary.
+
+       ffiilltteerr((PPrreedd,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Pred = fun((Key :: term(), Value :: term()) -> boolean())
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              _O_r_d_d_i_c_t_2 is a dictionary of all keys and values in _O_r_d_d_i_c_t_1 for
+              which _P_r_e_d_(_K_e_y_, _V_a_l_u_e_) is _t_r_u_e.
+
+       ffiinndd((KKeeyy,, OOrrddddiicctt)) -->> {{ookk,, VVaalluuee}} || eerrrroorr
+
+              Types:
+
+                 Key = term()
+                 Orddict = oorrddddiicctt(())
+                 Value = term()
+
+              This function searches for a key in a dictionary. Returns _{_o_k_,
+              _V_a_l_u_e_} where _V_a_l_u_e is the value associated with _K_e_y, or _e_r_r_o_r if
+              the key is not present in the dictionary.
+
+       ffoolldd((FFuunn,, AAcccc00,, OOrrddddiicctt)) -->> AAcccc11
+
+              Types:
+
+                 Fun =
+                     fun((Key :: term(), Value :: term(), AccIn :: term()) ->
+                             AccOut :: term())
+                 Acc0 = Acc1 = term()
+                 Orddict = oorrddddiicctt(())
+
+              Calls _F_u_n on successive keys and values of _O_r_d_d_i_c_t together with
+              an extra argument _A_c_c (short for accumulator). _F_u_n must return a
+              new accumulator which is passed to the next call. _A_c_c_0 is
+              returned if the list is empty. The evaluation order is
+              undefined.
+
+       ffrroomm__lliisstt((LLiisstt)) -->> OOrrddddiicctt
+
+              Types:
+
+                 List = [{Key :: term(), Value :: term()}]
+                 Orddict = oorrddddiicctt(())
+
+              This function converts the _K_e_y - _V_a_l_u_e list _L_i_s_t to a
+              dictionary.
+
+       iiss__kkeeyy((KKeeyy,, OOrrddddiicctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Key = term()
+                 Orddict = oorrddddiicctt(())
+
+              This function tests if _K_e_y is contained in the dictionary
+              _O_r_d_d_i_c_t.
+
+       mmaapp((FFuunn,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Fun =
+                     fun((Key :: term(), Value1 :: term()) -> Value2 ::
+                 term())
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              _m_a_p calls _F_u_n on successive keys and values of _O_r_d_d_i_c_t_1 to
+              return a new value for each key. The evaluation order is
+              undefined.
+
+       mmeerrggee((FFuunn,, OOrrddddiicctt11,, OOrrddddiicctt22)) -->> OOrrddddiicctt33
+
+              Types:
+
+                 Fun =
+                     fun((Key :: term(), Value1 :: term(), Value2 :: term())
+                 ->
+                             Value :: term())
+                 Orddict1 = Orddict2 = Orddict3 = oorrddddiicctt(())
+
+              _m_e_r_g_e merges two dictionaries, _O_r_d_d_i_c_t_1 and _O_r_d_d_i_c_t_2, to create
+              a new dictionary. All the _K_e_y - _V_a_l_u_e pairs from both
+              dictionaries are included in the new dictionary. If a key occurs
+              in both dictionaries then _F_u_n is called with the key and both
+              values to return a new value. _m_e_r_g_e could be defined as:
+
+              merge(Fun, D1, D2) ->
+                  fold(fun (K, V1, D) ->
+                               update(K, fun (V2) -> Fun(K, V1, V2) end, V1, D)
+                       end, D2, D1).
+
+              but is faster.
+
+       nneeww(()) -->> oorrddddiicctt(())
+
+              This function creates a new dictionary.
+
+       ssiizzee((OOrrddddiicctt)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Orddict = oorrddddiicctt(())
+
+              Returns the number of elements in an _O_r_d_d_i_c_t.
+
+       ssttoorree((KKeeyy,, VVaalluuee,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = Value = term()
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              This function stores a _K_e_y - _V_a_l_u_e pair in a dictionary. If the
+              _K_e_y already exists in _O_r_d_d_i_c_t_1, the associated value is replaced
+              by _V_a_l_u_e.
+
+       ttoo__lliisstt((OOrrddddiicctt)) -->> LLiisstt
+
+              Types:
+
+                 Orddict = oorrddddiicctt(())
+                 List = [{Key :: term(), Value :: term()}]
+
+              This function converts the dictionary to a list representation.
+
+       uuppddaattee((KKeeyy,, FFuunn,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = term()
+                 Fun = fun((Value1 :: term()) -> Value2 :: term())
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              Update a value in a dictionary by calling _F_u_n on the value to
+              get a new value. An exception is generated if _K_e_y is not present
+              in the dictionary.
+
+       uuppddaattee((KKeeyy,, FFuunn,, IInniittiiaall,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = Initial = term()
+                 Fun = fun((Value1 :: term()) -> Value2 :: term())
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              Update a value in a dictionary by calling _F_u_n on the value to
+              get a new value. If _K_e_y is not present in the dictionary then
+              _I_n_i_t_i_a_l will be stored as the first value. For example _a_p_p_e_n_d_/_3
+              could be defined as:
+
+              append(Key, Val, D) ->
+                  update(Key, fun (Old) -> Old ++ [Val] end, [Val], D).
+
+       uuppddaattee__ccoouunntteerr((KKeeyy,, IInnccrreemmeenntt,, OOrrddddiicctt11)) -->> OOrrddddiicctt22
+
+              Types:
+
+                 Key = term()
+                 Increment = number()
+                 Orddict1 = Orddict2 = oorrddddiicctt(())
+
+              Add _I_n_c_r_e_m_e_n_t to the value associated with _K_e_y and store this
+              value. If _K_e_y is not present in the dictionary then _I_n_c_r_e_m_e_n_t
+              will be stored as the first value.
+
+              This could be defined as:
+
+              update_counter(Key, Incr, D) ->
+                  update(Key, fun (Old) -> Old + Incr end, Incr, D).
+
+              but is faster.
+
+NNOOTTEESS
+       The functions _a_p_p_e_n_d and _a_p_p_e_n_d___l_i_s_t are included so we can store keyed
+       values in a list _a_c_c_u_m_u_l_a_t_o_r. For example:
+
+       > D0 = orddict:new(),
+         D1 = orddict:store(files, [], D0),
+         D2 = orddict:append(files, f1, D1),
+         D3 = orddict:append(files, f2, D2),
+         D4 = orddict:append(files, f3, D3),
+         orddict:fetch(files, D4).
+       [f1,f2,f3]
+
+       This saves the trouble of first fetching a keyed value, appending a new
+       value to the list of stored values, and storing the result.
+
+       The function _f_e_t_c_h should be used if the key is known to be in the
+       dictionary, otherwise _f_i_n_d.
+
+SSEEEE AALLSSOO
+       ddiicctt((33)), ggbb__ttrreeeess((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                      orddict(3)

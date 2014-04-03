@@ -1,0 +1,971 @@
+inviso(3)                  Erlang Module Definition                  inviso(3)
+
+
+
+NNAAMMEE
+       inviso - Main API Module to the Inviso Tracer
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       The _i_n_v_i_s_o application is deprecated and will be removed in the R16
+       release.
+
+
+       With the _i_n_v_i_s_o API runtime components can be started and tracing
+       managed across a network of distributed Erlang nodes, using a control
+       component also started with _i_n_v_i_s_o API functions.
+
+       Inviso can be used both in a distributed environment and in a non-
+       distributed. API functions not taking a list of nodes as argument works
+       on all started runtime components. If it is the non-distributed case,
+       that is the local runtime component. The API functions taking a list of
+       nodes as argument, or as part of one of the arguments, can not be used
+       in a non-distributed environment. Return values named _N_o_d_e_R_e_s_u_l_t refers
+       to return values from a single Erlang node, and will therefore be the
+       return in the non-distributed environment.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> {{ookk,,ppiidd(())}} || {{eerrrroorr,,RReeaassoonn}}
+       ssttaarrtt((OOppttiioonnss)) -->> {{ookk,,ppiidd(())}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Options = [Option]
+
+              _O_p_t_i_o_n_s may contain both options which will be default options
+              to a runtime component when started, and options to the control
+              component. See aadddd__nnooddeess//33 for details on runtime component
+              options. The control component recognizes the following options:
+
+                _{_s_u_b_s_c_r_i_b_e_,_P_i_d_}:
+                  Making the process _P_i_d receive Inviso events from the
+                  control component.
+
+                  Starts a control component process on the local node. A
+                  control component must be started before runtime components
+                  can be started manually or otherwise accessed through the
+                  _i_n_v_i_s_o API.
+
+       ssttoopp(()) -->> sshhuuttddoowwnn
+
+              Stops the control component. Runtime components are left as is.
+              They will behave according to their dependency values.
+
+       aadddd__nnooddee((RRTTttaagg)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       aadddd__nnooddee((RRTTttaagg,,OOppttiioonnss)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 RTtag = PreviousRTtag = term()
+                 Options = [Option]
+                  Option -- see below
+                  Option = {dependency,Dep}
+                  Dep = int() | infinity
+                   The timeout, in milliseconds, before the runtime component
+                   will terminate if abandoned by _t_h_i_scontrol component.
+                  Option = {overload,Overload} | overload
+                   Controls how and how often overload checks shall be
+                   performed. Just _o_v_e_r_l_o_a_dspecifies that no loadcheck shall
+                   be performed.
+                  Overload = Interval | {LoadMF,Interval,InitMFA,RemoveMFA}
+                  LoadMF = {Mod,Func} | function()/1
+                  Interval = int() | infinity
+                   Interval is the time in milliseconds between overload
+                   checks.
+                  InitMFA = RemoveMFA = {Mod,Func,ArgList} | void
+                   When starting up the runtime component or when changing
+                   options (see _c_h_a_n_g_e___o_p_t_i_o_n_s_/_2) the overload mechanism is
+                   initialized with a call to the _I_n_i_t_M_F_Afunction. It shall
+                   return _L_o_a_d_C_h_e_c_k_D_a_t_a. Every time a load check is performed,
+                   _L_o_a_d_M_Fis called with _L_o_a_d_C_h_e_c_k_D_a_t_aas its only argument.
+                   _L_o_a_d_M_Fshall return _o_kor _{_s_u_s_p_e_n_d_,_R_e_a_s_o_n_}. When the runtime
+                   component is stopped or made to change options involving
+                   changing overload-check, the _R_e_m_o_v_e_M_F_Afunction is called.
+                   Its return value is discarded.
+                 NodeResult = {ok,NAns} | {error,Reason}
+                  NAns = new | {adopted,State,Status,PreviousRTtag} |
+                 already_added
+                  State = new | tracing | idle
+                  Status = running | {suspended,SReason}
+
+              Starts or tries to connect to an existing runtime component at
+              the local node, regardless if the system is distributed or not.
+              _O_p_t_i_o_n_s will override any default options specified at start-up
+              of the control component.
+
+              The _P_r_e_v_i_o_u_s_R_T_t_a_g can indicate if the incarnation of the runtime
+              component at the node in question was started by "us" and then
+              can be expected to do tracing according to "our" instructions or
+              not.
+
+       aadddd__nnooddee__iiff__rreeff((RRTTttaagg)) -->> NNooddeeRReessuulltt ||
+       {{eerrrroorr,,{{wwrroonngg__rreeffeerreennccee,,OOtthheerrTTaagg}}}} || {{eerrrroorr,,RReeaassoonn}}
+       aadddd__nnooddee__iiff__rreeff((RRTTttaagg,,OOppttiioonnss)) -->> NNooddeeRReessuulltt ||
+       {{eerrrroorr,,{{wwrroonngg__rreeffeerreennccee,,OOtthheerrRReeff}}}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 OtherRef = term()
+                   rttag of the running incarnation
+
+              As aadddd__nnooddee//11,,22 but will only adopt the runtime component if its
+              rttag is _R_T_t_a_g.
+
+       aadddd__nnooddeess((NNooddeess,,RRTTttaagg)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       aadddd__nnooddeess((NNooddeess,,RRTTttaagg,,OOppttiioonnss)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeResults = [{Node,NodeResult}]
+
+              As aadddd__nnooddee//11,,22 but for a distributed environment.
+
+       aadddd__nnooddeess__iiff__rreeff((NNooddeess,,RRTTttaagg)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       aadddd__nnooddeess__iiff__rreeff((NNooddeess,,RRTTttaagg,,OOppttiioonnss)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeResults = [{Node,NodeResult}]
+
+              As aadddd__nnooddee__iiff__rreeff//11,,22 but for a distributed environment.
+
+       ssttoopp__nnooddeess(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt
+       ssttoopp__nnooddeess((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Stops runtime component on _N_o_d_e_s. _s_t_o_p___n_o_d_e_s_/_0 will if the
+              control component is running on a distributed node stop all
+              runtime components. And if running on a non distributed node,
+              stop the local and only runtime component.
+
+       ssttoopp__aallll(()) == {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              A combination of ssttoopp//00 and ssttoopp__nnooddeess//00.
+
+       cchhaannggee__ooppttiioonnss((OOppttiioonnss)) -->> NNooddeeRReessuulltt || {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+       cchhaannggee__ooppttiioonnss((NNooddeess,,OOppttiioonnss)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Changes the options for one or several runtime components. If
+              for instance overload is redefined, the previous overload will
+              be stopped and the new started. See aadddd__nnooddee//11 for details on
+              _O_p_t_i_o_n_s.
+
+       iinniitt__ttrraacciinngg((TTrraacceerrDDaattaa)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       iinniitt__ttrraacciinngg((TTrraacceerrLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       iinniitt__ttrraacciinngg((NNooddeess,,TTrraacceerrDDaattaa)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 TracerData = [{trace,LogTD} [,{ti,TiTD}] }] | LogTD
+                 LogTD = {HandlerFun,Data1} | collector |
+                 {relayer,CollectingNode} | {ip,IPPortParameters} |
+                 {file,FilePortParameters}
+                 TiTD = {file,FileName} | {file,FileName,TiSpec} |
+                 {relay,Node}
+                  TiSpec = {InitMFA,RemoveMF,CleanMF}
+                  InitMFA = {Mi,Fi,Argsi}
+                  RemoveMF = {Mr,Fr} | void
+                  CleanMF = {Mc,Fc}
+                  Mi = Fi = Mr = Fr = Mc = Fd = atom()
+                  Argsi = [term()]
+                 TracerList = [{Node,TracerData}]
+                 IPPortParameters = Portno | {Portno,Qsize}
+                  Portno = tcp_portno()
+                  Qsize = int()
+                 FilePortParameters =
+                 {Filename,wrap,Tail,{time,WrapTime},WrapCnt} |
+                 {FileName,wrap,Tail,WrapSize,WrapCnt} |
+                 {FileName,wrap,Tail,WrapSize} | {FileName,wrap,Tail} |
+                 FileName
+                  FileName = string()
+                  Tail = string() =/= ""
+                  WrapTime = WrapCnt = WrapSize = int() >0
+                 TracerList = [{Node,TracerData}]
+                 Nodes = [Node]
+                 HandlerFun = function()/2;
+                  HandlerFun(TraceMsg,Data1) -> NewData
+                 CollectingNode = pid() | node()
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,LogResults} | {error,NReason}
+                  LogResults = [LogResult]
+                  LogResult = {trace_log,LogRes} | {ti_log,LogRes}
+                  LogRes = ok | {error,Reason}
+
+              Starts the tracing at the specified nodes, meaning that the
+              runtime components transits from the state _n_e_w or _i_d_l_e to
+              _t_r_a_c_i_n_g. For trace messages to be generated, there must of
+              course also be trace pattern and/or trace flags set. Such can
+              not be set before tracing has been initiated with
+              _i_n_i_t___t_r_a_c_i_n_g_/_1_,_2.
+
+              _T_r_a_c_e_r_D_a_t_a controls how the runtime component will handle
+              generated trace messages. The _t_r_a_c_e tag controls how regular
+              trace messages are handled. The _t_i tag controls if and how trace
+              information will be stored and the meta tracer will be
+              activated. That is if _t_i is omitted, no meta tracer will be
+              started as part of the runtime component. It is possible to have
+              _t_i without _t_r_a_c_e, but most likely not useful.
+
+              The _i_p and _f_i_l_e trace tracerdata instructions results in using
+              the built in trace ip-port and file-port respectively. _r_e_l_a_y_e_r
+              will result in that all regular trace messages are forwarded to
+              a runtime component at the specified node. Using a _H_a_n_d_l_e_r_F_u_n
+              will result in that every incoming regular trace message is
+              applied to the _H_a_n_d_l_e_r_F_u_n. _c_o_l_l_e_c_t_o_r can be used to use this
+              runtime component to receive relayed trace messages and print
+              them to the shell.
+
+              The trace information can be configured to either write trace
+              information to a plain trace information file or to relay it to
+              another inviso meta tracer on another node. The inviso meta
+              tracer is capable of matching function calls with their function
+              returns (only if _r_e_t_u_r_n___t_r_a_c_e is activated in the meta trace
+              match specification for the function in question). This is
+              necessary since it may not be possible to decide what to do, if
+              anything shall be done at all, until the return value of the
+              function call is examined.
+
+              To be able to match calls with returns a state can be saved when
+              detecting a function call in a public loop data structure kept
+              by the inviso meta tracer. The public loop data structure is
+              given as argument to a handler-function called whenever a meta
+              trace message arrives to the inviso meta tracer (both function
+              calls and function returns). The public loop data structure is
+              first initiated by the _M_i_:_F_i function which takes the items in
+              _A_r_g_s_i as arguments. _F_i shall return the initial public loop data
+              structure. When meta tracing is stopped, either because tracing
+              is stopped or because tracing is suspended, the
+              _M_r_:_F_r_(_P_u_b_l_i_c_L_o_o_p_D_a_t_a_) is called to offer a possibility to clean-
+              up. Note that for every function meta-tracing is activated, a
+              public loop data modification function can be specified. That
+              function will prepare the current loop data structure for this
+              particular function.
+
+              Further there is a risk that function call states becomes
+              abandoned inside the public loop data structure. This will
+              happen if a function call is entered into the public loop data
+              structure, but no function return occurs. To prevent the public
+              loop data structure from growing infinitely the clean function
+              _F_c will periodically be called with the public loop data
+              structure as argument. Elements entered into the public loop
+              data structure as a result of a function call must contain a
+              timestamp for the _F_c to be able to conclude if it is abandoned
+              or not. _F_c shall return a new public loop data structure.
+
+              When initiating tracing involving trace information without a
+              _T_i_S_p_e_c, a default public loop data structure will be initiated
+              to handle locally registered process aliases. The default public
+              loop data structure is a two-tuple where the first element is
+              used by the meta tracing on the BIF _r_e_g_i_s_t_e_r_/_2. The second
+              element is left for user usage.
+
+              The default public loop data structure may be extended with more
+              element positions. The first position must be left to the
+              implementation of registered-name translations. If the public
+              loop data structure is changed no longer meeting this
+              requirement, the ttppmm__llooccaallnnaammeess//00,,11 and ttppmm__gglloobbaallnnaammeess//00,,11 can
+              no longer be used.
+
+              A wrap files specification is used to limit the disk space
+              consumed by the trace. The trace is written to a limited number
+              of files each with a limited size. The actual filenames are
+              _F_i_l_e_n_a_m_e _+_+ _S_e_q_C_n_t _+_+ _T_a_i_l, where _S_e_q_C_n_t counts as a decimal
+              string from 0 to _W_r_a_p_C_n_t and then around again from 0. When a
+              trace message written to the current file makes it longer than
+              _W_r_a_p_S_i_z_e, that file is closed, if the number of files in this
+              wrap trace is as many as _W_r_a_p_C_n_t the oldest file is deleted then
+              a new file is opened to become the current. Thus, when a wrap
+              trace has been stopped, there are at most _W_r_a_p_C_n_t trace files
+              saved with a size of at least _W_r_a_p_S_i_z_e (but not much bigger),
+              except for the last file that might even be empty. The default
+              values are _W_r_a_p_S_i_z_e _=_= _1_2_8_*_1_0_2_4 and _W_r_a_p_C_n_t _=_= _8.
+
+              The _S_e_q_C_n_t values in the filenames are all in the range 0
+              through _W_r_a_p_C_n_t with a gap in the circular sequence. The gap is
+              needed to find the end of the trace.
+
+              If the _W_r_a_p_S_i_z_e is specified as _{_t_i_m_e_,_W_r_a_p_T_i_m_e_}, the current
+              file is closed when it has been open more than _W_r_a_p_T_i_m_e
+              milliseconds, regardless of it being empty or not.
+
+              The ip trace driver has a queue of _Q_S_i_z_e messages waiting to be
+              delivered. If the driver cannot deliver messages as fast as they
+              are produced by the runtime system, they are dropped. The number
+              of dropped messages are indicated in the trace log as separate
+              trace message.
+
+       ssttoopp__ttrraacciinngg((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ssttoopp__ttrraacciinngg(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,State} | {error,Reason}
+                  State = new | idle
+
+              Stops tracing on all or specified _N_o_d_e_s. Flushes the trace
+              buffer if a trace-port is used, closes the trace-port and
+              removes all trace flags and meta-patterns. The nodes are called
+              in parallel.
+
+              Stopping tracing means going to state _i_d_l_e_<_c_>_. _I_f _t_h_e _r_u_n_t_i_m_e
+              _c_o_m_p_o_n_e_n_t _w_a_s _a_l_r_e_a_d_y _i_n _s_t_a_t_e _<_c_>_n_e_w, it will of course remain
+              in state _n_e_w (then there was no tracing to stop).
+
+       cclleeaarr(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt
+       cclleeaarr((NNooddeess,,OOppttiioonnss)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       cclleeaarr((OOppttiioonnss)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 Options = [Option]
+                  Option = keep_trace_patterns | keep_log_files
+                 NodeResults = [{Node,NodeResult}]
+                  NodeResult = {ok,{new,Status}} | {error,Reason}
+                  Status = running | {suspended,SReason}
+
+              Stops all tracing including removing meta-trace patterns.
+              Removes all trace patterns. If the node is _t_r_a_c_i_n_g or _i_d_l_e,
+              trace-logs belonging to the current tracerdata are removed.
+              Hence the node is returned to state _n_e_w. Note that the node can
+              still be suspended.
+
+              Various options can make the node keep set trace patterns and
+              log-files. The node still enters the _n_e_w state.
+
+       ttpp((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc,,OOppttss)) -->>
+       ttpp((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttpp((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc,,OOppttss)) -->>
+       ttpp((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttpp((NNooddeess,,PPaatttteerrnnLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttpp((PPaatttteerrnnLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 Mod = Func = atom() | '_'
+                 Arity = int() | '_'
+                 MatchSpec = true | false | [] | matchspec()
+                 PatternList = [Pattern],
+                  Pattern = {Mod,Func,Arity,MatchSpec,Opts}
+                 Opts = [Opt]
+                  Opt = only_loaded
+                 NodeResults = [NodeResult]
+                  NodeResult = {ok,[Ans]} | {error,Reason}
+                  Ans = int() | {error,Reason}
+
+              Set trace pattern (global) on specified or all nodes. The
+              integer replied if the call was successfully describes the
+              number of matched functions. The functions without a _N_o_d_e_s
+              argument means all nodes, in a non-distributed environment it
+              means the local node. Using wildcards follows the rules for
+              wildcards of _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_3. It is for instance illegal
+              to specify _M _=_= _'___' while _F is not _'___'.
+
+              When calling several nodes, the nodes are called in parallel.
+
+              The option _o_n_l_y___l_o_a_d_e_d will prevent modules not loaded (yet)
+              into the runtime system to become loaded just as a result of
+              that a trace pattern is requested to be set on it. Otherwise
+              modules are automatically loaded if not already loaded (since
+              the module must be present for a trace pattern to be set on it).
+              The latter does not apply if the wildcard _'___' is used as module
+              specification.
+
+       ttppll((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc)) -->>
+       ttppll((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc,,OOppttss)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppll((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc)) -->>
+       ttppll((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc,,OOppttss)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppll((NNooddeess,,PPaatttteerrnnLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttppll((PPaatttteerrnnLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttpp//NN function above for details on arguments and return
+              values.
+
+              Set local trace pattern on specified functions. When calling
+              several nodes, the nodes are called in parallel.
+
+       ccttpp((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ccttpp((MMoodd,,FFuunncc,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttpp//NN for argument descriptions.
+
+              Clear global trace patterns. When calling several nodes, the
+              nodes are called in parallel.
+
+       ccttppll((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ccttppll((MMoodd,,FFuunncctt,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttpp//NN for argument description.
+
+              Clear local trace patterns. When calling several nodes, the
+              nodes are called in parallel.
+
+       ttff((NNooddeess,,PPiiddSSppeecc,,FFllaaggLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttff((PPiiddSSppeecc,,FFllaaggLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttff((NNooddeess,,TTrraacceeCCoonnffLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttff((NNooddeeTTrraacceeCCoonnffLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttff((TTrraacceeCCoonnffLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeTraceConfList = [{Node,TraceConfList}]
+                 TraceConfList = [{PidSpec,FlagList}]
+                 FlagList = [Flag]
+                 PidSpec = all | new| existing | pid() |
+                 locally_registered_name()
+                 Flag -- see erlang:trace/3
+                 NodeResult = {ok,[Ans]} | {error,Reason}
+                 Ans = int() | {error,Reason}
+
+              Set process trace flags on processes on all or specified nodes.
+              The integer returned if the call was successful describes the
+              matched number of processes. The functions without a _N_o_d_e_s
+              argument means all nodes, in a non-distributed environment it
+              means the local node.
+
+              There are many combinations which does not make much sense. For
+              instance specifying a certain process identifier at all nodes.
+              Or an empty _T_r_a_c_e_C_o_n_f_L_i_s_t for all nodes.
+
+              When calling several nodes, the nodes are called in parallel.
+
+       ccttff((NNooddeess,,PPiiddSSppeecc,,FFllaaggLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ccttff((PPiiddSSppeecc,,FFllaaggLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccttff((NNooddeess,,TTrraacceeCCoonnffLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ccttff((TTrraacceeCCoonnffLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttff//NN for arguments and return value description.
+
+              Clear process trace flags on all or specified nodes. When
+              calling several nodes, the nodes are called in parallel.
+
+       ccttff__aallll((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ccttff__aallll(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Clears all trace flags on all or specified nodes. Just for
+              convenience.
+
+       iinniitt__ttppmm((MMoodd,,FFuunncc,,AArriittyy,,CCaallllFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       iinniitt__ttppmm((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,CCaallllFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+       iinniitt__ttppmm((MMoodd,,FFuunncc,,AArriittyy,,IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc)) -->>
+       {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       iinniitt__ttppmm((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,, IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc))
+       -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Mod = Func = atom()
+                 Arity = int()
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+                 InitFunc,RemoveFunc = {Module,Function} | function()/4 | void
+                 CallFunc = ReturnFunc = {Module,Function} | function()/3 |
+                 void
+
+              Initializes _M_o_d_:_F_u_n_c_/_A_r_i_t_y for meta tracing without setting any
+              meta trace patterns. This is necessary if the named match specs
+              will be used (see ttppmm__mmss//55,,66). Otherwise initialization of
+              public loop data can be done at the same time as setting meta
+              trace patterns using ttppmm//88,,99.
+
+              Note that we can not use wildcards here (even if it is perfectly
+              legal in Erlang). It also sets the _C_a_l_l_F_u_n_c and _R_e_t_u_r_n_F_u_n_c for
+              the meta traced function. That is the functions which will be
+              called when a function call and a return_trace meta trace
+              message respectively arrives to the inviso meta tracer for
+              _M_o_d_:_F_u_n_c_/_A_r_i_t_y.
+
+              This function is also available without _I_n_i_t_F_u_n_c and _R_e_m_o_v_e_F_u_n_c.
+              That means that no initialization of the public loop data
+              structure will be done and that _C_a_l_l_F_u_n_c and _R_e_t_u_r_n_F_u_n_c must
+              either use already existing parts of public loop data structure
+              or not use it at all.
+
+              The _I_n_i_t_F_u_n_c initializes the already existing public loop data
+              structure for use with _M_o_d_:_F_u_n_c_/_A_r_i_t_y_.
+              _I_n_i_t_F_u_n_c_(_M_o_d_,_F_u_n_c_,_A_r_i_t_y_,_P_u_b_l_L_D_) _-_> _{_o_k_,_N_e_w_P_u_b_l_L_D_,_O_u_t_p_u_t_} where
+              _O_u_t_P_u_t can be a binary which will then be written to the trace
+              information file. If it is not a binary, no output will be done.
+              _R_e_m_o_v_e_F_u_n_c will be called when the meta tracing is cleared with
+              ccttppmm//33,,44. _R_e_m_o_v_e_F_u_n_c_(_M_o_d_,_F_u_n_c_,_A_r_i_t_y_,_P_u_b_l_L_D_) _-_> _{_o_k_,_N_e_w_P_u_b_l_L_D_}.
+
+              See ttppmm//NN for details on _C_a_l_l_F_u_n_c and _R_e_t_u_r_n_F_u_n_c.
+
+       ttppmm((MMoodd,,FFuunncc,,AArriittyy,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,CCaallllFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuullttss ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSS,,CCaallllFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc)) -->>
+       {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSS,, IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc))
+       -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Mod = Func = atom()
+                 Arity = int()
+                 MS = [match_spec()]
+                 Nodes = [Node]
+                 InitFunc = RemoveFunc = {Module,Function} | function()/4 |
+                 void
+                 CallFunc = ReturnFunc = {Module,Function} | function()/3 |
+                 void
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,1} | {ok,0} | {error,Reason}1
+
+              Activates meta-tracing in the inviso_rt_meta tracer. Except when
+              using _t_p_m_/_6, _t_p_m_/_8 and _t_p_m_/_9 the _M_o_d_:_F_u_n_c_/_A_r_i_t_y must first have
+              been initiated using iinniitt__ttppmm//NN. When calling several nodes, the
+              nodes are called in parallel.
+
+              _C_a_l_l_F_u_n_c will be called every time a meta trace message arrives
+              to the inviso meta tracer because of a call to _F_u_n_c.
+              _C_a_l_l_F_u_n_c_(_C_a_l_l_i_n_g_P_i_d_,_A_c_t_u_a_l_A_r_g_L_i_s_t_,_P_u_b_l_L_D_) _-_>
+              _{_o_k_,_N_e_w_P_r_i_v_L_D_,_O_u_t_p_u_t_} where _O_u_t_p_u_t can be a binary or _v_o_i_d. If
+              it is a binary it will be written to the trace information file.
+
+              _R_e_t_u_r_n_F_u_n_c will be called every time a meta return_trace message
+              arrives to the inviso meta tracer because of a return_trace of a
+              call to _F_u_n_c. _R_e_t_u_r_n_F_u_n_c_(_C_a_l_l_i_n_g_P_i_d_,_R_e_t_u_r_n_V_a_l_u_e_,_P_u_b_l_L_D_) _-_>
+              _{_o_k_,_N_e_w_P_r_i_v_L_D_,_O_u_t_p_u_t_}. Further the _R_e_t_u_r_n_F_u_n_c must handle the
+              fact that a return_trace message arrives for a call which was
+              never noticed. This because the message queue of the meta tracer
+              may have been emptied.
+
+       ttppmm__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,CCaallllFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSS,,CCaallllFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc))
+       -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSS,,
+       IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+
+              See tpm/X for details on arguments and return values.
+
+              Same as tpm/X but all match specs in _M_S containing a _t_r_a_c_e
+              action term will have a _{_t_r_a_c_e_r_,_T_r_a_c_e_r_} appended to its enable-
+              list. _T_r_a_c_e_r will be the current output for regular trace
+              messages as specified when tracing was initiated. This function
+              is useful when setting a meta trace pattern on a function with
+              the intent that its execution shall turn tracing on for the
+              process executing the match-spec in the meta trace pattern. The
+              reason the _t_r_a_c_e_r process trace flag can not be explicitly
+              written in the action term by the user is that it may be
+              difficult to learn its exact value for a remote node. Further
+              more inviso functions are made to work on several nodes at the
+              same time, requiring different match specs to be set for
+              different nodes.
+
+              Simple example: We want any process executing the function
+              _m_y_m_o_d_:_i_n_i_t_(_1_2_3_4_) (with the argument, exactly the integer 1234)
+              to begin function-call tracing. In the example, if the process
+              is found to be one that shall start call tracing, we also first
+              disable _a_l_l process trace flags to ensure that we have full
+              control over what the process traces. _v_o_i_d in the example
+              specifies that the meta-tracer (inviso_rt_meta) will not call
+              any function when meta trace messages for _m_y_m_o_d_:_i_n_i_t_/_1 arrives.
+              There is no need for a _C_a_l_l_F_u_n_c since the side-effect (start
+              call-tracing) is achieved immediately with the match-spec.
+
+                  inviso:tpm_tracer(mymod,init,1,[{[1234],[],[{trace,[all],[call]}]}],void).
+
+              This will internally, by the meta tracer on each Erlang node, be
+              translated to:
+
+                  erlang:trace_pattern({mymod,init,1},[{[1234],[],[{trace,[all],[call,{{tracer,T}}]}]}],[{meta,P}]).
+
+
+              Where _T is the tracer for regular trace messages (most often a
+              trace-port, but can be the runtime component inviso_rt process),
+              and _P is the meta tracer (the inviso_rt_meta process).
+
+       ttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__mmss((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]<v> <v>Mod = Func = atom()<v> <v>Arity =
+                 int()<v> <v>MSname = term()<v> <v>MS = [match_spec()]<v>
+                 <v>NodeResults = [{Node,NodeResult}]<v> <v>NodeResult =
+                 {ok,1} | {ok,0} | {error,Reason}<v>
+
+              This function adds a list of match-specs to the already existing
+              ones. It uses an internal database to keep track of existing
+              match-specs. This set of match specs can hereafter be referred
+              to with the name _M_S_n_a_m_e. If the match-spec does not result in
+              any meta traced functions (for whatever reason), the _M_S is not
+              saved in the database. The previously known match-specs are not
+              removed. If _M_S_n_a_m_e is already in use as a name referring to a
+              set of match-specs for this particular meta-traced function, the
+              previous set of match-specs are replaced with _M_S.
+
+              _M_o_d_:_F_u_n_c_/_A_r_i_t_y must previously have been initiated in order for
+              this function to add a match-spec.
+
+              When calling several nodes, the nodes are called in parallel.
+              _{_o_k_,_1_} indicates success.
+
+       ttppmm__mmss__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__mmss__ttrraacceerr((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+
+              See tpm_ms/X for details on arguments and return values, and
+              tpm_tracer/X for explanations about the appending of
+              _{_t_r_a_c_e_r_,_T_r_a_c_e_r_} process trace flag.
+
+       ccttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ccttppmm__mmss((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Removes a named match-spec from the meta traced function. Note
+              that it never is a fault to remove a match spec. Not even from a
+              function which is non existent.
+
+              When calling several nodes, the nodes are called in parallel.
+
+       ccttppmm((MMoodd,,FFuunncc,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccttppmm((NNooddeess,,MMoodd,,FFuunncc,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Removes the meta trace pattern for the function, means stops
+              generating output for this function. The public loop data
+              structure may be cleared by the previously entered _R_e_m_o_v_e_F_u_n_c.
+
+              When calling several nodes, the nodes are called in parallel.
+
+       ttppmm__llooccaallnnaammeess(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__llooccaallnnaammeess((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {R1,R2}
+                 R1 = R2 = {ok,0} | {ok,1} | {error,Reason}
+
+              Quick version for setting meta-trace patterns on
+              _e_r_l_a_n_g_:_r_e_g_i_s_t_e_r_/_2. It uses a default _C_a_l_l_F_u_n_c and _R_e_t_u_r_n_F_u_n_c in
+              the meta-tracer server. The main purpose of this function is to
+              create ti-log entries for associations between pids and
+              registered name aliases. The implementation uses return_trace to
+              see if the registration was successful or not, before actually
+              making the ti-log alias entry. Further the implementation also
+              meta traces the BIF _u_n_r_e_g_i_s_t_e_r_/_1.
+
+              If both _N_1 and _N_2 is 1, function call was successful. _N_1 and _N_2
+              represent setting meta trace pattern on _r_e_g_i_s_t_e_r_/_2 and
+              _u_n_r_e_g_i_s_t_e_r_/_1.
+
+       ccttppmm__llooccaallnnaammeess(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccttppmm__llooccaallnnaammeess((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {R1,R2}
+                 R1 = R2 = ok | {error,Reason}
+
+              Function for removing previously set patters by
+              ttppmm__llooccaallnnaammeess//00. The two results _R_1 and _R_2 represents that meta
+              pattern is removed from both _r_e_g_i_s_t_e_r_/_2 and _u_n_r_e_g_i_s_t_e_r_/_1.
+
+       ttppmm__gglloobbaallnnaammeess(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__gglloobbaallnnaammeess((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {R1,R2}
+                 R1 = R2 = {ok,0} | {ok,1} | {error,Reason}
+
+              Quick version for setting meta-trace patterns capable of
+              learning the association of a pid with a globally registered
+              name (registered using _g_l_o_b_a_l_:_r_e_g_i_s_t_e_r___n_a_m_e). The implementation
+              meta-traces on
+              _g_l_o_b_a_l_:_h_a_n_d_l_e___c_a_l_l_(_{_r_e_g_i_s_t_e_r_,_'___'_,_'___'_,_'___'_}_,_'___'_,_'___'_) and
+              _g_l_o_b_a_l_:_d_e_l_e_t_e___g_l_o_b_a_l___n_a_m_e_/_2. The _N_1 and _N_2 represents the
+              success of the two sub-tmp calls.
+
+       ccttppmm__gglloobbaallnnaammeess(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccttppmm__gglloobbaallnnaammeess((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {R1,R2} | {error,Reason}
+                 R1 = R2 = ok | {error,Reason}
+
+              Function for removing previously set meta patters by
+              ttppmm__gglloobbaallnnaammeess//00,,11. The two results _R_1 and _R_2 represents that
+              meta pattern are removed from both _g_l_o_b_a_l_:_h_a_n_d_l_e___c_a_l_l_/_3 and
+              _g_l_o_b_a_l_:_d_e_l_e_t_e___g_l_o_b_a_l___n_a_m_e_/_1.
+
+       ccttpp__aallll(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccttpp__aallll((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Clears all, both global and local trace patterns. Does not clear
+              meta trace patterns. Equivalent to a call to ccttpp//33,,44 and to
+              ccttppll//33,,44 with wildcards _'___' for all modules, functions and
+              arities.
+
+       ssuussppeenndd((SSRReeaassoonn)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ssuussppeenndd((NNooddeess,,SSRReeaassoonn)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 SReason = term()
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Suspends the runtime components. _S_R_e_a_s_o_n will become the
+              suspend-reason replied in for instance a ggeett__ssttaattuuss//00,,11 call. A
+              runtime component that becomes suspended removes all trace flags
+              and all meta trace patterns. In that way trace output is no
+              longer generated. The task of reactivating a suspended runtime
+              component is outside the scoop of inviso. It can for instance be
+              implemented by a higher layer trace-tool "remembering" all trace
+              flags and meta patterns set.
+
+       ccaanncceell__ssuussppeennssiioonn(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccaanncceell__ssuussppeenndd((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              Makes the runtime components _r_u_n_n_i_n_g again (as opposite to
+              _s_u_s_p_e_n_d_e_d_)_. Since reactivating previous trace flags and meta
+              trace patterns is outside the scoop of inviso, cancelling
+              suspension is simply making it possible to set trace flags and
+              meta trace patterns again.
+
+       ggeett__ssttaattuuss(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ggeett__ssttaattuuss((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,{State,Status}} | {error,Reason}
+                 State = new | idle | tracing
+                 Status = running | {suspended,SReason}
+                 SReason = term()
+
+              Finds out the state and status of a runtime component. A runtime
+              component is in state _n_e_w before it has been initiated to do any
+              tracing the first time. There are clear-functions which can make
+              a runtime component become _n_e_w again without having to restart.
+              A runtime component becomes _i_d_l_e after tracing is stopped.
+
+       ggeett__ttrraacceerrddaattaa(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ggeett__ttrraacceerrddaattaa((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,NResult} | {error,Reason}
+                 NResult = TracerData | no_tracerdata
+
+              Returns the current tracerdata of a runtime component. A runtime
+              component in state _n_e_w can not have tracerdata. An _i_d_l_e runtime
+              component does have tracerdata, the last active tracerdata.
+              _T_r_a_c_e_r_D_a_t_a will be a term as specified to _i_n_i_t___t_r_a_c_i_n_g when
+              tracing was initiated for the runtime component.
+
+       lliisstt__llooggss(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       lliisstt__llooggss((NNooddeess)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       lliisstt__llooggss((NNooddeeTTrraacceerrDDaattaa)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       lliisstt__llooggss((TTrraacceerrDDaattaa)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 TracerData -- see init_tracing/1,2
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,FileList} | {ok,no_log} | {error,Reason}
+                  FileList = [FileType]
+                  FileType = {trace_log,Dir,Files} | {ti_log,Dir,Files}
+                  Files = [FileNameWithOutPath]
+
+              Returns the actually existing log files associated with
+              _T_r_a_c_e_r_D_a_t_a. If a tracerdata is not specified, current tracerdata
+              is used for that particular runtime component. _F_i_l_e_s will be a
+              list of one or more files should it be a wrap-set. Otherwise the
+              it is a list of only one filename.
+
+              This function is useful to learn the name and path of all files
+              belonging to a trace. This information can later be used to move
+              those files for merging. Note that since it is possible to ask
+              on other tracerdata than the current, it is possible to learn
+              filenames of previously done traces, under the circumstances
+              that they have not been removed.
+
+       ffeettcchh__lloogg((LLooggSSppeeccLLiisstt,,DDeessttDDiirr,,PPrreeffiixx)) -->> {{ookk,,NNooddeeRReessuullttss}} ||
+       {{eerrrroorr,,nnoott__ddiissttrriibbuutteedd}} || {{eerrrroorr,,RReeaassoonn}}
+       ffeettcchh__lloogg((DDeessttDDiirr,,PPrreeffiixx)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,nnoott__ddiissttrriibbuutteedd}}
+       || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 DestDir = string()
+                 Prefix = string()
+                 LogSpecList = [LogSpec]
+                  LogSpec = {Node,FileSpecList} | Node | {Node,TracerData}
+                 TracerData = see init_tracing/1,/2
+                 FileSpecList =
+                 [{trace_log,Dir,FileList},{ti_log,Dir,FileList}] |
+                 [{trace_log,Dir,FileList}]
+                  FileList = [RemoteFileName]
+                 NodeResult = {Conclusion,ResultFileSpec} | no_log |
+                 {error,NReason}
+                  NReason = own_node | Reason
+                  Conclusion = complete | incomplete
+                  ResultFileSpec =
+                 [{trace_log,FileResults},{ti_log,FileResults}]
+                  FileResults = [FileResult]
+                  FileResult = {ok,FileName} | {error,FReason}
+                  FReason = {file_open,{posix(),FileName}} |
+                 {file_open,{posix(),RemoteFileName}} |
+                 {file_open,{posix(),[DestDir,Prefix,RemoteFileName]}} |
+                 {file_write,{posix(),FileName}} | {truncated,FileName} |
+                 {truncated,{Reason,FileName}}
+                  posix() = atom()
+
+              Copies log files over distributed erlang to the control
+              component node. This function can only be used in a distributed
+              system.
+
+              The resulting transferred files will have the prefix _P_r_e_f_i_x and
+              will be located in _D_e_s_t_D_i_r. The source files can either be
+              pointed out using a _F_i_l_e_L_i_s_t_S_p_e_c or tracerdata. If no files are
+              explicitly specified, current tracerdata for that node will be
+              used. Note that if source files have the same name (on several
+              nodes) they will overwrite each other at _D_e_s_t_D_i_r.
+
+       ddeelleettee__lloogg((NNooddeess,,TTrraacceerrDDaattaa)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ddeelleettee__lloogg((NNooddeeSSppeeccLLiisstt)) -->> {{ookk,,NNooddeeRReessuullttss}} || {{eerrrroorr,,RReeaassoonn}}
+       ddeelleettee__lloogg((SSppeecc)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ddeelleettee__lloogg((TTrraacceerrDDaattaa)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt ||
+       {{eerrrroorr,,RReeaassoonn}}
+       ddeelleettee__lloogg(()) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [Node]
+                 NodeSpecList = [{Node,Spec}]
+                  Spec = [AbsPathFileName] | LogSpecs
+                  LogSpecs = [LogSpec]
+                  LogSpec = {trace_log,Dir,[FileNameWithoutPath]} |
+                 {ti_log,Dir,[FileNameWithoutPath]}
+                 TracerData -- see init_tracing/1,/2
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = {ok,no_log} | {ok,LogInfos} | {ok,FileInfos}
+                  LogInfos = [LogInfo]
+                  LogInfo = {trace_log,FileInfos} | {ti_log,FileInfos}
+                  FileInfos = [FileInfo]
+                  FileInfo = {ok,FileName} | {error,Reason}
+
+              Deletes listed files or files corresponding to tracerdata. If no
+              tracerdata or list of files are specified in the call, current
+              tracerdata at the runtime components will be used to identify
+              files to delete. All filenames shall be strings.
+
+              _F_i_l_e_N_a_m_e can either be an absolute path or just a filename
+              depending on if _A_b_s_P_a_t_h_F_i_l_e_N_a_m_e or a _L_o_g_S_p_e_c was used to
+              identify the file.
+
+       ssuubbssccrriibbee(()) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+       ssuubbssccrriibbee((PPiidd)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+
+              Adds _P_i_d or _s_e_l_f_(_) if using _s_u_b_s_c_r_i_b_e_/_0 to the inviso-event
+              sending list. Note that it is possible to add a pid several
+              times and that the _P_i_d then will receive multiple copies of
+              inviso-event messages.
+
+              All events will be sent to all subscribers in the event sending
+              list.
+
+              Event = {inviso_event,ControllerPid,erlang:localtime(),Msg}
+                Msg = {connected, Node, {RTtag, {State,Status}}}
+                    | {disconnected, Node, NA}
+                    | {state_change,Node,{State,Status}}
+                    | {port_down,Node,Reason}
+                  Node = node() | local_runtime
+
+
+              Subscribing to inviso-event may be necessary for a higher layer
+              trace-tool using inviso to follow the runtime components.
+              _l_o_c_a_l___r_u_n_t_i_m_e will be used for a runtime component running in a
+              non-distributed environment.
+
+       uunnssuubbssccrriibbee(()) -->> ookk
+       uunnssuubbssccrriibbee((PPiidd)) -->> ookk
+
+              Removes _P_i_d (once) from the subscription list.
+
+
+
+Ericsson AB                      inviso 0.6.3                        inviso(3)

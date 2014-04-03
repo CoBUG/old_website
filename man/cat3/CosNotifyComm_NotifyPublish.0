@@ -1,0 +1,37 @@
+CosNotifyComm_NotifyPublish(E3r)lang Module DefinitiCoonsNotifyComm_NotifyPublish(3)
+
+
+
+NNAAMMEE
+       CosNotifyComm_NotifyPublish - This module implements the OMG
+       CosNotifyComm::NotifyPublish interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       All objects, which inherit this interface, export functions described
+       in this module.
+
+EEXXPPOORRTTSS
+       ooffffeerr__cchhaannggee((OObbjjeecctt,, AAddddeedd,, RReemmoovveedd)) -->> RReeppllyy
+
+              Types:
+
+                 Object = #objref
+                 Added = Removed = EventTypeSeq
+                 EventTypeSeq = [type]
+                 Reply = ok | {'EXCEPTION',
+                 CosNotifyComm_InvalidEventType{type}}
+                 type = #'CosNotification_EventType'{domain_name, type_name}
+                 domain_name = type_name = string()
+
+              Objects supporting this interface can be informed by supplier
+              objects about which type of events that will be delivered in the
+              future. This operation accepts two parameters describing new and
+              old event types respectively. If any of the supplied event type
+              names is syntactically incorrect an exception is raised.
+
+
+
+Ericsson AB                 cosNotification 1.1.1C8osNotifyComm_NotifyPublish(3)

@@ -1,0 +1,99 @@
+wxGLCanvas(3)              Erlang Module Definition              wxGLCanvas(3)
+
+
+
+NNAAMMEE
+       wxGLCanvas - See external documentation: wxGLCanvas.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGLCanvas.
+
+       This class is derived (and can use functions) from:
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_L_C_a_n_v_a_s_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPaarreenntt)) -->> wwxxGGLLCCaannvvaass(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, SShhaarreedd)) -->> wwxxGGLLCCaannvvaass(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Shared = wx_object() (see module wx) | wxGLCanvas()
+
+              See external documentation.
+              Also:
+              new(Parent, [Option]) -> wxGLCanvas() when
+              Parent::wxWindow:wxWindow(),
+              Option :: {id, integer()}
+              | {pos, {X::integer(), Y::integer()}}
+              | {size, {W::integer(), H::integer()}}
+              | {style, integer()}
+              | {name, unicode:chardata()}
+              | {attribList, [integer()]}
+              | {palette, wxPalette:wxPalette()}.
+
+
+       nneeww((PPaarreenntt,, SShhaarreedd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGLLCCaannvvaass(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Shared = wx_object() (see module wx) | wxGLCanvas()
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()} | {name, chardata() (see module unicode)}
+                 | {attribList, [integer()]} | {palette, wxPalette() (see
+                 module wxPalette)}
+
+              See external documentation.
+
+       ggeettCCoonntteexxtt((TThhiiss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGLCanvas()
+
+              See external documentation.
+
+       sseettCCuurrrreenntt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGLCanvas()
+
+              See external documentation.
+
+       sswwaappBBuuffffeerrss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGLCanvas()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGLLCCaannvvaass(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxGLCanvas(3)

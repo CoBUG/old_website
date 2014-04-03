@@ -1,0 +1,72 @@
+math(3)                    Erlang Module Definition                    math(3)
+
+
+
+NNAAMMEE
+       math - Mathematical Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides an interface to a number of mathematical
+       functions.
+
+   NNoottee::
+       Not all functions are implemented on all platforms. In particular, the
+       _e_r_f_/_1 and _e_r_f_c_/_1 functions are not implemented on Windows.
+
+
+EEXXPPOORRTTSS
+       ppii(()) -->> ffllooaatt(())
+
+              A useful number.
+
+       ssiinn((XX))
+       ccooss((XX))
+       ttaann((XX))
+       aassiinn((XX))
+       aaccooss((XX))
+       aattaann((XX))
+       aattaann22((YY,, XX))
+       ssiinnhh((XX))
+       ccoosshh((XX))
+       ttaannhh((XX))
+       aassiinnhh((XX))
+       aaccoosshh((XX))
+       aattaannhh((XX))
+       eexxpp((XX))
+       lloogg((XX))
+       lloogg1100((XX))
+       ppooww((XX,, YY))
+       ssqqrrtt((XX))
+
+              Types:
+
+                 X = Y = number()
+
+              A collection of math functions which return floats. Arguments
+              are numbers.
+
+       eerrff((XX)) -->> ffllooaatt(())
+
+              Types:
+
+                 X = number()
+
+              Returns the error function of _X, where
+
+              erf(X) = 2/sqrt(pi)*integral from 0 to X of exp(-t*t) dt.
+
+       eerrffcc((XX)) -->> ffllooaatt(())
+
+              Types:
+
+                 X = number()
+
+              _e_r_f_c_(_X_) returns _1_._0 _- _e_r_f_(_X_), computed by methods that avoid
+              cancellation for large _X.
+
+BBUUGGSS
+       As these are the C library, the bugs are the same.
+
+
+
+Ericsson AB                      stdlib 1.18.2                         math(3)

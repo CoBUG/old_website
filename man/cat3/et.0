@@ -1,0 +1,64 @@
+et(3)                      Erlang Module Definition                      et(3)
+
+
+
+NNAAMMEE
+       et - Main API of the Event Trace (ET) application
+
+DDEESSCCRRIIPPTTIIOONN
+       Interface module for the Event Trace (ET) application
+
+EEXXPPOORRTTSS
+       ttrraaccee__mmee((DDeettaaiillLLeevveell,, FFrroomm,, TToo,, LLaabbeell,, CCoonntteennttss)) -->> hhooppeeffuullllyy__ttrraacceedd
+
+              Types:
+
+                 DetailLevel = integer(X) when X =< 0, X >= 100
+                 From = actor()
+                 To = actor()
+                 Label = atom() | string() | term()
+                 Contents = [{Key, Value}] | term()
+                 actor() = term()
+
+              A function that is intended to be traced.
+
+              This function is intended to be invoked at strategic places in
+              user applications in order to enable simplified tracing. The
+              functions are extremely light weight as they do nothing besides
+              returning an atom. The functions are designed for being traced.
+              The global tracing mechanism in _e_t___c_o_l_l_e_c_t_o_r defaults to set its
+              trace pattern to these functions.
+
+              The label is intended to provide a brief summary of the event.
+              It is preferred to use an atom but a string would also do.
+
+              The contents can be any term but in order to simplify post
+              processing of the traced events, a plain list of {Key, Value}
+              tuples is preferred.
+
+              Some events, such as messages, are directed from some actor to
+              another. Other events (termed actions) may be undirected and
+              only have one actor.
+
+       ttrraaccee__mmee((DDeettaaiillLLeevveell,, FFrroommTToo,, LLaabbeell,, CCoonntteennttss)) -->> hhooppeeffuullllyy__ttrraacceedd
+
+              Invokes _e_t_:_t_r_a_c_e___m_e_/_5 with both _F_r_o_m and _T_o set to _F_r_o_m_T_o.
+
+       pphhoonnee__hhoommee((DDeettaaiillLLeevveell,, FFrroommTToo,, LLaabbeell,, CCoonntteennttss)) -->> hhooppeeffuullllyy__ttrraacceedd
+       pphhoonnee__hhoommee((DDeettaaiillLLeevveell,, FFrroomm,, TToo,, LLaabbeell,, CCoonntteennttss)) -->> hhooppeeffuullllyy__ttrraacceedd
+
+              These functions sends a signal to the outer space and the caller
+              hopes that someone is listening. In other words, they invoke
+              _e_t_:_t_r_a_c_e___m_e_/_4 and _e_t_:_t_r_a_c_e___m_e_/_5 respectively.
+
+       rreeppoorrtt__eevveenntt((DDeettaaiillLLeevveell,, FFrroommTToo,, LLaabbeell,, CCoonntteennttss)) -->> hhooppeeffuullllyy__ttrraacceedd
+       rreeppoorrtt__eevveenntt((DDeettaaiillLLeevveell,, FFrroomm,, TToo,, LLaabbeell,, CCoonntteennttss)) -->>
+       hhooppeeffuullllyy__ttrraacceedd
+
+              Deprecated functions which for the time being are kept for
+              backwards compatibility. Invokes _e_t_:_t_r_a_c_e___m_e_/_4 and _e_t_:_t_r_a_c_e___m_e_/_5
+              respectively.
+
+
+
+Ericsson AB                       et 1.4.4.2                             et(3)

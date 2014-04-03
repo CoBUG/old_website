@@ -1,0 +1,127 @@
+wxSashLayoutWindow(3)      Erlang Module Definition      wxSashLayoutWindow(3)
+
+
+
+NNAAMMEE
+       wxSashLayoutWindow - See external documentation: wxSashLayoutWindow.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSashLayoutWindow.
+
+       This class is derived (and can use functions) from:
+       wwxxSSaasshhWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_a_s_h_L_a_y_o_u_t_W_i_n_d_o_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSaasshhLLaayyoouuttWWiinnddooww(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSaasshhLLaayyoouuttWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSaasshhLLaayyoouuttWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ggeettAAlliiggnnmmeenntt((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+
+              See external documentation.
+              Res = ?wxLAYOUT_NONE | ?wxLAYOUT_TOP | ?wxLAYOUT_LEFT |
+              ?wxLAYOUT_RIGHT | ?wxLAYOUT_BOTTOM
+
+       ggeettOOrriieennttaattiioonn((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+
+              See external documentation.
+              Res = ?wxLAYOUT_HORIZONTAL | ?wxLAYOUT_VERTICAL
+
+       sseettAAlliiggnnmmeenntt((TThhiiss,, AAlliiggnn)) -->> ookk
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+                 Align = wx_enum() (see module wx)
+
+              See external documentation.
+              Align = ?wxLAYOUT_NONE | ?wxLAYOUT_TOP | ?wxLAYOUT_LEFT |
+              ?wxLAYOUT_RIGHT | ?wxLAYOUT_BOTTOM
+
+       sseettDDeeffaauullttSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettOOrriieennttaattiioonn((TThhiiss,, OOrriieenntt)) -->> ookk
+
+              Types:
+
+                 This = wxSashLayoutWindow()
+                 Orient = wx_enum() (see module wx)
+
+              See external documentation.
+              Orient = ?wxLAYOUT_HORIZONTAL | ?wxLAYOUT_VERTICAL
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSaasshhLLaayyoouuttWWiinnddooww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxSashLayoutWindow(3)

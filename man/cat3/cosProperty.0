@@ -1,0 +1,108 @@
+cosProperty(3)             Erlang Module Definition             cosProperty(3)
+
+
+
+NNAAMMEE
+       cosProperty - The main module of the cosProperty application
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_P_r_o_p_e_r_t_y_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application.
+
+EEXXPPOORRTTSS
+       iinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation installs the cosProperty application in the IFR.
+
+       iinnssttaallll__ddbb(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation installs data in mnesia necessary for running the
+              cosProperty application.
+
+       uunniinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation removes all data in the IFR related to the
+              cosProperty application.
+
+       uunniinnssttaallll__ddbb(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation removes all data from mnesia related to the
+              cosProperty application.
+
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosProperty application.
+
+       ssttaarrtt__SSeettDDeeffFFaaccttoorryy(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = Factory | {'EXCEPTION', E}
+                 Factory = CosPropertyService::PropertySetDefFactory
+                 reference.
+
+              This operation starts a PropertySetDef Factory.
+
+       ssttaarrtt__SSeettFFaaccttoorryy(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = Factory | {'EXCEPTION', E}
+                 Factory = CosPropertyService::PropertySetDefFactory
+                 reference.
+
+              This operation starts a PropertySet Factory.
+
+       ssttoopp__SSeettDDeeffFFaaccttoorryy((FFaaccttoorryy)) -->> RReettuurrnn
+
+              Types:
+
+                 Factory = CosPropertyService::PropertySetDefFactory
+                 reference.
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation stops the supplied PropertySetDef Factory.
+
+       ssttoopp__SSeettFFaaccttoorryy((FFaaccttoorryy)) -->> RReettuurrnn
+
+              Types:
+
+                 Factory = CosPropertyService::PropertySetFactory reference.
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation stops the supplied PropertySet Factory.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosProperty application.
+
+
+
+Ericsson AB                   cosProperty 1.1.15                cosProperty(3)

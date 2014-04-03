@@ -1,0 +1,84 @@
+wxCloseEvent(3)            Erlang Module Definition            wxCloseEvent(3)
+
+
+
+NNAAMMEE
+       wxCloseEvent - See external documentation: wxCloseEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCloseEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_l_o_s_e___w_i_n_d_o_w, _e_n_d___s_e_s_s_i_o_n, _q_u_e_r_y___e_n_d___s_e_s_s_i_o_n
+
+       See also the message variant ##wwxxCClloossee{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_l_o_s_e_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ccaannVVeettoo((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCloseEvent()
+
+              See external documentation.
+
+       ggeettLLooggggiinnggOOffff((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCloseEvent()
+
+              See external documentation.
+
+       sseettCCaannVVeettoo((TThhiiss,, CCaannVVeettoo)) -->> ookk
+
+              Types:
+
+                 This = wxCloseEvent()
+                 CanVeto = boolean()
+
+              See external documentation.
+
+       sseettLLooggggiinnggOOffff((TThhiiss,, LLooggOOffff)) -->> ookk
+
+              Types:
+
+                 This = wxCloseEvent()
+                 LogOff = boolean()
+
+              See external documentation.
+
+       vveettoo((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxCloseEvent()
+
+              Equivalent to vveettoo((TThhiiss,, [[]])).
+
+       vveettoo((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxCloseEvent()
+                 Option = {veto, boolean()}
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxCloseEvent(3)

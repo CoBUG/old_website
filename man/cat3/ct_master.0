@@ -1,0 +1,135 @@
+ct_master(3)               Erlang Module Definition               ct_master(3)
+
+
+
+NNAAMMEE
+       ct_master - Distributed test execution control for Common Test.
+
+DDEESSCCRRIIPPTTIIOONN
+       Distributed test execution control for Common Test.
+
+       This module exports functions for running Common Test nodes on multiple
+       hosts in parallel.
+
+EEXXPPOORRTTSS
+       aabboorrtt(()) -->> ookk
+
+              Stops all running tests.
+
+       aabboorrtt((NNooddeess)) -->> ookk
+
+              Types:
+
+                 Nodes = atom() | [atom()]
+
+              Stops tests on specified nodes.
+
+       bbaassiicc__hhttmmll((BBooooll)) -->> ookk
+
+              Types:
+
+                 Bool = true | false
+
+              If set to true, the ct_master logs will be written on a
+              primitive html format, not using the Common Test CSS style
+              sheet.
+
+       pprrooggrreessss(()) -->> [[{{NNooddee,, SSttaattuuss}}]]
+
+              Types:
+
+                 Node = atom()
+                 Status = finished_ok | ongoing | aborted | {error, Reason}
+                 Reason = term()
+
+              Returns test progress. If _S_t_a_t_u_s is _o_n_g_o_i_n_g, tests are running
+              on the node and have not yet finished.
+
+       rruunn((TTeessttSSppeeccss)) -->> ookk
+
+              Types:
+
+                 TestSpecs = string() | [SeparateOrMerged]
+
+              Equivalent to rruunn((TTeessttSSppeeccss,, ffaallssee,, [[]],, [[]])).
+
+       rruunn((TTeessttSSppeeccss,, IInnccllNNooddeess,, EExxccllNNooddeess)) -->> ookk
+
+              Types:
+
+                 TestSpecs = string() | [SeparateOrMerged]
+                 SeparateOrMerged = string() | [string()]
+                 InclNodes = [atom()]
+                 ExclNodes = [atom()]
+
+              Equivalent to rruunn((TTeessttSSppeeccss,, ffaallssee,, IInnccllNNooddeess,, EExxccllNNooddeess)).
+
+       rruunn((TTeessttSSppeeccss,, AAlllloowwUUsseerrTTeerrmmss,, IInnccllNNooddeess,, EExxccllNNooddeess)) -->> ookk
+
+              Types:
+
+                 TestSpecs = string() | [SeparateOrMerged]
+                 SeparateOrMerged = string() | [string()]
+                 AllowUserTerms = bool()
+                 InclNodes = [atom()]
+                 ExclNodes = [atom()]
+
+              Tests are spawned on the nodes as specified in _T_e_s_t_S_p_e_c_s. Each
+              specification in TestSpec will be handled separately. It is
+              however possible to also specify a list of specifications that
+              should be merged into one before the tests are executed. Any
+              test without a particular node specification will also be
+              executed on the nodes in _I_n_c_l_N_o_d_e_s. Nodes in the _E_x_c_l_N_o_d_e_s list
+              will be excluded from the test.
+
+       rruunn__oonn__nnooddee((TTeessttSSppeeccss,, NNooddee)) -->> ookk
+
+              Types:
+
+                 TestSpecs = string() | [SeparateOrMerged]
+                 SeparateOrMerged = string() | [string()]
+                 Node = atom()
+
+              Equivalent to rruunn__oonn__nnooddee((TTeessttSSppeeccss,, ffaallssee,, NNooddee)).
+
+       rruunn__oonn__nnooddee((TTeessttSSppeeccss,, AAlllloowwUUsseerrTTeerrmmss,, NNooddee)) -->> ookk
+
+              Types:
+
+                 TestSpecs = string() | [SeparateOrMerged]
+                 SeparateOrMerged = string() | [string()]
+                 AllowUserTerms = bool()
+                 Node = atom()
+
+              Tests are spawned on _N_o_d_e according to _T_e_s_t_S_p_e_c_s.
+
+       rruunn__tteesstt((NNooddee,, OOppttss)) -->> ookk
+
+              Types:
+
+                 Node = atom()
+                 Opts = [OptTuples]
+                 OptTuples = {config, CfgFiles} | {dir, TestDirs} | {suite,
+                 Suites} | {testcase, Cases} | {spec, TestSpecs} |
+                 {allow_user_terms, Bool} | {logdir, LogDir} | {event_handler,
+                 EventHandlers} | {silent_connections, Conns} | {cover,
+                 CoverSpecFile} | {userconfig, UserCfgFiles}
+                 CfgFiles = string() | [string()]
+                 TestDirs = string() | [string()]
+                 Suites = atom() | [atom()]
+                 Cases = atom() | [atom()]
+                 TestSpecs = string() | [string()]
+                 LogDir = string()
+                 EventHandlers = EH | [EH]
+                 EH = atom() | {atom(), InitArgs} | {[atom()], InitArgs}
+                 InitArgs = [term()]
+                 Conns = all | [atom()]
+
+              Tests are spawned on _N_o_d_e using _c_t_:_r_u_n___t_e_s_t_/_1.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                  ct_master(3)

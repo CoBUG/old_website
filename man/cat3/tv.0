@@ -1,0 +1,35 @@
+tv(3)                      Erlang Module Definition                      tv(3)
+
+
+
+NNAAMMEE
+       tv - TV graphically examines ETS and Mnesia tables.
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       The TV application has been superseded by the Observer application. TV
+       will be removed in R16.
+
+
+       TV enables the user to examine ETS and Mnesia tables. Once a certain
+       table has been opened in the tool, the content may be viewed at various
+       levels of detail. The content viewed may also be sorted, using any
+       element as key. The table may be polled anytime; either regularly at
+       specified intervals, or manually. New and deleted objects, as well as
+       those altered, are marked with characteristic colors.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> PPiidd
+
+              Types:
+
+                 Pid = pid()
+
+              _s_t_a_r_t_/_0 starts the TV.
+
+SSEEEE AALLSSOO
+       For a complete description of the TV, please see the TV User's Guide.
+
+
+
+Ericsson AB                       tv 2.1.4.9                             tv(3)

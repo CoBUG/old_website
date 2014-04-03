@@ -1,0 +1,306 @@
+kernel(7)                Erlang Application Definition               kernel(7)
+
+
+
+NNAAMMEE
+       kernel - The Kernel Application
+
+DDEESSCCRRIIPPTTIIOONN
+       The Kernel application is the first application started. It is
+       mandatory in the sense that the minimal system based on Erlang/OTP
+       consists of Kernel and STDLIB. The Kernel application contains the
+       following services:
+
+         * application controller, see _a_p_p_l_i_c_a_t_i_o_n_(_3_)
+
+         * _c_o_d_e
+
+         * _d_i_s_k___l_o_g
+
+         * _d_i_s_t___a_c, distributed application controller
+
+         * _e_r_l___b_o_o_t___s_e_r_v_e_r
+
+         * _e_r_l___d_d_l_l
+
+         * _e_r_r_o_r___l_o_g_g_e_r
+
+         * _f_i_l_e
+
+         * _g_l_o_b_a_l
+
+         * _g_l_o_b_a_l___g_r_o_u_p
+
+         * _h_e_a_r_t
+
+         * _i_n_e_t
+
+         * _n_e_t___k_e_r_n_e_l
+
+         * _o_s
+
+         * _p_g_2
+
+         * _r_p_c
+
+         * _s_e_q___t_r_a_c_e
+
+         * _u_s_e_r
+
+EERRRROORR LLOOGGGGEERR EEVVEENNTT HHAANNDDLLEERRSS
+       Two standard error logger event handlers are defined in the Kernel
+       application. These are described in eerrrroorr__llooggggeerr((33)).
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following configuration parameters are defined for the Kernel
+       application. See _a_p_p_(_3_) for more information about configuration
+       parameters.
+
+         _b_r_o_w_s_e_r___c_m_d _= _s_t_r_i_n_g_(_) _| _{_M_,_F_,_A_}:
+           When pressing the Help button in a tool such as Debugger or TV, the
+           help text (an HTML file _F_i_l_e) is by default displayed in a Netscape
+           browser which is required to be up and running. This parameter can
+           be used to change the command for how to display the help text if
+           another browser than Netscape is preferred, or another platform
+           than Unix or Windows is used.
+
+           If set to a string _C_o_m_m_a_n_d, the command _"_C_o_m_m_a_n_d _F_i_l_e_" will be
+           evaluated using _o_s_:_c_m_d_/_1.
+
+           If set to a module-function-args tuple _{_M_,_F_,_A_}, the call
+           _a_p_p_l_y_(_M_,_F_,_[_F_i_l_e_|_A_]_) will be evaluated.
+
+         _d_i_s_t_r_i_b_u_t_e_d _= _[_D_i_s_t_r_i_b_]:
+           Specifies which applications are distributed and on which nodes
+           they may execute. In this parameter:
+
+           * _D_i_s_t_r_i_b _= _{_A_p_p_,_N_o_d_e_s_} _| _{_A_p_p_,_T_i_m_e_,_N_o_d_e_s_}
+
+           * _A_p_p _= _a_t_o_m_(_)
+
+           * _T_i_m_e _= _i_n_t_e_g_e_r_(_)_>_0
+
+           * _N_o_d_e_s _= _[_n_o_d_e_(_) _| _{_n_o_d_e_(_)_,_._._._,_n_o_d_e_(_)_}_]
+
+           The parameter is described in _a_p_p_l_i_c_a_t_i_o_n_(_3_), function _l_o_a_d_/_2.
+
+         _d_i_s_t___a_u_t_o___c_o_n_n_e_c_t _= _V_a_l_u_e:
+           Specifies when nodes will be automatically connected. If this
+           parameter is not specified, a node is always automatically
+           connected, e.g when a message is to be sent to that node. _V_a_l_u_e is
+           one of:
+
+           _n_e_v_e_r:
+             Connections are never automatically established, they must be
+             explicitly connected. See _n_e_t___k_e_r_n_e_l_(_3_).
+
+           _o_n_c_e:
+             Connections will be established automatically, but only once per
+             node. If a node goes down, it must thereafter be explicitly
+             connected. See _n_e_t___k_e_r_n_e_l_(_3_).
+
+         _p_e_r_m_i_s_s_i_o_n_s _= _[_P_e_r_m_]:
+           Specifies the default permission for applications when they are
+           started. In this parameter:
+
+           * _P_e_r_m _= _{_A_p_p_l_N_a_m_e_,_B_o_o_l_}
+
+           * _A_p_p_l_N_a_m_e _= _a_t_o_m_(_)
+
+           * _B_o_o_l _= _b_o_o_l_e_a_n_(_)
+
+           Permissions are described in _a_p_p_l_i_c_a_t_i_o_n_(_3_), function _p_e_r_m_i_t_/_2.
+
+         _e_r_r_o_r___l_o_g_g_e_r _= _V_a_l_u_e:
+           _V_a_l_u_e is one of:
+
+           _t_t_y:
+             Installs the standard event handler which prints error reports to
+             _s_t_d_i_o. This is the default option.
+
+           _{_f_i_l_e_, _F_i_l_e_N_a_m_e_}:
+             Installs the standard event handler which prints error reports to
+             the file _F_i_l_e_N_a_m_e, where _F_i_l_e_N_a_m_e is a string.
+
+           _f_a_l_s_e:
+             No standard event handler is installed, but the initial,
+             primitive event handler is kept, printing raw event messages to
+             tty.
+
+           _s_i_l_e_n_t:
+             Error logging is turned off.
+
+         _g_l_o_b_a_l___g_r_o_u_p_s _= _[_G_r_o_u_p_T_u_p_l_e_]:
+           Defines global groups, see _g_l_o_b_a_l___g_r_o_u_p_(_3_).
+
+           * _G_r_o_u_p_T_u_p_l_e _= _{_G_r_o_u_p_N_a_m_e_, _[_N_o_d_e_]_} _| _{_G_r_o_u_p_N_a_m_e_, _P_u_b_l_i_s_h_T_y_p_e_,
+             _[_N_o_d_e_]_}
+
+           * _G_r_o_u_p_N_a_m_e _= _a_t_o_m_(_)
+
+           * _P_u_b_l_i_s_h_T_y_p_e _= _n_o_r_m_a_l _| _h_i_d_d_e_n
+
+           * _N_o_d_e _= _n_o_d_e_(_)
+
+         _i_n_e_t___d_e_f_a_u_l_t___c_o_n_n_e_c_t___o_p_t_i_o_n_s _= _[_{_O_p_t_, _V_a_l_}_]:
+           Specifies default options for _c_o_n_n_e_c_t sockets, see _i_n_e_t_(_3_).
+
+         _i_n_e_t___d_e_f_a_u_l_t___l_i_s_t_e_n___o_p_t_i_o_n_s _= _[_{_O_p_t_, _V_a_l_}_]:
+           Specifies default options for _l_i_s_t_e_n (and _a_c_c_e_p_t) sockets, see
+           _i_n_e_t_(_3_).
+
+         _{_i_n_e_t___d_i_s_t___u_s_e___i_n_t_e_r_f_a_c_e_, _i_p___a_d_d_r_e_s_s_(_)_}:
+           If the host of an Erlang node has several network interfaces, this
+           parameter specifies which one to listen on. See _i_n_e_t_(_3_) for the
+           type definition of _i_p___a_d_d_r_e_s_s_(_).
+
+         _{_i_n_e_t___d_i_s_t___l_i_s_t_e_n___m_i_n_, _F_i_r_s_t_}:
+           See below.
+
+         _{_i_n_e_t___d_i_s_t___l_i_s_t_e_n___m_a_x_, _L_a_s_t_}:
+           Define the _F_i_r_s_t_._._L_a_s_t port range for the listener socket of a
+           distributed Erlang node.
+
+         _i_n_e_t___p_a_r_s_e___e_r_r_o_r___l_o_g _= _s_i_l_e_n_t:
+           If this configuration parameter is set, no _e_r_r_o_r___l_o_g_g_e_r messages
+           are generated when erroneous lines are found and skipped in the
+           various Inet configuration files.
+
+         _i_n_e_t_r_c _= _F_i_l_e_n_a_m_e:
+           The name (string) of an Inet user configuration file. See ERTS
+           User's Guide, Inet configuration.
+
+         _n_e_t___s_e_t_u_p_t_i_m_e _= _S_e_t_u_p_T_i_m_e:
+
+
+           _S_e_t_u_p_T_i_m_e must be a positive integer or floating point number, and
+           will be interpreted as the maximally allowed time for each network
+           operation during connection setup to another Erlang node. The
+           maximum allowed value is 120; if higher values are given, 120 will
+           be used. The default value if the variable is not given, or if the
+           value is incorrect (e.g. not a number), is 7 seconds.
+
+           Note that this value does not limit the total connection setup
+           time, but rather each individual network operation during the
+           connection setup and handshake.
+
+         _n_e_t___t_i_c_k_t_i_m_e _= _T_i_c_k_T_i_m_e:
+
+
+           Specifies the _n_e_t___k_e_r_n_e_l tick time. _T_i_c_k_T_i_m_e is given in seconds.
+           Once every _T_i_c_k_T_i_m_e_/_4 second, all connected nodes are ticked (if
+           anything else has been written to a node) and if nothing has been
+           received from another node within the last four (4) tick times that
+           node is considered to be down. This ensures that nodes which are
+           not responding, for reasons such as hardware errors, are considered
+           to be down.
+
+           The time _T, in which a node that is not responding is detected, is
+           calculated as: _M_i_n_T _< _T _< _M_a_x_T where:
+
+         MinT = TickTime - TickTime / 4
+         MaxT = TickTime + TickTime / 4
+
+           _T_i_c_k_T_i_m_e is by default 60 (seconds). Thus, _4_5 _< _T _< _7_5 seconds.
+
+           _N_o_t_e_: All communicating nodes should have the same _T_i_c_k_T_i_m_e value
+           specified.
+
+           _N_o_t_e_: Normally, a terminating node is detected immediately.
+
+         _s_h_u_t_d_o_w_n___t_i_m_e_o_u_t _= _i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y:
+           Specifies the time _a_p_p_l_i_c_a_t_i_o_n___c_o_n_t_r_o_l_l_e_r will wait for an
+           application to terminate during node shutdown. If the timer
+           expires, _a_p_p_l_i_c_a_t_i_o_n___c_o_n_t_r_o_l_l_e_r will brutally kill
+           _a_p_p_l_i_c_a_t_i_o_n___m_a_s_t_e_r of the hanging application. If this parameter is
+           undefined, it defaults to _i_n_f_i_n_i_t_y.
+
+         _s_y_n_c___n_o_d_e_s___m_a_n_d_a_t_o_r_y _= _[_N_o_d_e_N_a_m_e_]:
+           Specifies which other nodes _m_u_s_t be alive in order for this node to
+           start properly. If some node in the list does not start within the
+           specified time, this node will not start either. If this parameter
+           is undefined, it defaults to [].
+
+         _s_y_n_c___n_o_d_e_s___o_p_t_i_o_n_a_l _= _[_N_o_d_e_N_a_m_e_]:
+           Specifies which other nodes _c_a_n be alive in order for this node to
+           start properly. If some node in this list does not start within the
+           specified time, this node starts anyway. If this parameter is
+           undefined, it defaults to the empty list.
+
+         _s_y_n_c___n_o_d_e_s___t_i_m_e_o_u_t _= _i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y:
+           Specifies the amount of time (in milliseconds) this node will wait
+           for the mandatory and optional nodes to start. If this parameter is
+           undefined, no node synchronization is performed. This option also
+           makes sure that _g_l_o_b_a_l is synchronized.
+
+         _s_t_a_r_t___d_i_s_t___a_c _= _t_r_u_e _| _f_a_l_s_e:
+           Starts the _d_i_s_t___a_c server if the parameter is _t_r_u_e. This parameter
+           should be set to _t_r_u_e for systems that use distributed
+           applications.
+
+           The default value is _f_a_l_s_e. If this parameter is undefined, the
+           server is started if the parameter _d_i_s_t_r_i_b_u_t_e_d is set.
+
+         _s_t_a_r_t___b_o_o_t___s_e_r_v_e_r _= _t_r_u_e _| _f_a_l_s_e:
+           Starts the _b_o_o_t___s_e_r_v_e_r if the parameter is _t_r_u_e (see
+           _e_r_l___b_o_o_t___s_e_r_v_e_r_(_3_)). This parameter should be set to _t_r_u_e in an
+           embedded system which uses this service.
+
+           The default value is _f_a_l_s_e.
+
+         _b_o_o_t___s_e_r_v_e_r___s_l_a_v_e_s _= _[_S_l_a_v_e_I_P_]:
+           If the _s_t_a_r_t___b_o_o_t___s_e_r_v_e_r configuration parameter is _t_r_u_e, this
+           parameter can be used to initialize _b_o_o_t___s_e_r_v_e_r with a list of
+           slave IP addresses. _S_l_a_v_e_I_P _= _s_t_r_i_n_g_(_) _| _a_t_o_m _|
+           _{_i_n_t_e_g_e_r_(_)_,_i_n_t_e_g_e_r_(_)_,_i_n_t_e_g_e_r_(_)_,_i_n_t_e_g_e_r_(_)_}
+
+           where _0 _<_= _i_n_t_e_g_e_r_(_) _<_=_2_5_5.
+
+           Examples of _S_l_a_v_e_I_P in atom, string and tuple form are:
+           _'_1_5_0_._2_3_6_._1_6_._7_0_'_, _"_1_5_0_,_2_3_6_,_1_6_,_7_0_"_, _{_1_5_0_,_2_3_6_,_1_6_,_7_0_}.
+
+           The default value is _[_].
+
+         _s_t_a_r_t___d_i_s_k___l_o_g _= _t_r_u_e _| _f_a_l_s_e:
+           Starts the _d_i_s_k___l_o_g___s_e_r_v_e_r if the parameter is _t_r_u_e (see
+           _d_i_s_k___l_o_g_(_3_)). This parameter should be set to true in an embedded
+           system which uses this service.
+
+           The default value is _f_a_l_s_e.
+
+         _s_t_a_r_t___p_g_2 _= _t_r_u_e _| _f_a_l_s_e:
+           Starts the _p_g_2 server (see _p_g_2_(_3_)) if the parameter is _t_r_u_e. This
+           parameter should be set to _t_r_u_e in an embedded system which uses
+           this service.
+
+           The default value is _f_a_l_s_e.
+
+         _s_t_a_r_t___t_i_m_e_r _= _t_r_u_e _| _f_a_l_s_e:
+           Starts the _t_i_m_e_r___s_e_r_v_e_r if the parameter is _t_r_u_e (see _t_i_m_e_r_(_3_)).
+           This parameter should be set to _t_r_u_e in an embedded system which
+           uses this service.
+
+           The default value is _f_a_l_s_e.
+
+         _s_h_u_t_d_o_w_n___f_u_n_c _= _{_M_o_d_, _F_u_n_c_}:
+           Where:
+
+           * _M_o_d _= _a_t_o_m_(_)
+
+           * _F_u_n_c _= _a_t_o_m_(_)
+
+           Sets a function that _a_p_p_l_i_c_a_t_i_o_n___c_o_n_t_r_o_l_l_e_r calls when it starts to
+           terminate. The function is called as: _M_o_d_:_F_u_n_c_(_R_e_a_s_o_n_), where
+           _R_e_a_s_o_n is the terminate reason for _a_p_p_l_i_c_a_t_i_o_n___c_o_n_t_r_o_l_l_e_r, and it
+           must return as soon as possible for _a_p_p_l_i_c_a_t_i_o_n___c_o_n_t_r_o_l_l_e_r to
+           terminate properly.
+
+SSEEEE AALLSSOO
+       aapppp((44)), aapppplliiccaattiioonn((33)), ccooddee((33)), ddiisskk__lloogg((33)), eerrll__bboooott__sseerrvveerr((33)),
+       eerrll__ddddllll((33)), eerrrroorr__llooggggeerr((33)), ffiillee((33)), gglloobbaall((33)), gglloobbaall__ggrroouupp((33)),
+       hheeaarrtt((33)), iinneett((33)), nneett__kkeerrnneell((33)), ooss((33)), ppgg22((33)), rrppcc((33)), sseeqq__ttrraaccee((33)),
+       uusseerr((33))
+
+
+
+Ericsson AB                      kernel 2.15.2                       kernel(7)

@@ -1,0 +1,130 @@
+wxClipboard(3)             Erlang Module Definition             wxClipboard(3)
+
+
+
+NNAAMMEE
+       wxClipboard - See external documentation: wxClipboard.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxClipboard.
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_l_i_p_b_o_a_r_d_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCClliippbbooaarrdd(())
+
+              See external documentation.
+
+       aaddddDDaattaa((TThhiiss,, DDaattaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+                 Data = wxDataObject() (see module wxDataObject)
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxClipboard()
+
+              See external documentation.
+
+       cclloossee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxClipboard()
+
+              See external documentation.
+
+       fflluusshh((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+
+              See external documentation.
+
+       ggeettDDaattaa((TThhiiss,, DDaattaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+                 Data = wxDataObject() (see module wxDataObject)
+
+              See external documentation.
+
+       iissOOppeenneedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+
+              See external documentation.
+
+       ooppeenn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+
+              See external documentation.
+
+       sseettDDaattaa((TThhiiss,, DDaattaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+                 Data = wxDataObject() (see module wxDataObject)
+
+              See external documentation.
+
+       uusseePPrriimmaarryySSeelleeccttiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxClipboard()
+
+              Equivalent to uusseePPrriimmaarryySSeelleeccttiioonn((TThhiiss,, [[]])).
+
+       uusseePPrriimmaarryySSeelleeccttiioonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxClipboard()
+                 Option = {primary, boolean()}
+
+              See external documentation.
+
+       iissSSuuppppoorrtteedd((TThhiiss,, FFoorrmmaatt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxClipboard()
+                 Format = integer()
+
+              See external documentation.
+
+       ggeett(()) -->> wwxxCClliippbbooaarrdd(())
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxCClliippbbooaarrdd(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxClipboard(3)

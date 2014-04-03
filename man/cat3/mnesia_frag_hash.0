@@ -1,0 +1,131 @@
+mnesia_frag_hash(3)        Erlang Module Definition        mnesia_frag_hash(3)
+
+
+
+NNAAMMEE
+       mnesia_frag_hash - Defines mnesia_frag_hash callback behaviour
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _m_n_e_s_i_a___f_r_a_g___h_a_s_h defines a callback behaviour for user
+       defined hash functions of fragmented tables.
+
+       Which module that is selected to implement the _m_n_e_s_i_a___f_r_a_g___h_a_s_h
+       behaviour for a particular fragmented table is specified together with
+       the other _f_r_a_g___p_r_o_p_e_r_t_i_e_s. The _h_a_s_h___m_o_d_u_l_e defines the module name. The
+       _h_a_s_h___s_t_a_t_e defines the initial hash state.
+
+       It implements dynamic hashing which is a kind of hashing that grows
+       nicely when new fragments are added. It is well suited for scalable
+       hash tables
+
+EEXXPPOORRTTSS
+       iinniitt__ssttaattee((TTaabb,, SSttaattee)) -->> NNeewwSSttaattee || aabboorrtt((RReeaassoonn))
+
+              Types:
+
+                 Tab = atom()
+                 State = term()
+                 NewState = term()
+                 Reason = term()
+
+              This function is invoked when a fragmented table is created with
+              _m_n_e_s_i_a_:_c_r_e_a_t_e___t_a_b_l_e_/_2 or when a normal (un-fragmented) table is
+              converted to be a fragmented table with
+              _m_n_e_s_i_a_:_c_h_a_n_g_e___t_a_b_l_e___f_r_a_g_/_2.
+
+              Note that the _a_d_d___f_r_a_g_/_2 function will be invoked one time each
+              for the rest of the fragments (all but number 1) as a part of
+              the table creation procedure.
+
+              _S_t_a_t_e is the initial value of the _h_a_s_h___s_t_a_t_e _f_r_a_g___p_r_o_p_e_r_t_y. The
+              _N_e_w_S_t_a_t_e will be stored as _h_a_s_h___s_t_a_t_e among the other
+              _f_r_a_g___p_r_o_p_e_r_t_i_e_s.
+
+       aadddd__ffrraagg((SSttaattee)) -->> {{NNeewwSSttaattee,, IItteerrFFrraaggss,, AAddddiittiioonnaallLLoocckkFFrraaggss}} ||
+       aabboorrtt((RReeaassoonn))
+
+              Types:
+
+                 State = term()
+                 NewState = term()
+                 IterFrags = [integer()]
+                 AdditionalLockFrags = [integer()]
+                 Reason = term()
+
+              In order to scale well, it is a good idea ensure that the
+              records are evenly distributed over all fragments including the
+              new one.
+
+              The _N_e_w_S_t_a_t_e will be stored as _h_a_s_h___s_t_a_t_e among the other
+              _f_r_a_g___p_r_o_p_e_r_t_i_e_s.
+
+              As a part of the _a_d_d___f_r_a_g procedure, Mnesia will iterate over
+              all fragments corresponding to the _I_t_e_r_F_r_a_g_s numbers and invoke
+              _k_e_y___t_o___f_r_a_g___n_u_m_b_e_r_(_N_e_w_S_t_a_t_e_,_R_e_c_o_r_d_K_e_y_) for each record. If the
+              new fragment differs from the old fragment, the record will be
+              moved to the new fragment.
+
+              As the _a_d_d___f_r_a_g procedure is a part of a schema transaction
+              Mnesia will acquire a write locks on the affected tables. That
+              is both the fragments corresponding to _I_t_e_r_F_r_a_g_s and those
+              corresponding to _A_d_d_i_t_i_o_n_a_l_L_o_c_k_F_r_a_g_s.
+
+       ddeell__ffrraagg((SSttaattee)) -->> {{NNeewwSSttaattee,, IItteerrFFrraaggss,, AAddddiittiioonnaallLLoocckkFFrraaggss}} ||
+       aabboorrtt((RReeaassoonn))
+
+              Types:
+
+                 State = term()
+                 NewState = term()
+                 IterFrags = [integer()]
+                 AdditionalLockFrags = [integer()]
+                 Reason = term()
+
+              The _N_e_w_S_t_a_t_e will be stored as _h_a_s_h___s_t_a_t_e among the other
+              _f_r_a_g___p_r_o_p_e_r_t_i_e_s.
+
+              As a part of the _d_e_l___f_r_a_g procedure, Mnesia will iterate over
+              all fragments corresponding to the _I_t_e_r_F_r_a_g_s numbers and invoke
+              _k_e_y___t_o___f_r_a_g___n_u_m_b_e_r_(_N_e_w_S_t_a_t_e_,_R_e_c_o_r_d_K_e_y_) for each record. If the
+              new fragment differs from the old fragment, the record will be
+              moved to the new fragment.
+
+              Note that all records in the last fragment must be moved to
+              another fragment as the entire fragment will be deleted.
+
+              As the _d_e_l___f_r_a_g procedure is a part of a schema transaction
+              Mnesia will acquire a write locks on the affected tables. That
+              is both the fragments corresponding to _I_t_e_r_F_r_a_g_s and those
+              corresponding to _A_d_d_i_t_i_o_n_a_l_L_o_c_k_F_r_a_g_s.
+
+       kkeeyy__ttoo__ffrraagg__nnuummbbeerr((SSttaattee,, KKeeyy)) -->> FFrraaggNNuumm || aabboorrtt((RReeaassoonn))
+
+              Types:
+
+                 FragNum = integer()()
+                 Reason = term()
+
+              This function is invoked whenever Mnesia needs to determine
+              which fragment a certain record belongs to. It is typically
+              invoked at read, write and delete.
+
+       mmaattcchh__ssppeecc__ttoo__ffrraagg__nnuummbbeerrss((SSttaattee,, MMaattcchhSSppeecc)) -->> FFrraaggNNuummss ||
+       aabboorrtt((RReeaassoonn))
+
+              Types:
+
+                 MatcSpec = ets_select_match_spec()
+                 FragNums = [FragNum]
+                 FragNum = integer()
+                 Reason = term()
+
+              This function is invoked whenever Mnesia needs to determine
+              which fragments that needs to be searched for a MatchSpec. It is
+              typically invoked at select and match_object.
+
+SSEEEE AALLSSOO
+       mnesia(3)
+
+
+
+Ericsson AB                      mnesia 4.7.1              mnesia_frag_hash(3)

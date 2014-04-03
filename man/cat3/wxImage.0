@@ -1,0 +1,887 @@
+wxImage(3)                 Erlang Module Definition                 wxImage(3)
+
+
+
+NNAAMMEE
+       wxImage - See external documentation: wxImage.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxImage.
+
+       All (default) image handlers are initialized.
+
+DDAATTAA TTYYPPEESS
+         _w_x_I_m_a_g_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxIImmaaggee(())
+
+              See external documentation.
+
+       nneeww((NNaammee)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 Name = chardata() (see module unicode)
+
+              Equivalent to nneeww((NNaammee,, [[]])).
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              new(Name, [Option]) -> wxImage() when
+              Name::unicode:chardata(),
+              Option :: {type, integer()}
+              | {index, integer()}.
+
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt,, DDaattaa)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+                 Data = binary()
+
+              See external documentation.
+              Also:
+              new(Width, Height, [Option]) -> wxImage() when
+              Width::integer(), Height::integer(),
+              Option :: {clear, boolean()};
+              (Name, Mimetype, [Option]) -> wxImage() when
+              Name::unicode:chardata(), Mimetype::unicode:chardata(),
+              Option :: {index, integer()}.
+
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt,, DDaattaa,, AAllpphhaa)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+                 Data = binary()
+                 Alpha = binary()
+
+              See external documentation.
+              Also:
+              new(Width, Height, Data, [Option]) -> wxImage() when
+              Width::integer(), Height::integer(), Data::binary(),
+              Option :: {static_data, boolean()}.
+
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt,, DDaattaa,, AAllpphhaa,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+                 Data = binary()
+                 Alpha = binary()
+                 Option = {static_data, boolean()}
+
+              See external documentation.
+
+       bblluurr((TThhiiss,, RRaaddiiuuss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Radius = integer()
+
+              See external documentation.
+
+       bblluurrHHoorriizzoonnttaall((TThhiiss,, RRaaddiiuuss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Radius = integer()
+
+              See external documentation.
+
+       bblluurrVVeerrttiiccaall((TThhiiss,, RRaaddiiuuss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Radius = integer()
+
+              See external documentation.
+
+       ccoonnvveerrttAAllpphhaaTTooMMaasskk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+
+              Equivalent to ccoonnvveerrttAAllpphhaaTTooMMaasskk((TThhiiss,, [[]])).
+
+       ccoonnvveerrttAAllpphhaaTTooMMaasskk((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Option = {threshold, integer()}
+
+              See external documentation.
+
+       ccoonnvveerrttTTooGGrreeyyssccaallee((TThhiiss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+
+              Equivalent to ccoonnvveerrttTTooGGrreeyyssccaallee((TThhiiss,, [[]])).
+
+       ccoonnvveerrttTTooGGrreeyyssccaallee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Option = {lr, number()} | {lg, number()} | {lb, number()}
+
+              See external documentation.
+
+       ccoonnvveerrttTTooMMoonnoo((TThhiiss,, RR,, GG,, BB)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 R = integer()
+                 G = integer()
+                 B = integer()
+
+              See external documentation.
+
+       ccooppyy((TThhiiss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, DDaattaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+                 Data = binary()
+
+              See external documentation.
+              Also:
+              create(This, Width, Height, [Option]) -> boolean() when
+              This::wxImage(), Width::integer(), Height::integer(),
+              Option :: {clear, boolean()}.
+
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, DDaattaa,, AAllpphhaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+                 Data = binary()
+                 Alpha = binary()
+
+              See external documentation.
+              Also:
+              create(This, Width, Height, Data, [Option]) -> boolean() when
+              This::wxImage(), Width::integer(), Height::integer(),
+              Data::binary(),
+              Option :: {static_data, boolean()}.
+
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, DDaattaa,, AAllpphhaa,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+                 Data = binary()
+                 Alpha = binary()
+                 Option = {static_data, boolean()}
+
+              See external documentation.
+
+       DDeessttrrooyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ffiinnddFFiirrssttUUnnuusseeddCCoolloouurr((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), R::integer(), G::integer(),
+                 B::integer()}
+                 This = wxImage()
+
+              Equivalent to ffiinnddFFiirrssttUUnnuusseeddCCoolloouurr((TThhiiss,, [[]])).
+
+       ffiinnddFFiirrssttUUnnuusseeddCCoolloouurr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), R::integer(), G::integer(),
+                 B::integer()}
+                 This = wxImage()
+                 Option = {startR, integer()} | {startG, integer()} | {startB,
+                 integer()}
+
+              See external documentation.
+
+       ggeettIImmaaggeeEExxttWWiillddccaarrdd(()) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              See external documentation.
+
+       ggeettAAllpphhaa((TThhiiss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettAAllpphhaa((TThhiiss,, XX,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggeettBBlluuee((TThhiiss,, XX,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggeettDDaattaa((TThhiiss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettGGrreeeenn((TThhiiss,, XX,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggeettIImmaaggeeCCoouunntt((NNaammee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 Name = chardata() (see module unicode)
+
+              Equivalent to ggeettIImmaaggeeCCoouunntt((NNaammee,, [[]])).
+
+       ggeettIImmaaggeeCCoouunntt((NNaammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 Name = chardata() (see module unicode)
+                 Option = {type, integer()}
+
+              See external documentation.
+
+       ggeettHHeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettMMaasskkBBlluuee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettMMaasskkGGrreeeenn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettMMaasskkRReedd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettOOrrFFiinnddMMaasskkCCoolloouurr((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), R::integer(), G::integer(),
+                 B::integer()}
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettPPaalleettttee((TThhiiss)) -->> wwxxPPaalleettttee(()) ((sseeee mmoodduullee wwxxPPaalleettttee))
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettRReedd((TThhiiss,, XX,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggeettSSuubbIImmaaggee((TThhiiss,, RReecctt)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       ggeettWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       hhaassAAllpphhaa((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       hhaassMMaasskk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       ggeettOOppttiioonn((TThhiiss,, NNaammee)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettOOppttiioonnIInntt((TThhiiss,, NNaammee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       hhaassOOppttiioonn((TThhiiss,, NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       iinniittAAllpphhaa((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       iinniittSSttaannddaarrddHHaannddlleerrss(()) -->> ookk
+
+              See external documentation.
+
+       iissTTrraannssppaarreenntt((TThhiiss,, XX,, YY)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+
+              Equivalent to iissTTrraannssppaarreenntt((TThhiiss,, XX,, YY,, [[]])).
+
+       iissTTrraannssppaarreenntt((TThhiiss,, XX,, YY,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+                 Option = {threshold, integer()}
+
+              See external documentation.
+
+       llooaaddFFiillee((TThhiiss,, NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+
+              Equivalent to llooaaddFFiillee((TThhiiss,, NNaammee,, [[]])).
+
+       llooaaddFFiillee((TThhiiss,, NNaammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+                 Option = {type, integer()} | {index, integer()}
+
+              See external documentation.
+
+       llooaaddFFiillee((TThhiiss,, NNaammee,, MMiimmeettyyppee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+                 Mimetype = chardata() (see module unicode)
+                 Option = {index, integer()}
+
+              See external documentation.
+
+       ookk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+
+              See external documentation.
+
+       rreemmoovveeHHaannddlleerr((NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       mmiirrrroorr((TThhiiss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+
+              Equivalent to mmiirrrroorr((TThhiiss,, [[]])).
+
+       mmiirrrroorr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Option = {horizontally, boolean()}
+
+              See external documentation.
+
+       rreeppllaaccee((TThhiiss,, RR11,, GG11,, BB11,, RR22,, GG22,, BB22)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 R1 = integer()
+                 G1 = integer()
+                 B1 = integer()
+                 R2 = integer()
+                 G2 = integer()
+                 B2 = integer()
+
+              See external documentation.
+
+       rreessccaallee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to rreessccaallee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       rreessccaallee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+                 Option = {quality, integer()}
+
+              See external documentation.
+
+       rreessiizzee((TThhiiss,, SSiizzee,, PPooss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Size = {W::integer(), H::integer()}
+                 Pos = {X::integer(), Y::integer()}
+
+              Equivalent to rreessiizzee((TThhiiss,, SSiizzee,, PPooss,, [[]])).
+
+       rreessiizzee((TThhiiss,, SSiizzee,, PPooss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Size = {W::integer(), H::integer()}
+                 Pos = {X::integer(), Y::integer()}
+                 Option = {r, integer()} | {g, integer()} | {b, integer()}
+
+              See external documentation.
+
+       rroottaattee((TThhiiss,, AAnnggllee,, CCeennttrree__ooff__rroottaattiioonn)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Angle = number()
+                 Centre_of_rotation = {X::integer(), Y::integer()}
+
+              Equivalent to rroottaattee((TThhiiss,, AAnnggllee,, CCeennttrree__ooff__rroottaattiioonn,, [[]])).
+
+       rroottaattee((TThhiiss,, AAnnggllee,, CCeennttrree__ooff__rroottaattiioonn,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Angle = number()
+                 Centre_of_rotation = {X::integer(), Y::integer()}
+                 Option = {interpolating, boolean()} | {offset_after_rotation,
+                 {X::integer(), Y::integer()}}
+
+              See external documentation.
+
+       rroottaatteeHHuuee((TThhiiss,, AAnnggllee)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Angle = number()
+
+              See external documentation.
+
+       rroottaattee9900((TThhiiss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+
+              Equivalent to rroottaattee9900((TThhiiss,, [[]])).
+
+       rroottaattee9900((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Option = {clockwise, boolean()}
+
+              See external documentation.
+
+       ssaavveeFFiillee((TThhiiss,, NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       ssaavveeFFiillee((TThhiiss,, NNaammee,, TTyyppee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+                 Type = integer()
+
+              See external documentation.
+              Also:
+              saveFile(This, Name, Mimetype) -> boolean() when
+              This::wxImage(), Name::unicode:chardata(),
+              Mimetype::unicode:chardata().
+
+
+       ssccaallee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to ssccaallee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       ssccaallee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Width = integer()
+                 Height = integer()
+                 Option = {quality, integer()}
+
+              See external documentation.
+
+       ssiizzee((TThhiiss,, SSiizzee,, PPooss)) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Size = {W::integer(), H::integer()}
+                 Pos = {X::integer(), Y::integer()}
+
+              Equivalent to ssiizzee((TThhiiss,, SSiizzee,, PPooss,, [[]])).
+
+       ssiizzee((TThhiiss,, SSiizzee,, PPooss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggee(())
+
+              Types:
+
+                 This = wxImage()
+                 Size = {W::integer(), H::integer()}
+                 Pos = {X::integer(), Y::integer()}
+                 Option = {r, integer()} | {g, integer()} | {b, integer()}
+
+              See external documentation.
+
+       sseettAAllpphhaa((TThhiiss,, AAllpphhaa)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Alpha = binary()
+
+              Equivalent to sseettAAllpphhaa((TThhiiss,, AAllpphhaa,, [[]])).
+
+       sseettAAllpphhaa((TThhiiss,, AAllpphhaa,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Alpha = binary()
+                 Option = {static_data, boolean()}
+
+              See external documentation.
+
+       sseettAAllpphhaa((TThhiiss,, XX,, YY,, AAllpphhaa)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+                 Alpha = integer()
+
+              See external documentation.
+
+       sseettDDaattaa((TThhiiss,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Data = binary()
+
+              Equivalent to sseettDDaattaa((TThhiiss,, DDaattaa,, [[]])).
+
+       sseettDDaattaa((TThhiiss,, DDaattaa,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Data = binary()
+                 Option = {static_data, boolean()}
+
+              See external documentation.
+
+       sseettDDaattaa((TThhiiss,, DDaattaa,, NNeeww__wwiiddtthh,, NNeeww__hheeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Data = binary()
+                 New_width = integer()
+                 New_height = integer()
+
+              Equivalent to sseettDDaattaa((TThhiiss,, DDaattaa,, NNeeww__wwiiddtthh,, NNeeww__hheeiigghhtt,, [[]])).
+
+       sseettDDaattaa((TThhiiss,, DDaattaa,, NNeeww__wwiiddtthh,, NNeeww__hheeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Data = binary()
+                 New_width = integer()
+                 New_height = integer()
+                 Option = {static_data, boolean()}
+
+              See external documentation.
+
+       sseettMMaasskk((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+
+              Equivalent to sseettMMaasskk((TThhiiss,, [[]])).
+
+       sseettMMaasskk((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Option = {mask, boolean()}
+
+              See external documentation.
+
+       sseettMMaasskkCCoolloouurr((TThhiiss,, RR,, GG,, BB)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 R = integer()
+                 G = integer()
+                 B = integer()
+
+              See external documentation.
+
+       sseettMMaasskkFFrroommIImmaaggee((TThhiiss,, MMaasskk,, MMrr,, MMgg,, MMbb)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImage()
+                 Mask = wxImage()
+                 Mr = integer()
+                 Mg = integer()
+                 Mb = integer()
+
+              See external documentation.
+
+       sseettOOppttiioonn((TThhiiss,, NNaammee,, VVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Name = chardata() (see module unicode)
+                 Value = integer()
+
+              See external documentation.
+              Also:
+              setOption(This, Name, Value) -> ok when
+              This::wxImage(), Name::unicode:chardata(),
+              Value::unicode:chardata().
+
+
+       sseettPPaalleettttee((TThhiiss,, PPaalleettttee)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Palette = wxPalette() (see module wxPalette)
+
+              See external documentation.
+
+       sseettRRGGBB((TThhiiss,, RReecctt,, RR,, GG,, BB)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 R = integer()
+                 G = integer()
+                 B = integer()
+
+              See external documentation.
+
+       sseettRRGGBB((TThhiiss,, XX,, YY,, RR,, GG,, BB)) -->> ookk
+
+              Types:
+
+                 This = wxImage()
+                 X = integer()
+                 Y = integer()
+                 R = integer()
+                 G = integer()
+                 B = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxIImmaaggee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxImage(3)

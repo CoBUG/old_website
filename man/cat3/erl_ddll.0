@@ -1,0 +1,1038 @@
+erl_ddll(3)                Erlang Module Definition                erl_ddll(3)
+
+
+
+NNAAMMEE
+       erl_ddll - Dynamic Driver Loader and Linker
+
+DDEESSCCRRIIPPTTIIOONN
+       The _e_r_l___d_d_l_l module provides an interface for loading and unloading
+       _e_r_l_a_n_g _l_i_n_k_e_d _i_n _d_r_i_v_e_r_s in runtime.
+
+   NNoottee::
+       This is a large reference document. For casual use of the module, as
+       well as for most real world applications, the descriptions of the
+       functions llooaadd//22 and uunnllooaadd//11 are enough to get going.
+
+
+       The driver should be provided as a dynamically linked library in a
+       object code format specific for the platform in use, i. e. _._s_o files on
+       most Unix systems and _._d_d_l files on windows. An erlang linked in driver
+       has to provide specific interfaces to the emulator, so this module is
+       not designed for loading arbitrary dynamic libraries. For further
+       information about erlang drivers, refer to the ERTS reference manual
+       section eerrll__ddrriivveerr.
+
+       When describing a set of functions, (i.e. a module, a part of a module
+       or an application) executing in a process and wanting to use a ddll-
+       driver, we use the term _u_s_e_r. There can be several users in one process
+       (different modules needing the same driver) and several processes
+       running the same code, making up several _u_s_e_r_s of a driver. In the
+       basic scenario, each user loads the driver before starting to use it
+       and unloads the driver when done. The reference counting keeps track of
+       processes as well as the number of loads by each process, so that the
+       driver will only be unloaded when no one wants it (it has no user). The
+       driver also keeps track of ports that are opened towards it, so that
+       one can delay unloading until all ports are closed or kill all ports
+       using the driver when it is unloaded.
+
+       The interface supports two basic scenarios of loading and unloading.
+       Each scenario can also have the option of either killing ports when the
+       driver is unloading, or waiting for the ports to close themselves. The
+       scenarios are:
+
+         _L_o_a_d _a_n_d _u_n_l_o_a_d _o_n _a _"_w_h_e_n _n_e_e_d_e_d _b_a_s_i_s_":
+           This (most common) scenario simply supports that each uusseerr of the
+           driver loads it when it is needed and unloads it when the uusseerr no
+           longer have any use for it. The driver is always reference counted
+           and as long as a process keeping the driver loaded is still alive,
+           the driver is present in the system.
+
+           Each uusseerr of the driver use _l_i_t_e_r_a_l_l_y the same pathname for the
+           driver when demanding load, but the uusseerrss are not really concerned
+           with if the driver is already loaded from the filesystem or if the
+           object code has to be loaded from filesystem.
+
+           Two pairs of functions support this scenario:
+
+           _l_o_a_d_/_2 _a_n_d _u_n_l_o_a_d_/_1:
+             When using the _l_o_a_d_/_u_n_l_o_a_d interfaces, the driver will not
+             _a_c_t_u_a_l_l_y get unloaded until the _l_a_s_t _p_o_r_t using the driver is
+             closed. The function _u_n_l_o_a_d_/_1 can return immediately, as the
+             uusseerrss are not really concerned with when the actual unloading
+             occurs. The driver will actually get unloaded when no one needs
+             it any longer.
+
+             If a process having the driver loaded dies, it will have the same
+             effect as if unloading was done.
+
+             When loading, the function _l_o_a_d_/_2 returns _o_k as soon as there is
+             any instance of the driver present, so that if a driver is
+             waiting to get unloaded (due to open ports), it will simply
+             change state to no longer need unloading.
+
+           _l_o_a_d___d_r_i_v_e_r_/_2 _a_n_d _u_n_l_o_a_d___d_r_i_v_e_r_/_1:
+             These interfaces is intended to be used when it is considered an
+             error that ports are open towards a driver that no uusseerr has
+             loaded. The ports still open when the last uusseerr calls
+             _u_n_l_o_a_d___d_r_i_v_e_r_/_1 or when the last process having the driver loaded
+             dies, will get killed with reason _d_r_i_v_e_r___u_n_l_o_a_d_e_d.
+
+             The function names _l_o_a_d___d_r_i_v_e_r and _u_n_l_o_a_d___d_r_i_v_e_r are kept for
+             backward compatibility.
+
+         _L_o_a_d_i_n_g _a_n_d _r_e_l_o_a_d_i_n_g _f_o_r _c_o_d_e _r_e_p_l_a_c_e_m_e_n_t:
+           This scenario occurs when the driver code might need replacement
+           during operation of the Erlang emulator. Implementing driver code
+           replacement is somewhat more tedious than beam code replacement, as
+           one driver cannot be loaded as both "old" and "new" code. All uusseerrss
+           of a driver must have it closed (no open ports) before the old code
+           can be unloaded and the new code can be loaded.
+
+           The actual unloading/loading is done as one atomic operation,
+           blocking all processes in the system from using the driver
+           concerned while in progress.
+
+           The preferred way to do driver code replacement is to let _o_n_e
+           _s_i_n_g_l_e _p_r_o_c_e_s_s keep track of the driver. When the process start,
+           the driver is loaded. When replacement is required, the driver is
+           reloaded. Unload is probably never done, or done when the process
+           exits. If more than one uusseerr has a driver loaded when code
+           replacement is demanded, the replacement cannot occur until the
+           last "other" uusseerr has unloaded the driver.
+
+           Demanding reload when a reload is already in progress is always an
+           error. Using the high level functions, it is also an error to
+           demand reloading when more than one uusseerr has the driver loaded. To
+           simplify driver replacement, avoid designing your system so that
+           more than than one uusseerr has the driver loaded.
+
+           The two functions for reloading drivers should be used together
+           with corresponding load functions, to support the two different
+           behaviors concerning open ports:
+
+           _l_o_a_d_/_2 _a_n_d _r_e_l_o_a_d_/_2:
+             This pair of functions is used when reloading should be done
+             after the last open port towards the driver is closed.
+
+             As _r_e_l_o_a_d_/_2 actually waits for the reloading to occur, a
+             misbehaving process keeping open ports towards the driver (or
+             keeping the driver loaded) might cause infinite waiting for
+             reload. Timeouts has to be provided outside of the process
+             demanding the reload or by using the low-level interface
+             ttrryy__llooaadd//33 in combination with driver monitors (see below).
+
+           _l_o_a_d___d_r_i_v_e_r_/_2 _a_n_d _r_e_l_o_a_d___d_r_i_v_e_r_/_2:
+             This pair of functions are used when open ports towards the
+             driver should be killed with reason _d_r_i_v_e_r___u_n_l_o_a_d_e_d to allow for
+             new driver code to get loaded.
+
+             If, however, another process has the driver loaded, calling
+             _r_e_l_o_a_d___d_r_i_v_e_r returns the error code _p_e_n_d_i_n_g___p_r_o_c_e_s_s. As stated
+             earlier, the recommended design is to not allow other uusseerrss than
+             the "driver reloader" to actually demand loading of the concerned
+             driver.
+
+DDAATTAA TTYYPPEESS
+       ddrriivveerr(()) = string() | atom()
+
+       ppaatthh(()) = string() | atom()
+
+EEXXPPOORRTTSS
+       ddeemmoonniittoorr((MMoonniittoorrRReeff)) -->> ookk
+
+              Types:
+
+                 MonitorRef = reference()
+
+              Removes a driver monitor in much the same way as
+              eerrllaanngg::ddeemmoonniittoorr//11 does with process monitors. See mmoonniittoorr//22,
+              ttrryy__llooaadd//33 and ttrryy__uunnllooaadd//22 for details about how to create
+              driver monitors.
+
+              The function throws a _b_a_d_a_r_g exception if the parameter is not a
+              reference().
+
+       iinnffoo(()) -->> AAllllIInnffooLLiisstt
+
+              Types:
+
+                 AllInfoList = [DriverInfo]
+                 DriverInfo = {DriverName, InfoList}
+                 DriverName = string()
+                 InfoList = [InfoItem]
+                 InfoItem = {Tag :: atom(), Value :: term()}
+
+              Returns a list of tuples _{_D_r_i_v_e_r_N_a_m_e_, _I_n_f_o_L_i_s_t_}, where _I_n_f_o_L_i_s_t
+              is the result of calling iinnffoo//11 for that _D_r_i_v_e_r_N_a_m_e. Only
+              dynamically linked in drivers are included in the list.
+
+       iinnffoo((NNaammee)) -->> IInnffooLLiisstt
+
+              Types:
+
+                 Name = ddrriivveerr(())
+                 InfoList = [InfoItem, ...]
+                 InfoItem = {Tag :: atom(), Value :: term()}
+
+              Returns a list of tuples _{_T_a_g_, _V_a_l_u_e_}, where _T_a_g is the
+              information item and _V_a_l_u_e is the result of calling iinnffoo//22 with
+              this driver name and this tag. The result being a tuple list
+              containing all information available about a driver.
+
+              The different tags that will appear in the list are:
+
+                * processes
+
+                * driver_options
+
+                * port_count
+
+                * linked_in_driver
+
+                * permanent
+
+                * awaiting_load
+
+                * awaiting_unload
+
+              For a detailed description of each value, please read the
+              description of iinnffoo//22 below.
+
+              The function throws a _b_a_d_a_r_g exception if the driver is not
+              present in the system.
+
+       iinnffoo((NNaammee,, TTaagg)) -->> VVaalluuee
+
+              Types:
+
+                 Name = string() | atom()
+                 Tag = processes | driver_options | port_count |
+                 linked_in_driver | permanent | awaiting_load |
+                 awaiting_unload
+                 Value = term()
+
+              This function returns specific information about one aspect of a
+              driver. The _T_a_g parameter specifies which aspect to get
+              information about. The _V_a_l_u_e return differs between different
+              tags:
+
+                _p_r_o_c_e_s_s_e_s:
+                  Return all processes containing uusseerrss of the specific
+                  drivers as a list of tuples _{_p_i_d_(_)_,_i_n_t_(_)_}, where the _i_n_t_(_)
+                  denotes the number of users in the process _p_i_d_(_).
+
+                _d_r_i_v_e_r___o_p_t_i_o_n_s:
+                  Return a list of the driver options provided when loading,
+                  as well as any options set by the driver itself during
+                  initialization. The currently only valid option being
+                  _k_i_l_l___p_o_r_t_s.
+
+                _p_o_r_t___c_o_u_n_t:
+                  Return the number of ports (an _i_n_t_(_)) using the driver.
+
+                _l_i_n_k_e_d___i_n___d_r_i_v_e_r:
+                  Return a _b_o_o_l_(_), being _t_r_u_e if the driver is a statically
+                  linked in one and _f_a_l_s_e otherwise.
+
+                _p_e_r_m_a_n_e_n_t:
+                  Return a _b_o_o_l_(_), being _t_r_u_e if the driver has made itself
+                  permanent (and is _n_o_t a statically linked in driver). _f_a_l_s_e
+                  otherwise.
+
+                _a_w_a_i_t_i_n_g___l_o_a_d:
+                  Return a list of all processes having monitors for _l_o_a_d_i_n_g
+                  active, each process returned as _{_p_i_d_(_)_,_i_n_t_(_)_}, where the
+                  _i_n_t_(_) is the number of monitors held by the process _p_i_d_(_).
+
+                _a_w_a_i_t_i_n_g___u_n_l_o_a_d:
+                  Return a list of all processes having monitors for _u_n_l_o_a_d_i_n_g
+                  active, each process returned as _{_p_i_d_(_)_,_i_n_t_(_)_}, where the
+                  _i_n_t_(_) is the number of monitors held by the process _p_i_d_(_).
+
+              If the options _l_i_n_k_e_d___i_n___d_r_i_v_e_r or _p_e_r_m_a_n_e_n_t return true, all
+              other options will return the value _l_i_n_k_e_d___i_n___d_r_i_v_e_r or
+              _p_e_r_m_a_n_e_n_t respectively.
+
+              The function throws a _b_a_d_a_r_g exception if the driver is not
+              present in the system or the tag is not supported.
+
+       llooaadd((PPaatthh,, NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Path = ppaatthh(())
+                 Name = ddrriivveerr(())
+                 ErrorDesc = term()
+
+              Loads and links the dynamic driver _N_a_m_e. _P_a_t_h is a file path to
+              the directory containing the driver. _N_a_m_e must be a sharable
+              object/dynamic library. Two drivers with different _P_a_t_h
+              parameters cannot be loaded under the same name. The _N_a_m_e is a
+              string or atom containing at least one character.
+
+              The _N_a_m_e given should correspond to the filename of the actual
+              dynamically loadable object file residing in the directory given
+              as _P_a_t_h, but _w_i_t_h_o_u_t the extension (i.e. _._s_o). The driver name
+              provided in the driver initialization routine must correspond
+              with the filename, in much the same way as erlang module names
+              correspond to the names of the _._b_e_a_m files.
+
+              If the driver has been previously unloaded, but is still present
+              due to open ports against it, a call to _l_o_a_d_/_2 will stop the
+              unloading and keep the driver (as long as the _P_a_t_h is the same)
+              and _o_k is returned. If one actually wants the object code to be
+              reloaded, one uses rreellooaadd//22 or the low-level interface
+              ttrryy__llooaadd//33 instead. Please refer to the description of ddiiffffeerreenntt
+              sscceennaarriiooss for loading/unloading in the introduction.
+
+              If more than one process tries to load an already loaded driver
+              withe the same _P_a_t_h, or if the same process tries to load it
+              several times, the function will return _o_k. The emulator will
+              keep track of the _l_o_a_d_/_2 calls, so that a corresponding number
+              of _u_n_l_o_a_d_/_2 calls will have to be done from the same process
+              before the driver will actually get unloaded. It is therefore
+              safe for an application to load a driver that is shared between
+              processes or applications when needed. It can safely be unloaded
+              without causing trouble for other parts of the system.
+
+              It is not allowed to load several drivers with the same name but
+              with different _P_a_t_h parameters.
+
+          NNoottee::
+              Note especially that the _P_a_t_h is interpreted literally, so that
+              all loaders of the same driver needs to give the same
+              _l_i_t_e_r_a_l_P_a_t_h string, even though different paths might point out
+              the same directory in the filesystem (due to use of relative
+              paths and links).
+
+
+              On success, the function returns _o_k. On failure, the return
+              value is _{_e_r_r_o_r_,_E_r_r_o_r_D_e_s_c_}, where _E_r_r_o_r_D_e_s_c is an opaque term to
+              be translated into human readable form by the ffoorrmmaatt__eerrrroorr//11
+              function.
+
+              For more control over the error handling, again use the
+              ttrryy__llooaadd//33 interface instead.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       llooaadd__ddrriivveerr((PPaatthh,, NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Path = ppaatthh(())
+                 Name = ddrriivveerr(())
+                 ErrorDesc = term()
+
+              Works essentially as _l_o_a_d_/_2, but will load the driver with other
+              options. All ports that are using the driver will get killed
+              with the reason _d_r_i_v_e_r___u_n_l_o_a_d_e_d when the driver is to be
+              unloaded.
+
+              The number of loads and unloads by different uusseerrss influence the
+              actual loading and unloading of a driver file. The port killing
+              will therefore only happen when the _l_a_s_t uusseerr unloads the
+              driver, or the last process having loaded the driver exits.
+
+              This interface (or at least the name of the functions) is kept
+              for backward compatibility. Using ttrryy__llooaadd//33 with
+              _{_d_r_i_v_e_r___o_p_t_i_o_n_s_,_[_k_i_l_l___p_o_r_t_s_]_}  in the option list will give the
+              same effect regarding the port killing.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       mmoonniittoorr((TTaagg,, IItteemm)) -->> MMoonniittoorrRReeff
+
+              Types:
+
+                 Tag = driver
+                 Item = {Name, When}
+                 Name = atom() | string()
+                 When = loaded | unloaded | unloaded_only
+                 MonitorRef = reference()
+
+              This function creates a driver monitor and works in many ways as
+              the function eerrllaanngg::mmoonniittoorr//22, does for processes. When a driver
+              changes state, the monitor results in a monitor-message being
+              sent to the calling process. The _M_o_n_i_t_o_r_R_e_f returned by this
+              function is included in the message sent.
+
+              As with process monitors, each driver monitor set will only
+              generate _o_n_e _s_i_n_g_l_e _m_e_s_s_a_g_e. The monitor is "destroyed" after
+              the message is sent and there is then no need to call
+              ddeemmoonniittoorr//11.
+
+              The _M_o_n_i_t_o_r_R_e_f can also be used in subsequent calls to
+              ddeemmoonniittoorr//11 to remove a monitor.
+
+              The function accepts the following parameters:
+
+                _T_a_g:
+                  The monitor tag is always _d_r_i_v_e_r as this function can only
+                  be used to create driver monitors. In the future, driver
+                  monitors will be integrated with process monitors, why this
+                  parameter has to be given for consistence.
+
+                _I_t_e_m:
+                  The _I_t_e_m parameter specifies which driver one wants to
+                  monitor (the name of the driver) as well as which state
+                  change one wants to monitor. The parameter is a tuple of
+                  arity two whose first element is the driver name and second
+                  element is either of:
+
+                  _l_o_a_d_e_d:
+                    Notify me when the driver is reloaded (or loaded if
+                    loading is underway). It only makes sense to monitor
+                    drivers that are in the process of being loaded or
+                    reloaded. One cannot monitor a future-to-be driver name
+                    for loading, that will only result in a _'_D_O_W_N_' message
+                    being immediately sent. Monitoring for loading is
+                    therefore most useful when triggered by the ttrryy__llooaadd//33
+                    function, where the monitor is created _b_e_c_a_u_s_e the driver
+                    is in such a pending state.
+
+                    Setting a driver monitor for _l_o_a_d_i_n_g will eventually lead
+                    to one of the following messages being sent:
+
+                    _{_'_U_P_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _l_o_a_d_e_d_}:
+                      This message is sent, either immediately if the driver
+                      is already loaded and no reloading is pending, or when
+                      reloading is executed if reloading is pending.
+
+                      The uusseerr is expected to know if reloading is demanded
+                      prior to creating a monitor for loading.
+
+                    _{_'_U_P_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _p_e_r_m_a_n_e_n_t_}:
+                      This message will be sent if reloading was expected, but
+                      the (old) driver made itself permanent prior to
+                      reloading. It will also be sent if the driver was
+                      permanent or statically linked in when trying to create
+                      the monitor.
+
+                    _{_'_D_O_W_N_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _l_o_a_d___c_a_n_c_e_l_l_e_d_}:
+                      This message will arrive if reloading was underway, but
+                      the uusseerr having requested reload cancelled it by either
+                      dying or calling ttrryy__uunnllooaadd//22 (or
+                      _u_n_l_o_a_d_/_1/_u_n_l_o_a_d___d_r_i_v_e_r_/_1) again before it was reloaded.
+
+                    _{_'_D_O_W_N_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _{_l_o_a_d___f_a_i_l_u_r_e_,
+                    _F_a_i_l_u_r_e_}_}:
+                      This message will arrive if reloading was underway but
+                      the loading for some reason failed. The _F_a_i_l_u_r_e term is
+                      one of the errors that can be returned from ttrryy__llooaadd//33.
+                      The error term can be passed to ffoorrmmaatt__eerrrroorr//11 for
+                      translation into human readable form. Note that the
+                      translation has to be done in the same running erlang
+                      virtual machine as the error was detected in.
+
+                  _u_n_l_o_a_d_e_d:
+                    Monitor when a driver gets unloaded. If one monitors a
+                    driver that is not present in the system, one will
+                    immediately get notified that the driver got unloaded.
+                    There is no guarantee that the driver was actually ever
+                    loaded.
+
+                    A driver monitor for unload will eventually result in one
+                    of the following messages being sent:
+
+                    _{_'_D_O_W_N_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _u_n_l_o_a_d_e_d_}:
+                      The driver instance monitored is now unloaded. As the
+                      unload might have been due to a _r_e_l_o_a_d_/_2 request, the
+                      driver might once again have been loaded when this
+                      message arrives.
+
+                    _{_'_U_P_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _u_n_l_o_a_d___c_a_n_c_e_l_l_e_d_}:
+                      This message will be sent if unloading was expected, but
+                      while the driver was waiting for all ports to get
+                      closed, a new uusseerr of the driver appeared and the
+                      unloading was cancelled.
+
+                      This message appears when an _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_}) was
+                      returned from ttrryy__uunnllooaadd//22) for the last uusseerr of the
+                      driver and then a _{_o_k_, _a_l_r_e_a_d_y___l_o_a_d_e_d_} is returned from
+                      a call to ttrryy__llooaadd//33.
+
+                      If one wants to _r_e_a_l_l_y monitor when the driver gets
+                      unloaded, this message will distort the picture, no
+                      unloading was really done. The _u_n_l_o_a_d_e_d___o_n_l_y option
+                      creates a monitor similar to an _u_n_l_o_a_d_e_d monitor, but
+                      does never result in this message.
+
+                    _{_'_U_P_'_, _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _p_e_r_m_a_n_e_n_t_}:
+                      This message will be sent if unloading was expected, but
+                      the driver made itself permanent prior to unloading. It
+                      will also be sent if trying to monitor a permanent or
+                      statically linked in driver.
+
+                  _u_n_l_o_a_d_e_d___o_n_l_y:
+                    A monitor created as _u_n_l_o_a_d_e_d___o_n_l_y behaves exactly as one
+                    created as _u_n_l_o_a_d_e_d with the exception that the _{_'_U_P_'_,
+                    _r_e_f_e_r_e_n_c_e_(_)_, _d_r_i_v_e_r_, _N_a_m_e_, _u_n_l_o_a_d___c_a_n_c_e_l_l_e_d_} message will
+                    never be sent, but the monitor instead persists until the
+                    driver _r_e_a_l_l_y gets unloaded.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       rreellooaadd((PPaatthh,, NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Path = ppaatthh(())
+                 Name = ddrriivveerr(())
+                 ErrorDesc = pending_process | OpaqueError
+                 OpaqueError = term()
+
+              Reloads the driver named _N_a_m_e from a possibly different _P_a_t_h
+              than was previously used. This function is used in the code
+              change sscceennaarriioo described in the introduction.
+
+              If there are other uusseerrss of this driver, the function will
+              return _{_e_r_r_o_r_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_}, but if there are no more users,
+              the function call will hang until all open ports are closed.
+
+          NNoottee::
+              Avoid mixing several uusseerrss with driver reload requests.
+
+
+              If one wants to avoid hanging on open ports, one should use the
+              ttrryy__llooaadd//33 function instead.
+
+              The _N_a_m_e and _P_a_t_h parameters have exactly the same meaning as
+              when calling the plain llooaadd//22 function.
+
+          NNoottee::
+              Avoid mixing several uusseerrss with driver reload requests.
+
+
+              On success, the function returns _o_k. On failure, the function
+              returns an opaque error, with the exception of the
+              _p_e_n_d_i_n_g___p_r_o_c_e_s_s error described above. The opaque errors are to
+              be translated into human readable form by the ffoorrmmaatt__eerrrroorr//11
+              function.
+
+              For more control over the error handling, again use the
+              ttrryy__llooaadd//33 interface instead.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       rreellooaadd__ddrriivveerr((PPaatthh,, NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Path = ppaatthh(())
+                 Name = ddrriivveerr(())
+                 ErrorDesc = pending_process | OpaqueError
+                 OpaqueError = term()
+
+              Works exactly as rreellooaadd//22, but for drivers loaded with the
+              llooaadd__ddrriivveerr//22 interface.
+
+              As this interface implies that ports are being killed when the
+              last user disappears, the function wont hang waiting for ports
+              to get closed.
+
+              For further details, see the sscceennaarriiooss in the module description
+              and refer to the rreellooaadd//22 function description.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       ttrryy__llooaadd((PPaatthh,, NNaammee,, OOppttiioonnLLiisstt)) -->> {{ookk,,SSttaattuuss}} || {{ookk,, PPeennddiinnggSSttaattuuss,,
+       RReeff}} || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Path = Name = string() | atom()
+                 OptionList = [ Option ]
+                 Option = {driver_options, DriverOptionList} | {monitor,
+                 MonitorOption} | {reload, ReloadOption}
+                 DriverOptionList = [ DriverOption ]
+                 DriverOption = kill_ports
+                 MonitorOption = pending_driver | pending
+                 ReloadOption = pending_driver | pending
+                 Status = loaded | already_loaded | PendingStatus
+                 PendingStatus = pending_driver | pending_process
+                 Ref = reference()
+                 ErrorDesc = ErrorAtom | OpaqueError
+                 ErrorAtom = linked_in_driver | inconsistent | permanent |
+                 not_loaded_by_this_process | not_loaded | pending_reload |
+                 pending_process
+
+              This function provides more control than the _l_o_a_d_/_2/_r_e_l_o_a_d_/_2 and
+              _l_o_a_d___d_r_i_v_e_r_/_2/_r_e_l_o_a_d___d_r_i_v_e_r_/_2 interfaces. It will never wait for
+              completion of other operations related to the driver, but
+              immediately return the status of the driver as either:
+
+                _{_o_k_, _l_o_a_d_e_d_}:
+                  The driver was actually loaded and is immediately usable.
+
+                _{_o_k_, _a_l_r_e_a_d_y___l_o_a_d_e_d_}:
+                  The driver was already loaded by another process and/or is
+                  in use by a living port. The load by you is registered and a
+                  corresponding _t_r_y___u_n_l_o_a_d is expected sometime in the future.
+
+                _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_}or _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_, _r_e_f_e_r_e_n_c_e_(_)_}:
+                  The load request is registered, but the loading is delayed
+                  due to the fact that an earlier instance of the driver is
+                  still waiting to get unloaded (there are open ports using
+                  it). Still, unload is expected when you are done with the
+                  driver. This return value will _m_o_s_t_l_y happen when the
+                  _{_r_e_l_o_a_d_,_p_e_n_d_i_n_g___d_r_i_v_e_r_} or _{_r_e_l_o_a_d_,_p_e_n_d_i_n_g_} options are
+                  used, but _c_a_n happen when another uusseerr is unloading a driver
+                  in parallel and the _k_i_l_l___p_o_r_t_s driver option is set. In
+                  other words, this return value will always need to be
+                  handled!
+
+                _{_o_k_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_}or _{_o_k_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_, _r_e_f_e_r_e_n_c_e_(_)_}:
+                  The load request is registered, but the loading is delayed
+                  due to the fact that an earlier instance of the driver is
+                  still waiting to get unloaded by another uusseerr (not only by a
+                  port, in which case _{_o_k_,_p_e_n_d_i_n_g___d_r_i_v_e_r_} would have been
+                  returned). Still, unload is expected when you are done with
+                  the driver. This return value will _o_n_l_y happen when the
+                  _{_r_e_l_o_a_d_,_p_e_n_d_i_n_g_} option is used.
+
+              When the function returns _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_} or _{_o_k_,
+              _p_e_n_d_i_n_g___p_r_o_c_e_s_s_}, one might want to get information about when
+              the driver is _a_c_t_u_a_l_l_y loaded. This can be achieved by using the
+              _{_m_o_n_i_t_o_r_, _P_e_n_d_i_n_g_O_p_t_i_o_n_} option.
+
+              When monitoring is requested, and a corresponding _{_o_k_,
+              _p_e_n_d_i_n_g___d_r_i_v_e_r_} or _{_o_k_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_} would be returned, the
+              function will instead return a tuple _{_o_k_, _P_e_n_d_i_n_g_S_t_a_t_u_s_,
+              _r_e_f_e_r_e_n_c_e_(_)_} and the process will, at a later time when the
+              driver actually gets loaded, get a monitor message. The monitor
+              message one can expect is described in the mmoonniittoorr//22 function
+              description.
+
+          NNoottee::
+              Note that in case of loading, monitoring can _n_o_t only get
+              triggered by using the _{_r_e_l_o_a_d_, _R_e_l_o_a_d_O_p_t_i_o_n_} option, but also
+              in special cases where the load-error is transient, why
+              _{_m_o_n_i_t_o_r_, _p_e_n_d_i_n_g___d_r_i_v_e_r_} should be used under basically _a_l_l
+              real world circumstances!
+
+
+              The function accepts the following parameters:
+
+                _P_a_t_h:
+                  The filesystem path to the directory where the driver object
+                  file is situated. The filename of the object file (minus
+                  extension) must correspond to the driver name (used in the
+                  name parameter) and the driver must identify itself with the
+                  very same name. The _P_a_t_h might be provided as an _i_o___l_i_s_t,
+                  meaning it can be a list of other io_lists, characters
+                  (eight bit integers) or binaries, all to be flattened into a
+                  sequence of characters.
+
+                  The (possibly flattened) _P_a_t_h parameter must be consistent
+                  throughout the system, a driver should, by all uusseerrss, be
+                  loaded using the same _l_i_t_e_r_a_l_P_a_t_h. The exception is when
+                  _r_e_l_o_a_d_i_n_g is requested, in which case the _P_a_t_h may be
+                  specified differently. Note that all uusseerrss trying to load
+                  the driver at a later time will need to use the _n_e_w_P_a_t_h if
+                  the _P_a_t_h is changed using a _r_e_l_o_a_d option. This is yet
+                  another reason to have _o_n_l_y _o_n_e _l_o_a_d_e_r of a driver one wants
+                  to upgrade in a running system!
+
+                _N_a_m_e:
+                  The name parameter is the name of the driver to be used in
+                  subsequent calls to ooppeenn__ppoorrtt. The name can be specified
+                  either as an _i_o___l_i_s_t_(_) or as an _a_t_o_m_(_). The name given when
+                  loading is used to find the actual object file (with the
+                  help of the _P_a_t_h and the system implied extension suffix,
+                  i.e. _._s_o). The name by which the driver identifies itself
+                  must also be consistent with this _N_a_m_e parameter, much as a
+                  beam-file's module name much correspond to its filename.
+
+                _O_p_t_i_o_n_L_i_s_t:
+                  A number of options can be specified to control the loading
+                  operation. The options are given as a list of two-tuples,
+                  the tuples having the following values and meanings:
+
+                  _{_d_r_i_v_e_r___o_p_t_i_o_n_s_, _D_r_i_v_e_r_O_p_t_i_o_n_s_L_i_s_t_}:
+                    This option is to provide options that will change its
+                    general behavior and will "stick" to the driver throughout
+                    its lifespan.
+
+                    The driver options for a given driver name need always to
+                    be consistent, _e_v_e_n _w_h_e_n _t_h_e _d_r_i_v_e_r _i_s _r_e_l_o_a_d_e_d, meaning
+                    that they are as much a part of the driver as the actual
+                    name.
+
+                    Currently the only allowed driver option is _k_i_l_l___p_o_r_t_s,
+                    which means that all ports opened towards the driver are
+                    killed with the exit-reason _d_r_i_v_e_r___u_n_l_o_a_d_e_d when no
+                    process any longer has the driver loaded. This situation
+                    arises either when the last uusseerr calls ttrryy__uunnllooaadd//22, or
+                    the last process having loaded the driver exits.
+
+                  _{_m_o_n_i_t_o_r_, _M_o_n_i_t_o_r_O_p_t_i_o_n_}:
+                    A _M_o_n_i_t_o_r_O_p_t_i_o_n tells _t_r_y___l_o_a_d_/_3 to trigger a driver
+                    monitor under certain conditions. When the monitor is
+                    triggered, the function will return a three-tuple _{_o_k_,
+                    _P_e_n_d_i_n_g_S_t_a_t_u_s_, _r_e_f_e_r_e_n_c_e_(_)_}, where the _r_e_f_e_r_e_n_c_e_(_) is the
+                    monitor ref for the driver monitor.
+
+                    Only one _M_o_n_i_t_o_r_O_p_t_i_o_n can be specified and it is either
+                    the atom _p_e_n_d_i_n_g, which means that a monitor should be
+                    created whenever a load operation is delayed, and the atom
+                    _p_e_n_d_i_n_g___d_r_i_v_e_r, in which a monitor is created whenever the
+                    operation is delayed due to open ports towards an
+                    otherwise unused driver. The _p_e_n_d_i_n_g___d_r_i_v_e_r option is of
+                    little use, but is present for completeness, it is very
+                    well defined which reload-options might give rise to which
+                    delays. It might, however, be a good idea to use the same
+                    _M_o_n_i_t_o_r_O_p_t_i_o_n as the _R_e_l_o_a_d_O_p_t_i_o_n if present.
+
+                    If reloading is not requested, it might still be useful to
+                    specify the _m_o_n_i_t_o_r option, as forced unloads (_k_i_l_l___p_o_r_t_s
+                    driver option or the _k_i_l_l___p_o_r_t_s option to ttrryy__uunnllooaadd//22)
+                    will trigger a transient state where driver loading cannot
+                    be performed until all closing ports are actually closed.
+                    So, as _t_r_y___u_n_l_o_a_d can, in almost all situations, return
+                    _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_}, one should always specify at least
+                    _{_m_o_n_i_t_o_r_, _p_e_n_d_i_n_g___d_r_i_v_e_r_} in production code (see the
+                    monitor discussion above).
+
+                  _{_r_e_l_o_a_d_,_R_e_a_l_o_a_d_O_p_t_i_o_n_}:
+                    This option is used when one wants to _r_e_l_o_a_d a driver from
+                    disk, most often in a code upgrade scenario. Having a
+                    _r_e_l_o_a_d option also implies that the _P_a_t_h parameter need
+                    _n_o_t be consistent with earlier loads of the driver.
+
+                    To reload a driver, the process needs to have previously
+                    loaded the driver, i.e there has to be an active uusseerr of
+                    the driver in the process.
+
+                    The _r_e_l_o_a_d option can be either the atom _p_e_n_d_i_n_g, in which
+                    reloading is requested for any driver and will be
+                    effectuated when _a_l_l ports opened against the driver are
+                    closed. The replacement of the driver will in this case
+                    take place regardless of if there are still pending uusseerrss
+                    having the driver loaded! The option also triggers port-
+                    killing (if the _k_i_l_l___p_o_r_t_s driver option is used) even
+                    though there are pending users, making it usable for
+                    forced driver replacement, but laying a lot of
+                    responsibility on the driver uusseerrss. The pending option is
+                    seldom used as one does not want other uusseerrss to have
+                    loaded the driver when code change is underway.
+
+                    The more useful option is _p_e_n_d_i_n_g___d_r_i_v_e_r, which means that
+                    reloading will be queued if the driver is _n_o_t loaded by
+                    any other uusseerrss, but the driver has opened ports, in which
+                    case _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_} will be returned (a _m_o_n_i_t_o_r
+                    option is of course recommended).
+
+                    If the driver is unloaded (not present in the system), the
+                    error code _n_o_t___l_o_a_d_e_d will be returned. The _r_e_l_o_a_d option
+                    is intended for when the user has already loaded the
+                    driver in advance.
+
+              The function might return numerous errors, of which some only
+              can be returned given a certain combination of options.
+
+              A number of errors are opaque and can only be interpreted by
+              passing them to the ffoorrmmaatt__eerrrroorr//11 function, but some can be
+              interpreted directly:
+
+                _{_e_r_r_o_r_,_l_i_n_k_e_d___i_n___d_r_i_v_e_r_}:
+                  The driver with the specified name is an erlang statically
+                  linked in driver, which cannot be manipulated with this API.
+
+                _{_e_r_r_o_r_,_i_n_c_o_n_s_i_s_t_e_n_t_}:
+                  The driver has already been loaded with either other
+                  _D_r_i_v_e_r_O_p_t_i_o_n_s or a different _l_i_t_e_r_a_l_P_a_t_h argument.
+
+                  This can happen even if a _r_e_l_o_a_d option is given, if the
+                  _D_r_i_v_e_r_O_p_t_i_o_n_s differ from the current.
+
+                _{_e_r_r_o_r_, _p_e_r_m_a_n_e_n_t_}:
+                  The driver has requested itself to be permanent, making it
+                  behave like an erlang linked in driver and it can no longer
+                  be manipulated with this API.
+
+                _{_e_r_r_o_r_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_}:
+                  The driver is loaded by other uusseerrss when the _{_r_e_l_o_a_d_,
+                  _p_e_n_d_i_n_g___d_r_i_v_e_r_} option was given.
+
+                _{_e_r_r_o_r_, _p_e_n_d_i_n_g___r_e_l_o_a_d_}:
+                  Driver reload is already requested by another uusseerr when the
+                  _{_r_e_l_o_a_d_, _R_e_l_o_a_d_O_p_t_i_o_n_} option was given.
+
+                _{_e_r_r_o_r_, _n_o_t___l_o_a_d_e_d___b_y___t_h_i_s___p_r_o_c_e_s_s_}:
+                  Appears when the _r_e_l_o_a_d option is given. The driver _N_a_m_e is
+                  present in the system, but there is no uusseerr of it in this
+                  process.
+
+                _{_e_r_r_o_r_, _n_o_t___l_o_a_d_e_d_}:
+                  Appears when the _r_e_l_o_a_d option is given. The driver _N_a_m_e is
+                  not in the system. Only drivers loaded by this process can
+                  be reloaded.
+
+              All other error codes are to be translated by the ffoorrmmaatt__eerrrroorr//11
+              function. Note that calls to _f_o_r_m_a_t___e_r_r_o_r should be performed
+              from the same running instance of the erlang virtual machine as
+              the error was detected in, due to system dependent behavior
+              concerning error values.
+
+              If the arguments or options are malformed, the function will
+              throw a _b_a_d_a_r_g exception.
+
+       ttrryy__uunnllooaadd((NNaammee,, OOppttiioonnLLiisstt)) -->> {{ookk,,SSttaattuuss}} || {{ookk,, PPeennddiinnggSSttaattuuss,, RReeff}}
+       || {{eerrrroorr,, EErrrroorrAAttoomm}}
+
+              Types:
+
+                 Name = string() | atom()
+                 OptionList = [ Option ]
+                 Option = {monitor, MonitorOption} | kill_ports
+                 MonitorOption = pending_driver | pending
+                 Status = unloaded | PendingStatus
+                 PendingStatus = pending_driver | pending_process
+                 Ref = reference()
+                 ErrorAtom = linked_in_driver | not_loaded |
+                 not_loaded_by_this_process | permanent
+
+              This is the low level function to unload (or decrement reference
+              counts of) a driver. It can be used to force port killing, in
+              much the same way as the driver option _k_i_l_l___p_o_r_t_s implicitly
+              does, and it can trigger a monitor either due to other uusseerrss
+              still having the driver loaded or that there are open ports
+              using the driver.
+
+              Unloading can be described as the process of telling the
+              emulator that this particular part of the code in this
+              particular process (i.e. this uusseerr) no longer needs the driver.
+              That can, if there are no other users, trigger actual unloading
+              of the driver, in which case the driver name disappears from the
+              system and (if possible) the memory occupied by the driver
+              executable code is reclaimed. If the driver has the _k_i_l_l___p_o_r_t_s
+              option set, or if _k_i_l_l___p_o_r_t_s was specified as an option to this
+              function, all pending ports using this driver will get killed
+              when unloading is done by the last uusseerr. If no port-killing is
+              involved and there are open ports, the actual unloading is
+              delayed until there are no more open ports using the driver. If,
+              in this case, another uusseerr (or even this user) loads the driver
+              again before the driver is actually unloaded, the unloading will
+              never take place.
+
+              To allow the uusseerr that _r_e_q_u_e_s_t_s _u_n_l_o_a_d_i_n_g to wait for _a_c_t_u_a_l
+              _u_n_l_o_a_d_i_n_g to take place, _m_o_n_i_t_o_r triggers can be specified in
+              much the same way as when loading. As uusseerrss of this function
+              however seldom are interested in more than decrementing the
+              reference counts, monitoring is more seldom needed. If the
+              _k_i_l_l___p_o_r_t_s option is used however, monitor trigging is crucial,
+              as the ports are not guaranteed to have been killed until the
+              driver is unloaded, why a monitor should be triggered for at
+              least the _p_e_n_d_i_n_g___d_r_i_v_e_r case.
+
+              The possible monitor messages that can be expected are the same
+              as when using the _u_n_l_o_a_d_e_d option to the mmoonniittoorr//22 function.
+
+              The function will return one of the following statuses upon
+              success:
+
+                _{_o_k_, _u_n_l_o_a_d_e_d_}:
+                  The driver was immediately unloaded, meaning that the driver
+                  name is now free to use by other drivers and, if the
+                  underlying OS permits it, the memory occupied by the driver
+                  object code is now reclaimed.
+
+                  The driver can only be unloaded when there are no open ports
+                  using it and there are no more uusseerrss requiring it to be
+                  loaded.
+
+                _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_}or _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_, _r_e_f_e_r_e_n_c_e_(_)_}:
+                  This return value indicates that this call removed the last
+                  uusseerr from the driver, but there are still open ports using
+                  it. When all ports are closed and no new uusseerrss have arrived,
+                  the driver will actually be reloaded and the name and memory
+                  reclaimed.
+
+                  This return value is valid even when the option _k_i_l_l___p_o_r_t_s
+                  was used, as killing ports may not be a process that
+                  completes immediately. The condition is, in that case,
+                  however transient. Monitors are as always useful to detect
+                  when the driver is really unloaded.
+
+                _{_o_k_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_}or _{_o_k_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_, _r_e_f_e_r_e_n_c_e_(_)_}:
+                  The unload request is registered, but there are still other
+                  uusseerrss holding the driver. Note that the term _p_e_n_d_i_n_g___p_r_o_c_e_s_s
+                  might refer to the running process, there might be more than
+                  one uusseerr in the same process.
+
+                  This is a normal, healthy return value if the call was just
+                  placed to inform the emulator that you have no further use
+                  of the driver. It is actually the most common return value
+                  in the most common sscceennaarriioo described in the introduction.
+
+              The function accepts the following parameters:
+
+                _N_a_m_e:
+                  The name parameter is the name of the driver to be unloaded.
+                  The name can be specified either as an _i_o___l_i_s_t_(_) or as an
+                  _a_t_o_m_(_).
+
+                _O_p_t_i_o_n_L_i_s_t:
+                  The _O_p_t_i_o_n_L_i_s_t argument can be used to specify certain
+                  behavior regarding ports as well as triggering monitors
+                  under certain conditions:
+
+                  _k_i_l_l___p_o_r_t_s:
+                    Force killing of all ports opened using this driver, with
+                    the exit reason _d_r_i_v_e_r___u_n_l_o_a_d_e_d, if you are the _l_a_s_tuusseerr
+                    of the driver.
+
+                    If there are other uusseerrss having the driver loaded, this
+                    option will have no effect.
+
+                    If one wants the consistent behavior of killing ports when
+                    the last uusseerr unloads, one should use the driver option
+                    _k_i_l_l___p_o_r_t_s when loading the driver instead.
+
+                  _{_m_o_n_i_t_o_r_, _M_o_n_i_t_o_r_O_p_t_i_o_n_}:
+                    This option creates a driver monitor if the condition
+                    given in _M_o_n_i_t_o_r_O_p_t_i_o_n_s is true. The valid options are:
+
+                    _p_e_n_d_i_n_g___d_r_i_v_e_r:
+                      Create a driver monitor if the return value is to be
+                      _{_o_k_, _p_e_n_d_i_n_g___d_r_i_v_e_r_}.
+
+                    _p_e_n_d_i_n_g:
+                      Create a monitor if the return value will be either _{_o_k_,
+                      _p_e_n_d_i_n_g___d_r_i_v_e_r_} or _{_o_k_, _p_e_n_d_i_n_g___p_r_o_c_e_s_s_}.
+
+                    The _p_e_n_d_i_n_g___d_r_i_v_e_r _M_o_n_i_t_o_r_O_p_t_i_o_n is by far the most useful
+                    and it has to be used to ensure that the driver has really
+                    been unloaded and the ports closed whenever the _k_i_l_l___p_o_r_t_s
+                    option is used or the driver may have been loaded with the
+                    _k_i_l_l___p_o_r_t_s driver option.
+
+                    By using the monitor-triggers in the call to _t_r_y___u_n_l_o_a_d
+                    one can be sure that the monitor is actually added before
+                    the unloading is executed, meaning that the monitor will
+                    always get properly triggered, which would not be the case
+                    if one called _e_r_l___d_d_l_l_:_m_o_n_i_t_o_r_/_2 separately.
+
+              The function may return several error conditions, of which all
+              are well specified (no opaque values):
+
+                _{_e_r_r_o_r_, _l_i_n_k_e_d___i_n___d_r_i_v_e_r_}:
+                  You were trying to unload an erlang statically linked in
+                  driver, which cannot be manipulated with this interface (and
+                  cannot be unloaded at all).
+
+                _{_e_r_r_o_r_, _n_o_t___l_o_a_d_e_d_}:
+                  The driver _N_a_m_e is not present in the system.
+
+                _{_e_r_r_o_r_, _n_o_t___l_o_a_d_e_d___b_y___t_h_i_s___p_r_o_c_e_s_s_}:
+                  The driver _N_a_m_e is present in the system, but there is no
+                  uusseerr of it in this process.
+
+                  As a special case, drivers can be unloaded from processes
+                  that has done no corresponding call to _t_r_y___l_o_a_d_/_3 if, and
+                  only if, there are _n_o _u_s_e_r_s _o_f _t_h_e _d_r_i_v_e_r _a_t _a_l_l, which may
+                  happen if the process containing the last user dies.
+
+                _{_e_r_r_o_r_, _p_e_r_m_a_n_e_n_t_}:
+                  The driver has made itself permanent, in which case it can
+                  no longer be manipulated by this interface (much like a
+                  statically linked in driver).
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       uunnllooaadd((NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Name = ddrriivveerr(())
+                 ErrorDesc = term()
+
+              Unloads, or at least dereferences the driver named _N_a_m_e. If the
+              caller is the last uusseerr of the driver, and there are no more
+              open ports using the driver, the driver will actually get
+              unloaded. In all other cases, actual unloading will be delayed
+              until all ports are closed and there are no remaining uusseerrss.
+
+              If there are other uusseerrss of the driver, the reference counts of
+              the driver is merely decreased, so that the caller is no longer
+              considered a user of the driver. For usage scenarios, see the
+              ddeessccrriippttiioonn in the beginning of this document.
+
+              The _E_r_r_o_r_D_e_s_c returned is an opaque value to be passed further
+              on to the ffoorrmmaatt__eerrrroorr//11 function. For more control over the
+              operation, use the ttrryy__uunnllooaadd//22 interface.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       uunnllooaadd__ddrriivveerr((NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorrDDeesscc}}
+
+              Types:
+
+                 Name = ddrriivveerr(())
+                 ErrorDesc = term()
+
+              Unloads, or at least dereferences the driver named _N_a_m_e. If the
+              caller is the last uusseerr of the driver, all remaining open ports
+              using the driver will get killed with the reason _d_r_i_v_e_r___u_n_l_o_a_d_e_d
+              and the driver will eventually get unloaded.
+
+              If there are other uusseerrss of the driver, the reference counts of
+              the driver is merely decreased, so that the caller is no longer
+              considered a uusseerr. For usage scenarios, see the ddeessccrriippttiioonn in
+              the beginning of this document.
+
+              The _E_r_r_o_r_D_e_s_c returned is an opaque value to be passed further
+              on to the ffoorrmmaatt__eerrrroorr//11 function. For more control over the
+              operation, use the ttrryy__uunnllooaadd//22 interface.
+
+              The function throws a _b_a_d_a_r_g exception if the parameters are not
+              given as described above.
+
+       llooaaddeedd__ddrriivveerrss(()) -->> {{ookk,, DDrriivveerrss}}
+
+              Types:
+
+                 Drivers = [Driver]
+                 Driver = string()
+
+              Returns a list of all the available drivers, both (statically)
+              linked-in and dynamically loaded ones.
+
+              The driver names are returned as a list of strings rather than a
+              list of atoms for historical reasons.
+
+              More information about drivers can be obtained using one of the
+              iinnffoo functions.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrDDeesscc)) -->> ssttrriinngg(())
+
+              Types:
+
+                 ErrorDesc = term()
+
+              Takes an _E_r_r_o_r_D_e_s_c returned by load, unload or reload functions
+              and returns a string which describes the error or warning.
+
+          NNoottee::
+              Due to peculiarities in the dynamic loading interfaces on
+              different platform, the returned string is only guaranteed to
+              describe the correct error _i_f _f_o_r_m_a_t___e_r_r_o_r_/_1 _i_s _c_a_l_l_e_d _i_n _t_h_e
+              _s_a_m_e _i_n_s_t_a_n_c_e _o_f _t_h_e _e_r_l_a_n_g _v_i_r_t_u_a_l _m_a_c_h_i_n_e _a_s _t_h_e _e_r_r_o_r
+              _a_p_p_e_a_r_e_d _i_n (meaning the same operating system process)!
+
+
+SSEEEE AALLSSOO
+       erl_driver(4), driver_entry(4)
+
+
+
+Ericsson AB                      kernel 2.15.2                     erl_ddll(3)

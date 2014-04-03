@@ -1,0 +1,137 @@
+et_viewer(3)               Erlang Module Definition               et_viewer(3)
+
+
+
+NNAAMMEE
+       et_viewer - Displays a sequence chart for trace events
+       (messages/actions)
+
+DDEESSCCRRIIPPTTIIOONN
+EEXXPPOORRTTSS
+       ffiillee((FFiilleeNNaammee)) -->> {{ookk,, VViieewweerrPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 FileName() = string()
+                 ViewerPid = pid()
+                 Reason = term()
+
+              Start a new event viewer and a corresponding collector and load
+              them with trace events from a trace file.
+
+       ssttaarrtt(()) -->> ookk
+
+              Simplified start of a sequence chart viewer with global tracing
+              activated.
+
+              Convenient to be used from the command line (erl -s et_viewer).
+
+       ssttaarrtt((OOppttiioonnss)) -->> ookk
+
+              Start of a sequence chart viewer without linking to the parent
+              process.
+
+       ssttaarrtt__lliinnkk((OOppttiioonnss)) -->> {{ookk,, VViieewweerrPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [option() | collector_option()]
+                 option() = {parent_pid, extended_pid()} | {title, term()} |
+                 {detail_level, detail_level()} | {is_suspended, boolean()} |
+                 {scale, integer()} | {width, integer()} | {height, integer()}
+                 | {collector_pid, extended_pid()} | {event_order,
+                 event_order()} | {active_filter, atom()} | {max_actors,
+                 extended_integer()} | {trace_pattern,
+                 et_collector_trace_pattern()} | {trace_port,
+                 et_collector_trace_port()} | {trace_global,
+                 et_collector_trace_global()} | {trace_client,
+                 et_collector_trace_client()} | {dict_insert, {filter,
+                 filter_name()}, event_filter_fun()} | {dict_insert,
+                 et_collector_dict_key(), et_collector_dict_val()} |
+                 {dict_delete, {filter, filter_name()}} | {dict_delete,
+                 et_collector_dict_key()} | {actors, actors()} | {first_event,
+                 first_key()} | {hide_unknown, boolean()} | {hide_actions,
+                 boolean()} | {display_mode, display_mode()}
+                 extended_pid() = pid() | undefined
+                 detail_level() = min | max | integer(X) when X >=0, X =< 100
+                 event_order() = trace_ts | event_ts
+                 extended_integer() = integer() | infinity
+                 display_mode() = all | {search_actors, direction(),
+                 first_key(), actors()}
+                 direction() = forward | reverse
+                 first_key() = event_key()
+                 actors() = [term()]
+
+                 filter_name() = atom()
+                 filter_fun() = fun(Event) -> false | true | {true, NewEvent}
+                 Event = NewEvent = record(event)
+                 ViewerPid = pid()
+                 Reason = term()
+
+              Start a sequence chart viewer for trace events
+              (messages/actions)
+
+              A filter_fun() takes an event record as sole argument and
+              returns false | true | {true, NewEvent}.
+
+              If the _c_o_l_l_e_c_t_o_r___p_i_d is _u_n_d_e_f_i_n_e_d a new _e_t___c_o_l_l_e_c_t_o_r will be
+              started with the following parameter settings: _p_a_r_e_n_t___p_i_d,
+              _e_v_e_n_t___o_r_d_e_r, _t_r_a_c_e___g_l_o_b_a_l, _t_r_a_c_e___p_a_t_t_e_r_n, _t_r_a_c_e___p_o_r_t,
+              _t_r_a_c_e___m_a_x___q_u_e_u_e, _t_r_a_c_e___c_l_i_e_n_t, _d_i_c_t___i_n_s_e_r_t and _d_i_c_t___d_e_l_e_t_e. The
+              new _e_t___v_i_e_w_e_r will register itself as an _e_t___c_o_l_l_e_c_t_o_r
+              subscriber.
+
+              Default values:
+
+                * parent_pid - self().
+
+                * title - "et_viewer".
+
+                * detail_level - max.
+
+                * is_suspended - false.
+
+                * scale - 2.
+
+                * width - 800.
+
+                * height - 600.
+
+                * collector_pid - undefined.
+
+                * event_order - trace_ts.
+
+                * active_filter - collector.
+
+                * max_actors - 5.
+
+                * actors - ["UNKNOWN"].
+
+                * first_event - first.
+
+                * hide_unknown - false.
+
+                * hide_actions - false.
+
+                * display_mode - all.
+
+       ggeett__ccoolllleeccttoorr__ppiidd((VViieewweerrPPiidd)) -->> CCoolllleeccttoorrPPiidd
+
+              Types:
+
+                 ViewerPid = pid()
+                 CollectorPid = pid()
+
+              Returns the identifier of the collector process.
+
+       ssttoopp((VViieewweerrPPiidd)) -->> ookk
+
+              Types:
+
+                 ViewerPid = pid()
+
+              Stops a viewer process.
+
+
+
+Ericsson AB                       et 1.4.4.2                      et_viewer(3)

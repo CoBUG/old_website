@@ -1,0 +1,106 @@
+erl_format(3)                 C Library Functions                erl_format(3)
+
+
+
+NNAAMMEE
+       erl_format - Create and Match Erlang Terms
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains two routines - one general function for creating
+       Erlang terms and one for pattern matching Erlang terms.
+
+EEXXPPOORRTTSS
+       EETTEERRMM **eerrll__ffoorrmmaatt((FFoorrmmaattSSttrr,, ...... ))
+
+              Types:
+
+                 char *FormatStr;
+
+              This is a general function for creating Erlang terms using a
+              format specifier and a corresponding set of arguments, much in
+              the way _p_r_i_n_t_f_(_) works.
+
+              _F_o_r_m_a_t_S_t_r is a format specification string. The set of valid
+              format specifiers is as follows:
+
+                * ~i - Integer
+
+                * ~f - Floating point
+
+                * ~a - Atom
+
+                * ~s - String
+
+                * ~w - Arbitrary Erlang term
+
+              For each format specifier that appears in _F_o_r_m_a_t_S_t_r, there must
+              be a corresponding argument following _F_o_r_m_a_t_S_t_r. An Erlang term
+              is built according to the _F_o_r_m_a_t_S_t_r with values and Erlang terms
+              substituted from the corresponding arguments and according to
+              the individual format specifiers. For example:
+
+              erl_format("[{name,~a},{age,~i},{data,~w}]",
+                         "madonna",
+                         21,
+                         erl_format("[{adr,~s,~i}]","E-street",42));
+
+
+              This will create an _(_E_T_E_R_M _*_) structure corresponding to the
+              Erlang term: _[_{_n_a_m_e_,_m_a_d_o_n_n_a_}_,_{_a_g_e_,_2_1_}_,_{_d_a_t_a_,_[_{_a_d_r_,_"_E_-
+              _s_t_r_e_e_t_"_,_4_2_}_]_}_]
+
+              The function returns an Erlang term, or NULL if _F_o_r_m_a_t_S_t_r does
+              not describe a valid Erlang term.
+
+       iinntt eerrll__mmaattcchh((PPaatttteerrnn,, TTeerrmm))
+
+              Types:
+
+                 ETERM *Pattern,*Term;
+
+              This function is used to perform pattern matching similar to
+              that done in Erlang. Refer to an Erlang manual for matching
+              rules and more examples.
+
+              _P_a_t_t_e_r_n is an Erlang term, possibly containing unbound
+              variables.
+
+              _T_e_r_m is an Erlang term that we wish to match against _P_a_t_t_e_r_n.
+
+              _T_e_r_m and _P_a_t_t_e_r_n are compared, and any unbound variables in
+              _P_a_t_t_e_r_n are bound to corresponding values in _T_e_r_m.
+
+              If _T_e_r_m and _P_a_t_t_e_r_n can be matched, the function returns a non-
+              zero value and binds any unbound variables in _P_a_t_t_e_r_n. If _T_e_r_m
+              _P_a_t_t_e_r_n do not match, the function returns 0. For example:
+
+              ETERM *term, *pattern, *pattern2;
+              term1    = erl_format("{14,21}");
+              term2    = erl_format("{19,19}");
+              pattern1 = erl_format("{A,B}");
+              pattern2 = erl_format("{F,F}");
+              if (erl_match(pattern1, term1)) {
+                /* match succeeds:
+                 * A gets bound to 14,
+                 * B gets bound to 21
+                 */
+                ...
+              }
+              if (erl_match(pattern2, term1)) {
+                /* match fails because F cannot be
+                 * bound to two separate values, 14 and 21
+                 */
+                ...
+              }
+              if (erl_match(pattern2, term2)) {
+                /* match succeeds and F gets bound to 19 */
+                ...
+              }
+
+
+              _e_r_l___v_a_r___c_o_n_t_e_n_t_(_) can be used to retrieve the content of any
+              variables bound as a result of a call to _e_r_l___m_a_t_c_h_(_).
+
+
+
+Ericsson AB                   erl_interface 3.7.8                erl_format(3)

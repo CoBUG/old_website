@@ -1,0 +1,519 @@
+registry(3)                   C Library Functions                  registry(3)
+
+
+
+NNAAMMEE
+       registry - Store and backup key-value pairs
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides support for storing key-value pairs in a table
+       known as a registry, backing up registries to Mnesia in an atomic
+       manner, and later restoring the contents of a registry from Mnesia.
+
+EEXXPPOORRTTSS
+       eeii__rreegg **eeii__rreegg__ooppeenn((ssiizzee))
+
+              Types:
+
+                 int size;
+
+              Open (create) a registry. The registry will be initially empty.
+              Use _e_i___r_e_g___c_l_o_s_e_(_) to close the registry later.
+
+              _s_i_z_e is the approximate number of objects you intend to store in
+              the registry. Since the registry uses a hash table with
+              collision chaining, there is no absolute upper limit on the
+              number of objects that can be stored in it. However for reasons
+              of efficiency, it is a good idea to choose a number that is
+              appropriate for your needs. It is possible to use
+              _e_i___r_e_g___r_e_s_i_z_e_(_) to change the size later. Note that the number
+              you provide will be increased to the nearest larger prime
+              number.
+
+              On success, an empty registry will be returned. On failure, NULL
+              will be returned.
+
+       iinntt eeii__rreegg__rreessiizzee((rreegg,,nneewwssiizzee))
+
+              Types:
+
+                 ei_reg *reg;
+                 int newsize;
+
+              Change the size of a registry.
+
+              _n_e_w_s_i_z_e is the new size to make the registry. The number will be
+              increased to the nearest larger prime number.
+
+              On success, the registry will be resized, all contents rehashed,
+              and the function will return 0. On failure, the registry will be
+              left unchanged and the function will return -1.
+
+       iinntt eeii__rreegg__cclloossee((rreegg))
+
+              Types:
+
+                 ei_reg *reg;
+
+              A registry that has previously been created with _e_i___r_e_g___o_p_e_n_(_)
+              is closed, and all the objects it contains are freed.
+
+              _r_e_g is the registry to close.
+
+              The function returns 0.
+
+       iinntt eeii__rreegg__sseettiivvaall((rreegg,,kkeeyy,,ii))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 int i;
+
+              Create a key-value pair with the specified _k_e_y and integer value
+              _i. If an object already existed with the same _k_e_y, the new value
+              replaces the old one. If the previous value was a binary or
+              string, it is freed with _f_r_e_e_(_).
+
+              _r_e_g is the registry where the object should be placed.
+
+              _k_e_y is the name of the object.
+
+              _i is the integer value to assign.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__sseettffvvaall((rreegg,,kkeeyy,,ff))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 double f;
+
+              Create a key-value pair with the specified _k_e_y and floating
+              point value _f. If an object already existed with the same _k_e_y,
+              the new value replaces the old one. If the previous value was a
+              binary or string, it is freed with _f_r_e_e_(_).
+
+              _r_e_g is the registry where the object should be placed.
+
+              _k_e_y is the name of the object.
+
+              _f is the floating point value to assign.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__sseettssvvaall((rreegg,,kkeeyy,,ss))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 const char *s;
+
+              Create a key-value pair with the specified _k_e_y whose "value" is
+              the specified string _s. If an object already existed with the
+              same _k_e_y, the new value replaces the old one. If the previous
+              value was a binary or string, it is freed with _f_r_e_e_(_).
+
+              _r_e_g is the registry where the object should be placed.
+
+              _k_e_y is the name of the object.
+
+              _s is the string to assign. The string itself must have been
+              created through a single call to _m_a_l_l_o_c_(_) or similar function,
+              so that the registry can later delete it if necessary by calling
+              _f_r_e_e_(_).
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__sseettppvvaall((rreegg,,kkeeyy,,pp,,ssiizzee))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 const void *p;
+                 int size;
+
+              Create a key-value pair with the specified _k_e_y whose "value" is
+              the binary object pointed to by _p. If an object already existed
+              with the same _k_e_y, the new value replaces the old one. If the
+              previous value was a binary or string, it is freed with _f_r_e_e_(_).
+
+              _r_e_g is the registry where the object should be placed.
+
+              _k_e_y is the name of the object.
+
+              _p is a pointer to the binary object. The object itself must have
+              been created through a single call to _m_a_l_l_o_c_(_) or similar
+              function, so that the registry can later delete it if necessary
+              by calling _f_r_e_e_(_).
+
+              _s_i_z_e is the length in bytes of the binary object.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__sseettvvaall((rreegg,,kkeeyy,,ffllaaggss,,vv,,......))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 int flags;
+                 v (see below)
+
+              Create a key-value pair with the specified _k_e_y whose value is
+              specified by _v. If an object already existed with the same _k_e_y,
+              the new value replaces the old one. If the previous value was a
+              binary or string, it is freed with _f_r_e_e_(_).
+
+              _r_e_g is the registry where the object should be placed.
+
+              _k_e_y is the name of the object.
+
+              _f_l_a_g_s indicates the type of the object specified by _v. Flags
+              must be one of EI_INT, EI_FLT, EI_STR and EI_BIN, indicating
+              whether _v is _i_n_t, _d_o_u_b_l_e, _c_h_a_r_* or _v_o_i_d_*. If _f_l_a_g_s is EI_BIN,
+              then a fifth argument _s_i_z_e is required, indicating the size in
+              bytes of the object pointed to by _v.
+
+              If you wish to store an arbitrary pointer in the registry,
+              specify a _s_i_z_e of 0. In this case, the object itself will not be
+              transferred by an _e_i___r_e_g___d_u_m_p_(_) operation, just the pointer
+              value.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__ggeettiivvaall((rreegg,,kkeeyy))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+
+              Get the value associated with _k_e_y in the registry. The value
+              must be an integer.
+
+              _r_e_g is the registry where the object will be looked up.
+
+              _k_e_y is the name of the object to look up.
+
+              On success, the function returns the value associated with _k_e_y.
+              If the object was not found or it was not an integer object, -1
+              is returned. To avoid problems with in-band error reporting
+              (i.e. if you cannot distinguish between -1 and a valid result)
+              use the more general function _e_i___r_e_g___g_e_t_v_a_l_(_) instead.
+
+       ddoouubbllee eeii__rreegg__ggeettffvvaall((rreegg,,kkeeyy))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+
+              Get the value associated with _k_e_y in the registry. The value
+              must be a floating point type.
+
+              _r_e_g is the registry where the object will be looked up.
+
+              _k_e_y is the name of the object to look up.
+
+              On success, the function returns the value associated with _k_e_y.
+              If the object was not found or it was not a floating point
+              object, -1.0 is returned. To avoid problems with in-band error
+              reporting (i.e. if you cannot distinguish between -1.0 and a
+              valid result) use the more general function _e_i___r_e_g___g_e_t_v_a_l_(_)
+              instead.
+
+       ccoonnsstt cchhaarr **eeii__rreegg__ggeettssvvaall((rreegg,,kkeeyy))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+
+              Get the value associated with _k_e_y in the registry. The value
+              must be a string.
+
+              _r_e_g is the registry where the object will be looked up.
+
+              _k_e_y is the name of the object to look up.
+
+              On success, the function returns the value associated with _k_e_y.
+              If the object was not found or it was not a string, NULL is
+              returned. To avoid problems with in-band error reporting (i.e.
+              if you cannot distinguish between NULL and a valid result) use
+              the more general function _e_i___r_e_g___g_e_t_v_a_l_(_) instead.
+
+       ccoonnsstt vvooiidd **eeii__rreegg__ggeettppvvaall((rreegg,,kkeeyy,,ssiizzee))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 int size;
+
+              Get the value associated with _k_e_y in the registry. The value
+              must be a binary (pointer) type.
+
+              _r_e_g is the registry where the object will be looked up.
+
+              _k_e_y is the name of the object to look up.
+
+              _s_i_z_e will be initialized to contain the length in bytes of the
+              object, if it is found.
+
+              On success, the function returns the value associated with _k_e_y
+              and indicates its length in _s_i_z_e. If the object was not found or
+              it was not a binary object, NULL is returned. To avoid problems
+              with in-band error reporting (i.e. if you cannot distinguish
+              between NULL and a valid result) use the more general function
+              _e_i___r_e_g___g_e_t_v_a_l_(_) instead.
+
+       iinntt eeii__rreegg__ggeettvvaall((rreegg,,kkeeyy,,ffllaaggss,,vv,,......))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 int flags;
+                 void *v (see below)
+
+              This is a general function for retrieving any kind of object
+              from the registry.
+
+              _r_e_g is the registry where the object will be looked up.
+
+              _k_e_y is the name of the object to look up.
+
+              _f_l_a_g_s indicates the type of object that you are looking for. If
+              _f_l_a_g_s is 0, then any kind of object will be returned. If _f_l_a_g_s
+              is one of EI_INT, EI_FLT, EI_STR or EI_BIN, then only values of
+              that kind will be returned. The buffer pointed to by _v must be
+              large enough to hold the return data, i.e. it must be a pointer
+              to one of _i_n_t, _d_o_u_b_l_e, _c_h_a_r_* or _v_o_i_d_*, respectively. Also, if
+              _f_l_a_g_s is EI_BIN, then a fifth argument _i_n_t _*_s_i_z_e is required, so
+              that the size of the object can be returned.
+
+              If the function succeeds, _v (and _s_i_z_e if the object is binary)
+              will be initialized with the value associated with _k_e_y, and the
+              function will return one of EI_INT, EI_FLT, EI_STR or EI_BIN,
+              indicating the type of object. On failure the function will
+              return -1 and the arguments will not be updated.
+
+       iinntt eeii__rreegg__mmaarrkkddiirrttyy((rreegg,,kkeeyy))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+
+              Mark a registry object as dirty. This will ensure that it is
+              included in the next backup to Mnesia. Normally this operation
+              will not be necessary since all of the normal registry 'set'
+              functions do this automatically. However if you have retrieved
+              the value of a string or binary object from the registry and
+              modified the contents, then the change will be invisible to the
+              registry and the object will be assumed to be unmodified. This
+              function allows you to make such modifications and then let the
+              registry know about them.
+
+              _r_e_g is the registry containing the object.
+
+              _k_e_y is the name of the object to mark.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__ddeelleettee((rreegg,,kkeeyy))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+
+              Delete an object from the registry. The object is not actually
+              removed from the registry, it is only marked for later removal
+              so that on subsequent backups to Mnesia, the corresponding
+              object can be removed from the Mnesia table as well. If another
+              object is later created with the same key, the object will be
+              reused.
+
+              The object will be removed from the registry after a call to
+              _e_i___r_e_g___d_u_m_p_(_) or _e_i___r_e_g___p_u_r_g_e_(_).
+
+              _r_e_g is the registry containing _k_e_y.
+
+              _k_e_y is the object to remove.
+
+              If the object was found, the function returns 0 indicating
+              success. Otherwise the function returns -1.
+
+       iinntt eeii__rreegg__ssttaatt((rreegg,,kkeeyy,,oobbuuff))
+
+              Types:
+
+                 ei_reg *reg;
+                 const char *key;
+                 struct ei_reg_stat *obuf;
+
+              Return information about an object.
+
+              _r_e_g is the registry containing the object.
+
+              _k_e_y is the name of the object.
+
+              _o_b_u_f is a pointer to an _e_i___r_e_g___s_t_a_t structure, defined below:
+
+              struct ei_reg_stat {
+                int attr;
+                int size;
+              };
+
+
+              In _a_t_t_r the object's attributes are stored as the logical OR of
+              its type (one of EI_INT, EI_FLT, EI_BIN and EI_STR), whether it
+              is marked for deletion (EI_DELET) and whether it has been
+              modified since the last backup to Mnesia (EI_DIRTY).
+
+              The _s_i_z_e field indicates the size in bytes required to store
+              EI_STR (including the terminating 0) and EI_BIN objects, or 0
+              for EI_INT and EI_FLT.
+
+              The function returns 0 and initializes _o_b_u_f on success, or
+              returns -1 on failure.
+
+       iinntt eeii__rreegg__ttaabbssttaatt((rreegg,,oobbuuff))
+
+              Types:
+
+                 ei_reg *reg;
+                 struct ei_reg_tabstat *obuf;
+
+              Return information about a registry. Using information returned
+              by this function, you can see whether the size of the registry
+              is suitable for the amount of data it contains.
+
+              _r_e_g is the registry to return information about.
+
+              _o_b_u_f is a pointer to an _e_i___r_e_g___t_a_b_s_t_a_t structure, defined below:
+
+              struct ei_reg_tabstat {
+                int size;
+                int nelem;
+                int npos;
+                int collisions;
+              };
+
+
+              The _s_i_z_e field indicates the number of hash positions in the
+              registry. This is the number you provided when you created or
+              last resized the registry, rounded up to the nearest prime.
+
+              _n_e_l_e_m indicates the number of elements stored in the registry.
+              It includes objects that are deleted but not purged.
+
+              _n_p_o_s indicates the number of unique positions that are occupied
+              in the registry.
+
+              _c_o_l_l_i_s_i_o_n_s indicates how many elements are sharing positions in
+              the registry.
+
+              On success, the function returns 0 and _o_b_u_f is initialized to
+              contain table statistics. On failure, the function returns -1.
+
+       iinntt eeii__rreegg__dduummpp((ffdd,,rreegg,,mmnnttaabb,,ffllaaggss))
+
+              Types:
+
+                 int fd;
+                 ei_reg *reg;
+                 const char *mntab;
+                 int flags;
+
+              Dump the contents of a registry to a Mnesia table in an atomic
+              manner, i.e. either all data will be updated, or none of it
+              will. If any errors are encountered while backing up the data,
+              the entire operation is aborted.
+
+              _f_d is an open connection to Erlang. Mnesia 3.0 or later must be
+              running on the Erlang node.
+
+              _r_e_g is the registry to back up.
+
+              _m_n_t_a_b is the name of the Mnesia table where the backed up data
+              should be placed. If the table does not exist, it will be
+              created automatically using configurable defaults. See your
+              Mnesia documentation for information about configuring this
+              behaviour.
+
+              If _f_l_a_g_s is 0, the backup will include only those objects which
+              have been created, modified or deleted since the last backup or
+              restore (i.e. an incremental backup). After the backup, any
+              objects that were marked dirty are now clean, and any objects
+              that had been marked for deletion are deleted.
+
+              Alternatively, setting flags to EI_FORCE will cause a full
+              backup to be done, and EI_NOPURGE will cause the deleted objects
+              to be left in the registry afterwards. These can be bitwise ORed
+              together if both behaviours are desired. If EI_NOPURGE was
+              specified, you can use _e_i___r_e_g___p_u_r_g_e_(_) to explicitly remove the
+              deleted items from the registry later.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__rreessttoorree((ffdd,,rreegg,,mmnnttaabb))
+
+              Types:
+
+                 int fd;
+                 ei_reg *reg;
+                 const char *mntab;
+
+              The contents of a Mnesia table are read into the registry.
+
+              _f_d is an open connection to Erlang. Mnesia 3.0 or later must be
+              running on the Erlang node.
+
+              _r_e_g is the registry where the data should be placed.
+
+              _m_n_t_a_b is the name of the Mnesia table to read data from.
+
+              Note that only tables of a certain format can be restored, i.e.
+              those that have been created and backed up to with
+              _e_i___r_e_g___d_u_m_p_(_). If the registry was not empty before the
+              operation, then the contents of the table are added to the
+              contents of the registry. If the table contains objects with the
+              same keys as those already in the registry, the registry objects
+              will be overwritten with the new values. If the registry
+              contains objects that were not in the table, they will be
+              unchanged by this operation.
+
+              After the restore operation, the entire contents of the registry
+              is marked as unmodified. Note that this includes any objects
+              that were modified before the restore and not overwritten by the
+              restore.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eeii__rreegg__ppuurrggee((rreegg))
+
+              Types:
+
+                 ei_reg *reg;
+
+              Remove all objects marked for deletion. When objects are deleted
+              with _e_i___r_e_g___d_e_l_e_t_e_(_) they are not actually removed from the
+              registry, only marked for later removal. This is so that on a
+              subsequent backup to Mnesia, the objects can also be removed
+              from the Mnesia table. If you are not backing up to Mnesia then
+              you may wish to remove the objects manually with this function.
+
+              _r_e_g is a registry containing objects marked for deletion.
+
+              The function returns 0 on success, or -1 on failure.
+
+
+
+Ericsson AB                   erl_interface 3.7.8                  registry(3)

@@ -1,0 +1,249 @@
+wxListItem(3)              Erlang Module Definition              wxListItem(3)
+
+
+
+NNAAMMEE
+       wxListItem - See external documentation: wxListItem.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxListItem.
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_i_s_t_I_t_e_m_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxLLiissttIItteemm(())
+
+              See external documentation.
+
+       nneeww((IItteemm)) -->> wwxxLLiissttIItteemm(())
+
+              Types:
+
+                 Item = wxListItem()
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettAAlliiggnn((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+              Res = ?wxLIST_FORMAT_LEFT | ?wxLIST_FORMAT_RIGHT |
+              ?wxLIST_FORMAT_CENTRE | ?wxLIST_FORMAT_CENTER
+
+       ggeettBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettCCoolluummnn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettIIdd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettIImmaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettMMaasskk((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettSSttaattee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       ggeettWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListItem()
+
+              See external documentation.
+
+       sseettAAlliiggnn((TThhiiss,, AAlliiggnn)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Align = wx_enum() (see module wx)
+
+              See external documentation.
+              Align = ?wxLIST_FORMAT_LEFT | ?wxLIST_FORMAT_RIGHT |
+              ?wxLIST_FORMAT_CENTRE | ?wxLIST_FORMAT_CENTER
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoollBBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 ColBack = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCoolluummnn((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Col = integer()
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettIIdd((TThhiiss,, IIdd)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Id = integer()
+
+              See external documentation.
+
+       sseettIImmaaggee((TThhiiss,, IImmaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Image = integer()
+
+              See external documentation.
+
+       sseettMMaasskk((TThhiiss,, MMaasskk)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Mask = integer()
+
+              See external documentation.
+
+       sseettSSttaattee((TThhiiss,, SSttaattee)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 State = integer()
+
+              See external documentation.
+
+       sseettSSttaatteeMMaasskk((TThhiiss,, SSttaatteeMMaasskk)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 StateMask = integer()
+
+              See external documentation.
+
+       sseettTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettTTeexxttCCoolloouurr((TThhiiss,, CCoollTTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 ColText = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettWWiiddtthh((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxListItem()
+                 Width = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxLLiissttIItteemm(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxListItem(3)

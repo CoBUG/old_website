@@ -1,0 +1,48 @@
+snmpa_error_report(3)      Erlang Module Definition      snmpa_error_report(3)
+
+
+
+NNAAMMEE
+       snmpa_error_report - Behaviour module for reporting SNMP agent errors
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the agent error reporting. A
+       _s_n_m_p_a___e_r_r_o_r___r_e_p_o_r_t compliant module must export the following
+       functions:
+
+         * config_err/2
+
+         * user_err/2
+
+       The semantics of them and their exact signatures are explained below.
+
+EEXXPPOORRTTSS
+       ccoonnffiigg__eerrrr((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              The function is called if an error occurs during the
+              configuration phase, for example if a syntax error is found in a
+              configuration file.
+
+              _F_o_r_m_a_t and _A_r_g_s are as in _i_o_:_f_o_r_m_a_t_(_F_o_r_m_a_t_, _A_r_g_s_).
+
+       uusseerr__eerrrr((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              The function is called if a user related error occurs at run-
+              time, for example if a user defined instrumentation function
+              returns erroneous.
+
+              _F_o_r_m_a_t and _A_r_g_s are as in _i_o_:_f_o_r_m_a_t_(_F_o_r_m_a_t_, _A_r_g_s_).
+
+
+
+Ericsson AB                       snmp 4.22.1            snmpa_error_report(3)

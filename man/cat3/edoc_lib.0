@@ -1,0 +1,45 @@
+edoc_lib(3)                Erlang Module Definition                edoc_lib(3)
+
+
+
+NNAAMMEE
+       edoc_lib - Utility functions for EDoc.
+
+DDEESSCCRRIIPPTTIIOONN
+       Utility functions for EDoc.
+
+DDAATTAA TTYYPPEESS
+         _e_d_o_c___e_n_v_(_):
+
+
+           Environment information needed by EDoc for generating references.
+           The data representation is not documented.
+
+         _p_r_o_p_l_i_s_t_(_) _= _p_r_o_p_e_r_t_y_(_) _(_s_e_e _m_o_d_u_l_e _p_r_o_p_l_i_s_t_s_):
+
+
+EEXXPPOORRTTSS
+       ggeett__ddoocc__eennvv((AApppp,, PPaacckkaaggeess,, MMoodduulleess,, OOppttiioonnss::::pprroopplliisstt(()))) -->> eeddoocc__eennvv(())
+
+              Types:
+
+                 App = [] | atom()
+                 Packages = [atom()]
+                 Modules = [atom()]
+                 [term()]
+
+              Creates an environment data structure used by parts of EDoc for
+              generating references, etc. See eeddoocc::rruunn//33 for a description of
+              the options _f_i_l_e___s_u_f_f_i_x, _a_p_p___d_e_f_a_u_l_t and _d_o_c___p_a_t_h.
+
+              _S_e_e _a_l_s_o_: eeddoocc::ggeett__ddoocc//33, eeddoocc__eexxttrraacctt::ssoouurrccee//44.
+
+SSEEEE AALLSSOO
+       eeddoocc
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  edoc 0.7.10                      edoc_lib(3)

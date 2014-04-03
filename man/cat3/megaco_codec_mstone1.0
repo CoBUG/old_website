@@ -1,0 +1,92 @@
+megaco_codec_mstone1(3)    Erlang Module Definition    megaco_codec_mstone1(3)
+
+
+
+NNAAMMEE
+       megaco_codec_mstone1 - This module implements a simple megaco codec-
+       based performance tool.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements the _m_s_t_o_n_e_1 tool, a simple megaco codec-based
+       performance tool.
+
+       The results, the mstone value(s), are written to stdout.
+
+       _N_o_t_e that this module is _n_o_t included in the runtime part of the
+       application.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> vvooiidd(())
+       ssttaarrtt((MMeessssaaggeePPaacckkaaggee)) -->> vvooiidd(())
+       ssttaarrtt((MMeessssaaggeePPaacckkaaggee,, FFaaccttoorr)) -->> vvooiidd(())
+
+              Types:
+
+                 MessagePackage = message_package()
+                 message_package() = atom()
+                 Factor() = integer() > 0
+
+              This function starts the _m_s_t_o_n_e_1 performance test with all codec
+              configs. _F_a_c_t_o_r (defaults to _1) processes are started for every
+              supported codec config.
+
+              Each process encodes and decodes their messages. The number of
+              messages processed in total (for all processes) is the mstone
+              value.
+
+       ssttaarrtt__fflleexx(()) -->> vvooiidd(())
+       ssttaarrtt__fflleexx((MMeessssaaggeePPaacckkaaggee)) -->> vvooiidd(())
+       ssttaarrtt__fflleexx((MMeessssaaggeePPaacckkaaggee,, FFaaccttoorr)) -->> vvooiidd(())
+
+              Types:
+
+                 MessagePackage = message_package()
+                 message_package() = atom()
+                 Factor() = integer() > 0
+
+              This function starts the _m_s_t_o_n_e_1 performance test with only the
+              flex codec configs (i.e. _p_r_e_t_t_y and _c_o_m_p_a_c_t with _f_l_e_x). The same
+              number of processes are started as when running the standard
+              test (using the _s_t_a_r_t_/_0_,_1 function). Each process encodes and
+              decodes their messages. The number of messages processed in
+              total (for all processes) is the mstone value.
+
+       ssttaarrtt__oonnllyy__ddrrvv(()) -->> vvooiidd(())
+       ssttaarrtt__oonnllyy__ddrrvv((MMeessssaaggeePPaacckkaaggee)) -->> vvooiidd(())
+       ssttaarrtt__oonnllyy__ddrrvv((MMeessssaaggeePPaacckkaaggee,, FFaaccttoorr)) -->> vvooiidd(())
+
+              Types:
+
+                 MessagePackage = message_package()
+                 message_package() = atom()
+                 Factor() = integer() > 0
+
+              This function starts the _m_s_t_o_n_e_1 performance test with only the
+              driver using codec configs (i.e. _p_r_e_t_t_y and _c_o_m_p_a_c_t with _f_l_e_x,
+              and _b_e_r and _p_e_r with _d_r_i_v_e_r and _e_r_l_a_n_g with _c_o_m_p_r_e_s_s_e_d). The
+              same number of processes are started as when running the
+              standard test (using the _s_t_a_r_t_/_0_,_1 function). Each process
+              encodes and decodes their messages. The number of messages
+              processed in total (for all processes) is the mstone value.
+
+       ssttaarrtt__nnoo__ddrrvv(()) -->> vvooiidd(())
+       ssttaarrtt__nnoo__ddrrvv((MMeessssaaggeePPaacckkaaggee)) -->> vvooiidd(())
+       ssttaarrtt__nnoo__ddrrvv((MMeessssaaggeePPaacckkaaggee,, FFaaccttoorr)) -->> vvooiidd(())
+
+              Types:
+
+                 MessagePackage = message_package()
+                 message_package() = atom()
+                 Factor() = integer() > 0
+
+              This function starts the _m_s_t_o_n_e_1 performance test with codec
+              configs not using any drivers (i.e. _p_r_e_t_t_y and _c_o_m_p_a_c_t without
+              _f_l_e_x, _b_e_r and _p_e_r without _d_r_i_v_e_r and _e_r_l_a_n_g without _c_o_m_p_r_e_s_s_e_d).
+              The same number of processes are started as when running the
+              standard test (using the _s_t_a_r_t_/_0_,_1 function). Each process
+              encodes and decodes their messages. The number of messages
+              processed in total (for all processes) is the mstone value.
+
+
+
+Ericsson AB                     megaco 3.16.0.2        megaco_codec_mstone1(3)

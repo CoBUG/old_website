@@ -1,0 +1,121 @@
+snmpc(command)(1)                User Commands               snmpc(command)(1)
+
+
+
+NNAAMMEE
+       snmpc(command) - SNMP MIB compiler frontend
+
+DDEESSCCRRIIPPTTIIOONN
+       The _s_n_m_p_c program provides a way to run the SNMP MIB compiler of the
+       Erlang system.
+
+EEXXPPOORRTTSS
+       ssnnmmppcc [[ooppttiioonnss]] ffiillee..mmiibb || ffiillee..bbiinn
+
+              _s_n_m_p_c compile a SNMP MIB file, see ccoommppiillee//11,,22 for more info.
+
+              It can also be used to generate a header file (.hrl) with
+              definitions of Erlang constants for the objects in the MIB, see
+              mmiibb__ttoo__hhrrll//11.
+
+CCOOMMPPIILLEERR OOPPTTIIOONNSS
+       The following options are supported (note that most of these relate to
+       the compilation of the MIB file):
+
+         ----hheellpp::
+           Prints help info.
+
+         ----vveerrssiioonn::
+           Prints application and mib format version.
+
+         ----vveerrbboossiittyy _v_e_r_b_o_s_i_t_y:
+           Print debug info.
+
+           _v_e_r_b_o_s_i_t_y = _t_r_a_c_e | _d_e_b_u_g | _l_o_g | _i_n_f_o | _s_i_l_e_n_c_e
+
+           Defaults to _s_i_l_e_n_c_e.
+
+         ----wwaarrnniinnggss || ----WW::
+           Print warning messages.
+
+         ----wwaaee || ----WWeerrrroorr::
+           Warnings as errors. Indicates that warnings shall be treated as
+           errors.
+
+         ----oo _d_i_r_e_c_t_o_r_y:
+           The directory where the compiler should place the output files. If
+           not specified, output files will be placed in the current working
+           directory.
+
+         ----ii _D_i_r_e_c_t_o_r_y:
+           Specifies the path to search for imported (compiled) MIB files. By
+           default, the current working directory is always included.
+
+           This option can be present several times, each time specifying _o_n_e
+           path.
+
+         ----iill _D_i_r_e_c_t_o_r_y:
+           This option (include_lib), specifies a list of directories to
+           search for imported MIBs. It assumes that the first element in the
+           directory name corresponds to an OTP application. The compiler will
+           find the current installed version. For example, the value
+           ["snmp/mibs/"] will be replaced by ["snmp-3.1.1/mibs/"] (or what
+           the current version may be in the system). The current directory
+           and the "snmp-home"/priv/mibs/ are always listed last in the
+           include path.
+
+         ----ssggcc::
+           This option (skip group check), if present, disables the group
+           check of the mib compiler. That is, should the OBJECT-GROUP and the
+           NOTIFICATION-GROUP macro(s) be checked for correctness or not.
+
+         ----ddeepp::
+           Keep deprecated definition(s). If not specified the compiler will
+           ignore deprecated definitions.
+
+         ----ddeesscc::
+           The DESCRIPTION field will be included.
+
+         ----rreeff::
+           The REFERENCE field will be included.
+
+         ----iimmpp::
+           The IMPORTS field will be included.
+
+         ----mmii::
+           The MODULE-IDENTITY field will be included.
+
+         ----mmcc::
+           The MODULE-COMPLIANCE field will be included.
+
+         ----aacc::
+           The AGENT-CAPABILITIES field will be included.
+
+         ----mmoodd _m_o_d_u_l_e:
+           The module which implements all the instrumentation functions.
+
+           The name of all instrumentation functions must be the same as the
+           corresponding managed object it implements.
+
+         ----nndd::
+           The default instrumentation functions will _n_o_t be used if a managed
+           object have no instrumentation function. Instead this will be
+           reported as an error, and the compilation aborts.
+
+         ----rrrrnnaacc::
+           This option, if present, specifies that the row name assign check
+           shall not be done strictly according to the SMI (which allows only
+           the value 1).
+
+           With this option, all values greater than zero is allowed (>= 1).
+           This means that the error will be converted to a warning.
+
+           By default it is not included, but if this option is present it
+           will be.
+
+SSEEEE AALLSSOO
+       eerrllcc((11)), ccoommppiillee((33)), ssnnmmppcc((33))
+
+
+
+Ericsson AB                       snmp 4.22.1                snmpc(command)(1)

@@ -1,0 +1,184 @@
+ordsets(3)                 Erlang Module Definition                 ordsets(3)
+
+
+
+NNAAMMEE
+       ordsets - Functions for Manipulating Sets as Ordered Lists
+
+DDEESSCCRRIIPPTTIIOONN
+       Sets are collections of elements with no duplicate elements. An _o_r_d_s_e_t
+       is a representation of a set, where an ordered list is used to store
+       the elements of the set. An ordered list is more efficient than an
+       unordered list.
+
+       This module provides exactly the same interface as the module _s_e_t_s but
+       with a defined representation. One difference is that while _s_e_t_s
+       considers two elements as different if they do not match (_=_:_=), this
+       module considers two elements as different if and only if they do not
+       compare equal (_=_=).
+
+DDAATTAA TTYYPPEESS
+       oorrddsseett((TT)) = [T]
+
+              As returned by new/0.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> [[]]
+
+              Returns a new empty ordered set.
+
+       iiss__sseett((OOrrddsseett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Ordset = term()
+
+              Returns _t_r_u_e if _O_r_d_s_e_t is an ordered set of elements, otherwise
+              _f_a_l_s_e.
+
+       ssiizzee((OOrrddsseett)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Ordset = oorrddsseett(term())
+
+              Returns the number of elements in _O_r_d_s_e_t.
+
+       ttoo__lliisstt((OOrrddsseett)) -->> LLiisstt
+
+              Types:
+
+                 Ordset = oorrddsseett(T)
+                 List = [T]
+
+              Returns the elements of _O_r_d_s_e_t as a list.
+
+       ffrroomm__lliisstt((LLiisstt)) -->> OOrrddsseett
+
+              Types:
+
+                 List = [T]
+                 Ordset = oorrddsseett(T)
+
+              Returns an ordered set of the elements in _L_i_s_t.
+
+       iiss__eelleemmeenntt((EElleemmeenntt,, OOrrddsseett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Element = term()
+                 Ordset = oorrddsseett(term())
+
+              Returns _t_r_u_e if _E_l_e_m_e_n_t is an element of _O_r_d_s_e_t, otherwise
+              _f_a_l_s_e.
+
+       aadddd__eelleemmeenntt((EElleemmeenntt,, OOrrddsseett11)) -->> OOrrddsseett22
+
+              Types:
+
+                 Element = E
+                 Ordset1 = oorrddsseett(T)
+                 Ordset2 = oorrddsseett(T | E)
+
+              Returns a new ordered set formed from _O_r_d_s_e_t_1 with _E_l_e_m_e_n_t
+              inserted.
+
+       ddeell__eelleemmeenntt((EElleemmeenntt,, OOrrddsseett11)) -->> OOrrddsseett22
+
+              Types:
+
+                 Element = term()
+                 Ordset1 = Ordset2 = oorrddsseett(T)
+
+              Returns _O_r_d_s_e_t_1, but with _E_l_e_m_e_n_t removed.
+
+       uunniioonn((OOrrddsseett11,, OOrrddsseett22)) -->> OOrrddsseett33
+
+              Types:
+
+                 Ordset1 = oorrddsseett(T1)
+                 Ordset2 = oorrddsseett(T2)
+                 Ordset3 = oorrddsseett(T1 | T2)
+
+              Returns the merged (union) set of _O_r_d_s_e_t_1 and _O_r_d_s_e_t_2.
+
+       uunniioonn((OOrrddsseettLLiisstt)) -->> OOrrddsseett
+
+              Types:
+
+                 OrdsetList = [oorrddsseett(T)]
+                 Ordset = oorrddsseett(T)
+
+              Returns the merged (union) set of the list of sets.
+
+       iinntteerrsseeccttiioonn((OOrrddsseett11,, OOrrddsseett22)) -->> OOrrddsseett33
+
+              Types:
+
+                 Ordset1 = Ordset2 = Ordset3 = oorrddsseett(term())
+
+              Returns the intersection of _O_r_d_s_e_t_1 and _O_r_d_s_e_t_2.
+
+       iinntteerrsseeccttiioonn((OOrrddsseettLLiisstt)) -->> OOrrddsseett
+
+              Types:
+
+                 OrdsetList = [oorrddsseett(term()), ...]
+                 Ordset = oorrddsseett(term())
+
+              Returns the intersection of the non-empty list of sets.
+
+       iiss__ddiissjjooiinntt((OOrrddsseett11,, OOrrddsseett22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Ordset1 = Ordset2 = oorrddsseett(term())
+
+              Returns _t_r_u_e if _O_r_d_s_e_t_1 and _O_r_d_s_e_t_2 are disjoint (have no
+              elements in common), and _f_a_l_s_e otherwise.
+
+       ssuubbttrraacctt((OOrrddsseett11,, OOrrddsseett22)) -->> OOrrddsseett33
+
+              Types:
+
+                 Ordset1 = Ordset2 = Ordset3 = oorrddsseett(term())
+
+              Returns only the elements of _O_r_d_s_e_t_1 which are not also elements
+              of _O_r_d_s_e_t_2.
+
+       iiss__ssuubbsseett((OOrrddsseett11,, OOrrddsseett22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Ordset1 = Ordset2 = oorrddsseett(term())
+
+              Returns _t_r_u_e when every element of _O_r_d_s_e_t_1 is also a member of
+              _O_r_d_s_e_t_2, otherwise _f_a_l_s_e.
+
+       ffoolldd((FFuunnccttiioonn,, AAcccc00,, OOrrddsseett)) -->> AAcccc11
+
+              Types:
+
+                 Function =
+                     fun((Element :: T, AccIn :: term()) -> AccOut :: term())
+                 Ordset = oorrddsseett(T)
+                 Acc0 = Acc1 = term()
+
+              Fold _F_u_n_c_t_i_o_n over every element in _O_r_d_s_e_t returning the final
+              value of the accumulator.
+
+       ffiilltteerr((PPrreedd,, OOrrddsseett11)) -->> OOrrddsseett22
+
+              Types:
+
+                 Pred = fun((Element :: T) -> boolean())
+                 Ordset1 = Ordset2 = oorrddsseett(T)
+
+              Filter elements in _O_r_d_s_e_t_1 with boolean function _P_r_e_d.
+
+SSEEEE AALLSSOO
+       ggbb__sseettss((33)), sseettss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                      ordsets(3)

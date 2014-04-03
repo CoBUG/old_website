@@ -1,0 +1,989 @@
+io(3)                      Erlang Module Definition                      io(3)
+
+
+
+NNAAMMEE
+       io - Standard IO Server Interface Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides an interface to standard Erlang IO servers. The
+       output functions all return _o_k if they are successful, or exit if they
+       are not.
+
+       In the following description, all functions have an optional parameter
+       _I_o_D_e_v_i_c_e. If included, it must be the pid of a process which handles
+       the IO protocols. Normally, it is the _I_o_D_e_v_i_c_e returned by ffiillee::ooppeenn//22.
+
+       For a description of the IO protocols refer to the STDLIB Users Guide.
+
+   WWaarrnniinngg::
+       As of R13A, data supplied to the ppuutt__cchhaarrss function should be in the
+       _u_n_i_c_o_d_e_:_c_h_a_r_d_a_t_a_(_) format. This means that programs supplying binaries
+       to this function need to convert them to UTF-8 before trying to output
+       the data on an _i_o___d_e_v_i_c_e_(_).
+
+       If an io_device() is set in binary mode, the functions ggeett__cchhaarrss and
+       ggeett__lliinnee may return binaries instead of lists. The binaries will, as of
+       R13A, be encoded in UTF-8.
+
+       To work with binaries in ISO-latin-1 encoding, use the ffiillee module
+       instead.
+
+       For conversion functions between character encodings, see the uunniiccooddee
+       module.
+
+
+DDAATTAA TTYYPPEESS
+       ddeevviiccee(()) = atom() | pid()
+
+              Either _s_t_a_n_d_a_r_d___i_o, _s_t_a_n_d_a_r_d___e_r_r_o_r, a registered name, or a pid
+              handling IO protocols (returned from ffiillee::ooppeenn//22).
+
+       oopptt__ppaaiirr(()) = {binary, boolean()}
+                  | {echo, boolean()}
+                  | {expand_fun, eexxppaanndd__ffuunn(())}
+                  | {encoding, eennccooddiinngg(())}
+
+       eexxppaanndd__ffuunn(()) =
+           fun((term()) -> {yes | no, string(), [string(), ...]})
+
+       eennccooddiinngg(()) = latin1
+                  | unicode
+                  | utf8
+                  | utf16
+                  | utf32
+                  | {utf16, big | little}
+                  | {utf32, big | little}
+
+       sseettoopptt(()) = binary | list | oopptt__ppaaiirr(())
+
+       ffoorrmmaatt(()) = atom() | string() | binary()
+
+       lliinnee(()) = integer() >= 1
+
+       pprroommpptt(()) = atom() | string()
+
+       rreeqquueesstt__eerrrroorr(()) = {error, eerrrroorr__ddeessccrriippttiioonn(())}
+
+       eerrrroorr__ddeessccrriippttiioonn(()) = term()
+
+              Whatever the I/O-server sends.
+
+EEXXPPOORRTTSS
+       ccoolluummnnss(()) -->> {{ookk,, iinntteeggeerr(()) >>== 11}} || {{eerrrroorr,, eennoottssuupp}}
+
+       ccoolluummnnss((IIooDDeevviiccee)) -->> {{ookk,, iinntteeggeerr(()) >>== 11}} || {{eerrrroorr,, eennoottssuupp}}
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+
+              Retrieves the number of columns of the _I_o_D_e_v_i_c_e (i.e. the width
+              of a terminal). The function only succeeds for terminal devices,
+              for all other devices the function returns _{_e_r_r_o_r_, _e_n_o_t_s_u_p_}
+
+       ppuutt__cchhaarrss((CChhaarrDDaattaa)) -->> ookk
+
+       ppuutt__cchhaarrss((IIooDDeevviiccee,, IIooDDaattaa)) -->> ookk
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 IoData = uunniiccooddee::cchhaarrddaattaa(())
+
+              Writes the characters of _C_h_a_r_D_a_t_a to the io_server() (_I_o_D_e_v_i_c_e).
+
+       nnll(()) -->> ookk
+
+       nnll((IIooDDeevviiccee)) -->> ookk
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+
+              Writes new line to the standard output (_I_o_D_e_v_i_c_e).
+
+       ggeett__cchhaarrss((PPrroommpptt,, CCoouunntt)) -->> DDaattaa || eeooff
+
+       ggeett__cchhaarrss((IIooDDeevviiccee,, PPrroommpptt,, CCoouunntt)) -->> DDaattaa || eeooff || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 Count = integer() >= 0
+                 Reason = term()
+                 Data = [uunniiccooddee::uunniiccooddee__cchhaarr(())] | uunniiccooddee::uunniiccooddee__bbiinnaarryy(())
+
+              Reads _C_o_u_n_t characters from standard input (_I_o_D_e_v_i_c_e), prompting
+              it with _P_r_o_m_p_t. It returns:
+
+                _D_a_t_a:
+                  The input characters. If the device supports Unicode, the
+                  data may represent codepoints larger than 255 (the latin1
+                  range). If the io_server() is set to deliver binaries, they
+                  will be encoded in UTF-8 (regardless of if the device
+                  actually supports Unicode or not).
+
+                _e_o_f:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_,_R_e_a_s_o_n_}:
+                  Other (rare) error condition, for instance _{_e_r_r_o_r_,_e_s_t_a_l_e_} if
+                  reading from an NFS file system.
+
+       ggeett__lliinnee((PPrroommpptt)) -->> DDaattaa || eeooff || {{eerrrroorr,, RReeaassoonn}}
+
+       ggeett__lliinnee((IIooDDeevviiccee,, PPrroommpptt)) -->> DDaattaa || eeooff || {{eerrrroorr,, tteerrmm(())}}
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 Data = [uunniiccooddee::uunniiccooddee__cchhaarr(())] | uunniiccooddee::uunniiccooddee__bbiinnaarryy(())
+
+              Reads a line from the standard input (_I_o_D_e_v_i_c_e), prompting it
+              with _P_r_o_m_p_t. It returns:
+
+                _D_a_t_a:
+                  The characters in the line terminated by a LF (or end of
+                  file). If the device supports Unicode, the data may
+                  represent codepoints larger than 255 (the latin1 range). If
+                  the io_server() is set to deliver binaries, they will be
+                  encoded in UTF-8 (regardless of if the device actually
+                  supports Unicode or not).
+
+                _e_o_f:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_,_R_e_a_s_o_n_}:
+                  Other (rare) error condition, for instance _{_e_r_r_o_r_,_e_s_t_a_l_e_} if
+                  reading from an NFS file system.
+
+       ggeettooppttss(()) -->> [[oopptt__ppaaiirr(())]]
+
+       ggeettooppttss((IIooDDeevviiccee)) -->> [[oopptt__ppaaiirr(())]]
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+
+              This function requests all available options and their current
+              values for a specific io_device(). Example:
+
+              1> {ok,F} = file:open("/dev/null",[read]).
+              {ok,<0.42.0>}
+              2> io:getopts(F).
+              [{binary,false},{encoding,latin1}]
+
+              Here the file I/O-server returns all available options for a
+              file, which are the expected ones, _e_n_c_o_d_i_n_g and _b_i_n_a_r_y. The
+              standard shell however has some more options:
+
+              3> io:getopts().
+              [{expand_fun,#Fun<group.0.120017273>},
+               {echo,true},
+               {binary,false},
+               {encoding,unicode}]
+
+              This example is, as can be seen, run in an environment where the
+              terminal supports Unicode input and output.
+
+       sseettooppttss((OOppttss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       sseettooppttss((IIooDDeevviiccee,, OOppttss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Opts = [sseettoopptt(())]
+                 Reason = term()
+
+              Set options for the io_device() (_I_o_D_e_v_i_c_e).
+
+              Possible options and values vary depending on the actual
+              io_device(). For a list of supported options and their current
+              values on a specific device, use the ggeettooppttss//11 function.
+
+              The options and values supported by the current OTP io_devices
+              are:
+
+                _b_i_n_a_r_y_, _l_i_s_t _o_r _{_b_i_n_a_r_y_, _b_o_o_l_e_a_n_(_)_}:
+                  If set in binary mode (binary or {binary,true}), the
+                  io_server() sends binary data (encoded in UTF-8) as answers
+                  to the get_line, get_chars and, if possible, get_until
+                  requests (see the I/O protocol description in STDLIB User's
+                  Guide for details). The immediate effect is that
+                  _g_e_t___c_h_a_r_s_/_2_,_3 and _g_e_t___l_i_n_e_/_1_,_2 return UTF-8 binaries instead
+                  of lists of chars for the affected device.
+
+                  By default, all io_devices in OTP are set in list mode, but
+                  the io functions can handle any of these modes and so should
+                  other, user written, modules behaving as clients to I/O-
+                  servers.
+
+                  This option is supported by the standard shell (group.erl),
+                  the 'oldshell' (user.erl) and the file I/O servers.
+
+                _{_e_c_h_o_, _b_o_o_l_e_a_n_(_)_}:
+                  Denotes if the terminal should echo input. Only supported
+                  for the standard shell I/O-server (group.erl)
+
+                _{_e_x_p_a_n_d___f_u_n_, _e_x_p_a_n_d___f_u_n_(_)_}:
+                  Provide a function for tab-completion (expansion) like the
+                  erlang shell. This function is called when the user presses
+                  the Tab key. The expansion is active when calling line-
+                  reading functions such as _g_e_t___l_i_n_e_/_1_,_2.
+
+                  The function is called with the current line, upto the
+                  cursor, as a reversed string. It should return a three-
+                  tuple: _{_y_e_s_|_n_o_, _s_t_r_i_n_g_(_)_, _[_s_t_r_i_n_g_(_)_, _._._._]_}. The first
+                  element gives a beep if _n_o, otherwise the expansion is
+                  silent, the second is a string that will be entered at the
+                  cursor position, and the third is a list of possible
+                  expansions. If this list is non-empty, the list will be
+                  printed and the current input line will be written once
+                  again.
+
+                  Trivial example (beep on anything except empty line, which
+                  is expanded to "quit"):
+
+                 fun("") -> {yes, "quit", []};
+                    (_) -> {no, "", ["quit"]} end
+
+                  This option is supported by the standard shell only
+                  (group.erl).
+
+                _{_e_n_c_o_d_i_n_g_, _l_a_t_i_n_1 _| _u_n_i_c_o_d_e_}:
+                  Specifies how characters are input or output from or to the
+                  actual device, implying that i.e. a terminal is set to
+                  handle Unicode input and output or a file is set to handle
+                  UTF-8 data encoding.
+
+                  The option _d_o_e_s _n_o_t affect how data is returned from the io-
+                  functions or how it is sent in the I/O-protocol, it only
+                  affects how the io_device() is to handle Unicode characters
+                  towards the "physical" device.
+
+                  The standard shell will be set for either unicode or latin1
+                  encoding when the system is started. The actual encoding is
+                  set with the help of the "LANG" or "LC_CTYPE" environment
+                  variables on Unix-like system or by other means on other
+                  systems. The bottom line is that the user can input Unicode
+                  characters and the device will be in {encoding, unicode}
+                  mode if the device supports it. The mode can be changed, if
+                  the assumption of the runtime system is wrong, by setting
+                  this option.
+
+                  The io_device() used when Erlang is started with the
+                  "-oldshell" or "-noshell" flags is by default set to latin1
+                  encoding, meaning that any characters beyond codepoint 255
+                  will be escaped and that input is expected to be plain 8-bit
+                  ISO-latin-1. If the encoding is changed to Unicode, input
+                  and output from the standard file descriptors will be in
+                  UTF-8 (regardless of operating system).
+
+                  Files can also be set in {encoding, unicode}, meaning that
+                  data is written and read as UTF-8. More encodings are
+                  possible for files, see below.
+
+                  {encoding, unicode | latin1} is supported by both the
+                  standard shell (group.erl including werl on windows), the
+                  'oldshell' (user.erl) and the file I/O servers.
+
+                _{_e_n_c_o_d_i_n_g_, _u_t_f_8 _| _u_t_f_1_6 _| _u_t_f_3_2 _| _{_u_t_f_1_6_,_b_i_g_} _| _{_u_t_f_1_6_,_l_i_t_t_l_e_}
+                _| _{_u_t_f_3_2_,_b_i_g_} _| _{_u_t_f_3_2_,_l_i_t_t_l_e_}_}:
+                  For disk files, the encoding can be set to various UTF
+                  variants. This will have the effect that data is expected to
+                  be read as the specified encoding from the file and the data
+                  will be written in the specified encoding to the disk file.
+
+                  {encoding, utf8} will have the same effect as
+                  {encoding,unicode} on files.
+
+                  The extended encodings are only supported on disk files
+                  (opened by the ffiillee::ooppeenn//22 function)
+
+       wwrriittee((TTeerrmm)) -->> ookk
+
+       wwrriittee((IIooDDeevviiccee,, TTeerrmm)) -->> ookk
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Term = term()
+
+              Writes the term _T_e_r_m to the standard output (_I_o_D_e_v_i_c_e).
+
+       rreeaadd((PPrroommpptt)) -->> RReessuulltt
+
+       rreeaadd((IIooDDeevviiccee,, PPrroommpptt)) -->> RReessuulltt
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 Result = {ok, Term :: term()}
+                        | eof
+                        | {error, ErrorInfo :: eerrll__ssccaann::eerrrroorr__iinnffoo(())}
+
+              Reads a term _T_e_r_m from the standard input (_I_o_D_e_v_i_c_e), prompting
+              it with _P_r_o_m_p_t. It returns:
+
+                _{_o_k_, _T_e_r_m_}:
+                  The parsing was successful.
+
+                _e_o_f:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_}:
+                  The parsing failed.
+
+       rreeaadd((IIooDDeevviiccee,, PPrroommpptt,, SSttaarrttLLiinnee)) -->> RReessuulltt
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 StartLine = lliinnee(())
+                 Result = {ok, Term :: term(), EndLine :: lliinnee(())}
+                        | {eof, EndLine :: lliinnee(())}
+                        | {error,
+                           ErrorInfo :: eerrll__ssccaann::eerrrroorr__iinnffoo(()),
+                           ErrorLine :: lliinnee(())}
+
+              Reads a term _T_e_r_m from _I_o_D_e_v_i_c_e, prompting it with _P_r_o_m_p_t.
+              Reading starts at line number _S_t_a_r_t_L_i_n_e. It returns:
+
+                _{_o_k_, _T_e_r_m_, _E_n_d_L_i_n_e_}:
+                  The parsing was successful.
+
+                _{_e_o_f_, _E_n_d_L_i_n_e_}:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_, _E_r_r_o_r_L_i_n_e_}:
+                  The parsing failed.
+
+       ffwwrriittee((FFoorrmmaatt)) -->> ookk
+
+       ffwwrriittee((FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+       ffwwrriittee((IIooDDeevviiccee,, FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+       ffoorrmmaatt((FFoorrmmaatt)) -->> ookk
+
+       ffoorrmmaatt((FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+       ffoorrmmaatt((IIooDDeevviiccee,, FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Format = ffoorrmmaatt(())
+                 Data = [term()]
+
+              Writes the items in _D_a_t_a (_[_]) on the standard output (_I_o_D_e_v_i_c_e)
+              in accordance with _F_o_r_m_a_t. _F_o_r_m_a_t contains plain characters
+              which are copied to the output device, and control sequences for
+              formatting, see below. If _F_o_r_m_a_t is an atom or a binary, it is
+              first converted to a list with the aid of _a_t_o_m___t_o___l_i_s_t_/_1 or
+              _b_i_n_a_r_y___t_o___l_i_s_t_/_1.
+
+              1> io:fwrite("Hello world!~n", []).
+              Hello world!
+              ok
+
+              The general format of a control sequence is _~_F_._P_._P_a_d_M_o_d_C. The
+              character _C determines the type of control sequence to be used,
+              _F and _P are optional numeric arguments. If _F, _P, or _P_a_d is _*,
+              the next argument in _D_a_t_a is used as the numeric value of _F or
+              _P.
+
+              _F is the _f_i_e_l_d _w_i_d_t_h of the printed argument. A negative value
+              means that the argument will be left justified within the field,
+              otherwise it will be right justified. If no field width is
+              specified, the required print width will be used. If the field
+              width specified is too small, then the whole field will be
+              filled with _* characters.
+
+              _P is the _p_r_e_c_i_s_i_o_n of the printed argument. A default value is
+              used if no precision is specified. The interpretation of
+              precision depends on the control sequences. Unless otherwise
+              specified, the argument _w_i_t_h_i_n is used to determine print width.
+
+              _P_a_d is the padding character. This is the character used to pad
+              the printed representation of the argument so that it conforms
+              to the specified field width and precision. Only one padding
+              character can be specified and, whenever applicable, it is used
+              for both the field width and precision. The default padding
+              character is _' _' (space).
+
+              _M_o_d is the control sequence modifier. It is either a single
+              character (currently only 't', for unicode translation, is
+              supported) that changes the interpretation of Data.
+
+              The following control sequences are available:
+
+                _~:
+                  The character _~ is written.
+
+                _c:
+                  The argument is a number that will be interpreted as an
+                  ASCII code. The precision is the number of times the
+                  character is printed and it defaults to the field width,
+                  which in turn defaults to 1. The following example
+                  illustrates:
+
+                2> io:fwrite("|~10.5c|~-10.5c|~5c|~n", [$a, $b, $c]).
+                |     aaaaa|bbbbb     |ccccc|
+                ok
+
+                  If the Unicode translation modifier ('t') is in effect, the
+                  integer argument can be any number representing a valid
+                  unicode codepoint, otherwise it should be an integer less
+                  than or equal to 255, otherwise it is masked with 16#FF:
+
+                1> io:fwrite("~tc~n",[1024]).
+                \x{400}
+                ok
+                2> io:fwrite("~c~n",[1024]).
+                ^@
+                ok
+
+                _f:
+                  The argument is a float which is written as _[_-_]_d_d_d_._d_d_d,
+                  where the precision is the number of digits after the
+                  decimal point. The default precision is 6 and it cannot be
+                  less than 1.
+
+                _e:
+                  The argument is a float which is written as _[_-_]_d_._d_d_d_e_+_-_d_d_d,
+                  where the precision is the number of digits written. The
+                  default precision is 6 and it cannot be less than 2.
+
+                _g:
+                  The argument is a float which is written as _f, if it is >=
+                  0.1 and < 10000.0. Otherwise, it is written in the _e format.
+                  The precision is the number of significant digits. It
+                  defaults to 6 and should not be less than 2. If the absolute
+                  value of the float does not allow it to be written in the _f
+                  format with the desired number of significant digits, it is
+                  also written in the _e format.
+
+                _s:
+                  Prints the argument with the _s_t_r_i_n_g syntax. The argument is,
+                  if no Unicode translation modifier is present, an iolist(),
+                  a binary, or an atom. If the Unicode translation modifier
+                  ('t') is in effect, the argument is unicode:chardata(),
+                  meaning that binaries are in UTF-8. The characters are
+                  printed without quotes. The string is first truncated by the
+                  given precision and then padded and justified to the given
+                  field width. The default precision is the field width.
+
+                  This format can be used for printing any object and
+                  truncating the output so it fits a specified field:
+
+                3> io:fwrite("|~10w|~n", [{hey, hey, hey}]).
+                |**********|
+                ok
+                4> io:fwrite("|~10s|~n", [io_lib:write({hey, hey, hey})]).
+                |{hey,hey,h|
+                5> io:fwrite("|~-10.8s|~n", [io_lib:write({hey, hey, hey})]).
+                |{hey,hey  |
+                ok
+
+                  A list with integers larger than 255 is considered an error
+                  if the Unicode translation modifier is not given:
+
+                1> io:fwrite("~ts~n",[[1024]]).
+                \x{400}
+                ok
+                2> io:fwrite("~s~n",[[1024]]).
+                ** exception exit: {badarg,[{io,format,[<0.26.0>,"~s~n",[[1024]]]},
+                   ...
+
+                _w:
+                  Writes data with the standard syntax. This is used to output
+                  Erlang terms. Atoms are printed within quotes if they
+                  contain embedded non-printable characters, and floats are
+                  printed accurately as the shortest, correctly rounded
+                  string.
+
+                _p:
+                  Writes the data with standard syntax in the same way as _~_w,
+                  but breaks terms whose printed representation is longer than
+                  one line into many lines and indents each line sensibly. It
+                  also tries to detect lists of printable characters and to
+                  output these as strings. For example:
+
+                5> T = [{attributes,[[{id,age,1.50000},{mode,explicit},
+                {typename,"INTEGER"}], [{id,cho},{mode,explicit},{typename,'Cho'}]]},
+                {typename,'Person'},{tag,{'PRIVATE',3}},{mode,implicit}].
+                6> io:fwrite("~w~n", [T]).
+                [{attributes,[[{id,age,1.5},{mode,explicit},{typename,
+                [73,78,84,69,71,69,82]}],[{id,cho},{mode,explicit},{typena
+                me,'Cho'}]]},{typename,'Person'},{tag,{'PRIVATE',3}},{mode
+                ,implicit}]
+                ok
+                7> io:fwrite("~62p~n", [T]).
+                [{attributes,[[{id,age,1.5},
+                               {mode,explicit},
+                               {typename,"INTEGER"}],
+                              [{id,cho},{mode,explicit},{typename,'Cho'}]]},
+                 {typename,'Person'},
+                 {tag,{'PRIVATE',3}},
+                 {mode,implicit}]
+                ok
+
+                  The field width specifies the maximum line length. It
+                  defaults to 80. The precision specifies the initial
+                  indentation of the term. It defaults to the number of
+                  characters printed on this line in the _s_a_m_e call to
+                  _i_o_:_f_w_r_i_t_e or _i_o_:_f_o_r_m_a_t. For example, using _T above:
+
+                8> io:fwrite("Here T = ~62p~n", [T]).
+                Here T = [{attributes,[[{id,age,1.5},
+                                        {mode,explicit},
+                                        {typename,"INTEGER"}],
+                                       [{id,cho},
+                                        {mode,explicit},
+                                        {typename,'Cho'}]]},
+                          {typename,'Person'},
+                          {tag,{'PRIVATE',3}},
+                          {mode,implicit}]
+                ok
+
+                _W:
+                  Writes data in the same way as _~_w, but takes an extra
+                  argument which is the maximum depth to which terms are
+                  printed. Anything below this depth is replaced with _._._.. For
+                  example, using _T above:
+
+                9> io:fwrite("~W~n", [T,9]).
+                [{attributes,[[{id,age,1.5},{mode,explicit},{typename,...}],
+                [{id,cho},{mode,...},{...}]]},{typename,'Person'},
+                {tag,{'PRIVATE',3}},{mode,implicit}]
+                ok
+
+                  If the maximum depth has been reached, then it is impossible
+                  to read in the resultant output. Also, the _,_._._. form in a
+                  tuple denotes that there are more elements in the tuple but
+                  these are below the print depth.
+
+                _P:
+                  Writes data in the same way as _~_p, but takes an extra
+                  argument which is the maximum depth to which terms are
+                  printed. Anything below this depth is replaced with _._._.. For
+                  example:
+
+                10> io:fwrite("~62P~n", [T,9]).
+                [{attributes,[[{id,age,1.5},{mode,explicit},{typename,...}],
+                              [{id,cho},{mode,...},{...}]]},
+                 {typename,'Person'},
+                 {tag,{'PRIVATE',3}},
+                 {mode,implicit}]
+                ok
+
+                _B:
+                  Writes an integer in base 2..36, the default base is 10. A
+                  leading dash is printed for negative integers.
+
+                  The precision field selects base. For example:
+
+                11> io:fwrite("~.16B~n", [31]).
+                1F
+                ok
+                12> io:fwrite("~.2B~n", [-19]).
+                -10011
+                ok
+                13> io:fwrite("~.36B~n", [5*36+35]).
+                5Z
+                ok
+
+                _X:
+                  Like _B, but takes an extra argument that is a prefix to
+                  insert before the number, but after the leading dash, if
+                  any.
+
+                  The prefix can be a possibly deep list of characters or an
+                  atom.
+
+                14> io:fwrite("~X~n", [31,"10#"]).
+                10#31
+                ok
+                15> io:fwrite("~.16X~n", [-31,"0x"]).
+                -0x1F
+                ok
+
+                _#:
+                  Like _B, but prints the number with an Erlang style
+                  '#'-separated base prefix.
+
+                16> io:fwrite("~.10#~n", [31]).
+                10#31
+                ok
+                17> io:fwrite("~.16#~n", [-31]).
+                -16#1F
+                ok
+
+                _b:
+                  Like _B, but prints lowercase letters.
+
+                _x:
+                  Like _X, but prints lowercase letters.
+
+                _+:
+                  Like _#, but prints lowercase letters.
+
+                _n:
+                  Writes a new line.
+
+                _i:
+                  Ignores the next term.
+
+              Returns:
+
+                _o_k:
+                  The formatting succeeded.
+
+              If an error occurs, there is no output. For example:
+
+              18> io:fwrite("~s ~w ~i ~w ~c ~n",['abc def', 'abc def', {foo, 1},{foo, 1}, 65]).
+              abc def 'abc def'  {foo,1} A
+              ok
+              19> io:fwrite("~s", [65]).
+              ** exception exit: {badarg,[{io,format,[<0.22.0>,"~s","A"]},
+                                          {erl_eval,do_apply,5},
+                                          {shell,exprs,6},
+                                          {shell,eval_exprs,6},
+                                          {shell,eval_loop,3}]}
+                   in function  io:o_request/2
+
+              In this example, an attempt was made to output the single
+              character '65' with the aid of the string formatting directive
+              "~s".
+
+       ffrreeaadd((PPrroommpptt,, FFoorrmmaatt)) -->> RReessuulltt
+
+       ffrreeaadd((IIooDDeevviiccee,, PPrroommpptt,, FFoorrmmaatt)) -->> RReessuulltt
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 Format = ffoorrmmaatt(())
+                 Result = {ok, Terms :: [term()]}
+                        | eof
+                        | {error, What :: term()}
+
+              Reads characters from the standard input (_I_o_D_e_v_i_c_e), prompting
+              it with _P_r_o_m_p_t. Interprets the characters in accordance with
+              _F_o_r_m_a_t. _F_o_r_m_a_t contains control sequences which directs the
+              interpretation of the input.
+
+              _F_o_r_m_a_t may contain:
+
+                * White space characters (SPACE, TAB and NEWLINE) which cause
+                  input to be read to the next non-white space character.
+
+                * Ordinary characters which must match the next input
+                  character.
+
+                * Control sequences, which have the general format _~_*_F_M_C. The
+                  character _* is an optional return suppression character. It
+                  provides a method to specify a field which is to be omitted.
+                  _F is the _f_i_e_l_d _w_i_d_t_h of the input field, _M is an optional
+                  translation modifier (of which 't' is the only currently
+                  supported, meaning Unicode translation) and _C determines the
+                  type of control sequence.
+
+                  Unless otherwise specified, leading white-space is ignored
+                  for all control sequences. An input field cannot be more
+                  than one line wide. The following control sequences are
+                  available:
+
+                  _~:
+                    A single _~ is expected in the input.
+
+                  _d:
+                    A decimal integer is expected.
+
+                  _u:
+                    An unsigned integer in base 2..36 is expected. The field
+                    width parameter is used to specify base. Leading white-
+                    space characters are not skipped.
+
+                  _-:
+                    An optional sign character is expected. A sign character
+                    '-' gives the return value _-_1. Sign character '+' or none
+                    gives _1. The field width parameter is ignored. Leading
+                    white-space characters are not skipped.
+
+                  _#:
+                    An integer in base 2..36 with Erlang-style base prefix
+                    (for example _"_1_6_#_f_f_f_f_") is expected.
+
+                  _f:
+                    A floating point number is expected. It must follow the
+                    Erlang floating point number syntax.
+
+                  _s:
+                    A string of non-white-space characters is read. If a field
+                    width has been specified, this number of characters are
+                    read and all trailing white-space characters are stripped.
+                    An Erlang string (list of characters) is returned.
+
+                    If Unicode translation is in effect (~ts), characters
+                    larger than 255 are accepted, otherwise not. With the
+                    translation modifier, the list returned may as a
+                    consequence also contain integers larger than 255:
+
+                  1> io:fread("Prompt> ","~s").
+                  Prompt> <Characters beyond latin1 range not printable in this medium>
+                  {error,{fread,string}}
+                  2> io:fread("Prompt> ","~ts").
+                  Prompt> <Characters beyond latin1 range not printable in this medium>
+                  {ok,[[1091,1085,1080,1094,1086,1076,1077]]}
+
+                  _a:
+                    Similar to _s, but the resulting string is converted into
+                    an atom.
+
+                    The Unicode translation modifier is not allowed (atoms can
+                    not contain characters beyond the latin1 range).
+
+                  _c:
+                    The number of characters equal to the field width are read
+                    (default is 1) and returned as an Erlang string. However,
+                    leading and trailing white-space characters are not
+                    omitted as they are with _s. All characters are returned.
+
+                    The Unicode translation modifier works as with _s:
+
+                  1> io:fread("Prompt> ","~c").
+                  Prompt> <Character beyond latin1 range not printable in this medium>
+                  {error,{fread,string}}
+                  2> io:fread("Prompt> ","~tc").
+                  Prompt> <Character beyond latin1 range not printable in this medium>
+                  {ok,[[1091]]}
+
+                  _l:
+                    Returns the number of characters which have been scanned
+                    up to that point, including white-space characters.
+
+                  It returns:
+
+                  _{_o_k_, _T_e_r_m_s_}:
+                    The read was successful and _T_e_r_m_s is the list of
+                    successfully matched and read items.
+
+                  _e_o_f:
+                    End of file was encountered.
+
+                  _{_e_r_r_o_r_, _W_h_a_t_}:
+                    The read operation failed and the parameter _W_h_a_t gives a
+                    hint about the error.
+
+              Examples:
+
+              20> io:fread('enter>', "~f~f~f").
+              enter>1.9 35.5e3 15.0
+              {ok,[1.9,3.55e4,15.0]}
+              21> io:fread('enter>', "~10f~d").
+              enter>     5.67899
+              {ok,[5.678,99]}
+              22> io:fread('enter>', ":~10s:~10c:").
+              enter>:   alan   :   joe    :
+              {ok, ["alan", "   joe    "]}
+
+       rroowwss(()) -->> {{ookk,, iinntteeggeerr(()) >>== 11}} || {{eerrrroorr,, eennoottssuupp}}
+
+       rroowwss((IIooDDeevviiccee)) -->> {{ookk,, iinntteeggeerr(()) >>== 11}} || {{eerrrroorr,, eennoottssuupp}}
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+
+              Retrieves the number of rows of the _I_o_D_e_v_i_c_e (i.e. the height of
+              a terminal). The function only succeeds for terminal devices,
+              for all other devices the function returns _{_e_r_r_o_r_, _e_n_o_t_s_u_p_}
+
+       ssccaann__eerrll__eexxpprrss((PPrroommpptt)) -->> RReessuulltt
+
+       ssccaann__eerrll__eexxpprrss((DDeevviiccee,, PPrroommpptt)) -->> RReessuulltt
+
+       ssccaann__eerrll__eexxpprrss((DDeevviiccee,, PPrroommpptt,, SSttaarrttLLiinnee)) -->> RReessuulltt
+
+              Types:
+
+                 Device = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 StartLine = lliinnee(())
+                 Result = eerrll__ssccaann::ttookkeennss__rreessuulltt(()) | rreeqquueesstt__eerrrroorr(())
+
+              Reads data from the standard input (_I_o_D_e_v_i_c_e), prompting it with
+              _P_r_o_m_p_t. Reading starts at line number _S_t_a_r_t_L_i_n_e (1). The data is
+              tokenized as if it were a sequence of Erlang expressions until a
+              final _'_._' is reached. This token is also returned. It returns:
+
+                _{_o_k_, _T_o_k_e_n_s_, _E_n_d_L_i_n_e_}:
+                  The tokenization succeeded.
+
+                _{_e_o_f_, _E_n_d_L_i_n_e_}:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_, _E_r_r_o_r_L_i_n_e_}:
+                  An error occurred.
+
+              Example:
+
+              23> io:scan_erl_exprs('enter>').
+              enter>abc(), "hey".
+              {ok,[{atom,1,abc},{'(',1},{')',1},{',',1},{string,1,"hey"},{dot,1}],2}
+              24> io:scan_erl_exprs('enter>').
+              enter>1.0er.
+              {error,{1,erl_scan,{illegal,float}},2}
+
+       ssccaann__eerrll__ffoorrmm((PPrroommpptt)) -->> RReessuulltt
+
+       ssccaann__eerrll__ffoorrmm((IIooDDeevviiccee,, PPrroommpptt)) -->> RReessuulltt
+
+       ssccaann__eerrll__ffoorrmm((IIooDDeevviiccee,, PPrroommpptt,, SSttaarrttLLiinnee)) -->> RReessuulltt
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 StartLine = lliinnee(())
+                 Result = eerrll__ssccaann::ttookkeennss__rreessuulltt(()) | rreeqquueesstt__eerrrroorr(())
+
+              Reads data from the standard input (_I_o_D_e_v_i_c_e), prompting it with
+              _P_r_o_m_p_t. Starts reading at line number _S_t_a_r_t_L_i_n_e (1). The data is
+              tokenized as if it were an Erlang form - one of the valid Erlang
+              expressions in an Erlang source file - until a final _'_._' is
+              reached. This last token is also returned. The return values are
+              the same as for _s_c_a_n___e_r_l___e_x_p_r_s_/_1_,_2_,_3 above.
+
+       ppaarrssee__eerrll__eexxpprrss((PPrroommpptt)) -->> RReessuulltt
+
+       ppaarrssee__eerrll__eexxpprrss((IIooDDeevviiccee,, PPrroommpptt)) -->> RReessuulltt
+
+       ppaarrssee__eerrll__eexxpprrss((IIooDDeevviiccee,, PPrroommpptt,, SSttaarrttLLiinnee)) -->> RReessuulltt
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 StartLine = lliinnee(())
+                 Result = ppaarrssee__rreett(())
+                 ppaarrssee__rreett(()) = {ok,
+                                ExprList :: eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(()),
+                                EndLine :: lliinnee(())}
+                             | {eof, EndLine :: lliinnee(())}
+                             | {error,
+                                ErrorInfo :: eerrll__ssccaann::eerrrroorr__iinnffoo(()),
+                                ErrorLine :: lliinnee(())}
+                             | rreeqquueesstt__eerrrroorr(())
+
+              Reads data from the standard input (_I_o_D_e_v_i_c_e), prompting it with
+              _P_r_o_m_p_t. Starts reading at line number _S_t_a_r_t_L_i_n_e (1). The data is
+              tokenized and parsed as if it were a sequence of Erlang
+              expressions until a final '.' is reached. It returns:
+
+                _{_o_k_, _E_x_p_r_L_i_s_t_, _E_n_d_L_i_n_e_}:
+                  The parsing was successful.
+
+                _{_e_o_f_, _E_n_d_L_i_n_e_}:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_, _E_r_r_o_r_L_i_n_e_}:
+                  An error occurred.
+
+              Example:
+
+              25> io:parse_erl_exprs('enter>').
+              enter>abc(), "hey".
+              {ok, [{call,1,{atom,1,abc},[]},{string,1,"hey"}],2}
+              26> io:parse_erl_exprs ('enter>').
+              enter>abc("hey".
+              {error,{1,erl_parse,["syntax error before: ",["'.'"]]},2}
+
+       ppaarrssee__eerrll__ffoorrmm((PPrroommpptt)) -->> RReessuulltt
+
+       ppaarrssee__eerrll__ffoorrmm((IIooDDeevviiccee,, PPrroommpptt)) -->> RReessuulltt
+
+       ppaarrssee__eerrll__ffoorrmm((IIooDDeevviiccee,, PPrroommpptt,, SSttaarrttLLiinnee)) -->> RReessuulltt
+
+              Types:
+
+                 IoDevice = ddeevviiccee(())
+                 Prompt = pprroommpptt(())
+                 StartLine = lliinnee(())
+                 Result = ppaarrssee__ffoorrmm__rreett(())
+                 ppaarrssee__ffoorrmm__rreett(()) = {ok,
+                                     AbsForm :: eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(()),
+                                     EndLine :: lliinnee(())}
+                                  | {eof, EndLine :: lliinnee(())}
+                                  | {error,
+                                     ErrorInfo :: eerrll__ssccaann::eerrrroorr__iinnffoo(()),
+                                     ErrorLine :: lliinnee(())}
+                                  | rreeqquueesstt__eerrrroorr(())
+
+              Reads data from the standard input (_I_o_D_e_v_i_c_e), prompting it with
+              _P_r_o_m_p_t. Starts reading at line number _S_t_a_r_t_L_i_n_e (1). The data is
+              tokenized and parsed as if it were an Erlang form - one of the
+              valid Erlang expressions in an Erlang source file - until a
+              final '.' is reached. It returns:
+
+                _{_o_k_, _A_b_s_F_o_r_m_, _E_n_d_L_i_n_e_}:
+                  The parsing was successful.
+
+                _{_e_o_f_, _E_n_d_L_i_n_e_}:
+                  End of file was encountered.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_, _E_r_r_o_r_L_i_n_e_}:
+                  An error occurred.
+
+SSTTAANNDDAARRDD IINNPPUUTT//OOUUTTPPUUTT
+       All Erlang processes have a default standard IO device. This device is
+       used when no _I_o_D_e_v_i_c_e argument is specified in the above function
+       calls. However, it is sometimes desirable to use an explicit _I_o_D_e_v_i_c_e
+       argument which refers to the default IO device. This is the case with
+       functions that can access either a file or the default IO device. The
+       atom _s_t_a_n_d_a_r_d___i_o has this special meaning. The following example
+       illustrates this:
+
+       27> io:read('enter>').
+       enter>foo.
+       {ok,foo}
+       28> io:read(standard_io, 'enter>').
+       enter>bar.
+       {ok,bar}
+
+       There is always a process registered under the name of _u_s_e_r. This can
+       be used for sending output to the user.
+
+SSTTAANNDDAARRDD EERRRROORR
+       In certain situations, especially when the standard output is
+       redirected, access to an io_server() specific for error messages might
+       be convenient. The io_device 'standard_error' can be used to direct
+       output to whatever the current operating system considers a suitable
+       device for error output. Example on a Unix-like operating system:
+
+       $ erl -noshell -noinput -eval 'io:format(standard_error,"Error: ~s~n",["error 11"]),'\
+       'init:stop().' > /dev/null
+       Error: error 11
+
+EERRRROORR IINNFFOORRMMAATTIIOONN
+       The _E_r_r_o_r_I_n_f_o mentioned above is the standard _E_r_r_o_r_I_n_f_o structure which
+       is returned from all IO modules. It has the format:
+
+       {ErrorLine, Module, ErrorDescriptor}
+
+       A string which describes the error is obtained with the following call:
+
+       Module:format_error(ErrorDescriptor)
+
+
+
+Ericsson AB                      stdlib 1.18.2                           io(3)

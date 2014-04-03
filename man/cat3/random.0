@@ -1,0 +1,117 @@
+random(3)                  Erlang Module Definition                  random(3)
+
+
+
+NNAAMMEE
+       random - Pseudo random number generation
+
+DDEESSCCRRIIPPTTIIOONN
+       Random number generator. The method is attributed to B.A. Wichmann and
+       I.D.Hill, in 'An efficient and portable pseudo-random number
+       generator', Journal of Applied Statistics. AS183. 1982. Also Byte March
+       1987.
+
+       The current algorithm is a modification of the version attributed to
+       Richard A O'Keefe in the standard Prolog library.
+
+       Every time a random number is requested, a state is used to calculate
+       it, and a new state produced. The state can either be implicit (kept in
+       the process dictionary) or be an explicit argument and return value. In
+       this implementation, the state (the type _r_a_n_(_)) consists of a tuple of
+       three integers.
+
+       It should be noted that this random number generator is not
+       cryptographically strong. If a strong cryptographic random number
+       generator is needed for example _c_r_y_p_t_o_:_r_a_n_d___b_y_t_e_s_/_1 could be used
+       instead.
+
+DDAATTAA TTYYPPEESS
+       rraann(()) = {integer(), integer(), integer()}
+
+              The state.
+
+EEXXPPOORRTTSS
+       sseeeedd(()) -->> rraann(())
+
+              Seeds random number generation with default (fixed) values in
+              the process dictionary, and returns the old state.
+
+       sseeeedd((AA11,, AA22,, AA33)) -->> uunnddeeffiinneedd || rraann(())
+
+              Types:
+
+                 A1 = A2 = A3 = integer()
+
+              Seeds random number generation with integer values in the
+              process dictionary, and returns the old state.
+
+              One way of obtaining a seed is to use the BIF _n_o_w_/_0:
+
+                        ...
+                        {A1,A2,A3} = now(),
+                        random:seed(A1, A2, A3),
+                        ...
+
+       sseeeedd((XX11 :::: {{AA11,, AA22,, AA33}})) -->> uunnddeeffiinneedd || rraann(())
+
+              Types:
+
+                 A1 = A2 = A3 = integer()
+
+              _s_e_e_d_(_{_A_1_, _A_2_, _A_3_}_) is equivalent to _s_e_e_d_(_A_1_, _A_2_, _A_3_).
+
+       sseeeedd00(()) -->> rraann(())
+
+              Returns the default state.
+
+       uunniiffoorrmm(()) -->> ffllooaatt(())
+
+              Returns a random float uniformly distributed between _0_._0 and
+              _1_._0, updating the state in the process dictionary.
+
+       uunniiffoorrmm((NN)) -->> iinntteeggeerr(()) >>== 11
+
+              Types:
+
+                 N = integer() >= 1
+
+              Given an integer _N _>_= _1, _u_n_i_f_o_r_m_/_1 returns a random integer
+              uniformly distributed between _1 and _N, updating the state in the
+              process dictionary.
+
+       uunniiffoorrmm__ss((SSttaattee00)) -->> {{ffllooaatt(()),, SSttaattee11}}
+
+              Types:
+
+                 State0 = State1 = rraann(())
+
+              Given a state, _u_n_i_f_o_r_m___s_/_1returns a random float uniformly
+              distributed between _0_._0 and _1_._0, and a new state.
+
+       uunniiffoorrmm__ss((NN,, SSttaattee00)) -->> {{iinntteeggeerr(()),, SSttaattee11}}
+
+              Types:
+
+                 N = integer() >= 1
+                 State0 = State1 = rraann(())
+
+              Given an integer _N _>_= _1 and a state, _u_n_i_f_o_r_m___s_/_2 returns a
+              random integer uniformly distributed between _1 and _N, and a new
+              state.
+
+NNOOTTEE
+       Some of the functions use the process dictionary variable _r_a_n_d_o_m___s_e_e_d
+       to remember the current seed.
+
+       If a process calls _u_n_i_f_o_r_m_/_0 or _u_n_i_f_o_r_m_/_1 without setting a seed first,
+       _s_e_e_d_/_0 is called automatically.
+
+       The implementation changed in R15. Upgrading to R15 will break
+       applications that expect a specific output for a given seed. The output
+       is still deterministic number series, but different compared to
+       releases older than R15. The seed _{_0_,_0_,_0_} will for example no longer
+       produce a flawed series of only zeros.
+
+
+
+Ericsson AB                      stdlib 1.18.2                       random(3)

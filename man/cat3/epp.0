@@ -1,0 +1,104 @@
+epp(3)                     Erlang Module Definition                     epp(3)
+
+
+
+NNAAMMEE
+       epp - An Erlang Code Preprocessor
+
+DDEESSCCRRIIPPTTIIOONN
+       The Erlang code preprocessor includes functions which are used by
+       _c_o_m_p_i_l_e to preprocess macros and include files before the actual
+       parsing takes place.
+
+DDAATTAA TTYYPPEESS
+       mmaaccrrooss(()) = [{atom(), term()}]
+
+       eepppp__hhaannddllee(()) = pid()
+
+              Handle to the epp server.
+
+EEXXPPOORRTTSS
+       ooppeenn((FFiilleeNNaammee,, IInncclluuddeePPaatthh)) -->>
+               {{ookk,, EEpppp}} || {{eerrrroorr,, EErrrroorrDDeessccrriippttoorr}}
+
+       ooppeenn((FFiilleeNNaammee,, IInncclluuddeePPaatthh,, PPrreeddeeffMMaaccrrooss)) -->>
+               {{ookk,, EEpppp}} || {{eerrrroorr,, EErrrroorrDDeessccrriippttoorr}}
+
+              Types:
+
+                 FileName = ffiillee::nnaammee(())
+                 IncludePath = [DirectoryName :: ffiillee::nnaammee(())]
+                 PredefMacros = mmaaccrrooss(())
+                 Epp = eepppp__hhaannddllee(())
+                 ErrorDescriptor = term()
+
+              Opens a file for preprocessing.
+
+       cclloossee((EEpppp)) -->> ookk
+
+              Types:
+
+                 Epp = eepppp__hhaannddllee(())
+
+              Closes the preprocessing of a file.
+
+       ppaarrssee__eerrll__ffoorrmm((EEpppp)) -->>
+                         {{ookk,, AAbbssFFoorrmm}} || {{eeooff,, LLiinnee}} || {{eerrrroorr,, EErrrroorrIInnffoo}}
+
+              Types:
+
+                 Epp = eepppp__hhaannddllee(())
+                 AbsForm = eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())
+                 Line = eerrll__ssccaann::lliinnee(())
+                 ErrorInfo = eerrll__ssccaann::eerrrroorr__iinnffoo(()) | eerrll__ppaarrssee::eerrrroorr__iinnffoo(())
+
+              Returns the next Erlang form from the opened Erlang source file.
+              The tuple _{_e_o_f_, _L_i_n_e_} is returned at end-of-file. The first form
+              corresponds to an implicit attribute _-_f_i_l_e_(_F_i_l_e_,_1_)_., where _F_i_l_e
+              is the name of the file.
+
+       ppaarrssee__ffiillee((FFiilleeNNaammee,, IInncclluuddeePPaatthh,, PPrreeddeeffMMaaccrrooss)) -->>
+                     {{ookk,, [[FFoorrmm]]}} || {{eerrrroorr,, OOppeennEErrrroorr}}
+
+              Types:
+
+                 FileName = ffiillee::nnaammee(())
+                 IncludePath = [DirectoryName :: ffiillee::nnaammee(())]
+                 Form = eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())
+                      | {error, ErrorInfo}
+                      | {eof, Line}
+                 PredefMacros = mmaaccrrooss(())
+                 Line = eerrll__ssccaann::lliinnee(())
+                 ErrorInfo = eerrll__ssccaann::eerrrroorr__iinnffoo(()) | eerrll__ppaarrssee::eerrrroorr__iinnffoo(())
+                 OpenError = ffiillee::ppoossiixx(()) | badarg | system_limit
+
+              Preprocesses and parses an Erlang source file. Note that the
+              tuple _{_e_o_f_, _L_i_n_e_} returned at end-of-file is included as a
+              "form".
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrDDeessccrriippttoorr)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 ErrorDescriptor = term()
+
+              Takes an _E_r_r_o_r_D_e_s_c_r_i_p_t_o_r and returns a string which describes
+              the error or warning. This function is usually called implicitly
+              when processing an _E_r_r_o_r_I_n_f_o structure (see below).
+
+EERRRROORR IINNFFOORRMMAATTIIOONN
+       The _E_r_r_o_r_I_n_f_o mentioned above is the standard _E_r_r_o_r_I_n_f_o structure which
+       is returned from all IO modules. It has the following format:
+
+           {ErrorLine, Module, ErrorDescriptor}
+
+       A string which describes the error is obtained with the following call:
+
+           Module:format_error(ErrorDescriptor)
+
+SSEEEE AALLSSOO
+       eerrll__ppaarrssee((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                          epp(3)

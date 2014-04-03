@@ -1,0 +1,665 @@
+release_handler(3)         Erlang Module Definition         release_handler(3)
+
+
+
+NNAAMMEE
+       release_handler - Unpacking and Installation of Release Packages
+
+DDEESSCCRRIIPPTTIIOONN
+       The _r_e_l_e_a_s_e _h_a_n_d_l_e_r is a process belonging to the SASL application
+       which is responsible for _r_e_l_e_a_s_e _h_a_n_d_l_i_n_g, that is, unpacking,
+       installation, and removal of release packages.
+
+       An introduction to release handling and a usage example can be found in
+       DDeessiiggnn PPrriinncciipplleess.
+
+       A _r_e_l_e_a_s_e _p_a_c_k_a_g_e is a compressed tar file containing code for a
+       certain version of a release, created by calling ssyyssttoooollss::mmaakkee__ttaarr//11,,22.
+       The release package should be placed in the _$_R_O_O_T_/_r_e_l_e_a_s_e_s directory of
+       the previous version of the release where _$_R_O_O_T is the installation
+       root directory, _c_o_d_e_:_r_o_o_t___d_i_r_(_). Another _r_e_l_e_a_s_e_s directory can be
+       specified using the SASL configuration parameter _r_e_l_e_a_s_e_s___d_i_r, or the
+       OS environment variable _R_E_L_D_I_R. The release handler must have write
+       access to this directory in order to install the new release. The
+       persistent state of the release handler is stored there in a file
+       called _R_E_L_E_A_S_E_S.
+
+       A release package should always contain the release resource file
+       _N_a_m_e_._r_e_l and a boot script _N_a_m_e_._b_o_o_t. It may contain a release upgrade
+       file _r_e_l_u_p and a system configuration file _s_y_s_._c_o_n_f_i_g. The _._r_e_l file
+       contains information about the release: its name, version, and which
+       ERTS and application versions it uses. The _r_e_l_u_p file contains scripts
+       for how to upgrade to, or downgrade from, this version of the release.
+
+       The release package can be _u_n_p_a_c_k_e_d, which extracts the files. An
+       unpacked release can be _i_n_s_t_a_l_l_e_d. The currently used version of the
+       release is then upgraded or downgraded to the specified version by
+       evaluating the instructions in _r_e_l_u_p. An installed release can be made
+       _p_e_r_m_a_n_e_n_t. There can only be one permanent release in the system, and
+       this is the release that is used if the system is restarted. An
+       installed release, except the permanent one, can be _r_e_m_o_v_e_d. When a
+       release is removed, all files that belong to that release only are
+       deleted.
+
+       Each version of the release has a status. The status can be _u_n_p_a_c_k_e_d,
+       _c_u_r_r_e_n_t, _p_e_r_m_a_n_e_n_t, or _o_l_d. There is always one latest release which
+       either has status _p_e_r_m_a_n_e_n_t (normal case), or _c_u_r_r_e_n_t (installed, but
+       not yet made permanent). The following table illustrates the meaning of
+       the status values:
+
+       Status     Action                NextStatus
+       -------------------------------------------
+         -        unpack                unpacked
+       unpacked   install               current
+                  remove                  -
+       current    make_permanent        permanent
+                  install other         old
+                  remove                  -
+       permanent  make other permanent  old
+                  install               permanent
+       old        reboot_old            permanent
+                  install               current
+                  remove                  -
+
+
+       The release handler process is a locally registered process on each
+       node. When a release is installed in a distributed system, the release
+       handler on each node must be called. The release installation may be
+       synchronized between nodes. From an operator view, it may be
+       unsatisfactory to specify each node. The aim is to install one release
+       package in the system, no matter how many nodes there are. If this is
+       the case, it is recommended that software management functions are
+       written which take care of this problem. Such a function may have
+       knowledge of the system architecture, so it can contact each individual
+       release handler to install the package.
+
+       For release handling to work properly, the runtime system needs to have
+       knowledge about which release it is currently running. It must also be
+       able to change (in run-time) which boot script and system configuration
+       file should be used if the system is restarted. This is taken care of
+       automatically if Erlang is started as an embedded system. Read about
+       this in _E_m_b_e_d_d_e_d _S_y_s_t_e_m. In this case, the system configuration file
+       _s_y_s_._c_o_n_f_i_g is mandatory.
+
+       The installation of a new release may restart the system. Which program
+       to use is specified by the SASL configuration parameter _s_t_a_r_t___p_r_g which
+       defaults to _$_R_O_O_T_/_b_i_n_/_s_t_a_r_t.
+
+       The emulator restart on Windows NT expects that the system is started
+       using the _e_r_l_s_r_v program (as a service). Furthermore the release
+       handler expects that the service is named _N_o_d_e_N_a_m_e__R_e_l_e_a_s_e, where
+       _N_o_d_e_N_a_m_e is the first part of the Erlang nodename (up to, but not
+       including the "@") and _R_e_l_e_a_s_e is the current version of the release.
+       The release handler furthermore expects that a program like
+       _s_t_a_r_t___e_r_l_._e_x_e is specified as "machine" to _e_r_l_s_r_v. During upgrading
+       with restart, a new service will be registered and started. The new
+       service will be set to automatic and the old service removed as soon as
+       the new release is made permanent.
+
+       The release handler at a node which runs on a diskless machine, or with
+       a read-only file system, must be configured accordingly using the
+       following _s_a_s_l configuration parameters (see ssaassll((66)) for details):
+
+         _m_a_s_t_e_r_s:
+           This node uses a number of master nodes in order to store and fetch
+           release information. All master nodes must be up and running
+           whenever release information is written by this node.
+
+         _c_l_i_e_n_t___d_i_r_e_c_t_o_r_y:
+           The _c_l_i_e_n_t___d_i_r_e_c_t_o_r_y in the directory structure of the master nodes
+           must be specified.
+
+         _s_t_a_t_i_c___e_m_u_l_a_t_o_r:
+           This parameter specifies if the Erlang emulator is statically
+           installed at the client node. A node with a static emulator cannot
+           dynamically switch to a new emulator because the executable files
+           are statically written into memory.
+
+       It is also possible to use the release handler to unpack and install
+       release packages when not running Erlang as an embedded system, but in
+       this case the user must somehow make sure that correct boot scripts and
+       configuration files are used if the system needs to be restarted.
+
+       There are additional functions for using another file structure than
+       the structure defined in OTP. These functions can be used to test a
+       release upgrade locally.
+
+EEXXPPOORRTTSS
+       cchheecckk__iinnssttaallll__rreelleeaassee((VVssnn)) -->> {{ookk,, OOtthheerrVVssnn,, DDeessccrr}} || {{eerrrroorr,, RReeaassoonn}}
+       cchheecckk__iinnssttaallll__rreelleeaassee((VVssnn,,OOppttss)) -->> {{ookk,, OOtthheerrVVssnn,, DDeessccrr}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Vsn = OtherVsn = string()
+                 Opts = [Opt]
+                 Opt = purge
+                 Descr = term()
+                 Reason = term()
+
+              Checks if the specified version _V_s_n of the release can be
+              installed. The release must not have status _c_u_r_r_e_n_t. Issues
+              warnings if _r_e_l_u_p or _s_y_s_._c_o_n_f_i_g are not present. If _r_e_l_u_p is
+              present, its contents are checked and _{_e_r_r_o_r_,_R_e_a_s_o_n_} is returned
+              if an error is found. Also checks that all required applications
+              are present and that all new code can be loaded, or
+              _{_e_r_r_o_r_,_R_e_a_s_o_n_} is returned.
+
+              This function evaluates all instructions that occur before the
+              _p_o_i_n_t___o_f___n_o___r_e_t_u_r_n instruction in the release upgrade script.
+
+              Returns the same as _i_n_s_t_a_l_l___r_e_l_e_a_s_e_/_1. _D_e_s_c_r defaults to "" if
+              no _r_e_l_u_p file is found.
+
+              If the option _p_u_r_g_e is given, all old code that can be soft
+              purged will be purged after all other checks are successfully
+              completed. This can be useful in order to reduce the time needed
+              by iinnssttaallll__rreelleeaassee.
+
+       ccrreeaattee__RREELLEEAASSEESS((RRoooott,, RReellDDiirr,, RReellFFiillee,, AAppppDDiirrss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Root = RelDir = RelFile = string()
+                 AppDirs = [{App, Vsn, Dir}]
+                  App = atom()
+                  Vsn = Dir = string()
+                 Reason = term()
+
+              Creates an initial RELEASES file to be used by the release
+              handler. This file must exist in order to install new releases.
+
+              _R_o_o_t is the root of the installation (_$_R_O_O_T) as described above.
+              _R_e_l_D_i_r is the the directory where the _R_E_L_E_A_S_E_S file should be
+              created (normally _$_R_O_O_T_/_r_e_l_e_a_s_e_s). _R_e_l_F_i_l_e is the name of the
+              _._r_e_l file that describes the initial release, including the
+              extension _._r_e_l.
+
+              _A_p_p_D_i_r_s can be used to specify from where the modules for the
+              specified applications should be loaded. _A_p_p is the name of an
+              application, _V_s_n is the version, and _D_i_r is the name of the
+              directory where _A_p_p_-_V_s_n is located. The corresponding modules
+              should be located under _D_i_r_/_A_p_p_-_V_s_n_/_e_b_i_n. The directories for
+              applications not specified in _A_p_p_D_i_r_s are assumed to be located
+              in _$_R_O_O_T_/_l_i_b.
+
+       iinnssttaallll__ffiillee((VVssnn,, FFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = File = string()
+                 Reason = term()
+
+              Installs a release dependent file in the release structure. A
+              release dependent file is a file that must be in the release
+              structure when a new release is installed: _s_t_a_r_t_._b_o_o_t, _r_e_l_u_p and
+              _s_y_s_._c_o_n_f_i_g.
+
+              The function can be called, for example, when these files are
+              generated at the target. It should be called after
+              _s_e_t___u_n_p_a_c_k_e_d_/_2 has been called.
+
+       iinnssttaallll__rreelleeaassee((VVssnn)) -->> {{ookk,, OOtthheerrVVssnn,, DDeessccrr}} || {{eerrrroorr,, RReeaassoonn}}
+       iinnssttaallll__rreelleeaassee((VVssnn,, [[OOpptt]])) -->> {{ookk,, OOtthheerrVVssnn,, DDeessccrr}} ||
+       {{ccoonnttiinnuuee__aafftteerr__rreessttaarrtt,, OOtthheerrVVssnn,, DDeessccrr}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = OtherVsn = string()
+                 Opt = {error_action, Action} | {code_change_timeout, Timeout}
+                  | {suspend_timeout, Timeout} | {update_paths, Bool}
+                  Action = restart | reboot
+                  Timeout = default | infinity | int()>0
+                  Bool = boolean()
+                 Descr = term()
+                 Reason = {illegal_option, Opt} | {already_installed, Vsn} |
+                 {change_appl_data, term()} | {missing_base_app, OtherVsn,
+                 App} | {could_not_create_hybrid_boot, term()} | term()
+                 App = atom()
+
+              Installs the specified version _V_s_n of the release. Looks first
+              for a _r_e_l_u_p file for _V_s_n and a script
+              _{_U_p_F_r_o_m_V_s_n_,_D_e_s_c_r_1_,_I_n_s_t_r_u_c_t_i_o_n_s_1_} in this file for upgrading from
+              the current version. If not found, the function looks for a
+              _r_e_l_u_p file for the current version and a script
+              _{_V_s_n_,_D_e_s_c_r_2_,_I_n_s_t_r_u_c_t_i_o_n_s_2_} in this file for downgrading to _V_s_n.
+
+              If a script is found, the first thing that happens is that the
+              applications specifications are updated according to the _._a_p_p
+              files and _s_y_s_._c_o_n_f_i_g belonging to the release version _V_s_n.
+
+              After the application specifications have been updated, the
+              instructions in the script are evaluated and the function
+              returns _{_o_k_,_O_t_h_e_r_V_s_n_,_D_e_s_c_r_} if successful. _O_t_h_e_r_V_s_n and _D_e_s_c_r
+              are the version (_U_p_F_r_o_m_V_s_n or _V_s_n) and description (_D_e_s_c_r_1 or
+              _D_e_s_c_r_2) as specified in the script.
+
+              If _{_c_o_n_t_i_n_u_e___a_f_t_e_r___r_e_s_t_a_r_t_,_O_t_h_e_r_V_s_n_,_D_e_s_c_r_} is returned, it means
+              that the emulator will be restarted before the upgrade
+              instructions are executed. This will happen if the emulator or
+              any of the applications kernel, stdlib or sasl are updated. The
+              new version of the emulator and these core applications will
+              execute after the restart, but for all other applications the
+              old versions will be started and the upgrade will be performed
+              as normal by executing the upgrade instructions.
+
+              If a recoverable error occurs, the function returns
+              _{_e_r_r_o_r_,_R_e_a_s_o_n_} and the original application specifications are
+              restored. If a non-recoverable error occurs, the system is
+              restarted.
+
+              The option _e_r_r_o_r___a_c_t_i_o_n defines if the node should be restarted
+              (_i_n_i_t_:_r_e_s_t_a_r_t_(_)) or rebooted (_i_n_i_t_:_r_e_b_o_o_t_(_)) in case of an error
+              during the installation. Default is _r_e_s_t_a_r_t.
+
+              The option _c_o_d_e___c_h_a_n_g_e___t_i_m_e_o_u_t defines the timeout for all calls
+              to _s_y_s_:_c_h_a_n_g_e___c_o_d_e. If no value is specified or _d_e_f_a_u_l_t is
+              given, the default value defined in _s_y_s is used.
+
+              The option _s_u_s_p_e_n_d___t_i_m_e_o_u_t defines the timeout for all calls to
+              _s_y_s_:_s_u_s_p_e_n_d. If no value is specified, the values defined by the
+              _T_i_m_e_o_u_t parameter of the _u_p_g_r_a_d_e or _s_u_s_p_e_n_d instructions are
+              used. If _d_e_f_a_u_l_t is specified, the default value defined in _s_y_s
+              is used.
+
+              The option _{_u_p_d_a_t_e___p_a_t_h_s_,_B_o_o_l_} indicates if all application code
+              paths should be updated (_B_o_o_l_=_=_t_r_u_e), or if only code paths for
+              modified applications should be updated (_B_o_o_l_=_=_f_a_l_s_e, default).
+              This option only has effect for other application directories
+              than the default _$_R_O_O_T_/_l_i_b_/_A_p_p_-_V_s_n, that is, application
+              directories provided in the _A_p_p_D_i_r_s argument in a call to
+              _c_r_e_a_t_e___R_E_L_E_A_S_E_S_/_4 or _s_e_t___u_n_p_a_c_k_e_d_/_2.
+
+              Example: In the current version _C_u_r_V_s_n of a release, the
+              application directory of _m_y_a_p_p is _$_R_O_O_T_/_l_i_b_/_m_y_a_p_p_-_1_._0. A new
+              version _N_e_w_V_s_n is unpacked outside the release handler, and the
+              release handler is informed about this with a call to:
+
+              release_handler:set_unpacked(RelFile, [{myapp,"1.0","/home/user"},...]).
+              => {ok,NewVsn}
+
+
+              If _N_e_w_V_s_n is installed with the option _{_u_p_d_a_t_e___p_a_t_h_s_,_t_r_u_e_},
+              afterwards _c_o_d_e_:_l_i_b___d_i_r_(_m_y_a_p_p_) will return _/_h_o_m_e_/_u_s_e_r_/_m_y_a_p_p_-_1_._0.
+
+          NNoottee::
+              Installing a new release might be quite time consuming if there
+              are many processes in the system. The reason is that each
+              process must be checked for references to old code before a
+              module can be purged. This check might lead to garbage
+              collections and copying of data.
+
+              If you wish to speed up the execution of _i_n_s_t_a_l_l___r_e_l_e_a_s_e, then
+              you may call cchheecckk__iinnssttaallll__rreelleeaassee first, using the option
+              _p_u_r_g_e. This will do the same check for old code, and then purge
+              all modules that can be soft purged. The purged modules will
+              then no longer have any old code, and _i_n_s_t_a_l_l___r_e_l_e_a_s_e will not
+              need to do the checks.
+
+              Obviously, this will not reduce the overall time for the
+              upgrade, but it will allow checks and purge to be executed in
+              the background before the real upgrade is started.
+
+
+          NNoottee::
+              When upgrading the emulator from a version older than OTP R15,
+              there will be an attempt to load new application beam code into
+              the old emulator. In some cases, the new beam format can not be
+              read by the old emulator, and so the code loading will fail and
+              terminate the complete upgrade. To overcome this problem, the
+              new application code should be compiled with the old emulator.
+              See DDeessiiggnn PPrriinncciipplleess for more information about emulator
+              upgrade from pre OTP R15 versions.
+
+
+       mmaakkee__ppeerrmmaanneenntt((VVssnn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = string()
+                 Reason = {bad_status, Status} | term()
+
+              Makes the specified version _V_s_n of the release permanent.
+
+       rreemmoovvee__rreelleeaassee((VVssnn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = string()
+                 Reason = {permanent, Vsn} | client_node | term()
+
+              Removes a release and its files from the system. The release
+              must not be the permanent release. Removes only the files and
+              directories not in use by another release.
+
+       rreebboooott__oolldd__rreelleeaassee((VVssnn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = string()
+                 Reason = {bad_status, Status} | term()
+
+              Reboots the system by making the old release permanent, and
+              calls _i_n_i_t_:_r_e_b_o_o_t_(_) directly. The release must have status _o_l_d.
+
+       sseett__rreemmoovveedd((VVssnn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = string()
+                 Reason = {permanent, Vsn} | term()
+
+              Makes it possible to handle removal of releases outside the
+              release handler. Tells the release handler that the release is
+              removed from the system. This function does not delete any
+              files.
+
+       sseett__uunnppaacckkeedd((RReellFFiillee,, AAppppDDiirrss)) -->> {{ookk,, VVssnn}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 RelFile = string()
+                 AppDirs = [{App, Vsn, Dir}]
+                  App = atom()
+                  Vsn = Dir = string()
+                 Reason = term()
+
+              Makes it possible to handle unpacking of releases outside the
+              release handler. Tells the release handler that the release is
+              unpacked. _V_s_n is extracted from the release resource file
+              _R_e_l_F_i_l_e.
+
+              _A_p_p_D_i_r_s can be used to specify from where the modules for the
+              specified applications should be loaded. _A_p_p is the name of an
+              application, _V_s_n is the version, and _D_i_r is the name of the
+              directory where _A_p_p_-_V_s_n is located. The corresponding modules
+              should be located under _D_i_r_/_A_p_p_-_V_s_n_/_e_b_i_n. The directories for
+              applications not specified in _A_p_p_D_i_r_s are assumed to be located
+              in _$_R_O_O_T_/_l_i_b.
+
+       uunnppaacckk__rreelleeaassee((NNaammee)) -->> {{ookk,, VVssnn}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = Vsn = string()
+                 Reason = client_node | term()
+
+              Unpacks a release package _N_a_m_e_._t_a_r_._g_z located in the _r_e_l_e_a_s_e_s
+              directory.
+
+              Performs some checks on the package - for example checks that
+              all mandatory files are present - and extracts its contents.
+
+       wwhhiicchh__rreelleeaasseess(()) -->> [[{{NNaammee,, VVssnn,, AAppppss,, SSttaattuuss}}]]
+
+              Types:
+
+                 Name = Vsn = string()
+                 Apps = ["App-Vsn"]
+                 Status = unpacked | current | permanent | old
+
+              Returns all releases known to the release handler.
+
+       wwhhiicchh__rreelleeaasseess((SSttaattuuss)) -->> [[{{NNaammee,, VVssnn,, AAppppss,, SSttaattuuss}}]]
+
+              Types:
+
+                 Name = Vsn = string()
+                 Apps = ["App-Vsn"]
+                 Status = unpacked | current | permanent | old
+
+              Returns all releases known to the release handler of a specific
+              status.
+
+AAPPPPLLIICCAATTIIOONN UUPPGGRRAADDEE//DDOOWWNNGGRRAADDEE
+       The following functions can be used to test upgrade and downgrade of
+       single applications (instead of upgrading/downgrading an entire
+       release). A script corresponding to _r_e_l_u_p is created on-the-fly, based
+       on the _._a_p_p_u_p file for the application, and evaluated exactly in the
+       same way as _r_e_l_e_a_s_e___h_a_n_d_l_e_r does.
+
+   WWaarrnniinngg::
+       These functions are primarily intended for simplified testing of _._a_p_p_u_p
+       files. They are not run within the context of the _r_e_l_e_a_s_e___h_a_n_d_l_e_r
+       process. They must therefore _n_o_t be used together with calls to
+       _i_n_s_t_a_l_l___r_e_l_e_a_s_e_/_1_,_2, as this will cause _r_e_l_e_a_s_e___h_a_n_d_l_e_r to end up in an
+       inconsistent state.
+
+       No persistent information is updated, why these functions can be used
+       on any Erlang node, embedded or not. Also, using these functions does
+       not affect which code will be loaded in case of a reboot.
+
+       If the upgrade or downgrade fails, the application may end up in an
+       inconsistent state.
+
+
+EEXXPPOORRTTSS
+       uuppggrraaddee__aapppp((AApppp,, DDiirr)) -->> {{ookk,, UUnnppuurrggeedd}} || rreessttaarrtt__eemmuullaattoorr || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 App = atom()
+                 Dir = string()
+                 Unpurged = [Module]
+                  Module = atom()
+                 Reason = term()
+
+              Upgrades an application _A_p_p from the current version to a new
+              version located in _D_i_r according to the _._a_p_p_u_p script.
+
+              _A_p_p is the name of the application, which must be started. _D_i_r
+              is the new library directory of _A_p_p, the corresponding modules
+              as well as the _._a_p_p and _._a_p_p_u_p files should be located under
+              _D_i_r_/_e_b_i_n.
+
+              The function looks in the _._a_p_p_u_p file and tries to find an
+              upgrade script from the current version of the application using
+              uuppggrraaddee__ssccrriipptt//22. This script is evaluated using
+              eevvaall__aappppuupp__ssccrriipptt//44, exactly in the same way as
+              iinnssttaallll__rreelleeaassee//11,,22 does.
+
+              Returns _{_o_k_, _U_n_p_u_r_g_e_d_} if evaluating the script is successful,
+              where _U_n_p_u_r_g_e_d is a list of unpurged modules, or
+              _r_e_s_t_a_r_t___e_m_u_l_a_t_o_r if this instruction is encountered in the
+              script, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an error occurred when finding or
+              evaluating the script.
+
+              If the _r_e_s_t_a_r_t___n_e_w___e_m_u_l_a_t_o_r instruction is found in the script,
+              _u_p_g_r_a_d_e___a_p_p_/_2 will return _{_e_r_r_o_r_,_r_e_s_t_a_r_t___n_e_w___e_m_u_l_a_t_o_r_}. The
+              reason for this is that this instruction requires that a new
+              version of the emulator is started before the rest of the
+              upgrade instructions can be executed, and this can only be done
+              by _i_n_s_t_a_l_l___r_e_l_e_a_s_e_/_1_,_2.
+
+       ddoowwnnggrraaddee__aapppp((AApppp,, DDiirr)) -->>
+       ddoowwnnggrraaddee__aapppp((AApppp,, OOllddVVssnn,, DDiirr)) -->> {{ookk,, UUnnppuurrggeedd}} || rreessttaarrtt__eemmuullaattoorr ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 App = atom()
+                 Dir = OldVsn = string()
+                 Unpurged = [Module]
+                  Module = atom()
+                 Reason = term()
+
+              Downgrades an application _A_p_p from the current version to a
+              previous version _O_l_d_V_s_n located in _D_i_r according to the _._a_p_p_u_p
+              script.
+
+              _A_p_p is the name of the application, which must be started.
+              _O_l_d_V_s_n is the previous version of the application and can be
+              omitted if _D_i_r is of the format _"_A_p_p_-_O_l_d_V_s_n_". _D_i_r is the library
+              directory of this previous version of _A_p_p, the corresponding
+              modules as well as the old _._a_p_p file should be located under
+              _D_i_r_/_e_b_i_n. The _._a_p_p_u_p file should be located in the _e_b_i_n
+              directory of the _c_u_r_r_e_n_t library directory of the application
+              (_c_o_d_e_:_l_i_b___d_i_r_(_A_p_p_)).
+
+              The function looks in the _._a_p_p_u_p file and tries to find an
+              downgrade script to the previous version of the application
+              using ddoowwnnggrraaddee__ssccrriipptt//33. This script is evaluated using
+              eevvaall__aappppuupp__ssccrriipptt//44, exactly in the same way as
+              iinnssttaallll__rreelleeaassee//11,,22 does.
+
+              Returns _{_o_k_, _U_n_p_u_r_g_e_d_} if evaluating the script is successful,
+              where _U_n_p_u_r_g_e_d is a list of unpurged modules, or
+              _r_e_s_t_a_r_t___e_m_u_l_a_t_o_r if this instruction is encountered in the
+              script, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an error occurred when finding or
+              evaluating the script.
+
+       uuppggrraaddee__ssccrriipptt((AApppp,, DDiirr)) -->> {{ookk,, NNeewwVVssnn,, SSccrriipptt}}
+
+              Types:
+
+                 App = atom()
+                 Dir = string()
+                 NewVsn = string()
+                 Script = Instructions -- see appup(4)
+
+              Tries to find an application upgrade script for _A_p_p from the
+              current version to a new version located in _D_i_r.
+
+              The upgrade script can then be evaluated using
+              eevvaall__aappppuupp__ssccrriipptt//44. It is recommended to use uuppggrraaddee__aapppp//22
+              instead, but this function is useful in order to inspect the
+              contents of the script.
+
+              _A_p_p is the name of the application, which must be started. _D_i_r
+              is the new library directory of _A_p_p, the corresponding modules
+              as well as the _._a_p_p and _._a_p_p_u_p files should be located under
+              _D_i_r_/_e_b_i_n.
+
+              The function looks in the _._a_p_p_u_p file and tries to find an
+              upgrade script from the current version of the application.
+              High-level instructions are translated to low-level instructions
+              and the instructions are sorted in the same manner as when
+              generating a _r_e_l_u_p script.
+
+              Returns _{_o_k_, _N_e_w_V_s_n_, _S_c_r_i_p_t_} if successful, where _N_e_w_V_s_n is the
+              new application version.
+
+              Failure: If a script cannot be found, the function fails with an
+              appropriate error reason.
+
+       ddoowwnnggrraaddee__ssccrriipptt((AApppp,, OOllddVVssnn,, DDiirr)) -->> {{ookk,, SSccrriipptt}}
+
+              Types:
+
+                 App = atom()
+                 OldVsn = Dir = string()
+                 Script = Instructions -- see appup(4)
+
+              Tries to find an application downgrade script for _A_p_p from the
+              current version to a previous version _O_l_d_V_s_n located in _D_i_r.
+
+              The downgrade script can then be evaluated using
+              eevvaall__aappppuupp__ssccrriipptt//44. It is recommended to use ddoowwnnggrraaddee__aapppp//22,,33
+              instead, but this function is useful in order to inspect the
+              contents of the script.
+
+              _A_p_p is the name of the application, which must be started. _D_i_r
+              is the previous library directory of _A_p_p, the corresponding
+              modules as well as the old _._a_p_p file should be located under
+              _D_i_r_/_e_b_i_n. The _._a_p_p_u_p file should be located in the _e_b_i_n
+              directory of the _c_u_r_r_e_n_t library directory of the application
+              (_c_o_d_e_:_l_i_b___d_i_r_(_A_p_p_)).
+
+              The function looks in the _._a_p_p_u_p file and tries to find an
+              downgrade script from the current version of the application.
+              High-level instructions are translated to low-level instructions
+              and the instructions are sorted in the same manner as when
+              generating a _r_e_l_u_p script.
+
+              Returns _{_o_k_, _S_c_r_i_p_t_} if successful.
+
+              Failure: If a script cannot be found, the function fails with an
+              appropriate error reason.
+
+       eevvaall__aappppuupp__ssccrriipptt((AApppp,, TTooVVssnn,, TTooDDiirr,, SSccrriipptt)) -->> {{ookk,, UUnnppuurrggeedd}} ||
+       rreessttaarrtt__eemmuullaattoorr || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 App = atom()
+                 ToVsn = ToDir = string()
+                 Script -- see upgrade_script/2, downgrade_script/3
+                 Unpurged = [Module]
+                  Module = atom()
+                 Reason = term()
+
+              Evaluates an application upgrade or downgrade script _S_c_r_i_p_t, the
+              result from calling uuppggrraaddee__ssccrriipptt//22 or ddoowwnnggrraaddee__ssccrriipptt//33,
+              exactly in the same way as iinnssttaallll__rreelleeaassee//11,,22 does.
+
+              _A_p_p is the name of the application, which must be started. _T_o_V_s_n
+              is the version to be upgraded/downgraded to, and _T_o_D_i_r is the
+              library directory of this version. The corresponding modules as
+              well as the _._a_p_p and _._a_p_p_u_p files should be located under
+              _D_i_r_/_e_b_i_n.
+
+              Returns _{_o_k_, _U_n_p_u_r_g_e_d_} if evaluating the script is successful,
+              where _U_n_p_u_r_g_e_d is a list of unpurged modules, or
+              _r_e_s_t_a_r_t___e_m_u_l_a_t_o_r if this instruction is encountered in the
+              script, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an error occurred when evaluating
+              the script.
+
+              If the _r_e_s_t_a_r_t___n_e_w___e_m_u_l_a_t_o_r instruction is found in the script,
+              _e_v_a_l___a_p_p_u_p___s_c_r_i_p_t_/_4 will return _{_e_r_r_o_r_,_r_e_s_t_a_r_t___n_e_w___e_m_u_l_a_t_o_r_}.
+              The reason for this is that this instruction requires that a new
+              version of the emulator is started before the rest of the
+              upgrade instructions can be executed, and this can only be done
+              by _i_n_s_t_a_l_l___r_e_l_e_a_s_e_/_1_,_2.
+
+TTYYPPIICCAALL EERRRROORR RREEAASSOONNSS
+         * _{_b_a_d___m_a_s_t_e_r_s_, _M_a_s_t_e_r_s_} - The master nodes _M_a_s_t_e_r_s are not alive.
+
+         * _{_b_a_d___r_e_l___f_i_l_e_, _F_i_l_e_} - Specified _._r_e_l file _F_i_l_e can not be read, or
+           does not contain a single term.
+
+         * _{_b_a_d___r_e_l___d_a_t_a_, _D_a_t_a_} - Specified _._r_e_l file does not contain a
+           recognized release specification, but another term _D_a_t_a.
+
+         * _{_b_a_d___r_e_l_u_p___f_i_l_e_, _F_i_l_e_} - Specified _r_e_l_u_p file _R_e_l_u_p contains bad
+           data.
+
+         * _{_c_a_n_n_o_t___e_x_t_r_a_c_t___f_i_l_e_, _N_a_m_e_, _R_e_a_s_o_n_} - Problems when extracting from
+           a tar file, _e_r_l___t_a_r_:_e_x_t_r_a_c_t_/_2 returned _{_e_r_r_o_r_, _{_N_a_m_e_, _R_e_a_s_o_n_}_}.
+
+         * _{_e_x_i_s_t_i_n_g___r_e_l_e_a_s_e_, _V_s_n_} - Specified release version _V_s_n is already
+           in use.
+
+         * _{_M_a_s_t_e_r_, _R_e_a_s_o_n_, _W_h_e_n_} - Some operation, indicated by the term
+           _W_h_e_n, failed on the master node _M_a_s_t_e_r with the specified error
+           reason _R_e_a_s_o_n.
+
+         * _{_n_o___m_a_t_c_h_i_n_g___r_e_l_u_p_, _V_s_n_, _C_u_r_r_e_n_t_V_s_n_} - Cannot find a script for
+           up/downgrading between _C_u_r_r_e_n_t_V_s_n and _V_s_n.
+
+         * _{_n_o___s_u_c_h___d_i_r_e_c_t_o_r_y_, _P_a_t_h_} - The directory _P_a_t_h does not exist.
+
+         * _{_n_o___s_u_c_h___f_i_l_e_, _P_a_t_h_} - The path _P_a_t_h (file or directory) does not
+           exist.
+
+         * _{_n_o___s_u_c_h___f_i_l_e_, _{_M_a_s_t_e_r_, _P_a_t_h_}_} - The path _P_a_t_h (file or directory)
+           does not exist at the master node _M_a_s_t_e_r.
+
+         * _{_n_o___s_u_c_h___r_e_l_e_a_s_e_, _V_s_n_} - The specified version _V_s_n of the release
+           does not exist.
+
+         * _{_n_o_t___a___d_i_r_e_c_t_o_r_y_, _P_a_t_h_} - _P_a_t_h exists, but is not a directory.
+
+         * _{_P_o_s_i_x_, _F_i_l_e_} - Some file operation failed for _F_i_l_e. _P_o_s_i_x is an
+           atom named from the Posix error codes, such as _e_n_o_e_n_t, _e_a_c_c_e_s or
+           _e_i_s_d_i_r. See _f_i_l_e_(_3_).
+
+         * _P_o_s_i_x - Some file operation failed, as above.
+
+SSEEEE AALLSSOO
+       OOTTPP DDeessiiggnn PPrriinncciipplleess, ccoonnffiigg((44)), rreelluupp((44)), rreell((44)), ssccrriipptt((44)), ssyyss((33)),
+       ssyyssttoooollss((33))
+
+
+
+Ericsson AB                       sasl 2.2.1                release_handler(3)

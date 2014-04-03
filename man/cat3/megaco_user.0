@@ -1,0 +1,582 @@
+megaco_user(3)             Erlang Module Definition             megaco_user(3)
+
+
+
+NNAAMMEE
+       megaco_user - Callback module for users of the Megaco application
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the callback behaviour of Megaco users. A
+       megaco_user compliant callback module must export the following
+       functions:
+
+         * hhaannddllee__ccoonnnneecctt//22,,33
+
+         * hhaannddllee__ddiissccoonnnneecctt//33
+
+         * hhaannddllee__ssyynnttaaxx__eerrrroorr//33,,44
+
+         * hhaannddllee__mmeessssaaggee__eerrrroorr//33,,44
+
+         * hhaannddllee__ttrraannss__rreeqquueesstt//33,,44
+
+         * hhaannddllee__ttrraannss__lloonngg__rreeqquueesstt//33,,44
+
+         * hhaannddllee__ttrraannss__rreeppllyy//44,,55
+
+         * hhaannddllee__ttrraannss__aacckk//44,,55
+
+         * hhaannddllee__uunneexxppeecctteedd__ttrraannss//33,,44
+
+         * hhaannddllee__ttrraannss__rreeqquueesstt__aabboorrtt//44,,55
+
+         * hhaannddllee__sseeggmmeenntt__rreeppllyy//55,,66
+
+       The semantics of them and their exact signatures are explained below.
+
+       The _u_s_e_r___a_r_g_s configuration parameter which may be used to extend the
+       argument list of the callback functions. For example, the
+       handle_connect function takes by default two arguments:
+
+               handle_connect(Handle, Version)
+
+
+       but if the _u_s_e_r___a_r_g_s parameter is set to a longer list, such as
+       _[_S_o_m_e_P_i_d_,_S_o_m_e_T_a_b_l_e_R_e_f_], the callback function is expected to have these
+       (in this case two) extra arguments last in the argument list:
+
+               handle_connect(Handle, Version, SomePid, SomeTableRef)
+
+
+   NNoottee::
+       Must of the functions below has an optional _E_x_t_r_a argument (e.g.
+       hhaannddllee__uunneexxppeecctteedd__ttrraannss//44). The functions which takes this argument
+       will be called if and only if one of the functions rreecceeiivvee__mmeessssaaggee//55 or
+       pprroocceessss__rreecceeiivveedd__mmeessssaaggee//55 was called with the _E_x_t_r_a argument different
+       than _i_g_n_o_r_e___e_x_t_r_a.
+
+
+DDAATTAA TTYYPPEESS
+       action_request() = #'ActionRequest'{}
+       action_reply() = #'ActionReply'{}
+       error_desc() = #'ErrorDescriptor'{}
+       segment_no() = integer()
+
+
+       conn_handle() = #megaco_conn_handle{}
+
+       The record initially returned by _m_e_g_a_c_o_:_c_o_n_n_e_c_t_/_4_,_5. It identifies a
+       "virtual" connection and may be reused after a reconnect (disconnect +
+       connect).
+
+       protocol_version() = integer()
+
+       Is the actual protocol version. In most cases the protocol version is
+       retrieved from the processed message, but there are exceptions:
+
+         * When _h_a_n_d_l_e___c_o_n_n_e_c_t_/_2_,_3 is triggered by an explicit call to
+           _m_e_g_a_c_o_:_c_o_n_n_e_c_t_/_4_,_5.
+
+         * _h_a_n_d_l_e___d_i_s_c_o_n_n_e_c_t_/_3
+
+         * _h_a_n_d_l_e___s_y_n_t_a_x___e_r_r_o_r_/_3
+
+       In these cases, the ProtocolVersion default version is obtained from
+       the static connection configuration:
+
+         * _m_e_g_a_c_o_:_c_o_n_n___i_n_f_o_(_C_o_n_n_H_a_n_d_l_e_, _p_r_o_t_o_c_o_l___v_e_r_s_i_o_n_).
+
+EEXXPPOORRTTSS
+       hhaannddllee__ccoonnnneecctt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn)) -->> ookk || eerrrroorr ||
+       {{eerrrroorr,,EErrrroorrDDeessccrr}}
+       hhaannddllee__ccoonnnneecctt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, EExxttrraa]])) -->> ookk || eerrrroorr ||
+       {{eerrrroorr,,EErrrroorrDDeessccrr}}
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 ErrorDescr = error_desc()
+                 Extra = term()
+
+              Invoked when a new connection is established
+
+              Connections may either be established by an explicit call to
+              megaco:connect/4 or implicitly at the first invocation of
+              megaco:receive_message/3.
+
+              Normally a Media Gateway (MG) connects explicitly while a Media
+              Gateway Controller (MGC) connects implicitly.
+
+              At the Media Gateway Controller (MGC) side it is possible to
+              reject a connection request (and send a message error reply to
+              the gateway) by returning _{_e_r_r_o_r_, _E_r_r_o_r_D_e_s_c_r_} or simply _e_r_r_o_r
+              which generates an error descriptor with code 402 (unauthorized)
+              and reason "Connection refused by user" (this is also the case
+              for all unknown results, such as exit signals or throw).
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___m_e_s_s_a_g_e___e_r_r_o_r_/_4.
+
+              _h_a_n_d_l_e___c_o_n_n_e_c_t_/_3 (with _E_x_t_r_a) can also be called as a result of
+              a call to the mmeeggaaccoo::ccoonnnneecctt//55 function (if that function is
+              called with the _E_x_t_r_a argument different than _i_g_n_o_r_e___e_x_t_r_a.
+
+       hhaannddllee__ddiissccoonnnneecctt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, RReeaassoonn)) -->> ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 Reason = term()
+
+              Invoked when a connection is teared down
+
+              The disconnect may either be made explicitly by a call to
+              megaco:disconnect/2 or implicitly when the control process of
+              the connection dies.
+
+       hhaannddllee__ssyynnttaaxx__eerrrroorr((RReecceeiivveeHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, DDeeffaauullttEEDD)) -->> rreeppllyy
+       || {{rreeppllyy,, EEDD}} || nnoo__rreeppllyy || {{nnoo__rreeppllyy,, EEDD}}
+       hhaannddllee__ssyynnttaaxx__eerrrroorr((RReecceeiivveeHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, DDeeffaauullttEEDD,, EExxttrraa))
+       -->> rreeppllyy || {{rreeppllyy,, EEDD}} || nnoo__rreeppllyy || {{nnoo__rreeppllyy,, EEDD}}
+
+              Types:
+
+                 ReceiveHandle = receive_handle()
+                 ProtocolVersion = protocol_version()
+                 DefaultED = error_desc()
+                 ED = error_desc()
+                 Extra = term()
+
+              Invoked when a received message had syntax errors
+
+              Incoming messages is delivered by megaco:receive_message/4 and
+              normally decoded successfully. But if the decoding failed this
+              function is called in order to decide if the originator should
+              get a reply message (reply) or if the reply silently should be
+              discarded (no_reply).
+
+              Syntax errors are detected locally on this side of the protocol
+              and may have many causes, e.g. a malfunctioning transport layer,
+              wrong encoder/decoder selected, bad configuration of the
+              selected encoder/decoder etc.
+
+              The error descriptor defaults to _D_e_f_a_u_l_t_E_D, but can be
+              overridden with an alternate one by returning _{_r_e_p_l_y_,_E_D_} or
+              _{_n_o___r_e_p_l_y_,_E_D_} instead of _r_e_p_l_y and _n_o___r_e_p_l_y respectively.
+
+              Any other return values (including exit signals or throw) and
+              the _D_e_f_a_u_l_t_E_D will be used.
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___s_y_n_t_a_x___e_r_r_o_r_/_4.
+
+       hhaannddllee__mmeessssaaggee__eerrrroorr((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, EErrrroorrDDeessccrr)) -->> ookk
+       hhaannddllee__mmeessssaaggee__eerrrroorr((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, EErrrroorrDDeessccrr,, EExxttrraa)) -->>
+       ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 ErrorDescr = error_desc()
+                 Extra = term()
+
+              Invoked when a received message just contains an error instead
+              of a list of transactions.
+
+              Incoming messages is delivered by megaco:receive_message/4 and
+              successfully decoded. Normally a message contains a list of
+              transactions, but it may instead contain an ErrorDescriptor on
+              top level of the message.
+
+              Message errors are detected remotely on the other side of the
+              protocol. And you probably don't want to reply to it, but it may
+              indicate that you have outstanding transactions that not will
+              get any response (request -> reply; reply -> ack).
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___m_e_s_s_a_g_e___e_r_r_o_r_/_4.
+
+       hhaannddllee__ttrraannss__rreeqquueesstt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, AAccttiioonnRReeqquueessttss)) -->>
+       ppeennddiinngg(()) || rreeppllyy(()) || iiggnnoorree__ttrraannss__rreeqquueesstt
+       hhaannddllee__ttrraannss__rreeqquueesstt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, AAccttiioonnRReeqquueessttss,,
+       EExxttrraa)) -->> ppeennddiinngg(()) || rreeppllyy(()) || iiggnnoorree__ttrraannss__rreeqquueesstt
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 ActionRequests = [action_request()]
+                 Extra = term()
+                 pending() = {pending, req_data()}
+                 req_data() = term()
+                 reply() = {ack_action(), actual_reply()} | {ack_action(),
+                 actual_reply(), send_options()}
+                 ack_action() = discard_ack | {handle_ack, ack_data()} |
+                 {handle_pending_ack, ack_data()} | {handle_sloppy_ack,
+                 ack_data()}
+                 actual_reply() = [action_reply()] | error_desc()
+                 ack_data() = term()
+                 send_options() = [send_option()]
+                 send_option() = {reply_timer, megaco_timer()} | {send_handle,
+                 term()} | {protocol_version, integer()}
+                 Extra = term()
+
+              Invoked for each transaction request
+
+              Incoming messages is delivered by megaco:receive_message/4 and
+              successfully decoded. Normally a message contains a list of
+              transactions and this function is invoked for each
+              TransactionRequest in the message.
+
+              This function takes a list of 'ActionRequest' records and has
+              three main options:
+
+                _R_e_t_u_r_n _i_g_n_o_r_e___t_r_a_n_s___r_e_q_u_e_s_t:
+                  Decide that these action requests shall be ignored
+                  completely.
+
+                _R_e_t_u_r_n _p_e_n_d_i_n_g_(_):
+                  Decide that the processing of these action requests will
+                  take a long time and that the originator should get an
+                  immediate 'TransactionPending' reply as interim response.
+                  The actual processing of these action requests instead
+                  should be delegated to the the handle_trans_long_request/3
+                  callback function with the req_data() as one of its
+                  arguments.
+
+                _R_e_t_u_r_n _r_e_p_l_y_(_):
+                  Process the action requests and either return an
+                  error_descr() indicating some fatal error or a list of
+                  action replies (wildcarded or not).
+
+                  If for some reason megaco is unable to deliver the reply,
+                  the reason for this will be passed to the user via a call to
+                  the callback function hhaannddllee__ttrraannss__aacckk, unless _a_c_k___a_c_t_i_o_n_(_)
+                  _= _d_i_s_c_a_r_d___a_c_k.
+
+                  The ack_action() is either:
+
+                  _d_i_s_c_a_r_d___a_c_k:
+                    Meaning that you don't care if the reply is acknowledged
+                    or not.
+
+                  _{_h_a_n_d_l_e___a_c_k_, _a_c_k___d_a_t_a_(_)_} _| _{_h_a_n_d_l_e___a_c_k_, _a_c_k___d_a_t_a_(_)_,
+                  _s_e_n_d___o_p_t_i_o_n_s_(_)_}:
+                    Meaning that you want an immediate acknowledgement when
+                    the other part receives this transaction reply. When the
+                    acknowledgement eventually is received, the
+                    handle_trans_ack/4 callback function will be invoked with
+                    the ack_data() as one of its arguments. ack_data() may be
+                    any Erlang term.
+
+                  _{_h_a_n_d_l_e___p_e_n_d_i_n_g___a_c_k_, _a_c_k___d_a_t_a_(_)_} _| _{_h_a_n_d_l_e___p_e_n_d_i_n_g___a_c_k_,
+                  _a_c_k___d_a_t_a_(_)_, _s_e_n_d___o_p_t_i_o_n_s_(_)_}:
+                    This has the same effect as the above, _i_f _a_n_d _o_n_l_y _i_f
+                    megaco has sent at least one pending message for this
+                    request (during the processing of the request). If no
+                    pending message has been sent, then immediate
+                    acknowledgement will _n_o_t be requested.
+
+                    Note that this only works as specified if the
+                    _s_e_n_t___p_e_n_d_i_n_g___l_i_m_i_t config option has been set to an
+                    integer value.
+
+                  _{_h_a_n_d_l_e___s_l_o_p_p_y___a_c_k_, _a_c_k___d_a_t_a_(_)_}_| _{_h_a_n_d_l_e___s_l_o_p_p_y___a_c_k_,
+                  _a_c_k___d_a_t_a_(_)_, _s_e_n_d___o_p_t_i_o_n_s_(_)_}:
+                    Meaning that you want an acknowledgement _s_o_m_e_t_i_m_e. When
+                    the acknowledgement eventually is received, the
+                    handle_trans_ack/4 callback function will be invoked with
+                    the ack_data() as one of its arguments. ack_data() may be
+                    any Erlang term.
+
+              Any other return values (including exit signals or throw) will
+              result in an error descriptor with code 500 (internal gateway
+              error) and the module name (of the callback module) as reason.
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___t_r_a_n_s___r_e_q_u_e_s_t_/_4.
+
+       hhaannddllee__ttrraannss__lloonngg__rreeqquueesstt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, RReeqqDDaattaa)) -->>
+       rreeppllyy(())
+       hhaannddllee__ttrraannss__lloonngg__rreeqquueesstt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, RReeqqDDaattaa,, EExxttrraa))
+       -->> rreeppllyy(())
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 ReqData = req_data()
+                 Extra = term()
+                 req_data() = term()
+                 reply() = {ack_action(), actual_reply()} | {ack_action(),
+                 actual_reply(), send_options()}
+                 ack_action() = discard_ack | {handle_ack, ack_data()} |
+                 {handle_sloppy_ack, ack_data()}
+                 actual_reply() = [action_reply()] | error_desc()
+                 ack_data() = term()
+                 send_options() = [send_option()]
+                 send_option() = {reply_timer, megaco_timer()} | {send_handle,
+                 term()} | {protocol_version, integer()}
+                 Extra = term()
+
+              Optionally invoked for a time consuming transaction request
+
+              If this function gets invoked or not is controlled by the reply
+              from the preceding call to handle_trans_request/3. The
+              handle_trans_request/3 function may decide to process the action
+              requests itself or to delegate the processing to this function.
+
+              The req_data() argument to this function is the Erlang term
+              returned by handle_trans_request/3.
+
+              Any other return values (including exit signals or throw) will
+              result in an error descriptor with code 500 (internal gateway
+              error) and the module name (of the callback module) as reason.
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___t_r_a_n_s___l_o_n_g___r_e_q_u_e_s_t_/_4.
+
+       hhaannddllee__ttrraannss__rreeppllyy((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, UUsseerrRReeppllyy,, RReeppllyyDDaattaa))
+       -->> ookk
+       hhaannddllee__ttrraannss__rreeppllyy((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, UUsseerrRReeppllyy,, RReeppllyyDDaattaa,,
+       EExxttrraa)) -->> ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 UserReply = success() | failure()
+                 success() = {ok, result()}
+                 result() = transaction_result() | segment_result()
+                 transaction_result() = action_reps()
+                 segment_result() = {segment_no(), last_segment(),
+                 action_reps()}
+                 action_reps() = [action_reply()]
+                 failure() = {error, reason()} | {error, ReplyNo, reason()}
+                 reason() = transaction_reason() | segment_reason() |
+                 user_cancel_reason() | send_reason() | other_reason()
+                 transaction_reason() = error_desc()
+                 segment_reason() = {segment_no(), last_segment(),
+                 error_desc()}
+                 other_reason() = timeout | {segment_timeout,
+                 missing_segments()} | exceeded_recv_pending_limit | term()
+                 last_segment() = bool()
+                 missing_segments() = [segment_no()]
+                 user_cancel_reason() = {user_cancel,
+                 reason_for_user_cancel()}
+                 reason_for_user_cancel() = term()
+                 send_reason() = send_cancelled_reason() |
+                 send_failed_reason()
+                 send_cancelled_reason() = {send_message_cancelled,
+                 reason_for_send_cancel()}
+                 reason_for_send_cancel() = term()
+                 send_failed_reason() = {send_message_failed,
+                 reason_for_send_failure()}
+                 reason_for_send_failure() = term()
+                 ReplyData = reply_data()
+                 ReplyNo = integer() > 0
+                 reply_data() = term()
+                 Extra = term()
+
+              Optionally invoked for a transaction reply
+
+              The sender of a transaction request has the option of deciding,
+              whether the originating Erlang process should synchronously wait
+              (_m_e_g_a_c_o_:_c_a_l_l_/_3) for a reply or if the message should be sent
+              asynchronously (_m_e_g_a_c_o_:_c_a_s_t_/_3) and the processing of the reply
+              should be delegated this callback function.
+
+              Note that if the reply is segmented (split into several smaller
+              messages; segments), then some extra info, segment number and an
+              indication if all segments of a reply has been received or not,
+              is also included in the _U_s_e_r_R_e_p_l_y.
+
+              The _R_e_p_l_y_D_a_t_a defaults to _m_e_g_a_c_o_:_l_o_o_k_u_p_(_C_o_n_n_H_a_n_d_l_e_, _r_e_p_l_y___d_a_t_a_),
+              but may be explicitly overridden by a _m_e_g_a_c_o_:_c_a_s_t_/_3 option in
+              order to forward info about the calling context of the
+              originating process.
+
+              At _s_u_c_c_e_s_s_(_), the _U_s_e_r_R_e_p_l_y either contains:
+
+                * A list of 'ActionReply' records possibly containing error
+                  indications.
+
+                * A tuple of size three containing: the segment number, the
+                  _l_a_s_t _s_e_g_m_e_n_t _i_n_d_i_c_a_t_o_r and finally a list of 'ActionReply'
+                  records possibly containing error indications. This is of
+                  course only possible if the reply was segmented.
+
+              _f_a_i_l_u_r_e_(_) indicates an local or external error and can be one of
+              the following:
+
+                * A _t_r_a_n_s_a_c_t_i_o_n___r_e_a_s_o_n_(_), indicates that the remote user has
+                  replied with an explicit transactionError.
+
+                * A _s_e_g_m_e_n_t___r_e_a_s_o_n_(_), indicates that the remote user has
+                  replied with an explicit transactionError for this segment.
+                  This is of course only possible if the reply was segmented.
+
+                * A _u_s_e_r___c_a_n_c_e_l___r_e_a_s_o_n_(_), indicates that the request has been
+                  canceled by the user. _r_e_a_s_o_n___f_o_r___u_s_e_r___c_a_n_c_e_l_(_) is the reason
+                  given in the call to the ccaanncceell function.
+
+                * A _s_e_n_d___r_e_a_s_o_n_(_), indicates that the transport module
+                  sseenndd__mmeessssaaggee function did not send the message. The reason
+                  for this can be:
+
+                  * _s_e_n_d___c_a_n_c_e_l_l_e_d___r_e_a_s_o_n_(_) - the message sending was
+                    deliberately cancelled. _r_e_a_s_o_n___f_o_r___s_e_n_d___c_a_n_c_e_l_(_) is the
+                    reason given in the _c_a_n_c_e_l return from the sseenndd__mmeessssaaggee
+                    function.
+
+                  * _s_e_n_d___f_a_i_l_e_d___r_e_a_s_o_n_(_) - an error occurred while attempting
+                    to send the message.
+
+                * An _o_t_h_e_r___r_e_a_s_o_n_(_), indicates some other error such as:
+
+                  * _t_i_m_e_o_u_t - the reply failed to arrive before the request
+                    timer expired.
+
+                  * _{_s_e_g_m_e_n_t___t_i_m_e_o_u_t_, _m_i_s_s_i_n_g___s_e_g_m_e_n_t_s_(_)_} - one or more
+                    segments was not delivered before the expire of the
+                    segment timer.
+
+                  * _e_x_c_e_e_d_e_d___r_e_c_v___p_e_n_d_i_n_g___l_i_m_i_t - the pending limit was
+                    exceeded for this request.
+
+              See nnoottee above about the _E_x_t_r_a argument in _h_a_n_d_l_e___t_r_a_n_s___r_e_p_l_y_/_5.
+
+       hhaannddllee__ttrraannss__aacckk((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, AAcckkSSttaattuuss,, AAcckkDDaattaa)) -->> ookk
+       hhaannddllee__ttrraannss__aacckk((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, AAcckkSSttaattuuss,, AAcckkDDaattaa,,
+       EExxttrraa)) -->> ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 AckStatus = ok | {error, reason()}
+                 reason() = user_cancel_reason() | send_reason() |
+                 other_reason()
+                 user_cancel_reason() = {user_cancel,
+                 reason_for_user_cancel()}
+                 send_reason() = send_cancelled_reason() |
+                 send_failed_reason()
+                 send_cancelled_reason() = {send_message_cancelled,
+                 reason_for_send_cancel()}
+                 reason_for_send_cancel() = term()
+                 send_failed_reason() = {send_message_failed,
+                 reason_for_send_failure()}
+                 reason_for_send_failure() = term()
+                 other_reason() = term()
+                 AckData = ack_data()
+                 ack_data() = term()
+                 Extra = term()
+
+              Optionally invoked for a transaction acknowledgement
+
+              If this function gets invoked or not, is controlled by the reply
+              from the preceding call to handle_trans_request/3. The
+              handle_trans_request/3 function may decide to return
+              {handle_ack, ack_data()} or {handle_sloppy_ack, ack_data()}
+              meaning that you need an immediate acknowledgement of the reply
+              and that this function should be invoked to handle the
+              acknowledgement.
+
+              The ack_data() argument to this function is the Erlang term
+              returned by handle_trans_request/3.
+
+              If the AckStatus is ok, it is indicating that this is a true
+              acknowledgement of the transaction reply.
+
+              If the AckStatus is {error, Reason}, it is an indication that
+              the acknowledgement or even the reply (for which this is an
+              acknowledgement) was not delivered, but there is no point in
+              waiting any longer for it to arrive. This happens when:
+
+                _r_e_p_l_y___t_i_m_e_r:
+                  The _r_e_p_l_y___t_i_m_e_r eventually times out.
+
+                rreeppllyy sseenndd ffaaiilluurree::
+                  When megaco fails to send the reply (see
+                  hhaannddllee__ttrraannss__rreeppllyy), for whatever reason.
+
+                ccaanncceell::
+                  The user has explicitly cancelled the wait
+                  (megaco:cancel/2).
+
+              See nnoottee above about the _E_x_t_r_a argument in _h_a_n_d_l_e___t_r_a_n_s___a_c_k_/_5.
+
+       hhaannddllee__uunneexxppeecctteedd__ttrraannss((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, TTrraannss)) -->> ookk
+       hhaannddllee__uunneexxppeecctteedd__ttrraannss((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, TTrraannss,, EExxttrraa)) -->>
+       ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 Trans = #'TransactionPending'{} | #'TransactionReply'{} |
+                 #'TransactionResponseAck'{}
+                 Extra = term()
+
+              Invoked when a unexpected message is received
+
+              If a reply to a request is not received in time, the megaco
+              stack removes all info about the request from its tables. If a
+              reply should arrive after this has been done the app has no way
+              of knowing where to send this message. The message is delivered
+              to the "user" by calling this function on the local node (the
+              node which has the link).
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___u_n_e_x_p_e_c_t_e_d___t_r_a_n_s_/_4.
+
+       hhaannddllee__ttrraannss__rreeqquueesstt__aabboorrtt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, TTrraannssNNoo,, PPiidd))
+       -->> ookk
+       hhaannddllee__ttrraannss__rreeqquueesstt__aabboorrtt((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, TTrraannssNNoo,, PPiidd,,
+       EExxttrraa)) -->> ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 TransNo = integer()
+                 Pid = undefined | pid()
+                 Extra = term()
+
+              Invoked when a transaction request has been aborted
+
+              This function is invoked if the originating pending limit has
+              been exceeded. This usually means that a request has taken
+              abnormally long time to complete.
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___t_r_a_n_s___r_e_q_u_e_s_t___a_b_o_r_t_/_5.
+
+       hhaannddllee__sseeggmmeenntt__rreeppllyy((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, TTrraannssNNoo,, SSeeggNNoo,,
+       SSeeggCCoommppll)) -->> ookk
+       hhaannddllee__sseeggmmeenntt__rreeppllyy((CCoonnnnHHaannddllee,, PPrroottooccoollVVeerrssiioonn,, TTrraannssNNoo,, SSeeggNNoo,,
+       SSeeggCCoommppll,, EExxttrraa)) -->> ookk
+
+              Types:
+
+                 ConnHandle = conn_handle()
+                 ProtocolVersion = protocol_version()
+                 TransNo = integer()
+                 SegNo = integer()
+                 SegCompl = asn1_NOVALUE | 'NULL'
+                 Extra = term()
+
+              This function is called when a segment reply has been received
+              if the sseeggmmeenntt__rreeppllyy__iinndd config option has been set to true.
+
+              This is in effect a progress report.
+
+              See nnoottee above about the _E_x_t_r_a argument in
+              _h_a_n_d_l_e___s_e_g_m_e_n_t___r_e_p_l_y_/_6.
+
+
+
+Ericsson AB                     megaco 3.16.0.2                 megaco_user(3)

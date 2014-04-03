@@ -1,0 +1,56 @@
+eunit(3)                   Erlang Module Definition                   eunit(3)
+
+
+
+NNAAMMEE
+       eunit - This module is the main EUnit user interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is the main EUnit user interface.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> tteerrmm(())
+
+              Starts the EUnit server. Normally, you don't need to call this
+              function; it is started automatically.
+
+       ssttoopp(()) -->> tteerrmm(())
+
+              Stops the EUnit server. Normally, you don't need to call this
+              function.
+
+       tteesstt((TTeessttss)) -->> tteerrmm(())
+
+              Equivalent to tteesstt((TTeessttss,, [[]])).
+
+       tteesstt((TTeessttss::::tteerrmm(()),, OOppttiioonnss::::[[tteerrmm(())]])) -->> ookk || {{eerrrroorr,, tteerrmm(())}}
+
+              Runs a set of tests. The format of _T_e_s_t_s is described in the
+              section EEUUnniitt tteesstt rreepprreesseennttaattiioonn of the overview.
+
+              Example:
+
+                eunit:test(fred)
+
+              runs all tests in the module _f_r_e_d and also any tests in the
+              module _f_r_e_d___t_e_s_t_s, if that module exists.
+
+              Options:
+
+                _v_e_r_b_o_s_e:
+                  Displays more details about the running tests.
+
+              Options in the environment variable EUNIT are also included last
+              in the option list, i.e., have lower precedence than those in
+              _O_p_t_i_o_n_s.
+
+              _S_e_e _a_l_s_o_: tteesstt//11.
+
+AAUUTTHHOORRSS
+       Micka~A<<l R~A(C)mond _<_m_i_c_k_a_e_l_._r_e_m_o_n_d_@_p_r_o_c_e_s_s_-_o_n_e_._n_e_t_>
+
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  eunit 2.2.3                         eunit(3)

@@ -1,0 +1,71 @@
+snmpa_notification_delivery_Eirnlfaon_greMsconedmiupvlaee_rn(Do3et)fiifniictaitoinon_delivery_info_receiver(3)
+
+
+
+NNAAMMEE
+       snmpa_notification_delivery_info_receiver -
+           Behaviour module for the SNMP agent notification delivery
+           information receiver.
+
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the notification delivery
+       information receiver.
+
+       A _s_n_m_p_a___n_o_t_i_f_i_c_a_t_i_o_n___d_e_l_i_v_e_r_y___i_n_f_o___r_e_c_e_i_v_e_r compliant module must
+       export the following functions:
+
+         * ddeelliivveerryy__ttaarrggeettss//33
+
+         * ddeelliivveerryy__iinnffoo//44
+
+       The semantics of them and their exact signatures are explained below.
+
+DDAATTAA TTYYPPEESS
+       address() = A 4-tuple
+
+
+EEXXPPOORRTTSS
+       ddeelliivveerryy__ttaarrggeettss((TTaagg,, TTaarrggeettss,, EExxttrraa)) -->> vvooiidd(())
+
+              Types:
+
+                 Tag = term()
+                 Targets = [target()]
+                 target() = {Address, Port}
+                 Address = address()
+                 Port = integer()
+                 Extra = term()
+
+              Inform about target addresses.
+
+              This is the first function called when a notification delivery
+              is in progress. It informs the _r_e_c_e_i_v_e_r which targets will get
+              the notification. The result of the delivery will be provided
+              via successive calls to _d_e_l_i_v_e_r_y___i_n_f_o_/_4 function, see below.
+
+       ddeelliivveerryy__iinnffoo((TTaagg,, TTaarrggeett,, DDeelliivveerryyRReessuulltt,, EExxttrraa)) -->> vvooiidd(())
+
+              Types:
+
+                 Tag = term()
+                 Target = target()
+                 target() = {Address, Port}
+                 Address = address()
+                 Port = integer()
+                 DeliveryResult = delivery_result()
+                 delivery_result() = no_response | got_response
+                 Extra = term()
+
+              Inform about delivery result.
+
+              This function is called for each target in the _T_a_r_g_e_t_s argument
+              of the _d_e_l_i_v_e_r_y___t_a_r_g_e_t_s_/_3 function, see above.
+
+              The purpose is to inform the _r_e_c_e_i_v_e_r of the result of the
+              delivery (was the notification acknowledged or not) for each
+              target.
+
+
+
+Ericsson AB                       ssnnmmppa4_.n2o2t.i1fication_delivery_info_receiver(3)

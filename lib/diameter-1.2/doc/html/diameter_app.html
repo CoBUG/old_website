@@ -1,0 +1,749 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- diameter_app(3)</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/diameter-1.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Diameter</strong><br><strong>Reference Manual</strong><br><small>Version 1.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Table of Contents</strong></small></p>
+<ul class="flipMenu">
+<li id="no" title="diameter " expanded="false">diameter<ul>
+<li><a href="diameter.html">
+                  Top of manual page
+                </a></li>
+<li title="add_transport-2"><a href="diameter.html#add_transport-2">add_transport/2</a></li>
+<li title="call-4"><a href="diameter.html#call-4">call/4</a></li>
+<li title="origin_state_id-0"><a href="diameter.html#origin_state_id-0">origin_state_id/0</a></li>
+<li title="remove_transport-2"><a href="diameter.html#remove_transport-2">remove_transport/2</a></li>
+<li title="service_info-2"><a href="diameter.html#service_info-2">service_info/2</a></li>
+<li title="services-0"><a href="diameter.html#services-0">services/0</a></li>
+<li title="session_id-1"><a href="diameter.html#session_id-1">session_id/1</a></li>
+<li title="start-0"><a href="diameter.html#start-0">start/0</a></li>
+<li title="start_service-2"><a href="diameter.html#start_service-2">start_service/2</a></li>
+<li title="stop-0"><a href="diameter.html#stop-0">stop/0</a></li>
+<li title="stop_service-1"><a href="diameter.html#stop_service-1">stop_service/1</a></li>
+<li title="subscribe-1"><a href="diameter.html#subscribe-1">subscribe/1</a></li>
+<li title="unsubscribe-1"><a href="diameter.html#unsubscribe-1">unsubscribe/1</a></li>
+</ul>
+</li>
+<li title="diameterc"><a href="diameterc.html">diameterc</a></li>
+<li id="loadscrollpos" title="diameter_app " expanded="true">diameter_app<ul>
+<li><a href="diameter_app.html">
+                  Top of manual page
+                </a></li>
+<li title="Mod:peer_up-3"><a href="diameter_app.html#Mod:peer_up-3">Mod:peer_up/3</a></li>
+<li title="Mod:peer_down-3"><a href="diameter_app.html#Mod:peer_down-3">Mod:peer_down/3</a></li>
+<li title="Mod:pick_peer-4"><a href="diameter_app.html#Mod:pick_peer-4">Mod:pick_peer/4</a></li>
+<li title="Mod:prepare_request-3"><a href="diameter_app.html#Mod:prepare_request-3">Mod:prepare_request/3</a></li>
+<li title="Mod:prepare_retransmit-3"><a href="diameter_app.html#Mod:prepare_retransmit-3">Mod:prepare_retransmit/3</a></li>
+<li title="Mod:handle_answer-4"><a href="diameter_app.html#Mod:handle_answer-4">Mod:handle_answer/4</a></li>
+<li title="Mod:handle_error-4"><a href="diameter_app.html#Mod:handle_error-4">Mod:handle_error/4</a></li>
+<li title="Mod:handle_request-3"><a href="diameter_app.html#Mod:handle_request-3">Mod:handle_request/3</a></li>
+</ul>
+</li>
+<li title="diameter_dict"><a href="diameter_dict.html">diameter_dict</a></li>
+<li id="no" title="diameter_transport " expanded="false">diameter_transport<ul>
+<li><a href="diameter_transport.html">
+                  Top of manual page
+                </a></li>
+<li title="Mod:start-3"><a href="diameter_transport.html#Mod:start-3">Mod:start/3</a></li>
+</ul>
+</li>
+<li id="no" title="diameter_tcp " expanded="false">diameter_tcp<ul>
+<li><a href="diameter_tcp.html">
+                  Top of manual page
+                </a></li>
+<li title="start-3"><a href="diameter_tcp.html#start-3">start/3</a></li>
+</ul>
+</li>
+<li id="no" title="diameter_sctp " expanded="false">diameter_sctp<ul>
+<li><a href="diameter_sctp.html">
+                  Top of manual page
+                </a></li>
+<li title="start-3"><a href="diameter_sctp.html#start-3">start/3</a></li>
+</ul>
+</li>
+</ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<!-- refpage --><center><h1>diameter_app</h1></center>
+
+
+<h3>MODULE</h3>
+<div class="REFBODY">diameter_app</div>
+<h3>MODULE SUMMARY</h3>
+<div class="REFBODY">
+Callback module of a Diameter application.</div>
+
+<h3>DESCRIPTION</h3>
+<div class="REFBODY"><p>
+
+<p>
+A diameter service as started by <span class="bold_code"><a href="diameter.html#start_service">diameter:start_service/2</a></span>
+configures one of more Diameter applications, each of whose
+configuration specifies a callback that handles messages specific to
+the application.
+The messages and AVPs of the application are defined in a
+dictionary file whose format is documented in
+<span class="bold_code"><a href="diameter_dict.html">diameter_dict(4)</a></span>
+while the callback module is documented here.
+The callback module implements the Diameter application-specific
+functionality of a service.</p>
+
+<p>
+A callback module must export all of the functions documented below.
+The functions themselves are of three distinct flavours:</p>
+
+<ul>
+<li>
+<p>
+<span class="bold_code"><a href="#peer_up">peer_up/3</a></span> and
+<span class="bold_code"><a href="#peer_down">peer_down/3</a></span> signal the
+attainment or loss of connectivity with a Diameter peer.</p>
+</li>
+
+<li>
+<p>
+<span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span>,
+<span class="bold_code"><a href="#prepare_request">prepare_request/3</a></span>,
+<span class="bold_code"><a href="#prepare_retransmit">prepare_retransmit/3</a></span>,
+<span class="bold_code"><a href="#handle_answer">handle_answer/4</a></span>
+and <span class="bold_code"><a href="#handle_error">handle_error/4</a></span> are (or may
+be) called as a consequence of a call to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> to send an outgoing
+Diameter request message.</p>
+</li>
+
+<li>
+<p>
+<span class="bold_code"><a href="#handle_request">handle_request/3</a></span>
+is called in response to an incoming Diameter request message.</p>
+</li>
+
+</ul>
+
+</p></div>
+
+<div class="note">
+<div class="label">Note</div>
+<div class="content"><p>
+<p>
+The arities given for the the callback functions here assume no extra
+arguments.
+All functions will also be passed any extra arguments configured with
+the callback module itself when calling <span class="bold_code"><a href="diameter.html#start_service">diameter:start_service/2</a></span>
+and, for the call-specific callbacks, any extra arguments passed to
+<span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span>.</p>
+</p></div>
+</div>
+
+
+
+
+<h3><a name="id70923">DATA TYPES</a></h3>
+<div class="REFBODY">
+
+
+<dl>
+
+<a name="capabilities"></a>
+
+<dt><strong><span class="code">capabilities() = #diameter_caps{}</span></strong></dt>
+<dd>
+<p>
+A record containing the identities of
+the local Diameter node and the remote Diameter peer having an established transport
+connection, as well as the capabilities as
+determined by capabilities exchange.
+Each field of the record is a 2-tuple consisting of
+values for the (local) host and (remote) peer.
+Optional or possibly multiple values are encoded as lists of values,
+mandatory values as the bare value.</p>
+</dd>
+
+<a name="message"></a>
+
+<dt><strong><span class="code">message() = record() | list()</span></strong></dt>
+<dd>
+<p>
+The representation of a Diameter message as passed to
+<span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span>.
+The record representation is as outlined in
+<span class="bold_code"><a href="diameter_dict.html#MESSAGE_RECORDS">diameter_dict(4)</a></span>:
+a message as defined in a dictionary file is encoded as a record with
+one field for each component AVP.
+Equivalently, a message can also be encoded as a list whose head is
+the atom-valued message name (the record name minus any
+prefix specified in the relevant dictionary file) and whose tail is a
+list of <span class="code">{FieldName, FieldValue}</span> pairs.</p>
+
+<p>
+A third representation allows a message to be specified as a list
+whose head is a <span class="code">#diameter_header{}</span> record and whose tail is a list
+of <span class="code">#diameter_avp{}</span> records.
+This representation is used by diameter itself when relaying requests
+as directed by the return value of a
+<span class="bold_code"><a href="#handle_request">handle_request/3</a></span>
+callback.
+It differs from the other other two in that it bypasses the checks for
+messages that do not agree with their definitions in the dictionary in
+question (since relays agents must handle arbitrary request): messages
+are sent exactly as specified.</p>
+
+</dd>
+
+<a name="packet"></a>
+
+<dt><strong><span class="code">packet() = #diameter_packet{}</span></strong></dt>
+<dd>
+<p>
+A container for incoming and outgoing Diameter messages that's passed
+through encode/decode and transport.
+Fields should not be set in return values except as documented.</p>
+</dd>
+
+<a name="peer_ref"></a>
+
+<dt><strong><span class="code">peer_ref() = term()</span></strong></dt>
+<dd>
+<p>
+A term identifying a transport connection with a Diameter peer.
+Should be treated opaquely.</p>
+</dd>
+
+<a name="peer"></a>
+
+<dt><strong><span class="code">peer() = {<span class="bold_code"><a href="#peer_ref">peer_ref()</a></span>, <span class="bold_code"><a href="#capabilities">capabilities()</a></span>}</span></strong></dt>
+<dd>
+<p>
+A tuple representing a Diameter peer connection.</p>
+</dd>
+
+<a name="state"></a>
+
+<dt><strong><span class="code">state() = term()</span></strong></dt>
+<dd>
+<p>
+The state maintained by the application callback functions
+<span class="bold_code"><a href="#peer_up">peer_up/3</a></span>,
+<span class="bold_code"><a href="#peer_down">peer_down/3</a></span> and (optionally)
+<span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span>.
+The initial state is configured in the call to
+<span class="bold_code"><a href="diameter.html#start_service">diameter:start_service/2</a></span>
+that configures the application on a service.
+Callback functions returning a state are evaluated in a common
+service-specific process while
+those not returning state are evaluated in a request-specific
+process.</p>
+</dd>
+
+</dl>
+
+<a name="peer_up"></a>
+</div>
+
+
+
+
+<h3>EXPORTS</h3>
+
+<p><a name="Mod:peer_up-3"><span class="bold_code">Mod:peer_up(SvcName, Peer, State) -&gt; NewState</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer    = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">State   = NewState = <span class="bold_code"><a href="#state">state()</a></span></span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked when a transport connection has been established
+and a successful capabilities exchange has indicated that the peer
+supports the Diameter application of the application on which
+the callback module in question has been configured.</p>
+
+<a name="peer_down"></a>
+</p></div>
+
+<p><a name="Mod:peer_down-3"><span class="bold_code">Mod:peer_down(SvcName, Peer, State) -&gt; NewState</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer    = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">State   = NewState = <span class="bold_code"><a href="#state">state()</a></span></span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked when a transport connection has been lost following a previous
+call to <span class="bold_code"><a href="#peer_up">peer_up/3</a></span>.</p>
+
+<a name="pick_peer"></a>
+</p></div>
+
+<p><a name="Mod:pick_peer-4"><span class="bold_code">Mod:pick_peer(Candidates, Reserved, SvcName, State)
+      -&gt; {ok, Peer} | {Peer, NewState} | false</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">Candidates = [<span class="bold_code"><a href="#peer">peer()</a></span>]</span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer = <span class="bold_code"><a href="#peer">peer()</a></span> | false</span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">State = NewState = <span class="bold_code"><a href="#state">state()</a></span></span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked as a consequence of a call to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> to select a destination
+peer for an outgoing request, the return value indicating the selected
+peer.</p>
+
+<p>
+The candidate peers list will only include those
+which are selected by any <span class="code">filter</span> option specified in the call to
+<span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span>, and only
+those which have indicated support for the Diameter application in
+question.
+The order of the elements is unspecified except that any
+peers whose Origin-Host and Origin-Realm matches that of the
+outgoing request (in the sense of a <span class="code">{filter, {all, [host, realm]}}</span>
+option to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span>)
+will be placed at the head of the list.</p>
+
+<p>
+The return values <span class="code">false</span> and <span class="code">{false, State}</span> are
+equivalent when callback state is mutable, as are
+<span class="code">{ok, Peer}</span> and <span class="code">{Peer, State}</span>.
+Returning a peer as <span class="code">false</span> causes <span class="code">{error, no_connection}</span>
+to be returned from <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span>.
+Returning a <span class="bold_code"><a href="#peer">peer()</a></span> from an initial
+pick_peer/4 callback will result in a
+<span class="bold_code"><a href="#prepare_request">prepare_request/3</a></span> callback
+followed by either <span class="bold_code"><a href="#handle_answer">handle_answer/4</a></span>
+or <span class="bold_code"><a href="#handle_error">handle_error/4</a></span> depending
+on whether or not an answer message is received from the peer.
+If transport with the peer is lost before this then a new <span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span> callback takes place to
+select an alternate peer.</p>
+
+<p>
+Note that there is no guarantee that a <span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span> callback to select
+an alternate peer will be followed by any additional callbacks, only
+that the initial <span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span> will be, since a
+retransmission to an alternate peer is abandoned if an answer is
+received from a previously selected peer.</p>
+
+<div class="note">
+<div class="label">Note</div>
+<div class="content"><p>
+<p>
+<span class="code">{Peer, NewState}</span> and its equivalents can only be returned if
+the Diameter application in question was
+configured with the <span class="bold_code"><a href="diameter.html#application_opt">diameter:application_opt()</a></span>
+<span class="code">{call_mutates_state, true}</span>.
+Otherwise, the <span class="code">State</span> argument is always
+the intial value as configured on the application, not any subsequent
+value returned by a <span class="bold_code"><a href="#peer_up">peer_up/3</a></span>
+or <span class="bold_code"><a href="#peer_down">peer_down/3</a></span> callback.</p>
+</p></div>
+</div>
+
+<a name="prepare_request"></a>
+</p></div>
+
+<p><a name="Mod:prepare_request-3"><span class="bold_code">Mod:prepare_request(Packet, SvcName, Peer) -&gt; Action</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">Packet = <span class="bold_code"><a href="#packet">packet()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Action = {send, <span class="bold_code"><a href="#packet">packet()</a></span> | <span class="bold_code"><a href="#message">message()</a></span>} | {discard, Reason} | discard</span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked to return a request for encoding and transport.
+Allows the sender to access the selected peer's capabilities
+in order to set (for example) <span class="code">Destination-Host</span> and/or
+<span class="code">Destination-Realm</span> in the outgoing request, although the
+callback need not be limited to this usage.
+Many implementations may simply want to return <span class="code">{send, Packet}</span></p>
+
+<p>
+A returned <span class="bold_code"><a href="#packet">packet()</a></span> should set the request to be encoded in its
+<span class="code">msg</span> field and can set the <span class="code">transport_data</span> field in order
+to pass information to the transport module.
+Extra arguments passed to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> can be used to
+communicate transport data to the callback.
+A returned <span class="bold_code"><a href="#packet">packet()</a></span> can also set the <span class="code">header</span> field to a
+<span class="code">#diameter_header{}</span> record in order to specify values that should
+be preserved in the outgoing request, although this should typically
+not be necessary and allows the callback to set header values
+inappropriately.
+A returned <span class="code">length</span>, <span class="code">cmd_code</span> or <span class="code">application_id</span> is
+ignored.</p>
+
+<p>
+Returning <span class="code">{discard, Reason}</span> causes the request to be aborted
+and the <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> for which the
+callback has taken place to return <span class="code">{error, Reason}</span>.
+Returning <span class="code">discard</span> is equivalent to returning <span class="code">{discard,
+discarded}</span>.</p>
+
+<a name="prepare_retransmit"></a>
+</p></div>
+
+<p><a name="Mod:prepare_retransmit-3"><span class="bold_code">Mod:prepare_retransmit(Packet, SvcName, Peer) -&gt; Result</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">Packet  = <span class="bold_code"><a href="#packet">packet()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer    = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Result  = {send, <span class="bold_code"><a href="#packet">packet()</a></span> | <span class="bold_code"><a href="#message">message()</a></span>} | {discard, Reason} | discard</span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked to return a request for encoding and retransmission.
+Has the same role as <span class="bold_code"><a href="#prepare_request">prepare_request/3</a></span> in the case that
+a peer connection is lost an an alternate peer selected but the
+argument <span class="bold_code"><a href="#packet">packet()</a></span> is as returned by the initial
+<span class="code">prepare_request/3</span>.</p>
+
+<p>
+Returning <span class="code">{discard, Reason}</span> causes the request to be aborted
+and a <span class="bold_code"><a href="#handle_error">handle_error/4</a></span> callback to
+take place with <span class="code">Reason</span> as initial argument.
+Returning <span class="code">discard</span> is equivalent to returning <span class="code">{discard,
+discarded}</span>.</p>
+
+<a name="handle_answer"></a>
+</p></div>
+
+<p><a name="Mod:handle_answer-4"><span class="bold_code">Mod:handle_answer(Packet, Request, SvcName, Peer) -&gt; Result</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">Packet  = <span class="bold_code"><a href="#packet">packet()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Request = <span class="bold_code"><a href="#message">message()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer    = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Result  = term()</span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked when an answer message is received from a peer.
+The return value is returned from the call to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> for which the
+callback takes place unless the <span class="code">detach</span> option was
+specified.</p>
+
+<p>
+The decoded answer record is in the <span class="code">msg</span> field of the argument
+<span class="bold_code"><a href="#packet">packet()</a></span>,
+the undecoded binary in the <span class="code">packet</span> field.
+<span class="code">Request</span> is the outgoing request message as was returned from
+<span class="bold_code"><a href="#prepare_request">prepare_request/3</a></span> or
+<span class="bold_code"><a href="#prepare_retransmit">prepare_retransmit/3</a></span>
+before the request was passed to the transport.</p>
+
+<p>
+For any given call to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> there is at most one
+call to the handle_answer callback of the application in question: any
+duplicate answer (due to retransmission or otherwise) is discarded.
+Similarly, only one of <span class="code">handle_answer/4</span> or <span class="code">handle_error/4</span> is
+called for any given request.</p>
+
+<p>
+By default, an incoming answer message that cannot be successfully
+decoded causes the request process in question to fail, causing the
+relevant call to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span>
+to return <span class="code">{error, failure} (unless the <span class="code">detach</span> option was
+specified)</span>.
+In particular, there is no <span class="code">handle_error/4</span> callback in this
+case.
+Application configuration may change this behaviour as described for
+<span class="bold_code"><a href="diameter.html#start_service">diameter:start_service/2</a></span>.</p>
+
+<a name="handle_error"></a>
+</p></div>
+
+<p><a name="Mod:handle_error-4"><span class="bold_code">Mod:handle_error(Reason, Request, SvcName, Peer) -&gt; Result</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">Reason  = timeout | failover | term()</span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Request = <span class="bold_code"><a href="#message">message()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = <span class="bold_code"><a href="diameter.html#service_name">diameter:service_name()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer    = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Result  = term()</span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked when an error occurs before an answer message is received from
+a peer in response to an outgoing request.
+The return value is returned from the call to <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> for which the
+callback takes place (unless the <span class="code">detach</span> option was
+specified).</p>
+
+<p>
+Reason <span class="code">timeout</span> indicates that an answer message has not been
+received within the required time.
+Reason <span class="code">failover</span> indicates
+that the transport connection to the peer to which the request has
+been sent has been lost but that not alternate node was available,
+possibly because a <span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span>
+callback returned false.</p>
+
+<a name="handle_request"></a>
+</p></div>
+
+<p><a name="Mod:handle_request-3"><span class="bold_code">Mod:handle_request(Packet, SvcName, Peer) -&gt; Action</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+<div class="REFTYPES">
+<span class="bold_code">Packet  = <span class="bold_code"><a href="#packet">packet()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">SvcName = term()</span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Peer    = <span class="bold_code"><a href="#peer">peer()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Action  = Reply | {relay, [Opt]} | discard | {eval, Action, PostF}</span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Reply   = {reply, <span class="bold_code"><a href="#message">message()</a></span>}
+           | {protocol_error, 3000..3999}</span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">Opt     = <span class="bold_code"><a href="diameter.html#call_opt">diameter:call_opt()</a></span></span><br>
+</div>
+<div class="REFTYPES">
+<span class="bold_code">PostF   = <span class="bold_code"><a href="diameter.html#evaluable">diameter:evaluable()</a></span></span><br>
+</div>
+</div>
+<div class="REFBODY"><p>
+<p>
+Invoked when a request message is received from a peer.
+The application in which the callback takes place (that is, the
+callback module as configured with <span class="bold_code"><a href="diameter.html#start_service">diameter:start_service/2</a></span>)
+is determined by the Application Identifier in the header of the
+incoming request message, the selected module being the one
+whose corresponding <span class="bold_code"><a href="diameter_dict.html#MESSAGE_RECORDS">dictionary</a></span> declares
+itself as defining either the application in question or the Relay
+application.</p>
+
+<p>
+The argument <span class="bold_code"><a href="#packet">packet()</a></span> has the following signature.</p>
+
+<div class="example"><pre>
+#diameter_packet{header = #diameter_header{},
+                 avps   = [#diameter_avp{}],
+                 msg    = record() | undefined,
+                 errors = [<span class="bold_code"><a href="diameter_dict.html#DATA_TYPES">Unsigned32()</a></span> | {<span class="bold_code"><a href="diameter_dict.html#DATA_TYPES">Unsigned32()</a></span>, #diameter_avp{}}],
+                 bin    = binary(),
+                 transport_data = term()}
+</pre></div>
+
+<p>
+The <span class="code">msg</span> field will be <span class="code">undefined</span> only in case the request has
+been received in the relay application.
+Otherwise it contains the record representing the request as outlined
+in <span class="bold_code"><a href="diameter_dict.html#MESSAGE_RECORDS">diameter_dict(4)</a></span>.</p>
+
+<p>
+The <span class="code">errors</span> field specifies any Result-Code's identifying errors
+that were encountered in decoding the request.
+In this case diameter will set both Result-Code and
+Failed-AVP AVP's in a returned
+answer <span class="bold_code"><a href="#message">message()</a></span> before sending it to the peer:
+the returned <span class="bold_code"><a href="#message">message()</a></span> need only set any other required AVP's.
+Note that the errors detected by diameter are all of the 5xxx series
+(Permanent Failures).
+The <span class="code">errors</span> list is empty if the request has been received in
+the relay application.</p>
+
+<p>
+The <span class="code">transport_data</span> field contains an arbitrary term passed into
+diameter from the transport module in question, or the atom
+<span class="code">undefined</span> if the transport specified no data.
+The term is preserved in the <span class="bold_code"><a href="#packet">packet()</a></span> containing any answer message
+sent back to the transport process unless another value is explicitly
+specified.</p>
+
+<p>
+The semantics of each of the possible return values are as follows.</p>
+
+<dl>
+
+<dt><strong><span class="code">{reply, <span class="bold_code"><a href="#message">message()</a></span>}</span></strong></dt>
+<dd>
+<p>
+Send the specified answer message to the peer.</p>
+</dd>
+
+<dt><strong><span class="code">{protocol_error, 3000..3999}</span></strong></dt>
+<dd>
+<p>
+Send an answer message to the peer containing the specified
+protocol error.
+Equivalent to</p>
+<div class="example"><pre>
+{reply, ['answer-message' | Avps]
+</pre></div>
+<p>
+where <span class="code">Avps</span> sets the Origin-Host, Origin-Realm, the specified
+Result-Code and (if the request sent one) Session-Id AVP's.</p>
+
+<p>
+Note that RFC 3588 mandates that only answers with a 3xxx series
+Result-Code (protocol errors) may set the E bit.
+Returning a non-3xxx value in a <span class="code">protocol_error</span> tuple
+will cause the request process in question to fail.</p>
+</dd>
+
+<dt><strong><span class="code">{relay, Opts}</span></strong></dt>
+<dd>
+<p>
+Relay a request to another peer in the role of a Diameter relay agent.
+If a routing loop is detected then the request is answered with
+3005 (DIAMETER_LOOP_DETECTED).
+Otherwise a Route-Record AVP (containing the sending peer's Origin-Host) is
+added to the request and <span class="bold_code"><a href="#pick_peer">pick_peer/4</a></span>
+and subsequent callbacks take place just as if <span class="bold_code"><a href="diameter.html#call">diameter:call/4</a></span> had been called
+explicitly.
+The End-to-End Identifier of the incoming request is preserved in the
+header of the relayed request.</p>
+
+<p>
+The returned <span class="code">Opts</span> should not specify <span class="code">detach</span>.
+A subsequent <span class="bold_code"><a href="#handle_answer">handle_answer/4</a></span>
+callback for the relayed request must return its first
+argument, the <span class="code">#diameter_packet{}</span> record containing the answer
+message.
+Note that the <span class="code">extra</span> option can be specified to supply arguments
+that can distinguish the relay case from others if so desired.
+Any other return value (for example, from a
+<span class="bold_code"><a href="#handle_error">handle_error/4</a></span> callback)
+causes the request to be answered with 3002 (DIAMETER_UNABLE_TO_DELIVER).</p>
+</dd>
+
+<dt><strong><span class="code">discard</span></strong></dt>
+<dd>
+<p>
+Discard the request.</p>
+</dd>
+
+<dt><strong><span class="code">{eval, Action, PostF}</span></strong></dt>
+<dd>
+<p>
+Handle the request as if <span class="code">Action</span> has been returned and then
+evaluate <span class="code">PostF</span> in the request process.</p>
+</dd>
+
+</dl>
+
+<p>
+Note that protocol errors detected by diameter will result in an
+answer message without <span class="code">handle_request/3</span> being invoked.</p>
+
+</p></div>
+
+
+
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 2011-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

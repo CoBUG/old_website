@@ -1,0 +1,502 @@
+wxTextCtrl(3)              Erlang Module Definition              wxTextCtrl(3)
+
+
+
+NNAAMMEE
+       wxTextCtrl - See external documentation: wxTextCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxTextCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_T_e_x_t_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxTTeexxttCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxTTeexxttCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxTTeexxttCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {value, chardata() (see module unicode)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       aappppeennddTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ccaannCCooppyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ccaannCCuutt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ccaannPPaassttee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ccaannRReeddoo((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ccaannUUnnddoo((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ccooppyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {value, chardata() (see module unicode)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ccuutt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ddiissccaarrddEEddiittss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       eemmuullaatteeKKeeyyPPrreessss((TThhiiss,, EEvveenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Event = wxKeyEvent() (see module wxKeyEvent)
+
+              See external documentation.
+
+       ggeettDDeeffaauullttSSttyyllee((TThhiiss)) -->> wwxxTTeexxttAAttttrr(()) ((sseeee mmoodduullee wwxxTTeexxttAAttttrr))
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ggeettIInnsseerrttiioonnPPooiinntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ggeettLLaassttPPoossiittiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ggeettLLiinneeLLeennggtthh((TThhiiss,, LLiinneeNNoo)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 LineNo = integer()
+
+              See external documentation.
+
+       ggeettLLiinneeTTeexxtt((TThhiiss,, LLiinneeNNoo)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxTextCtrl()
+                 LineNo = integer()
+
+              See external documentation.
+
+       ggeettNNuummbbeerrOOffLLiinneess((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ggeettRRaannggee((TThhiiss,, FFrroomm,, TToo)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxTextCtrl()
+                 From = integer()
+                 To = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> {{FFrroomm::::iinntteeggeerr(()),, TToo::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ggeettSSttrriinnggSSeelleeccttiioonn((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ggeettSSttyyllee((TThhiiss,, PPoossiittiioonn,, SSttyyllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Position = integer()
+                 Style = wxTextAttr() (see module wxTextAttr)
+
+              See external documentation.
+
+       ggeettVVaalluuee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       iissEEddiittaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       iissMMooddiiffiieedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       iissMMuullttiiLLiinnee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       iissSSiinngglleeLLiinnee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       llooaaddFFiillee((TThhiiss,, FFiillee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 File = chardata() (see module unicode)
+
+              Equivalent to llooaaddFFiillee((TThhiiss,, FFiillee,, [[]])).
+
+       llooaaddFFiillee((TThhiiss,, FFiillee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 File = chardata() (see module unicode)
+                 Option = {fileType, integer()}
+
+              See external documentation.
+
+       mmaarrkkDDiirrttyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ppaassttee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       ppoossiittiioonnTTooXXYY((TThhiiss,, PPooss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), X::integer(), Y::integer()}
+                 This = wxTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       rreeddoo((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       rreemmoovvee((TThhiiss,, FFrroomm,, TToo)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 From = integer()
+                 To = integer()
+
+              See external documentation.
+
+       rreeppllaaccee((TThhiiss,, FFrroomm,, TToo,, VVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 From = integer()
+                 To = integer()
+                 Value = chardata() (see module unicode)
+
+              See external documentation.
+
+       ssaavveeFFiillee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              Equivalent to ssaavveeFFiillee((TThhiiss,, [[]])).
+
+       ssaavveeFFiillee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Option = {file, chardata() (see module unicode)} | {fileType,
+                 integer()}
+
+              See external documentation.
+
+       sseettDDeeffaauullttSSttyyllee((TThhiiss,, SSttyyllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Style = wxTextAttr() (see module wxTextAttr)
+
+              See external documentation.
+
+       sseettEEddiittaabbllee((TThhiiss,, EEddiittaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Editable = boolean()
+
+              See external documentation.
+
+       sseettIInnsseerrttiioonnPPooiinntt((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       sseettIInnsseerrttiioonnPPooiinnttEEnndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       sseettMMaaxxLLeennggtthh((TThhiiss,, LLeenn)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Len = integer()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, FFrroomm,, TToo)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 From = integer()
+                 To = integer()
+
+              See external documentation.
+
+       sseettSSttyyllee((TThhiiss,, SSttaarrtt,, EEnndd,, SSttyyllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Start = integer()
+                 End = integer()
+                 Style = wxTextAttr() (see module wxTextAttr)
+
+              See external documentation.
+
+       sseettVVaalluuee((TThhiiss,, VVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Value = chardata() (see module unicode)
+
+              See external documentation.
+
+       sshhoowwPPoossiittiioonn((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       uunnddoo((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+
+              See external documentation.
+
+       wwrriitteeTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       xxYYTTooPPoossiittiioonn((TThhiiss,, XX,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextCtrl()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxTTeexxttCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxTextCtrl(3)

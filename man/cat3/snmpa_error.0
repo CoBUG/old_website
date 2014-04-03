@@ -1,0 +1,49 @@
+snmpa_error(3)             Erlang Module Definition             snmpa_error(3)
+
+
+
+NNAAMMEE
+       snmpa_error - Functions for Reporting SNMP Errors
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_a___e_r_r_o_r contains two callback functions which are called
+       if an error occurs at different times during agent operation. These
+       functions in turn calls the corresponding function in the configured
+       error report module, which implements the actual report functionality.
+
+       Two simple implementation(s) is provided with the toolkit; the modules
+       ssnnmmppaa__eerrrroorr__llooggggeerr which is the default and ssnnmmppaa__eerrrroorr__iioo.
+
+       The error report module is configured using the directive
+       _e_r_r_o_r___r_e_p_o_r_t___m_o_d, see ccoonnffiigguurraattiioonn ppaarraammeetteerrss.
+
+EEXXPPOORRTTSS
+       ccoonnffiigg__eerrrr((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              The function is called if an error occurs during the
+              configuration phase, for example if a syntax error is found in a
+              configuration file.
+
+              _F_o_r_m_a_t and _A_r_g_s are as in _i_o_:_f_o_r_m_a_t_(_F_o_r_m_a_t_, _A_r_g_s_).
+
+       uusseerr__eerrrr((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              The function is called if a user related error occurs at run-
+              time, for example if a user defined instrumentation function
+              returns erroneous.
+
+              _F_o_r_m_a_t and _A_r_g_s are as in _i_o_:_f_o_r_m_a_t_(_F_o_r_m_a_t_, _A_r_g_s_).
+
+
+
+Ericsson AB                       snmp 4.22.1                   snmpa_error(3)

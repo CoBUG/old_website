@@ -1,0 +1,81 @@
+CosNotifyChannelAdmin_StrucCtEoursrlNeaodntPgirfoMyxoCydhPuaulnsenheCDloeAnfdsimuniminet_riS(ot3nr)ucturedProxyPushConsumer(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_StructuredProxyPushConsumer - This module
+       implements the OMG  CosNotifyChannelAdmin::StructuredProxyPushConsumer
+       interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyyPPuubblliisshh
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+         * CCoossNNoottiiffyyCChhaannnneellAAddmmiinn__PPrrooxxyyCCoonnssuummeerr
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuusshh__ssuupppplliieerr((SSttrruuccttuurreeddPPrrooxxyyPPuusshhCCoonnssuummeerr,,
+       PPuusshhSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 StructuredProxyPushConsumer = #objref
+                 PushSupplier = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_AlreadyConnected'{}}
+
+              This operation connects a _P_u_s_h_S_u_p_p_l_i_e_r to the target object. If
+              a connection already exists an exception is raised.
+
+       ppuusshh__ssttrruuccttuurreedd__eevveenntt((SSttrruuccttuurreeddPPrrooxxyyPPuusshhCCoonnssuummeerr,, SSttrruuccttuurreeddEEvveenntt)) -->>
+       RReeppllyy
+
+              Types:
+
+                 StructuredProxyPushConsumer = #objref
+                 StructuredEvent = #'CosNotification_StructuredEvent'{header,
+                 filterable_data, remainder_of_body}
+                 header = EventHeader
+                 filterable_data = [#'CosNotification_Property'{name, value}]
+                 name = string()
+                 value = #any
+                 remainder_of_body = #any
+                 EventHeader = #'CosNotification_EventHeader'{fixed_header,
+                 variable_header}
+                 fixed_header = FixedEventHeader
+                 variable_header = OptionalHeaderFields
+                 FixedEventHeader =
+                 #'CosNotification_FixedEventHeader'{event_type, event_name}
+                 event_type = EventType
+                 event_name = string()
+                 EventType = #'CosNotification_EventType'{domain_name,
+                 type_name}
+                 domain_name = type_name = string()
+                 OptionalHeaderFields = [#'CosNotification_Property'{name,
+                 value}]
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_Disconnected'{}}
+
+              When a client want to push a new event to the target object this
+              operation must be used.
+
+       ddiissccoonnnneecctt__ssttrruuccttuurreedd__ppuusshh__ccoonnssuummeerr((SSttrruuccttuurreeddPPrrooxxyyPPuusshhCCoonnssuummeerr)) -->> ookk
+
+              Types:
+
+                 StructuredProxyPushConsumer = #objref
+
+              This operation cause the target object to close the connection
+              and terminate.
+
+
+
+Ericsson AB               CocsoNsoNtoitfiyfCihcaantnieolnAd1m.i1n._1S8tructuredProxyPushConsumer(3)

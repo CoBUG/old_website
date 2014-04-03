@@ -1,0 +1,117 @@
+disksup(3)                 Erlang Module Definition                 disksup(3)
+
+
+
+NNAAMMEE
+       disksup - A Disk Supervisor Process
+
+DDEESSCCRRIIPPTTIIOONN
+       _d_i_s_k_s_u_p is a process which supervises the available disk space in the
+       system. It is part of the OS_Mon application, see ooss__mmoonn((66)). Available
+       for Unix and Windows.
+
+       Periodically checks the disks. For each disk or partition which uses
+       more than a certain amount of the available space, the alarm
+       _{_{_d_i_s_k___a_l_m_o_s_t___f_u_l_l_, _M_o_u_n_t_e_d_O_n_}_, _[_]_} is set.
+
+         OOnn UUnniixx::
+           All (locally) mounted disks are checked, including the swap disk if
+           it is present.
+
+         OOnn WWIINN3322::
+           All logical drives of type "FIXED_DISK" are checked.
+
+       Alarms are reported to the SASL alarm handler, see aallaarrmm__hhaannddlleerr((33)). To
+       set an alarm, _a_l_a_r_m___h_a_n_d_l_e_r_:_s_e_t___a_l_a_r_m_(_A_l_a_r_m_) is called where _A_l_a_r_m is
+       the alarm specified above.
+
+       The alarms are cleared automatically when the alarm cause is no longer
+       valid.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following configuration parameters can be used to change the
+       default values for time interval and threshold:
+
+         _d_i_s_k___s_p_a_c_e___c_h_e_c_k___i_n_t_e_r_v_a_l _= _i_n_t_(_)_>_0:
+           The time interval, in minutes, for the periodic disk space check.
+           The default is 30 minutes.
+
+         _d_i_s_k___a_l_m_o_s_t___f_u_l_l___t_h_r_e_s_h_o_l_d _= _f_l_o_a_t_(_):
+           The threshold, as percentage of total disk space, for how much disk
+           can be utilized before the _d_i_s_k___a_l_m_o_s_t___f_u_l_l alarm is set. The
+           default is 0.80 (80%).
+
+       See ccoonnffiigg((44)) for information about how to change the value of
+       configuration parameters.
+
+EEXXPPOORRTTSS
+       ggeett__ddiisskk__ddaattaa(()) -->> [[DDiisskkDDaattaa]]
+
+              Types:
+
+                 DiskData = {Id, KByte, Capacity}
+                  Id = string()
+                  KByte = int()
+                  Capacity = int()
+
+              Returns the result of the latest disk check. _I_d is a string that
+              identifies the disk or partition. _K_B_y_t_e is the total size of the
+              disk or partition in kbytes. _C_a_p_a_c_i_t_y is the percentage of disk
+              space used.
+
+              The function is asynchronous in the sense that it does not
+              invoke a disk check, but returns the latest available value.
+
+              Returns _[_{_"_n_o_n_e_"_,_0_,_0_}_] if _d_i_s_k_s_u_p is not available.
+
+       ggeett__cchheecckk__iinntteerrvvaall(()) -->> MMSS
+
+              Types:
+
+                 MS = int()
+
+              Returns the time interval, in milliseconds, for the periodic
+              disk space check.
+
+       sseett__cchheecckk__iinntteerrvvaall((MMiinnuutteess)) -->> ookk
+
+              Types:
+
+                 Minutes = int()>=1
+
+              Changes the time interval, given in minutes, for the periodic
+              disk space check.
+
+              The change will take effect after the next disk space check and
+              is non-persist. That is, in case of a process restart, this
+              value is forgotten and the default value will be used. See
+              CCoonnffiigguurraattiioonn above.
+
+       ggeett__aallmmoosstt__ffuullll__tthhrreesshhoolldd(()) -->> PPeerrcceenntt
+
+              Types:
+
+                 Percent = int()
+
+              Returns the threshold, in percent, for disk space utilization.
+
+       sseett__aallmmoosstt__ffuullll__tthhrreesshhoolldd((FFllooaatt)) -->> ookk
+
+              Types:
+
+                 Float = float(), 0=<Float=<1
+
+              Changes the threshold, given as a float, for disk space
+              utilization.
+
+              The change will take effect during the next disk space check and
+              is non-persist. That is, in case of a process restart, this
+              value is forgotten and the default value will be used. See
+              CCoonnffiigguurraattiioonn above.
+
+SSEEEE AALLSSOO
+       aallaarrmm__hhaannddlleerr((33)), ooss__mmoonn((33))
+
+
+
+Ericsson AB                      os_mon 2.2.10                      disksup(3)

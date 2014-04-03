@@ -1,0 +1,126 @@
+wxPrinter(3)               Erlang Module Definition               wxPrinter(3)
+
+
+
+NNAAMMEE
+       wxPrinter - See external documentation: wxPrinter.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPrinter.
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_r_i_n_t_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxPPrriinntteerr(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxPPrriinntteerr(())
+
+              Types:
+
+                 Option = {data, wxPrintDialogData() (see module
+                 wxPrintDialogData)}
+
+              See external documentation.
+
+       ccrreeaatteeAAbboorrttWWiinnddooww((TThhiiss,, PPaarreenntt,, PPrriinnttoouutt)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee
+       wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxPrinter()
+                 Parent = wxWindow() (see module wxWindow)
+                 Printout = wxPrintout() (see module wxPrintout)
+
+              See external documentation.
+
+       ggeettAAbboorrtt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrinter()
+
+              See external documentation.
+
+       ggeettLLaassttEErrrroorr(()) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              See external documentation.
+              Res = ?wxPRINTER_NO_ERROR | ?wxPRINTER_CANCELLED |
+              ?wxPRINTER_ERROR
+
+       ggeettPPrriinnttDDiiaallooggDDaattaa((TThhiiss)) -->> wwxxPPrriinnttDDiiaallooggDDaattaa(()) ((sseeee mmoodduullee
+       wwxxPPrriinnttDDiiaallooggDDaattaa))
+
+              Types:
+
+                 This = wxPrinter()
+
+              See external documentation.
+
+       pprriinntt((TThhiiss,, PPaarreenntt,, PPrriinnttoouutt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrinter()
+                 Parent = wxWindow() (see module wxWindow)
+                 Printout = wxPrintout() (see module wxPrintout)
+
+              Equivalent to pprriinntt((TThhiiss,, PPaarreenntt,, PPrriinnttoouutt,, [[]])).
+
+       pprriinntt((TThhiiss,, PPaarreenntt,, PPrriinnttoouutt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrinter()
+                 Parent = wxWindow() (see module wxWindow)
+                 Printout = wxPrintout() (see module wxPrintout)
+                 Option = {prompt, boolean()}
+
+              See external documentation.
+
+       pprriinnttDDiiaalloogg((TThhiiss,, PPaarreenntt)) -->> wwxxDDCC(()) ((sseeee mmoodduullee wwxxDDCC))
+
+              Types:
+
+                 This = wxPrinter()
+                 Parent = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       rreeppoorrttEErrrroorr((TThhiiss,, PPaarreenntt,, PPrriinnttoouutt,, MMeessssaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxPrinter()
+                 Parent = wxWindow() (see module wxWindow)
+                 Printout = wxPrintout() (see module wxPrintout)
+                 Message = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettuupp((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrinter()
+                 Parent = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPrriinntteerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                      wxPrinter(3)

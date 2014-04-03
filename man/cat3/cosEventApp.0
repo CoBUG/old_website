@@ -1,0 +1,121 @@
+cosEventApp(3)             Erlang Module Definition             cosEventApp(3)
+
+
+
+NNAAMMEE
+       cosEventApp - The main module of the cosEvent application.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application.
+
+EEXXPPOORRTTSS
+       iinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E} | {'EXIT', R}
+
+              This operation installs the cosEvent application.
+
+       uunniinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E} | {'EXIT', R}
+
+              This operation uninstalls the cosEvent application.
+
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosEvent application.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosEvent application.
+
+       ssttaarrtt__cchhaannnneell(()) -->> CChhaannnneell
+
+              Types:
+
+                 Channel = #objref
+
+              This operation creates a new instance of a EEvveenntt CChhaannnneell using
+              the default settings.
+
+       ssttaarrtt__cchhaannnneell((OOppttiioonnss)) -->> CChhaannnneell
+
+              Types:
+
+                 Options = [Option]
+                 Option = {pull_interval, Seconds} | {typecheck, Boolean} |
+                 {maxEvents, Integer} | {blocking, Boolean}
+                 Channel = #objref
+
+              This operation creates a new instance of a EEvveenntt CChhaannnneell
+
+                * _{_p_u_l_l___i_n_t_e_r_v_a_l_, _S_e_c_o_n_d_s_} - determine how often Proxy Pull
+                  Consumers will check for new events with the client
+                  application. The default value is 20 seconds.
+
+                * _{_t_y_p_e_c_h_e_c_k_, _B_o_o_l_e_a_n_} - if this option is set to true the
+                  proxies will check if the supplied client object is of
+                  correct type. The default value is false.
+
+                * _{_m_a_x_E_v_e_n_t_s_, _I_n_t_e_g_e_r_} - this option determine how many events
+                  the _P_r_o_x_y_P_u_l_l_S_u_p_p_l_i_e_r_s will store before discarding events.
+                  If the limit is reached events will be discarded in any
+                  order. The default value is 300.
+
+                * _{_b_l_o_c_k_i_n_g_, _B_o_o_l_e_a_n_} - this option determine the behavior of
+                  the channel when handling events internally. If set to _t_r_u_e
+                  the risk of a single event supplier floods the system is
+                  reduced, but the performance may also be reduced. The
+                  default value is _t_r_u_e.
+
+       ssttaarrtt__cchhaannnneell__lliinnkk(()) -->> CChhaannnneell
+
+              Types:
+
+                 Channel = #objref
+
+              This operation creates a new instance of a EEvveenntt CChhaannnneell, which
+              is linked to the invoking process, using the default settings.
+
+       ssttaarrtt__cchhaannnneell__lliinnkk((OOppttiioonnss)) -->> CChhaannnneell
+
+              Types:
+
+                 Options = [Option]
+                 Option = {pull_interval, Seconds} | {typecheck, Boolean} |
+                 {maxEvents, Integer} | {blocking, Boolean}
+                 Channel = #objref
+
+              This operation creates a new instance of a EEvveenntt CChhaannnneell, which
+              is linked to the invoking process, with settings defined by the
+              given options. Allowed options are the same as for
+              _c_o_s_E_v_e_n_t_A_p_p_:_s_t_a_r_t___c_h_a_n_n_e_l_/_1.
+
+       ssttoopp__cchhaannnneell((CChhaannnneell)) -->> RReeppllyy
+
+              Types:
+
+                 Channel = #objref
+                 Reply = ok | {'EXCEPTION', E}
+
+              This operation stop the target event channel.
+
+
+
+Ericsson AB                     cosEvent 2.1.12                 cosEventApp(3)

@@ -1,0 +1,367 @@
+wxSizerItem(3)             Erlang Module Definition             wxSizerItem(3)
+
+
+
+NNAAMMEE
+       wxSizerItem - See external documentation: wxSizerItem.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSizerItem.
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_i_z_e_r_I_t_e_m_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSiizzeerrIItteemm(())
+
+              See external documentation.
+
+       nneeww((WWiinnddooww,, FFllaaggss)) -->> wwxxSSiizzeerrIItteemm(())
+
+              Types:
+
+                 Window = wxWindow() (see module wxWindow) | wxSizer() (see
+                 module wxSizer)
+                 Flags = wxSizerFlags() (see module wxSizerFlags)
+
+              See external documentation.
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt,, FFllaaggss)) -->> wwxxSSiizzeerrIItteemm(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+                 Flags = wxSizerFlags() (see module wxSizerFlags)
+
+              See external documentation.
+
+       nneeww((WWiinnddooww,, PPrrooppoorrttiioonn,, FFllaagg,, BBoorrddeerr,, UUsseerrDDaattaa)) -->> wwxxSSiizzeerrIItteemm(())
+
+              Types:
+
+                 Window = wxWindow() (see module wxWindow) | wxSizer() (see
+                 module wxSizer)
+                 Proportion = integer()
+                 Flag = integer()
+                 Border = integer()
+                 UserData = wx_object() (see module wx)
+
+              See external documentation.
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt,, PPrrooppoorrttiioonn,, FFllaagg,, BBoorrddeerr,, UUsseerrDDaattaa)) -->> wwxxSSiizzeerrIItteemm(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+                 Proportion = integer()
+                 Flag = integer()
+                 Border = integer()
+                 UserData = wx_object() (see module wx)
+
+              See external documentation.
+
+       ccaallccMMiinn((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ddeelleetteeWWiinnddoowwss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ddeettaacchhSSiizzeerr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettBBoorrddeerr((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettFFllaagg((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettMMiinnSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettPPrrooppoorrttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettRRaattiioo((TThhiiss)) -->> nnuummbbeerr(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettRReecctt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettSSiizzeerr((TThhiiss)) -->> wwxxSSiizzeerr(()) ((sseeee mmoodduullee wwxxSSiizzeerr))
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettSSppaacceerr((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettUUsseerrDDaattaa((TThhiiss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       ggeettWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       iissSSiizzeerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       iissSShhoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       iissSSppaacceerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       iissWWiinnddooww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizerItem()
+
+              See external documentation.
+
+       sseettBBoorrddeerr((TThhiiss,, BBoorrddeerr)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Border = integer()
+
+              See external documentation.
+
+       sseettDDiimmeennssiioonn((TThhiiss,, PPooss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettFFllaagg((TThhiiss,, FFllaagg)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Flag = integer()
+
+              See external documentation.
+
+       sseettIInniittSSiizzee((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettMMiinnSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettMMiinnSSiizzee((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettPPrrooppoorrttiioonn((TThhiiss,, PPrrooppoorrttiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Proportion = integer()
+
+              See external documentation.
+
+       sseettRRaattiioo((TThhiiss,, RRaattiioo)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Ratio = number()
+
+              See external documentation.
+              Also:
+              setRatio(This, Size) -> ok when
+              This::wxSizerItem(), Size::{W::integer(), H::integer()}.
+
+
+       sseettRRaattiioo((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettSSiizzeerr((TThhiiss,, SSiizzeerr)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Sizer = wxSizer() (see module wxSizer)
+
+              See external documentation.
+
+       sseettSSppaacceerr((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettSSppaacceerr((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettWWiinnddooww((TThhiiss,, WWiinnddooww)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       sshhooww((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxSizerItem()
+                 Show = boolean()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSiizzeerrIItteemm(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxSizerItem(3)

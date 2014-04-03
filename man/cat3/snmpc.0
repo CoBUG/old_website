@@ -1,0 +1,198 @@
+snmpc(3)                   Erlang Module Definition                   snmpc(3)
+
+
+
+NNAAMMEE
+       snmpc - Interface Functions to the SNMP toolkit MIB compiler
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_c contains interface functions to the SNMP toolkit MIB
+       compiler.
+
+EEXXPPOORRTTSS
+       ccoommppiillee((FFiillee))
+       ccoommppiillee((FFiillee,, OOppttiioonnss)) -->> {{ookk,, BBiinnFFiilleeNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 File = string()
+                 Options = [opt()]
+                 opt() = db() | relaxed_row_name_assign_check() | deprecated()
+                 | description() | reference() | group_check() | i() | il() |
+                 imports() | module() | module_identity() |
+                 module_compliance() | agent_capabilities() | outdir() |
+                 no_defs() | verbosity() | warnings() | warnings_as_errors()
+                 db() = {db, volatile|persistent|mnesia}
+                 deprecated() = {deprecated, bool()}
+                 relaxed_row_name_assign_check() =
+                 relaxed_row_name_assign_check
+                 description() = description
+                 reference() = reference
+                 group_check() = {group_check, bool()}
+                 i() = {i, [dir()]}
+                 il() = {il, [dir()]}
+                 imports() = imports
+                 module() = {module, atom()}
+                 module_identity() = module_identity
+                 module_compliance() = module_compliance
+                 agent_capabilities() = agent_capabilities
+                 no_defs() = no_defs
+                 outdir() = {outdir, dir()}
+                 verbosity() = {verbosity,
+                 silence|warning|info|log|debug|trace}
+                 warnings() = {warnings, bool()}
+                 warnings_as_errors() = warnings_as_errors
+                 dir() = string()
+                 BinFileName = string()
+
+              Compiles the specified MIB file _<_F_i_l_e_>_._m_i_b. The compiled file
+              _B_i_n_F_i_l_e_N_a_m_e is called _<_F_i_l_e_>_._b_i_n.
+
+                * The option _d_b specifies which database should be used for
+                  the default instrumentation.
+
+                  Default is _v_o_l_a_t_i_l_e.
+
+                * The option _d_e_p_r_e_c_a_t_e_d specifies if a deprecated definition
+                  should be kept or not. If the option is false the MIB
+                  compiler will ignore all deprecated definitions.
+
+                  Default is _t_r_u_e.
+
+                * The option _r_e_l_a_x_e_d___r_o_w___n_a_m_e___a_s_s_i_g_n___c_h_e_c_k, if present,
+                  specifies that the row name assign check shall not be done
+                  strictly according to the SMI (which allows only the value
+                  1). With this option, all values greater than zero is
+                  allowed (>= 1). This means that the error will be converted
+                  to a warning.
+
+                  By default it is not included, but if this option is present
+                  it will be.
+
+                * The option _d_e_s_c_r_i_p_t_i_o_n specifies if the text of the
+                  DESCRIPTION field will be included or not.
+
+                  By default it is not included, but if this option is present
+                  it will be.
+
+                * The option _r_e_f_e_r_e_n_c_e specifies if the text of the REFERENCE
+                  field, when found in a table definition, will be included or
+                  not.
+
+                  By default it is not included, but if this option is present
+                  it will be. The reference text will be placed in the
+                  allocList field of the mib-entry record (#me{}) for the
+                  table.
+
+                * The option _g_r_o_u_p___c_h_e_c_k specifies whether the mib compiler
+                  should check the OBJECT-GROUP macro and the NOTIFICATION-
+                  GROUP macro for correctness or not.
+
+                  Default is _t_r_u_e.
+
+                * The option _i specifies the path to search for imported
+                  (compiled) MIB files. The directories should be strings with
+                  a trailing directory delimiter.
+
+                  Default is _[_"_._/_"_].
+
+                * The option _i_l (include_lib) also specifies a list of
+                  directories to search for imported MIBs. It assumes that the
+                  first element in the directory name corresponds to an OTP
+                  application. The compiler will find the current installed
+                  version. For example, the value ["snmp/mibs/"] will be
+                  replaced by ["snmp-3.1.1/mibs/"] (or what the current
+                  version may be in the system). The current directory and the
+                  _<_s_n_m_p_-_h_o_m_e_>_/_p_r_i_v_/_m_i_b_s_/ are always listed last in the include
+                  path.
+
+                * The option _i_m_p_o_r_t_s, if present, specifies that the IMPORT
+                  statement of the MIB shall be included in the compiled mib.
+
+                * The option _m_o_d_u_l_e, if present, specifies the name of a
+                  module which implements all instrumentation functions for
+                  the MIB.
+
+                  The name of all instrumentation functions must be the same
+                  as the corresponding managed object it implements.
+
+                * The option _m_o_d_u_l_e___i_d_e_n_t_i_t_y, if present, specifies that the
+                  info part of the MODULE-IDENTITY statement of the MIB shall
+                  be included in the compiled mib.
+
+                * The option _m_o_d_u_l_e___c_o_m_p_l_i_a_n_c_e, if present, specifies that the
+                  MODULE-COMPLIANCE statement of the MIB shall be included
+                  (with a mib-entry record) in the compiled mib. The mib-entry
+                  record of the module-compliance will contain _r_e_f_e_r_e_n_c_e and
+                  _m_o_d_u_l_e part(s) this info in the _a_s_s_o_c_L_i_s_t field).
+
+                * The option _a_g_e_n_t___c_a_p_a_b_i_l_i_t_i_e_s, if present, specifies that
+                  the AGENT-CAPABILITIES statement of the MIB shall be
+                  included (with a mib-entry record) in the compiled mib. The
+                  mib-entry record of the agent-capabilitie will contain
+                  _r_e_f_e_r_e_n_c_e and _m_o_d_u_l_e_s part(s) this info in the _a_s_s_o_c_L_i_s_t
+                  field).
+
+                * The option _n_o___d_e_f_s, if present, specifies that if a managed
+                  object does not have an instrumentation function, the
+                  default instrumentation function should NOT be used, instead
+                  this is reported as an error, and the compilation aborts.
+
+                * The option _v_e_r_b_o_s_i_t_y specifies the verbosity of the SNMP mib
+                  compiler. I.e. if warning, info, log, debug and trace
+                  messages shall be shown.
+
+                  Default is _s_i_l_e_n_c_e.
+
+                  Note that if the option _w_a_r_n_i_n_g_s is _t_r_u_e and the option
+                  _v_e_r_b_o_s_i_t_y is _s_i_l_e_n_c_e, warning messages will still be shown.
+
+                * The option _w_a_r_n_i_n_g_s specifies whether warning messages
+                  should be shown.
+
+                  Default is _t_r_u_e.
+
+                * The option _w_a_r_n_i_n_g_s___a_s___e_r_r_o_r_s, if present, specifies whether
+                  warnings should be treated as errors.
+
+              The MIB compiler understands both SMIv1 and SMIv2 MIBs. It uses
+              the _M_O_D_U_L_E_-_I_D_E_N_T_I_T_Y statement to determine if the MIB is version
+              1 or 2.
+
+              The MIB compiler can be invoked from the OS command line by
+              using the command _e_r_l_c. _e_r_l_c recognizes the extension _._m_i_b, and
+              invokes the SNMP MIB compiler for files with that extension. The
+              options _d_b, _g_r_o_u_p___c_h_e_c_k, _d_e_p_r_e_c_a_t_e_d, _d_e_s_c_r_i_p_t_i_o_n, _v_e_r_b_o_s_i_t_y,
+              _i_m_p_o_r_t_s and _m_o_d_u_l_e___i_d_e_n_t_i_t_y have to be specified to _e_r_l_c using
+              the syntax _+_t_e_r_m. See _e_r_l_c_(_1_) for details.
+
+       iiss__ccoonnssiisstteenntt((MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Mibs = [MibName]
+                 MibName = string()
+
+              Checks for multiple usage of object identifiers and traps
+              between MIBs.
+
+       mmiibb__ttoo__hhrrll((MMiibbNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 MibName = string()
+
+              Generates a _._h_r_l file with definitions of Erlang constants for
+              the objects in the MIB. The _._h_r_l file is called _<_M_i_b_N_a_m_e_>_._h_r_l.
+              The MIB must be compiled, and present in the current directory.
+
+              The _m_i_b___t_o___h_r_l generator can be invoked from the OS command line
+              by using the command _e_r_l_c. _e_r_l_c recognizes the extension _._b_i_n,
+              and invokes this function for files with that extension.
+
+SSEEEE AALLSSOO
+       erlc(1)
+
+
+
+Ericsson AB                       snmp 4.22.1                         snmpc(3)

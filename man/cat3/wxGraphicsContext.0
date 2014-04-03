@@ -1,0 +1,477 @@
+wxGraphicsContext(3)       Erlang Module Definition       wxGraphicsContext(3)
+
+
+
+NNAAMMEE
+       wxGraphicsContext - See external documentation: wxGraphicsContext.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGraphicsContext.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrraapphhiiccssOObbjjeecctt
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_a_p_h_i_c_s_C_o_n_t_e_x_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ccrreeaattee(()) -->> wwxxGGrraapphhiiccssCCoonntteexxtt(())
+
+              See external documentation.
+
+       ccrreeaattee((DDcc)) -->> wwxxGGrraapphhiiccssCCoonntteexxtt(())
+
+              Types:
+
+                 Dc = wxWindowDC() (see module wxWindowDC) | wxWindow() (see
+                 module wxWindow)
+
+              See external documentation.
+
+       ccrreeaatteePPeenn((TThhiiss,, PPeenn)) -->> wwxxGGrraapphhiiccssPPeenn(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssPPeenn))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Pen = wxPen() (see module wxPen)
+
+              See external documentation.
+
+       ccrreeaatteeBBrruusshh((TThhiiss,, BBrruusshh)) -->> wwxxGGrraapphhiiccssBBrruusshh(()) ((sseeee mmoodduullee
+       wwxxGGrraapphhiiccssBBrruusshh))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Brush = wxBrush() (see module wxBrush)
+
+              See external documentation.
+
+       ccrreeaatteeRRaaddiiaallGGrraaddiieennttBBrruusshh((TThhiiss,, XXoo,, YYoo,, XXcc,, YYcc,, RRaaddiiuuss,, OOCCoolloorr,, CCCCoolloorr))
+       -->> wwxxGGrraapphhiiccssBBrruusshh(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssBBrruusshh))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Xo = number()
+                 Yo = number()
+                 Xc = number()
+                 Yc = number()
+                 Radius = number()
+                 OColor = wx_colour() (see module wx)
+                 CColor = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccrreeaatteeLLiinneeaarrGGrraaddiieennttBBrruusshh((TThhiiss,, XX11,, YY11,, XX22,, YY22,, CC11,, CC22)) -->>
+       wwxxGGrraapphhiiccssBBrruusshh(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssBBrruusshh))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 X1 = number()
+                 Y1 = number()
+                 X2 = number()
+                 Y2 = number()
+                 C1 = wx_colour() (see module wx)
+                 C2 = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccrreeaatteeFFoonntt((TThhiiss,, FFoonntt)) -->> wwxxGGrraapphhiiccssFFoonntt(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssFFoonntt))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Font = wxFont() (see module wxFont)
+
+              Equivalent to ccrreeaatteeFFoonntt((TThhiiss,, FFoonntt,, [[]])).
+
+       ccrreeaatteeFFoonntt((TThhiiss,, FFoonntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrraapphhiiccssFFoonntt(()) ((sseeee
+       mmoodduullee wwxxGGrraapphhiiccssFFoonntt))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Font = wxFont() (see module wxFont)
+                 Option = {col, wx_colour() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaatteeMMaattrriixx((TThhiiss)) -->> wwxxGGrraapphhiiccssMMaattrriixx(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssMMaattrriixx))
+
+              Types:
+
+                 This = wxGraphicsContext()
+
+              Equivalent to ccrreeaatteeMMaattrriixx((TThhiiss,, [[]])).
+
+       ccrreeaatteeMMaattrriixx((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrraapphhiiccssMMaattrriixx(()) ((sseeee mmoodduullee
+       wwxxGGrraapphhiiccssMMaattrriixx))
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Option = {a, number()} | {b, number()} | {c, number()} | {d,
+                 number()} | {tx, number()} | {ty, number()}
+
+              See external documentation.
+
+       ccrreeaatteePPaatthh((TThhiiss)) -->> wwxxGGrraapphhiiccssPPaatthh(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssPPaatthh))
+
+              Types:
+
+                 This = wxGraphicsContext()
+
+              See external documentation.
+
+       cclliipp((TThhiiss,, RReeggiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Region = wxRegion() (see module wxRegion)
+
+              See external documentation.
+
+       cclliipp((TThhiiss,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       rreesseettCClliipp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+
+              See external documentation.
+
+       ddrraawwBBiittmmaapp((TThhiiss,, BBmmpp,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Bmp = wxBitmap() (see module wxBitmap)
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       ddrraawwEElllliippssee((TThhiiss,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       ddrraawwIIccoonn((TThhiiss,, IIccoonn,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Icon = wxIcon() (see module wxIcon)
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       ddrraawwLLiinneess((TThhiiss,, PPooiinnttss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Points = [{X::float(), Y::float()}]
+
+              Equivalent to ddrraawwLLiinneess((TThhiiss,, PPooiinnttss,, [[]])).
+
+       ddrraawwLLiinneess((TThhiiss,, PPooiinnttss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Points = [{X::float(), Y::float()}]
+                 Option = {fillStyle, integer()}
+
+              See external documentation.
+
+       ddrraawwPPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Path = wxGraphicsPath() (see module wxGraphicsPath)
+
+              Equivalent to ddrraawwPPaatthh((TThhiiss,, PPaatthh,, [[]])).
+
+       ddrraawwPPaatthh((TThhiiss,, PPaatthh,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Path = wxGraphicsPath() (see module wxGraphicsPath)
+                 Option = {fillStyle, integer()}
+
+              See external documentation.
+
+       ddrraawwRReeccttaannggllee((TThhiiss,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       ddrraawwRRoouunnddeeddRReeccttaannggllee((TThhiiss,, XX,, YY,, WW,, HH,, RRaaddiiuuss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+                 Radius = number()
+
+              See external documentation.
+
+       ddrraawwTTeexxtt((TThhiiss,, SSttrr,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Str = chardata() (see module unicode)
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+
+       ddrraawwTTeexxtt((TThhiiss,, SSttrr,, XX,, YY,, AAnnggllee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Str = chardata() (see module unicode)
+                 X = number()
+                 Y = number()
+                 Angle = number()
+
+              See external documentation.
+              Also:
+              drawText(This, Str, X, Y, BackgroundBrush) -> ok when
+              This::wxGraphicsContext(), Str::unicode:chardata(), X::number(),
+              Y::number(), BackgroundBrush::wxGraphicsBrush:wxGraphicsBrush().
+
+
+       ddrraawwTTeexxtt((TThhiiss,, SSttrr,, XX,, YY,, AAnnggllee,, BBaacckkggrroouunnddBBrruusshh)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Str = chardata() (see module unicode)
+                 X = number()
+                 Y = number()
+                 Angle = number()
+                 BackgroundBrush = wxGraphicsBrush() (see module
+                 wxGraphicsBrush)
+
+              See external documentation.
+
+       ffiillllPPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Path = wxGraphicsPath() (see module wxGraphicsPath)
+
+              Equivalent to ffiillllPPaatthh((TThhiiss,, PPaatthh,, [[]])).
+
+       ffiillllPPaatthh((TThhiiss,, PPaatthh,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Path = wxGraphicsPath() (see module wxGraphicsPath)
+                 Option = {fillStyle, integer()}
+
+              See external documentation.
+
+       ssttrrookkeePPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Path = wxGraphicsPath() (see module wxGraphicsPath)
+
+              See external documentation.
+
+       ggeettPPaarrttiiaallTTeexxttEExxtteennttss((TThhiiss,, TTeexxtt)) -->> [[nnuummbbeerr(())]]
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettTTeexxttEExxtteenntt((TThhiiss,, TTeexxtt)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Width::number(), Height::number(),
+                 Descent::number(), ExternalLeading::number()}
+                 This = wxGraphicsContext()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       rroottaattee((TThhiiss,, AAnnggllee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Angle = number()
+
+              See external documentation.
+
+       ssccaallee((TThhiiss,, XXSSccaallee,, YYSSccaallee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 XScale = number()
+                 YScale = number()
+
+              See external documentation.
+
+       ttrraannssllaattee((TThhiiss,, DDxx,, DDyy)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Dx = number()
+                 Dy = number()
+
+              See external documentation.
+
+       ggeettTTrraannssffoorrmm((TThhiiss)) -->> wwxxGGrraapphhiiccssMMaattrriixx(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssMMaattrriixx))
+
+              Types:
+
+                 This = wxGraphicsContext()
+
+              See external documentation.
+
+       sseettTTrraannssffoorrmm((TThhiiss,, MMaattrriixx)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Matrix = wxGraphicsMatrix() (see module wxGraphicsMatrix)
+
+              See external documentation.
+
+       ccoonnccaattTTrraannssffoorrmm((TThhiiss,, MMaattrriixx)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Matrix = wxGraphicsMatrix() (see module wxGraphicsMatrix)
+
+              See external documentation.
+
+       sseettBBrruusshh((TThhiiss,, BBrruusshh)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Brush = wxGraphicsBrush() (see module wxGraphicsBrush) |
+                 wxBrush() (see module wxBrush)
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Font = wxGraphicsFont() (see module wxGraphicsFont)
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Font = wxFont() (see module wxFont)
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettPPeenn((TThhiiss,, PPeenn)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Pen = wxPen() (see module wxPen) | wxGraphicsPen() (see
+                 module wxGraphicsPen)
+
+              See external documentation.
+
+       ssttrrookkeeLLiinnee((TThhiiss,, XX11,, YY11,, XX22,, YY22)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 X1 = number()
+                 Y1 = number()
+                 X2 = number()
+                 Y2 = number()
+
+              See external documentation.
+
+       ssttrrookkeeLLiinneess((TThhiiss,, PPooiinnttss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsContext()
+                 Points = [{X::float(), Y::float()}]
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrraapphhiiccssCCoonntteexxtt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2              wxGraphicsContext(3)

@@ -1,0 +1,77 @@
+wxCursor(3)                Erlang Module Definition                wxCursor(3)
+
+
+
+NNAAMMEE
+       wxCursor - See external documentation: wxCursor.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCursor.
+
+       This class is derived (and can use functions) from:
+       wwxxBBiittmmaapp
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_u_r_s_o_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCCuurrssoorr(())
+
+              See external documentation.
+
+       nneeww((CCuurrssoorrIIdd)) -->> wwxxCCuurrssoorr(())
+
+              Types:
+
+                 CursorId = integer()
+
+              See external documentation.
+              Also:
+              new(Image) -> wxCursor() when
+              Image::wxImage:wxImage().
+
+
+       nneeww((BBiittss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxCCuurrssoorr(())
+
+              Types:
+
+                 Bits = binary()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to nneeww((BBiittss,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       nneeww((BBiittss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxCCuurrssoorr(())
+
+              Types:
+
+                 Bits = binary()
+                 Width = integer()
+                 Height = integer()
+                 Option = {hotSpotX, integer()} | {hotSpotY, integer()}
+
+              See external documentation.
+
+       ookk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCursor()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxCCuurrssoorr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                       wxCursor(3)

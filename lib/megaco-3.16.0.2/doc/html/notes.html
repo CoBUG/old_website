@@ -1,0 +1,1016 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- Megaco Release Notes</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/megaco-3.16.0.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Megaco/H.248</strong><br><strong>Release Notes</strong><br><small>Version 3.16.0.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Chapters</strong></small></p>
+<ul class="flipMenu" imagepath="../../../../doc/js/flipmenu"><li id="loadscrollpos" title="Megaco Release Notes" expanded="true">Megaco Release Notes<ul>
+<li><a href="notes.html">
+              Top of chapter
+            </a></li>
+<li title="Megaco 3.16.0.2"><a href="notes.html#id61798">Megaco 3.16.0.2</a></li>
+<li title="Megaco 3.16.0.1"><a href="notes.html#id60835">Megaco 3.16.0.1</a></li>
+<li title="Megaco 3.16"><a href="notes.html#id64875">Megaco 3.16</a></li>
+<li title="Megaco 3.15.1.1"><a href="notes.html#id56718">Megaco 3.15.1.1</a></li>
+<li title="Megaco 3.15.1"><a href="notes.html#id56774">Megaco 3.15.1</a></li>
+<li title="Megaco 3.15"><a href="notes.html#id61384">Megaco 3.15</a></li>
+<li title="Megaco 3.14.1.1"><a href="notes.html#id61437">Megaco 3.14.1.1</a></li>
+<li title="Megaco 3.14.1"><a href="notes.html#id61506">Megaco 3.14.1</a></li>
+<li title="Megaco 3.14"><a href="notes.html#id69246">Megaco 3.14</a></li>
+<li title="Megaco 3.13"><a href="notes.html#id69354">Megaco 3.13</a></li>
+<li title="Megaco 3.12"><a href="notes.html#id69450">Megaco 3.12</a></li>
+<li title="Megaco 3.11.3"><a href="notes.html#id59495">Megaco 3.11.3</a></li>
+<li title="Megaco 3.11.2"><a href="notes.html#id63556">Megaco 3.11.2</a></li>
+<li title="Megaco 3.11.1"><a href="notes.html#id63650">Megaco 3.11.1</a></li>
+<li title="Megaco 3.11"><a href="notes.html#id63756">Megaco 3.11</a></li>
+<li title="Megaco 3.10.1"><a href="notes.html#id60083">Megaco 3.10.1</a></li>
+<li title="Megaco 3.10.0.1"><a href="notes.html#id60219">Megaco 3.10.0.1</a></li>
+<li title="Megaco 3.10"><a href="notes.html#id60301">Megaco 3.10</a></li>
+</ul>
+</li></ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<h1>1 Megaco Release Notes</h1>
+  
+  <p>This document describes the changes made to the Megaco system
+    from version to version. The intention of this document is to
+    list all incompatibilities as well as all enhancements and
+    bugfixes for every release of Megaco. Each release of Megaco
+    thus constitutes one section in this document. The title of each
+    section is the version number of Megaco.</p>
+
+
+  <h3><a name="id61798">1.1 
+        Megaco 3.16.0.2</a></h3>
+
+    <p>Version 3.16.0.2 supports code replacement in runtime from/to
+      version 3.16.0.1, 3.16, 3.15.1.1, 3.15.1 and 3.15.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>Allow whitespaces in installation path. </p>
+          <p>It is now possible to give configure and make an 
+	  installation/release path with whitespaces in it. </p>
+          <p>Own Id: OTP-10107</p>
+        </li>
+
+        <li>
+          <p>Fix parallel make for behaviours. </p>
+        </li>
+
+        <li>
+          <p>Removed use of deprecated system flag, 
+	  <span class="code">global_haeps_size</span>, in the measurement tool 
+	  <span class="code">mstone1</span>. </p>
+        </li>
+
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      
+      <p>-</p>
+      
+ 
+      
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+   
+
+
+  <h3><a name="id60835">1.2 
+        Megaco 3.16.0.1</a></h3>
+
+    <p>Version 3.16.0.1 supports code replacement in runtime from/to
+      version 3.16, 3.15.1.1, 3.15.1 and 3.15.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+	  <p>Fixed some faulty test cases. </p>
+
+        </li>
+
+        <li>
+          <p>Removed use of deprecated system flag, 
+	  <span class="code">scheduler_bind_type</span>, in the measurement tool 
+	  <span class="code">mstone1</span>. </p>
+          <p>Own Id: OTP-9949</p>
+        </li>
+
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      
+      <p>-</p>
+      
+ 
+      
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+   
+
+
+  <h3><a name="id64875">1.3 
+        Megaco 3.16</a></h3>
+
+    <p>Version 3.16 supports code replacement in runtime from/to
+      version 3.15.1.1, 3.15.1 and 3.15.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>Minor improvements to the measurement tool <span class="code">mstone1</span>. </p>
+          <p>Own Id: OTP-9604</p>
+        </li>
+
+        <li>
+	  <p>ASN.1 no longer makes use of a driver to accelerate encode/decode, 
+	  instead it uses NIFs. The encoding config option is <strong>still</strong> 
+	  the same, i.e. <span class="code">driver</span>. </p>
+          <p>Own Id: OTP-9672</p>
+        </li>
+
+        <li>
+	  <p>The profiling test tool has been rewritten. </p>
+	  <p>Håkan Mattsson</p>
+          <p>Own Id: OTP-9679</p>
+        </li>
+
+        <li>
+	  <p>The flex driver has been updated to support the new driver format
+	  (changed to enable 64-bit aware drivers). </p>
+          <p>Own Id: OTP-9795</p>
+        </li>
+
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      
+      <p>-</p>
+      
+ 
+      
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+   
+
+
+  <h3><a name="id56718">1.4 
+        Megaco 3.15.1.1</a></h3>
+
+    <p>Version 3.15.1.1 supports code replacement in runtime from/to
+      version 3.15.1 and 3.15.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>Correct various XML errors. </p>
+          <p>Own Id: OTP-9550</p>
+        </li>
+
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      
+      <p>-</p>
+      
+ 
+      
+    
+
+   
+
+
+  <h3><a name="id56774">1.5 
+        Megaco 3.15.1</a></h3>
+
+    <p>Version 3.15.1 supports code replacement in runtime from/to
+      version 3.15, 3.14.1.1, 3.14.1 and 3.14.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+      <p>-</p>
+
+
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>Fixing miscellaneous things detected by dialyzer. </p>
+          <p>Own Id: OTP-9075</p>
+	  
+        </li>
+
+      </ul>
+
+    
+
+   
+
+
+  <h3><a name="id61384">1.6 
+        Megaco 3.15</a></h3>
+
+    <h4>Improvements and New Features</h4>
+
+
+
+      <ul>
+        <li>
+          <p>Fixing auto-import issues.</p>
+          <p>Own Id: OTP-8842</p>
+        </li>
+      </ul>
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+   
+
+
+  <h3><a name="id61437">1.7 
+        Megaco 3.14.1.1</a></h3>
+    
+
+    <p>Version 3.14.1.1 supports code replacement in runtime from/to
+      version 3.14.1, 3.14, 3.13, 3.12 and 3.11.3.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>Updated the 
+            <span class="bold_code"><a href="megaco_performance.html">performance</a></span> 
+            chapter. </p>
+          <p>Own Id: OTP-8696</p>
+        </li>
+
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+   
+
+
+  <h3><a name="id61506">1.8 
+        Megaco 3.14.1</a></h3>
+    
+
+    <p>Version 3.14.1 supports code replacement in runtime from/to
+      version 3.14, 3.13, 3.12 and 3.11.3.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>A minor compiler related performance improvement. </p>
+          <p>Own Id: OTP-8561</p>
+        </li>
+
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>A race condition when, during high load, processing
+            both the original and a resent message and delivering
+            this as two separate messages to the user. </p>
+          <p>Note that this solution only protects against multiple
+            reply deliveries! </p>
+          <p>Own Id: OTP-8529</p>
+          <p>Aux Id: Seq 10915</p>
+        </li>
+
+        <li>
+          <p>Fix shared libraries installation. </p>
+          <p>The flex shared lib(s) were incorrectly installed as data 
+            files. </p>
+          <p>Peter Lemenkov</p>
+          <p>Own Id: OTP-8627</p>
+        </li>
+
+        <li>
+          <p>Eliminated a possible race condition while creating 
+            pending counters. </p>
+          <p>Own Id: OTP-8634</p>
+	  <p>Aux Id: Seq 11579</p>
+        </li>
+
+      </ul>
+
+    
+
+   
+
+
+  <h3><a name="id69246">1.9 
+        Megaco 3.14</a></h3>
+    
+
+    <p>Version 3.14 supports code replacement in runtime from/to
+      version 3.13, 3.12 and 3.11.3.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+
+      <ul>
+        <li>
+          <p>Various changes to configure and makefile(s) to facilitate cross 
+            compilation (and other build system improvements). </p>
+          <p>Own Id: OTP-8323</p>
+        </li>
+
+        <li>
+          <p>Added a help target in the test Makefile to explain 
+            the most useful make targets, used when testing the 
+            application using the test-server provided with megaco.</p>
+          <p>Own Id: OTP-8362</p>
+        </li>
+ 
+        <li>
+          <p>Adapted megaco_filter to the new internal format.</p>
+          <p>Own Id: OTP-8403</p>
+        </li>
+     </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Callbacks, when the callback module is unknown (undefined), 
+            results in warning messages. </p>
+          <p>A race condition scenario. As part of a cancelation operation,
+            replies with waiting acknowledgements is cancelled. This includes
+            informing the user (via a call to the handle_trans_ack callback 
+            function). It is possible that at this point the connection data 
+            has been removed, which makes it impossible for megaco to 
+            perform this operation, resulting in the warning message. The 
+            solution is to also store the callback module with the other 
+            reply information, to be used when cleaning up after a 
+            cancelation. </p>
+          <p>Own Id: OTP-8328</p>
+	  <p>Aux Id: Seq 11384</p>
+        </li>
+
+      </ul>
+
+    
+
+   
+
+
+  <h3><a name="id69354">1.10 
+        Megaco 3.13</a></h3>
+    
+
+    <p>Version 3.13 supports code replacement in runtime from/to
+      version 3.12 and 3.11.3.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>A minor optimization by using ets:update_element
+            instead of ets:insert for some table updates.</p>
+          <p>Own Id: OTP-8239</p>
+	  
+        </li>
+
+        <li>
+          <p>The documentation is now built with open source tools 
+            (<strong>xsltproc</strong> and <strong>fop</strong>) that exists on most 
+            platforms. One visible change is that the frames are removed.</p>
+          <p>Own Id: OTP-8249</p>
+        </li>
+
+      </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id69450">1.11 
+        Megaco 3.12</a></h3>
+    
+
+
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Improve handling of async transaction reply. </p>
+          <p>For asynchronous requests, issued using 
+            <span class="bold_code"><a href="megaco.html#cast">megaco:cast/3</a></span>, 
+            the reply will be delivered using the 
+            <span class="bold_code"><a href="megaco_user.html#trans_reply">handle_trans_reply/4,5</a></span> 
+            callback function. </p>
+          <p>If a receiver of a request, issued using 
+            <span class="bold_code"><a href="megaco.html#cast">megaco:cast/3</a></span>, 
+            does not reply in time, megaco re-sends the request. 
+            If the receiver of the request sends the reply at the same 
+            time as megaco re-sends, it may also send a reply to the 
+            resent request (thinking the first reply got lost). These 
+            two replies may arrive more or less at the same time, 
+            causing confusion. </p>
+          <p>In order to improve this situation, a number of 
+            improvements have been done: </p>
+          <ul>
+            <li>
+              <p>When the first reply arrives, a timer, request-keep-alive, 
+                is started. This timer is used to decide when to stop 
+                accepting replies as legitimate. </p>
+              <p>The timeout time for the timer is specified by the
+                config option <strong>request_keep_alive_timout</strong>, 
+                which can be set per 
+                <span class="bold_code"><a href="megaco.html#ui_request_keep_alive_timeout">user</a></span> 
+                or per 
+                <span class="bold_code"><a href="megaco.html#ci_request_keep_alive_timeout">connection</a></span>. </p>
+	    </li>
+            <li>
+              <p>We also keep track of how many replies has been received
+                (we do this as long as the request-keep-alive timer is 
+                running). </p>
+            </li>
+            <li>
+              <p>Each reply that arrives while the request-keep-alive timer 
+                is running (including the first) will be delivered using the 
+                <span class="bold_code"><a href="megaco_user.html#trans_reply">handle_trans_reply/4,5</a></span> 
+                callback function, but with the UserReply augmented to
+                include a serial number indicating which reply number this
+                is. 
+                The <strong>first</strong> reply to arrive, 
+                will be numbered <strong>one (1)</strong>. </p>
+            </li>
+            <li>
+              <p>Replies arriving after the timer has expired will be delivered
+                in the same way as before, using the 
+                <span class="bold_code"><a href="megaco_user.html#unexpected_trans">handle_unexpected_trans/3,4</a></span> 
+                callback function. </p>
+	     </li>  
+            <li>
+              <p>Note that if the timer was <strong>not</strong> configured, 
+                megaco will act exactly as before! </p>
+            </li>
+          </ul>
+          <p>Own Id: OTP-8183</p>
+	  <p>Aux Id: Seq 11393</p>
+        </li>
+
+      </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>If the megaco app received a transaction reply, for a request 
+            issued using the
+	    <span class="bold_code"><a href="megaco.html#call">call/3</a></span> function, from 
+            the wrong remote entity (wrong MId)), megaco would still deliver 
+            the reply (<span class="bold_code"><a href="megaco.html#call">call/3</a></span> 
+            returnes) as if from the correct remote entity (right MId). </p>
+          <p>This has been changed so that the function now returns with
+            an error reason. </p>
+          <p>See <span class="bold_code"><a href="megaco.html#call">call/3</a></span> for more 
+            info. </p>
+          <p>*** POTENTIAL INCOMPATIBILITY ***</p>
+          <p>Own Id: OTP-8212</p>
+	  <p>Aux Id: Seq 11305</p>
+        </li>
+
+      </ul>
+
+    
+
+   
+
+
+  <h3><a name="id59495">1.12 
+        Megaco 3.11.3</a></h3>
+    
+
+
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Replacing obsolete guard tests.</p>
+          <p>Own Id: OTP-8164</p>
+	  
+        </li>
+
+        <li>
+          <p>Added the config option 
+            <span class="bold_code"><a href="megaco.html#ui_call_proxy_gc_timeout">call_proxy_gc_timeout</a></span>
+            to be able to control the way unexpected replies (when requests issued 
+            via calls to <span class="bold_code"><a href="megaco.html#call">call/3</a></span>)
+            are handled. </p>
+          <p>See
+            <span class="bold_code"><a href="megaco.html#user_info">user_info/2</a></span>, 
+            <span class="bold_code"><a href="megaco.html#conn_info">conn_info/2</a></span> and
+            <span class="bold_code"><a href="megaco.html#call">call/3</a></span> for more info. </p>
+          <p>Own Id: OTP-8167</p>
+	  <p>Aux Id: Seq 11393</p>
+        </li>
+
+        <li>
+          <p>Make flex scanner c89 compiler compliant.</p>
+	  <p>Akira Kitada</p>
+          <p>Own Id: OTP-8191</p>
+	  
+        </li>
+
+      </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id63556">1.13 
+        Megaco 3.11.2</a></h3>
+    
+
+    <p>Version 3.11.2 supports code replacement in runtime from/to
+      version 3.11.1 and 3.11.</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Megaco was unnecessarily strict when parsing the SDP 
+            attribute <span class="code">maxptime</span> (leading or trailing spaces
+            cased the value parse to fail). </p>
+          <p>This has been improved so that leading and trailing 
+            spaces are stripped before parsing the value. 
+            The same has been done for the attribute <span class="code">ptime</span>.</p>
+          <p>Own Id: OTP-8123</p>
+	  <p>Aux Id: Seq 11364</p>
+        </li>
+
+      </ul>
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id63650">1.14 
+        Megaco 3.11.1</a></h3>
+    
+
+    <p>Version 3.11.1 supports code replacement in runtime from/to
+      version 3.11.</p>
+
+    <h4>Improvements and new features</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>[text] The <strong>unquoted</strong> string BOTH was interpreted as the 
+            <span class="code">'BothToken'</span> token. This was a version 3 (prev3a, prev3b, 
+            prev3c and v3) only. </p>
+          <p>Own Id: OTP-8114</p>
+	  <p>Aux Id: Seq 11353</p>
+        </li>
+
+        <li>
+          <p>The reply proxy could crash if the timeout time calculation
+            results in a negative number. This will result in a function 
+            clause with resulting error report.</p>
+          <p>Own Id: OTP-8081</p>
+	  <p>Aux Id: Seq 11332</p>
+        </li>
+
+      </ul>
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id63756">1.15 
+        Megaco 3.11</a></h3>
+    
+
+
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>In order to better utilize multi-core procs, the 
+            <span class="code">flex</span> (text) scanner has been improved. </p>
+          <p>The <span class="code">flex</span> (text) scanner has been made reentrant,
+            <strong>if</strong> the flex utility supports this. Note that the version
+            of <span class="code">flex</span> supplied with some OS/distros (Solaris 10, 
+            FreeBSD and OpenBSD to mention a few) may not support this, in which
+            case the flex scanner will be non-reentrant, just as before. </p>
+          <p>Own Id: OTP-7302</p>
+        </li>
+
+      </ul>
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id60083">1.16 
+        Megaco 3.10.1</a></h3>
+    
+
+    <p>Version 3.10.1 supports code replacement in runtime from/to
+      version 3.10.0.1, 3.10 and 3.9.4.</p>
+
+    <h4>Improvements and new features</h4>
+      
+      <p>-</p>
+
+
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Unexpected 
+            <span class="bold_code"><a href="megaco_user.html#unexpected_trans">handle_unexpected_reply</a></span> 
+            callbacks. </p>
+          <p>The <span class="bold_code"><a href="megaco_user.html">megaco_user</a></span> callback 
+            function 
+            <span class="bold_code"><a href="megaco_user.html#unexpected_trans">handle_unexpected_reply</a></span> 
+            could during high load be called with unexpected values for the Trans
+            argument, such as an <span class="code">TransactionReply</span> where 
+            <span class="code">transactionResult</span> had the value <span class="code">{error, timeout}</span>. 
+            This was a result of a race condition and has now been fixed. </p>
+          <p>Own Id: OTP-7926</p>
+	  <p>Aux Id: Seq 11255</p>
+        </li>
+
+        <li>
+          <p>[text] PropertyParm values cannot be quoted. </p>
+          <p>It was not possible to encode a PropertyParm value as a quoted string 
+            (unless it *had* to (has at least one RestChar)). The megaco text codec's 
+            now also accepts quoted strings as PropertyParm values. </p>
+          <p>Own Id: OTP-7936</p>
+	  <p>Aux Id: Seq 11258</p>
+        </li>
+
+      </ul>
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id60219">1.17 
+        Megaco 3.10.0.1</a></h3>
+    
+
+    <p>Version 3.10.0.1 supports code replacement in runtime from/to
+      version 3.10 and 3.9.4 except 
+      when using any of the drivers (flex for text or asn1 for binary).</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Updated file headers.</p>
+          <p>Own Id: OTP-7851</p>
+	  
+        </li>
+
+      </ul>
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+      <p>-</p>
+
+
+
+    
+   
+
+
+  <h3><a name="id60301">1.18 
+        Megaco 3.10</a></h3>
+    
+
+    <p>Version 3.10 supports code replacement in runtime from/to
+      version 3.9.4, 3.9.3, 3.9.2, 3.9.1.1, 3.9.1, 3.9, 3.8.2, 3.8.1 and 3.8 except 
+      when using any of the drivers (flex for text or asn1 for binary).</p>
+
+    <h4>Improvements and new features</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>Added new API function 
+            <span class="bold_code"><a href="megaco.html#connect">megaco:connect/5</a></span> and
+            the corresponding new <span class="code">megaco_user</span> callback function 
+            <span class="bold_code"><a href="megaco_user.html#connect">handle_connect/3</a></span>. 
+            The purpose of this is to be able to pass information to the
+            <span class="bold_code"><a href="megaco_user.html#connect">handle_connect/3</a></span> 
+            function by calling the 
+            <span class="bold_code"><a href="megaco.html#connect">megaco:connect/5</a></span> 
+            function. </p>
+          <p>Own Id: OTP-7713</p>
+	  <p>Aux Id: Seq 11140</p>
+        </li>
+
+        <li>
+          <p>Update file headers with new copyright notice. </p>
+          <p>Own Id: OTP-7743</p>
+        </li>
+
+      </ul>
+    
+
+    <h4>Fixed bugs and malfunctions</h4>
+      
+      <p>-</p>
+
+
+
+    
+
+    <h4>Incompatibilities</h4>
+      
+
+
+      <ul>
+        <li>
+          <p>If the transport module calls the 
+            <span class="bold_code"><a href="megaco.html#process_received_message">process_received_message/5</a></span> 
+            or 
+            <span class="bold_code"><a href="megaco.html#receive_message">receive_message/5</a></span> 
+            function(s) for the initial message, then the 
+            <span class="bold_code"><a href="megaco_user.html#connect">handle_connect/3</a></span> 
+            function will now be called and not the
+            <span class="bold_code"><a href="megaco_user.html#connect">handle_connect/2</a></span> 
+            function. </p>
+          <p>Own Id: OTP-7713</p>
+	  <p>Aux Id: Seq 11140</p>
+        </li>
+
+      </ul>
+
+    
+   
+
+  
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 2000-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

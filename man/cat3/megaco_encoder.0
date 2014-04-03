@@ -1,0 +1,150 @@
+megaco_encoder(3)          Erlang Module Definition          megaco_encoder(3)
+
+
+
+NNAAMMEE
+       megaco_encoder - Megaco encoder behaviour.
+
+DDEESSCCRRIIPPTTIIOONN
+       The following functions should be exported from a _m_e_g_a_c_o___e_n_c_o_d_e_r
+       callback module:
+
+DDAATTAA TTYYPPEESS
+       megaco_message() = #'MegacoMessage{}'
+       transaction() = {transactionRequest,     transaction_request()}      |
+                       {transactionPending,     transaction_reply()}        |
+                       {transactionReply,       transaction_pending()}      |
+                       {transactionResponseAck, transaction_response_ack()} |
+                       {segmentReply,           segment_reply()}
+       transaction_request() = #'TransactionRequest'{}
+       transaction_pending() = #'TransactionPending'{}
+       transaction_reply() = #'TransactionReply'{}
+       transaction_response_ack() = [transaction_ack()]
+       transaction_ack() = #'TransactionAck'{}
+       segment_reply() = #'SegmentReply'{}
+       action_request() = #'ActionRequest'{}
+       action_reply() = #'ActionReply'{}
+
+
+EEXXPPOORRTTSS
+       MMoodduullee::eennccooddee__mmeessssaaggee((EEnnccooddiinnggCCoonnffiigg,, VVeerrssiioonn,, MMeessssaaggee)) -->> {{ookk,, BBiinn}} ||
+       EErrrroorr
+
+              Types:
+
+                 EncodingConfig = list()
+                 Version = integer()
+                 Message = megaco_message()
+                 Bin = binary()
+                 Error = term()
+
+              Encode a megaco message.
+
+       MMoodduullee::ddeeccooddee__mmeessssaaggee((EEnnccooddiinnggCCoonnffiigg,, VVeerrssiioonn,, BBiinn)) -->> {{ookk,, MMeessssaaggee}} ||
+       EErrrroorr
+
+              Types:
+
+                 EncodingConfig = list()
+                 Version = integer() | dynamic
+                 Message = megaco_message()
+                 Bin = binary()
+                 Error = term()
+
+              Decode a megaco message.
+
+              Note that if the Version argument is _d_y_n_a_m_i_c, the decoder should
+              try to figure out the actual version from the message itself and
+              then use the proper decoder, e.g. version 1.
+              If on the other hand the Version argument is an integer, it
+              means that this is the expected version of the message and the
+              decoder for that version should be used.
+
+       MMoodduullee::ddeeccooddee__mmiinnii__mmeessssaaggee((EEnnccooddiinnggCCoonnffiigg,, VVeerrssiioonn,, BBiinn)) -->> {{ookk,,
+       MMeessssaaggee}} || EErrrroorr
+
+              Types:
+
+                 EncodingConfig = list()
+                 Version = integer() | dynamic
+                 Message = megaco_message()
+                 Bin = binary()
+                 Error = term()
+
+              Perform a minimal decode of a megaco message.
+
+              The purpose of this function is to do a minimal decode of Megaco
+              message. A successfull result is a _'_M_e_g_a_c_o_M_e_s_s_a_g_e_' in which only
+              version and mid has been initiated. This function is used by the
+              megaco_messenger module when the _d_e_c_o_d_e___m_e_s_s_a_g_e_/_3 function fails
+              to figure out the mid (the actual sender) of the message.
+
+              Note again that a successfull decode only returns a partially
+              initiated message.
+
+       MMoodduullee::eennccooddee__ttrraannssaaccttiioonn((EEnnccooddiinnggCCoonnffiigg,, VVeerrssiioonn,, TTrraannssaaccttiioonn)) -->> OOKK ||
+       EErrrroorr
+
+              Types:
+
+                 EncodingConfig = list()
+                 Version = integer()
+                 Transaction = transaction()
+                 OK = {ok, Bin}
+                 Bin = binary()
+                 Error = {error, Reason}
+                 Reason = not_implemented | OtherReason
+                 OtherReason = term()
+
+              Encode a megaco transaction. If this, for whatever reason, is
+              not supported, the function should return the error reason
+              _n_o_t___i_m_p_l_e_m_e_n_t_e_d.
+
+              This functionality is used both when the transaction sender is
+              used and for segmentation. So, for either of those to work, this
+              function _m_u_s_t be fully supported!
+
+       MMoodduullee::eennccooddee__aaccttiioonn__rreeqquueessttss((EEnnccooddiinnggCCoonnffiigg,, VVeerrssiioonn,, AARRss)) -->> OOKK ||
+       EErrrroorr
+
+              Types:
+
+                 EncodingConfig = list()
+                 Version = integer()
+                 ARs = action_requests()
+                 action_requests() = [action_request()]
+                 OK = {ok, Bin}
+                 Bin = binary()
+                 Error = {error, Reason}
+                 Reason = not_implemented | OtherReason
+                 OtherReason = term()
+
+              Encode megaco action requests. This function is called when the
+              user calls the function eennccooddee__aaccttiioonnss//33. If that function is
+              never used or if the codec cannot support this (the encoding of
+              individual actions), then return with error reason
+              _n_o_t___i_m_p_l_e_m_e_n_t_e_d.
+
+       MMoodduullee::eennccooddee__aaccttiioonn__rreeppllyy((EEnnccooddiinnggCCoonnffiigg,, VVeerrssiioonn,, AARR)) -->> OOKK || EErrrroorr
+
+              Types:
+
+                 EncodingConfig = list()
+                 Version = integer()
+                 AR = action_reply()
+                 OK = {ok, Bin}
+                 Bin = binary()
+                 Error = {error, Reason}
+                 Reason = not_implemented | OtherReason
+                 OtherReason = term()
+
+              Encode a megaco action reply. If this, for whatever reason, is
+              not supported, the function should return the error reason
+              _n_o_t___i_m_p_l_e_m_e_n_t_e_d.
+
+              This function is used when segmentation has been configured. So,
+              for this to work, this function _m_u_s_t be fully supported!
+
+
+
+Ericsson AB                     megaco 3.16.0.2              megaco_encoder(3)

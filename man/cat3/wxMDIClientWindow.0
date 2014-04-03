@@ -1,0 +1,73 @@
+wxMDIClientWindow(3)       Erlang Module Definition       wxMDIClientWindow(3)
+
+
+
+NNAAMMEE
+       wxMDIClientWindow - See external documentation: wxMDIClientWindow.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMDIClientWindow.
+
+       This class is derived (and can use functions) from:
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_D_I_C_l_i_e_n_t_W_i_n_d_o_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMDDIICClliieennttWWiinnddooww(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxMMDDIICClliieennttWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMDDIICClliieennttWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ccrreeaatteeCClliieenntt((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMDIClientWindow()
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+
+              Equivalent to ccrreeaatteeCClliieenntt((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaatteeCClliieenntt((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMDIClientWindow()
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMDDIICClliieennttWWiinnddooww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2              wxMDIClientWindow(3)

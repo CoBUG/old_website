@@ -1,0 +1,396 @@
+ic(3)                      Erlang Module Definition                      ic(3)
+
+
+
+NNAAMMEE
+       ic - The Erlang IDL Compiler
+
+DDEESSCCRRIIPPTTIIOONN
+       The ic module is an Erlang implementation of an OMG IDL compiler.
+       Depending on the choice of back-end the code will map to Erlang, C, or
+       Java. The compiler generates client stubs and server skeletons.
+
+       Two kinds of files are generated for each scope: Ordinary code files
+       and header files. The latter are used for defining record definitions,
+       while the ordinary files contain the object interface functions.
+
+EEXXPPOORRTTSS
+       iicc::ggeenn((FFiilleeNNaammee)) -->> RReessuulltt
+       iicc::ggeenn((FFiilleeNNaammee,, [[OOppttiioonn]])) -->> RReessuulltt
+
+              Types:
+
+                 Result = ok | error | {ok, [Warning]} | {error, [Warning],
+                 [Error]}
+
+                 Option = [ GeneralOption | CodeOption | WarningOption |
+                 BackendOption]
+
+                 GeneralOption =
+                 {outdir, String()} | {cfgfile, String()} | {use_preproc,
+                 bool()} |
+                 {preproc_cmd, String()} | {preproc_flags, String()}
+
+                 CodeOption =
+                 {gen_hrl, bool()} | {serv_last_call, exception | exit} |
+                 {{impl, String()}, String()} | {light_ifr, bool()}
+                 this | {this, String()} | {{this, String()}, bool()} |
+                 from | {from, String()} | {{from, String()}, bool()} |
+                 handle_info | {handle_info, String()} | {{handle_info,
+                 String()}, bool()} |
+                 timeout | {timeout, String()} | {{timeout, String()}, bool()}
+                 |
+                 {scoped_op_calls, bool()} | {scl, bool()} |
+                 {user_protocol, Prefix} |
+                 {c_timeout, {SendTimeout, RecvTimeout}} |
+                 {c_report, bool()} |
+                 {precond, {atom(), atom()}} | {{precond, String()} {atom(),
+                 atom()}} |
+                 {postcond, {atom(), atom()}} | {{postcond, String()} {atom(),
+                 atom()}}
+
+                 WarningOption =
+                 {'Wall', bool()} | {maxerrs, int() | infinity} |
+                 {maxwarns, int() | infinity} | {nowarn, bool()} |
+                 {warn_name_shadow, bool()} | {pedantic, bool()} |
+                 {silent, bool()}
+
+                 BackendOption = {be, Backend}
+
+                 Backend = erl_corba | erl_template | erl_plain | erl_genserv
+                 | c_client | c_server | java
+
+                 DirNAme = string() | atom()
+                 FileName = string() | atom()
+
+              The tuple _{_O_p_t_i_o_n_, _t_r_u_e_} can be replaced by _O_p_t_i_o_n for boolean
+              values.
+
+              The _i_c_:_g_e_n_/_2 function can be called from the command line as
+              follows:
+
+              _e_r_l_c _"_+_O_p_t_i_o_n_" _._._. _F_i_l_e_._i_d_l
+
+              Example:
+
+              _e_r_l_c _"_+_{_b_e_,_c___c_l_i_e_n_t_}_" _'_+_{_o_u_t_d_i_r_, _"_._._/_o_u_t_"_}_' _F_i_l_e_._i_d_l
+
+GGEENNEERRAALL OOPPTTIIOONNSS
+         _o_u_t_d_i_r:
+           Places all output files in the directory given by the option. The
+           directory will be created if it does not already exist.
+
+           Example option: _{_o_u_t_d_i_r_, _"_o_u_t_p_u_t_/_g_e_n_e_r_a_t_e_d_"_}.
+
+         _c_f_g_f_i_l_e:
+           Uses _F_i_l_e_N_a_m_e as configuration file. Options will override compiler
+           defaults but can be overridden by command line options. Default
+           value is _"_._i_c___c_o_n_f_i_g_".
+
+           Example option: _{_c_f_g_f_i_l_e_, _"_s_p_e_c_i_a_l_._c_f_g_"_}.
+
+         _u_s_e___p_r_e_p_r_o_c:
+           Uses a preprocessor. Default value is true.
+
+         _p_r_e_p_r_o_c___c_m_d:
+           Command string to invoke the preprocessor. The actual command will
+           be built as _p_r_e_p_r_o_c___c_m_d_+_+_p_r_e_p_r_o_c___f_l_a_g_s_+_+_F_i_l_e_N_a_m_e
+
+           Example option: _{_p_r_e_p_r_o_c___c_m_d_, _"_e_r_l_"_}_).
+
+           Example option: _{_p_r_e_p_r_o_c___c_m_d_, _"_g_c_c _-_x _c_+_+ _-_E_"_}.
+
+         _p_r_e_p_r_o_c___f_l_a_g_s:
+           Flags given to the preprocessor.
+
+           Example option: _{_p_r_e_p_r_o_c___f_l_a_g_s_, _"_-_I_._._/_i_n_c_l_u_d_e_"_}.
+
+CCOODDEE OOPPTTIIOONNSS
+         _l_i_g_h_t___i_f_r:
+           Currently, the default setting is _f_a_l_s_e. To be able to use this
+           option Orber must be configured to use Light IFR (see Orber's
+           User's Guide). When this options is used, the size of the generated
+           files used to register the API in the IFR DB are minimized.
+
+           Example option: _{_l_i_g_h_t___i_f_r_, _t_r_u_e_}.
+
+         _g_e_n___h_r_l:
+           Generate header files. Default is true.
+
+         _s_e_r_v___l_a_s_t___c_a_l_l:
+           Makes the last _g_e_n___s_e_r_v_e_r _h_a_n_d_l_e___c_a_l_l either raise a CORBA
+           exception or just exit plainly. Default is the exception.
+
+         _{_{_i_m_p_l_, _I_n_t_f_N_a_m_e_}_, _M_o_d_N_a_m_e_}:
+           Assumes that the interface with name _I_n_t_f_N_a_m_e is implemented by the
+           module with name _M_o_d_N_a_m_e and will generate calls to the _M_o_d_N_a_m_e
+           module in the server behavior. Note that the _I_n_t_f_N_a_m_e must be a
+           fully scoped name as in _"_M_1_:_:_I_1_".
+
+         _t_h_i_s:
+           Adds the object reference as the first parameter to the object
+           implementation functions. This makes the implementation aware of
+           its own object reference.
+           The option comes in three varieties: _t_h_i_s which activates the
+           parameter for all interfaces in the source file, _{_t_h_i_s_, _I_n_t_f_N_a_m_e_}
+           which activates the parameter for a specified interface and _{_{_t_h_i_s_,
+           _I_n_t_f_N_a_m_e_}_, _f_a_l_s_e_} which deactivates the parameter for a specified
+           interface.
+
+           Example option: _t_h_i_s_) activates the parameter for all interfaces.
+
+           Example option: _{_t_h_i_s_, _"_M_1_:_:_I_1_"_} activates the parameter for all
+           functions of _M_1_:_:_I_1.
+
+           Example options: _[_t_h_i_s_, _{_{_t_h_i_s_, _"_M_1_:_:_I_2_"_}_, _f_a_l_s_e_}_] activates the
+           parameter for all interfaces except _M_1_:_:_I_2.
+
+         _f_r_o_m:
+           Adds the invokers reference as the first parameter to the object
+           implementation two-way functions. If both _f_r_o_m and _t_h_i_s options are
+           used the invokers reference parameter will be passed as the second
+           parameter. This makes it possible for the implementation to respond
+           to a request and continue executing afterwards. Consult the
+           _g_e_n___s_e_r_v_e_r and _O_r_b_e_r documentation how this option may be used.
+           The option comes in three varieties: _f_r_o_m which activates the
+           parameter for all interfaces in the source file, _{_f_r_o_m_, _I_n_t_f_N_a_m_e_}
+           which activates the parameter for a specified interface and _{_{_f_r_o_m_,
+           _I_n_t_f_N_a_m_e_}_, _f_a_l_s_e_} which deactivates the parameter for a specified
+           interface.
+
+           Example option: _f_r_o_m_) activates the parameter for all interfaces.
+
+           Example options: _[_{_f_r_o_m_, _"_M_1_:_:_I_1_"_}_] activates the parameter for all
+           functions of _M_1_:_:_I_1.
+
+           Example options: _[_f_r_o_m_, _{_{_f_r_o_m_, _"_M_1_:_:_I_2_"_}_, _f_a_l_s_e_}_] activates the
+           parameter for all interfaces except _M_1_:_:_I_2.
+
+         _h_a_n_d_l_e___i_n_f_o:
+           Makes the object server call a function _h_a_n_d_l_e___i_n_f_o in the object
+           implementation module on all unexpected messages. Useful if the
+           object implementation need to trap exits.
+
+           Example option: _h_a_n_d_l_e___i_n_f_o will activates module implementation
+           _h_a_n_d_l_e___i_n_f_o for all interfaces in the source file.
+
+           Example option: _{_{_h_a_n_d_l_e___i_n_f_o_, _"_M_1_:_:_I_1_"_}_, _t_r_u_e_} will activates
+           module implementation _h_a_n_d_l_e___i_n_f_o for the specified interface.
+
+           Example options: _[_h_a_n_d_l_e___i_n_f_o_, _{_{_h_a_n_d_l_e___i_n_f_o_, _"_M_1_:_:_I_1_"_}_, _f_a_l_s_e_}_]
+           will generate the _h_a_n_d_l_e___i_n_f_o call for all interfaces except
+           _M_1_:_:_I_1.
+
+         _t_i_m_e_o_u_t:
+           Used to allow a server response time limit to be set by the user.
+           This should be a string that represents the scope for the interface
+           which should have an extra variable for wait time initialization.
+
+           Example option: _{_t_i_m_e_o_u_t_,_"_M_:_:_I_"_}_) produces server stub which will
+           has an extra timeout parameter in the initialization function for
+           that interface.
+
+           Example option: _t_i_m_e_o_u_t produces server stub which will has an
+           extra timeout parameter in the initialization function for all
+           interfaces in the source file.
+
+           Example options: _[_t_i_m_e_o_u_t_, _{_{_t_i_m_e_o_u_t_,_"_M_:_:_I_"_}_, _f_a_l_s_e_}_] produces
+           server stub which will has an extra timeout parameter in the
+           initialization function for all interfaces except _M_1_:_:_I_1.
+
+         _s_c_o_p_e_d___o_p___c_a_l_l_s:
+           Used to produce more refined request calls to server. When this
+           option is set to true, the operation name which was mentioned in
+           the call is scoped. This is essential to avoid name clashes when
+           communicating with c-servers. This option is available for the c-
+           client, c-server and the Erlang gen_server back ends. _A_l_l of the
+           parts generated by ic have to agree in the use of this option.
+           Default is _f_a_l_s_e.
+
+           Example options: _[_{_b_e_,_c___g_e_n_s_e_r_v_}_,_{_s_c_o_p_e_d___o_p___c_a_l_l_s_,_t_r_u_e_}_]_) produces
+           client stubs which sends "scoped" requests to a gen_server or a c-
+           server.
+
+         _u_s_e_r___p_r_o_t_o_c_o_l:
+           Used to define a own protocol different from the default Erlang
+           distribution + gen_server protocol. Currently only valid for C
+           back-ends. For further details see IICC CC pprroottooccooll.
+
+           Example options: _[_{_b_e_,_c___c_l_i_e_n_t_}_,_{_u_s_e_r___p_r_o_t_o_c_o_l_, _"_m_y___s_p_e_c_i_a_l_"_}_]_)
+           produces client stubs which use C protocol functions with the
+           prefix "my_special".
+
+         _c___t_i_m_e_o_u_t:
+           Makes sends and receives to have timeouts (C back-ends only). These
+           timeouts are specified in milliseconds.
+
+           Example options: _[_{_b_e_,_c___c_l_i_e_n_t_}_,_{_c___t_i_m_e_o_u_t_, _{_1_0_0_0_0_, _2_0_0_0_0_}_}_]_)
+           produces client stubs which use a 10 seconds send timeout, and a 20
+           seconds receive timeout.
+
+         _c___r_e_p_o_r_t:
+           Generates code for writing encode/decode errors to _s_t_d_e_r_r (C back-
+           ends only). timeouts are specified in milliseconds.
+
+           Example options: _[_{_b_e_,_c___c_l_i_e_n_t_}_, _c___r_e_p_o_r_t_]_).
+
+         _s_c_l:
+           Used for compatibility with previous compiler versions up to _3_._3.
+           Due to better semantic checks on enumerants, the compiler discovers
+           name clashes between user defined types and enumerant values in the
+           same name space. By enabling this option the compiler turns off the
+           extended semantic check on enumerant values. Default is _f_a_l_s_e.
+
+           Example option: _{_s_c_l_,_t_r_u_e_}
+
+         _p_r_e_c_o_n_d:
+           Adds a precondition call before the call to the operation
+           implementation on the server side.
+
+           The option comes in three varieties: _{_p_r_e_c_o_n_d_, _{_M_, _F_}_} which
+           activates the call for operations in all interfaces in the source
+           file, _{_{_p_r_e_c_o_n_d_, _I_n_t_f_N_a_m_e_}_, _{_M_, _F_}_} which activates the call for
+           all operations in a specific interface and _{_{_p_r_e_c_o_n_d_, _O_p_N_a_m_e_}_, _{_M_,
+           _F_}_} which activates the call for a specific operation.
+
+           The precondition function has the following signature _m_:_f_(_M_o_d_u_l_e_,
+           _F_u_n_c_t_i_o_n_, _A_r_g_s_).
+
+           Example option: _{_p_r_e_c_o_n_d_, _{_m_o_d_, _f_u_n_}_} adds the call of m:f for all
+           operations in the idl file.
+
+           Example options: _[_{_{_p_r_e_c_o_n_d_, _"_M_1_:_:_I_"_}_, _{_m_o_d_, _f_u_n_}_}_] adds the call
+           of _m_:_f for all operations in the interface _M_1_:_:_I_1.
+
+           Example options: _[_{_{_p_r_e_c_o_n_d_, _"_M_1_:_:_I_:_:_O_p_"_}_, _{_m_o_d_, _f_u_n_}_}_] adds the
+           call of _m_:_f for the operation _M_1_:_:_I_:_:_O_p.
+
+         _p_o_s_t_c_o_n_d:
+           Adds a postcondition call after the call to the operation
+           implementation on the server side.
+
+           The option comes in three varieties: _{_p_o_s_t_c_o_n_d_, _{_M_, _F_}_} which
+           activates the call for operations in all interfaces in the source
+           file, _{_{_p_o_s_t_c_o_n_d_, _I_n_t_f_N_a_m_e_}_, _{_M_, _F_}_} which activates the call for
+           all operations in a specific interface and _{_{_p_o_s_t_c_o_n_d_, _O_p_N_a_m_e_}_, _{_M_,
+           _F_}_} which activates the call for a specific operation.
+
+           The postcondition function has the following signature _m_:_f_(_M_o_d_u_l_e_,
+           _F_u_n_c_t_i_o_n_, _A_r_g_s_, _R_e_s_u_l_t_).
+
+           Example option: _{_p_o_s_t_c_o_n_d_, _{_m_o_d_, _f_u_n_}_} adds the call of m:f for all
+           operations in the idl file.
+
+           Example options: _[_{_{_p_o_s_t_c_o_n_d_, _"_M_1_:_:_I_"_}_, _{_m_o_d_, _f_u_n_}_}_] adds the call
+           of _m_:_f for all operations in the interface _M_1_:_:_I_1.
+
+           Example options: _[_{_{_p_o_s_t_c_o_n_d_, _"_M_1_:_:_I_:_:_O_p_"_}_, _{_m_o_d_, _f_u_n_}_}_] adds the
+           call of _m_:_f for the operation _M_1_:_:_I_:_:_O_p.
+
+WWAARRNNIINNGG OOPPTTIIOONNSS
+         _'_W_a_l_l_':
+           The option activates all reasonable warning messages in analogy
+           with the gcc -Wall option. Default value is true.
+
+         _m_a_x_e_r_r_s:
+           The maximum numbers of errors that can be detected before the
+           compiler gives up. The option can either have an integer value or
+           the atom _i_n_f_i_n_i_t_y. Default number is 10.
+
+         _m_a_x_w_a_r_n_s:
+           The maximum numbers of warnings that can be detected before the
+           compiler gives up. The option can either have an integer value or
+           the atom _i_n_f_i_n_i_t_y. Default value is infinity.
+
+         _n_o_w_a_r_n:
+           Suppresses all warnings. Default value is false.
+
+         _w_a_r_n___n_a_m_e___s_h_a_d_o_w:
+           Warning appears whenever names are shadowed due to inheritance; for
+           example, if a type name is redefined from a base interface. Note
+           that it is illegal to overload operation and attribute names as
+           this causes an error to be produced. Default value is true.
+
+         _p_e_d_a_n_t_i_c:
+           Activates all warning options. Default value is false.
+
+         _s_i_l_e_n_t:
+           Suppresses compiler printed output. Default value is false.
+
+BBAACCKK--EENNDD OOPPTTIIOONNSS
+       Which back-end IC will generate code for is determined by the supplied
+       _{_b_e_,_a_t_o_m_(_)_} option. If left out, _e_r_l___c_o_r_b_a is used. Currently, IC
+       support the following back-ends:
+
+         _e_r_l___c_o_r_b_a:
+           This option switches to the IDL generation for CORBA.
+
+         _e_r_l___t_e_m_p_l_a_t_e:
+           Generate CORBA call-back module templates for each interface in the
+           target IDL file. Note, will overwrite existing files.
+
+         _e_r_l___p_l_a_i_n:
+           Will produce plain Erlang modules which contain functions that map
+           to the corresponding interface functions on the input file.
+
+         _e_r_l___g_e_n_s_e_r_v:
+           This is an IDL to Erlang generic server generation option.
+
+         _c___c_l_i_e_n_t:
+           Will produce a C client to the generic Erlang server.
+
+         _c___s_e_r_v_e_r:
+           Will produce a C server switch with functionality of a generic
+           Erlang server.
+
+         _j_a_v_a:
+           Will produce Java client stubs and server skeletons with
+           functionality of a generic Erlang server.
+
+         _c___g_e_n_s_e_r_v:
+           Deprecated. Use _c___c_l_i_e_n_t instead.
+
+PPRREEPPRROOCCEESSSSOORR
+       The IDL compiler allows several preprocessors to be used, the _E_r_l_a_n_g
+       _I_D_L _p_r_e_p_r_o_c_e_s_s_o_r or other standard _C preprocessors. Options can be used
+       to provide extra flags such as include directories to the preprocessor.
+       The build in the Erlang IDL preprocessor is used by default, but any
+       standard C preprocessor such as _g_c_c is adequate.
+
+       The preprocessor command is formed by appending the prepoc_cmd to the
+       preproc_flags option and then appending the input IDL file name.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The compiler can be configured in two ways:
+
+         * Configuration file
+
+         * Command line options
+
+       The configuration file is optional and overrides the compiler defaults
+       and is in turn overridden by the command line options. The
+       configuration file shall contain options in the form of Erlang terms.
+       The configuration file is read using _f_i_l_e_:_c_o_n_s_u_l_t.
+
+       An example of a configuration file, note the "." after each line.
+
+       {outdir, gen_dir}.
+       {{impl, "M1::M2::object"}, "obj"}.
+
+
+OOUUTTPPUUTT FFIILLEESS
+       The compiler will produce output in several files depending on scope
+       declarations found in the IDL file. At most three file types will be
+       generated for each scope (including the top scope), depending on the
+       compiler back-end and the compiled interface. Generally, the output per
+       interface will be a header file (_._h_r_l/ _._h) and one or more Erlang/C
+       files (_._e_r_l/_._c). Please look at the language mapping for each back-end
+       for details.
+
+       There will be at least one set of files for an IDL file, for the file
+       level scope. Modules and interfaces also have their own set of
+       generated files.
+
+
+
+Ericsson AB                        ic 4.2.31                             ic(3)

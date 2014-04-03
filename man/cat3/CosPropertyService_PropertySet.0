@@ -1,0 +1,177 @@
+CosPropertyService_PropertySEertl(a3n)g Module DefinCiotsiPornopertyService_PropertySet(3)
+
+
+
+NNAAMMEE
+       CosPropertyService_PropertySet - This module implements the OMG
+       CosPropertyService::PropertySet interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_P_r_o_p_e_r_t_y_/_i_n_c_l_u_d_e_/_C_o_s_P_r_o_p_e_r_t_y_S_e_r_v_i_c_e_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ddeeffiinnee__pprrooppeerrttyy((PPrrooppeerrttyySSeett,, NNaammee,, VVaalluuee)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Name = non-empty string()
+                 Value = #any
+                 Reply = ok | {'EXCEPTION',
+                 #CosPropertyService_InvalidPropertyName{}} | {'EXCEPTION',
+                 #CosPropertyService_ConflictingProperty{}} | {'EXCEPTION',
+                 #CosPropertyService_UnsupportedTypeCode{}} | {'EXCEPTION',
+                 #CosPropertyService_UnsupportedProperty{}} | {'EXCEPTION',
+                 #CosPropertyService_ReadOnlyProperty{}}
+
+              This operation adds a new property to the given object.
+              Depending on which initial arguments was supplied when starting
+              the object several exceptions may be raised.
+
+       ddeeffiinnee__pprrooppeerrttiieess((PPrrooppeerrttyySSeett,, PPrrooppeerrttiieess)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Properties = [#'CosPropertyService_Property'{property_name =
+                 Name, property_value = Value}]
+                 Name = string()
+                 Value = #any
+                 Reply = ok | {'EXCEPTION',
+                 #CosPropertyService_MultipleExceptions{exceptions = Excs}}
+                 Excs = [#'CosPropertyService_PropertyException{reason =
+                 Reason, failing_property_name = Name}]
+                 Reason = invalid_property_name | conflicting_property |
+                 property_not_found | unsupported_type_code |
+                 unsupported_property | unsupported_mode | fixed_property |
+                 read_only_property
+
+              This operation adds several new properties to the given object.
+              Depending on which initial arguments was supplied when starting
+              the object an exceptions may be raised listing the properties
+              failing.
+
+       ggeett__nnuummbbeerr__ooff__pprrooppeerrttiieess((PPrrooppeerrttyySSeett)) -->> uulloonngg(())
+
+              Types:
+
+                 PropertySet = #objref
+
+              This operation returns the number of properties associated with
+              the target object.
+
+       ggeett__aallll__pprrooppeerrttyy__nnaammeess((PPrrooppeerrttyySSeett,, MMaaxx)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = NamesIterator = #objref
+                 Max = ulong()
+                 Reply = {ok, Names, NamesIterator}
+                 Names = [string()]
+
+              This operation returns up to _M_a_x property names. If the target
+              object have additional associated properties they will be put in
+              the returned Iterator, otherwise the Iterator will be a _N_I_L
+              object.
+
+       ggeett__pprrooppeerrttyy__vvaalluuee((PPrrooppeerrttyySSeett,, NNaammee)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Name = string()
+                 Reply = #any | {'EXCEPTION',
+                 #CosPropertyService_PropertyNotFound{}} | {'EXCEPTION',
+                 #CosPropertyService_InvalidPropertyName{}}
+
+              This operation returns the property value associated with given
+              name. If no such property exists or the given name is an empty
+              string an exception will be raised.
+
+       ggeett__pprrooppeerrttiieess((PPrrooppeerrttyySSeett,, NNaammeess)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Names = [string()]
+                 Reply = {boolean(), Properties}
+                 Properties = [#'CosPropertyService_Property'{property_name =
+                 Name, property_value = Value}]
+
+              This operation returns all properties associated with given
+              names. If the boolean flag is true all properties where
+              retrieved correctly, otherwise, all properties with the type
+              _t_k___v_o_i_d was not found.
+
+       ggeett__aallll__pprrooppeerrttiieess((PPrrooppeerrttyySSeett,, MMaaxx)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = PropertiesIterator = #objref
+                 Reply = {ok, Properties, PropertiesIterator}
+                 Properties = [#'CosPropertyService_Property'{property_name =
+                 Name, property_value = Value}]
+
+              This operation return a list _M_a_x properties or less. If more
+              properties are associated with the target object they will be
+              put in the _P_r_o_p_e_r_t_i_e_s_I_t_e_r_a_t_o_r. If the object had less than _M_a_x
+              associated properties the Iterator will be a _N_I_L object.
+
+       ddeelleettee__pprrooppeerrttyy((PPrrooppeerrttyySSeett,, NNaammee)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Name = string()
+                 Reply = ok | {'EXCEPTION',
+                 #CosPropertyService_FixedProperty{}} | {'EXCEPTION',
+                 #CosPropertyService_PropertyNotFound{}} | {'EXCEPTION',
+                 #CosPropertyService_InvalidPropertyName{}}
+
+              This operation tries to delete the property with given Name. An
+              exception which indicates why it failed is raised if so needed.
+
+       ddeelleettee__pprrooppeerrttiieess((PPrrooppeerrttyySSeett,, NNaammeess)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Names = [string()]
+                 Reply = ok | {'EXCEPTION',
+                 #CosPropertyService_MultipleExceptions{exceptions = Excs}}
+                 Excs = [#'CosPropertyService_PropertyException{reason =
+                 Reason, failing_property_name = Name}]
+                 Reason = invalid_property_name | conflicting_property |
+                 property_not_found | unsupported_type_code |
+                 unsupported_property | unsupported_mode | fixed_property |
+                 read_only_property
+
+              This operation tries to delete all given Properties. If one or
+              more removal fails an exception is raised which describe why.
+
+       ddeelleettee__aallll__pprrooppeerrttiieess((PPrrooppeerrttyySSeett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 PropertySet = #objref
+
+              This operation deletes all properties. The boolean flag, if set
+              to false, indicates that it was not possible to remove one or
+              more properties, e.g., may be read only.
+
+       iiss__pprrooppeerrttyy__ddeeffiinneedd((PPrrooppeerrttyySSeett,, NNaammee)) -->> RReeppllyy
+
+              Types:
+
+                 PropertySet = #objref
+                 Name = non-empty string()
+                 Reply = boolean() | {'EXCEPTION',
+                 #CosPropertyService_InvalidPropertyName{}}
+
+              This operation returns true if the target have an associated
+              property with given name.
+
+
+
+Ericsson AB                   cosProperty 1.1.C1o5sPropertyService_PropertySet(3)

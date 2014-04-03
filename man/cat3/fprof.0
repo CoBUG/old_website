@@ -1,0 +1,803 @@
+fprof(3)                   Erlang Module Definition                   fprof(3)
+
+
+
+NNAAMMEE
+       fprof - A Time Profiling Tool using trace to file for minimal runtime
+       performance impact.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is used to profile a program to find out how the execution
+       time is used. Trace to file is used to minimize runtime performance
+       impact.
+
+       The _f_p_r_o_f module uses tracing to collect profiling data, hence there is
+       no need for special compilation of any module to be profiled. When it
+       starts tracing, _f_p_r_o_f will erase all previous tracing in the node and
+       set the necessary trace flags on the profiling target processes as well
+       as local call trace on all functions in all loaded modules and all
+       modules to be loaded. _f_p_r_o_f erases all tracing in the node when it
+       stops tracing.
+
+       _f_p_r_o_f presents both _o_w_n _t_i_m_e i.e how much time a function has used for
+       its own execution, and _a_c_c_u_m_u_l_a_t_e_d _t_i_m_e i.e including called functions.
+       All presented times are collected using trace timestamps. _f_p_r_o_f tries
+       to collect cpu time timestamps, if the host machine OS supports it.
+       Therefore the times may be wallclock times and OS scheduling will
+       randomly strike all called functions in a presumably fair way.
+
+       If, however, the profiling time is short, and the host machine OS does
+       not support high resolution cpu time measurements, some few OS
+       schedulings may show up as ridiculously long execution times for
+       functions doing practically nothing. An example of a function more or
+       less just composing a tuple in about 100 times the normal execution
+       time has been seen, and when the tracing was repeated, the execution
+       time became normal.
+
+       Profiling is essentially done in 3 steps:
+
+         _1:
+           Tracing; to file, as mentioned in the previous paragraph. The trace
+           contains entries for function calls, returns to function, process
+           scheduling, other process related (spawn, etc) events, and garbage
+           collection. All trace entries are timestamped.
+
+         _2:
+           Profiling; the trace file is read, the execution call stack is
+           simulated, and raw profile data is calculated from the simulated
+           call stack and the trace timestamps. The profile data is stored in
+           the _f_p_r_o_f server state. During this step the trace data may be
+           dumped in text format to file or console.
+
+         _3:
+           Analysing; the raw profile data is sorted, filtered and dumped in
+           text format either to file or console. The text format intended to
+           be both readable for a human reader, as well as parsable with the
+           standard erlang parsing tools.
+
+       Since _f_p_r_o_f uses trace to file, the runtime performance degradation is
+       minimized, but still far from negligible, especially for programs that
+       use the filesystem heavily by themselves. Where you place the trace
+       file is also important, e.g on Solaris _/_t_m_p is usually a good choice
+       since it is essentially a RAM disk, while any NFS (network) mounted
+       disk is a bad idea.
+
+       _f_p_r_o_f can also skip the file step and trace to a tracer process that
+       does the profiling in runtime.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, {{aallrreeaaddyy__ssttaarrtteedd,, PPiidd}}}}
+
+              Types:
+
+                 Pid = pid()
+
+              Starts the _f_p_r_o_f server.
+
+              Note that it seldom needs to be started explicitly since it is
+              automatically started by the functions that need a running
+              server.
+
+       ssttoopp(()) -->> ookk
+
+              Same as _s_t_o_p_(_n_o_r_m_a_l_).
+
+       ssttoopp((RReeaassoonn)) -->> ookk
+
+              Types:
+
+                 Reason = term()
+
+              Stops the _f_p_r_o_f server.
+
+              The supplied _R_e_a_s_o_n becomes the exit reason for the server
+              process. Default Any _R_e_a_s_o_n other than _k_i_l_l sends a request to
+              the server and waits for it to clean up, reply and exit. If
+              _R_e_a_s_o_n is _k_i_l_l, the server is bluntly killed.
+
+              If the _f_p_r_o_f server is not running, this function returns
+              immediately with the same return value.
+
+          NNoottee::
+              When the _f_p_r_o_f server is stopped the collected raw profile data
+              is lost.
+
+
+       aappppllyy((FFuunncc,, AArrggss)) -->> tteerrmm(())
+
+              Types:
+
+                 Func = function() | {Module, Function}
+                 Args = [term()]
+                 Module = atom()
+                 Function = atom()
+
+              Same as _a_p_p_l_y_(_F_u_n_c_, _A_r_g_s_, _[_]_).
+
+       aappppllyy((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> tteerrmm(())
+
+              Types:
+
+                 Args = [term()]
+                 Module = atom()
+                 Function = atom()
+
+              Same as _a_p_p_l_y_(_{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_}_, _A_r_g_s_, _[_]_).
+
+       aappppllyy((FFuunncc,, AArrggss,, OOppttiioonnLLiisstt)) -->> tteerrmm(())
+
+              Types:
+
+                 Func = function() | {Module, Function}
+                 Args = [term()]
+                 OptionList = [Option]
+                 Module = atom()
+                 Function = atom()
+                 Option = continue | start | {procs, PidList} |
+                 TraceStartOption
+
+              Calls _e_r_l_a_n_g_:_a_p_p_l_y_(_F_u_n_c_, _A_r_g_s_) surrounded by _t_r_a_c_e_(_[_s_t_a_r_t_, _._._._]_)
+              and _t_r_a_c_e_(_s_t_o_p_).
+
+              Some effort is made to keep the trace clean from unnecessary
+              trace messages; tracing is started and stopped from a spawned
+              process while the _e_r_l_a_n_g_:_a_p_p_l_y_/_2 call is made in the current
+              process, only surrounded by _r_e_c_e_i_v_e and _s_e_n_d statements towards
+              the trace starting process. The trace starting process exits
+              when not needed any more.
+
+              The _T_r_a_c_e_S_t_a_r_t_O_p_t_i_o_n is any option allowed for _t_r_a_c_e_/_1. The
+              options _[_s_t_a_r_t_, _{_p_r_o_c_s_, _[_s_e_l_f_(_) _| _P_i_d_L_i_s_t_]_} _| _O_p_t_L_i_s_t_] are given
+              to _t_r_a_c_e_/_1, where _O_p_t_L_i_s_t is _O_p_t_i_o_n_L_i_s_t with _c_o_n_t_i_n_u_e, _s_t_a_r_t and
+              _{_p_r_o_c_s_, ___} options removed.
+
+              The _c_o_n_t_i_n_u_e option inhibits the call to _t_r_a_c_e_(_s_t_o_p_) and leaves
+              it up to the caller to stop tracing at a suitable time.
+
+       aappppllyy((MMoodduullee,, FFuunnccttiioonn,, AArrggss,, OOppttiioonnLLiisstt)) -->> tteerrmm(())
+
+              Types:
+
+                 Module = atom()
+                 Function = atom()
+                 Args = [term()]
+
+              Same as _a_p_p_l_y_(_{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_}_, _A_r_g_s_, _O_p_t_i_o_n_L_i_s_t_).
+
+              _O_p_t_i_o_n_L_i_s_t is an option list allowed for _a_p_p_l_y_/_3.
+
+       ttrraaccee((ssttaarrtt,, FFiilleennaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              Same as _t_r_a_c_e_(_[_s_t_a_r_t_, _{_f_i_l_e_, _F_i_l_e_n_a_m_e_}_]_).
+
+       ttrraaccee((vveerrbboossee,, FFiilleennaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              Same as _t_r_a_c_e_(_[_s_t_a_r_t_, _v_e_r_b_o_s_e_, _{_f_i_l_e_, _F_i_l_e_n_a_m_e_}_]_).
+
+       ttrraaccee((OOppttiioonnNNaammee,, OOppttiioonnVVaalluuee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 OptionValue = term()
+                 Reason = term()
+
+              Same as _t_r_a_c_e_(_[_{_O_p_t_i_o_n_N_a_m_e_, _O_p_t_i_o_n_V_a_l_u_e_}_]_).
+
+       ttrraaccee((vveerrbboossee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              Same as _t_r_a_c_e_(_[_s_t_a_r_t_, _v_e_r_b_o_s_e_]_).
+
+       ttrraaccee((OOppttiioonnNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 Reason = term()
+
+              Same as _t_r_a_c_e_(_[_O_p_t_i_o_n_N_a_m_e_]_).
+
+       ttrraaccee(({{OOppttiioonnNNaammee,, OOppttiioonnVVaalluuee}})) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 OptionValue = term()
+                 Reason = term()
+
+              Same as _t_r_a_c_e_(_[_{_O_p_t_i_o_n_N_a_m_e_, _O_p_t_i_o_n_V_a_l_u_e_}_]_).
+
+       ttrraaccee(([[OOppttiioonn]])) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 Option = start | stop | {procs, PidSpec} | {procs, [PidSpec]}
+                 | verbose | {verbose, bool()} | file | {file, Filename} |
+                 {tracer, Tracer}
+                 PidSpec = pid() | atom()
+                 Tracer = pid() | port()
+                 Reason = term()
+
+              Starts or stops tracing.
+
+              _P_i_d_S_p_e_c and _T_r_a_c_e_r are used in calls to _e_r_l_a_n_g_:_t_r_a_c_e_(_P_i_d_S_p_e_c_,
+              _t_r_u_e_, _[_{_t_r_a_c_e_r_, _T_r_a_c_e_r_} _| _F_l_a_g_s_]_), and _F_i_l_e_n_a_m_e is used to call
+              _d_b_g_:_t_r_a_c_e___p_o_r_t_(_f_i_l_e_, _F_i_l_e_n_a_m_e_). Please see the appropriate
+              documentation.
+
+              Option description:
+
+                _s_t_o_p:
+                  Stops a running _f_p_r_o_f trace and clears all tracing from the
+                  node. Either option _s_t_o_p or _s_t_a_r_t must be specified, but not
+                  both.
+
+                _s_t_a_r_t:
+                  Clears all tracing from the node and starts a new _f_p_r_o_f
+                  trace. Either option _s_t_a_r_t or _s_t_o_p must be specified, but
+                  not both.
+
+                _v_e_r_b_o_s_e| _{_v_e_r_b_o_s_e_, _b_o_o_l_(_)_}:
+                  The options _v_e_r_b_o_s_e or _{_v_e_r_b_o_s_e_, _t_r_u_e_} adds some trace flags
+                  that _f_p_r_o_f does not need, but that may be interesting for
+                  general debugging purposes. This option is only allowed with
+                  the _s_t_a_r_t option.
+
+                _c_p_u___t_i_m_e| _{_c_p_u___t_i_m_e_, _b_o_o_l_(_)_}:
+                  The options _c_p_u___t_i_m_e or _{_c_p_u___t_i_m_e_, _t_r_u_e_> makes the
+                  timestamps in the trace be in CPU time instead of wallclock
+                  time which is the default. This option is only allowed with
+                  the _s_t_a_r_t option.
+
+                _{_p_r_o_c_s_, _P_i_d_S_p_e_c_}| _{_p_r_o_c_s_, _[_P_i_d_S_p_e_c_]_}:
+                  Specifies which processes that shall be traced. If this
+                  option is not given, the calling process is traced. All
+                  processes spawned by the traced processes are also traced.
+                  This option is only allowed with the _s_t_a_r_t option.
+
+                _f_i_l_e| _{_f_i_l_e_, _F_i_l_e_n_a_m_e_}:
+                  Specifies the filename of the trace. If the option _f_i_l_e is
+                  given, or none of these options are given, the file
+                  _"_f_p_r_o_f_._t_r_a_c_e_" is used. This option is only allowed with the
+                  _s_t_a_r_t option, but not with the _{_t_r_a_c_e_r_, _T_r_a_c_e_r_} option.
+
+                _{_t_r_a_c_e_r_, _T_r_a_c_e_r_}:
+                  Specifies that trace to process or port shall be done
+                  instead of trace to file. This option is only allowed with
+                  the _s_t_a_r_t option, but not with the _{_f_i_l_e_, _F_i_l_e_n_a_m_e_} option.
+
+       pprrooffiillee(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              Same as _p_r_o_f_i_l_e_(_[_]_).
+
+       pprrooffiillee((OOppttiioonnNNaammee,, OOppttiioonnVVaalluuee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 OptionValue = term()
+                 Reason = term()
+
+              Same as _p_r_o_f_i_l_e_(_[_{_O_p_t_i_o_n_N_a_m_e_, _O_p_t_i_o_n_V_a_l_u_e_}_]_).
+
+       pprrooffiillee((OOppttiioonnNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,,
+       RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 Reason = term()
+
+              Same as _p_r_o_f_i_l_e_(_[_O_p_t_i_o_n_N_a_m_e_]_).
+
+       pprrooffiillee(({{OOppttiioonnNNaammee,, OOppttiioonnVVaalluuee}})) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 OptionValue = term()
+                 Reason = term()
+
+              Same as _p_r_o_f_i_l_e_(_[_{_O_p_t_i_o_n_N_a_m_e_, _O_p_t_i_o_n_V_a_l_u_e_}_]_).
+
+       pprrooffiillee(([[OOppttiioonn]])) -->> ookk || {{ookk,, TTrraacceerr}} || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 Option = file | {file, Filename} | dump | {dump, Dump} |
+                 append | start | stop
+                 Dump = pid() | Dumpfile | []
+                 Tracer = pid()
+                 Reason = term()
+
+              Compiles a trace into raw profile data held by the _f_p_r_o_f server.
+
+              _D_u_m_p_f_i_l_e is used to call _f_i_l_e_:_o_p_e_n_/_2, and _F_i_l_e_n_a_m_e is used to
+              call _d_b_g_:_t_r_a_c_e___p_o_r_t_(_f_i_l_e_, _F_i_l_e_n_a_m_e_). Please see the appropriate
+              documentation.
+
+              Option description:
+
+                _f_i_l_e| _{_f_i_l_e_, _F_i_l_e_n_a_m_e_}:
+                  Reads the file _F_i_l_e_n_a_m_e and creates raw profile data that is
+                  stored in RAM by the _f_p_r_o_f server. If the option _f_i_l_e is
+                  given, or none of these options are given, the file
+                  _"_f_p_r_o_f_._t_r_a_c_e_" is read. The call will return when the whole
+                  trace has been read with the return value _o_k if successful.
+                  This option is not allowed with the _s_t_a_r_t or _s_t_o_p options.
+
+                _d_u_m_p| _{_d_u_m_p_, _D_u_m_p_}:
+                  Specifies the destination for the trace text dump. If this
+                  option is not given, no dump is generated, if it is _d_u_m_p the
+                  destination will be the caller's group leader, otherwise the
+                  destination _D_u_m_p is either the pid of an I/O device or a
+                  filename. And, finally, if the filename is _[_] - _"_f_p_r_o_f_._d_u_m_p_"
+                  is used instead. This option is not allowed with the _s_t_o_p
+                  option.
+
+                _a_p_p_e_n_d:
+                  Causes the trace text dump to be appended to the destination
+                  file. This option is only allowed with the _{_d_u_m_p_, _D_u_m_p_f_i_l_e_}
+                  option.
+
+                _s_t_a_r_t:
+                  Starts a tracer process that profiles trace data in runtime.
+                  The call will return immediately with the return value _{_o_k_,
+                  _T_r_a_c_e_r_} if successful. This option is not allowed with the
+                  _s_t_o_p, _f_i_l_e or _{_f_i_l_e_, _F_i_l_e_n_a_m_e_} options.
+
+                _s_t_o_p:
+                  Stops the tracer process that profiles trace data in
+                  runtime. The return value will be value _o_k if successful.
+                  This option is not allowed with the _s_t_a_r_t, _f_i_l_e or _{_f_i_l_e_,
+                  _F_i_l_e_n_a_m_e_} options.
+
+       aannaallyyssee(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              Same as _a_n_a_l_y_s_e_(_[_]_).
+
+       aannaallyyssee((OOppttiioonnNNaammee,, OOppttiioonnVVaalluuee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 OptionValue = term()
+                 Reason = term()
+
+              Same as _a_n_a_l_y_s_e_(_[_{_O_p_t_i_o_n_N_a_m_e_, _O_p_t_i_o_n_V_a_l_u_e_}_]_).
+
+       aannaallyyssee((OOppttiioonnNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,,
+       RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 Reason = term()
+
+              Same as _a_n_a_l_y_s_e_(_[_O_p_t_i_o_n_N_a_m_e_]_).
+
+       aannaallyyssee(({{OOppttiioonnNNaammee,, OOppttiioonnVVaalluuee}})) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',,
+       SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 OptionName = atom()
+                 OptionValue = term()
+                 Reason = term()
+
+              Same as _a_n_a_l_y_s_e_(_[_{_O_p_t_i_o_n_N_a_m_e_, _O_p_t_i_o_n_V_a_l_u_e_}_]_).
+
+       aannaallyyssee(([[OOppttiioonn]])) -->> ookk || {{eerrrroorr,, RReeaassoonn}} || {{''EEXXIITT'',, SSeerrvveerrPPiidd,, RReeaassoonn}}
+
+              Types:
+
+                 Option = dest | {dest, Dest} | append | {cols, Cols} |
+                 callers | {callers, bool()} | no_callers | {sort, SortSpec} |
+                 totals | {totals, bool()} | details | {details, bool()} |
+                 no_details
+                 Dest = pid() | Destfile
+                 Cols = integer() >= 80
+                 SortSpec = acc | own
+                 Reason = term()
+
+              Analyses raw profile data in the _f_p_r_o_f server. If called while
+              there is no raw profile data available, _{_e_r_r_o_r_, _n_o___p_r_o_f_i_l_e_} is
+              returned.
+
+              _D_e_s_t_f_i_l_e is used to call _f_i_l_e_:_o_p_e_n_/_2. Please see the appropriate
+              documentation.
+
+              Option description:
+
+                _d_e_s_t| _{_d_e_s_t_, _D_e_s_t_}:
+                  Specifies the destination for the analysis. If this option
+                  is not given or it is _d_e_s_t, the destination will be the
+                  caller's group leader, otherwise the destination _D_e_s_t is
+                  either the _p_i_d_(_) of an I/O device or a filename. And,
+                  finally, if the filename is _[_] - _"_f_p_r_o_f_._a_n_a_l_y_s_i_s_" is used
+                  instead.
+
+                _a_p_p_e_n_d:
+                  Causes the analysis to be appended to the destination file.
+                  This option is only allowed with the _{_d_e_s_t_, _D_e_s_t_f_i_l_e_}
+                  option.
+
+                _{_c_o_l_s_, _C_o_l_s_}:
+                  Specifies the number of columns in the analysis text. If
+                  this option is not given the number of columns is set to 80.
+
+                _c_a_l_l_e_r_s| _{_c_a_l_l_e_r_s_, _t_r_u_e_}:
+                  Prints callers and called information in the analysis. This
+                  is the default.
+
+                _{_c_a_l_l_e_r_s_, _f_a_l_s_e_}| _n_o___c_a_l_l_e_r_s:
+                  Suppresses the printing of callers and called information in
+                  the analysis.
+
+                _{_s_o_r_t_, _S_o_r_t_S_p_e_c_}:
+                  Specifies if the analysis should be sorted according to the
+                  ACC column, which is the default, or the OWN column. See
+                  AAnnaallyyssiiss FFoorrmmaatt below.
+
+                _t_o_t_a_l_s| _{_t_o_t_a_l_s_, _t_r_u_e_}:
+                  Includes a section containing call statistics for all calls
+                  regardless of process, in the analysis.
+
+                _{_t_o_t_a_l_s_, _f_a_l_s_e_}:
+                  Supresses the totals section in the analysis, which is the
+                  default.
+
+                _d_e_t_a_i_l_s| _{_d_e_t_a_i_l_s_, _t_r_u_e_}:
+                  Prints call statistics for each process in the analysis.
+                  This is the default.
+
+                _{_d_e_t_a_i_l_s_, _f_a_l_s_e_}| _n_o___d_e_t_a_i_l_s:
+                  Suppresses the call statistics for each process from the
+                  analysis.
+
+AANNAALLYYSSIISS FFOORRMMAATT
+       This section describes the output format of the analyse command. See
+       aannaallyyssee//00.
+
+       The format is parsable with the standard Erlang parsing tools _e_r_l___s_c_a_n
+       and _e_r_l___p_a_r_s_e, _f_i_l_e_:_c_o_n_s_u_l_t_/_1 or _i_o_:_r_e_a_d_/_2. The parse format is not
+       explained here - it should be easy for the interested to try it out.
+       Note that some flags to _a_n_a_l_y_s_e_/_1 will affect the format.
+
+       The following example was run on OTP/R8 on Solaris 8, all OTP internals
+       in this example are very version dependent.
+
+       As an example, we will use the following function, that you may
+       recognise as a slightly modified benchmark function from the manpage
+       file(3):
+
+       -module(foo).
+       -export([create_file_slow/2]).
+
+       create_file_slow(Name, N) when integer(N), N >= 0 ->
+           {ok, FD} =
+               file:open(Name, [raw, write, delayed_write, binary]),
+           if N > 256 ->
+                   ok = file:write(FD,
+                                   lists:map(fun (X) -> <<X:32/unsigned>> end,
+                                   lists:seq(0, 255))),
+                   ok = create_file_slow(FD, 256, N);
+              true ->
+                   ok = create_file_slow(FD, 0, N)
+           end,
+           ok = file:close(FD).
+
+       create_file_slow(FD, M, M) ->
+           ok;
+       create_file_slow(FD, M, N) ->
+           ok = file:write(FD, <<M:32/unsigned>>),
+           create_file_slow(FD, M+1, N).
+
+       Let us have a look at the printout after running:
+
+       1> fprof:apply(foo, create_file_slow, [junk, 1024]).
+       2> fprof:profile().
+       3> fprof:analyse().
+
+       The printout starts with:
+
+       %% Analysis results:
+       {  analysis_options,
+        [{callers, true},
+         {sort, acc},
+         {totals, false},
+         {details, true}]}.
+
+       %                                       CNT       ACC       OWN
+       [{ totals,                             9627, 1691.119, 1659.074}].  %%%
+
+       The CNT column shows the total number of function calls that was found
+       in the trace. In the ACC column is the total time of the trace from
+       first timestamp to last. And in the OWN column is the sum of the
+       execution time in functions found in the trace, not including called
+       functions. In this case it is very close to the ACC time since the
+       emulator had practically nothing else to do than to execute our test
+       program.
+
+       All time values in the printout are in milliseconds.
+
+       The printout continues:
+
+       %                                       CNT       ACC       OWN
+       [{ "<0.28.0>",                         9627,undefined, 1659.074}].   %%
+
+       This is the printout header of one process. The printout contains only
+       this one process since we did _f_p_r_o_f_:_a_p_p_l_y_/_3 which traces only the
+       current process. Therefore the CNT and OWN columns perfectly matches
+       the totals above. The ACC column is undefined since summing the ACC
+       times of all calls in the process makes no sense - you would get
+       something like the ACC value from totals above multiplied by the
+       average depth of the call stack, or something.
+
+       All paragraphs up to the next process header only concerns function
+       calls within this process.
+
+       Now we come to something more interesting:
+
+       {[{undefined,                             0, 1691.076,    0.030}],
+        { {fprof,apply_start_stop,4},            0, 1691.076,    0.030},     %
+        [{{foo,create_file_slow,2},              1, 1691.046,    0.103},
+         {suspend,                               1,    0.000,    0.000}]}.
+
+       {[{{fprof,apply_start_stop,4},            1, 1691.046,    0.103}],
+        { {foo,create_file_slow,2},              1, 1691.046,    0.103},     %
+        [{{file,close,1},                        1, 1398.873,    0.019},
+         {{foo,create_file_slow,3},              1,  249.678,    0.029},
+         {{file,open,2},                         1,   20.778,    0.055},
+         {{lists,map,2},                         1,   16.590,    0.043},
+         {{lists,seq,2},                         1,    4.708,    0.017},
+         {{file,write,2},                        1,    0.316,    0.021}]}.
+
+       The printout consists of one paragraph per called function. The
+       function _m_a_r_k_e_d with '%' is the one the paragraph concerns -
+       _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_2. Above the marked function are the _c_a_l_l_i_n_g
+       functions - those that has called the marked, and below are those
+       _c_a_l_l_e_d by the marked function.
+
+       The paragraphs are per default sorted in decreasing order of the ACC
+       column for the marked function. The calling list and called list within
+       one paragraph are also per default sorted in decreasing order of their
+       ACC column.
+
+       The columns are: CNT - the number of times the function has been
+       called, ACC - the time spent in the function including called
+       functions, and OWN - the time spent in the function not including
+       called functions.
+
+       The rows for the _c_a_l_l_i_n_g functions contain statistics for the _m_a_r_k_e_d
+       function with the constraint that only the occasions when a call was
+       made from the _r_o_w_'_s function to the _m_a_r_k_e_d function are accounted for.
+
+       The row for the _m_a_r_k_e_d function simply contains the sum of all _c_a_l_l_i_n_g
+       rows.
+
+       The rows for the _c_a_l_l_e_d functions contains statistics for the _r_o_w_'_s
+       function with the constraint that only the occasions when a call was
+       made from the _m_a_r_k_e_d to the _r_o_w_'_s function are accounted for.
+
+       So, we see that _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_2 used very little time for its
+       own execution. It spent most of its time in _f_i_l_e_:_c_l_o_s_e_/_1. The function
+       _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_3 that writes 3/4 of the file contents is the
+       second biggest time thief.
+
+       We also see that the call to _f_i_l_e_:_w_r_i_t_e_/_2 that writes 1/4 of the file
+       contents takes very little time in itself. What takes time is to build
+       the data (_l_i_s_t_s_:_s_e_q_/_2 and _l_i_s_t_s_:_m_a_p_/_2).
+
+       The function 'undefined' that has called _f_p_r_o_f_:_a_p_p_l_y___s_t_a_r_t___s_t_o_p_/_4 is an
+       unknown function because that call was not recorded in the trace. It
+       was only recorded that the execution returned from
+       _f_p_r_o_f_:_a_p_p_l_y___s_t_a_r_t___s_t_o_p_/_4 to some other function above in the call
+       stack, or that the process exited from there.
+
+       Let us continue down the printout to find:
+
+       {[{{foo,create_file_slow,2},              1,  249.678,    0.029},
+         {{foo,create_file_slow,3},            768,    0.000,   23.294}],
+        { {foo,create_file_slow,3},            769,  249.678,   23.323},     %
+        [{{file,write,2},                      768,  220.314,   14.539},
+         {suspend,                              57,    6.041,    0.000},
+         {{foo,create_file_slow,3},            768,    0.000,   23.294}]}.
+
+       If you compare with the code you will see there also that
+       _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_3 was called only from _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_2 and
+       itself, and called only _f_i_l_e_:_w_r_i_t_e_/_2, note the number of calls to
+       _f_i_l_e_:_w_r_i_t_e_/_2. But here we see that _s_u_s_p_e_n_d was called a few times. This
+       is a pseudo function that indicates that the process was suspended
+       while executing in _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_3, and since there is no
+       _r_e_c_e_i_v_e or _e_r_l_a_n_g_:_y_i_e_l_d_/_0 in the code, it must be Erlang scheduling
+       suspensions, or the trace file driver compensating for large file write
+       operations (these are regarded as a schedule out followed by a schedule
+       in to the same process).
+
+       Let us find the _s_u_s_p_e_n_d entry:
+
+       {[{{file,write,2},                       53,    6.281,    0.000},
+         {{foo,create_file_slow,3},             57,    6.041,    0.000},
+         {{prim_file,drv_command,4},            50,    4.582,    0.000},
+         {{prim_file,drv_get_response,1},       34,    2.986,    0.000},
+         {{lists,map,2},                        10,    2.104,    0.000},
+         {{prim_file,write,2},                  17,    1.852,    0.000},
+         {{erlang,port_command,2},              15,    1.713,    0.000},
+         {{prim_file,drv_command,2},            22,    1.482,    0.000},
+         {{prim_file,translate_response,2},     11,    1.441,    0.000},
+         {{prim_file,'-drv_command/2-fun-0-',1},  15,    1.340,    0.000},
+         {{lists,seq,4},                         3,    0.880,    0.000},
+         {{foo,'-create_file_slow/2-fun-0-',1},   5,    0.523,    0.000},
+         {{erlang,bump_reductions,1},            4,    0.503,    0.000},
+         {{prim_file,open_int_setopts,3},        1,    0.165,    0.000},
+         {{prim_file,i32,4},                     1,    0.109,    0.000},
+         {{fprof,apply_start_stop,4},            1,    0.000,    0.000}],
+        { suspend,                             299,   32.002,    0.000},     %
+        [ ]}.
+
+       We find no particulary long suspend times, so no function seems to have
+       waited in a receive statement. Actually, _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_4
+       contains a receive statement, but in this test program, the message
+       lies in the process receive buffer when the receive statement is
+       entered. We also see that the total suspend time for the test run is
+       small.
+
+       The _s_u_s_p_e_n_d pseudo function has got an OWN time of zero. This is to
+       prevent the process total OWN time from including time in suspension.
+       Whether suspend time is really ACC or OWN time is more of a
+       philosophical question.
+
+       Now we look at another interesting pseudo function, _g_a_r_b_a_g_e___c_o_l_l_e_c_t:
+
+       {[{{prim_file,drv_command,4},            25,    0.873,    0.873},
+         {{prim_file,write,2},                  16,    0.692,    0.692},
+         {{lists,map,2},                         2,    0.195,    0.195}],
+        { garbage_collect,                      43,    1.760,    1.760},     %
+        [ ]}.
+
+       Here we see that no function distinguishes itself considerably, which
+       is very normal.
+
+       The _g_a_r_b_a_g_e___c_o_l_l_e_c_t pseudo function has not got an OWN time of zero
+       like _s_u_s_p_e_n_d, instead it is equal to the ACC time.
+
+       Garbage collect often occurs while a process is suspended, but _f_p_r_o_f
+       hides this fact by pretending that the suspended function was first
+       unsuspended and then garbage collected. Otherwise the printout would
+       show _g_a_r_b_a_g_e___c_o_l_l_e_c_t being called from _s_u_s_p_e_n_d but not not which
+       function that might have caused the garbage collection.
+
+       Let us now get back to the test code:
+
+       {[{{foo,create_file_slow,3},            768,  220.314,   14.539},
+         {{foo,create_file_slow,2},              1,    0.316,    0.021}],
+        { {file,write,2},                      769,  220.630,   14.560},     %
+        [{{prim_file,write,2},                 769,  199.789,   22.573},
+         {suspend,                              53,    6.281,    0.000}]}.
+
+       Not unexpectedly, we see that _f_i_l_e_:_w_r_i_t_e_/_2 was called from
+       _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_3 and _f_o_o_:_c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_2. The number of calls
+       in each case as well as the used time are also just confirms the
+       previous results.
+
+       We see that _f_i_l_e_:_w_r_i_t_e_/_2 only calls _p_r_i_m___f_i_l_e_:_w_r_i_t_e_/_2, but let us
+       refrain from digging into the internals of the kernel application.
+
+       But, if we nevertheless _d_o dig down we find the call to the linked in
+       driver that does the file operations towards the host operating system:
+
+       {[{{prim_file,drv_command,4},           772, 1458.356, 1456.643}],
+        { {erlang,port_command,2},             772, 1458.356, 1456.643},     %
+        [{suspend,                              15,    1.713,    0.000}]}.
+
+       This is 86 % of the total run time, and as we saw before it is the
+       close operation the absolutely biggest contributor. We find a
+       comparison ratio a little bit up in the call stack:
+
+       {[{{prim_file,close,1},                   1, 1398.748,    0.024},
+         {{prim_file,write,2},                 769,  174.672,   12.810},
+         {{prim_file,open_int,4},                1,   19.755,    0.017},
+         {{prim_file,open_int_setopts,3},        1,    0.147,    0.016}],
+        { {prim_file,drv_command,2},           772, 1593.322,   12.867},     %
+        [{{prim_file,drv_command,4},           772, 1578.973,   27.265},
+         {suspend,                              22,    1.482,    0.000}]}.
+
+       The time for file operations in the linked in driver distributes itself
+       as 1 % for open, 11 % for write and 87 % for close. All data is
+       probably buffered in the operating system until the close.
+
+       The unsleeping reader may notice that the ACC times for
+       _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_2 and _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_4 is not equal
+       between the paragraphs above, even though it is easy to believe that
+       _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_2 is just a passthrough function.
+
+       The missing time can be found in the paragraph for
+       _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_4 where it is evident that not only
+       _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_2 is called but also a fun:
+
+       {[{{prim_file,drv_command,2},           772, 1578.973,   27.265}],
+        { {prim_file,drv_command,4},           772, 1578.973,   27.265},     %
+        [{{erlang,port_command,2},             772, 1458.356, 1456.643},
+         {{prim_file,'-drv_command/2-fun-0-',1}, 772,   87.897,   12.736},
+         {suspend,                              50,    4.582,    0.000},
+         {garbage_collect,                      25,    0.873,    0.873}]}.
+
+       And some more missing time can be explained by the fact that
+       _p_r_i_m___f_i_l_e_:_o_p_e_n___i_n_t_/_4 both calls _p_r_i_m___f_i_l_e_:_d_r_v___c_o_m_m_a_n_d_/_2 directly as
+       well as through _p_r_i_m___f_i_l_e_:_o_p_e_n___i_n_t___s_e_t_o_p_t_s_/_3, which complicates the
+       picture.
+
+       {[{{prim_file,open,2},                    1,   20.309,    0.029},
+         {{prim_file,open_int,4},                1,    0.000,    0.057}],
+        { {prim_file,open_int,4},                2,   20.309,    0.086},     %
+        [{{prim_file,drv_command,2},             1,   19.755,    0.017},
+         {{prim_file,open_int_setopts,3},        1,    0.360,    0.032},
+         {{prim_file,drv_open,2},                1,    0.071,    0.030},
+         {{erlang,list_to_binary,1},             1,    0.020,    0.020},
+         {{prim_file,i32,1},                     1,    0.017,    0.017},
+         {{prim_file,open_int,4},                1,    0.000,    0.057}]}.
+       {[{{prim_file,open_int,4},                1,    0.360,    0.032},
+         {{prim_file,open_int_setopts,3},        1,    0.000,    0.016}],
+        { {prim_file,open_int_setopts,3},        2,    0.360,    0.048},     %
+        [{suspend,                               1,    0.165,    0.000},
+         {{prim_file,drv_command,2},             1,    0.147,    0.016},
+         {{prim_file,open_int_setopts,3},        1,    0.000,    0.016}]}.
+
+NNOOTTEESS
+       The actual supervision of execution times is in itself a CPU intensive
+       activity. A message is written on the trace file for every function
+       call that is made by the profiled code.
+
+       The ACC time calculation is sometimes difficult to make correct, since
+       it is difficult to define. This happens especially when a function
+       occurs in several instances in the call stack, for example by calling
+       itself perhaps through other functions and perhaps even non-tail
+       recursively.
+
+       To produce sensible results, _f_p_r_o_f tries not to charge any function
+       more than once for ACC time. The instance highest up (with longest
+       duration) in the call stack is chosen.
+
+       Sometimes a function may unexpectedly waste a lot (some 10 ms or more
+       depending on host machine OS) of OWN (and ACC) time, even functions
+       that does practically nothing at all. The problem may be that the OS
+       has chosen to schedule out the Erlang runtime system process for a
+       while, and if the OS does not support high resolution cpu time
+       measurements _f_p_r_o_f will use wallclock time for its calculations, and it
+       will appear as functions randomly burn virtual machine time.
+
+SSEEEE AALLSSOO
+       dbg(3), eepprrooff(3), erlang(3), io(3), TToooollss UUsseerr''ss GGuuiiddee
+
+
+
+Ericsson AB                       tools 2.6.8                         fprof(3)

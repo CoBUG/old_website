@@ -1,0 +1,1083 @@
+snmpa(3)                   Erlang Module Definition                   snmpa(3)
+
+
+
+NNAAMMEE
+       snmpa - Interface Functions to the SNMP toolkit agent
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_a contains interface functions to the SNMP agent.
+
+DDAATTAA TTYYPPEESS
+       oid() = [byte()]
+       atl_type() = read | write | read_write
+       notification_delivery_info() = #snmpa_notification_delivery_info{}
+
+
+       The _o_i_d_(_) type is used to represent an ASN.1 OBJECT IDENTIFIER.
+
+       The record _s_n_m_p_a___n_o_t_i_f_i_c_a_t_i_o_n___d_e_l_i_v_e_r_y___i_n_f_o contains the following
+       fields:
+
+         _t_a_g _= _t_e_r_m_(_):
+           A user defined identity representing this notification send
+           operation.
+
+         _m_o_d _= _m_o_d_u_l_e_(_):
+           A module implementing the ssnnmmppaa__nnoottiiffiiccaattiioonn__ddeelliivveerryy__iinnffoo__rreecceeiivveerr
+           behaviour. The info functions of this module will be called at
+           various stages of delivery.
+
+         _e_x_t_r_a _= _t_e_r_m_(_):
+           This is any extra info the user wants to have supplied when the
+           functions in the callback module is called.
+
+EEXXPPOORRTTSS
+       aadddd__aaggeenntt__ccaappss((SSyyssOORRIIDD,, SSyyssOORRDDeessccrr)) -->> SSyyssOORRIInnddeexx
+
+              Types:
+
+                 SysORID = oid()
+                 SysORDescr = string()
+                 SysORIndex = integer()
+
+              This function can be used to add an AGENT-CAPABILITY statement
+              to the sysORTable in the agent. The table is defined in the
+              SNMPv2-MIB.
+
+       ddeell__aaggeenntt__ccaappss((SSyyssOORRIInnddeexx)) -->> vvooiidd(())
+
+              Types:
+
+                 SysORIndex = integer()
+
+              This function can be used to delete an AGENT-CAPABILITY
+              statement to the sysORTable in the agent. This table is defined
+              in the SNMPv2-MIB.
+
+       ggeett__aaggeenntt__ccaappss(()) -->> [[[[SSyyssOORRIInnddeexx,, SSyyssOORRIIDD,, SSyyssOORRDDeessccrr,, SSyyssOORRUUppTTiimmee]]]]
+
+              Types:
+
+                 SysORIndex = integer()
+                 SysORId = oid()
+                 SysORDescr = string()
+                 SysORUpTime = integer()
+
+              Returns all AGENT-CAPABILITY statements in the sysORTable in the
+              agent. This table is defined in the SNMPv2-MIB.
+
+       ggeett((AAggeenntt,, VVaarrss)) -->> VVaalluueess || {{eerrrroorr,, RReeaassoonn}}
+       ggeett((AAggeenntt,, VVaarrss,, CCoonntteexxtt)) -->> VVaalluueess || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Vars = [oid()]
+                 Context = string()
+                 Values = [term()]
+                 Reason = {atom(), oid()}
+
+              Performs a GET operation on the agent. All loaded MIB objects
+              are visible in this operation. The agent calls the corresponding
+              instrumentation functions just as if it was a GET request coming
+              from a manager.
+
+              Note that the request specific parameters (such as
+              ccuurrrreenntt__rreeqquueesstt__iidd) are not accessible for the instrumentation
+              functions if this function is used.
+
+       ggeett__nneexxtt((AAggeenntt,, VVaarrss)) -->> VVaalluueess || {{eerrrroorr,, RReeaassoonn}}
+       ggeett__nneexxtt((AAggeenntt,, VVaarrss,, CCoonntteexxtt)) -->> VVaalluueess || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Vars = [oid()]
+                 Context = string()
+                 Values = [{oid(), term()}]
+                 Reason = {atom(), oid()}
+
+              Performs a GET-NEXT operation on the agent. All loaded MIB
+              objects are visible in this operation. The agent calls the
+              corresponding instrumentation functions just as if it was a GET
+              request coming from a manager.
+
+              Note that the request specific parameters (such as
+              _s_n_m_p_a_:_c_u_r_r_e_n_t___r_e_q_u_e_s_t___i_d_/_0 are not accessible for the
+              instrumentation functions if this function is used.
+
+       bbaacckkuupp((BBaacckkuuppDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       bbaacckkuupp((AAggeenntt,, BBaacckkuuppDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 BackupDir = string()
+                 Agent = pid() | atom()
+                 Reason = backup_in_progress | term()
+
+              Backup persistent/permanent data handled by the agent (such as
+              local-db, mib-data and vacm).
+
+              Data stored by mnesia is not handled.
+
+              BackupDir cannot be identical to DbDir.
+
+              Simultaneous backup calls are _n_o_t allowed. That is, two
+              different processes cannot simultaneously successfully call this
+              function. One of them will be first, and succeed. The second
+              will fail with the error reason _b_a_c_k_u_p___i_n___p_r_o_g_r_e_s_s.
+
+       iinnffoo(()) -->> [[{{KKeeyy,, VVaalluuee}}]]
+       iinnffoo((AAggeenntt)) -->> [[{{KKeeyy,, VVaalluuee}}]]
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Returns a list (a dictionary) containing information about the
+              agent. Information includes loaded MIBs, registered sub-agents,
+              some information about the memory allocation.
+
+              As of version 4.4 the format of the info has been changed. To
+              convert the info to the old format, call the oolldd__iinnffoo__ffoorrmmaatt
+              function.
+
+       oolldd__iinnffoo__ffoorrmmaatt((NNeewwIInnffoo)) -->> OOllddIInnffoo
+
+              Types:
+
+                 OldInfo = NewInfo = [{Key, Value}]
+
+              As of version 4.4 the format of the info has been changed. This
+              function is used to convert to the old (pre-4.4) info format.
+
+       llooaadd__mmiibbss((MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       llooaadd__mmiibbss((AAggeenntt,,MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Mibs = [MibName]
+                 MibName = string()
+                 Reason = term()
+
+              Loads _M_i_b_s into an agent. If the agent cannot load all MIBs, it
+              will indicate where loading was aborted. The _M_i_b_N_a_m_e is the name
+              of the Mib, including the path to where the compiled mib is
+              found. For example,
+
+                        Dir = code:priv_dir(my_app) ++ "/mibs/",
+                        snmpa:load_mibs(snmp_master_agent, [Dir ++ "MY-MIB"]).
+
+
+       uunnllooaadd__mmiibbss((MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       uunnllooaadd__mmiibbss((AAggeenntt,,MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Mibs = [MibName]
+                 MibName = string()
+
+              Unloads MIBs into an agent. If it cannot unload all MIBs, it
+              will indicate where unloading was aborted.
+
+       wwhhiicchh__mmiibbss(()) -->> MMiibbss
+       wwhhiicchh__mmiibbss((AAggeenntt)) -->> MMiibbss
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Mibs = [{MibName, MibFile}]
+                 MibName = atom()
+                 MibFile = string()
+
+              Retrieve the list of all the mibs loaded into this agent.
+              Default is the master agent.
+
+       wwhheerreeiiss__mmiibb((MMiibbNNaammee)) -->> {{ookk,, MMiibbFFiillee}} || {{eerrrroorr,, RReeaassoonn}}
+       wwhheerreeiiss__mmiibb((AAggeenntt,, MMiibbNNaammee)) -->> {{ookk,, MMiibbFFiillee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 MibName = atom()
+                 MibFile = string()
+                 Reason = term()
+
+              Get the full path to the (compiled) mib-file.
+
+       ccuurrrreenntt__rreeqquueesstt__iidd(()) -->> {{vvaalluuee,, RReeqquueessttIIdd}} || ffaallssee
+       ccuurrrreenntt__ccoonntteexxtt(()) -->> {{vvaalluuee,, CCoonntteexxtt}} || ffaallssee
+       ccuurrrreenntt__ccoommmmuunniittyy(()) -->> {{vvaalluuee,, CCoommmmuunniittyy}} || ffaallssee
+       ccuurrrreenntt__aaddddrreessss(()) -->> {{vvaalluuee,, AAddddrreessss}} || ffaallssee
+
+              Types:
+
+                 RequestId = integer()
+                 Context = string()
+                 Community = string()
+                 Address = term()
+
+              Get the request-id, context, community and address of the
+              request currently being processed by the agent.
+
+              Note that these functions is intended to be called by the
+              instrumentation functions and _o_n_l_y if they are executed in the
+              context of the agent process (e.g. it does not work if called
+              from a spawned process).
+
+       eennuumm__ttoo__iinntt((NNaammee,, EEnnuumm)) -->> {{vvaalluuee,, IInntt}} || ffaallssee
+       eennuumm__ttoo__iinntt((DDbb,, NNaammee,, EEnnuumm)) -->> {{vvaalluuee,, IInntt}} || ffaallssee
+
+              Types:
+
+                 Db = term()
+                 Name = atom()
+                 Enum = atom()
+                 Int = int()
+
+              Converts the symbolic value _E_n_u_m to the corresponding integer of
+              the enumerated object or type _N_a_m_e in a MIB. The MIB must be
+              loaded.
+
+              _f_a_l_s_e is returned if the object or type is not defined in any
+              loaded MIB, or if it does not define the symbolic value as
+              enumerated.
+
+              _D_b is a reference to the symbolic store database (retrieved by a
+              call to _g_e_t___s_y_m_b_o_l_i_c___s_t_o_r_e___d_b_/_0).
+
+       iinntt__ttoo__eennuumm((NNaammee,, IInntt)) -->> {{vvaalluuee,, EEnnuumm}} || ffaallssee
+       iinntt__ttoo__eennuumm((DDbb,, NNaammee,, IInntt)) -->> {{vvaalluuee,, EEnnuumm}} || ffaallssee
+
+              Types:
+
+                 Db = term()
+                 Name = atom()
+                 Int = int()
+                 Enum = atom()
+
+              Converts the integer _I_n_t to the corresponding symbolic value of
+              the enumerated object or type _N_a_m_e in a MIB. The MIB must be
+              loaded.
+
+              _f_a_l_s_e is returned if the object or type is not defined in any
+              loaded MIB, or if it does not define the symbolic value as
+              enumerated.
+
+              _D_b is a reference to the symbolic store database (retrieved by a
+              call to _g_e_t___s_y_m_b_o_l_i_c___s_t_o_r_e___d_b_/_0).
+
+       nnaammee__ttoo__ooiidd((NNaammee)) -->> {{vvaalluuee,, ooiidd(())}} || ffaallssee
+       nnaammee__ttoo__ooiidd((DDbb,, NNaammee)) -->> {{vvaalluuee,, ooiidd(())}} || ffaallssee
+
+              Types:
+
+                 Db = term()
+                 Name = atom()
+
+              Looks up the OBJECT IDENTIFIER of a MIB object, given the
+              symbolic name. Note, the OBJECT IDENTIFIER is given for the
+              object, not for an instance.
+
+              _f_a_l_s_e is returned if the object is not defined in any loaded
+              MIB.
+
+              _D_b is a reference to the symbolic store database (retrieved by a
+              call to _g_e_t___s_y_m_b_o_l_i_c___s_t_o_r_e___d_b_/_0).
+
+       ooiidd__ttoo__nnaammee((OOIIDD)) -->> {{vvaalluuee,, NNaammee}} || ffaallssee
+       ooiidd__ttoo__nnaammee((DDbb,, OOIIDD)) -->> {{vvaalluuee,, NNaammee}} || ffaallssee
+
+              Types:
+
+                 Db = term()
+                 OID = oid()
+                 Name = atom()
+
+              Looks up the symbolic name of a MIB object, given OBJECT
+              IDENTIFIER.
+
+              _f_a_l_s_e is returned if the object is not defined in any loaded
+              MIB.
+
+              _D_b is a reference to the symbolic store database (retrieved by a
+              call to _g_e_t___s_y_m_b_o_l_i_c___s_t_o_r_e___d_b_/_0).
+
+       wwhhiicchh__aalliiaassnnaammeess(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = [atom()]
+
+              Retrieve all alias-names known to the agent.
+
+       wwhhiicchh__ttaabblleess(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = [atom()]
+
+              Retrieve all tables known to the agent.
+
+       wwhhiicchh__vvaarriiaabblleess(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = [atom()]
+
+              Retrieve all variables known to the agent.
+
+       wwhhiicchh__nnoottiiffiiccaattiioonnss(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = [{Name, MibName, Info}]
+                 Name = atom()
+                 MibName = atom()
+                 Info = term()
+
+              Retrieve all notifications (and traps) known to the agent.
+
+       lloogg__ttoo__ttxxtt((LLooggDDiirr))
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss))
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt,, SSttoopp)) -->> ookk
+       || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 LogDir = string()
+                 Mibs = [MibName]
+                 MibName = string()
+                 OutFile = string()
+                 LogName = string()
+                 LogFile = string()
+                 Start = Stop = null | datetime() | {local_time,datetime()} |
+                 {universal_time,datetime()}
+                 Reason = disk_log_open_error() | file_open_error() | term()
+                 disk_log_open_error() = {LogName, term()}
+                 file_open_error() = {OutFile, term()}
+
+              Converts an Audit Trail Log to a readable text file. _O_u_t_F_i_l_e
+              defaults to "./snmpa_log.txt". _L_o_g_N_a_m_e defaults to "snmpa_log".
+              _L_o_g_F_i_l_e defaults to "snmpa.log". See ssnnmmpp::lloogg__ttoo__ttxxtt for more
+              info.
+
+       lloogg__ttoo__iioo((LLooggDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt,, SSttoopp)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 LogDir = string()
+                 Mibs = [MibName]
+                 MibName = string()
+                 LogName = string()
+                 LogFile = string()
+                 Start = Stop = null | datetime() | {local_time,datetime()} |
+                 {universal_time,datetime()}
+                 Reason = disk_log_open_error() | file_open_error() | term()
+                 disk_log_open_error() = {LogName, term()}
+                 file_open_error() = {OutFile, term()}
+
+              Converts an Audit Trail Log to a readable format and prints it
+              on stdio. _L_o_g_N_a_m_e defaults to "snmpa_log". _L_o_g_F_i_l_e defaults to
+              "snmpa.log". See ssnnmmpp::lloogg__ttoo__iioo for more info.
+
+       cchhaannggee__lloogg__ssiizzee((NNeewwSSiizzee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 NewSize = {MaxBytes, MaxFiles}
+                 MaxBytes = integer()
+                 MaxFiles = integer()
+                 Reason = term()
+
+              Changes the log size of the Audit Trail Log. The application
+              must be configured to use the audit trail log function. Please
+              refer to disk_log(3) in Kernel Reference Manual for a
+              description of how to change the log size.
+
+              The change is permanent, as long as the log is not deleted. That
+              means, the log size is remembered across reboots.
+
+       sseett__lloogg__ttyyppee((NNeewwTTyyppee)) -->> {{ookk,, OOllddTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+       sseett__lloogg__ttyyppee((AAggeenntt,, NNeewwTTyyppee)) -->> {{ookk,, OOllddTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 NewType = OldType = atl_type()
+                 Agent = pid() | atom()
+                 Reason = term()
+
+              Changes the run-time Audit Trail log type.
+
+              Note that this has no effect on the application configuration as
+              defined by configuration files, so a node restart will revert
+              the config to whatever is in those files.
+
+              This function is primarily useful in testing/debugging
+              scenarios.
+
+       mmiibb__ooff((OOiidd)) -->> {{ookk,, MMiibbNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+       mmiibb__ooff((AAggeenntt,, OOiidd)) -->> {{ookk,, MMiibbNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Oid = oid()
+                 MibName = atom()
+                 Reason = term()
+
+              Finds the mib corresponding to the _O_i_d. If it is a variable, the
+              Oid must be <Oid for var>.0 and if it is a table, Oid must be
+              <table>.<entry>.<col>.<any>
+
+       mmee__ooff((OOiidd)) -->> {{ookk,, MMee}} || {{eerrrroorr,, RReeaassoonn}}
+       mmee__ooff((AAggeenntt,, OOiidd)) -->> {{ookk,, MMee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Oid = oid()
+                 Me = #me{}
+                 Reason = term()
+
+              Finds the mib entry corresponding to the _O_i_d. If it is a
+              variable, the Oid must be <Oid for var>.0 and if it is a table,
+              Oid must be <table>.<entry>.<col>.<any>
+
+       iinnvvaalliiddaattee__mmiibbss__ccaacchhee(()) -->> vvooiidd(())
+       iinnvvaalliiddaattee__mmiibbss__ccaacchhee((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Invalidate the mib server cache.
+
+              The entire contents of the cache will be deleted.
+
+       eennaabbllee__mmiibbss__ccaacchhee(()) -->> vvooiidd(())
+       eennaabbllee__mmiibbss__ccaacchhee((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Enable the mib server cache.
+
+       ddiissaabbllee__mmiibbss__ccaacchhee(()) -->> vvooiidd(())
+       ddiissaabbllee__mmiibbss__ccaacchhee((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Disable the mib server cache.
+
+       wwhhiicchh__mmiibbss__ccaacchhee__ssiizzee(()) -->> vvooiidd(())
+       wwhhiicchh__mmiibbss__ccaacchhee__ssiizzee((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Retreive the size of the mib server cache.
+
+       ggcc__mmiibbss__ccaacchhee(()) -->> {{ookk,, NNuummEElleemmeennttssGGCCeedd}} || {{eerrrroorr,, RReeaassoonn}}
+       ggcc__mmiibbss__ccaacchhee((AAggeenntt)) -->> {{ookk,, NNuummEElleemmeennttssGGCCeedd}} || {{eerrrroorr,, RReeaassoonn}}
+       ggcc__mmiibbss__ccaacchhee((AAggee)) -->> {{ookk,, NNuummEElleemmeennttssGGCCeedd}} || {{eerrrroorr,, RReeaassoonn}}
+       ggcc__mmiibbss__ccaacchhee((AAggeenntt,, AAggee)) -->> {{ookk,, NNuummEElleemmeennttssGGCCeedd}} || {{eerrrroorr,, RReeaassoonn}}
+       ggcc__mmiibbss__ccaacchhee((AAggee,, GGccLLiimmiitt)) -->> {{ookk,, NNuummEElleemmeennttssGGCCeedd}} || {{eerrrroorr,, RReeaassoonn}}
+       ggcc__mmiibbss__ccaacchhee((AAggeenntt,, AAggee,, GGccLLiimmiitt)) -->> {{ookk,, NNuummEElleemmeennttssGGCCeedd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Age = integer() > 0
+                 GcLimit = integer() > 0 | infinity
+                 NumElementsGCed = integer() >= 0
+                 Reason = term()
+
+              Perform mib server cache gc.
+
+              Manually performs a mib server cache gc. This can be done
+              regardless of the value of the _a_u_t_o_g_c option. The
+              _N_u_m_E_l_e_m_e_n_t_s_G_C_e_d value indicates how many elements where actually
+              removed from the cache.
+
+       eennaabbllee__mmiibbss__ccaacchhee__aauuttooggcc(()) -->> vvooiidd(())
+       eennaabbllee__mmiibbss__ccaacchhee__aauuttooggcc((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Enable automatic gc of the mib server cache.
+
+       ddiissaabbllee__mmiibbss__ccaacchhee__aauuttooggcc(()) -->> vvooiidd(())
+       ddiissaabbllee__mmiibbss__ccaacchhee__aauuttooggcc((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Disable automatic gc of the mib server cache.
+
+       uuppddaattee__mmiibbss__ccaacchhee__aaggee((NNeewwAAggee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       uuppddaattee__mmiibbss__ccaacchhee__aaggee((AAggeenntt,, NNeewwAAggee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 NewAge = integer() > 0
+                 Reason = term()
+
+              Change the mib server cache _a_g_e property.
+
+       uuppddaattee__mmiibbss__ccaacchhee__ggcclliimmiitt((NNeewwGGccLLiimmiitt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       uuppddaattee__mmiibbss__ccaacchhee__ggcclliimmiitt((AAggeenntt,, NNeewwGGCCLLiimmiitt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 NewGcLimit = integer() > 0 | infinity
+                 Reason = term()
+
+              Change the mib server cache _g_c_l_i_m_i_t property.
+
+       rreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr((IIdd,, MMoodd,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       rreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr((AAggeenntt,, IIdd,, MMoodd,, DDaattaa)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       rreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr((IIdd,, MMoodd,, DDaattaa,, WWhheerree)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       rreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr((AAggeenntt,, IIdd,, MMoodd,, DDaattaa,, WWhheerree)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Id = filter_id()
+                 filter_id() = term()
+                 Mod = atom()
+                 Data = term()
+                 Where = filter_position()
+                 Reason = term()
+                 filter_position() = first | last | {insert_before,
+                 filter_id()} | {insert_after, filter_id()}
+
+              Registers a notification filter.
+
+              _M_o_d is a module implementing the _s_n_m_p_a___n_o_t_i_f_i_c_a_t_i_o_n___f_i_l_t_e_r
+              behaviour.
+
+              _D_a_t_a will be passed on to the filter when calling the functions
+              of the behaviour.
+
+       uunnrreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr((IIdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       uunnrreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr((AAggeenntt,, IIdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Id = filter_id()
+                 filter_id() = term()
+
+              Unregister a notification filter.
+
+       wwhhiicchh__nnoottiiffiiccaattiioonn__ffiilltteerr(()) -->> FFiilltteerrss
+       wwhhiicchh__nnoottiiffiiccaattiioonn__ffiilltteerr((AAggeenntt)) -->> FFiilltteerrss
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Filters = [filter_id()]
+                 filter_id() = term()
+
+              List all notification filters in an agent.
+
+       sseett__rreeqquueesstt__lliimmiitt((NNeewwLLiimmiitt)) -->> {{ookk,, OOllddLLiimmiitt}} || {{eerrrroorr,, RReeaassoonn}}
+       sseett__rreeqquueesstt__lliimmiitt((AAggeenntt,, NNeewwLLiimmiitt)) -->> {{ookk,, OOllddLLiimmiitt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 NewLimit = OldLimit = infinity | integer() >= 0
+                 Agent = pid() | atom()
+                 Reason = term()
+
+              Changes the request limit.
+
+              Note that this has no effect on the application configuration as
+              defined by configuration files, so a node restart will revert
+              the config to whatever is in those files.
+
+              This function is primarily useful in load regulation scenarios.
+
+       rreeggiisstteerr__ssuubbaaggeenntt((AAggeenntt,, SSuubbTTrreeeeOOiidd,, SSuubbaaggeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 SubTreeOid = oid()
+                 SubAgent = pid()
+
+              Registers a sub-agent under a sub-tree of another agent.
+
+              It is easy to make mistakes when registering sub-agents and this
+              activity should be done carefully. For example, a strange
+              behaviour would result from the following configuration:
+
+              snmp_agent:register_subagent(MAPid,[1,2,3,4],SA1),
+              snmp_agent:register_subagent(SA1,[1,2,3], SA2).
+
+
+              _S_A_2 will not get requests starting with object identifier
+              _[_1_,_2_,_3_] since _S_A_1 does not.
+
+       uunnrreeggiisstteerr__ssuubbaaggeenntt((AAggeenntt,, SSuubbaaggeennttOOiiddOOrrPPiidd)) -->> ookk || {{ookk,, SSuubbAAggeennttPPiidd}}
+       || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 SubTreeOidorPid = oid() | pid()
+
+              Unregister a sub-agent. If the second argument is a pid, then
+              that sub-agent will be unregistered from all trees in _A_g_e_n_t.
+
+       sseenndd__nnoottiiffiiccaattiioonn22((AAggeenntt,, NNoottiiffiiccaattiioonn,, SSeennddOOppttss)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Notification = atom()
+                 SendOpts = [send_option()]
+                 send_option() = {receiver, receiver()} | {name,
+                 notify_name()} | {context, context_name()} | {varbinds,
+                 varbinds()} | {local_engine_id, string()} | {extra,
+                 extra_info()}
+                 receiver() = no_receiver | {tag(), tag_receiver()} |
+                 notification_delivery_info()
+                 tag() = term(()
+                 tag_receiver() = pid() | registered_name() | {Mod, Func,
+                 Args}
+                 registered_name() = atom()
+                 Mod = atom()
+                 Func = atom()
+                 Args = list()
+                 notify_name() = string()
+                 context_name() = string()
+                 varbinds() = [varbind()]
+                 varbind() = {variable(), value()} | {column(), row_index(),
+                 value()} | {oid(), value()}
+                 variable() = atom()
+                 value() = term()
+                 column() = atom()
+                 row_index() = [int()]
+                 extra_info() = term()
+
+              Send the notification _N_o_t_i_f_i_c_a_t_i_o_n to the management targets
+              defined for notify-name (_n_a_m_e) in the _s_n_m_p_N_o_t_i_f_y_T_a_b_l_e in SNMP-
+              NOTIFICATION-MIB from the specified _c_o_n_t_e_x_t.
+
+              If no _n_a_m_e is specified (or if it is _"_"), the notification is
+              sent to all management targets.
+
+              If no _c_o_n_t_e_x_t is specified, the default context, _"_", is used.
+
+              The send option _r_e_c_e_i_v_e_r specifies where information about
+              delivery of Inform-Requests should be sent. The agent sends
+              Inform-Requests and waits for acknowledgments from the
+              management targets. The _r_e_c_e_i_v_e_r can have three values:
+
+                * _n_o___r_e_c_e_i_v_e_r - No information is delivered.
+
+                * _n_o_t_i_f_i_c_a_t_i_o_n___d_e_l_i_v_e_r_y___i_n_f_o_(_) - The information is delivered
+                  via a function call according to this data. See the DDAATTAA
+                  TTYYPPEESS section above for details.
+
+                * _{_t_a_g_(_)_, _t_a_g___r_e_c_e_i_v_e_r_(_)_} - The information is delivered
+                  either via messages or via a function call according to the
+                  value of _t_a_g___r_e_c_e_i_v_e_r_(_).
+
+                  Delivery is done differently depending on the value of
+                  _t_a_g___r_e_c_e_i_v_e_r_(_):
+
+                  * _p_i_d_(_) _| _r_e_g_i_s_t_e_r_e_d___n_a_m_e_(_) - The info will be delivered in
+                    the following messages:
+
+                    * _{_s_n_m_p___t_a_r_g_e_t_s_, _t_a_g_(_)_, _A_d_d_r_e_s_s_e_s_}
+
+                      This informs the user which target addresses the
+                      notification was sent to.
+
+                    * _{_s_n_m_p___n_o_t_i_f_i_c_a_t_i_o_n_, _t_a_g_(_)_, _{_g_o_t___r_e_s_p_o_n_s_e_, _A_d_d_r_e_s_s_}_}
+
+                      This informs the user that this target address
+                      acknowledged the notification.
+
+                    * _{_s_n_m_p___n_o_t_i_f_i_c_a_t_i_o_n_, _t_a_g_(_)_, _{_n_o___r_e_s_p_o_n_s_e_, _A_d_d_r_e_s_s_}_}
+
+                      This informs the user that this target address did not
+                      acknowledge the notification.
+
+                    The notification is sent as an Inform-Request to each
+                    target address in _A_d_d_r_e_s_s_e_s and if there are no targets
+                    for which an Inform-Request is sent, _A_d_d_r_e_s_s_e_s is the
+                    empty list _[_].
+
+                    The _t_a_g___r_e_c_e_i_v_e_r_(_) will first be sent the _s_n_m_p___t_a_r_g_e_t_s
+                    message, and then for each address in _A_d_d_r_e_s_s_e_s list, one
+                    of the two _s_n_m_p___n_o_t_i_f_i_c_a_t_i_o_n messages.
+
+                  * _{_M_o_d_, _F_u_n_c_, _A_r_g_s_} - The info will be delivered via the
+                    function call:
+
+                    _M_o_d_:_F_u_n_c_(_[_M_s_g _| _A_r_g_s_]_)
+
+                    where _M_s_g has the same content and purpose as the messages
+                    descrived above.
+
+          NNoottee::
+              The _e_x_t_r_a info is not normally interpreted by the agent, instead
+              it is passed through to the nneett--iiff process. It is up to the
+              implementor of that process to make use of this data.
+
+              The version of net-if provided by this application makes no use
+              of this data, with one exception: Any tuple containing the atom
+              _s_n_m_p_a___d_e_f_a_u_l_t___n_o_t_i_f_i_c_a_t_i_o_n___e_x_t_r_a___i_n_f_o may be used by the agent
+              and is therefor _r_e_s_e_r_v_e_d.
+
+              See the net-if incomming messages for sending a  ttrraapp and
+              nnoottiiffiiccaattiioonn for more info.
+
+
+       sseenndd__nnoottiiffiiccaattiioonn((AAggeenntt,, NNoottiiffiiccaattiioonn,, RReecceeiivveerr))
+       sseenndd__nnoottiiffiiccaattiioonn((AAggeenntt,, NNoottiiffiiccaattiioonn,, RReecceeiivveerr,, VVaarrbbiinnddss))
+       sseenndd__nnoottiiffiiccaattiioonn((AAggeenntt,, NNoottiiffiiccaattiioonn,, RReecceeiivveerr,, NNoottiiffyyNNaammee,, VVaarrbbiinnddss))
+       sseenndd__nnoottiiffiiccaattiioonn((AAggeenntt,, NNoottiiffiiccaattiioonn,, RReecceeiivveerr,, NNoottiiffyyNNaammee,,
+       CCoonntteexxttNNaammee,, VVaarrbbiinnddss)) -->> vvooiidd(())
+       sseenndd__nnoottiiffiiccaattiioonn((AAggeenntt,, NNoottiiffiiccaattiioonn,, RReecceeiivveerr,, NNoottiiffyyNNaammee,,
+       CCoonntteexxttNNaammee,, VVaarrbbiinnddss,, LLooccaallEEnnggiinneeIIDD)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Notification = atom()
+                 Receiver = no_receiver | {Tag, Recv} |
+                 notification_delivery_info()
+                 Tag = term()
+                 Recv = receiver()
+                 receiver() = pid() | atom() | {Mod, Func, Args}
+                 Mod = atom()
+                 Func = atom()
+                 Args = list()
+                 NotifyName = string()
+                 ContextName = string()
+                 Varbinds = varbinds()
+                 varbinds() = [varbind()]
+                 varbind() = {Variable, Value} | {Column, RowIndex, Value} |
+                 {OID, Value}
+                 Variable = atom()
+                 Column = atom()
+                 OID = oid()
+                 Value = term()
+                 RowIndex = [int()]
+                 LocalEngineID = string()
+
+              Sends the notification _N_o_t_i_f_i_c_a_t_i_o_n to the management targets
+              defined for _N_o_t_i_f_y_N_a_m_e in the _s_n_m_p_N_o_t_i_f_y_T_a_b_l_e in SNMP-
+              NOTIFICATION-MIB from the specified context.
+
+              If no _N_o_t_i_f_y_N_a_m_e is specified (or if it is _"_"), the notification
+              is sent to all management targets (_A_d_d_r_e_s_s_e_s below).
+
+              If no _C_o_n_t_e_x_t_N_a_m_e is specified, the default _"_" context is used.
+
+              The parameter _R_e_c_e_i_v_e_r specifies where information about
+              delivery of Inform-Requests should be sent. The agent sends
+              Inform-Requests and waits for acknowledgments from the managers.
+              _R_e_c_e_i_v_e_r can have three values:
+
+                * _n_o___r_e_c_e_i_v_e_r - No information is delivered.
+
+                * _n_o_t_i_f_i_c_a_t_i_o_n___d_e_l_i_v_e_r_y___i_n_f_o_(_) - The information is delivered
+                  via a function call according to this data. See the DDAATTAA
+                  TTYYPPEESS section above for details.
+
+                * _{_T_a_g_, _R_e_c_v_} - The information is delivered either via
+                  messages or via a function call according to the value of
+                  _R_e_c_v.
+
+              If _R_e_c_e_i_v_e_r has the value _{_T_a_g_, _R_e_c_v_}, the delivery is done
+              according to _R_e_c_v:
+
+                * _p_i_d_(_) _| _a_t_o_m_(_) - The info will be delivered in the following
+                  messages:
+
+                  * _{_s_n_m_p___t_a_r_g_e_t_s_, _T_a_g_, _A_d_d_r_e_s_s_e_s_}
+
+                    This inform the user which target addresses the
+                    notification was sent to.
+
+                  * _{_s_n_m_p___n_o_t_i_f_i_c_a_t_i_o_n_, _T_a_g_, _{_g_o_t___r_e_s_p_o_n_s_e_, _A_d_d_r_e_s_s_}_}
+
+                    This informs the user that this target address
+                    acknowledged the notification.
+
+                  * _{_s_n_m_p___n_o_t_i_f_i_c_a_t_i_o_n_, _T_a_g_, _{_n_o___r_e_s_p_o_n_s_e_, _A_d_d_r_e_s_s_}_}
+
+                    This informs the user that this target address did not
+                    acknowledge notification.
+
+                  The notification is sent as an Inform-Request to each target
+                  address in _A_d_d_r_e_s_s_e_s and if there are no targets for which
+                  an Inform-Request is sent, _A_d_d_r_e_s_s_e_s is the empty list _[_].
+
+                  The _r_e_c_e_i_v_e_r will first be sent the _s_n_m_p___t_a_r_g_e_t_s message,
+                  and then for each address in _A_d_d_r_e_s_s_e_s list, one of the two
+                  _s_n_m_p___n_o_t_i_f_i_c_a_t_i_o_n messages.
+
+                * _{_M_o_d_, _F_u_n_c_, _A_r_g_s_} - The info will be delivered via the
+                  function call:
+
+                  _M_o_d_:_F_u_n_c_(_[_M_s_g _| _A_r_g_s_]_)
+
+                  where _M_s_g has the same content and purpose as the messages
+                  descrived above.
+
+              _A_d_d_r_e_s_s is a management target address and _A_d_d_r_e_s_s_e_s is a list
+              of management target addresses. They are defined as followes:
+
+                      Addresses  = [address()]
+                      Address    = address()
+                      address()  = v1_address() | v3_address()
+                      v1_address() = {TDomain, TAddress}
+                      v3_address() = {{TDomain, TAddress}, V3MsgData}
+                      TDomain    = tdoamin()
+                      TAddress   = taddress()
+                      tdomain()  = The oid of snmpUDPDomain
+                                   This is the only supported transport domain.
+                      taddress() = [A1, A2, A3, A4, P1, P3]
+                                   The 4 first bytes makes up the IP-address and the last 2,
+                                   the UDP-port number.
+                      V3MsgData  = v3_msg_data()
+                      v3_msg_data() = term()
+
+
+              If _R_e_c_e_i_v_e_r is a _n_o_t_i_f_i_c_a_t_i_o_n___d_e_l_i_v_e_r_y___i_n_f_o_(_) record, then the
+              information about the notification delivery will be delivered to
+              the _r_e_c_e_i_v_e_r via the callback functions defined by the
+              ssnnmmppaa__nnoottiiffiiccaattiioonn__ddeelliivveerryy__iinnffoo__rreecceeiivveerr behaviour according to
+              the content of the _n_o_t_i_f_i_c_a_t_i_o_n___d_e_l_i_v_e_r_y___i_n_f_o_(_) record.
+
+              The optional argument _V_a_r_b_i_n_d_s defines values for the objects in
+              the notification. If no value is given for an object, the _A_g_e_n_t
+              performs a get-operation to retrieve the value.
+
+              _V_a_r_b_i_n_d_s is a list of _V_a_r_b_i_n_d, where each _V_a_r_b_i_n_d is one of:
+
+                * _{_V_a_r_i_a_b_l_e_, _V_a_l_u_e_}, where _V_a_r_i_a_b_l_e is the symbolic name of a
+                  scalar variable referred to in the notification
+                  specification.
+
+                * _{_C_o_l_u_m_n_, _R_o_w_I_n_d_e_x_, _V_a_l_u_e_}, where _C_o_l_u_m_n is the symbolic name
+                  of a column variable. _R_o_w_I_n_d_e_x is a list of indices for the
+                  specified element. If this is the case, the OBJECT
+                  IDENTIFIER sent in the notification is the _R_o_w_I_n_d_e_x appended
+                  to the OBJECT IDENTIFIER for the table column. This is the
+                  OBJECT IDENTIFIER which specifies the element.
+
+                * _{_O_I_D_, _V_a_l_u_e_}, where _O_I_D is the OBJECT IDENTIFIER for an
+                  instance of an object, scalar variable, or column variable.
+
+              For example, to specify that _s_y_s_L_o_c_a_t_i_o_n should have the value
+              _"_u_p_s_t_a_i_r_s_" in the notification, we could use one of:
+
+                * _{_s_y_s_L_o_c_a_t_i_o_n_, _"_u_p_s_t_a_i_r_s_"_} or
+
+                * _{_[_1_,_3_,_6_,_1_,_2_,_1_,_1_,_6_,_0_]_, _"_u_p_s_t_a_i_r_s_"_} or
+
+                * _{_?_s_y_s_L_o_c_a_t_i_o_n___i_n_s_t_a_n_c_e_, _"_u_p_s_t_a_i_r_s_"_} (provided that the
+                  generated _._h_r_l file is included)
+
+              If a variable in the notification is a table element, the
+              _R_o_w_I_n_d_e_x for the element must be given in the _V_a_r_b_i_n_d_s list. In
+              this case, the OBJECT IDENTIFIER sent in the notification is the
+              OBJECT IDENTIFIER that identifies this element. This OBJECT
+              IDENTIFIER could be used in a get operation later.
+
+              This function is asynchronous, and does not return any
+              information. If an error occurs, _u_s_e_r___e_r_r_/_2 of the error report
+              module is called and the notification is discarded.
+
+          NNoottee::
+              Note that the use of the LocalEngineID argument is only intended
+              for special cases, if the agent is to "emulate" multiple
+              EngineIDs! By default, the agent uses the value of _S_n_m_p_E_n_g_i_n_e_I_D
+              (see SNMP-FRAMEWORK-MIB).
+
+
+              _E_x_t_r_a_I_n_f_o is not normally used in any way by the agent. It is
+              intended to be passed along to the net-if process, which is a
+              component that a user can implement themself. The users own net-
+              if may then make use of ExtraInfo. The net-if provided with this
+              application does not process ExtraInfo.
+
+              There is one exception. _A_n_y tuple containing the atom
+              _s_n_m_p_a___d_e_f_a_u_l_t___n_o_t_i_f_i_c_a_t_i_o_n___e_x_t_r_a___i_n_f_o will, in this context, be
+              considered belonging to this application, and may be processed
+              by the agent.
+
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn)) -->> {{ookk,, MMaannaaggeerrEEnnggiinneeIIDD}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn,, VVaarrbbiinnddss)) -->> {{ookk,, MMaannaaggeerrEEnnggiinneeIIDD}}
+       || {{eerrrroorr,, RReeaassoonn}}
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn,, DDiissccooHHaannddlleerr)) -->> {{ookk,,
+       MMaannaaggeerrEEnnggiinneeIIDD}} || {{eerrrroorr,, RReeaassoonn}}
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn,, CCoonntteexxttNNaammee,, VVaarrbbiinnddss)) -->> {{ookk,,
+       MMaannaaggeerrEEnnggiinneeIIDD}} || {{eerrrroorr,, RReeaassoonn}}
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn,, VVaarrbbiinnddss,, DDiissccooHHaannddlleerr)) -->> {{ookk,,
+       MMaannaaggeerrEEnnggiinneeIIDD}} || {{eerrrroorr,, RReeaassoonn}}
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn,, CCoonntteexxttNNaammee,, VVaarrbbiinnddss,,
+       DDiissccooHHaannddlleerr)) -->> {{ookk,, MMaannaaggeerrEEnnggiinneeIIDD}} || {{eerrrroorr,, RReeaassoonn}}
+       ddiissccoovveerryy((TTaarrggeettNNaammee,, NNoottiiffiiccaattiioonn,, CCoonntteexxttNNaammee,, VVaarrbbiinnddss,,
+       DDiissccooHHaannddlleerr,, EExxttrraaIInnffoo)) -->> {{ookk,, MMaannaaggeerrEEnnggiinneeIIDD}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TargetName = string()
+                 Notification = atom()
+                 ContextName = string() (defaults to "")
+                 Varbinds = varbinds()
+                 varbinds() = [varbind()]
+                 DiscoHandler = snmpa_discovery_handler()
+                 ExtraInfo = term()
+                 snmpa_discovery_handler() = Module implementing the
+                 snmpa_discovery_handler behaviour
+                 ManagerEngineID = string()
+                 varbind() = {Variable, Value} | {Column, RowIndex, Value} |
+                 {OID, Value}
+                 Variable = atom()
+                 Column = atom()
+                 OID = oid()
+                 Value = term()
+                 RowIndex = [int()]
+                 Reason = term()
+
+              Initiate the discovery process with the manager identified by
+              _T_a_r_g_e_t_N_a_m_e using the notification _N_o_t_i_f_i_c_a_t_i_o_n.
+
+              This function is synchronous, which means that it will return
+              when the discovery process has been completed or failed.
+
+              The _D_i_s_c_o_H_a_n_d_l_e_r module is used during the discovery process.
+              See ddiissccoovveerryy hhaannddlleerr for more info.
+
+              The _E_x_t_r_a_I_n_f_o argument is passed on to the callback functions of
+              the _D_i_s_c_o_H_a_n_d_l_e_r.
+
+          NNoottee::
+              If we are not at security-level _n_o_A_u_t_h_N_o_P_r_i_v, this could be
+              complicated, since the agent will then continue with stage 2,
+              before which the usm-related updates must be done.
+
+
+          NNoottee::
+              The default discovery handler will require additional actions by
+              the caller and the discovery will not work if the security-level
+              is higher then _n_o_A_u_t_h_N_o_P_r_i_v.
+
+
+       ccoonnvveerrtt__ccoonnffiigg((OOllddCCoonnffiigg)) -->> AAggeennttCCoonnffiigg
+
+              Types:
+
+                 OldConfig = list()
+                 AgentConfig = list()
+
+              This off-line utility function can be used to convert the old
+              snmp application config (pre snmp-4.0) to the new snmp agent
+              config (as of snmp-4.0).
+
+              For information about the old config (_O_l_d_C_o_n_f_i_g) see the OTP R9C
+              documentation.
+
+              For information about the current agent config (_A_g_e_n_t_C_o_n_f_i_g),
+              see either the SSNNMMPP aapppplliiccaattiioonn part of the reference manual or
+              the CCoonnffiigguurriinngg tthhee aapppplliiccaattiioonn chapter of the SNMP user's
+              guide.
+
+       rreessttaarrtt__wwoorrkkeerr(()) -->> vvooiidd(())
+       rreessttaarrtt__wwoorrkkeerr((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Restart the worker process of a multi-threaded agent.
+
+              This is a utility function, that can be useful when e.g.
+              debugging instrumentation functions.
+
+       rreessttaarrtt__sseett__wwoorrkkeerr(()) -->> vvooiidd(())
+       rreessttaarrtt__sseett__wwoorrkkeerr((AAggeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Agent = pid() | atom()
+
+              Restart the set worker process of a multi-threaded agent.
+
+              This is a utility function, that can be useful when e.g.
+              debugging instrumentation functions.
+
+       pprriinntt__mmiibb__iinnffoo(()) -->> vvooiidd(())
+
+              Prints the content of all the (snmp) tables and variables for
+              all mibs handled by the snmp agent.
+
+       pprriinntt__mmiibb__ttaabblleess(()) -->> vvooiidd(())
+
+              Prints the content of all the (snmp) tables for all mibs handled
+              by the snmp agent.
+
+       pprriinntt__mmiibb__vvaarriiaabblleess(()) -->> vvooiidd(())
+
+              Prints the content of all the (snmp) variables for all mibs
+              handled by the snmp agent.
+
+       vveerrbboossiittyy((RReeff,,VVeerrbboossiittyy)) -->> vvooiidd(())
+
+              Types:
+
+                 Ref = pid() | sub_agents | master_agent | net_if | mib_server
+                 | symbolic_store | note_store | local_db
+                 Verbosity = verbosity() | {subagents, verbosity()}
+                 verbosity() = silence | info | log | debug | trace
+
+              Sets verbosity for the designated process. For the lowest
+              verbosity _s_i_l_e_n_c_e, nothing is printed. The higher the verbosity,
+              the more is printed.
+
+SSEEEE AALLSSOO
+       calendar(3), erlc(1)
+
+
+
+Ericsson AB                       snmp 4.22.1                         snmpa(3)

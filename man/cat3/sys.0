@@ -1,0 +1,414 @@
+sys(3)                     Erlang Module Definition                     sys(3)
+
+
+
+NNAAMMEE
+       sys - A Functional Interface to System Messages
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for sending system messages used by
+       programs, and messages used for debugging purposes.
+
+       Functions used for implementation of processes should also understand
+       system messages such as debugging messages and code change. These
+       functions must be used to implement the use of system messages for a
+       process; either directly, or through standard behaviours, such as
+       _g_e_n___s_e_r_v_e_r.
+
+       The default timeout is 5000 ms, unless otherwise specified. The _t_i_m_e_o_u_t
+       defines the time period to wait for the process to respond to a
+       request. If the process does not respond, the function evaluates
+       _e_x_i_t_(_{_t_i_m_e_o_u_t_, _{_M_, _F_, _A_}_}_).
+
+       The functions make reference to a debug structure. The debug structure
+       is a list of _d_b_g___o_p_t_(_). _d_b_g___o_p_t_(_) is an internal data type used by the
+       _h_a_n_d_l_e___s_y_s_t_e_m___m_s_g_/_6 function. No debugging is performed if it is an
+       empty list.
+
+SSYYSSTTEEMM MMEESSSSAAGGEESS
+       Processes which are not implemented as one of the standard behaviours
+       must still understand system messages. There are three different
+       messages which must be understood:
+
+         * Plain system messages. These are received as _{_s_y_s_t_e_m_, _F_r_o_m_, _M_s_g_}.
+           The content and meaning of this message are not interpreted by the
+           receiving process module. When a system message has been received,
+           the function _s_y_s_:_h_a_n_d_l_e___s_y_s_t_e_m___m_s_g_/_6 is called in order to handle
+           the request.
+
+         * Shutdown messages. If the process traps exits, it must be able to
+           handle an shut-down request from its parent, the supervisor. The
+           message _{_'_E_X_I_T_'_, _P_a_r_e_n_t_, _R_e_a_s_o_n_} from the parent is an order to
+           terminate. The process must terminate when this message is
+           received, normally with the same _R_e_a_s_o_n as _P_a_r_e_n_t.
+
+         * There is one more message which the process must understand if the
+           modules used to implement the process change dynamically during
+           runtime. An example of such a process is the _g_e_n___e_v_e_n_t processes.
+           This message is _{_g_e_t___m_o_d_u_l_e_s_, _F_r_o_m_}. The reply to this message is
+           _F_r_o_m _! _{_m_o_d_u_l_e_s_, _M_o_d_u_l_e_s_}, where _M_o_d_u_l_e_s is a list of the currently
+           active modules in the process.
+
+           This message is used by the release handler to find which processes
+           execute a certain module. The process may at a later time be
+           suspended and ordered to perform a code change for one of its
+           modules.
+
+SSYYSSTTEEMM EEVVEENNTTSS
+       When debugging a process with the functions of this module, the process
+       generates _s_y_s_t_e_m___e_v_e_n_t_s which are then treated in the debug function.
+       For example, _t_r_a_c_e formats the system events to the tty.
+
+       There are three predefined system events which are used when a process
+       receives or sends a message. The process can also define its own system
+       events. It is always up to the process itself to format these events.
+
+DDAATTAA TTYYPPEESS
+       nnaammee(()) = pid() | atom() | {global, atom()}
+
+       ssyysstteemm__eevveenntt(()) = {in, Msg :: term()}
+                      | {in, Msg :: term(), From :: term()}
+                      | {out, Msg :: term(), To :: term()}
+                      | term()
+
+       ddbbgg__oopptt(())
+
+              See aabboovvee.
+
+       ddbbgg__ffuunn(()) =
+           fun((FuncState :: term(),
+                Event :: ssyysstteemm__eevveenntt(()),
+                ProcState :: term()) ->
+                   done | (NewFuncState :: term()))
+
+EEXXPPOORRTTSS
+       lloogg((NNaammee,, FFllaagg)) -->> ookk || {{ookk,, [[ssyysstteemm__eevveenntt(())]]}}
+
+       lloogg((NNaammee,, FFllaagg,, TTiimmeeoouutt)) -->> ookk || {{ookk,, [[ssyysstteemm__eevveenntt(())]]}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Flag = true | {true, N :: integer() >= 1} | false | get |
+                 print
+                 Timeout = timeout()
+
+              Turns the logging of system events On or Off. If On, a maximum
+              of _N events are kept in the debug structure (the default is 10).
+              If _F_l_a_g is _g_e_t, a list of all logged events is returned. If _F_l_a_g
+              is _p_r_i_n_t, the logged events are printed to _s_t_a_n_d_a_r_d___i_o. The
+              events are formatted with a function that is defined by the
+              process that generated the event (with a call to
+              _s_y_s_:_h_a_n_d_l_e___d_e_b_u_g_/_4).
+
+       lloogg__ttoo__ffiillee((NNaammee,, FFllaagg)) -->> ookk || {{eerrrroorr,, ooppeenn__ffiillee}}
+
+       lloogg__ttoo__ffiillee((NNaammee,, FFllaagg,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, ooppeenn__ffiillee}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Flag = (FileName :: string()) | false
+                 Timeout = timeout()
+
+              Enables or disables the logging of all system events in textual
+              format to the file. The events are formatted with a function
+              that is defined by the process that generated the event (with a
+              call to _s_y_s_:_h_a_n_d_l_e___d_e_b_u_g_/_4).
+
+       ssttaattiissttiiccss((NNaammee,, FFllaagg)) -->> ookk || {{ookk,, SSttaattiissttiiccss}}
+
+       ssttaattiissttiiccss((NNaammee,, FFllaagg,, TTiimmeeoouutt)) -->> ookk || {{ookk,, SSttaattiissttiiccss}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Flag = true | false | get
+                 Statistics = [StatisticsTuple] | no_statistics
+                 StatisticsTuple = {start_time, DateTime1}
+                                 | {current_time, DateTime2}
+                                 | {reductions, integer() >= 0}
+                                 | {messages_in, integer() >= 0}
+                                 | {messages_out, integer() >= 0}
+                 DateTime1 = DateTime2 = ffiillee::ddaattee__ttiimmee(())
+                 Timeout = timeout()
+
+              Enables or disables the collection of statistics. If _F_l_a_g is
+              _g_e_t, the statistical collection is returned.
+
+       ttrraaccee((NNaammee,, FFllaagg)) -->> ookk
+
+       ttrraaccee((NNaammee,, FFllaagg,, TTiimmeeoouutt)) -->> ookk
+
+              Types:
+
+                 Name = nnaammee(())
+                 Flag = boolean()
+                 Timeout = timeout()
+
+              Prints all system events on _s_t_a_n_d_a_r_d___i_o. The events are
+              formatted with a function that is defined by the process that
+              generated the event (with a call to _s_y_s_:_h_a_n_d_l_e___d_e_b_u_g_/_4).
+
+       nnoo__ddeebbuugg((NNaammee)) -->> ookk
+
+       nnoo__ddeebbuugg((NNaammee,, TTiimmeeoouutt)) -->> ookk
+
+              Types:
+
+                 Name = nnaammee(())
+                 Timeout = timeout()
+
+              Turns off all debugging for the process. This includes functions
+              that have been installed explicitly with the _i_n_s_t_a_l_l function,
+              for example triggers.
+
+       ssuussppeenndd((NNaammee)) -->> VVooiidd
+
+       ssuussppeenndd((NNaammee,, TTiimmeeoouutt)) -->> VVooiidd
+
+              Types:
+
+                 Name = nnaammee(())
+                 Timeout = timeout()
+                 Void = term()
+
+              Suspends the process. When the process is suspended, it will
+              only respond to other system messages, but not other messages.
+
+       rreessuummee((NNaammee)) -->> VVooiidd
+
+       rreessuummee((NNaammee,, TTiimmeeoouutt)) -->> VVooiidd
+
+              Types:
+
+                 Name = nnaammee(())
+                 Timeout = timeout()
+                 Void = term()
+
+              Resumes a suspended process.
+
+       cchhaannggee__ccooddee((NNaammee,, MMoodduullee,, OOllddVVssnn,, EExxttrraa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       cchhaannggee__ccooddee((NNaammee,, MMoodduullee,, OOllddVVssnn,, EExxttrraa,, TTiimmeeoouutt)) -->>
+                      ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Module = module()
+                 OldVsn = undefined | term()
+                 Extra = term()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Tells the process to change code. The process must be suspended
+              to handle this message. The _E_x_t_r_a argument is reserved for each
+              process to use as its own. The function
+              _M_o_d_u_l_e_:_s_y_s_t_e_m___c_o_d_e___c_h_a_n_g_e_/_4 is called. _O_l_d_V_s_n is the old version
+              of the _M_o_d_u_l_e.
+
+       ggeett__ssttaattuuss((NNaammee)) -->> SSttaattuuss
+
+       ggeett__ssttaattuuss((NNaammee,, TTiimmeeoouutt)) -->> SSttaattuuss
+
+              Types:
+
+                 Name = nnaammee(())
+                 Timeout = timeout()
+                 Status =
+                     {status, Pid :: pid(), {module, Module :: module()},
+                 [SItem]}
+                 SItem = (PDict :: [{Key :: term(), Value :: term()}])
+                       | (SysState :: running | suspended)
+                       | (Parent :: pid())
+                       | (Dbg :: ddbbgg__oopptt(()))
+                       | (Misc :: term())
+
+              Gets the status of the process.
+
+              The value of _M_i_s_c varies for different types of processes. For
+              example, a _g_e_n___s_e_r_v_e_r process returns the callback module's
+              state, and a _g_e_n___f_s_m process returns information such as its
+              current state name. Callback modules for _g_e_n___s_e_r_v_e_r and _g_e_n___f_s_m
+              can also customise the value of _M_i_s_c by exporting a
+              _f_o_r_m_a_t___s_t_a_t_u_s_/_2 function that contributes module-specific
+              information; see ggeenn__sseerrvveerr::ffoorrmmaatt__ssttaattuuss//22 and
+              ggeenn__ffssmm::ffoorrmmaatt__ssttaattuuss//22 for more details.
+
+       iinnssttaallll((NNaammee,, FFuunnccSSppeecc)) -->> VVooiidd
+
+       iinnssttaallll((NNaammee,, FFuunnccSSppeecc,, TTiimmeeoouutt)) -->> VVooiidd
+
+              Types:
+
+                 Name = nnaammee(())
+                 FuncSpec = {Func, FuncState}
+                 Func = ddbbgg__ffuunn(())
+                 FuncState = term()
+                 Timeout = timeout()
+                 Void = term()
+
+              This function makes it possible to install other debug functions
+              than the ones defined above. An example of such a function is a
+              trigger, a function that waits for some special event and
+              performs some action when the event is generated. This could,
+              for example, be turning on low level tracing.
+
+              _F_u_n_c is called whenever a system event is generated. This
+              function should return _d_o_n_e, or a new func state. In the first
+              case, the function is removed. It is removed if the function
+              fails.
+
+       rreemmoovvee((NNaammee,, FFuunncc)) -->> VVooiidd
+
+       rreemmoovvee((NNaammee,, FFuunncc,, TTiimmeeoouutt)) -->> VVooiidd
+
+              Types:
+
+                 Name = nnaammee(())
+                 Func = ddbbgg__ffuunn(())
+                 Timeout = timeout()
+                 Void = term()
+
+              Removes a previously installed debug function from the process.
+              _F_u_n_c must be the same as previously installed.
+
+PPRROOCCEESSSS IIMMPPLLEEMMEENNTTAATTIIOONN FFUUNNCCTTIIOONNSS
+       The following functions are used when implementing a special process.
+       This is an ordinary process which does not use a standard behaviour,
+       but a process which understands the standard system messages.
+
+EEXXPPOORRTTSS
+       ddeebbuugg__ooppttiioonnss((OOppttiioonnss)) -->> [[ddbbgg__oopptt(())]]
+
+              Types:
+
+                 Options = [Opt]
+                 Opt = trace
+                     | log
+                     | statistics
+                     | {log_to_file, FileName}
+                     | {install, FuncSpec}
+                 FileName = ffiillee::nnaammee(())
+                 FuncSpec = {Func, FuncState}
+                 Func = ddbbgg__ffuunn(())
+                 FuncState = term()
+
+              This function can be used by a process that initiates a debug
+              structure from a list of options. The values of the _O_p_t argument
+              are the same as the corresponding functions.
+
+       ggeett__ddeebbuugg((IItteemm,, DDeebbuugg,, DDeeffaauulltt)) -->> tteerrmm(())
+
+              Types:
+
+                 Item = log | statistics
+                 Debug = [ddbbgg__oopptt(())]
+                 Default = term()
+
+              This function gets the data associated with a debug option.
+              _D_e_f_a_u_l_t is returned if the _I_t_e_m is not found. Can be used by the
+              process to retrieve debug data for printing before it
+              terminates.
+
+       hhaannddllee__ddeebbuugg((DDeebbuugg,, FFoorrmmFFuunncc,, EExxttrraa,, EEvveenntt)) -->> [[ddbbgg__oopptt(())]]
+
+              Types:
+
+                 Debug = [ddbbgg__oopptt(())]
+                 FormFunc = ddbbgg__ffuunn(())
+                 Extra = term()
+                 Event = ssyysstteemm__eevveenntt(())
+
+              This function is called by a process when it generates a system
+              event. _F_o_r_m_F_u_n_c is a formatting function which is called as
+              _F_o_r_m_F_u_n_c_(_D_e_v_i_c_e_, _E_v_e_n_t_, _E_x_t_r_a_) in order to print the events,
+              which is necessary if tracing is activated. _E_x_t_r_a is any extra
+              information which the process needs in the format function, for
+              example the name of the process.
+
+       hhaannddllee__ssyysstteemm__mmssgg((MMssgg,, FFrroomm,, PPaarreenntt,, MMoodduullee,, DDeebbuugg,, MMiisscc)) -->> VVooiidd
+
+              Types:
+
+                 Msg = term()
+                 From = {pid(), Tag :: term()}
+                 Parent = pid()
+                 Module = module()
+                 Debug = [ddbbgg__oopptt(())]
+                 Misc = Void = term()
+
+              This function is used by a process module that wishes to take
+              care of system messages. The process receives a _{_s_y_s_t_e_m_, _F_r_o_m_,
+              _M_s_g_} message and passes the _M_s_g and _F_r_o_m to this function.
+
+              This function _n_e_v_e_r returns. It calls the function
+              _M_o_d_u_l_e_:_s_y_s_t_e_m___c_o_n_t_i_n_u_e_(_P_a_r_e_n_t_, _N_D_e_b_u_g_, _M_i_s_c_) where the process
+              continues the execution, or _M_o_d_u_l_e_:_s_y_s_t_e_m___t_e_r_m_i_n_a_t_e_(_R_e_a_s_o_n_,
+              _P_a_r_e_n_t_, _D_e_b_u_g_, _M_i_s_c_) if the process should terminate. The _M_o_d_u_l_e
+              must export _s_y_s_t_e_m___c_o_n_t_i_n_u_e_/_3, _s_y_s_t_e_m___t_e_r_m_i_n_a_t_e_/_4, and
+              _s_y_s_t_e_m___c_o_d_e___c_h_a_n_g_e_/_4 (see below).
+
+              The _M_i_s_c argument can be used to save internal data in a
+              process, for example its state. It is sent to
+              _M_o_d_u_l_e_:_s_y_s_t_e_m___c_o_n_t_i_n_u_e_/_3 or _M_o_d_u_l_e_:_s_y_s_t_e_m___t_e_r_m_i_n_a_t_e_/_4
+
+       pprriinntt__lloogg((DDeebbuugg)) -->> VVooiidd
+
+              Types:
+
+                 Debug = [ddbbgg__oopptt(())]
+                 Void = term()
+
+              Prints the logged system events in the debug structure using
+              _F_o_r_m_F_u_n_c as defined when the event was generated by a call to
+              _h_a_n_d_l_e___d_e_b_u_g_/_4.
+
+       MMoodd::ssyysstteemm__ccoonnttiinnuuee((PPaarreenntt,, DDeebbuugg,, MMiisscc)) -->> nnoonnee(())
+
+              Types:
+
+                 Parent = pid()
+                 Debug = [ddbbgg__oopptt(())]
+                 Misc = term()
+
+              This function is called from _s_y_s_:_h_a_n_d_l_e___s_y_s_t_e_m___m_s_g_/_6 when the
+              process should continue its execution (for example after it has
+              been suspended). This function never returns.
+
+       MMoodd::ssyysstteemm__tteerrmmiinnaattee((RReeaassoonn,, PPaarreenntt,, DDeebbuugg,, MMiisscc)) -->> nnoonnee(())
+
+              Types:
+
+                 Reason = term()
+                 Parent = pid()
+                 Debug = [ddbbgg__oopptt(())]
+                 Misc = term()
+
+              This function is called from _s_y_s_:_h_a_n_d_l_e___s_y_s_t_e_m___m_s_g_/_6 when the
+              process should terminate. For example, this function is called
+              when the process is suspended and its parent orders shut-down.
+              It gives the process a chance to do a clean-up. This function
+              never returns.
+
+       MMoodd::ssyysstteemm__ccooddee__cchhaannggee((MMiisscc,, MMoodduullee,, OOllddVVssnn,, EExxttrraa)) -->> {{ookk,, NNMMiisscc}}
+
+              Types:
+
+                 Misc = term()
+                 OldVsn = undefined | term()
+                 Module = atom()
+                 Extra = term()
+                 NMisc = term()
+
+              Called from _s_y_s_:_h_a_n_d_l_e___s_y_s_t_e_m___m_s_g_/_6 when the process should
+              perform a code change. The code change is used when the internal
+              data structure has changed. This function converts the _M_i_s_c
+              argument to the new data structure. _O_l_d_V_s_n is the _v_s_n attribute
+              of the old version of the _M_o_d_u_l_e. If no such attribute was
+              defined, the atom _u_n_d_e_f_i_n_e_d is sent.
+
+
+
+Ericsson AB                      stdlib 1.18.2                          sys(3)

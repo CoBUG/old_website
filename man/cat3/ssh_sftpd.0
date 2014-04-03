@@ -1,0 +1,58 @@
+ssh_sftpd(3)               Erlang Module Definition               ssh_sftpd(3)
+
+
+
+NNAAMMEE
+       ssh_sftpd - Specifies a channel process to handle a sftp subsystem.
+
+DDEESSCCRRIIPPTTIIOONN
+       Specifies a channel process to handle a sftp subsystem.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       _s_u_b_s_y_s_t_e_m___s_p_e_c_(_) _= _{_s_u_b_s_y_s_t_e_m___n_a_m_e_(_)_, _{_c_h_a_n_n_e_l___c_a_l_l_b_a_c_k_(_)_,
+       _c_h_a_n_n_e_l___i_n_i_t___a_r_g_s_(_)_}_}
+
+       _s_u_b_s_y_s_t_e_m___n_a_m_e_(_) _= _"_s_f_t_p_"
+
+       _c_h_a_n_n_e_l___c_a_l_l_b_a_c_k_(_) _= _a_t_o_m_(_) - Name of the erlang module implementing
+       the subsystem using the ssh_channel behavior see sssshh__cchhaannnneell((33))
+
+        _c_h_a_n_n_e_l___i_n_i_t___a_r_g_s_(_) _= _l_i_s_t_(_) _- _T_h_e _o_n_e _g_i_v_e_n _a_s _a_r_g_u_m_e_n_t _t_o _f_u_n_c_t_i_o_n
+       _s_u_b_s_y_s_t_e_m___s_p_e_c_/_1_.
+
+EEXXPPOORRTTSS
+       ssuubbssyysstteemm__ssppeecc((OOppttiioonnss)) -->> ssuubbssyysstteemm__ssppeecc(())
+
+              Types:
+
+                 Options = [{Option, Value}]
+
+              Should be used together with ssh:daemon/[1,2,3]
+
+              Options are:
+
+                _{_c_w_d_, _S_t_r_i_n_g_}:
+                  Sets the initial current working directory for the server.
+
+                _{_f_i_l_e___h_a_n_d_l_e_r_, _C_a_l_l_b_a_c_k_M_o_d_u_l_e_}:
+                  Determines which module to call for communicating with the
+                  file server. Default value is _s_s_h___s_f_t_p_d___f_i_l_e that uses the
+                  file and filelib API:s to access the standard OTP file
+                  server. This option may be used to plug in the use of other
+                  file servers.
+
+                _{_m_a_x___f_i_l_e_s_, _I_n_t_e_g_e_r_}:
+                  The default value is _0, which means that there is no upper
+                  limit. If supplied, the number of filenames returned to the
+                  sftp client per _R_E_A_D_D_I_R request, is limited to at most the
+                  given value.
+
+                _{_r_o_o_t_, _S_t_r_i_n_g_}:
+                  Sets the sftp root directory. The user will then not be able
+                  to see any files above this root. If for instance the root
+                  is set to _/_t_m_p the user will see this directory as _/ and if
+                  the user does cd _/_e_t_c the user will end up in _/_t_m_p_/_e_t_c.
+
+
+
+Ericsson AB                        ssh 2.1.1                      ssh_sftpd(3)

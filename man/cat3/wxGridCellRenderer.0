@@ -1,0 +1,55 @@
+wxGridCellRenderer(3)      Erlang Module Definition      wxGridCellRenderer(3)
+
+
+
+NNAAMMEE
+       wxGridCellRenderer - See external documentation: wxGridCellRenderer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridCellRenderer.
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_C_e_l_l_R_e_n_d_e_r_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ddrraaww((TThhiiss,, GGrriidd,, AAttttrr,, DDcc,, RReecctt,, RRooww,, CCooll,, IIssSSeelleecctteedd)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellRenderer()
+                 Grid = wxGrid() (see module wxGrid)
+                 Attr = wxGridCellAttr() (see module wxGridCellAttr)
+                 Dc = wxDC() (see module wxDC)
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 Row = integer()
+                 Col = integer()
+                 IsSelected = boolean()
+
+              See external documentation.
+
+       ggeettBBeessttSSiizzee((TThhiiss,, GGrriidd,, AAttttrr,, DDcc,, RRooww,, CCooll)) -->> {{WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridCellRenderer()
+                 Grid = wxGrid() (see module wxGrid)
+                 Attr = wxGridCellAttr() (see module wxGridCellAttr)
+                 Dc = wxDC() (see module wxDC)
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxGridCellRenderer(3)

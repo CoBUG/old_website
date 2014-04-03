@@ -1,0 +1,90 @@
+wxPreviewControlBar(3)     Erlang Module Definition     wxPreviewControlBar(3)
+
+
+
+NNAAMMEE
+       wxPreviewControlBar - See external documentation: wxPreviewControlBar.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPreviewControlBar.
+
+       This class is derived (and can use functions) from:
+       wwxxPPaanneell
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_r_e_v_i_e_w_C_o_n_t_r_o_l_B_a_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPrreevviieeww,, BBuuttttoonnss,, PPaarreenntt)) -->> wwxxPPrreevviieewwCCoonnttrroollBBaarr(())
+
+              Types:
+
+                 Preview = wxPrintPreview() (see module wxPrintPreview)
+                 Buttons = integer()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPrreevviieeww,, BBuuttttoonnss,, PPaarreenntt,, [[]])).
+
+       nneeww((PPrreevviieeww,, BBuuttttoonnss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxxPPrreevviieewwCCoonnttrroollBBaarr(())
+
+              Types:
+
+                 Preview = wxPrintPreview() (see module wxPrintPreview)
+                 Buttons = integer()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaatteeBBuuttttoonnss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxPreviewControlBar()
+
+              See external documentation.
+
+       ggeettPPrriinnttPPrreevviieeww((TThhiiss)) -->> wwxxPPrriinnttPPrreevviieeww(()) ((sseeee mmoodduullee wwxxPPrriinnttPPrreevviieeww))
+
+              Types:
+
+                 This = wxPreviewControlBar()
+
+              See external documentation.
+
+       ggeettZZoooommCCoonnttrrooll((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPreviewControlBar()
+
+              See external documentation.
+
+       sseettZZoooommCCoonnttrrooll((TThhiiss,, ZZoooomm)) -->> ookk
+
+              Types:
+
+                 This = wxPreviewControlBar()
+                 Zoom = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPrreevviieewwCCoonnttrroollBBaarr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2            wxPreviewControlBar(3)

@@ -1,0 +1,78 @@
+xmerl_xpath(3)             Erlang Module Definition             xmerl_xpath(3)
+
+
+
+NNAAMMEE
+       xmerl_xpath - The xmerl_xpath module handles the entire XPath 1.0 spec.
+
+DDEESSCCRRIIPPTTIIOONN
+       The xmerl_xpath module handles the entire XPath 1.0 spec. XPath
+       expressions typically occur in XML attributes and are used to address
+       parts of an XML document. The grammar is defined in
+       _x_m_e_r_l___x_p_a_t_h___p_a_r_s_e_._y_r_l. The core functions are defined in
+       _x_m_e_r_l___x_p_a_t_h___p_r_e_d_._e_r_l.
+
+       Some useful shell commands for debugging the XPath parser
+
+        c(xmerl_xpath_scan).
+        yecc:yecc("xmerl_xpath_parse.yrl", "xmerl_xpath_parse", true, []).
+        c(xmerl_xpath_parse).
+
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("position() > -1")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("5 * 6 div 2")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("5 + 6 mod 2")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("5 * 6")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("-----6")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("parent::node()")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("descendant-or-self::node()")).
+        xmerl_xpath_parse:parse(xmerl_xpath_scan:tokens("parent::processing-instruction('foo')")).
+
+
+DDAATTAA TTYYPPEESS
+         _n_o_d_e_E_n_t_i_t_y_(_) _= _x_m_l_E_l_e_m_e_n_t_(_) _| _x_m_l_A_t_t_r_i_b_u_t_e_(_) _| _x_m_l_T_e_x_t_(_) _| _x_m_l_P_I_(_) _|
+         _x_m_l_C_o_m_m_e_n_t_(_) _| _x_m_l_N_s_N_o_d_e_(_) _| _x_m_l_D_o_c_u_m_e_n_t_(_):
+
+
+         _o_p_t_i_o_n___l_i_s_t_(_):
+
+
+           Options allows to customize the behaviour of the XPath scanner.
+
+           Possible options are:
+
+           _{_n_a_m_e_s_p_a_c_e_, _#_x_m_l_N_a_m_e_s_p_a_c_e_}:
+             Set namespace nodes, from XmlNamspace, in xmlContext
+
+           _{_n_a_m_e_s_p_a_c_e_, _N_o_d_e_s_}:
+             Set namespace nodes in xmlContext.
+
+EEXXPPOORRTTSS
+       ssttrriinngg((SSttrr,, DDoocc)) -->> [[ddooccEEnnttiittyy(())]] || SSccaallaarr
+
+              Equivalent to ssttrriinngg((SSttrr,, DDoocc,, [[]])).
+
+       ssttrriinngg((SSttrr,, DDoocc,, OOppttiioonnss)) -->> [[ddooccEEnnttiittyy(())]] || SSccaallaarr
+
+              Equivalent to ssttrriinngg((SSttrr,, DDoocc,, [[]],, DDoocc,, OOppttiioonnss)).
+
+       ssttrriinngg((SSttrr,, NNooddee,, PPaarreennttss,, DDoocc,, OOppttiioonnss)) -->> [[ddooccEEnnttiittyy(())]] || SSccaallaarr
+
+              Types:
+
+                 Str = xPathString()
+                 Node = nodeEntity()
+                 Parents = parentList()
+                 Doc = nodeEntity()
+                 Options = option_list()
+                 Scalar = xmlObj
+
+              Extracts the nodes from the parsed XML tree according to XPath.
+              xmlObj is a record with fields type and value, where type is
+              boolean | number | string
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                  xmerl 1.3.2                   xmerl_xpath(3)

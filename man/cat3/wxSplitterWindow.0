@@ -1,0 +1,276 @@
+wxSplitterWindow(3)        Erlang Module Definition        wxSplitterWindow(3)
+
+
+
+NNAAMMEE
+       wxSplitterWindow - See external documentation: wxSplitterWindow.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSplitterWindow.
+
+       This class is derived (and can use functions) from:
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_p_l_i_t_t_e_r_W_i_n_d_o_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSpplliitttteerrWWiinnddooww(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSpplliitttteerrWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSpplliitttteerrWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ggeettMMiinniimmuummPPaanneeSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       ggeettSSaasshhGGrraavviittyy((TThhiiss)) -->> nnuummbbeerr(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       ggeettSSaasshhPPoossiittiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       ggeettSSpplliittMMooddee((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+              Res = ?wxSPLIT_HORIZONTAL | ?wxSPLIT_VERTICAL
+
+       ggeettWWiinnddooww11((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       ggeettWWiinnddooww22((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       iinniittiiaalliizzee((TThhiiss,, WWiinnddooww)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       iissSSpplliitt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       rreeppllaacceeWWiinnddooww((TThhiiss,, WWiinnOOlldd,, WWiinnNNeeww)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 WinOld = wxWindow() (see module wxWindow)
+                 WinNew = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       sseettSSaasshhGGrraavviittyy((TThhiiss,, GGrraavviittyy)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Gravity = number()
+
+              See external documentation.
+
+       sseettSSaasshhPPoossiittiioonn((TThhiiss,, PPoossiittiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Position = integer()
+
+              Equivalent to sseettSSaasshhPPoossiittiioonn((TThhiiss,, PPoossiittiioonn,, [[]])).
+
+       sseettSSaasshhPPoossiittiioonn((TThhiiss,, PPoossiittiioonn,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Position = integer()
+                 Option = {redraw, boolean()}
+
+              See external documentation.
+
+       sseettSSaasshhSSiizzee((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettMMiinniimmuummPPaanneeSSiizzee((TThhiiss,, MMiinn)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Min = integer()
+
+              See external documentation.
+
+       sseettSSpplliittMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Mode = integer()
+
+              See external documentation.
+
+       sspplliittHHoorriizzoonnttaallllyy((TThhiiss,, WWiinnddooww11,, WWiinnddooww22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Window1 = wxWindow() (see module wxWindow)
+                 Window2 = wxWindow() (see module wxWindow)
+
+              Equivalent to sspplliittHHoorriizzoonnttaallllyy((TThhiiss,, WWiinnddooww11,, WWiinnddooww22,, [[]])).
+
+       sspplliittHHoorriizzoonnttaallllyy((TThhiiss,, WWiinnddooww11,, WWiinnddooww22,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Window1 = wxWindow() (see module wxWindow)
+                 Window2 = wxWindow() (see module wxWindow)
+                 Option = {sashPosition, integer()}
+
+              See external documentation.
+
+       sspplliittVVeerrttiiccaallllyy((TThhiiss,, WWiinnddooww11,, WWiinnddooww22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Window1 = wxWindow() (see module wxWindow)
+                 Window2 = wxWindow() (see module wxWindow)
+
+              Equivalent to sspplliittVVeerrttiiccaallllyy((TThhiiss,, WWiinnddooww11,, WWiinnddooww22,, [[]])).
+
+       sspplliittVVeerrttiiccaallllyy((TThhiiss,, WWiinnddooww11,, WWiinnddooww22,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Window1 = wxWindow() (see module wxWindow)
+                 Window2 = wxWindow() (see module wxWindow)
+                 Option = {sashPosition, integer()}
+
+              See external documentation.
+
+       uunnsspplliitt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              Equivalent to uunnsspplliitt((TThhiiss,, [[]])).
+
+       uunnsspplliitt((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSplitterWindow()
+                 Option = {toRemove, wxWindow() (see module wxWindow)}
+
+              See external documentation.
+
+       uuppddaatteeSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterWindow()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSpplliitttteerrWWiinnddooww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxSplitterWindow(3)

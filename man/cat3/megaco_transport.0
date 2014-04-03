@@ -1,0 +1,97 @@
+megaco_transport(3)        Erlang Module Definition        megaco_transport(3)
+
+
+
+NNAAMMEE
+       megaco_transport - Megaco transport behaviour.
+
+DDEESSCCRRIIPPTTIIOONN
+       The following functions should be exported from a _m_e_g_a_c_o___t_r_a_n_s_p_o_r_t
+       callback module:
+
+         * sseenndd__mmeessssaaggee//22 [_m_a_n_d_a_t_o_r_y]
+
+         * sseenndd__mmeessssaaggee//33 [_o_p_t_i_o_n_a_l]
+
+         * rreesseenndd__mmeessssaaggee//22 [_o_p_t_i_o_n_a_l]
+
+         *
+
+
+EEXXPPOORRTTSS
+       MMoodduullee::sseenndd__mmeessssaaggee((HHaannddllee,, MMssgg)) -->> ookk || {{ccaanncceell,, RReeaassoonn}} || EErrrroorr
+       MMoodduullee::sseenndd__mmeessssaaggee((HHaannddllee,, MMssgg,, RReesseenndd)) -->> ookk || {{ccaanncceell,, RReeaassoonn}} ||
+       EErrrroorr
+
+              Types:
+
+                 Handle = term()
+                 Msg = binary() | iolist()
+                 Resend = boolean()
+                 Reason = term()
+                 Error = term()
+
+              Send a megaco message.
+
+              If the function returns _{_c_a_n_c_e_l_, _R_e_a_s_o_n_}, this means the
+              transport module decided not to send the message. This is _n_o_t an
+              error. No error messages will be issued and no error counters
+              incremented. What actions this will result in depends on what
+              kind of message was sent.
+
+              In the case of requests, megaco will cancel the message in much
+              the same way as if _m_e_g_a_c_o_:_c_a_n_c_e_l had been called (after a
+              successfull send). The information will be propagated back to
+              the user differently depending on how the request(s) where
+              issued: For requests issued using mmeeggaaccoo::ccaallll, the info will be
+              delivered in the return value. For requests issued using
+              _m_e_g_a_c_o_:_c_a_s_t the info will be delivered via a call to the
+              callback function hhaannddllee__ttrraannss__rreeppllyy.
+
+              In the case of reply, megaco will cancel the reply and
+              information of this will be returned to the user via a call to
+              the callback function hhaannddllee__ttrraannss__aacckk.
+
+              The function _s_e_n_d___m_e_s_s_a_g_e_/_3 will only be called if the
+              rreesseenndd__iinnddiiccaattiioonn config option has been set to the value _f_l_a_g.
+              The third argument, _R_e_s_e_n_d then indicates if the message send is
+              a resend or not.
+
+       MMoodduullee::rreesseenndd__mmeessssaaggee((HHaannddllee,, MMssgg)) -->> ookk || {{ccaanncceell,, RReeaassoonn}} || EErrrroorr
+
+              Types:
+
+                 Handle = term()
+                 Msg = binary() | iolist()
+                 Reason = term()
+                 Error = term()
+
+              Re-send a megaco message.
+
+              Note that this function will only be called if the user has set
+              the rreesseenndd__iinnddiiccaattiioonn config option to _t_r_u_e_a_n_d it is in fact a
+              message resend. If not _b_o_t_h of these condition's are meet,
+              _s_e_n_d___m_e_s_s_a_g_e will be called.
+
+              If the function returns _{_c_a_n_c_e_l_, _R_e_a_s_o_n_}, this means the
+              transport module decided not to send the message. This is _n_o_t an
+              error. No error messages will be issued and no error counters
+              incremented. What actions this will result in depends on what
+              kind of message was sent.
+
+              In the case of requests, megaco will cancel the message in much
+              the same way as if _m_e_g_a_c_o_:_c_a_n_c_e_l had been called (after a
+              successfull send). The information will be propagated back to
+              the user differently depending on how the request(s) where
+              issued: For requests issued using mmeeggaaccoo::ccaallll, the info will be
+              delivered in the return value. For requests issued using
+              _m_e_g_a_c_o_:_c_a_s_t the info will be delivered via a call to the
+              callback function hhaannddllee__ttrraannss__rreeppllyy.
+
+              In the case of reply, megaco will cancel the reply and
+              information of this will be returned to the user via a call to
+              the callback function hhaannddllee__ttrraannss__aacckk.
+
+
+
+Ericsson AB                     megaco 3.16.0.2            megaco_transport(3)

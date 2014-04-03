@@ -1,0 +1,58 @@
+wxGridCellBoolEditor(3)    Erlang Module Definition    wxGridCellBoolEditor(3)
+
+
+
+NNAAMMEE
+       wxGridCellBoolEditor - See external documentation:
+       wxGridCellBoolEditor.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridCellBoolEditor.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrriiddCCeellllEEddiittoorr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_C_e_l_l_B_o_o_l_E_d_i_t_o_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxGGrriiddCCeellllBBoooollEEddiittoorr(())
+
+              See external documentation.
+
+       iissTTrruueeVVaalluuee((VVaalluuee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Value = chardata() (see module unicode)
+
+              See external documentation.
+
+       uusseeSSttrriinnggVVaalluueess(()) -->> ookk
+
+              Equivalent to uusseeSSttrriinnggVVaalluueess(([[]])).
+
+       uusseeSSttrriinnggVVaalluueess((OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 Option = {valueTrue, chardata() (see module unicode)} |
+                 {valueFalse, chardata() (see module unicode)}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrriiddCCeellllBBoooollEEddiittoorr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2           wxGridCellBoolEditor(3)

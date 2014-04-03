@@ -1,0 +1,200 @@
+orber_tc(3)                Erlang Module Definition                orber_tc(3)
+
+
+
+NNAAMMEE
+       orber_tc - Help functions for IDL typecodes
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains some functions that gives support in creating IDL
+       typecodes that can be used in for example the any types typecode field.
+       For the simple types it is meaningless to use this API but the
+       functions exist to get the interface complete.
+
+       The type _T_C used below describes an IDL type and is a tuple according
+       to the to the Erlang language mapping.
+
+EEXXPPOORRTTSS
+       nnuullll(()) -->> TTCC
+       vvooiidd(()) -->> TTCC
+       sshhoorrtt(()) -->> TTCC
+       uunnssiiggnneedd__sshhoorrtt(()) -->> TTCC
+       lloonngg(()) -->> TTCC
+       uunnssiiggnneedd__lloonngg(()) -->> TTCC
+       lloonngg__lloonngg(()) -->> TTCC
+       uunnssiiggnneedd__lloonngg__lloonngg(()) -->> TTCC
+       wwcchhaarr(()) -->> TTCC
+       ffllooaatt(()) -->> TTCC
+       ddoouubbllee(()) -->> TTCC
+       bboooolleeaann(()) -->> TTCC
+       cchhaarr(()) -->> TTCC
+       oocctteett(()) -->> TTCC
+       aannyy(()) -->> TTCC
+       ttyyppeeccooddee(()) -->> TTCC
+       pprriinncciippaall(()) -->> TTCC
+
+              These functions return the IDL typecodes for simple types.
+
+       oobbjjeecctt__rreeffeerreennccee((IIdd,, NNaammee)) -->> TTCC
+
+              Types:
+
+                 Id = string()
+                   the repository ID
+                 Name = string()
+                   the type name of the object
+
+              Function returns the IDL typecode for object_reference.
+
+       ssttrruucctt((IIdd,, NNaammee,, EElleemmeennttLLiisstt)) -->> TTCC
+
+              Types:
+
+                 Id = string()
+                   the repository ID
+                 Name = string()
+                   the type name of the struct
+                 ElementList = [{MemberName, TC}]
+                   a list of the struct elements
+                 MemberName = string()
+                   the element name
+
+              Function returns the IDL typecode for struct.
+
+       uunniioonn((IIdd,, NNaammee,, DDiissccrrTTCC,, DDeeffaauulltt,, EElleemmeennttLLiisstt)) -->> TTCC
+
+              Types:
+
+                 Id = string()
+                   the repository ID
+                 Name = string()
+                   the type name of the union
+                 DiscrTC = TC
+                   the typecode for the unions discriminant
+                 Default = integer()
+                   a value that indicates which tuple in the element list that
+                   is default (value < 0 means no default)
+                 ElementList = [{Label, MemberName, TC}]
+                   a list of the union elements
+                 Label = term()
+                   the label value should be of the _D_i_s_c_r_T_Ctype
+                 MemberName = string()
+                   the element name
+
+              Function returns the IDL typecode for union.
+
+       eennuumm((IIdd,, NNaammee,, EElleemmeennttLLiisstt)) -->> TTCC
+
+              Types:
+
+                 Id = string()
+                   the repository ID
+                 Name = string()
+                   the type name of the enum
+                 ElementList = [MemberName]
+                   a list of the enums elements
+                 MemberName = string()
+                   the element name
+
+              Function returns the IDL typecode for enum.
+
+       ssttrriinngg((LLeennggtthh)) -->> TTCC
+
+              Types:
+
+                 Length = integer()
+                   the length of the string (0 means unbounded)
+
+              Function returns the IDL typecode for string.
+
+       wwssttrriinngg((LLeennggtthh)) -->> TTCC
+
+              Types:
+
+                 Length = integer()
+                   the length of the wstring (0 means unbounded)
+
+              Function returns the IDL typecode for wstring.
+
+       ffiixxeedd((DDiiggiittss,, SSccaallee)) -->> TTCC
+
+              Types:
+
+                 Digits = Scale = integer()
+                   the digits and scale parameters of a Fixed type
+
+              Function returns the IDL typecode for fixed.
+
+       sseeqquueennccee((EElleemmTTCC,, LLeennggtthh)) -->> TTCC
+
+              Types:
+
+                 ElemTC = TC
+                   the typecode for the sequence elements
+                 Length = integer()
+                   the length of the sequence (0 means unbounded)
+
+              Function returns the IDL typecode for sequence.
+
+       aarrrraayy((EElleemmTTCC,, LLeennggtthh)) -->> TTCC
+
+              Types:
+
+                 ElemTC = TC
+                   the typecode for the array elements
+                 Length = integer()
+                   the length of the array
+
+              Function returns the IDL typecode for array.
+
+       aalliiaass((IIdd,, NNaammee,, AAlliiaassTTCC)) -->> TTCC
+
+              Types:
+
+                 Id = string()
+                   the repository ID
+                 Name = string()
+                   the type name of the alias
+                 AliasTC = TC
+                   the typecode for the type which the alias refer to
+
+              Function returns the IDL typecode for alias.
+
+       eexxcceeppttiioonn((IIdd,, NNaammee,, EElleemmeennttLLiisstt)) -->> TTCC
+
+              Types:
+
+                 Id = string()
+                   the repository ID
+                 Name = string()
+                   the type name of the exception
+                 ElementList = [{MemberName, TC}]
+                   a list of the exception elements
+                 MemberName = string()
+                   the element name
+
+              Function returns the IDL typecode for exception.
+
+       ggeett__ttcc((OObbjjeecctt)) -->> TTCC
+       ggeett__ttcc((IIdd)) -->> TTCC
+
+              Types:
+
+                 Object = record()
+                   an IDL specified struct, union or exception
+                 Id = string()
+                   the repository ID
+
+              If the get_tc/1 gets a record that is and IDL specified struct,
+              union or exception as a parameter it returns the typecode.
+
+              If the parameter is a repository ID it uses the Interface
+              Repository to get the typecode.
+
+       cchheecckk__ttcc((TTCC)) -->> bboooolleeaann(())
+
+              Function checks the syntax of an IDL typecode.
+
+
+
+Ericsson AB                      orber 3.6.24                      orber_tc(3)

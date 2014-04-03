@@ -1,0 +1,91 @@
+wxFindReplaceDialog(3)     Erlang Module Definition     wxFindReplaceDialog(3)
+
+
+
+NNAAMMEE
+       wxFindReplaceDialog - See external documentation: wxFindReplaceDialog.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFindReplaceDialog.
+
+       This class is derived (and can use functions) from:
+       wwxxDDiiaalloogg
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_i_n_d_R_e_p_l_a_c_e_D_i_a_l_o_g_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxFFiinnddRReeppllaacceeDDiiaalloogg(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, DDaattaa,, TTiittllee)) -->> wwxxFFiinnddRReeppllaacceeDDiiaalloogg(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Data = wxFindReplaceData() (see module wxFindReplaceData)
+                 Title = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, DDaattaa,, TTiittllee,, [[]])).
+
+       nneeww((PPaarreenntt,, DDaattaa,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxFFiinnddRReeppllaacceeDDiiaalloogg(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Data = wxFindReplaceData() (see module wxFindReplaceData)
+                 Title = chardata() (see module unicode)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, DDaattaa,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFindReplaceDialog()
+                 Parent = wxWindow() (see module wxWindow)
+                 Data = wxFindReplaceData() (see module wxFindReplaceData)
+                 Title = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, DDaattaa,, TTiittllee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, DDaattaa,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFindReplaceDialog()
+                 Parent = wxWindow() (see module wxWindow)
+                 Data = wxFindReplaceData() (see module wxFindReplaceData)
+                 Title = chardata() (see module unicode)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ggeettDDaattaa((TThhiiss)) -->> wwxxFFiinnddRReeppllaacceeDDaattaa(()) ((sseeee mmoodduullee wwxxFFiinnddRReeppllaacceeDDaattaa))
+
+              Types:
+
+                 This = wxFindReplaceDialog()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFiinnddRReeppllaacceeDDiiaalloogg(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2            wxFindReplaceDialog(3)

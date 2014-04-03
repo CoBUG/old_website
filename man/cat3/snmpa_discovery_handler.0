@@ -1,0 +1,77 @@
+snmpa_discovery_handler(3) Erlang Module Definition snmpa_discovery_handler(3)
+
+
+
+NNAAMMEE
+       snmpa_discovery_handler - Behaviour module for the SNMP agent discovery
+       handler.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the agent discovery handler. A
+       _s_n_m_p_a___d_i_s_c_o_v_e_r_y___h_a_n_d_l_e_r compliant module must export the following
+       functions:
+
+         * ssttaaggee11__ffiinniisshh//22
+
+       The semantics of them and their exact signatures are explained below.
+
+EEXXPPOORRTTSS
+       ssttaaggee11__ffiinniisshh((TTaarrggeettNNaammee,, MMaannaaggeerrEEnnggiinneeIIDD,, EExxttrraaIInnffoo)) -->> iiggnnoorree || {{ookk,,
+       uussmm__eennttrryy(()) || [[uussmm__eennttrryy(())]]}} || {{ookk,, uussmm__eennttrryy(()) || [[uussmm__eennttrryy(())]],,
+       NNeewwEExxttrraaIInnffoo}}
+
+              Types:
+
+                 TargetName = string()
+                 ManagerEngineID = string()
+                 ExtraInfo = term()
+                 usm_entry() = tuple() compatible with usm.conf
+                 NewExtraInfo = term()
+
+              This function is called at the end of stage 1 of the discovery
+              process. It should return either the atom _i_g_n_o_r_e or _{_o_k_,
+              _u_s_m___e_n_t_r_y_(_) _| _[_u_s_m___e_n_t_r_y_(_)_]_}. See uussmm__eennttrryy(()) and uussmm__eennttrryy//1133
+              for more info.
+
+              If the function returns _i_g_n_o_r_e, then it is assumed that either:
+
+                * The caller (of the discovery function) will make the needed
+                  updates later.
+
+                * The callback function itself did the updates.
+
+              In either case, the agent will do nothing, but return the
+              retrieved ManagerEngineID (see ddiissccoovveerryy for more info) and
+              possible continue with stage 2 of the discovery process.
+
+              The _E_x_t_r_a_I_n_f_o argument is passed on from the ddiissccoovveerryy function.
+
+              This function may return an updated _N_e_w_E_x_t_r_a_I_n_f_o that will be
+              used in subsequent calls to the callback functions. Intended for
+              future use.
+
+              The purpose of this function is to generate the usm- related
+              security data needed for usm processing in the agent.
+              Specifically, updating the usmUserTable.
+
+              When an _u_s_m___e_n_t_r_y_(_) tuple (or a list of such tuples) is
+              returned, this data is then added to the _u_s_m_U_s_e_r_T_a_b_l_e by the
+              (master-) agent.
+
+              When an _u_s_m___e_n_t_r_y_(_) tuple (or a list of such tuples) is
+              returned, this data is then added to the _u_s_m_U_s_e_r_T_a_b_l_e by the
+              (master-) agent.
+
+          NNoottee::
+              Note that the function does not check if this entry already
+              exists.
+
+
+          NNoottee::
+              Note that this function is executed in the context of the
+              master-agent process.
+
+
+
+
+Ericsson AB                       snmp 4.22.1       snmpa_discovery_handler(3)

@@ -1,0 +1,46 @@
+debugger(3)                Erlang Module Definition                debugger(3)
+
+
+
+NNAAMMEE
+       debugger - Erlang Debugger
+
+DDEESSCCRRIIPPTTIIOONN
+       Erlang Debugger for debugging and testing of Erlang programs.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(())
+       ssttaarrtt((FFiillee))
+       ssttaarrtt((MMooddee))
+       ssttaarrtt((MMooddee,, FFiillee))
+
+              Types:
+
+                 Mode = local | global
+                 File = string()
+
+              Starts Debugger.
+
+              If given a file name as argument, Debugger will try to load its
+              settings from this file. Refer to Debugger User's Guide for more
+              information about settings.
+
+              If given _l_o_c_a_l as argument, Debugger will interpret code only at
+              the current node. If given _g_l_o_b_a_l as argument, Debugger will
+              interpret code at all known nodes, this is the default.
+
+       qquuiicckk((MMoodduullee,, NNaammee,, AArrggss))
+
+              Types:
+
+                 Module = Name = atom()
+                 Args = [term()]
+
+              This function can be used to debug a single process. The module
+              _M_o_d_u_l_e is interpreted and _a_p_p_l_y_(_M_o_d_u_l_e_,_N_a_m_e_,_A_r_g_s_) is called.
+              This will open an Attach Process window, refer to Debugger
+              User's Guide for more information.
+
+
+
+Ericsson AB                     debugger 3.2.8                     debugger(3)

@@ -1,0 +1,35 @@
+CosNotifyComm_NotifySubscribEer(l3a)ng Module DefiniCtoisoNnotifyComm_NotifySubscribe(3)
+
+
+
+NNAAMMEE
+       CosNotifyComm_NotifySubscribe - This module implements the OMG
+       CosNotifyComm::NotifySubscribe interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       All objects, which inherit this interface, export functions described
+       in this module.
+
+EEXXPPOORRTTSS
+       ssuubbssccrriippttiioonn__cchhaannggee((OObbjjeecctt,, AAddddeedd,, RReemmoovveedd)) -->> RReeppllyy
+
+              Types:
+
+                 Object = #objref
+                 Added = Removed = EventTypeSeq
+                 EventTypeSeq = [type]
+                 Reply = ok | {'EXCEPTION',
+                 CosNotifyComm_InvalidEventType{type}}
+                 type = #'CosNotification_EventType'{domain_name, type_name}
+                 domain_name = type_name = string()
+
+              This operation takes as input two sequences of event type names
+              specifying events the client will and will not accept in the
+              future respectively.
+
+
+
+Ericsson AB                 cosNotification 1.1C.o1s8NotifyComm_NotifySubscribe(3)

@@ -1,0 +1,1161 @@
+dets(3)                    Erlang Module Definition                    dets(3)
+
+
+
+NNAAMMEE
+       dets - A Disk Based Term Storage
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _d_e_t_s provides a term storage on file. The stored terms, in
+       this module called _o_b_j_e_c_t_s, are tuples such that one element is defined
+       to be the key. A Dets _t_a_b_l_e is a collection of objects with the key at
+       the same position stored on a file.
+
+       Dets is used by the Mnesia application, and is provided as is for users
+       who are interested in an efficient storage of Erlang terms on disk
+       only. Many applications just need to store some terms in a file. Mnesia
+       adds transactions, queries, and distribution. The size of Dets files
+       cannot exceed 2 GB. If larger tables are needed, Mnesia's table
+       fragmentation can be used.
+
+       There are three types of Dets tables: set, bag and duplicate_bag. A
+       table of type _s_e_t has at most one object with a given key. If an object
+       with a key already present in the table is inserted, the existing
+       object is overwritten by the new object. A table of type _b_a_g has zero
+       or more different objects with a given key. A table of type
+       _d_u_p_l_i_c_a_t_e___b_a_g has zero or more possibly matching objects with a given
+       key.
+
+       Dets tables must be opened before they can be updated or read, and when
+       finished they must be properly closed. If a table has not been properly
+       closed, Dets will automatically repair the table. This can take a
+       substantial time if the table is large. A Dets table is closed when the
+       process which opened the table terminates. If several Erlang processes
+       (users) open the same Dets table, they will share the table. The table
+       is properly closed when all users have either terminated or closed the
+       table. Dets tables are not properly closed if the Erlang runtime system
+       is terminated abnormally.
+
+   NNoottee::
+       A ^C command abnormally terminates an Erlang runtime system in a Unix
+       environment with a break-handler.
+
+
+       Since all operations performed by Dets are disk operations, it is
+       important to realize that a single look-up operation involves a series
+       of disk seek and read operations. For this reason, the Dets functions
+       are much slower than the corresponding Ets functions, although Dets
+       exports a similar interface.
+
+       Dets organizes data as a linear hash list and the hash list grows
+       gracefully as more data is inserted into the table. Space management on
+       the file is performed by what is called a buddy system. The current
+       implementation keeps the entire buddy system in RAM, which implies that
+       if the table gets heavily fragmented, quite some memory can be used up.
+       The only way to defragment a table is to close it and then open it
+       again with the _r_e_p_a_i_r option set to _f_o_r_c_e.
+
+       It is worth noting that the ordered_set type present in Ets is not yet
+       implemented by Dets, neither is the limited support for concurrent
+       updates which makes a sequence of _f_i_r_s_t and _n_e_x_t calls safe to use on
+       fixed Ets tables. Both these features will be implemented by Dets in a
+       future release of Erlang/OTP. Until then, the Mnesia application (or
+       some user implemented method for locking) has to be used to implement
+       safe concurrency. Currently, no library of Erlang/OTP has support for
+       ordered disk based term storage.
+
+       Two versions of the format used for storing objects on file are
+       supported by Dets. The first version, 8, is the format always used for
+       tables created by OTP R7 and earlier. The second version, 9, is the
+       default version of tables created by OTP R8 (and later OTP releases).
+       OTP R8 can create version 8 tables, and convert version 8 tables to
+       version 9, and vice versa, upon request.
+
+       All Dets functions return _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an error occurs (_f_i_r_s_t_/_1
+       and _n_e_x_t_/_2 are exceptions, they exit the process with the error tuple).
+       If given badly formed arguments, all functions exit the process with a
+       _b_a_d_a_r_g message.
+
+DDAATTAA TTYYPPEESS
+       aacccceessss(()) = read | read_write
+
+       aauuttoo__ssaavvee(()) = infinity | integer() >= 0
+
+       bbiinnddiinnggss__ccoonntt(())
+
+              Opaque continuation used by _m_a_t_c_h_/_1 and _m_a_t_c_h_/_3.
+
+       ccoonntt(())
+
+              Opaque continuation used by _b_c_h_u_n_k_/_2.
+
+       kkeeyyppooss(()) = integer() >= 1
+
+       mmaattcchh__ssppeecc(()) = eettss::mmaattcchh__ssppeecc(())
+
+              Match specifications, see the mmaattcchh ssppeecciiffiiccaattiioonn documentation
+              in the ERTS User's Guide and mmss__ttrraannssffoorrmm((33))..
+
+       nnoo__sslloottss(()) = integer() >= 0 | default
+
+       oobbjjeecctt(()) = tuple()
+
+       oobbjjeecctt__ccoonntt(())
+
+              Opaque continuation used by _m_a_t_c_h___o_b_j_e_c_t_/_1 and _m_a_t_c_h___o_b_j_e_c_t_/_3.
+
+       ppaatttteerrnn(()) = atom() | tuple()
+
+              See eettss::mmaattcchh//22 for a description of patterns.
+
+       sseelleecctt__ccoonntt(())
+
+              Opaque continuation used by _s_e_l_e_c_t_/_1 and _s_e_l_e_c_t_/_3.
+
+       ttaabb__nnaammee(()) = term()
+
+       ttyyppee(()) = bag | duplicate_bag | set
+
+       vveerrssiioonn(()) = 8 | 9 | default
+
+EEXXPPOORRTTSS
+       aallll(()) -->> [[ttaabb__nnaammee(())]]
+
+              Returns a list of the names of all open tables on this node.
+
+       bbcchhuunnkk((NNaammee,, CCoonnttiinnuuaattiioonn)) -->>
+                 {{CCoonnttiinnuuaattiioonn22,, DDaattaa}} ||
+                 ''$$eenndd__ooff__ttaabbllee'' ||
+                 {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Continuation = start | ccoonntt(())
+                 Continuation2 = ccoonntt(())
+                 Data = binary() | tuple()
+                 Reason = term()
+
+              Returns a list of objects stored in a table. The exact
+              representation of the returned objects is not public. The lists
+              of data can be used for initializing a table by giving the value
+              _b_c_h_u_n_k to the _f_o_r_m_a_t option of the _i_n_i_t___t_a_b_l_e_/_3 function. The
+              Mnesia application uses this function for copying open tables.
+
+              Unless the table is protected using _s_a_f_e___f_i_x_t_a_b_l_e_/_2, calls to
+              _b_c_h_u_n_k_/_2 may not work as expected if concurrent updates are made
+              to the table.
+
+              The first time _b_c_h_u_n_k_/_2 is called, an initial continuation, the
+              atom _s_t_a_r_t, must be provided.
+
+              The _b_c_h_u_n_k_/_2 function returns a tuple _{_C_o_n_t_i_n_u_a_t_i_o_n_2_, _D_a_t_a_},
+              where _D_a_t_a is a list of objects. _C_o_n_t_i_n_u_a_t_i_o_n_2 is another
+              continuation which is to be passed on to a subsequent call to
+              _b_c_h_u_n_k_/_2. With a series of calls to _b_c_h_u_n_k_/_2 it is possible to
+              extract all objects of the table.
+
+              _b_c_h_u_n_k_/_2 returns _'_$_e_n_d___o_f___t_a_b_l_e_' when all objects have been
+              returned, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an error occurs.
+
+       cclloossee((NNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Reason = term()
+
+              Closes a table. Only processes that have opened a table are
+              allowed to close it.
+
+              All open tables must be closed before the system is stopped. If
+              an attempt is made to open a table which has not been properly
+              closed, Dets automatically tries to repair the table.
+
+       ddeelleettee((NNaammee,, KKeeyy)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Key = Reason = term()
+
+              Deletes all objects with the key _K_e_y from the table _N_a_m_e.
+
+       ddeelleettee__aallll__oobbjjeeccttss((NNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Reason = term()
+
+              Deletes all objects from a table in almost constant time.
+              However, if the table if fixed, _d_e_l_e_t_e___a_l_l___o_b_j_e_c_t_s_(_T_) is
+              equivalent to _m_a_t_c_h___d_e_l_e_t_e_(_T_, _'___'_).
+
+       ddeelleettee__oobbjjeecctt((NNaammee,, OObbjjeecctt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Object = oobbjjeecctt(())
+                 Reason = term()
+
+              Deletes all instances of a given object from a table. If a table
+              is of type _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g, the _d_e_l_e_t_e_/_2 function cannot be
+              used to delete only some of the objects with a given key. This
+              function makes this possible.
+
+       ffiirrsstt((NNaammee)) -->> KKeeyy || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Key = term()
+
+              Returns the first key stored in the table _N_a_m_e according to the
+              table's internal order, or _'_$_e_n_d___o_f___t_a_b_l_e_' if the table is
+              empty.
+
+              Unless the table is protected using _s_a_f_e___f_i_x_t_a_b_l_e_/_2, subsequent
+              calls to _n_e_x_t_/_2 may not work as expected if concurrent updates
+              are made to the table.
+
+              Should an error occur, the process is exited with an error tuple
+              _{_e_r_r_o_r_, _R_e_a_s_o_n_}. The reason for not returning the error tuple is
+              that it cannot be distinguished from a key.
+
+              There are two reasons why _f_i_r_s_t_/_1 and _n_e_x_t_/_2 should not be used:
+              they are not very efficient, and they prevent the use of the key
+              _'_$_e_n_d___o_f___t_a_b_l_e_' since this atom is used to indicate the end of
+              the table. If possible, the _m_a_t_c_h, _m_a_t_c_h___o_b_j_e_c_t, and _s_e_l_e_c_t
+              functions should be used for traversing tables.
+
+       ffoollddll((FFuunnccttiioonn,, AAcccc00,, NNaammee)) -->> AAcccc || {{eerrrroorr,, RReeaassoonn}}
+
+       ffoollddrr((FFuunnccttiioonn,, AAcccc00,, NNaammee)) -->> AAcccc || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Function = fun((Object :: oobbjjeecctt(()), AccIn) -> AccOut)
+                 Acc0 = Acc = AccIn = AccOut = Reason = term()
+
+              Calls _F_u_n_c_t_i_o_n on successive elements of the table _N_a_m_e together
+              with an extra argument _A_c_c_I_n. The order in which the elements of
+              the table are traversed is unspecified. _F_u_n_c_t_i_o_n must return a
+              new accumulator which is passed to the next call. _A_c_c_0 is
+              returned if the table is empty.
+
+       ffrroomm__eettss((NNaammee,, EEttssTTaabb)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 EtsTab = eettss::ttaabb(())
+                 Reason = term()
+
+              Deletes all objects of the table _N_a_m_e and then inserts all the
+              objects of the Ets table _E_t_s_T_a_b. The order in which the objects
+              are inserted is not specified. Since _e_t_s_:_s_a_f_e___f_i_x_t_a_b_l_e_/_2 is
+              called the Ets table must be public or owned by the calling
+              process.
+
+       iinnffoo((NNaammee)) -->> IInnffooLLiisstt || uunnddeeffiinneedd
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 InfoList = [InfoTuple]
+                 InfoTuple = {file_size, integer() >= 0}
+                           | {filename, ffiillee::nnaammee(())}
+                           | {keypos, kkeeyyppooss(())}
+                           | {size, integer() >= 0}
+                           | {type, ttyyppee(())}
+
+              Returns information about the table _N_a_m_e as a list of tuples:
+
+                * _{_f_i_l_e___s_i_z_e_, _i_n_t_e_g_e_r_(_) _>_= _0_}, the size of the file in bytes.
+
+                * _{_f_i_l_e_n_a_m_e_, ffiillee::nnaammee(())}, the name of the file where objects
+                  are stored.
+
+                * _{_k_e_y_p_o_s_, kkeeyyppooss(())} , the position of the key.
+
+                * _{_s_i_z_e_, _i_n_t_e_g_e_r_(_) _>_= _0_}, the number of objects stored in the
+                  table.
+
+                * _{_t_y_p_e_, ttyyppee(())}, the type of the table.
+
+       iinnffoo((NNaammee,, IItteemm)) -->> VVaalluuee || uunnddeeffiinneedd
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Item = access
+                      | auto_save
+                      | bchunk_format
+                      | hash
+                      | file_size
+                      | filename
+                      | keypos
+                      | memory
+                      | no_keys
+                      | no_objects
+                      | no_slots
+                      | owner
+                      | ram_file
+                      | safe_fixed
+                      | size
+                      | type
+                      | version
+                 Value = term()
+
+              Returns the information associated with _I_t_e_m for the table _N_a_m_e.
+              In addition to the _{_I_t_e_m_, _V_a_l_u_e_} pairs defined for _i_n_f_o_/_1, the
+              following items are allowed:
+
+                * _{_a_c_c_e_s_s_, aacccceessss(())} , the access mode.
+
+                * _{_a_u_t_o___s_a_v_e_,  aauuttoo__ssaavvee(())}, the auto save interval.
+
+                * _{_b_c_h_u_n_k___f_o_r_m_a_t_, _b_i_n_a_r_y_(_)_}, an opaque binary describing the
+                  format of the objects returned by _b_c_h_u_n_k_/_2. The binary can
+                  be used as argument to _i_s___c_o_m_p_a_t_i_b_l_e___c_h_u_n_k___f_o_r_m_a_t_/_2. Only
+                  available for version 9 tables.
+
+                * _{_h_a_s_h_, Hash_}. Describes which BIF is used to calculate the
+                  hash values of the objects stored in the Dets table.
+                  Possible values of Hash are _h_a_s_h, which implies that the
+                  _e_r_l_a_n_g_:_h_a_s_h_/_2 BIF is used, _p_h_a_s_h, which implies that the
+                  _e_r_l_a_n_g_:_p_h_a_s_h_/_2 BIF is used, and _p_h_a_s_h_2, which implies that
+                  the _e_r_l_a_n_g_:_p_h_a_s_h_2_/_1 BIF is used.
+
+                * _{_m_e_m_o_r_y_, _i_n_t_e_g_e_r_(_) _>_= _0_}, the size of the file in bytes. The
+                  same value is associated with the item _f_i_l_e___s_i_z_e.
+
+                * _{_n_o___k_e_y_s_, _i_n_t_e_g_e_r _>_= _0_(_)_}, the number of different keys
+                  stored in the table. Only available for version 9 tables.
+
+                * _{_n_o___o_b_j_e_c_t_s_, _i_n_t_e_g_e_r _>_= _0_(_)_}, the number of objects stored
+                  in the table.
+
+                * _{_n_o___s_l_o_t_s_, _{Min_, Used_, Max_}_}, the number of slots of the
+                  table. _M_i_n is the minimum number of slots, _U_s_e_d is the
+                  number of currently used slots, and _M_a_x is the maximum
+                  number of slots. Only available for version 9 tables.
+
+                * _{_o_w_n_e_r_, _p_i_d_(_)_}, the pid of the process that handles requests
+                  to the Dets table.
+
+                * _{_r_a_m___f_i_l_e_, _b_o_o_l_e_a_n_(_)_}, whether the table is kept in RAM.
+
+                * _{_s_a_f_e___f_i_x_e_d_, SafeFixed_}. If the table is fixed, SafeFixed is
+                  a tuple _{_F_i_x_e_d_A_t_T_i_m_e_, _[_{_P_i_d_,_R_e_f_C_o_u_n_t_}_]_}. _F_i_x_e_d_A_t_T_i_m_e is the
+                  time when the table was first fixed, and _P_i_d is the pid of
+                  the process that fixes the table _R_e_f_C_o_u_n_t times. There may
+                  be any number of processes in the list. If the table is not
+                  fixed, SafeFixed is the atom _f_a_l_s_e.
+
+                * _{_v_e_r_s_i_o_n_, _i_n_t_e_g_e_r_(_), the version of the format of the table.
+
+       iinniitt__ttaabbllee((NNaammee,, IInniittFFuunn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       iinniitt__ttaabbllee((NNaammee,, IInniittFFuunn,, OOppttiioonnss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 InitFun = fun((Arg) -> Res)
+                 Arg = read | close
+                 Res = end_of_input
+                     | {[oobbjjeecctt(())], InitFun}
+                     | {Data, InitFun}
+                     | term()
+                 Options = Option | [Option]
+                 Option = {min_no_slots, nnoo__sslloottss(())} | {format, term | bchunk}
+                 Reason = term()
+                 Data = binary() | tuple()
+
+              Replaces the existing objects of the table _N_a_m_e with objects
+              created by calling the input function _I_n_i_t_F_u_n, see below. The
+              reason for using this function rather than calling _i_n_s_e_r_t_/_2 is
+              that of efficiency. It should be noted that the input functions
+              are called by the process that handles requests to the Dets
+              table, not by the calling process.
+
+              When called with the argument _r_e_a_d the function _I_n_i_t_F_u_n is
+              assumed to return _e_n_d___o_f___i_n_p_u_t when there is no more input, or
+              _{_O_b_j_e_c_t_s_, _F_u_n_}, where _O_b_j_e_c_t_s is a list of objects and _F_u_n is a
+              new input function. Any other value Value is returned as an
+              error _{_e_r_r_o_r_, _{_i_n_i_t___f_u_n_, _V_a_l_u_e_}_}. Each input function will be
+              called exactly once, and should an error occur, the last
+              function is called with the argument _c_l_o_s_e, the reply of which
+              is ignored.
+
+              If the type of the table is _s_e_t and there is more than one
+              object with a given key, one of the objects is chosen. This is
+              not necessarily the last object with the given key in the
+              sequence of objects returned by the input functions. Duplicate
+              keys should be avoided, or the file will be unnecessarily
+              fragmented. This holds also for duplicated objects stored in
+              tables of type _b_a_g.
+
+              It is important that the table has a sufficient number of slots
+              for the objects. If not, the hash list will start to grow when
+              _i_n_i_t___t_a_b_l_e_/_2 returns which will significantly slow down access
+              to the table for a period of time. The minimum number of slots
+              is set by the _o_p_e_n___f_i_l_e_/_2 option _m_i_n___n_o___s_l_o_t_s and returned by
+              the _i_n_f_o_/_2 item _n_o___s_l_o_t_s. See also the _m_i_n___n_o___s_l_o_t_s option
+              below.
+
+              The _O_p_t_i_o_n_s argument is a list of _{_K_e_y_, _V_a_l_} tuples where the
+              following values are allowed:
+
+                * _{_m_i_n___n_o___s_l_o_t_s_, _n_o___s_l_o_t_s_(_)_}. Specifies the estimated number
+                  of different keys that will be stored in the table. The
+                  _o_p_e_n___f_i_l_e option with the same name is ignored unless the
+                  table is created, and in that case performance can be
+                  enhanced by supplying an estimate when initializing the
+                  table.
+
+                * _{_f_o_r_m_a_t_, _F_o_r_m_a_t_}. Specifies the format of the objects
+                  returned by the function _I_n_i_t_F_u_n. If _F_o_r_m_a_t is _t_e_r_m (the
+                  default), _I_n_i_t_F_u_n is assumed to return a list of tuples. If
+                  _F_o_r_m_a_t is _b_c_h_u_n_k, _I_n_i_t_F_u_n is assumed to return _D_a_t_a as
+                  returned by _b_c_h_u_n_k_/_2. This option overrides the _m_i_n___n_o___s_l_o_t_s
+                  option.
+
+       iinnsseerrtt((NNaammee,, OObbjjeeccttss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Objects = oobbjjeecctt(()) | [oobbjjeecctt(())]
+                 Reason = term()
+
+              Inserts one or more objects into the table _N_a_m_e. If there
+              already exists an object with a key matching the key of some of
+              the given objects and the table type is _s_e_t, the old object will
+              be replaced.
+
+       iinnsseerrtt__nneeww((NNaammee,, OObbjjeeccttss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Objects = oobbjjeecctt(()) | [oobbjjeecctt(())]
+
+              Inserts one or more objects into the table _N_a_m_e. If there
+              already exists some object with a key matching the key of any of
+              the given objects the table is not updated and _f_a_l_s_e is
+              returned, otherwise the objects are inserted and _t_r_u_e returned.
+
+       iiss__ccoommppaattiibbllee__bbcchhuunnkk__ffoorrmmaatt((NNaammee,, BBcchhuunnkkFFoorrmmaatt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 BchunkFormat = binary()
+
+              Returns _t_r_u_e if it would be possible to initialize the table
+              _N_a_m_e, using _i_n_i_t___t_a_b_l_e_/_3 with the option _{_f_o_r_m_a_t_, _b_c_h_u_n_k_}, with
+              objects read with _b_c_h_u_n_k_/_2 from some table _T such that calling
+              _i_n_f_o_(_T_, _b_c_h_u_n_k___f_o_r_m_a_t_) returns _B_c_h_u_n_k_F_o_r_m_a_t.
+
+       iiss__ddeettss__ffiillee((FFiilleennaammee)) -->> bboooolleeaann(()) || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Reason = term()
+
+              Returns _t_r_u_e if the file _F_i_l_e_n_a_m_e is a Dets table, _f_a_l_s_e
+              otherwise.
+
+       llooookkuupp((NNaammee,, KKeeyy)) -->> OObbjjeeccttss || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Key = term()
+                 Objects = [oobbjjeecctt(())]
+                 Reason = term()
+
+              Returns a list of all objects with the key _K_e_y stored in the
+              table _N_a_m_e. For example:
+
+              2> dets:open_file(abc, [{type, bag}]).
+              {ok,abc}
+              3> dets:insert(abc, {1,2,3}).
+              ok
+              4> dets:insert(abc, {1,3,4}).
+              ok
+              5> dets:lookup(abc, 1).
+              [{1,2,3},{1,3,4}]
+
+              If the table is of type _s_e_t, the function returns either the
+              empty list or a list with one object, as there cannot be more
+              than one object with a given key. If the table is of type _b_a_g or
+              _d_u_p_l_i_c_a_t_e___b_a_g, the function returns a list of arbitrary length.
+
+              Note that the order of objects returned is unspecified. In
+              particular, the order in which objects were inserted is not
+              reflected.
+
+       mmaattcchh((CCoonnttiinnuuaattiioonn)) -->>
+                {{[[MMaattcchh]],, CCoonnttiinnuuaattiioonn22}} ||
+                ''$$eenndd__ooff__ttaabbllee'' ||
+                {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Continuation = Continuation2 = bbiinnddiinnggss__ccoonntt(())
+                 Match = [term()]
+                 Reason = term()
+
+              Matches some objects stored in a table and returns a non-empty
+              list of the bindings that match a given pattern in some
+              unspecified order. The table, the pattern, and the number of
+              objects that are matched are all defined by _C_o_n_t_i_n_u_a_t_i_o_n, which
+              has been returned by a prior call to _m_a_t_c_h_/_1 or _m_a_t_c_h_/_3.
+
+              When all objects of the table have been matched, _'_$_e_n_d___o_f___t_a_b_l_e_'
+              is returned.
+
+       mmaattcchh((NNaammee,, PPaatttteerrnn)) -->> [[MMaattcchh]] || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Pattern = ppaatttteerrnn(())
+                 Match = [term()]
+                 Reason = term()
+
+              Returns for each object of the table _N_a_m_e that matches _P_a_t_t_e_r_n a
+              list of bindings in some unspecified order. See eettss::mmaattcchh//22 for
+              a description of patterns. If the keypos'th element of _P_a_t_t_e_r_n
+              is unbound, all objects of the table are matched. If the
+              keypos'th element is bound, only the objects with the right key
+              are matched.
+
+       mmaattcchh((NNaammee,, PPaatttteerrnn,, NN)) -->>
+                {{[[MMaattcchh]],, CCoonnttiinnuuaattiioonn}} ||
+                ''$$eenndd__ooff__ttaabbllee'' ||
+                {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Pattern = ppaatttteerrnn(())
+                 N = default | integer() >= 0
+                 Continuation = bbiinnddiinnggss__ccoonntt(())
+                 Match = [term()]
+                 Reason = term()
+
+              Matches some or all objects of the table _N_a_m_e and returns a non-
+              empty list of the bindings that match _P_a_t_t_e_r_n in some
+              unspecified order. See eettss::mmaattcchh//22 for a description of
+              patterns.
+
+              A tuple of the bindings and a continuation is returned, unless
+              the table is empty, in which case _'_$_e_n_d___o_f___t_a_b_l_e_' is returned.
+              The continuation is to be used when matching further objects by
+              calling _m_a_t_c_h_/_1.
+
+              If the keypos'th element of _P_a_t_t_e_r_n is bound, all objects of the
+              table are matched. If the keypos'th element is unbound, all
+              objects of the table are matched, _N objects at a time, until at
+              least one object matches or the end of the table has been
+              reached. The default, indicated by giving _N the value _d_e_f_a_u_l_t,
+              is to let the number of objects vary depending on the sizes of
+              the objects. If _N_a_m_e is a version 9 table, all objects with the
+              same key are always matched at the same time which implies that
+              more than N objects may sometimes be matched.
+
+              The table should always be protected using _s_a_f_e___f_i_x_t_a_b_l_e_/_2
+              before calling _m_a_t_c_h_/_3, or errors may occur when calling
+              _m_a_t_c_h_/_1.
+
+       mmaattcchh__ddeelleettee((NNaammee,, PPaatttteerrnn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Pattern = ppaatttteerrnn(())
+                 Reason = term()
+
+              Deletes all objects that match _P_a_t_t_e_r_n from the table _N_a_m_e. See
+              eettss::mmaattcchh//22 for a description of patterns.
+
+              If the keypos'th element of _P_a_t_t_e_r_n is bound, only the objects
+              with the right key are matched.
+
+       mmaattcchh__oobbjjeecctt((CCoonnttiinnuuaattiioonn)) -->>
+                       {{OObbjjeeccttss,, CCoonnttiinnuuaattiioonn22}} ||
+                       ''$$eenndd__ooff__ttaabbllee'' ||
+                       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Continuation = Continuation2 = oobbjjeecctt__ccoonntt(())
+                 Objects = [oobbjjeecctt(())]
+                 Reason = term()
+
+              Returns a non-empty list of some objects stored in a table that
+              match a given pattern in some unspecified order. The table, the
+              pattern, and the number of objects that are matched are all
+              defined by _C_o_n_t_i_n_u_a_t_i_o_n, which has been returned by a prior call
+              to _m_a_t_c_h___o_b_j_e_c_t_/_1 or _m_a_t_c_h___o_b_j_e_c_t_/_3.
+
+              When all objects of the table have been matched, _'_$_e_n_d___o_f___t_a_b_l_e_'
+              is returned.
+
+       mmaattcchh__oobbjjeecctt((NNaammee,, PPaatttteerrnn)) -->> OObbjjeeccttss || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Pattern = ppaatttteerrnn(())
+                 Objects = [oobbjjeecctt(())]
+                 Reason = term()
+
+              Returns a list of all objects of the table _N_a_m_e that match
+              _P_a_t_t_e_r_n in some unspecified order. See eettss::mmaattcchh//22 for a
+              description of patterns.
+
+              If the keypos'th element of _P_a_t_t_e_r_n is unbound, all objects of
+              the table are matched. If the keypos'th element of _P_a_t_t_e_r_n is
+              bound, only the objects with the right key are matched.
+
+              Using the _m_a_t_c_h___o_b_j_e_c_t functions for traversing all objects of a
+              table is more efficient than calling _f_i_r_s_t_/_1 and _n_e_x_t_/_2 or
+              _s_l_o_t_/_2.
+
+       mmaattcchh__oobbjjeecctt((NNaammee,, PPaatttteerrnn,, NN)) -->>
+                       {{OObbjjeeccttss,, CCoonnttiinnuuaattiioonn}} ||
+                       ''$$eenndd__ooff__ttaabbllee'' ||
+                       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Pattern = ppaatttteerrnn(())
+                 N = default | integer() >= 0
+                 Continuation = oobbjjeecctt__ccoonntt(())
+                 Objects = [oobbjjeecctt(())]
+                 Reason = term()
+
+              Matches some or all objects stored in the table _N_a_m_e and returns
+              a non-empty list of the objects that match _P_a_t_t_e_r_n in some
+              unspecified order. See eettss::mmaattcchh//22 for a description of
+              patterns.
+
+              A list of objects and a continuation is returned, unless the
+              table is empty, in which case _'_$_e_n_d___o_f___t_a_b_l_e_' is returned. The
+              continuation is to be used when matching further objects by
+              calling _m_a_t_c_h___o_b_j_e_c_t_/_1.
+
+              If the keypos'th element of _P_a_t_t_e_r_n is bound, all objects of the
+              table are matched. If the keypos'th element is unbound, all
+              objects of the table are matched, _N objects at a time, until at
+              least one object matches or the end of the table has been
+              reached. The default, indicated by giving _N the value _d_e_f_a_u_l_t,
+              is to let the number of objects vary depending on the sizes of
+              the objects. If _N_a_m_e is a version 9 table, all matching objects
+              with the same key are always returned in the same reply which
+              implies that more than N objects may sometimes be returned.
+
+              The table should always be protected using _s_a_f_e___f_i_x_t_a_b_l_e_/_2
+              before calling _m_a_t_c_h___o_b_j_e_c_t_/_3, or errors may occur when calling
+              _m_a_t_c_h___o_b_j_e_c_t_/_1.
+
+       mmeemmbbeerr((NNaammee,, KKeeyy)) -->> bboooolleeaann(()) || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Key = Reason = term()
+
+              Works like _l_o_o_k_u_p_/_2, but does not return the objects. The
+              function returns _t_r_u_e if one or more elements of the table has
+              the key _K_e_y, _f_a_l_s_e otherwise.
+
+       nneexxtt((NNaammee,, KKeeyy11)) -->> KKeeyy22 || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Key1 = Key2 = term()
+
+              Returns the key following _K_e_y_1 in the table _N_a_m_e according to
+              the table's internal order, or _'_$_e_n_d___o_f___t_a_b_l_e_' if there is no
+              next key.
+
+              Should an error occur, the process is exited with an error tuple
+              _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+              Use _f_i_r_s_t_/_1 to find the first key in the table.
+
+       ooppeenn__ffiillee((FFiilleennaammee)) -->> {{ookk,, RReeffeerreennccee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Reference = reference()
+                 Reason = term()
+
+              Opens an existing table. If the table has not been properly
+              closed, it will be repaired. The returned reference is to be
+              used as the name of the table. This function is most useful for
+              debugging purposes.
+
+       ooppeenn__ffiillee((NNaammee,, AArrggss)) -->> {{ookk,, NNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Args = [OpenArg]
+                 OpenArg = {access, aacccceessss(())}
+                         | {auto_save, aauuttoo__ssaavvee(())}
+                         | {estimated_no_objects, integer() >= 0}
+                         | {file, ffiillee::nnaammee(())}
+                         | {max_no_slots, nnoo__sslloottss(())}
+                         | {min_no_slots, nnoo__sslloottss(())}
+                         | {keypos, kkeeyyppooss(())}
+                         | {ram_file, boolean()}
+                         | {repair, boolean() | force}
+                         | {type, ttyyppee(())}
+                         | {version, vveerrssiioonn(())}
+                 Reason = term()
+
+              Opens a table. An empty Dets table is created if no file exists.
+
+              The atom _N_a_m_e is the name of the table. The table name must be
+              provided in all subsequent operations on the table. The name can
+              be used by other processes as well, and several process can
+              share one table.
+
+              If two processes open the same table by giving the same name and
+              arguments, then the table will have two users. If one user
+              closes the table, it still remains open until the second user
+              closes the table.
+
+              The _A_r_g_s argument is a list of _{_K_e_y_, _V_a_l_} tuples where the
+              following values are allowed:
+
+                * _{_a_c_c_e_s_s_,  aacccceessss(())}. It is possible to open existing tables
+                  in read-only mode. A table which is opened in read-only mode
+                  is not subjected to the automatic file reparation algorithm
+                  if it is later opened after a crash. The default value is
+                  _r_e_a_d___w_r_i_t_e.
+
+                * _{_a_u_t_o___s_a_v_e_,  aauuttoo__ssaavvee(())}, the auto save interval. If the
+                  interval is an integer _T_i_m_e, the table is flushed to disk
+                  whenever it is not accessed for _T_i_m_e milliseconds. A table
+                  that has been flushed will require no reparation when
+                  reopened after an uncontrolled emulator halt. If the
+                  interval is the atom _i_n_f_i_n_i_t_y, auto save is disabled. The
+                  default value is 180000 (3 minutes).
+
+                * _{_e_s_t_i_m_a_t_e_d___n_o___o_b_j_e_c_t_s_,  nnoo__sslloottss(())}. Equivalent to the
+                  _m_i_n___n_o___s_l_o_t_s option.
+
+                * _{_f_i_l_e_,  ffiillee::nnaammee(())}, the name of the file to be opened. The
+                  default value is the name of the table.
+
+                * _{_m_a_x___n_o___s_l_o_t_s_,  nnoo__sslloottss(())}, the maximum number of slots
+                  that will be used. The default value as well as the maximal
+                  value is 32 M. Note that a higher value may increase the
+                  fragmentation of the table, and conversely, that a smaller
+                  value may decrease the fragmentation, at the expense of
+                  execution time. Only available for version 9 tables.
+
+                * _{_m_i_n___n_o___s_l_o_t_s_,  nnoo__sslloottss(())}. Application performance can be
+                  enhanced with this flag by specifying, when the table is
+                  created, the estimated number of different keys that will be
+                  stored in the table. The default value as well as the
+                  minimum value is 256.
+
+                * _{_k_e_y_p_o_s_,  kkeeyyppooss(())}, the position of the element of each
+                  object to be used as key. The default value is 1. The
+                  ability to explicitly state the key position is most
+                  convenient when we want to store Erlang records in which the
+                  first position of the record is the name of the record type.
+
+                * _{_r_a_m___f_i_l_e_, _b_o_o_l_e_a_n_(_)_}, whether the table is to be kept in
+                  RAM. Keeping the table in RAM may sound like an anomaly, but
+                  can enhance the performance of applications which open a
+                  table, insert a set of objects, and then close the table.
+                  When the table is closed, its contents are written to the
+                  disk file. The default value is _f_a_l_s_e.
+
+                * _{_r_e_p_a_i_r_, _V_a_l_u_e_}. _V_a_l_u_e can be either a _b_o_o_l_e_a_n_(_) or the atom
+                  _f_o_r_c_e. The flag specifies whether the Dets server should
+                  invoke the automatic file reparation algorithm. The default
+                  is _t_r_u_e. If _f_a_l_s_e is specified, there is no attempt to
+                  repair the file and _{_e_r_r_o_r_, _{_n_e_e_d_s___r_e_p_a_i_r_, _F_i_l_e_N_a_m_e_}_} is
+                  returned if the table needs to be repaired.
+
+                  The value _f_o_r_c_e means that a reparation will take place even
+                  if the table has been properly closed. This is how to
+                  convert tables created by older versions of STDLIB. An
+                  example is tables hashed with the deprecated _e_r_l_a_n_g_:_h_a_s_h_/_2
+                  BIF. Tables created with Dets from a STDLIB version of 1.8.2
+                  and later use the _e_r_l_a_n_g_:_p_h_a_s_h_/_2 function or the
+                  _e_r_l_a_n_g_:_p_h_a_s_h_2_/_1 function, which is preferred.
+
+                  The _r_e_p_a_i_r option is ignored if the table is already open.
+
+                * _{_t_y_p_e_, ttyyppee(())}, the type of the table. The default value is
+                  _s_e_t.
+
+                * _{_v_e_r_s_i_o_n_,  vveerrssiioonn(())}, the version of the format used for
+                  the table. The default value is _9. Tables on the format used
+                  before OTP R8 can be created by giving the value _8. A
+                  version 8 table can be converted to a version 9 table by
+                  giving the options _{_v_e_r_s_i_o_n_,_9_} and _{_r_e_p_a_i_r_,_f_o_r_c_e_}.
+
+       ppiidd22nnaammee((PPiidd)) -->> {{ookk,, NNaammee}} || uunnddeeffiinneedd
+
+              Types:
+
+                 Pid = pid()
+                 Name = ttaabb__nnaammee(())
+
+              Returns the name of the table given the pid of a process that
+              handles requests to a table, or _u_n_d_e_f_i_n_e_d if there is no such
+              table.
+
+              This function is meant to be used for debugging only.
+
+       rreeppaaiirr__ccoonnttiinnuuaattiioonn((CCoonnttiinnuuaattiioonn,, MMaattcchhSSppeecc)) -->> CCoonnttiinnuuaattiioonn22
+
+              Types:
+
+                 Continuation = Continuation2 = sseelleecctt__ccoonntt(())
+                 MatchSpec = mmaattcchh__ssppeecc(())
+
+              This function can be used to restore an opaque continuation
+              returned by _s_e_l_e_c_t_/_3 or _s_e_l_e_c_t_/_1 if the continuation has passed
+              through external term format (been sent between nodes or stored
+              on disk).
+
+              The reason for this function is that continuation terms contain
+              compiled match specifications and therefore will be invalidated
+              if converted to external term format. Given that the original
+              match specification is kept intact, the continuation can be
+              restored, meaning it can once again be used in subsequent
+              _s_e_l_e_c_t_/_1 calls even though it has been stored on disk or on
+              another node.
+
+              See also _e_t_s_(_3_) for further explanations and examples.
+
+          NNoottee::
+              This function is very rarely needed in application code. It is
+              used by Mnesia to implement distributed _s_e_l_e_c_t_/_3 and _s_e_l_e_c_t_/_1
+              sequences. A normal application would either use Mnesia or keep
+              the continuation from being converted to external format.
+
+              The reason for not having an external representation of compiled
+              match specifications is performance. It may be subject to change
+              in future releases, while this interface will remain for
+              backward compatibility.
+
+
+       ssaaffee__ffiixxttaabbllee((NNaammee,, FFiixx)) -->> ookk
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Fix = boolean()
+
+              If _F_i_x is _t_r_u_e, the table _N_a_m_e is fixed (once more) by the
+              calling process, otherwise the table is released. The table is
+              also released when a fixing process terminates.
+
+              If several processes fix a table, the table will remain fixed
+              until all processes have released it or terminated. A reference
+              counter is kept on a per process basis, and N consecutive fixes
+              require N releases to release the table.
+
+              It is not guaranteed that calls to _f_i_r_s_t_/_1, _n_e_x_t_/_2, select and
+              match functions work as expected even if the table has been
+              fixed; the limited support for concurrency implemented in Ets
+              has not yet been implemented in Dets. Fixing a table currently
+              only disables resizing of the hash list of the table.
+
+              If objects have been added while the table was fixed, the hash
+              list will start to grow when the table is released which will
+              significantly slow down access to the table for a period of
+              time.
+
+       sseelleecctt((CCoonnttiinnuuaattiioonn)) -->>
+                 {{SSeelleeccttiioonn,, CCoonnttiinnuuaattiioonn22}} ||
+                 ''$$eenndd__ooff__ttaabbllee'' ||
+                 {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Continuation = Continuation2 = sseelleecctt__ccoonntt(())
+                 Selection = [term()]
+                 Reason = term()
+
+              Applies a match specification to some objects stored in a table
+              and returns a non-empty list of the results. The table, the
+              match specification, and the number of objects that are matched
+              are all defined by _C_o_n_t_i_n_u_a_t_i_o_n, which has been returned by a
+              prior call to _s_e_l_e_c_t_/_1 or _s_e_l_e_c_t_/_3.
+
+              When all objects of the table have been matched, _'_$_e_n_d___o_f___t_a_b_l_e_'
+              is returned.
+
+       sseelleecctt((NNaammee,, MMaattcchhSSppeecc)) -->> SSeelleeccttiioonn || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 MatchSpec = mmaattcchh__ssppeecc(())
+                 Selection = [term()]
+                 Reason = term()
+
+              Returns the results of applying the match specification
+              _M_a_t_c_h_S_p_e_c to all or some objects stored in the table _N_a_m_e. The
+              order of the objects is not specified. See the ERTS User's Guide
+              for a description of match specifications.
+
+              If the keypos'th element of _M_a_t_c_h_S_p_e_c is unbound, the match
+              specification is applied to all objects of the table. If the
+              keypos'th element is bound, the match specification is applied
+              to the objects with the right key(s) only.
+
+              Using the _s_e_l_e_c_t functions for traversing all objects of a table
+              is more efficient than calling _f_i_r_s_t_/_1 and _n_e_x_t_/_2 or _s_l_o_t_/_2.
+
+       sseelleecctt((NNaammee,, MMaattcchhSSppeecc,, NN)) -->>
+                 {{SSeelleeccttiioonn,, CCoonnttiinnuuaattiioonn}} ||
+                 ''$$eenndd__ooff__ttaabbllee'' ||
+                 {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 MatchSpec = mmaattcchh__ssppeecc(())
+                 N = default | integer() >= 0
+                 Continuation = sseelleecctt__ccoonntt(())
+                 Selection = [term()]
+                 Reason = term()
+
+              Returns the results of applying the match specification
+              _M_a_t_c_h_S_p_e_c to some or all objects stored in the table _N_a_m_e. The
+              order of the objects is not specified. See the ERTS User's Guide
+              for a description of match specifications.
+
+              A tuple of the results of applying the match specification and a
+              continuation is returned, unless the table is empty, in which
+              case _'_$_e_n_d___o_f___t_a_b_l_e_' is returned. The continuation is to be used
+              when matching further objects by calling _s_e_l_e_c_t_/_1.
+
+              If the keypos'th element of _M_a_t_c_h_S_p_e_c is bound, the match
+              specification is applied to all objects of the table with the
+              right key(s). If the keypos'th element of _M_a_t_c_h_S_p_e_c is unbound,
+              the match specification is applied to all objects of the table,
+              _N objects at a time, until at least one object matches or the
+              end of the table has been reached. The default, indicated by
+              giving _N the value _d_e_f_a_u_l_t, is to let the number of objects vary
+              depending on the sizes of the objects. If _N_a_m_e is a version 9
+              table, all objects with the same key are always handled at the
+              same time which implies that the match specification may be
+              applied to more than N objects.
+
+              The table should always be protected using _s_a_f_e___f_i_x_t_a_b_l_e_/_2
+              before calling _s_e_l_e_c_t_/_3, or errors may occur when calling
+              _s_e_l_e_c_t_/_1.
+
+       sseelleecctt__ddeelleettee((NNaammee,, MMaattcchhSSppeecc)) -->> NN || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 MatchSpec = mmaattcchh__ssppeecc(())
+                 N = integer() >= 0
+                 Reason = term()
+
+              Deletes each object from the table _N_a_m_e such that applying the
+              match specification _M_a_t_c_h_S_p_e_c to the object returns the value
+              _t_r_u_e. See the ERTS User's Guide for a description of match
+              specifications. Returns the number of deleted objects.
+
+              If the keypos'th element of _M_a_t_c_h_S_p_e_c is bound, the match
+              specification is applied to the objects with the right key(s)
+              only.
+
+       sslloott((NNaammee,, II)) -->> ''$$eenndd__ooff__ttaabbllee'' || OObbjjeeccttss || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 I = integer() >= 0
+                 Objects = [oobbjjeecctt(())]
+                 Reason = term()
+
+              The objects of a table are distributed among slots, starting
+              with slot _0 and ending with slot n. This function returns the
+              list of objects associated with slot _I. If _I is greater than n
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned.
+
+       ssyynncc((NNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Reason = term()
+
+              Ensures that all updates made to the table _N_a_m_e are written to
+              disk. This also applies to tables which have been opened with
+              the _r_a_m___f_i_l_e flag set to _t_r_u_e. In this case, the contents of the
+              RAM file are flushed to disk.
+
+              Note that the space management data structures kept in RAM, the
+              buddy system, is also written to the disk. This may take some
+              time if the table is fragmented.
+
+       ttaabbllee((NNaammee)) -->> QQuueerryyHHaannddllee
+
+       ttaabbllee((NNaammee,, OOppttiioonnss)) -->> QQuueerryyHHaannddllee
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Options = Option | [Option]
+                 Option = {n_objects, Limit} | {traverse, TraverseMethod}
+                 Limit = default | integer() >= 1
+                 TraverseMethod = first_next | select | {select, mmaattcchh__ssppeecc(())}
+                 QueryHandle = qqllcc::qquueerryy__hhaannddllee(())
+
+              Returns a QLC (Query List Comprehension) query handle. The
+              module _q_l_c implements a query language aimed mainly at Mnesia
+              but Ets tables, Dets tables, and lists are also recognized by
+              _q_l_c as sources of data. Calling _d_e_t_s_:_t_a_b_l_e_/_1_,_2 is the means to
+              make the Dets table _N_a_m_e usable to _q_l_c.
+
+              When there are only simple restrictions on the key position _q_l_c
+              uses _d_e_t_s_:_l_o_o_k_u_p_/_2 to look up the keys, but when that is not
+              possible the whole table is traversed. The option _t_r_a_v_e_r_s_e
+              determines how this is done:
+
+                * _f_i_r_s_t___n_e_x_t. The table is traversed one key at a time by
+                  calling _d_e_t_s_:_f_i_r_s_t_/_1 and _d_e_t_s_:_n_e_x_t_/_2.
+
+                * _s_e_l_e_c_t. The table is traversed by calling _d_e_t_s_:_s_e_l_e_c_t_/_3 and
+                  _d_e_t_s_:_s_e_l_e_c_t_/_1. The option _n___o_b_j_e_c_t_s determines the number of
+                  objects returned (the third argument of _s_e_l_e_c_t_/_3). The match
+                  specification (the second argument of _s_e_l_e_c_t_/_3) is assembled
+                  by _q_l_c: simple filters are translated into equivalent match
+                  specifications while more complicated filters have to be
+                  applied to all objects returned by _s_e_l_e_c_t_/_3 given a match
+                  specification that matches all objects.
+
+                * _{_s_e_l_e_c_t_,  mmaattcchh__ssppeecc(())}}. As for _s_e_l_e_c_t the table is
+                  traversed by calling _d_e_t_s_:_s_e_l_e_c_t_/_3 and _d_e_t_s_:_s_e_l_e_c_t_/_1. The
+                  difference is that the match specification is explicitly
+                  given. This is how to state match specifications that cannot
+                  easily be expressed within the syntax provided by _q_l_c.
+
+              The following example uses an explicit match specification to
+              traverse the table:
+
+              1> dets:open_file(t, []),
+              ok = dets:insert(t, [{1,a},{2,b},{3,c},{4,d}]),
+              MS = ets:fun2ms(fun({X,Y}) when (X > 1) or (X < 5) -> {Y} end),
+              QH1 = dets:table(t, [{traverse, {select, MS}}]).
+
+              An example with implicit match specification:
+
+              2> QH2 = qlc:q([{Y} || {X,Y} <- dets:table(t), (X > 1) or (X < 5)]).
+
+              The latter example is in fact equivalent to the former which can
+              be verified using the function _q_l_c_:_i_n_f_o_/_1:
+
+              3> qlc:info(QH1) =:= qlc:info(QH2).
+              true
+
+              _q_l_c_:_i_n_f_o_/_1 returns information about a query handle, and in this
+              case identical information is returned for the two query
+              handles.
+
+       ttoo__eettss((NNaammee,, EEttssTTaabb)) -->> EEttssTTaabb || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 EtsTab = eettss::ttaabb(())
+                 Reason = term()
+
+              Inserts the objects of the Dets table _N_a_m_e into the Ets table
+              _E_t_s_T_a_b. The order in which the objects are inserted is not
+              specified. The existing objects of the Ets table are kept unless
+              overwritten.
+
+       ttrraavveerrssee((NNaammee,, FFuunn)) -->> RReettuurrnn || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Fun = fun((Object) -> FunReturn)
+                 Object = oobbjjeecctt(())
+                 FunReturn = continue
+                           | {continue, Val}
+                           | {done, Value}
+                           | OtherValue
+                 Return = [term()] | OtherValue
+                 Val = Value = OtherValue = Reason = term()
+
+              Applies _F_u_n to each object stored in the table _N_a_m_e in some
+              unspecified order. Different actions are taken depending on the
+              return value of _F_u_n. The following _F_u_n return values are
+              allowed:
+
+                _c_o_n_t_i_n_u_e:
+                  Continue to perform the traversal. For example, the
+                  following function can be used to print out the contents of
+                  a table:
+
+                fun(X) -> io:format("~p~n", [X]), continue end.
+
+                _{_c_o_n_t_i_n_u_e_, _V_a_l_}:
+                  Continue the traversal and accumulate _V_a_l. The following
+                  function is supplied in order to collect all objects of a
+                  table in a list:
+
+                fun(X) -> {continue, X} end.
+
+                _{_d_o_n_e_, _V_a_l_u_e_}:
+                  Terminate the traversal and return _[_V_a_l_u_e _| _A_c_c_].
+
+              Any other value _O_t_h_e_r_V_a_l_u_e returned by _F_u_n terminates the
+              traversal and is immediately returned.
+
+       uuppddaattee__ccoouunntteerr((NNaammee,, KKeeyy,, IInnccrreemmeenntt)) -->> RReessuulltt
+
+              Types:
+
+                 Name = ttaabb__nnaammee(())
+                 Key = term()
+                 Increment = {Pos, Incr} | Incr
+                 Pos = Incr = Result = integer()
+
+              Updates the object with key _K_e_y stored in the table _N_a_m_e of type
+              _s_e_t by adding _I_n_c_r to the element at the _P_o_s:th position. The
+              new counter value is returned. If no position is specified, the
+              element directly following the key is updated.
+
+              This functions provides a way of updating a counter, without
+              having to look up an object, update the object by incrementing
+              an element and insert the resulting object into the table again.
+
+SSEEEE AALLSSOO
+       eettss((33)), mnesia(3), qqllcc((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                         dets(3)

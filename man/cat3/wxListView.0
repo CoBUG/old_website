@@ -1,0 +1,111 @@
+wxListView(3)              Erlang Module Definition              wxListView(3)
+
+
+
+NNAAMMEE
+       wxListView - See external documentation: wxListView.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxListView.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_i_s_t_V_i_e_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       cclleeaarrCCoolluummnnIImmaaggee((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxListView()
+                 Col = integer()
+
+              See external documentation.
+
+       ffooccuuss((TThhiiss,, IInnddeexx)) -->> ookk
+
+              Types:
+
+                 This = wxListView()
+                 Index = integer()
+
+              See external documentation.
+
+       ggeettFFiirrssttSSeelleecctteedd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListView()
+
+              See external documentation.
+
+       ggeettFFooccuusseeddIItteemm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListView()
+
+              See external documentation.
+
+       ggeettNNeexxttSSeelleecctteedd((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListView()
+                 Item = integer()
+
+              See external documentation.
+
+       iissSSeelleecctteedd((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListView()
+                 Index = integer()
+
+              See external documentation.
+
+       sseelleecctt((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxListView()
+                 N = integer()
+
+              Equivalent to sseelleecctt((TThhiiss,, NN,, [[]])).
+
+       sseelleecctt((TThhiiss,, NN,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxListView()
+                 N = integer()
+                 Option = {on, boolean()}
+
+              See external documentation.
+
+       sseettCCoolluummnnIImmaaggee((TThhiiss,, CCooll,, IImmaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxListView()
+                 Col = integer()
+                 Image = integer()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxListView(3)

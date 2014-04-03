@@ -1,0 +1,133 @@
+sasl(7)                  Erlang Application Definition                 sasl(7)
+
+
+
+NNAAMMEE
+       sasl - The SASL Application
+
+DDEESSCCRRIIPPTTIIOONN
+       This section describes the SASL (System Architecture Support Libraries)
+       application which provides the following services:
+
+         * _a_l_a_r_m___h_a_n_d_l_e_r
+
+         * _o_v_e_r_l_o_a_d
+
+         * _r_b
+
+         * _r_e_l_e_a_s_e___h_a_n_d_l_e_r
+
+         * _s_y_s_t_o_o_l_s
+
+       The SASL application also includes _e_r_r_o_r___l_o_g_g_e_r event handlers for
+       formatting SASL error and crash reports.
+
+   NNoottee::
+       The SASL application in OTP has nothing to do with "Simple
+       Authentication and Security Layer" (RFC 4422).
+
+
+EERRRROORR LLOOGGGGEERR EEVVEENNTT HHAANNDDLLEERRSS
+       The following error logger event handlers are defined in the SASL
+       application.
+
+         _s_a_s_l___r_e_p_o_r_t___t_t_y___h:
+           Formats and writes _s_u_p_e_r_v_i_s_o_r _r_e_p_o_r_t_s, _c_r_a_s_h _r_e_p_o_r_t_s and _p_r_o_g_r_e_s_s
+           _r_e_p_o_r_t_s to _s_t_d_i_o.
+
+         _s_a_s_l___r_e_p_o_r_t___f_i_l_e___h:
+           Formats and writes _s_u_p_e_r_v_i_s_o_r _r_e_p_o_r_t_s, _c_r_a_s_h _r_e_p_o_r_t and _p_r_o_g_r_e_s_s
+           _r_e_p_o_r_t to a single file.
+
+         _e_r_r_o_r___l_o_g_g_e_r___m_f___h:
+           This error logger writes _a_l_l events sent to the error logger to
+           disk. It installs the _l_o_g___m_f___h event handler in the _e_r_r_o_r___l_o_g_g_e_r
+           process.
+
+           To activate this event handler, the following three sasl
+           configuration parameters must be set: _e_r_r_o_r___l_o_g_g_e_r___m_f___d_i_r,
+           _e_r_r_o_r___l_o_g_g_e_r___m_f___m_a_x_b_y_t_e_s and _e_r_r_o_r___l_o_g_g_e_r___m_f___m_a_x_f_i_l_e_s. See below
+           for more information about the configuration parameters.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following configuration parameters are defined for the SASL
+       application. See _a_p_p_(_4_) for more information about configuration
+       parameters:
+
+         _s_a_s_l___e_r_r_o_r___l_o_g_g_e_r _= _V_a_l_u_e _<_o_p_t_i_o_n_a_l_>:
+           _V_a_l_u_e is one of:
+
+           _t_t_y:
+             Installs _s_a_s_l___r_e_p_o_r_t___t_t_y___h in the error logger. This is the
+             default option.
+
+           _{_f_i_l_e_,_F_i_l_e_N_a_m_e_}:
+             Installs _s_a_s_l___r_e_p_o_r_t___f_i_l_e___h in the error logger. This makes all
+             reports go to the file _F_i_l_e_N_a_m_e. _F_i_l_e_N_a_m_e is a string.
+
+           _f_a_l_s_e:
+             No SASL error logger handler is installed.
+
+         _e_r_r_l_o_g___t_y_p_e _= _e_r_r_o_r _| _p_r_o_g_r_e_s_s _| _a_l_l _<_o_p_t_i_o_n_a_l_>:
+           Restricts the error logging performed by the specified
+           _s_a_s_l___e_r_r_o_r___l_o_g_g_e_r to error reports, progress reports, or both.
+           Default is _a_l_l.
+
+         _e_r_r_o_r___l_o_g_g_e_r___m_f___d_i_r _= _s_t_r_i_n_g_(_) _| _f_a_l_s_e_<_o_p_t_i_o_n_a_l_>:
+           Specifies in which directory the files are stored. If this
+           parameter is undefined or _f_a_l_s_e, the _e_r_r_o_r___l_o_g_g_e_r___m_f___h is not
+           installed.
+
+         _e_r_r_o_r___l_o_g_g_e_r___m_f___m_a_x_b_y_t_e_s _= _i_n_t_e_g_e_r_(_) _<_o_p_t_i_o_n_a_l_>:
+           Specifies how large each individual file can be. If this parameter
+           is undefined, the _e_r_r_o_r___l_o_g_g_e_r___m_f___h is not installed.
+
+         _e_r_r_o_r___l_o_g_g_e_r___m_f___m_a_x_f_i_l_e_s _= _0_<_i_n_t_e_g_e_r_(_)_<_2_5_6 _<_o_p_t_i_o_n_a_l_>:
+           Specifies how many files are used. If this parameter is undefined,
+           the _e_r_r_o_r___l_o_g_g_e_r___m_f___h is not installed.
+
+         _o_v_e_r_l_o_a_d___m_a_x___i_n_t_e_n_s_i_t_y _= _f_l_o_a_t_(_) _> _0 _<_o_p_t_i_o_n_a_l_>:
+           Specifies the maximum intensity for _o_v_e_r_l_o_a_d. Default is _0_._8.
+
+         _o_v_e_r_l_o_a_d___w_e_i_g_h_t _= _f_l_o_a_t_(_) _> _0 _<_o_p_t_i_o_n_a_l_>:
+           Specifies the _o_v_e_r_l_o_a_d weight. Default is _0_._1.
+
+         _s_t_a_r_t___p_r_g _= _s_t_r_i_n_g_(_) _<_o_p_t_i_o_n_a_l_>:
+           Specifies which program should be used when restarting the system.
+           Default is _$_O_T_P___R_O_O_T_/_b_i_n_/_s_t_a_r_t.
+
+         _m_a_s_t_e_r_s _= _[_a_t_o_m_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           Specifies which nodes this node uses to read/write release
+           information. This parameter is ignored if the _c_l_i_e_n_t___d_i_r_e_c_t_o_r_y
+           parameter is not set.
+
+         _c_l_i_e_n_t___d_i_r_e_c_t_o_r_y _= _s_t_r_i_n_g_(_) _<_o_p_t_i_o_n_a_l_>:
+           This parameter specifies the client directory at the master nodes.
+           Refer to Release Handling in _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s for more
+           information. This parameter is ignored if the _m_a_s_t_e_r_s parameter is
+           not set.
+
+         _s_t_a_t_i_c___e_m_u_l_a_t_o_r _= _t_r_u_e _| _f_a_l_s_e _<_o_p_t_i_o_n_a_l_>:
+           Indicates if the Erlang emulator is statically installed. A node
+           with a static emulator cannot switch dynamically to a new emulator
+           as the executable files are written into memory statically. This
+           parameter is ignored if the _m_a_s_t_e_r_s and _c_l_i_e_n_t___d_i_r_e_c_t_o_r_y parameters
+           are not set.
+
+         _r_e_l_e_a_s_e_s___d_i_r _= _s_t_r_i_n_g_(_) _<_o_p_t_i_o_n_a_l_>:
+           Indicates where the _r_e_l_e_a_s_e_s directory is located. The release
+           handler writes all its files to this directory. If this parameter
+           is not set, the OS environment parameter _R_E_L_D_I_R is used. By
+           default, this is _$_O_T_P___R_O_O_T_/_r_e_l_e_a_s_e_s.
+
+         _u_t_c___l_o_g _= _t_r_u_e _| _f_a_l_s_e _<_o_p_t_i_o_n_a_l_>:
+           If set to _t_r_u_e, all dates in textual log outputs are displayed in
+           Universal Coordinated Time with the string _U_T_C appended.
+
+SSEEEE AALLSSOO
+       aallaarrmm__hhaannddlleerr((33)), error_logger(3), log_mf_h(3), oovveerrllooaadd((33)), rrbb((33)),
+       rreelleeaassee__hhaannddlleerr((33)), ssyyssttoooollss((33))
+
+
+
+Ericsson AB                       sasl 2.2.1                           sasl(7)

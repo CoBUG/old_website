@@ -1,0 +1,306 @@
+proc_lib(3)                Erlang Module Definition                proc_lib(3)
+
+
+
+NNAAMMEE
+       proc_lib - Functions for asynchronous and synchronous start of
+       processes adhering to the OTP design principles.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is used to start processes adhering to the OOTTPP DDeessiiggnn
+       PPrriinncciipplleess. Specifically, the functions in this module are used by the
+       OTP standard behaviors (_g_e_n___s_e_r_v_e_r, _g_e_n___f_s_m, ...) when starting new
+       processes. The functions can also be used to start _s_p_e_c_i_a_l _p_r_o_c_e_s_s_e_s,
+       user defined processes which comply to the OTP design principles. See
+       SSyyss aanndd PPrroocc__LLiibb in OTP Design Principles for an example.
+
+       Some useful information is initialized when a process starts. The
+       registered names, or the process identifiers, of the parent process,
+       and the parent ancestors, are stored together with information about
+       the function initially called in the process.
+
+       While in "plain Erlang" a process is said to terminate normally only
+       for the exit reason _n_o_r_m_a_l, a process started using _p_r_o_c___l_i_b is also
+       said to terminate normally if it exits with reason _s_h_u_t_d_o_w_n or
+       _{_s_h_u_t_d_o_w_n_,_T_e_r_m_}. _s_h_u_t_d_o_w_n is the reason used when an application
+       (supervision tree) is stopped.
+
+       When a process started using _p_r_o_c___l_i_b terminates abnormally -- that is,
+       with another exit reason than _n_o_r_m_a_l, _s_h_u_t_d_o_w_n, or _{_s_h_u_t_d_o_w_n_,_T_e_r_m_} -- a
+       _c_r_a_s_h _r_e_p_o_r_t is generated, which is written to terminal by the default
+       SASL event handler. That is, the crash report is normally only visible
+       if the SASL application is started. See ssaassll((66)) and SSAASSLL UUsseerr''ss GGuuiiddee.
+
+       The crash report contains the previously stored information such as
+       ancestors and initial function, the termination reason, and information
+       regarding other processes which terminate as a result of this process
+       terminating.
+
+DDAATTAA TTYYPPEESS
+       ssppaawwnn__ooppttiioonn(()) = link
+                      | monitor
+                      | {priority, pprriioorriittyy__lleevveell(())}
+                      | {min_heap_size, integer() >= 0}
+                      | {min_bin_vheap_size, integer() >= 0}
+                      | {fullsweep_after, integer() >= 0}
+
+              See  eerrllaanngg::ssppaawwnn__oopptt//22,,33,,44,,55.
+
+       pprriioorriittyy__lleevveell(()) = high | low | max | normal
+
+       ddiicctt__oorr__ppiidd(()) = pid()
+                     | (ProcInfo :: [term()])
+                     | {X :: integer(),
+                        Y :: integer(),
+                        Z :: integer()}
+
+EEXXPPOORRTTSS
+       ssppaawwnn((FFuunn)) -->> ppiidd(())
+
+       ssppaawwnn((NNooddee,, FFuunn)) -->> ppiidd(())
+
+       ssppaawwnn((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> ppiidd(())
+
+       ssppaawwnn((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> ppiidd(())
+
+              Types:
+
+                 Node = node()
+                 Fun = function()
+                 Module = module()
+                 Function = atom()
+                 Args = [term()]
+
+              Spawns a new process and initializes it as described above. The
+              process is spawned using the ssppaawwnn BIFs.
+
+       ssppaawwnn__lliinnkk((FFuunn)) -->> ppiidd(())
+
+       ssppaawwnn__lliinnkk((NNooddee,, FFuunn)) -->> ppiidd(())
+
+       ssppaawwnn__lliinnkk((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> ppiidd(())
+
+       ssppaawwnn__lliinnkk((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> ppiidd(())
+
+              Types:
+
+                 Node = node()
+                 Fun = function()
+                 Module = module()
+                 Function = atom()
+                 Args = [term()]
+
+              Spawns a new process and initializes it as described above. The
+              process is spawned using the ssppaawwnn__lliinnkk BIFs.
+
+       ssppaawwnn__oopptt((FFuunn,, SSppaawwnnOOppttss)) -->> ppiidd(())
+
+       ssppaawwnn__oopptt((NNooddee,, FFuunnccttiioonn,, SSppaawwnnOOppttss)) -->> ppiidd(())
+
+       ssppaawwnn__oopptt((MMoodduullee,, FFuunnccttiioonn,, AArrggss,, SSppaawwnnOOppttss)) -->> ppiidd(())
+
+       ssppaawwnn__oopptt((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss,, SSppaawwnnOOppttss)) -->> ppiidd(())
+
+              Types:
+
+                 Node = node()
+                 Fun = function()
+                 Module = module()
+                 Function = atom()
+                 Args = [term()]
+                 SpawnOpts = [ssppaawwnn__ooppttiioonn(())]
+
+              Spawns a new process and initializes it as described above. The
+              process is spawned using the ssppaawwnn__oopptt BIFs.
+
+          NNoottee::
+              Using the spawn option _m_o_n_i_t_o_r is currently not allowed, but
+              will cause the function to fail with reason _b_a_d_a_r_g.
+
+
+       ssttaarrtt((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> RReett
+
+       ssttaarrtt((MMoodduullee,, FFuunnccttiioonn,, AArrggss,, TTiimmee)) -->> RReett
+
+       ssttaarrtt((MMoodduullee,, FFuunnccttiioonn,, AArrggss,, TTiimmee,, SSppaawwnnOOppttss)) -->> RReett
+
+       ssttaarrtt__lliinnkk((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> RReett
+
+       ssttaarrtt__lliinnkk((MMoodduullee,, FFuunnccttiioonn,, AArrggss,, TTiimmee)) -->> RReett
+
+       ssttaarrtt__lliinnkk((MMoodduullee,, FFuunnccttiioonn,, AArrggss,, TTiimmee,, SSppaawwnnOOppttss)) -->> RReett
+
+              Types:
+
+                 Module = module()
+                 Function = atom()
+                 Args = [term()]
+                 Time = timeout()
+                 SpawnOpts = [ssppaawwnn__ooppttiioonn(())]
+                 Ret = term() | {error, Reason :: term()}
+
+              Starts a new process synchronously. Spawns the process and waits
+              for it to start. When the process has started, it _m_u_s_t call
+              iinniitt__aacckk((PPaarreenntt,,RReett)) or iinniitt__aacckk((RReett)), where _P_a_r_e_n_t is the
+              process that evaluates this function. At this time, _R_e_t is
+              returned.
+
+              If the _s_t_a_r_t___l_i_n_k_/_3_,_4_,_5 function is used and the process crashes
+              before it has called _i_n_i_t___a_c_k_/_1_,_2, _{_e_r_r_o_r_, _R_e_a_s_o_n_} is returned
+              if the calling process traps exits.
+
+              If _T_i_m_e is specified as an integer, this function waits for _T_i_m_e
+              milliseconds for the new process to call _i_n_i_t___a_c_k, or _{_e_r_r_o_r_,
+              _t_i_m_e_o_u_t_} is returned, and the process is killed.
+
+              The _S_p_a_w_n_O_p_t_s argument, if given, will be passed as the last
+              argument to the _s_p_a_w_n___o_p_t_/_2_,_3_,_4_,_5 BIF.
+
+          NNoottee::
+              Using the spawn option _m_o_n_i_t_o_r is currently not allowed, but
+              will cause the function to fail with reason _b_a_d_a_r_g.
+
+
+       iinniitt__aacckk((RReett)) -->> ookk
+
+       iinniitt__aacckk((PPaarreenntt,, RReett)) -->> ookk
+
+              Types:
+
+                 Parent = pid()
+                 Ret = term()
+
+              This function must used by a process that has been started by a
+              ssttaarrtt[[__lliinnkk]]//33,,44,,55 function. It tells _P_a_r_e_n_t that the process
+              has initialized itself, has started, or has failed to initialize
+              itself.
+
+              The _i_n_i_t___a_c_k_/_1 function uses the parent value previously stored
+              by the start function used.
+
+              If this function is not called, the start function will return
+              an error tuple (if a link and/or a timeout is used) or hang
+              otherwise.
+
+              The following example illustrates how this function and
+              _p_r_o_c___l_i_b_:_s_t_a_r_t___l_i_n_k_/_3 are used.
+
+              -module(my_proc).
+              -export([start_link/0]).
+              -export([init/1]).
+
+              start_link() ->
+                  proc_lib:start_link(my_proc, init, [self()]).
+
+              init(Parent) ->
+                  case do_initialization() of
+                      ok ->
+                          proc_lib:init_ack(Parent, {ok, self()});
+                      {error, Reason} ->
+                          exit(Reason)
+                  end,
+                  loop().
+
+
+       ffoorrmmaatt((CCrraasshhRReeppoorrtt)) -->> ssttrriinngg(())
+
+              Types:
+
+                 CrashReport = [term()]
+
+              This function can be used by a user defined event handler to
+              format a crash report. The crash report is sent using
+              _e_r_r_o_r___l_o_g_g_e_r_:_e_r_r_o_r___r_e_p_o_r_t_(_c_r_a_s_h___r_e_p_o_r_t_, _C_r_a_s_h_R_e_p_o_r_t_). That is,
+              the event to be handled is of the format _{_e_r_r_o_r___r_e_p_o_r_t_, _G_L_,
+              _{_P_i_d_, _c_r_a_s_h___r_e_p_o_r_t_, _C_r_a_s_h_R_e_p_o_r_t_}_} where _G_L is the group leader
+              pid of the process _P_i_d which sent the crash report.
+
+       iinniittiiaall__ccaallll((PPrroocceessss)) -->> {{MMoodduullee,, FFuunnccttiioonn,, AArrggss}} || ffaallssee
+
+              Types:
+
+                 Process = ddiicctt__oorr__ppiidd(())
+                 Module = module()
+                 Function = atom()
+                 Args = [atom()]
+
+              Extracts the initial call of a process that was started using
+              one of the spawn or start functions described above. _P_r_o_c_e_s_s can
+              either be a pid, an integer tuple (from which a pid can be
+              created), or the process information of a process _P_i_d fetched
+              through an _e_r_l_a_n_g_:_p_r_o_c_e_s_s___i_n_f_o_(_P_i_d_) function call.
+
+          NNoottee::
+              The list _A_r_g_s no longer contains the actual arguments, but the
+              same number of atoms as the number of arguments; the first atom
+              is always _'_A_r_g_u_m_e_n_t_____1_', the second _'_A_r_g_u_m_e_n_t_____2_', and so on.
+              The reason is that the argument list could waste a significant
+              amount of memory, and if the argument list contained funs, it
+              could be impossible to upgrade the code for the module.
+
+              If the process was spawned using a fun, _i_n_i_t_i_a_l___c_a_l_l_/_1 no longer
+              returns the actual fun, but the module, function for the local
+              function implementing the fun, and the arity, for instance
+              _{_s_o_m_e___m_o_d_u_l_e_,_-_w_o_r_k_/_3_-_f_u_n_-_0_-_,_0_} (meaning that the fun was created
+              in the function _s_o_m_e___m_o_d_u_l_e_:_w_o_r_k_/_3). The reason is that keeping
+              the fun would prevent code upgrade for the module, and that a
+              significant amount of memory could be wasted.
+
+
+       ttrraannssllaattee__iinniittiiaall__ccaallll((PPrroocceessss)) -->> {{MMoodduullee,, FFuunnccttiioonn,, AArriittyy}}
+
+              Types:
+
+                 Process = ddiicctt__oorr__ppiidd(())
+                 Module = module()
+                 Function = atom()
+                 Arity = byte()
+
+              This function is used by the _c_:_i_/_0 and _c_:_r_e_g_s_/_0 functions in
+              order to present process information.
+
+              Extracts the initial call of a process that was started using
+              one of the spawn or start functions described above, and
+              translates it to more useful information. _P_r_o_c_e_s_s can either be
+              a pid, an integer tuple (from which a pid can be created), or
+              the process information of a process _P_i_d fetched through an
+              _e_r_l_a_n_g_:_p_r_o_c_e_s_s___i_n_f_o_(_P_i_d_) function call.
+
+              If the initial call is to one of the system defined behaviors
+              such as _g_e_n___s_e_r_v_e_r or _g_e_n___e_v_e_n_t, it is translated to more useful
+              information. If a _g_e_n___s_e_r_v_e_r is spawned, the returned _M_o_d_u_l_e is
+              the name of the callback module and _F_u_n_c_t_i_o_n is _i_n_i_t (the
+              function that initiates the new server).
+
+              A _s_u_p_e_r_v_i_s_o_r and a _s_u_p_e_r_v_i_s_o_r___b_r_i_d_g_e are also _g_e_n___s_e_r_v_e_r
+              processes. In order to return information that this process is a
+              supervisor and the name of the call-back module, _M_o_d_u_l_e is
+              _s_u_p_e_r_v_i_s_o_r and _F_u_n_c_t_i_o_n is the name of the supervisor callback
+              module. _A_r_i_t_y is _1 since the _i_n_i_t_/_1 function is called initially
+              in the callback module.
+
+              By default, _{_p_r_o_c___l_i_b_,_i_n_i_t___p_,_5_} is returned if no information
+              about the initial call can be found. It is assumed that the
+              caller knows that the process has been spawned with the _p_r_o_c___l_i_b
+              module.
+
+       hhiibbeerrnnaattee((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> nnoo__rreettuurrnn(())
+
+              Types:
+
+                 Module = module()
+                 Function = atom()
+                 Args = [term()]
+
+              This function does the same as (and does call) the BIF
+              hhiibbeerrnnaattee//33, but ensures that exception handling and logging
+              continues to work as expected when the process wakes up. Always
+              use this function instead of the BIF for processes started using
+              _p_r_o_c___l_i_b functions.
+
+SSEEEE AALLSSOO
+       eerrrroorr__llooggggeerr((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                     proc_lib(3)

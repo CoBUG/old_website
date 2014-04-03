@@ -1,0 +1,137 @@
+cosTime(3)                 Erlang Module Definition                 cosTime(3)
+
+
+
+NNAAMMEE
+       cosTime - The main module of the cosTime application
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_i_m_e_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application.
+
+       This application use the time base _1_5 _o_c_t_o_b_e_r _1_5_8_2 _0_0_:_0_0. Performing
+       operations using other time bases will not yield correct result.
+
+       The OMG CosTime specification defines the operation
+       _s_e_c_u_r_e___u_n_i_v_e_r_s_a_l___t_i_m_e. As of today we cannot provide this functionality
+       considering the criteria demanded to fulfill the OMG specification.
+
+       When using this application, time and inaccuracy supplied by the user
+       must be given in number of _1_0_0 _n_a_n_o _s_e_c_o_n_d_s. The _T_i_m_e _D_i_s_p_l_a_c_e_m_e_n_t
+       _F_a_c_t_o_r is positive east of the meridian, while those to the west are
+       negative.
+
+       This application use _c_a_l_e_n_d_e_r_:_n_o_w___t_o___u_n_i_v_e_r_s_a_l___t_i_m_e_(_N_o_w_) to create a
+       UTC. Hence, the underlying OS must deliver a correct result when
+       calling _e_r_l_a_n_g_:_n_o_w_(_).
+
+       When determining the inaccuracy of the system, the user should consider
+       the way the time objects will be used. Communicating with other ORB's,
+       add a substantial overhead and should be taken into consideration.
+
+EEXXPPOORRTTSS
+       iinnssttaallll__ttiimmee(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation installs the cosTime Time Service part
+              application.
+
+       uunniinnssttaallll__ttiimmee(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation uninstalls the cosTime Time Service part
+              application.
+
+       iinnssttaallll__ttiimmeerreevveenntt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation installs the cosTime Timer Event Service part
+              application.
+
+          NNoottee::
+              The Timer Event Service part requires _T_i_m_e _S_e_r_v_i_c_e part and
+              _c_o_s_E_v_e_n_t or the _c_o_s_N_o_t_i_f_i_c_a_t_i_o_n application to be installed
+              first.
+
+
+       uunniinnssttaallll__ttiimmeerreevveenntt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation uninstalls the cosTime Timer Event Service part
+              application.
+
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosTime application.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosTime application.
+
+       ssttaarrtt__ttiimmee__sseerrvviiccee((TTddff,, IInnaaccccuurraaccyy)) -->> RReettuurrnn
+
+              Types:
+
+                 Tdf = short()
+                 Inaccuracy = ulonglong(), eq. #100 nano seconds
+                 Return = ok | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              This operation starts a Time Service server. Please note that
+              there may only be exactly one Time Service active at a time. The
+              _I_n_a_c_c_u_r_a_c_y parameter defines the inaccuracy the underlying OS
+              will introduce. Remember to take into account latency when
+              passing time object between nodes.
+
+       ssttoopp__ttiimmee__sseerrvviiccee((TTiimmeeSSeerrvviiccee)) -->> ookk
+
+              Types:
+
+                 TimeService = #objref
+
+              This operation stops the Time Service object.
+
+       ssttaarrtt__ttiimmeerreevveenntt__sseerrvviiccee((TTiimmeeSSeerrvviiccee)) -->> ookk
+
+              Types:
+
+                 TimeService = #objref
+
+              This operation starts a Timer Event Service server. Please note
+              that there may only be exactly one Timer Event Service per node
+              active at a time. The supplied TimeServcie reference will be the
+              object Timer Event Service contacts to get access to a new UTC.
+
+       ssttoopp__ttiimmeerreevveenntt__sseerrvviiccee((TTiimmeerrEEvveennttSSeerrvviiccee)) -->> ookk
+
+              Types:
+
+                 TimerEventService = #objref
+
+              This operation stops the Timer Event Service object.
+
+
+
+Ericsson AB                     cosTime 1.1.12                      cosTime(3)

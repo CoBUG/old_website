@@ -1,0 +1,347 @@
+wxMouseEvent(3)            Erlang Module Definition            wxMouseEvent(3)
+
+
+
+NNAAMMEE
+       wxMouseEvent - See external documentation: wxMouseEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMouseEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _l_e_f_t___d_o_w_n, _l_e_f_t___u_p, _m_i_d_d_l_e___d_o_w_n, _m_i_d_d_l_e___u_p, _r_i_g_h_t___d_o_w_n, _r_i_g_h_t___u_p,
+           _m_o_t_i_o_n, _e_n_t_e_r___w_i_n_d_o_w, _l_e_a_v_e___w_i_n_d_o_w, _l_e_f_t___d_c_l_i_c_k, _m_i_d_d_l_e___d_c_l_i_c_k,
+           _r_i_g_h_t___d_c_l_i_c_k, _m_o_u_s_e_w_h_e_e_l, _n_c___l_e_f_t___d_o_w_n, _n_c___l_e_f_t___u_p, _n_c___m_i_d_d_l_e___d_o_w_n,
+           _n_c___m_i_d_d_l_e___u_p, _n_c___r_i_g_h_t___d_o_w_n, _n_c___r_i_g_h_t___u_p, _n_c___m_o_t_i_o_n,
+           _n_c___e_n_t_e_r___w_i_n_d_o_w, _n_c___l_e_a_v_e___w_i_n_d_o_w, _n_c___l_e_f_t___d_c_l_i_c_k, _n_c___m_i_d_d_l_e___d_c_l_i_c_k,
+           _n_c___r_i_g_h_t___d_c_l_i_c_k
+
+       See also the message variant ##wwxxMMoouussee{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_o_u_s_e_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       aallttDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       bbuuttttoonn((TThhiiss,, BBuutt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+                 But = integer()
+
+              See external documentation.
+
+       bbuuttttoonnDDCClliicckk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              Equivalent to bbuuttttoonnDDCClliicckk((TThhiiss,, [[]])).
+
+       bbuuttttoonnDDCClliicckk((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+                 Option = {but, integer()}
+
+              See external documentation.
+
+       bbuuttttoonnDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              Equivalent to bbuuttttoonnDDoowwnn((TThhiiss,, [[]])).
+
+       bbuuttttoonnDDoowwnn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+                 Option = {but, integer()}
+
+              See external documentation.
+
+       bbuuttttoonnUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              Equivalent to bbuuttttoonnUUpp((TThhiiss,, [[]])).
+
+       bbuuttttoonnUUpp((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+                 Option = {but, integer()}
+
+              See external documentation.
+
+       ccmmddDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ccoonnttrroollDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ddrraaggggiinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       eenntteerriinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettBBuuttttoonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettLLooggiiccaallPPoossiittiioonn((TThhiiss,, DDcc)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxMouseEvent()
+                 Dc = wxDC() (see module wxDC)
+
+              See external documentation.
+
+       ggeettLLiinneessPPeerrAAccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettWWhheeeellRRoottaattiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettWWhheeeellDDeellttaa((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettXX((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       ggeettYY((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       iissBBuuttttoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       iissPPaaggeeSSccrroollll((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       lleeaavviinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       lleeffttDDCClliicckk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       lleeffttDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       lleeffttIIssDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       lleeffttUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       mmeettaaDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       mmiiddddlleeDDCClliicckk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       mmiiddddlleeDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       mmiiddddlleeIIssDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       mmiiddddlleeUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       mmoovviinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       rriigghhttDDCClliicckk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       rriigghhttDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       rriigghhttIIssDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       rriigghhttUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+       sshhiiffttDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMouseEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxMouseEvent(3)

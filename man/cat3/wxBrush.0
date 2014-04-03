@@ -1,0 +1,132 @@
+wxBrush(3)                 Erlang Module Definition                 wxBrush(3)
+
+
+
+NNAAMMEE
+       wxBrush - See external documentation: wxBrush.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxBrush.
+
+DDAATTAA TTYYPPEESS
+         _w_x_B_r_u_s_h_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxBBrruusshh(())
+
+              See external documentation.
+
+       nneeww((CCoolloouurr)) -->> wwxxBBrruusshh(())
+
+              Types:
+
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+              Also:
+              new(StippleBitmap) -> wxBrush() when
+              StippleBitmap::wxBitmap:wxBitmap().
+
+
+       nneeww((CCoolloouurr,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBrruusshh(())
+
+              Types:
+
+                 Colour = wx_colour() (see module wx)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ggeettCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxBrush()
+
+              See external documentation.
+
+       ggeettSSttiippppllee((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxBrush()
+
+              See external documentation.
+
+       ggeettSSttyyllee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxBrush()
+
+              See external documentation.
+
+       iissHHaattcchh((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBrush()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxBrush()
+
+              See external documentation.
+
+       sseettCCoolloouurr((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxBrush()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCoolloouurr((TThhiiss,, RR,, GG,, BB)) -->> ookk
+
+              Types:
+
+                 This = wxBrush()
+                 R = integer()
+                 G = integer()
+                 B = integer()
+
+              See external documentation.
+
+       sseettSSttiippppllee((TThhiiss,, SSttiippppllee)) -->> ookk
+
+              Types:
+
+                 This = wxBrush()
+                 Stipple = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       sseettSSttyyllee((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxBrush()
+                 Style = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxBBrruusshh(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxBrush(3)

@@ -1,0 +1,812 @@
+wxTreeCtrl(3)              Erlang Module Definition              wxTreeCtrl(3)
+
+
+
+NNAAMMEE
+       wxTreeCtrl - See external documentation: wxTreeCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxTreeCtrl.
+
+       Note: The representation of treeItemId() have changed from the original
+       class implementation to be an semi-opaque type,Equality between
+       TreeItemId's can be tested and zero means that the TreeItem is invalid.
+
+DDAATTAA TTYYPPEESS
+         _w_x_T_r_e_e_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxTTrreeeeCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxTTrreeeeCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxTTrreeeeCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()} | {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       aaddddRRoooott((TThhiiss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to aaddddRRoooott((TThhiiss,, TTeexxtt,, [[]])).
+
+       aaddddRRoooott((TThhiiss,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Text = chardata() (see module unicode)
+                 Option = {image, integer()} | {selectedImage, integer()} |
+                 {data, term()}
+
+              See external documentation.
+
+       aappppeennddIItteemm((TThhiiss,, PPaarreenntt,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to aappppeennddIItteemm((TThhiiss,, PPaarreenntt,, TTeexxtt,, [[]])).
+
+       aappppeennddIItteemm((TThhiiss,, PPaarreenntt,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {image, integer()} | {selectedImage, integer()} |
+                 {data, term()}
+
+              See external documentation.
+
+       aassssiiggnnIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 ImageList = wxImageList() (see module wxImageList)
+
+              See external documentation.
+
+       aassssiiggnnSSttaatteeIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 ImageList = wxImageList() (see module wxImageList)
+
+              See external documentation.
+
+       ccoollllaappssee((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ccoollllaappsseeAAnnddRReesseett((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()} | {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ddeelleettee((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ddeelleetteeAAllllIItteemmss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ddeelleetteeCChhiillddrreenn((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       eeddiittLLaabbeell((TThhiiss,, IItteemm)) -->> wwxxTTeexxttCCttrrll(()) ((sseeee mmoodduullee wwxxTTeexxttCCttrrll))
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       eennssuurreeVViissiibbllee((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       eexxppaanndd((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettBBoouunnddiinnggRReecctt((TThhiiss,, IItteemm,, RReecctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              Equivalent to ggeettBBoouunnddiinnggRReecctt((TThhiiss,, IItteemm,, RReecctt,, [[]])).
+
+       ggeettBBoouunnddiinnggRReecctt((TThhiiss,, IItteemm,, RReecctt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 Option = {textOnly, boolean()}
+
+              See external documentation.
+
+       ggeettCChhiillddrreennCCoouunntt((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              Equivalent to ggeettCChhiillddrreennCCoouunntt((TThhiiss,, IItteemm,, [[]])).
+
+       ggeettCChhiillddrreennCCoouunntt((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Option = {recursively, boolean()}
+
+              See external documentation.
+
+       ggeettCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettEEddiittCCoonnttrrooll((TThhiiss)) -->> wwxxTTeexxttCCttrrll(()) ((sseeee mmoodduullee wwxxTTeexxttCCttrrll))
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettFFiirrssttCChhiilldd((TThhiiss,, IItteemm)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::integer(), Cookie::integer()}
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettNNeexxttCChhiilldd((TThhiiss,, IItteemm,, CCooookkiiee)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::integer(), Cookie::integer()}
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Cookie = integer()
+
+              See external documentation.
+
+       ggeettFFiirrssttVViissiibblleeIItteemm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettIImmaaggeeLLiisstt((TThhiiss)) -->> wwxxIImmaaggeeLLiisstt(()) ((sseeee mmoodduullee wwxxIImmaaggeeLLiisstt))
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettIInnddeenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettIItteemmBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, IItteemm)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmDDaattaa((TThhiiss,, IItteemm)) -->> tteerrmm(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmFFoonntt((TThhiiss,, IItteemm)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmIImmaaggee((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmIImmaaggee((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Option = {which, wx_enum() (see module wx)}
+
+              See external documentation.
+              Which = ?wxTreeItemIcon_Normal | ?wxTreeItemIcon_Selected |
+              ?wxTreeItemIcon_Expanded | ?wxTreeItemIcon_SelectedExpanded |
+              ?wxTreeItemIcon_Max
+
+       ggeettIItteemmTTeexxtt((TThhiiss,, IItteemm)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmTTeexxttCCoolloouurr((TThhiiss,, IItteemm)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettLLaassttCChhiilldd((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettNNeexxttSSiibblliinngg((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettNNeexxttVViissiibbllee((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmPPaarreenntt((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettPPrreevvSSiibblliinngg((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettPPrreevvVViissiibbllee((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettRRoooottIItteemm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnss((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::integer(), Val::[integer()]}
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       ggeettSSttaatteeIImmaaggeeLLiisstt((TThhiiss)) -->> wwxxIImmaaggeeLLiisstt(()) ((sseeee mmoodduullee wwxxIImmaaggeeLLiisstt))
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       hhiittTTeesstt((TThhiiss,, PPooiinntt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Point = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       iinnsseerrttIItteemm((TThhiiss,, PPaarreenntt,, PPooss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = integer()
+                 Pos = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to iinnsseerrttIItteemm((TThhiiss,, PPaarreenntt,, PPooss,, TTeexxtt,, [[]])).
+
+       iinnsseerrttIItteemm((TThhiiss,, PPaarreenntt,, PPooss,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = integer()
+                 Pos = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {image, integer()} | {selImage, integer()} | {data,
+                 term()}
+
+              See external documentation.
+
+       iissBBoolldd((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       iissEExxppaannddeedd((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       iissSSeelleecctteedd((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       iissVViissiibbllee((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       iitteemmHHaassCChhiillddrreenn((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       pprreeppeennddIItteemm((TThhiiss,, PPaarreenntt,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to pprreeppeennddIItteemm((TThhiiss,, PPaarreenntt,, TTeexxtt,, [[]])).
+
+       pprreeppeennddIItteemm((TThhiiss,, PPaarreenntt,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Parent = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {image, integer()} | {selectedImage, integer()} |
+                 {data, term()}
+
+              See external documentation.
+
+       ssccrroollllTToo((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       sseelleeccttIItteemm((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       sseelleeccttIItteemm((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Option = {select, boolean()}
+
+              See external documentation.
+
+       sseettIInnddeenntt((TThhiiss,, IInnddeenntt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Indent = integer()
+
+              See external documentation.
+
+       sseettIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 ImageList = wxImageList() (see module wxImageList)
+
+              See external documentation.
+
+       sseettIItteemmBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, IItteemm,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettIItteemmBBoolldd((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              Equivalent to sseettIItteemmBBoolldd((TThhiiss,, IItteemm,, [[]])).
+
+       sseettIItteemmBBoolldd((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Option = {bold, boolean()}
+
+              See external documentation.
+
+       sseettIItteemmDDaattaa((TThhiiss,, IItteemm,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Data = term()
+
+              See external documentation.
+
+       sseettIItteemmDDrrooppHHiigghhlliigghhtt((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              Equivalent to sseettIItteemmDDrrooppHHiigghhlliigghhtt((TThhiiss,, IItteemm,, [[]])).
+
+       sseettIItteemmDDrrooppHHiigghhlliigghhtt((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Option = {highlight, boolean()}
+
+              See external documentation.
+
+       sseettIItteemmFFoonntt((TThhiiss,, IItteemm,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettIItteemmHHaassCChhiillddrreenn((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              Equivalent to sseettIItteemmHHaassCChhiillddrreenn((TThhiiss,, IItteemm,, [[]])).
+
+       sseettIItteemmHHaassCChhiillddrreenn((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Option = {has, boolean()}
+
+              See external documentation.
+
+       sseettIItteemmIImmaaggee((TThhiiss,, IItteemm,, IImmaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Image = integer()
+
+              See external documentation.
+
+       sseettIItteemmIImmaaggee((TThhiiss,, IItteemm,, IImmaaggee,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Image = integer()
+                 Option = {which, wx_enum() (see module wx)}
+
+              See external documentation.
+              Which = ?wxTreeItemIcon_Normal | ?wxTreeItemIcon_Selected |
+              ?wxTreeItemIcon_Expanded | ?wxTreeItemIcon_SelectedExpanded |
+              ?wxTreeItemIcon_Max
+
+       sseettIItteemmTTeexxtt((TThhiiss,, IItteemm,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettIItteemmTTeexxttCCoolloouurr((TThhiiss,, IItteemm,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettSSttaatteeIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 ImageList = wxImageList() (see module wxImageList)
+
+              See external documentation.
+
+       sseettWWiinnddoowwSSttyyllee((TThhiiss,, SSttyylleess)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Styles = integer()
+
+              See external documentation.
+
+       ssoorrttCChhiillddrreenn((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ttooggggllee((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ttoogggglleeIItteemmSSeelleeccttiioonn((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       uunnsseelleecctt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       uunnsseelleeccttAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+
+              See external documentation.
+
+       uunnsseelleeccttIItteemm((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxTreeCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxTTrreeeeCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxTreeCtrl(3)

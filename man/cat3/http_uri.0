@@ -1,0 +1,88 @@
+http_uri(3)                Erlang Module Definition                http_uri(3)
+
+
+
+NNAAMMEE
+       http_uri - URI utility module
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides utility functions for working with URIs, according
+       to RFC 3986.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module:
+
+       boolean() = true | false
+       string()  = list of ASCII characters
+
+
+UURRII DDAATTAA TTYYPPEESS
+       Type definitions that are related to URI:
+
+       For more information about URI, see RFC 3986.
+
+       uri()       = string() - Syntax according to the URI definition in rfc 3986, ex: "http://www.erlang.org/"
+       user_info() = string()
+       scheme()    = atom()   - Example: http, https
+       host()      = string()
+       port()      = pos_integer()
+       path()      = string() - Representing a file path or directory path
+       query()     = string()
+
+
+EEXXPPOORRTTSS
+       sscchheemmee__ddeeffaauullttss(()) -->> SScchheemmeeDDeeffaauullttss
+
+              Types:
+
+                 SchemeDefaults = [{scheme(), default_scheme_port_number()}]
+                 default_scheme_port_number() = pos_integer()
+
+              This function provides a list of the scheme and their default
+              port numbers currently supported (by default) by this utility.
+
+       ppaarrssee((UURRII)) -->> {{ookk,, RReessuulltt}} || {{eerrrroorr,, RReeaassoonn}}
+       ppaarrssee((UURRII,, OOppttiioonnss)) -->> {{ookk,, RReessuulltt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 URI = uri()
+                 Options = [Option]
+                 Option = {ipv6_host_with_brackets, boolean()} |
+                 {scheme_defaults, scheme_defaults()}]
+                 Result = {Scheme, UserInfo, Host, Port, Path, Query}
+                 UserInfo = user_info()
+                 Host = host()
+                 Port = pos_integer()
+                 Path = path()
+                 Query = query()
+                 Reason = term()
+
+              This function is used to parse an URI. If no scheme defaults are
+              provided, the value of sscchheemmee__ddeeffaauullttss function will be used.
+
+              Note that when parsing an URI with an unknown scheme (that is, a
+              scheme not found in the scheme defaults) a port number must be
+              provided or else the parsing will fail.
+
+       eennccooddee((UURRII)) -->> HHeexxEEnnccooddeeddUURRII
+
+              Types:
+
+                 URI = uri()
+                 HexEncodedURI = string() - Hex encoded uri
+
+              Hex encode an URI.
+
+       ddeeccooddee((HHeexxEEnnccooddeeddUURRII)) -->> UURRII
+
+              Types:
+
+                 HexEncodedURI = string() - A possibly hex encoded uri
+                 URI = uri()
+
+              Decode a possibly hex encoded URI.
+
+
+
+Ericsson AB                       inets 5.9.1                      http_uri(3)

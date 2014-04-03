@@ -1,0 +1,335 @@
+systools(3)                Erlang Module Definition                systools(3)
+
+
+
+NNAAMMEE
+       systools - A Set of Release Handling Tools.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions to generate boot scripts (_._b_o_o_t,
+       _._s_c_r_i_p_t), release upgrade scripts (_r_e_l_u_p), and release packages.
+
+EEXXPPOORRTTSS
+       mmaakkee__rreelluupp((NNaammee,, UUppFFrroomm,, DDoowwnnTToo)) -->> RReessuulltt
+       mmaakkee__rreelluupp((NNaammee,, UUppFFrroomm,, DDoowwnnTToo,, [[OOpptt]])) -->> RReessuulltt
+
+              Types:
+
+                 Name = string()
+                 UpFrom = DownTo = [Name | {Name,Descr}]
+                  Descr = term()
+                 Opt = {path,[Dir]} | restart_emulator | silent | noexec |
+                 {outdir,Dir} | warnings_as_errors
+                  Dir = string()
+                 Result = ok | error | {ok,Relup,Module,Warnings} |
+                 {error,Module,Error}
+                  Relup - see relup(4)
+                  Module = atom()
+                  Warnings = Error = term()
+
+              Generates a release upgrade file _r_e_l_u_p containing a script which
+              describes how to upgrade the system from a number of previous
+              releases, and how to downgrade to a number of previous releases.
+              The script is used by _r_e_l_e_a_s_e___h_a_n_d_l_e_r when installing a new
+              version of a release in run-time.
+
+              By default, _r_e_l_u_p is placed in the current working directory. If
+              the option _{_o_u_t_d_i_r_,_D_i_r_} is provided, _r_e_l_u_p is placed in _D_i_r
+              instead.
+
+              The release resource file _N_a_m_e_._r_e_l is compared with all release
+              resource files _N_a_m_e_2_._r_e_l specified in _U_p_F_r_o_m and _D_o_w_n_T_o. For
+              each such pair, it is deducted:
+
+                * Which applications should be deleted, that is applications
+                  which are listed in _N_a_m_e_._r_e_l but not in _N_a_m_e_2_._r_e_l.
+
+                * Which applications should be added, that is applications
+                  which are listed in _N_a_m_e_2_._r_e_l but not in _N_a_m_e_._r_e_l.
+
+                * Which applications should be upgraded/downgraded, that is
+                  applications listed in both _N_a_m_e_._r_e_l and _N_a_m_e_2_._r_e_l, but with
+                  different versions.
+
+                * If the emulator needs to be restarted after upgrading or
+                  downgrading, that is if the ERTS version differs between
+                  _N_a_m_e_._r_e_l and _N_a_m_e_2_._r_e_l.
+
+              Instructions for this are added to the _r_e_l_u_p script in the above
+              order. Instructions for upgrading or downgrading between
+              application versions are fetched from the relevant application
+              upgrade files _A_p_p_._a_p_p_u_p, sorted in the same order as when
+              generating a boot script, see _m_a_k_e___s_c_r_i_p_t_/_1_,_2. High-level
+              instructions are translated into low-level instructions and the
+              result is printed to _r_e_l_u_p.
+
+              The optional _D_e_s_c_r parameter is included as-is in the _r_e_l_u_p
+              script, see _r_e_l_u_p_(_4_). Defaults to the empty list.
+
+              All the files are searched for in the code path. It is assumed
+              that the _._a_p_p and _._a_p_p_u_p file for an application is located in
+              the same directory.
+
+              If the option _{_p_a_t_h_,_[_D_i_r_]_} is provided, this path is appended to
+              the current path. The wildcard _* is expanded to all matching
+              directories. Example: _l_i_b_/_*_/_e_b_i_n.
+
+              If the _r_e_s_t_a_r_t___e_m_u_l_a_t_o_r option is supplied, a low-level
+              instruction to restart the emulator is appended to the relup
+              scripts. This ensures that a complete reboot of the system is
+              done when the system is upgraded or downgraded.
+
+              If an upgrade includes a change from an emulator earlier than
+              OTP R15 to OTP R15 or later, the warning
+              _p_r_e___R_1_5___e_m_u_l_a_t_o_r___u_p_g_r_a_d_e is issued. See DDeessiiggnn PPrriinncciipplleess for
+              more information about this.
+
+              By default, errors and warnings are printed to tty and the
+              function returns _o_k or _e_r_r_o_r. If the option _s_i_l_e_n_t is provided,
+              the function instead returns _{_o_k_,_R_e_l_u_p_,_M_o_d_u_l_e_,_W_a_r_n_i_n_g_s_} where
+              _R_e_l_u_p is the release upgrade script, or it returns
+              _{_e_r_r_o_r_,_M_o_d_u_l_e_,_E_r_r_o_r_}. Warnings and errors can be converted to
+              strings by calling _M_o_d_u_l_e_:_f_o_r_m_a_t___w_a_r_n_i_n_g_(_W_a_r_n_i_n_g_s_) or
+              _M_o_d_u_l_e_:_f_o_r_m_a_t___e_r_r_o_r_(_E_r_r_o_r_).
+
+              If the option _n_o_e_x_e_c is provided, the function returns the same
+              values as for _s_i_l_e_n_t but no _r_e_l_u_p file is created.
+
+              If the option _w_a_r_n_i_n_g_s___a_s___e_r_r_o_r_s is provided, warnings are
+              treated as errors.
+
+       mmaakkee__ssccrriipptt((NNaammee)) -->> RReessuulltt
+       mmaakkee__ssccrriipptt((NNaammee,, [[OOpptt]])) -->> RReessuulltt
+
+              Types:
+
+                 Name = string()
+                 Opt = src_tests | {path,[Dir]} | local | {variables,[Var]} |
+                 exref | {exref,[App]}] | silent | {outdir,Dir} | no_warn_sasl
+                 | warnings_as_errors
+                  Dir = string()
+                  Var = {VarName,Prefix}
+                  VarName = Prefix = string()
+                  App = atom()
+                 Result = ok | error | {ok,Module,Warnings} |
+                 {error,Module,Error}
+                  Module = atom()
+                  Warnings = Error = term()
+
+              Generates a boot script _N_a_m_e_._s_c_r_i_p_t and its binary version, the
+              boot file _N_a_m_e_._b_o_o_t. The boot file specifies which code should
+              be loaded and which applications should be started when the
+              Erlang runtime system is started. See _s_c_r_i_p_t_(_4_).
+
+              The release resource file _N_a_m_e_._r_e_l is read to find out which
+              applications are included in the release. Then the relevant
+              application resource files _A_p_p_._a_p_p are read to find out which
+              modules should be loaded and if and how the application should
+              be started. (Keys _m_o_d_u_l_e_s and _m_o_d, see _a_p_p_(_4_)).
+
+              By default, the boot script and boot file are placed in the same
+              directory as _N_a_m_e_._r_e_l. That is, in the current working directory
+              unless _N_a_m_e contains a path. If the option _{_o_u_t_d_i_r_,_D_i_r_} is
+              provided, they are placed in _D_i_r instead.
+
+              The correctness of each application is checked:
+
+                * The version of an application specified in the _._r_e_l file
+                  should be the same as the version specified in the _._a_p_p
+                  file.
+
+                * There should be no undefined applications, that is,
+                  dependencies to applications which are not included in the
+                  release. (Key _a_p_p_l_i_c_a_t_i_o_n_s in _._a_p_p file).
+
+                * There should be no circular dependencies among the
+                  applications.
+
+                * There should be no duplicated modules, that is, modules with
+                  the same name but belonging to different applications.
+
+                * If the _s_r_c___t_e_s_t_s option is specified, a warning is issued if
+                  the source code for a module is missing or newer than the
+                  object code.
+
+              The applications are sorted according to the dependencies
+              between the applications. Where there are no dependencies, the
+              order in the _._r_e_l file is kept.
+
+              The function will fail if the mandatory applications _k_e_r_n_e_l and
+              _s_t_d_l_i_b are not included in the _._r_e_l file and have start type
+              _p_e_r_m_a_n_e_n_t (default).
+
+              If _s_a_s_l is not included as an application in the _._r_e_l file, a
+              warning is emitted because such a release can not be used in an
+              upgrade. To turn off this warning, add the option _n_o___w_a_r_n___s_a_s_l.
+
+              All files are searched for in the current path. It is assumed
+              that the _._a_p_p and _._b_e_a_m files for an application is located in
+              the same directory. The _._e_r_l files are also assumed to be
+              located in this directory, unless it is an _e_b_i_n directory in
+              which case they may be located in the corresponding _s_r_c
+              directory.
+
+              If the option _{_p_a_t_h_,_[_D_i_r_]_} is provided, this path is appended to
+              the current path. A directory in the path can be given with a
+              wildcard _*, this is expanded to all matching directories.
+              Example: _"_l_i_b_/_*_/_e_b_i_n_".
+
+              In the generated boot script all application directories are
+              structured as _A_p_p_-_V_s_n_/_e_b_i_n and assumed to be located in
+              _$_R_O_O_T_/_l_i_b, where _$_R_O_O_T is the root directory of the installed
+              release. If the _l_o_c_a_l option is supplied, the actual directories
+              where the applications were found are used instead. This is a
+              useful way to test a generated boot script locally.
+
+              The _v_a_r_i_a_b_l_e_s option can be used to specify an installation
+              directory other than _$_R_O_O_T_/_l_i_b for some of the applications. If
+              a variable _{_V_a_r_N_a_m_e_,_P_r_e_f_i_x_} is specified and an application is
+              found in a directory _P_r_e_f_i_x_/_R_e_s_t_/_A_p_p_[_-_V_s_n_]_/_e_b_i_n, this
+              application will get the path _V_a_r_N_a_m_e_/_R_e_s_t_/_A_p_p_-_V_s_n_/_e_b_i_n in the
+              boot script. If an application is found in a directory
+              _P_r_e_f_i_x_/_R_e_s_t, the path will be _V_a_r_N_a_m_e_/_R_e_s_t_/_A_p_p_-_V_s_n_/_e_b_i_n. When
+              starting Erlang, all variables _V_a_r_N_a_m_e are given values using
+              the _b_o_o_t___v_a_r command line flag.
+
+              Example: If the option _{_v_a_r_i_a_b_l_e_s_,_[_{_"_T_E_S_T_"_,_"_l_i_b_"_}_]_} is supplied,
+              and _m_y_a_p_p_._a_p_p is found in _l_i_b_/_m_y_a_p_p_/_e_b_i_n, then the path to this
+              application in the boot script will be _"_$_T_E_S_T_/_m_y_a_p_p_-_1_/_e_b_i_n_". If
+              _m_y_a_p_p_._a_p_p is found in _l_i_b_/_t_e_s_t, then the path will be
+              _$_T_E_S_T_/_t_e_s_t_/_m_y_a_p_p_-_1_/_e_b_i_n.
+
+              The checks performed before the boot script is generated can be
+              extended with some cross reference checks by specifying the
+              _e_x_r_e_f option. These checks are performed with the Xref tool. All
+              applications, or the applications specified with _{_e_x_r_e_f_,_[_A_p_p_]_},
+              are checked by Xref and warnings are generated for calls to
+              undefined functions.
+
+              By default, errors and warnings are printed to tty and the
+              function returns _o_k or _e_r_r_o_r. If the option _s_i_l_e_n_t is provided,
+              the function instead returns _{_o_k_,_M_o_d_u_l_e_,_W_a_r_n_i_n_g_s_} or
+              _{_e_r_r_o_r_,_M_o_d_u_l_e_,_E_r_r_o_r_}. Warnings and errors can be converted to
+              strings by calling _M_o_d_u_l_e_:_f_o_r_m_a_t___w_a_r_n_i_n_g_(_W_a_r_n_i_n_g_s_) or
+              _M_o_d_u_l_e_:_f_o_r_m_a_t___e_r_r_o_r_(_E_r_r_o_r_).
+
+              If the option _w_a_r_n_i_n_g_s___a_s___e_r_r_o_r_s is provided, warnings are
+              treated as errors.
+
+       mmaakkee__ttaarr((NNaammee)) -->> RReessuulltt
+       mmaakkee__ttaarr((NNaammee,, [[OOpptt]])) -->> RReessuulltt
+
+              Types:
+
+                 Name = string()
+                 Opt = {dirs,[IncDir]} | {path,[Dir]} | {variables,[Var]} |
+                 {var_tar,VarTar} | {erts,Dir} | src_tests | exref |
+                 {exref,[App]} | silent | {outdir,Dir}
+                  Dir = string()
+                  IncDir = src | include | atom()
+                  Var = {VarName,PreFix}
+                  VarName = Prefix = string()
+                  VarTar = include | ownfile | omit
+                  Machine = atom()
+                  App = atom()
+                 Result = ok | error | {ok,Module,Warnings} |
+                 {error,Module,Error}
+                  Module = atom()
+                  Warning = Error = term()
+
+              Creates a release package file _N_a_m_e_._t_a_r_._g_z. file. This file must
+              be uncompressed and unpacked on the target system using the
+              _r_e_l_e_a_s_e___h_a_n_d_l_e_r, before the new release can be installed.
+
+              The release resource file _N_a_m_e_._r_e_l is read to find out which
+              applications are included in the release. Then the relevant
+              application resource files _A_p_p_._a_p_p are read to find out the
+              version and modules of each application. (Keys _v_s_n and _m_o_d_u_l_e_s,
+              see _a_p_p_(_4_)).
+
+              By default, the release package file is placed in the same
+              directory as _N_a_m_e_._r_e_l. That is, in the current working directory
+              unless _N_a_m_e contains a path. If the option _{_o_u_t_d_i_r_,_D_i_r_} is
+              provided, it is placed in _D_i_r instead.
+
+              By default, the release package contains the directories
+              _l_i_b_/_A_p_p_-_V_s_n_/_e_b_i_n and _l_i_b_/_A_p_p_-_V_s_n_/_p_r_i_v for each included
+              application. If more directories, the option _d_i_r_s is supplied.
+              Example: _{_d_i_r_s_,_[_s_r_c_,_e_x_a_m_p_l_e_s_]_}.
+
+              All these files are searched for in the current path. If the
+              option _{_p_a_t_h_,_[_D_i_r_]_} is provided, this path is appended to the
+              current path. The wildcard _* is expanded to all matching
+              directories. Example: _"_l_i_b_/_*_/_e_b_i_n_".
+
+              The _v_a_r_i_a_b_l_e_s option can be used to specify an installation
+              directory other than _l_i_b for some of the applications. If a
+              variable _{_V_a_r_N_a_m_e_,_P_r_e_f_i_x_} is specified and an application is
+              found in a directory _P_r_e_f_i_x_/_R_e_s_t_/_A_p_p_[_-_V_s_n_]_/_e_b_i_n, this
+              application will be packed into a separate _V_a_r_N_a_m_e_._t_a_r_._g_z file
+              as _R_e_s_t_/_A_p_p_-_V_s_n_/_e_b_i_n.
+
+              Example: If the option _{_v_a_r_i_a_b_l_e_s_,_[_{_"_T_E_S_T_"_,_"_l_i_b_"_}_]_} is supplied,
+              and _m_y_a_p_p_._a_p_p is found in _l_i_b_/_m_y_a_p_p_-_1_/_e_b_i_n, the the application
+              _m_y_a_p_p is included in _T_E_S_T_._t_a_r_._g_z:
+
+              % tar tf TEST.tar
+              myapp-1/ebin/myapp.app
+
+
+              The _{_v_a_r___t_a_r_,_V_a_r_T_a_r_} option can be used to specify if and where
+              a separate package should be stored. In this option, _V_a_r_T_a_r is:
+
+                * _i_n_c_l_u_d_e. Each separate (variable) package is included in the
+                  main _R_e_l_e_a_s_e_N_a_m_e_._t_a_r_._g_z file. This is the default.
+
+                * _o_w_n_f_i_l_e. Each separate (variable) package is generated as
+                  separate files in the same directory as the
+                  _R_e_l_e_a_s_e_N_a_m_e_._t_a_r_._g_z file.
+
+                * _o_m_i_t. No separate (variable) packages are generated and
+                  applications which are found underneath a variable directory
+                  are ignored.
+
+              A directory called _r_e_l_e_a_s_e_s is also included in the release
+              package, containing _N_a_m_e_._r_e_l and a subdirectory called _R_e_l_V_s_n.
+              _R_e_l_V_s_n is the release version as specified in _N_a_m_e_._r_e_l.
+
+              _r_e_l_e_a_s_e_s_/_R_e_l_V_s_n contains the boot script _N_a_m_e_._b_o_o_t renamed to
+              _s_t_a_r_t_._b_o_o_t and, if found, the files _r_e_l_u_p and _s_y_s_._c_o_n_f_i_g. These
+              files are searched for in the same directory as _N_a_m_e_._r_e_l, in the
+              current working directory, and in any directories specified
+              using the _p_a_t_h option.
+
+              If the release package should contain a new Erlang runtime
+              system, the _b_i_n directory of the specified runtime system
+              _{_e_r_t_s_,_D_i_r_} is copied to _e_r_t_s_-_E_r_t_s_V_s_n_/_b_i_n.
+
+              All checks performed with the _m_a_k_e___s_c_r_i_p_t function are performed
+              before the release package is created. The _s_r_c___t_e_s_t_s and _e_x_r_e_f
+              options are also valid here.
+
+              The return value and the handling of errors and warnings are the
+              same as described for _m_a_k_e___s_c_r_i_p_t above.
+
+       ssccrriipptt22bboooott((FFiillee)) -->> ookk || eerrrroorr
+
+              Types:
+
+                 File = string()
+
+              The Erlang runtime system requires that the contents of the
+              script used to boot the system is a binary Erlang term. This
+              function transforms the _F_i_l_e_._s_c_r_i_p_t boot script to a binary term
+              which is stored in the file _F_i_l_e_._b_o_o_t.
+
+              A boot script generated using the _m_a_k_e___s_c_r_i_p_t function is
+              already transformed to the binary form.
+
+SSEEEE AALLSSOO
+       app(4), appup(4), erl(1), rel(4), release_handler(3), relup(4),
+       script(4)
+
+
+
+Ericsson AB                       sasl 2.2.1                       systools(3)

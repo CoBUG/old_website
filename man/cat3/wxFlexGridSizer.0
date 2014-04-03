@@ -1,0 +1,155 @@
+wxFlexGridSizer(3)         Erlang Module Definition         wxFlexGridSizer(3)
+
+
+
+NNAAMMEE
+       wxFlexGridSizer - See external documentation: wxFlexGridSizer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFlexGridSizer.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrriiddSSiizzeerr
+       wwxxSSiizzeerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_l_e_x_G_r_i_d_S_i_z_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((CCoollss)) -->> wwxxFFlleexxGGrriiddSSiizzeerr(())
+
+              Types:
+
+                 Cols = integer()
+
+              Equivalent to nneeww((CCoollss,, [[]])).
+
+       nneeww((CCoollss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxFFlleexxGGrriiddSSiizzeerr(())
+
+              Types:
+
+                 Cols = integer()
+                 Option = {vgap, integer()} | {hgap, integer()}
+
+              See external documentation.
+
+       nneeww((RRoowwss,, CCoollss,, VVggaapp,, HHggaapp)) -->> wwxxFFlleexxGGrriiddSSiizzeerr(())
+
+              Types:
+
+                 Rows = integer()
+                 Cols = integer()
+                 Vgap = integer()
+                 Hgap = integer()
+
+              See external documentation.
+
+       aaddddGGrroowwaabblleeCCooll((TThhiiss,, IIddxx)) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Idx = integer()
+
+              Equivalent to aaddddGGrroowwaabblleeCCooll((TThhiiss,, IIddxx,, [[]])).
+
+       aaddddGGrroowwaabblleeCCooll((TThhiiss,, IIddxx,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Idx = integer()
+                 Option = {proportion, integer()}
+
+              See external documentation.
+
+       aaddddGGrroowwaabblleeRRooww((TThhiiss,, IIddxx)) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Idx = integer()
+
+              Equivalent to aaddddGGrroowwaabblleeRRooww((TThhiiss,, IIddxx,, [[]])).
+
+       aaddddGGrroowwaabblleeRRooww((TThhiiss,, IIddxx,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Idx = integer()
+                 Option = {proportion, integer()}
+
+              See external documentation.
+
+       ggeettFFlleexxiibblleeDDiirreeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxFlexGridSizer()
+
+              See external documentation.
+
+       ggeettNNoonnFFlleexxiibblleeGGrroowwMMooddee((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxFlexGridSizer()
+
+              See external documentation.
+              Res = ?wxFLEX_GROWMODE_NONE | ?wxFLEX_GROWMODE_SPECIFIED |
+              ?wxFLEX_GROWMODE_ALL
+
+       rreemmoovveeGGrroowwaabblleeCCooll((TThhiiss,, IIddxx)) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Idx = integer()
+
+              See external documentation.
+
+       rreemmoovveeGGrroowwaabblleeRRooww((TThhiiss,, IIddxx)) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Idx = integer()
+
+              See external documentation.
+
+       sseettFFlleexxiibblleeDDiirreeccttiioonn((TThhiiss,, DDiirreeccttiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Direction = integer()
+
+              See external documentation.
+
+       sseettNNoonnFFlleexxiibblleeGGrroowwMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxFlexGridSizer()
+                 Mode = wx_enum() (see module wx)
+
+              See external documentation.
+              Mode = ?wxFLEX_GROWMODE_NONE | ?wxFLEX_GROWMODE_SPECIFIED |
+              ?wxFLEX_GROWMODE_ALL
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFlleexxGGrriiddSSiizzeerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxFlexGridSizer(3)

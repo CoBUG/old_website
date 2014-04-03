@@ -1,0 +1,148 @@
+megaco_udp(3)              Erlang Module Definition              megaco_udp(3)
+
+
+
+NNAAMMEE
+       megaco_udp - Interface module to UDP transport protocol for
+       Megaco/H.248.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains the public interface to the UDP/IP version
+       transport protocol for Megaco/H.248.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__ttrraannssppoorrtt(()) -->> {{ookk,, TTrraannssppoorrttRReeff}}
+
+              Types:
+
+                 TransportRef = pid()
+
+              This function is used for starting the UDP/IP transport service.
+              Use exit(TransportRef, Reason) to stop the transport service.
+
+       ooppeenn((TTrraannssppoorrttRReeff,, OOppttiioonnLLiisstt)) -->> {{ookk,, HHaannddllee,, CCoonnttrroollPPiidd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 TransportRef = pid() | regname()
+                 OptionList = [option()]
+                 option() = {port, integer()} |{options, list()}
+                 |{receive_handle, receive_handle()} |{module, atom()}
+                 Handle = socket_handle()
+                 receive_handle() = term()
+                 ControlPid = pid()
+                 Reason = term()
+
+              This function is used to open an UDP/IP socket.
+
+              The _m_o_d_u_l_e option makes it possible for the user to provide
+              their own callback module. The functions _r_e_c_e_i_v_e___m_e_s_s_a_g_e_/_4 or
+              _p_r_o_c_e_s_s___r_e_c_e_i_v_e_d___m_e_s_s_a_g_e_/_4 of this module is called when a new
+              message is received (which one depends on the size of the
+              message; small - receive_message, large -
+              process_received_message). Default value is _m_e_g_a_c_o.
+
+       cclloossee((HHaannddllee,, MMssgg)) -->> ookk
+
+              Types:
+
+                 Handle = socket_handle()
+                 Msg
+
+              This function is used for closing an active UDP socket.
+
+       ssoocckkeett((HHaannddllee)) -->> SSoocckkeett
+
+              Types:
+
+                 Handle = socket_handle()
+                 Socket = inet_socket()
+
+              This function is used to convert a socket_handle() to a
+              inet_socket(). inet_socket() is a plain socket, see the inet
+              module for more info.
+
+       ccrreeaattee__sseenndd__hhaannddllee((HHaannddllee,, HHoosstt,, PPoorrtt)) -->> sseenndd__hhaannddllee(())
+
+              Types:
+
+                 Handle = socket_handle()
+                 Host = {A,B,C,D} | string()
+                 Port = integer()
+
+              Creates a send handle from a transport handle. The send handle
+              is intended to be used by megaco_udp:send_message/2.
+
+       sseenndd__mmeessssaaggee((SSeennddHHaannddllee,, MMssgg)) -->> ookk
+
+              Types:
+
+                 SendHandle = send_handle()
+                 Message = binary() | iolist()
+
+              Sends a message on a socket. The send handle is obtained by
+              megaco_udp:create_send_handle/3. Increments the NumOutMessages
+              and NumOutOctets counters if message successfully sent. In case
+              of a failure to send, the NumErrors counter is _n_o_t incremented.
+              This is done elsewhere in the megaco app.
+
+       bblloocckk((HHaannddllee)) -->> ookk
+
+              Types:
+
+                 Handle = socket_handle()
+
+              Stop receiving incoming messages on the socket.
+
+       uunnbblloocckk((HHaannddllee)) -->> ookk
+
+              Types:
+
+                 Handle = socket_handle()
+
+              Starting to receive incoming messages from the socket again.
+
+       uuppggrraaddee__rreecceeiivvee__hhaannddllee((CCoonnttrroollPPiidd,, NNeewwHHaannddllee)) -->> ookk
+
+              Types:
+
+                 ControlPid = pid()
+                 NewHandle = receive_handle()
+                 receive_handle() = term()
+
+              Update the receive handle of the control process (e.g. after
+              having changed protocol version).
+
+       ggeett__ssttaattss(()) -->> {{ookk,, TToottaallSSttaattss}} || {{eerrrroorr,, RReeaassoonn}}
+       ggeett__ssttaattss((SSeennddHHaannddllee)) -->> {{ookk,, SSeennddHHaannddlleeSSttaattss}} || {{eerrrroorr,, RReeaassoonn}}
+       ggeett__ssttaattss((SSeennddHHaannddllee,, CCoouunntteerr)) -->> {{ookk,, CCoouunntteerrSSttaattss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TotalStats = [total_stats()]
+                 total_stats() = {send_handle(), [stats()]}
+                 SendHandle = send_handle()
+                 SendHandleStats = [stats()]
+                 Counter = udp_stats_counter()
+                 CounterStats = integer()
+                 stats() = {udp_stats_counter(), integer()}
+                 tcp_stats_counter() = medGwyGatewayNumInMessages |
+                 medGwyGatewayNumInOctets | medGwyGatewayNumOutMessages |
+                 medGwyGatewayNumOutOctets | medGwyGatewayNumErrors
+                 Reason = term()
+
+              Retreive the UDP related (SNMP) statistics counters.
+
+       rreesseett__ssttaattss(()) -->> vvooiidd(())
+       rreesseett__ssttaattss((SSeennddHHaannddllee)) -->> vvooiidd(())
+
+              Types:
+
+                 SendHandle = send_handle()
+
+              Reset all TCP related (SNMP) statistics counters.
+
+
+
+Ericsson AB                     megaco 3.16.0.2                  megaco_udp(3)

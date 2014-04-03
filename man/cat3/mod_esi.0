@@ -1,0 +1,94 @@
+mod_esi(3)                 Erlang Module Definition                 mod_esi(3)
+
+
+
+NNAAMMEE
+       mod_esi - Erlang Server Interface
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the Erlang Server Interface (ESI) API. It is a more
+       efficient way of writing erlang scripts for your Inets web server than
+       writing them as common CGI scripts.
+
+EEXXPPOORRTTSS
+       ddeelliivveerr((SSeessssiioonnIIDD,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SessionID = term()
+                 Data = string() | io_list() | binary()
+                 Reason = term()
+
+              This function is _o_n_l_y intended to be used from functions called
+              by the Erl Scheme interface to deliver parts of the content to
+              the user.
+
+              Sends data from a Erl Scheme script back to the client.
+
+          NNoottee::
+              Note that if any HTTP-header fields should be added by the
+              script they must be in the first call to deliver/2 and the data
+              in the call must be a string. Calls after the headers are
+              complete may contain binary data to reduce copying overhead. Do
+              not assume anything about the data type of SessionID, the
+              SessionID must be the value given as input to the esi call back
+              function that you implemented.
+
+
+EESSII CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+EEXXPPOORRTTSS
+       MMoodduullee::FFuunnccttiioonn((SSeessssiioonnIIDD,, EEnnvv,, IInnppuutt))-->> __
+
+              Types:
+
+                 SessionID = term()
+                 Env = [EnvironmentDirectives] ++ ParsedHeader
+                 EnvironmentDirectives = {Key,Value}
+                 Key = query_string | content_length | server_software |
+                 gateway_interface | server_protocol | server_port |
+                 request_method | remote_addr | script_name
+                 Input = string()
+
+              The _M_o_d_u_l_e must be found in the code path and export _F_u_n_c_t_i_o_n
+              with an arity of three. An erlScriptAlias must also be set up in
+              the configuration file for the Web server.
+
+              If the HTTP request is a 'post' request and a body is sent then
+              content_length will be the length of the posted data. If 'get'
+              is used query_string will be the data after _? in the url.
+
+              ParsedHeader is the HTTP request as a key value tuple list. The
+              keys in parsed header will be the in lower case.
+
+              SessionID is a identifier the server uses when _d_e_l_i_v_e_r_/_2 is
+              called; do not assume anything about the datatype.
+
+              Use this callback function to dynamically generate dynamic web
+              content. When a part of the page is generated send the data back
+              to the client through _d_e_l_i_v_e_r_/_2. Note that the first chunk of
+              data sent to the client must at least contain all HTTP header
+              fields that the response will generate. If the first chunk does
+              not contain the _E_n_d _o_f _H_T_T_P _h_e_a_d_e_r, that is _"_\_r_\_n_\_r_\_n_"_, the
+              server will assume that no HTTP header fields will be generated.
+
+       MMoodduullee::FFuunnccttiioonn((EEnnvv,, IInnppuutt))-->> RReessppoonnssee
+
+              Types:
+
+                 Env = [EnvironmentDirectives] ++ ParsedHeader
+                 EnvironmentDirectives = {Key,Value}
+                 Key = query_string | content_length | server_software |
+                 gateway_interface | server_protocol | server_port |
+                 request_method | remote_addr | script_name.
+                 Input = string()
+                 Response = string()
+
+              This callback format consumes a lot of memory since the whole
+              response must be generated before it is sent to the user. This
+              function is deprecated and only kept for backwards
+              compatibility. For new development Module:Function/3 should be
+              used.
+
+
+
+Ericsson AB                       inets 5.9.1                       mod_esi(3)

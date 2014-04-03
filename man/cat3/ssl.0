@@ -1,0 +1,597 @@
+ssl(3)                     Erlang Module Definition                     ssl(3)
+
+
+
+NNAAMMEE
+       ssl - Interface Functions for Secure Socket Layer
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains interface functions to the Secure Socket Layer.
+
+SSSSLL
+         * ssl requires the crypto and public_key applications.
+
+         * Supported SSL/TLS-versions are SSL-3.0 and TLS-1.0, experimental
+           support for TLS-1.1 and TLS-1.2 is also available (no support for
+           elliptic curve cipher suites yet).
+
+         * For security reasons sslv2 is not supported.
+
+         * Ephemeral Diffie-Hellman cipher suites are supported but not Diffie
+           Hellman Certificates cipher suites.
+
+         * Export cipher suites are not supported as the U.S. lifted its
+           export restrictions in early 2000.
+
+         * IDEA cipher suites are not supported as they have become deprecated
+           by the latest TLS spec so there is not any real motivation to
+           implement them.
+
+         * CRL and policy certificate extensions are not supported yet.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       The following data types are used in the functions below:
+
+       _b_o_o_l_e_a_n_(_) _= _t_r_u_e _| _f_a_l_s_e
+
+       _o_p_t_i_o_n_(_) _= _s_o_c_k_e_t_o_p_t_i_o_n_(_) _| _s_s_l_o_p_t_i_o_n_(_) _| _t_r_a_n_s_p_o_r_t_o_p_t_i_o_n_(_)
+
+       _s_o_c_k_e_t_o_p_t_i_o_n_(_) _= _p_r_o_p_l_i_s_t_s_:_p_r_o_p_e_r_t_y_(_) _- _T_h_e _d_e_f_a_u_l_t _s_o_c_k_e_t _o_p_t_i_o_n_s _a_r_e
+       _[_{_m_o_d_e_,_l_i_s_t_}_,_{_p_a_c_k_e_t_, _0_}_,_{_h_e_a_d_e_r_, _0_}_,_{_a_c_t_i_v_e_, _t_r_u_e_}_]_.
+
+       For valid options see iinneett((33)) and ggeenn__ttccpp((33)).
+
+       _s_s_l_o_p_t_i_o_n_(_) _= _{_v_e_r_i_f_y_, _v_e_r_i_f_y___t_y_p_e_(_)_} _| _{_v_e_r_i_f_y___f_u_n_, _{_f_u_n_(_)_, _t_e_r_m_(_)_}_} _|
+       _{_f_a_i_l___i_f___n_o___p_e_e_r___c_e_r_t_, _b_o_o_l_e_a_n_(_)_} _{_d_e_p_t_h_, _i_n_t_e_g_e_r_(_)_} _| _{_c_e_r_t_,
+       _d_e_r___e_n_c_o_d_e_d_(_)_}_| _{_c_e_r_t_f_i_l_e_, _p_a_t_h_(_)_} _| _{_k_e_y_, _{_'_R_S_A_P_r_i_v_a_t_e_K_e_y_'_|
+       _'_D_S_A_P_r_i_v_a_t_e_K_e_y_' _| _'_P_r_i_v_a_t_e_K_e_y_I_n_f_o_'_, _d_e_r___e_n_c_o_d_e_d_(_)_}_} _| _{_k_e_y_f_i_l_e_, _p_a_t_h_(_)_}
+       _| _{_p_a_s_s_w_o_r_d_, _s_t_r_i_n_g_(_)_} _| _{_c_a_c_e_r_t_s_, _[_d_e_r___e_n_c_o_d_e_d_(_)_]_} _| _{_c_a_c_e_r_t_f_i_l_e_,
+       _p_a_t_h_(_)_} _| _|_{_d_h_, _d_e_r___e_n_c_o_d_e_d_(_)_} _| _{_d_h_f_i_l_e_, _p_a_t_h_(_)_} _| _{_c_i_p_h_e_r_s_,
+       _c_i_p_h_e_r_s_(_)_} _| _{_s_s_l___i_m_p_, _s_s_l___i_m_p_(_)_}_| _{_r_e_u_s_e___s_e_s_s_i_o_n_s_, _b_o_o_l_e_a_n_(_)_} _|
+       _{_r_e_u_s_e___s_e_s_s_i_o_n_, _f_u_n_(_)_}
+
+       _t_r_a_n_s_p_o_r_t_o_p_t_i_o_n_(_) _= _{_C_a_l_l_b_a_c_k_M_o_d_u_l_e_, _D_a_t_a_T_a_g_, _C_l_o_s_e_d_T_a_g_} _- _d_e_f_a_u_l_t_s _t_o
+       _{_g_e_n___t_c_p_, _t_c_p_, _t_c_p___c_l_o_s_e_d_}_. _S_s_l _m_a_y _b_e _r_u_n _o_v_e_r _a_n_y _r_e_l_i_a_b_l_e _t_r_a_n_s_p_o_r_t
+       _p_r_o_t_o_c_o_l _t_h_a_t _h_a_s _a_n _e_q_u_i_v_a_l_e_n_t _A_P_I _t_o _g_e_n___t_c_p_'_s_.
+
+        _C_a_l_l_b_a_c_k_M_o_d_u_l_e _= _a_t_o_m_(_)
+
+        _D_a_t_a_T_a_g _= _a_t_o_m_(_) _- _t_a_g _u_s_e_d _i_n _s_o_c_k_e_t _d_a_t_a _m_e_s_s_a_g_e_.
+
+        _C_l_o_s_e_d_T_a_g _= _a_t_o_m_(_) _- _t_a_g _u_s_e_d _i_n _s_o_c_k_e_t _c_l_o_s_e _m_e_s_s_a_g_e_.
+
+       _v_e_r_i_f_y___t_y_p_e_(_) _= _v_e_r_i_f_y___n_o_n_e _| _v_e_r_i_f_y___p_e_e_r
+
+       _p_a_t_h_(_) _= _s_t_r_i_n_g_(_) _- _r_e_p_r_e_s_e_n_t_i_n_g _a _f_i_l_e _p_a_t_h_.
+
+       _d_e_r___e_n_c_o_d_e_d_(_) _= _b_i_n_a_r_y_(_) _-_A_s_n_1 _D_E_R _e_n_c_o_d_e_d _e_n_t_i_t_y _a_s _a_n _e_r_l_a_n_g _b_i_n_a_r_y_.
+
+       _h_o_s_t_(_) _= _h_o_s_t_n_a_m_e_(_) _| _i_p_a_d_d_r_e_s_s_(_)
+
+       _h_o_s_t_n_a_m_e_(_) _= _s_t_r_i_n_g_(_)
+
+        _i_p___a_d_d_r_e_s_s_(_) _= _{_N_1_,_N_2_,_N_3_,_N_4_} _% _I_P_v_4 _| _{_K_1_,_K_2_,_K_3_,_K_4_,_K_5_,_K_6_,_K_7_,_K_8_} _% _I_P_v_6
+
+
+       _s_s_l_s_o_c_k_e_t_(_) _- _o_p_a_q_u_e _t_o _t_h_e _u_s_e_r_.
+
+       _p_r_o_t_o_c_o_l_(_) _= _s_s_l_v_3 _| _t_l_s_v_1 _| _'_t_l_s_v_1_._1_' _| _'_t_l_s_v_1_._2_'
+
+       _c_i_p_h_e_r_s_(_) _= _[_c_i_p_h_e_r_s_u_i_t_e_(_)_] _| _s_t_r_i_n_g_(_) _(_a_c_c_o_r_d_i_n_g _t_o _o_l_d _A_P_I_)
+
+       _c_i_p_h_e_r_s_u_i_t_e_(_) _= _{_k_e_y___e_x_c_h_a_n_g_e_(_)_, _c_i_p_h_e_r_(_)_, _h_a_s_h_(_)_}
+
+       _k_e_y___e_x_c_h_a_n_g_e_(_) _= _r_s_a _| _d_h_e___d_s_s _| _d_h_e___r_s_a _| _d_h___a_n_o_n
+
+       _c_i_p_h_e_r_(_) _= _r_c_4___1_2_8 _| _d_e_s___c_b_c _| _'_3_d_e_s___e_d_e___c_b_c_' _| _a_e_s___1_2_8___c_b_c _|
+       _a_e_s___2_5_6___c_b_c
+
+       _h_a_s_h_(_) _= _m_d_5 _| _s_h_a
+
+       _p_r_f___r_a_n_d_o_m_(_) _= _c_l_i_e_n_t___r_a_n_d_o_m _| _s_e_r_v_e_r___r_a_n_d_o_m
+
+SSSSLL OOPPTTIIOONN DDEESSCCRRIIPPTTIIOONNSS -- CCOOMMMMOONN FFOORR SSEERRVVEERR AANNDD CCLLIIEENNTT
+       Options described here are options that are have the same meaning in
+       the client and the server.
+
+         {{cceerrtt,, ddeerr__eennccooddeedd(())}}::
+            The DER encoded users certificate. If this option is supplied it
+           will override the certfile option.
+
+         {{cceerrttffiillee,, ppaatthh(())}}::
+           Path to a file containing the user's certificate.
+
+         {{kkeeyy,, {{''RRSSAAPPrriivvaatteeKKeeyy''|| ''DDSSAAPPrriivvaatteeKKeeyy'' || ''PPrriivvaatteeKKeeyyIInnffoo'',,
+         ddeerr__eennccooddeedd(())}}}}::
+            The DER encoded users private key. If this option is supplied it
+           will override the keyfile option.
+
+         {{kkeeyyffiillee,, ppaatthh(())}}::
+           Path to file containing user's private PEM encoded key. As PEM-
+           files may contain several entries this option defaults to the same
+           file as given by certfile option.
+
+         {{ppaasssswwoorrdd,, ssttrriinngg(())}}::
+           String containing the user's password. Only used if the private
+           keyfile is password protected.
+
+         {{ccaacceerrttss,, [[ddeerr__eennccooddeedd(())]]}}::
+            The DER encoded trusted certificates. If this option is supplied
+           it will override the cacertfile option.
+
+         {{ccaacceerrttffiillee,, ppaatthh(())}}::
+           Path to file containing PEM encoded CA certificates (trusted
+           certificates used for verifying a peer certificate). May be omitted
+           if you do not want to verify the peer.
+
+         {{cciipphheerrss,, cciipphheerrss(())}}::
+           The cipher suites that should be supported. The function
+           _c_i_p_h_e_r___s_u_i_t_e_s_/_0 can be used to find all available ciphers.
+           Additionally some anonymous cipher suites ({dh_anon, rc4_128, md5},
+           {dh_anon, des_cbc, sha}, {dh_anon, '3des_ede_cbc', sha}, {dh_anon,
+           aes_128_cbc, sha}, {dh_anon, aes_256_cbc, sha}) are supported for
+           testing purposes and will only work if explicitly enabled by this
+           option and they are supported/enabled by the peer also.
+
+         {{ssssll__iimmpp,, nneeww || oolldd}}::
+           No longer has any meaning as the old implementation has been
+           removed, it will be ignored.
+
+         {{sseeccuurree__rreenneeggoottiiaattee,, bboooolleeaann(())}}::
+           Specifies if to reject renegotiation attempt that does not live up
+           to RFC 5746. By default secure_renegotiate is set to false i.e.
+           secure renegotiation will be used if possible but it will fallback
+           to unsecure renegotiation if the peer does not support RFC 5746.
+
+         {{ddeepptthh,, iinntteeggeerr(())}}::
+            The depth is the maximum number of non-self-issued intermediate
+           certificates that may follow the peer certificate in a valid
+           certification path. So if depth is 0 the PEER must be signed by the
+           trusted ROOT-CA directly, if 1 the path can be PEER, CA, ROOT-CA,
+           if it is 2 PEER, CA, CA, ROOT-CA and so on. The default value is 1.
+
+         {{vveerriiffyy__ffuunn,, {{VVeerriiffyyffuunn :::: ffuunn(()),, IInniittiiaallUUsseerrSSttaattee :::: tteerrmm(())}}}}::
+           The verification fun should be defined as:
+
+         fun(OtpCert :: #'OTPCertificate'{}, Event :: {bad_cert, Reason :: atom()} |
+                   {extension, #'Extension'{}}, InitialUserState :: term()) ->
+              {valid, UserState :: term()} | {valid_peer, UserState :: term()} |
+              {fail, Reason :: term()} | {unknown, UserState :: term()}.
+
+
+           The verify fun will be called during the X509-path validation when
+           an error or an extension unknown to the ssl application is
+           encountered. Additionally it will be called when a certificate is
+           considered valid by the path validation to allow access to each
+           certificate in the path to the user application. Note that it will
+           differentiate between the peer certificate and CA certificates by
+           using valid_peer or valid as the second argument to the verify fun.
+           See tthhee ppuubblliicc__kkeeyy UUsseerr''ss GGuuiiddee for definition of
+           #'OTPCertificate'{} and #'Extension'{}.
+
+           If the verify callback fun returns {fail, Reason}, the verification
+           process is immediately stopped and an alert is sent to the peer and
+           the TLS/SSL handshake is terminated. If the verify callback fun
+           returns {valid, UserState}, the verification process is continued.
+           If the verify callback fun always returns {valid, UserState}, the
+           TLS/SSL handshake will not be terminated with respect to
+           verification failures and the connection will be established. If
+           called with an extension unknown to the user application the return
+           value {unknown, UserState} should be used.
+
+           The default verify_fun option in verify_peer mode:
+
+         {fun(_,{bad_cert, _} = Reason, _) ->
+               {fail, Reason};
+             (_,{extension, _}, UserState) ->
+               {unknown, UserState};
+             (_, valid, UserState) ->
+               {valid, UserState};
+             (_, valid_peer, UserState) ->
+                  {valid, UserState}
+          end, []}
+
+
+           The default verify_fun option in verify_none mode:
+
+         {fun(_,{bad_cert, _}, UserState) ->
+               {valid, UserState};
+             (_,{extension, _}, UserState) ->
+               {unknown, UserState};
+             (_, valid, UserState) ->
+               {valid, UserState};
+             (_, valid_peer, UserState) ->
+                  {valid, UserState}
+          end, []}
+
+
+           Possible path validation errors:
+
+           {bad_cert, cert_expired}, {bad_cert, invalid_issuer}, {bad_cert,
+           invalid_signature}, {bad_cert, unknown_ca},{bad_cert,
+           selfsigned_peer}, {bad_cert, name_not_permitted}, {bad_cert,
+           missing_basic_constraint}, {bad_cert, invalid_key_usage}
+
+         {{hhiibbeerrnnaattee__aafftteerr,, iinntteeggeerr(())||uunnddeeffiinneedd}}::
+           When an integer-value is specified, the
+
+         ssl_connection
+
+         undefined
+
+SSSSLL OOPPTTIIOONN DDEESSCCRRIIPPTTIIOONNSS -- CCLLIIEENNTT SSIIDDEE
+       Options described here are client specific or has a slightly different
+       meaning in the client than in the server.
+
+         {{vveerriiffyy,, vveerriiffyy__ttyyppee(())}}::
+            In verify_none mode the default behavior will be to allow all
+           x509-path validation errors. See also the verify_fun option.
+
+         {{rreeuussee__sseessssiioonnss,, bboooolleeaann(())}}::
+           Specifies if client should try to reuse sessions when possible.
+
+SSSSLL OOPPTTIIOONN DDEESSCCRRIIPPTTIIOONNSS -- SSEERRVVEERR SSIIDDEE
+       Options described here are server specific or has a slightly different
+       meaning in the server than in the client.
+
+         {{ddhh,, ddeerr__eennccooddeedd(())}}::
+           The DER encoded Diffie Hellman parameters. If this option is
+           supplied it will override the dhfile option.
+
+         {{ddhhffiillee,, ppaatthh(())}}::
+           Path to file containing PEM encoded Diffie Hellman parameters, for
+           the server to use if a cipher suite using Diffie Hellman key
+           exchange is negotiated. If not specified default parameters will be
+           used.
+
+         {{vveerriiffyy,, vveerriiffyy__ttyyppee(())}}::
+           Servers only do the x509-path validation in verify_peer mode, as it
+           then will send a certificate request to the client (this message is
+           not sent if the verify option is verify_none) and you may then also
+           want to specify the option fail_if_no_peer_cert.
+
+         {{ffaaiill__iiff__nnoo__ppeeeerr__cceerrtt,, bboooolleeaann(())}}::
+           Used together with {verify, verify_peer} by an ssl server. If set
+           to true, the server will fail if the client does not have a
+           certificate to send, i.e. sends a empty certificate, if set to
+           false it will only fail if the client sends an invalid certificate
+           (an empty certificate is considered valid).
+
+         {{rreeuussee__sseessssiioonnss,, bboooolleeaann(())}}::
+           Specifies if the server should agree to reuse sessions when the
+           clients request to do so. See also the reuse_session option.
+
+         {{rreeuussee__sseessssiioonn,, ffuunn((SSuuggggeesstteeddSSeessssiioonnIIdd,, PPeeeerrCCeerrtt,, CCoommpprreessssiioonn,,
+         CCiipphheerrSSuuiittee)) -->> bboooolleeaann(())}}::
+           Enables the ssl server to have a local policy for deciding if a
+           session should be reused or not, only meaningful if _r_e_u_s_e___s_e_s_s_i_o_n_s
+           is set to true. SuggestedSessionId is a binary(), PeerCert is a DER
+           encoded certificate, Compression is an enumeration integer and
+           CipherSuite is of type ciphersuite().
+
+GGEENNEERRAALL
+       When an ssl socket is in active mode (the default), data from the
+       socket is delivered to the owner of the socket in the form of messages:
+
+         * {ssl, Socket, Data}
+
+         * {ssl_closed, Socket}
+
+         *
+            {ssl_error, Socket, Reason}
+
+       A _T_i_m_e_o_u_t argument specifies a timeout in milliseconds. The default
+       value for a _T_i_m_e_o_u_t argument is _i_n_f_i_n_i_t_y.
+
+EEXXPPOORRTTSS
+       cciipphheerr__ssuuiitteess(()) -->>
+       cciipphheerr__ssuuiitteess((TTyyppee)) -->> cciipphheerrss(())
+
+              Types:
+
+                 Type = erlang | openssl
+
+              Returns a list of supported cipher suites. cipher_suites() is
+              equivalent to cipher_suites(erlang). Type openssl is provided
+              for backwards compatibility with old ssl that used openssl.
+
+       ccoonnnneecctt((SSoocckkeett,, SSssllOOppttiioonnss)) -->>
+       ccoonnnneecctt((SSoocckkeett,, SSssllOOppttiioonnss,, TTiimmeeoouutt)) -->> {{ookk,, SSssllSSoocckkeett}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Socket = socket()
+                 SslOptions = [ssloption()]
+                 Timeout = integer() | infinity
+                 SslSocket = sslsocket()
+                 Reason = term()
+
+              Upgrades a gen_tcp, or equivalent, connected socket to an ssl
+              socket i.e. performs the client-side ssl handshake.
+
+       ccoonnnneecctt((HHoosstt,, PPoorrtt,, OOppttiioonnss)) -->>
+       ccoonnnneecctt((HHoosstt,, PPoorrtt,, OOppttiioonnss,, TTiimmeeoouutt)) -->> {{ookk,, SSssllSSoocckkeett}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Host = host()
+                 Port = integer()
+                 Options = [option()]
+                 Timeout = integer() | infinity
+                 SslSocket = sslsocket()
+                 Reason = term()
+
+              Opens an ssl connection to Host, Port.
+
+       cclloossee((SSssllSSoocckkeett)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SslSocket = sslsocket()
+                 Reason = term()
+
+              Close an ssl connection.
+
+       ccoonnttrroolllliinngg__pprroocceessss((SSssllSSoocckkeett,, NNeewwOOwwnneerr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SslSocket = sslsocket()
+                 NewOwner = pid()
+                 Reason = term()
+
+              Assigns a new controlling process to the ssl-socket. A
+              controlling process is the owner of an ssl-socket, and receives
+              all messages from the socket.
+
+       ccoonnnneeccttiioonn__iinnffoo((SSssllSSoocckkeett)) -->> {{ookk,, {{PPrroottooccoollVVeerrssiioonn,, CCiipphheerrSSuuiittee}}}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 CipherSuite = ciphersuite()
+                 ProtocolVersion = protocol()
+
+              Returns the negotiated protocol version and cipher suite.
+
+       ffoorrmmaatt__eerrrroorr((RReeaassoonn)) -->> ssttrriinngg(())
+
+              Types:
+
+                 Reason = term()
+
+              Presents the error returned by an ssl function as a printable
+              string.
+
+       ggeettooppttss((SSoocckkeett,, OOppttiioonnNNaammeess)) -->> {{ookk,, [[ssoocckkeettooppttiioonn(())]]}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 OptionNames = [atom()]
+
+              Get the value of the specified socket options.
+
+       lliisstteenn((PPoorrtt,, OOppttiioonnss)) -->> {{ookk,, LLiisstteennSSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Port = integer()
+                 Options = options()
+                 ListenSocket = sslsocket()
+
+              Creates an ssl listen socket.
+
+       ppeeeerrcceerrtt((SSoocckkeett)) -->> {{ookk,, CCeerrtt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Cert = binary()
+
+              The peer certificate is returned as a DER encoded binary. The
+              certificate can be decoded with _p_u_b_l_i_c___k_e_y_:_p_k_i_x___d_e_c_o_d_e___c_e_r_t_/_2.
+
+       ppeeeerrnnaammee((SSoocckkeett)) -->> {{ookk,, {{AAddddrreessss,, PPoorrtt}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Address = ipaddress()
+                 Port = integer()
+
+              Returns the address and port number of the peer.
+
+       rreeccvv((SSoocckkeett,, LLeennggtthh)) -->>
+       rreeccvv((SSoocckkeett,, LLeennggtthh,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Length = integer()
+                 Timeout = integer()
+                 Data = [char()] | binary()
+
+              This function receives a packet from a socket in passive mode. A
+              closed socket is indicated by a return value _{_e_r_r_o_r_, _c_l_o_s_e_d_}.
+
+              The _L_e_n_g_t_h argument is only meaningful when the socket is in _r_a_w
+              mode and denotes the number of bytes to read. If _L_e_n_g_t_h = 0, all
+              available bytes are returned. If _L_e_n_g_t_h > 0, exactly _L_e_n_g_t_h
+              bytes are returned, or an error; possibly discarding less than
+              _L_e_n_g_t_h bytes of data when the socket gets closed from the other
+              side.
+
+              The optional _T_i_m_e_o_u_t parameter specifies a timeout in
+              milliseconds. The default value is _i_n_f_i_n_i_t_y.
+
+       pprrff((SSoocckkeett,, SSeeccrreett,, LLaabbeell,, SSeeeedd,, WWaanntteeddLLeennggtthh)) -->> {{ookk,, bbiinnaarryy(())}} ||
+       {{eerrrroorr,, rreeaassoonn(())}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Secret = binary() | master_secret
+                 Label = binary()
+                 Seed = [binary() | prf_random()]
+                 WantedLength = non_neg_integer()
+
+              Use the pseudo random function (PRF) of a TLS session to
+              generate additional key material. It either takes user generated
+              values for _S_e_c_r_e_t and _S_e_e_d or atoms directing it use a specific
+              value from the session security parameters.
+
+              This function can only be used with TLS connections, _{_e_r_r_o_r_,
+              _u_n_d_e_f_i_n_e_d_} is returned for SSLv3 connections.
+
+       rreenneeggoottiiaattee((SSoocckkeett)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+
+              Initiates a new handshake. A notable return value is _{_e_r_r_o_r_,
+              _r_e_n_e_g_o_t_i_a_t_i_o_n___r_e_j_e_c_t_e_d_} indicating that the peer refused to go
+              through with the renegotiation but the connection is still
+              active using the previously negotiated session.
+
+       sseenndd((SSoocckkeett,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Data = iodata()
+
+              Writes _D_a_t_a to _S_o_c_k_e_t.
+
+              A notable return value is _{_e_r_r_o_r_, _c_l_o_s_e_d_} indicating that the
+              socket is closed.
+
+       sseettooppttss((SSoocckkeett,, OOppttiioonnss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Options = [socketoption]()
+
+              Sets options according to _O_p_t_i_o_n_s for the socket _S_o_c_k_e_t.
+
+       sshhuuttddoowwnn((SSoocckkeett,, HHooww)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 How = read | write | read_write
+                 Reason = reason()
+
+              Immediately close a socket in one or two directions.
+
+              _H_o_w _=_= _w_r_i_t_e means closing the socket for writing, reading from
+              it is still possible.
+
+              To be able to handle that the peer has done a shutdown on the
+              write side, the _{_e_x_i_t___o_n___c_l_o_s_e_, _f_a_l_s_e_} option is useful.
+
+       ssssll__aacccceepptt((LLiisstteennSSoocckkeett)) -->>
+       ssssll__aacccceepptt((LLiisstteennSSoocckkeett,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ListenSocket = sslsocket()
+                 Timeout = integer()
+                 Reason = term()
+
+              The _s_s_l___a_c_c_e_p_t function establish the SSL connection on the
+              server side. It should be called directly after
+              _t_r_a_n_s_p_o_r_t___a_c_c_e_p_t, in the spawned server-loop.
+
+       ssssll__aacccceepptt((LLiisstteennSSoocckkeett,, SSssllOOppttiioonnss)) -->>
+       ssssll__aacccceepptt((LLiisstteennSSoocckkeett,, SSssllOOppttiioonnss,, TTiimmeeoouutt)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 ListenSocket = socket()
+                 SslOptions = ssloptions()
+                 Timeout = integer()
+                 Reason = term()
+
+              Upgrades a gen_tcp, or equivalent, socket to an ssl socket i.e.
+              performs the ssl server-side handshake.
+
+          WWaarrnniinngg::
+              Note that the listen socket should be in {active, false} mode
+              before telling the client that the server is ready to upgrade
+              and calling this function, otherwise the upgrade may or may not
+              succeed depending on timing.
+
+
+       ssoocckknnaammee((SSoocckkeett)) -->> {{ookk,, {{AAddddrreessss,, PPoorrtt}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = sslsocket()
+                 Address = ipaddress()
+                 Port = integer()
+
+              Returns the local address and port number of the socket _S_o_c_k_e_t.
+
+       ssttaarrtt(()) -->>
+       ssttaarrtt((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = permanent | transient | temporary
+
+              Starts the Ssl application. Default type is temporary.
+              aapppplliiccaattiioonn((33))
+
+       ssttoopp(()) -->> ookk
+
+              Stops the Ssl application. aapppplliiccaattiioonn((33))
+
+       ttrraannssppoorrtt__aacccceepptt((SSoocckkeett)) -->>
+       ttrraannssppoorrtt__aacccceepptt((SSoocckkeett,, TTiimmeeoouutt)) -->> {{ookk,, NNeewwSSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = NewSocket = sslsocket()
+                 Timeout = integer()
+                 Reason = reason()
+
+              Accepts an incoming connection request on a listen socket.
+              _L_i_s_t_e_n_S_o_c_k_e_t must be a socket returned from _l_i_s_t_e_n_/_2. The socket
+              returned should be passed to _s_s_l___a_c_c_e_p_t to complete ssl
+              handshaking and establishing the connection.
+
+          WWaarrnniinngg::
+              The socket returned can only be used with _s_s_l___a_c_c_e_p_t, no traffic
+              can be sent or received before that call.
+
+
+              The accepted socket inherits the options set for _L_i_s_t_e_n_S_o_c_k_e_t in
+              _l_i_s_t_e_n_/_2.
+
+              The default value for _T_i_m_e_o_u_t is _i_n_f_i_n_i_t_y. If _T_i_m_e_o_u_t is
+              specified, and no connection is accepted within the given time,
+              _{_e_r_r_o_r_, _t_i_m_e_o_u_t_} is returned.
+
+       vveerrssiioonnss(()) -->> [[{{SSssllAAppppVVeerr,, SSuuppppoorrtteeddSSssllVVeerr,, AAvvaaiillaabblleeSSssllVVssnn}}]]
+
+              Types:
+
+                 SslAppVer = string()
+                 SupportedSslVer = [protocol()]
+                 AvailableSslVsn = [protocol()]
+
+              Returns version information relevant for the ssl application.
+
+SSEEEE AALLSSOO
+       iinneett((33))  and ggeenn__ttccpp((33))
+
+
+
+Ericsson AB                         ssl 5.1                             ssl(3)

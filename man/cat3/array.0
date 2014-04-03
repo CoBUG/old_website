@@ -1,0 +1,400 @@
+array(3)                   Erlang Module Definition                   array(3)
+
+
+
+NNAAMMEE
+       array - Functional, extendible arrays.
+
+DDEESSCCRRIIPPTTIIOONN
+       Functional, extendible arrays. Arrays can have fixed size, or can grow
+       automatically as needed. A default value is used for entries that have
+       not been explicitly set.
+
+       Arrays uses _z_e_r_o based indexing. This is a deliberate design choice and
+       differs from other erlang datastructures, e.g. tuples.
+
+       Unless specified by the user when the array is created, the default
+       value is the atom _u_n_d_e_f_i_n_e_d. There is no difference between an unset
+       entry and an entry which has been explicitly set to the same value as
+       the default one (cf. rreesseett//22). If you need to differentiate between
+       unset and set entries, you must make sure that the default value cannot
+       be confused with the values of set entries.
+
+       The array never shrinks automatically; if an index _I has been used
+       successfully to set an entry, all indices in the range [0,_I] will stay
+       accessible unless the array size is explicitly changed by calling
+       rreessiizzee//22.
+
+       Examples:
+
+         %% Create a fixed-size array with entries 0-9 set to 'undefined'
+         A0 = array:new(10).
+         10 = array:size(A0).
+
+         %% Create an extendible array and set entry 17 to 'true',
+         %% causing the array to grow automatically
+         A1 = array:set(17, true, array:new()).
+         18 = array:size(A1).
+
+         %% Read back a stored value
+         true = array:get(17, A1).
+
+         %% Accessing an unset entry returns the default value
+         undefined = array:get(3, A1).
+
+         %% Accessing an entry beyond the last set entry also returns the
+         %% default value, if the array does not have fixed size
+         undefined = array:get(18, A1).
+
+         %% "sparse" functions ignore default-valued entries
+         A2 = array:set(4, false, A1).
+         [{4, false}, {17, true}] = array:sparse_to_orddict(A2).
+
+         %% An extendible array can be made fixed-size later
+         A3 = array:fix(A2).
+
+         %% A fixed-size array does not grow automatically and does not
+         %% allow accesses beyond the last set entry
+         {'EXIT',{badarg,_}} = (catch array:set(18, true, A3)).
+         {'EXIT',{badarg,_}} = (catch array:get(18, A3)).
+
+DDAATTAA TTYYPPEESS
+       aarrrraayy(())
+
+              A functional, extendible array. The representation is not
+              documented and is subject to change without notice. Note that
+              arrays cannot be directly compared for equality.
+
+       aarrrraayy__iinnddxx(()) = integer() >= 0
+
+       aarrrraayy__ooppttss(()) = aarrrraayy__oopptt(()) | [aarrrraayy__oopptt(())]
+
+       aarrrraayy__oopptt(()) = {fixed, boolean()}
+                   | fixed
+                   | {default, Value :: term()}
+                   | {size, N :: integer() >= 0}
+                   | (N :: integer() >= 0)
+
+       iinnddxx__ppaaiirrss(()) = [iinnddxx__ppaaiirr(())]
+
+       iinnddxx__ppaaiirr(()) = {Index :: aarrrraayy__iinnddxx(()), Value :: term()}
+
+EEXXPPOORRTTSS
+       ddeeffaauulltt((AArrrraayy :::: aarrrraayy(()))) -->> tteerrmm(())
+
+              Get the value used for uninitialized entries.
+
+              _S_e_e _a_l_s_o_: nneeww//22.
+
+       ffiixx((AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Fix the size of the array. This prevents it from growing
+              automatically upon insertion; see also sseett//33.
+
+              _S_e_e _a_l_s_o_: rreellaaxx//11.
+
+       ffoollddll((FFuunnccttiioonn,, IInniittiiaallAAcccc :::: AA,, AArrrraayy :::: aarrrraayy(()))) -->> BB
+
+              Types:
+
+                 Function =
+                     fun((Index :: aarrrraayy__iinnddxx(()), Value :: term(), Acc :: A) ->
+                 B)
+
+              Fold the elements of the array using the given function and
+              initial accumulator value. The elements are visited in order
+              from the lowest index to the highest. If _F_u_n_c_t_i_o_n is not a
+              function, the call fails with reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: ffoollddrr//33, mmaapp//22, ssppaarrssee__ffoollddll//33.
+
+       ffoollddrr((FFuunnccttiioonn,, IInniittiiaallAAcccc :::: AA,, AArrrraayy :::: aarrrraayy(()))) -->> BB
+
+              Types:
+
+                 Function =
+                     fun((Index :: aarrrraayy__iinnddxx(()), Value :: term(), Acc :: A) ->
+                 B)
+
+              Fold the elements of the array right-to-left using the given
+              function and initial accumulator value. The elements are visited
+              in order from the highest index to the lowest. If _F_u_n_c_t_i_o_n is
+              not a function, the call fails with reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: ffoollddll//33, mmaapp//22.
+
+       ffrroomm__lliisstt((LLiisstt :::: lliisstt(()))) -->> aarrrraayy(())
+
+              Equivalent to ffrroomm__lliisstt((LLiisstt,, uunnddeeffiinneedd)).
+
+       ffrroomm__lliisstt((LLiisstt :::: lliisstt(()),, DDeeffaauulltt :::: tteerrmm(()))) -->> aarrrraayy(())
+
+              Convert a list to an extendible array. _D_e_f_a_u_l_t is used as the
+              value for uninitialized entries of the array. If _L_i_s_t is not a
+              proper list, the call fails with reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: nneeww//22, ttoo__lliisstt//11.
+
+       ffrroomm__oorrddddiicctt((OOrrddddiicctt :::: iinnddxx__ppaaiirrss(()))) -->> aarrrraayy(())
+
+              Equivalent to ffrroomm__oorrddddiicctt((OOrrddddiicctt,, uunnddeeffiinneedd)).
+
+       ffrroomm__oorrddddiicctt((OOrrddddiicctt :::: iinnddxx__ppaaiirrss(()),, DDeeffaauulltt :::: tteerrmm(()))) -->>
+                       aarrrraayy(())
+
+              Convert an ordered list of pairs _{_I_n_d_e_x_, _V_a_l_u_e_} to a
+              corresponding extendible array. _D_e_f_a_u_l_t is used as the value for
+              uninitialized entries of the array. If _O_r_d_d_i_c_t is not a proper,
+              ordered list of pairs whose first elements are nonnegative
+              integers, the call fails with reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: nneeww//22, ttoo__oorrddddiicctt//11.
+
+       ggeett((II :::: aarrrraayy__iinnddxx(()),, AArrrraayy :::: aarrrraayy(()))) -->> tteerrmm(())
+
+              Get the value of entry _I. If _I is not a nonnegative integer, or
+              if the array has fixed size and _I is larger than the maximum
+              index, the call fails with reason _b_a_d_a_r_g.
+
+              If the array does not have fixed size, this function will return
+              the default value for any index _I greater than _s_i_z_e_(_A_r_r_a_y_)_-_1.
+
+              _S_e_e _a_l_s_o_: sseett//33.
+
+       iiss__aarrrraayy((XX :::: tteerrmm(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _X appears to be an array, otherwise _f_a_l_s_e. Note
+              that the check is only shallow; there is no guarantee that _X is
+              a well-formed array representation even if this function returns
+              _t_r_u_e.
+
+       iiss__ffiixx((AArrrraayy :::: aarrrraayy(()))) -->> bboooolleeaann(())
+
+              Check if the array has fixed size. Returns _t_r_u_e if the array is
+              fixed, otherwise _f_a_l_s_e.
+
+              _S_e_e _a_l_s_o_: ffiixx//11.
+
+       mmaapp((FFuunnccttiioonn,, AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Types:
+
+                 Function =
+                     fun((Index :: aarrrraayy__iinnddxx(()), Value :: term()) -> term())
+
+              Map the given function onto each element of the array. The
+              elements are visited in order from the lowest index to the
+              highest. If _F_u_n_c_t_i_o_n is not a function, the call fails with
+              reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: ffoollddll//33, ffoollddrr//33, ssppaarrssee__mmaapp//22.
+
+       nneeww(()) -->> aarrrraayy(())
+
+              Create a new, extendible array with initial size zero.
+
+              _S_e_e _a_l_s_o_: nneeww//11, nneeww//22.
+
+       nneeww((OOppttiioonnss :::: aarrrraayy__ooppttss(()))) -->> aarrrraayy(())
+
+              Create a new array according to the given options. By default,
+              the array is extendible and has initial size zero. Array indices
+              start at 0.
+
+              _O_p_t_i_o_n_s is a single term or a list of terms, selected from the
+              following:
+
+                _N_:_:_i_n_t_e_g_e_r_(_) _>_= _0 or _{_s_i_z_e_, _N_:_:_i_n_t_e_g_e_r_(_) _>_= _0_}:
+                  Specifies the initial size of the array; this also implies
+                  _{_f_i_x_e_d_, _t_r_u_e_}. If _N is not a nonnegative integer, the call
+                  fails with reason _b_a_d_a_r_g.
+
+                _f_i_x_e_d or _{_f_i_x_e_d_, _t_r_u_e_}:
+                  Creates a fixed-size array; see also ffiixx//11.
+
+                _{_f_i_x_e_d_, _f_a_l_s_e_}:
+                  Creates an extendible (non fixed-size) array.
+
+                _{_d_e_f_a_u_l_t_, _V_a_l_u_e_}:
+                  Sets the default value for the array to _V_a_l_u_e.
+
+              Options are processed in the order they occur in the list, i.e.,
+              later options have higher precedence.
+
+              The default value is used as the value of uninitialized entries,
+              and cannot be changed once the array has been created.
+
+              Examples:
+
+                   array:new(100)
+
+              creates a fixed-size array of size 100.
+
+                   array:new({default,0})
+
+              creates an empty, extendible array whose default value is 0.
+
+                   array:new([{size,10},{fixed,false},{default,-1}])
+
+              creates an extendible array with initial size 10 whose default
+              value is -1.
+
+              _S_e_e _a_l_s_o_: ffiixx//11, ffrroomm__lliisstt//22, ggeett//22, nneeww//00, nneeww//22, sseett//33.
+
+       nneeww((SSiizzee :::: iinntteeggeerr(()) >>== 00,, OOppttiioonnss :::: aarrrraayy__ooppttss(()))) -->> aarrrraayy(())
+
+              Create a new array according to the given size and options. If
+              _S_i_z_e is not a nonnegative integer, the call fails with reason
+              _b_a_d_a_r_g. By default, the array has fixed size. Note that any size
+              specifications in _O_p_t_i_o_n_s will override the _S_i_z_e parameter.
+
+              If _O_p_t_i_o_n_s is a list, this is simply equivalent to _n_e_w_(_[_{_s_i_z_e_,
+              _S_i_z_e_} _| _O_p_t_i_o_n_s_], otherwise it is equivalent to _n_e_w_(_[_{_s_i_z_e_,
+              _S_i_z_e_} _| _[_O_p_t_i_o_n_s_]_]. However, using this function directly is
+              more efficient.
+
+              Example:
+
+                   array:new(100, {default,0})
+
+              creates a fixed-size array of size 100, whose default value is
+              0.
+
+              _S_e_e _a_l_s_o_: nneeww//11.
+
+       rreellaaxx((AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Make the array resizable. (Reverses the effects of ffiixx//11.)
+
+              _S_e_e _a_l_s_o_: ffiixx//11.
+
+       rreesseett((II :::: aarrrraayy__iinnddxx(()),, AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Reset entry _I to the default value for the array. If the value
+              of entry _I is the default value the array will be returned
+              unchanged. Reset will never change size of the array. Shrinking
+              can be done explicitly by calling rreessiizzee//22.
+
+              If _I is not a nonnegative integer, or if the array has fixed
+              size and _I is larger than the maximum index, the call fails with
+              reason _b_a_d_a_r_g; cf. sseett//33
+
+              _S_e_e _a_l_s_o_: nneeww//22, sseett//33.
+
+       rreessiizzee((AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Change the size of the array to that reported by ssppaarrssee__ssiizzee//11.
+              If the given array has fixed size, the resulting array will also
+              have fixed size.
+
+              _S_e_e _a_l_s_o_: rreessiizzee//22, ssppaarrssee__ssiizzee//11.
+
+       rreessiizzee((SSiizzee :::: iinntteeggeerr(()) >>== 00,, AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Change the size of the array. If _S_i_z_e is not a nonnegative
+              integer, the call fails with reason _b_a_d_a_r_g. If the given array
+              has fixed size, the resulting array will also have fixed size.
+
+       sseett((II :::: aarrrraayy__iinnddxx(()),, VVaalluuee :::: tteerrmm(()),, AArrrraayy :::: aarrrraayy(()))) -->>
+              aarrrraayy(())
+
+              Set entry _I of the array to _V_a_l_u_e. If _I is not a nonnegative
+              integer, or if the array has fixed size and _I is larger than the
+              maximum index, the call fails with reason _b_a_d_a_r_g.
+
+              If the array does not have fixed size, and _I is greater than
+              _s_i_z_e_(_A_r_r_a_y_)_-_1, the array will grow to size _I_+_1.
+
+              _S_e_e _a_l_s_o_: ggeett//22, rreesseett//22.
+
+       ssiizzee((AArrrraayy :::: aarrrraayy(()))) -->> iinntteeggeerr(()) >>== 00
+
+              Get the number of entries in the array. Entries are numbered
+              from 0 to _s_i_z_e_(_A_r_r_a_y_)_-_1; hence, this is also the index of the
+              first entry that is guaranteed to not have been previously set.
+
+              _S_e_e _a_l_s_o_: sseett//33, ssppaarrssee__ssiizzee//11.
+
+       ssppaarrssee__ffoollddll((FFuunnccttiioonn,, IInniittiiaallAAcccc :::: AA,, AArrrraayy :::: aarrrraayy(()))) -->> BB
+
+              Types:
+
+                 Function =
+                     fun((Index :: aarrrraayy__iinnddxx(()), Value :: term(), Acc :: A) ->
+                 B)
+
+              Fold the elements of the array using the given function and
+              initial accumulator value, skipping default-valued entries. The
+              elements are visited in order from the lowest index to the
+              highest. If _F_u_n_c_t_i_o_n is not a function, the call fails with
+              reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: ffoollddll//33, ssppaarrssee__ffoollddrr//33.
+
+       ssppaarrssee__ffoollddrr((FFuunnccttiioonn,, IInniittiiaallAAcccc :::: AA,, AArrrraayy :::: aarrrraayy(()))) -->> BB
+
+              Types:
+
+                 Function =
+                     fun((Index :: aarrrraayy__iinnddxx(()), Value :: term(), Acc :: A) ->
+                 B)
+
+              Fold the elements of the array right-to-left using the given
+              function and initial accumulator value, skipping default-valued
+              entries. The elements are visited in order from the highest
+              index to the lowest. If _F_u_n_c_t_i_o_n is not a function, the call
+              fails with reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: ffoollddrr//33, ssppaarrssee__ffoollddll//33.
+
+       ssppaarrssee__mmaapp((FFuunnccttiioonn,, AArrrraayy :::: aarrrraayy(()))) -->> aarrrraayy(())
+
+              Types:
+
+                 Function =
+                     fun((Index :: aarrrraayy__iinnddxx(()), Value :: term()) -> term())
+
+              Map the given function onto each element of the array, skipping
+              default-valued entries. The elements are visited in order from
+              the lowest index to the highest. If _F_u_n_c_t_i_o_n is not a function,
+              the call fails with reason _b_a_d_a_r_g.
+
+              _S_e_e _a_l_s_o_: mmaapp//22.
+
+       ssppaarrssee__ssiizzee((AArrrraayy :::: aarrrraayy(()))) -->> iinntteeggeerr(()) >>== 00
+
+              Get the number of entries in the array up until the last non-
+              default valued entry. In other words, returns _I_+_1 if _I is the
+              last non-default valued entry in the array, or zero if no such
+              entry exists.
+
+              _S_e_e _a_l_s_o_: rreessiizzee//11, ssiizzee//11.
+
+       ssppaarrssee__ttoo__lliisstt((AArrrraayy :::: aarrrraayy(()))) -->> lliisstt(())
+
+              Converts the array to a list, skipping default-valued entries.
+
+              _S_e_e _a_l_s_o_: ttoo__lliisstt//11.
+
+       ssppaarrssee__ttoo__oorrddddiicctt((AArrrraayy :::: aarrrraayy(()))) -->> iinnddxx__ppaaiirrss(())
+
+              Convert the array to an ordered list of pairs _{_I_n_d_e_x_, _V_a_l_u_e_},
+              skipping default-valued entries.
+
+              _S_e_e _a_l_s_o_: ttoo__oorrddddiicctt//11.
+
+       ttoo__lliisstt((AArrrraayy :::: aarrrraayy(()))) -->> lliisstt(())
+
+              Converts the array to a list.
+
+              _S_e_e _a_l_s_o_: ffrroomm__lliisstt//22, ssppaarrssee__ttoo__lliisstt//11.
+
+       ttoo__oorrddddiicctt((AArrrraayy :::: aarrrraayy(()))) -->> iinnddxx__ppaaiirrss(())
+
+              Convert the array to an ordered list of pairs _{_I_n_d_e_x_, _V_a_l_u_e_}.
+
+              _S_e_e _a_l_s_o_: ffrroomm__oorrddddiicctt//22, ssppaarrssee__ttoo__oorrddddiicctt//11.
+
+
+
+Ericsson AB                      stdlib 1.18.2                        array(3)

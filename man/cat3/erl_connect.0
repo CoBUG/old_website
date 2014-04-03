@@ -1,0 +1,544 @@
+erl_connect(3)                C Library Functions               erl_connect(3)
+
+
+
+NNAAMMEE
+       erl_connect - Communicate with Distributed Erlang
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides support for communication between distributed
+       Erlang nodes and C nodes, in a manner that is transparent to Erlang
+       processes.
+
+       A C node appears to Erlang as a _h_i_d_d_e_n _n_o_d_e. That is, Erlang processes
+       that know the name of the C node are able to communicate with it in a
+       normal manner, but the node name will not appear in the listing
+       provided by the Erlang function _n_o_d_e_s_/_0.
+
+EEXXPPOORRTTSS
+       iinntt eerrll__ccoonnnneecctt__iinniitt((nnuummbbeerr,, ccooookkiiee,, ccrreeaattiioonn))
+       iinntt eerrll__ccoonnnneecctt__xxiinniitt((hhoosstt,, aalliivvee,, nnooddee,, aaddddrr,, ccooookkiiee,, ccrreeaattiioonn))
+
+              Types:
+
+                 int number;
+                 char *cookie;
+                 short creation;
+                 char *host,*alive,*node;
+                 struct in_addr *addr;
+
+              These functions initialize the _e_r_l___c_o_n_n_e_c_t module. In
+              particular, they are used to identify the name of the C-node
+              from which they are called. One of these functions must be
+              called before any of the other functions in the erl_connect
+              module are used.
+
+              _e_r_l___c_o_n_n_e_c_t___x_i_n_i_t_(_) stores for later use information about the
+              node's host name _h_o_s_t, alive name _a_l_i_v_e, node name _n_o_d_e, IP
+              address _a_d_d_r, cookie _c_o_o_k_i_e, and creation number _c_r_e_a_t_i_o_n.
+              _e_r_l___c_o_n_n_e_c_t___i_n_i_t_(_) provides an alternative interface which does
+              not require as much information from the caller. Instead,
+              _e_r_l___c_o_n_n_e_c_t___i_n_i_t_(_) uses _g_e_t_h_o_s_t_b_y_n_a_m_e_(_) to obtain default
+              values.
+
+              If you use _e_r_l___c_o_n_n_e_c_t___i_n_i_t_(_) your node will have a short name,
+              i.e., it will not be fully qualified. If you need to use fully
+              qualified (a.k.a. long) names, use _e_r_l___c_o_n_n_e_c_t___x_i_n_i_t_(_) instead.
+
+              _h_o_s_t is the name of the host on which the node is running.
+
+              _a_l_i_v_e is the alivename of the node.
+
+              _n_o_d_e is the name of the node. The nodename should be of the form
+              _a_l_i_v_e_n_a_m_e_@_h_o_s_t_n_a_m_e.
+
+              _a_d_d_r is the 32-bit IP address of _h_o_s_t.
+
+              _c_o_o_k_i_e is the authorization string required for access to the
+              remote node. If NULL the user HOME directory is searched for a
+              cookie file _._e_r_l_a_n_g_._c_o_o_k_i_e. The path to the home directory is
+              retrieved from the environment variable _H_O_M_E on Unix and from
+              the _H_O_M_E_D_R_I_V_E and _H_O_M_E_P_A_T_H variables on Windows. Refer to the
+              _a_u_t_h module for more details.
+
+              _c_r_e_a_t_i_o_n helps identify a particular instance of a C node. In
+              particular, it can help prevent us from receiving messages sent
+              to an earlier process with the same registered name.
+
+              A C node acting as a server will be assigned a creation number
+              when it calls _e_r_l___p_u_b_l_i_s_h_(_).
+
+              _n_u_m_b_e_r is used by _e_r_l___c_o_n_n_e_c_t___i_n_i_t_(_) to construct the actual
+              node name. In the second example shown below, _"_c_1_7_@_a_._D_N_S_._n_a_m_e_"
+              will be the resulting node name.
+
+              Example 1:
+
+              struct in_addr addr;
+              addr = inet_addr("150.236.14.75");
+              if (!erl_connect_xinit("chivas",
+                                     "madonna",
+                                     "madonna@chivas.du.etx.ericsson.se",
+                                     &addr;
+                                     "samplecookiestring..."),
+                                     0)
+                erl_err_quit("<ERROR> when initializing !");
+
+
+              Example 2:
+
+              if (!erl_connect_init(17, "samplecookiestring...", 0))
+                erl_err_quit("<ERROR> when initializing !");
+
+
+       iinntt eerrll__ccoonnnneecctt((nnooddee))
+       iinntt eerrll__xxccoonnnneecctt((aaddddrr,, aalliivvee))
+
+              Types:
+
+                 char *node, *alive;
+                 struct in_addr *addr;
+
+              These functions set up a connection to an Erlang node.
+
+              _e_r_l___x_c_o_n_n_e_c_t_(_) requires the IP address of the remote host and
+              the alive name of the remote node to be specified. _e_r_l___c_o_n_n_e_c_t_(_)
+              provides an alternative interface, and determines the
+              information from the node name provided.
+
+              _a_d_d_r is the 32-bit IP address of the remote host.
+
+              _a_l_i_v_e is the alivename of the remote node.
+
+              _n_o_d_e is the name of the remote node.
+
+              These functions return an open file descriptor on success, or a
+              negative value indicating that an error occurred --- in which
+              case they will set _e_r_l___e_r_r_n_o to one of:
+
+                _E_H_O_S_T_U_N_R_E_A_C_H:
+                  The remote host _n_o_d_e is unreachable
+
+                _E_N_O_M_E_M:
+                  No more memory available.
+
+                _E_I_O:
+                  I/O error.
+
+              Additionally, _e_r_r_n_o values from _s_o_c_k_e_t_(_2_) and _c_o_n_n_e_c_t_(_2_) system
+              calls may be propagated into _e_r_l___e_r_r_n_o.
+
+              #define NODE   "madonna@chivas.du.etx.ericsson.se"
+              #define ALIVE  "madonna"
+              #define IP_ADDR "150.236.14.75"
+
+              /*** Variant 1 ***/
+              erl_connect( NODE );
+
+              /*** Variant 2 ***/
+              struct in_addr addr;
+              addr = inet_addr(IP_ADDR);
+              erl_xconnect( &addr , ALIVE );
+
+
+       iinntt eerrll__cclloossee__ccoonnnneeccttiioonn((ffdd))
+
+              Types:
+
+                 int fd;
+
+              This function closes an open connection to an Erlang node.
+
+              _F_d is a file descriptor obtained from _e_r_l___c_o_n_n_e_c_t_(_) or
+              _e_r_l___x_c_o_n_n_e_c_t_(_).
+
+              On success, 0 is returned. If the call fails, a non-zero value
+              is returned, and the reason for the error can be obtained with
+              the appropriate platform-dependent call.
+
+       iinntt eerrll__rreecceeiivvee((ffdd,, bbuuffpp,, bbuuffssiizzee))
+
+              Types:
+
+                 int fd;
+                 char *bufp;
+                 int bufsize;
+
+              This function receives a message consisting of a sequence of
+              bytes in the Erlang external format.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _b_u_f_p is a buffer large enough to hold the expected message.
+
+              _b_u_f_s_i_z_e indicates the size of _b_u_f_p.
+
+              If a _t_i_c_k occurs, i.e., the Erlang node on the other end of the
+              connection has polled this node to see if it is still alive, the
+              function will return _E_R_L___T_I_C_K and no message will be placed in
+              the buffer. Also, _e_r_l___e_r_r_n_o will be set to _E_A_G_A_I_N.
+
+              On success, the message is placed in the specified buffer and
+              the function returns the number of bytes actually read. On
+              failure, the function returns a negative value and will set
+              _e_r_l___e_r_r_n_o to one of:
+
+                _E_A_G_A_I_N:
+                  Temporary error: Try again.
+
+                _E_M_S_G_S_I_Z_E:
+                  Buffer too small.
+
+                _E_I_O:
+                  I/O error.
+
+       iinntt eerrll__rreecceeiivvee__mmssgg((ffdd,, bbuuffpp,, bbuuffssiizzee,, eemmssgg))
+
+              Types:
+
+                 int fd;
+                 unsigned char *bufp;
+                 int bufsize;
+                 ErlMessage *emsg;
+
+              This function receives the message into the specified buffer,
+              and decodes into the _(_E_r_l_M_e_s_s_a_g_e _*_) _e_m_s_g.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _b_u_f_p is a buffer large enough to hold the expected message.
+
+              _b_u_f_s_i_z_e indicates the size of _b_u_f_p.
+
+              _e_m_s_g is a pointer to an _E_r_l_M_e_s_s_a_g_e structure, into which the
+              message will be decoded. _E_r_l_M_e_s_s_a_g_e is defined as follows:
+
+              typedef struct {
+                int type;
+                ETERM *msg;
+                ETERM *to;
+                ETERM *from;
+                char to_name[MAXREGLEN];
+              } ErlMessage;
+
+
+          NNoottee::
+              The definition of _E_r_l_M_e_s_s_a_g_e has changed since earlier versions
+              of Erl_Interface.
+
+
+              _t_y_p_e identifies the type of message, one of _E_R_L___S_E_N_D,
+              _E_R_L___R_E_G___S_E_N_D, _E_R_L___L_I_N_K, _E_R_L___U_N_L_I_N_K and _E_R_L___E_X_I_T.
+
+              If _t_y_p_e contains _E_R_L___S_E_N_D this indicates that an ordinary send
+              operation has taken place, and _e_m_s_g_-_>_t_o contains the Pid of the
+              recipient. If _t_y_p_e contains _E_R_L___R_E_G___S_E_N_D then a registered send
+              operation took place, and _e_m_s_g_-_>_f_r_o_m contains the Pid of the
+              sender. In both cases, the actual message will be in _e_m_s_g_-_>_m_s_g.
+
+              If _t_y_p_e contains one of _E_R_L___L_I_N_K or _E_R_L___U_N_L_I_N_K, then _e_m_s_g_-_>_t_o
+              and _e_m_s_g_-_>_f_r_o_m contain the pids of the sender and recipient of
+              the link or unlink. _e_m_s_g_-_>_m_s_g is not used in these cases.
+
+              If _t_y_p_e contains _E_R_L___E_X_I_T, then this indicates that a link has
+              been broken. In this case, _e_m_s_g_-_>_t_o and _e_m_s_g_-_>_f_r_o_m contain the
+              pids of the linked processes, and _e_m_s_g_-_>_m_s_g contains the reason
+              for the exit.
+
+          NNoottee::
+              It is the caller's responsibility to release the memory pointed
+              to by _e_m_s_g_-_>_m_s_g, _e_m_s_g_-_>_t_o and _e_m_s_g_-_>_f_r_o_m.
+
+
+              If a _t_i_c_k occurs, i.e., the Erlang node on the other end of the
+              connection has polled this node to see if it is still alive, the
+              function will return _E_R_L___T_I_C_K indicating that the tick has been
+              received and responded to, but no message will be placed in the
+              buffer. In this case you should call _e_r_l___r_e_c_e_i_v_e___m_s_g_(_) again.
+
+              On success, the function returns _E_R_L___M_S_G and the _E_m_s_g struct
+              will be initialized as described above, or _E_R_L___T_I_C_K, in which
+              case no message is returned. On failure, the function returns
+              _E_R_L___E_R_R_O_R and will set _e_r_l___e_r_r_n_o to one of:
+
+                _E_M_S_G_S_I_Z_E:
+                  Buffer too small.
+
+                _E_N_O_M_E_M:
+                  No more memory available.
+
+                _E_I_O:
+                  I/O error.
+
+       iinntt eerrll__xxrreecceeiivvee__mmssgg((ffdd,, bbuuffpppp,, bbuuffssiizzeepp,, eemmssgg))
+
+              Types:
+
+                 int fd;
+                 unsigned char **bufpp;
+                 int *bufsizep;
+                 ErlMessage *emsg;
+
+              This function is similar to _e_r_l___r_e_c_e_i_v_e___m_s_g. The difference is
+              that _e_r_l___x_r_e_c_e_i_v_e___m_s_g expects the buffer to have been allocated
+              by _m_a_l_l_o_c, and reallocates it if the received message does not
+              fit into the original buffer. For that reason, both buffer and
+              buffer length are given as pointers - their values may change by
+              the call.
+
+              On success, the function returns _E_R_L___M_S_G and the _E_m_s_g struct
+              will be initialized as described above, or _E_R_L___T_I_C_K, in which
+              case no message is returned. On failure, the function returns
+              _E_R_L___E_R_R_O_R and will set _e_r_l___e_r_r_n_o to one of:
+
+                _E_M_S_G_S_I_Z_E:
+                  Buffer too small.
+
+                _E_N_O_M_E_M:
+                  No more memory available.
+
+                _E_I_O:
+                  I/O error.
+
+       iinntt eerrll__sseenndd((ffdd,, ttoo,, mmssgg))
+
+              Types:
+
+                 int fd;
+                 ETERM *to, *msg;
+
+              This function sends an Erlang term to a process.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _t_o is an Erlang term containing the Pid of the intended
+              recipient of the message.
+
+              _m_s_g is the Erlang term to be sent.
+
+              The function returns 1 if successful, otherwise 0 --- in which
+              case it will set _e_r_l___e_r_r_n_o to one of:
+
+                _E_I_N_V_A_L:
+                  Invalid argument: _t_o is not a valid Erlang pid.
+
+                _E_N_O_M_E_M:
+                  No more memory available.
+
+                _E_I_O:
+                  I/O error.
+
+       iinntt eerrll__rreegg__sseenndd((ffdd,, ttoo,, mmssgg))
+
+              Types:
+
+                 int fd;
+                 char *to;
+                 ETERM *msg;
+
+              This function sends an Erlang term to a registered process.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _t_o is a string containing the registered name of the intended
+              recipient of the message.
+
+              _m_s_g is the Erlang term to be sent.
+
+              The function returns 1 if successful, otherwise 0 --- in which
+              case it will set _e_r_l___e_r_r_n_o to one of:
+
+                _E_N_O_M_E_M:
+                  No more memory available.
+
+                _E_I_O:
+                  I/O error.
+
+       EETTEERRMM **eerrll__rrppcc((ffdd,, mmoodd,, ffuunn,, aarrggss))
+       iinntt eerrll__rrppcc__ttoo((ffdd,, mmoodd,, ffuunn,, aarrggss))
+       iinntt eerrll__rrppcc__ffrroomm((ffdd,, ttiimmeeoouutt,, eemmssgg))
+
+              Types:
+
+                 int fd, timeout;
+                 char *mod, *fun;
+                 ETERM *args;
+                 ErlMessage *emsg;
+
+              These functions support calling Erlang functions on remote
+              nodes. _e_r_l___r_p_c___t_o_(_) sends an rpc request to a remote node and
+              _e_r_l___r_p_c___f_r_o_m_(_) receives the results of such a call. _e_r_l___r_p_c_(_)
+              combines the functionality of these two functions by sending an
+              rpc request and waiting for the results. See also _r_p_c_:_c_a_l_l_/_4.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _t_i_m_e_o_u_t is the maximum time (in ms) to wait for results. Specify
+              _E_R_L___N_O___T_I_M_E_O_U_T to wait forever. When erl_rpc() calls
+              erl_rpc_from(), the call will never timeout.
+
+              _m_o_d is the name of the module containing the function to be run
+              on the remote node.
+
+              _f_u_n is the name of the function to run.
+
+              _a_r_g_s is an Erlang list, containing the arguments to be passed to
+              the function.
+
+              _e_m_s_g is a message containing the result of the function call.
+
+              The actual message returned by the rpc server is a 2-tuple
+              _{_r_e_x_,_R_e_p_l_y_}. If you are using _e_r_l___r_p_c___f_r_o_m_(_) in your code then
+              this is the message you will need to parse. If you are using
+              _e_r_l___r_p_c_(_) then the tuple itself is parsed for you, and the
+              message returned to your program is the erlang term containing
+              _R_e_p_l_y only. Replies to rpc requests are always ERL_SEND
+              messages.
+
+          NNoottee::
+              It is the caller's responsibility to free the returned _E_T_E_R_M
+              structure as well as the memory pointed to by _e_m_s_g_-_>_m_s_g and
+              _e_m_s_g_-_>_t_o.
+
+
+              _e_r_l___r_p_c_(_) returns the remote function's return value (or _N_U_L_L if
+              it failed). _e_r_l___r_p_c___t_o_(_) returns 0 on success, and a negative
+              number on failure. _e_r_l___r_c_p___f_r_o_m_(_) returns _E_R_L___M_S_G when
+              successful (with _E_m_s_g now containing the reply tuple), and one
+              of _E_R_L___T_I_C_K, _E_R_L___T_I_M_E_O_U_T and _E_R_L___E_R_R_O_R otherwise. When failing,
+              all three functions set _e_r_l___e_r_r_n_o to one of:
+
+                _E_N_O_M_E_M:
+                  No more memory available.
+
+                _E_I_O:
+                  I/O error.
+
+                _E_T_I_M_E_D_O_U_T:
+                  Timeout expired.
+
+                _E_A_G_A_I_N:
+                  Temporary error: Try again.
+
+       iinntt eerrll__ppuubblliisshh((ppoorrtt))
+
+              Types:
+
+                 int port;
+
+              These functions are used by a server process to register with
+              the local name server _e_p_m_d, thereby allowing other processes to
+              send messages by using the registered name. Before calling
+              either of these functions, the process should have called _b_i_n_d_(_)
+              and _l_i_s_t_e_n_(_) on an open socket.
+
+              _p_o_r_t is the local name to register, and should be the same as
+              the port number that was previously bound to the socket.
+
+              To unregister with epmd, simply close the returned descriptor.
+
+              On success, the functions return a descriptor connecting the
+              calling process to epmd. On failure, they return -1 and set
+              _e_r_l___e_r_r_n_o to:
+
+                _E_I_O:
+                  I/O error
+
+              Additionally, _e_r_r_n_o values from _s_o_c_k_e_t_(_2_) and _c_o_n_n_e_c_t_(_2_) system
+              calls may be propagated into _e_r_l___e_r_r_n_o.
+
+       iinntt eerrll__aacccceepptt((lliisstteennssoocckk,, ccoonnpp))
+
+              Types:
+
+                 int listensock;
+                 ErlConnect *conp;
+
+              This function is used by a server process to accept a connection
+              from a client process.
+
+              _l_i_s_t_e_n_s_o_c_k is an open socket descriptor on which _l_i_s_t_e_n_(_) has
+              previously been called.
+
+              _c_o_n_p is a pointer to an _E_r_l_C_o_n_n_e_c_t struct, described as follows:
+
+              typedef struct {
+                char ipadr[4];
+                char nodename[MAXNODELEN];
+              } ErlConnect;
+
+
+              On success, _c_o_n_p is filled in with the address and node name of
+              the connecting client and a file descriptor is returned. On
+              failure, _E_R_L___E_R_R_O_R is returned and _e_r_l___e_r_r_n_o is set to _E_I_O.
+
+       ccoonnsstt cchhaarr **eerrll__tthhiissccooookkiiee(())
+       ccoonnsstt cchhaarr **eerrll__tthhiissnnooddeennaammee(())
+       ccoonnsstt cchhaarr **eerrll__tthhiisshhoossttnnaammee(())
+       ccoonnsstt cchhaarr **eerrll__tthhiissaalliivveennaammee(())
+       sshhoorrtt eerrll__tthhiissccrreeaattiioonn(())
+
+              These functions can be used to retrieve information about the C
+              Node. These values are initially set with _e_r_l___c_o_n_n_e_c_t___i_n_i_t_(_) or
+              _e_r_l___c_o_n_n_e_c_t___x_i_n_i_t_(_).
+
+       iinntt eerrll__uunnppuubblliisshh((aalliivvee))
+
+              Types:
+
+                 char *alive;
+
+              This function can be called by a process to unregister a
+              specified node from epmd on the localhost. This is however
+              usually not allowed, unless epmd was started with the
+              -relaxed_command_check flag, which it normally isn't.
+
+              To unregister a node you have published, you should instead
+              close the descriptor that was returned by _e_i___p_u_b_l_i_s_h_(_).
+
+          WWaarrnniinngg::
+              This function is deprecated and will be removed in a future
+              release.
+
+
+              _a_l_i_v_e is the name of the node to unregister, i.e., the first
+              component of the nodename, without the _@_h_o_s_t_n_a_m_e.
+
+              If the node was successfully unregistered from epmd, the
+              function returns 0. Otherwise, it returns -1 and sets _e_r_l___e_r_r_n_o
+              is to _E_I_O.
+
+       ssttrruucctt hhoosstteenntt **eerrll__ggeetthhoossttbbyynnaammee((nnaammee))
+       ssttrruucctt hhoosstteenntt **eerrll__ggeetthhoossttbbyyaaddddrr((aaddddrr,, lleennggtthh,, ttyyppee))
+       ssttrruucctt hhoosstteenntt **eerrll__ggeetthhoossttbbyynnaammee__rr((nnaammee,, hhoossttpp,, bbuuffffeerr,, bbuufflleenn,,
+       hh__eerrrrnnoopp))
+       ssttrruucctt hhoosstteenntt **eerrll__ggeetthhoossttbbyyaaddddrr__rr((aaddddrr,, lleennggtthh,, ttyyppee,, hhoossttpp,, bbuuffffeerr,,
+       bbuufflleenn,, hh__eerrrrnnoopp))
+
+              Types:
+
+                 const char *name;
+                 const char *addr;
+                 int length;
+                 int type;
+                 struct hostent *hostp;
+                 char *buffer;
+                 int buflen;
+                 int *h_errnop;
+
+              These are convenience functions for some common name lookup
+              functions.
+
+DDEEBBUUGG IINNFFOORRMMAATTIIOONN
+       If a connection attempt fails, the following can be checked:
+
+         * _e_r_l___e_r_r_n_o
+
+         * that the right cookie was used
+
+         * that _e_p_m_d is running
+
+         * the remote Erlang node on the other side is running the same
+           version of Erlang as the _e_r_l___i_n_t_e_r_f_a_c_e library.
+
+Ericsson AB                   erl_interface 3.7.8               erl_connect(3)

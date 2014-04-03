@@ -1,0 +1,4085 @@
+wxStyledTextCtrl(3)        Erlang Module Definition        wxStyledTextCtrl(3)
+
+
+
+NNAAMMEE
+       wxStyledTextCtrl - See external documentation: wxStyledTextCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxStyledTextCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_t_y_l_e_d_T_e_x_t_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSttyylleeddTTeexxttCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSttyylleeddTTeexxttCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSttyylleeddTTeexxttCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       aaddddTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       aaddddSSttyylleeddTTeexxtt((TThhiiss,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Data = wx_object() (see module wx)
+
+              See external documentation.
+
+       iinnsseerrttTTeexxtt((TThhiiss,, PPooss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       cclleeaarrAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cclleeaarrDDooccuummeennttSSttyyllee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettLLeennggtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettCChhaarrAAtt((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettCCuurrrreennttPPooss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettAAnncchhoorr((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettSSttyylleeAAtt((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       rreeddoo((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettUUnnddooCCoolllleeccttiioonn((TThhiiss,, CCoolllleeccttUUnnddoo)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CollectUndo = boolean()
+
+              See external documentation.
+
+       sseelleeccttAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSaavveePPooiinntt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettSSttyylleeddTTeexxtt((TThhiiss,, SSttaarrttPPooss,, EEnnddPPooss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StartPos = integer()
+                 EndPos = integer()
+
+              See external documentation.
+
+       ccaannRReeddoo((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       mmaarrkkeerrLLiinneeFFrroommHHaannddllee((TThhiiss,, HHaannddllee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Handle = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrDDeelleetteeHHaannddllee((TThhiiss,, HHaannddllee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Handle = integer()
+
+              See external documentation.
+
+       ggeettUUnnddooCCoolllleeccttiioonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettVViieewwWWhhiitteeSSppaaccee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettVViieewwWWhhiitteeSSppaaccee((TThhiiss,, VViieewwWWSS)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 ViewWS = integer()
+
+              See external documentation.
+
+       ppoossiittiioonnFFrroommPPooiinntt((TThhiiss,, PPtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ppoossiittiioonnFFrroommPPooiinnttCClloossee((TThhiiss,, XX,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggoottooLLiinnee((TThhiiss,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggoottooPPooss((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       sseettAAnncchhoorr((TThhiiss,, PPoossAAnncchhoorr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PosAnchor = integer()
+
+              See external documentation.
+
+       ggeettCCuurrLLiinnee((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::charlist() (see module unicode),
+                 LinePos::integer()}
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettEEnnddSSttyylleedd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccoonnvveerrttEEOOLLss((TThhiiss,, EEoollMMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 EolMode = integer()
+
+              See external documentation.
+
+       ggeettEEOOLLMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettEEOOLLMMooddee((TThhiiss,, EEoollMMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 EolMode = integer()
+
+              See external documentation.
+
+       ssttaarrttSSttyylliinngg((TThhiiss,, PPooss,, MMaasskk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+                 Mask = integer()
+
+              See external documentation.
+
+       sseettSSttyylliinngg((TThhiiss,, LLeennggtthh,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Length = integer()
+                 Style = integer()
+
+              See external documentation.
+
+       ggeettBBuuffffeerreeddDDrraaww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettBBuuffffeerreeddDDrraaww((TThhiiss,, BBuuffffeerreedd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Buffered = boolean()
+
+              See external documentation.
+
+       sseettTTaabbWWiiddtthh((TThhiiss,, TTaabbWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 TabWidth = integer()
+
+              See external documentation.
+
+       ggeettTTaabbWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCooddeePPaaggee((TThhiiss,, CCooddeePPaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CodePage = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrDDeeffiinnee((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, MMaarrkkeerrSSyymmbbooll)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+                 MarkerSymbol = integer()
+
+              Equivalent to mmaarrkkeerrDDeeffiinnee((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, MMaarrkkeerrSSyymmbbooll,,
+              [[]])).
+
+       mmaarrkkeerrDDeeffiinnee((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, MMaarrkkeerrSSyymmbbooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+                 MarkerSymbol = integer()
+                 Option = {foreground, wx_colour() (see module wx)} |
+                 {background, wx_colour() (see module wx)}
+
+              See external documentation.
+
+       mmaarrkkeerrSSeettFFoorreeggrroouunndd((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       mmaarrkkeerrSSeettBBaacckkggrroouunndd((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       mmaarrkkeerrAAdddd((TThhiiss,, LLiinnee,, MMaarrkkeerrNNuummbbeerr)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 MarkerNumber = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrDDeelleettee((TThhiiss,, LLiinnee,, MMaarrkkeerrNNuummbbeerr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 MarkerNumber = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrDDeelleetteeAAllll((TThhiiss,, MMaarrkkeerrNNuummbbeerr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrGGeett((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrNNeexxtt((TThhiiss,, LLiinneeSSttaarrtt,, MMaarrkkeerrMMaasskk)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 LineStart = integer()
+                 MarkerMask = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrPPrreevviioouuss((TThhiiss,, LLiinneeSSttaarrtt,, MMaarrkkeerrMMaasskk)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 LineStart = integer()
+                 MarkerMask = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrDDeeffiinneeBBiittmmaapp((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, BBmmpp)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+                 Bmp = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       mmaarrkkeerrAAddddSSeett((TThhiiss,, LLiinnee,, SSeett)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 Set = integer()
+
+              See external documentation.
+
+       mmaarrkkeerrSSeettAAllpphhaa((TThhiiss,, MMaarrkkeerrNNuummbbeerr,, AAllpphhaa)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MarkerNumber = integer()
+                 Alpha = integer()
+
+              See external documentation.
+
+       sseettMMaarrggiinnTTyyppee((TThhiiss,, MMaarrggiinn,, MMaarrggiinnTTyyppee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+                 MarginType = integer()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnTTyyppee((TThhiiss,, MMaarrggiinn)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+
+              See external documentation.
+
+       sseettMMaarrggiinnWWiiddtthh((TThhiiss,, MMaarrggiinn,, PPiixxeellWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+                 PixelWidth = integer()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnWWiiddtthh((TThhiiss,, MMaarrggiinn)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+
+              See external documentation.
+
+       sseettMMaarrggiinnMMaasskk((TThhiiss,, MMaarrggiinn,, MMaasskk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+                 Mask = integer()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnMMaasskk((TThhiiss,, MMaarrggiinn)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+
+              See external documentation.
+
+       sseettMMaarrggiinnSSeennssiittiivvee((TThhiiss,, MMaarrggiinn,, SSeennssiittiivvee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+                 Sensitive = boolean()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnSSeennssiittiivvee((TThhiiss,, MMaarrggiinn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Margin = integer()
+
+              See external documentation.
+
+       ssttyylleeCClleeaarrAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttyylleeSSeettFFoorreeggrroouunndd((TThhiiss,, SSttyyllee,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ssttyylleeSSeettBBaacckkggrroouunndd((TThhiiss,, SSttyyllee,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ssttyylleeSSeettBBoolldd((TThhiiss,, SSttyyllee,, BBoolldd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Bold = boolean()
+
+              See external documentation.
+
+       ssttyylleeSSeettIIttaalliicc((TThhiiss,, SSttyyllee,, IIttaalliicc)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Italic = boolean()
+
+              See external documentation.
+
+       ssttyylleeSSeettSSiizzee((TThhiiss,, SSttyyllee,, SSiizzeePPooiinnttss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 SizePoints = integer()
+
+              See external documentation.
+
+       ssttyylleeSSeettFFaacceeNNaammee((TThhiiss,, SSttyyllee,, FFoonnttNNaammee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 FontName = chardata() (see module unicode)
+
+              See external documentation.
+
+       ssttyylleeSSeettEEOOLLFFiilllleedd((TThhiiss,, SSttyyllee,, FFiilllleedd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Filled = boolean()
+
+              See external documentation.
+
+       ssttyylleeRReesseettDDeeffaauulltt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttyylleeSSeettUUnnddeerrlliinnee((TThhiiss,, SSttyyllee,, UUnnddeerrlliinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Underline = boolean()
+
+              See external documentation.
+
+       ssttyylleeSSeettCCaassee((TThhiiss,, SSttyyllee,, CCaasseeFFoorrccee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 CaseForce = integer()
+
+              See external documentation.
+
+       ssttyylleeSSeettHHoottSSppoott((TThhiiss,, SSttyyllee,, HHoottssppoott)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Hotspot = boolean()
+
+              See external documentation.
+
+       sseettSSeellFFoorreeggrroouunndd((TThhiiss,, UUsseeSSeettttiinngg,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettSSeellBBaacckkggrroouunndd((TThhiiss,, UUsseeSSeettttiinngg,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ggeettSSeellAAllpphhaa((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSeellAAllpphhaa((TThhiiss,, AAllpphhaa)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Alpha = integer()
+
+              See external documentation.
+
+       sseettCCaarreettFFoorreeggrroouunndd((TThhiiss,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccmmddKKeeyyAAssssiiggnn((TThhiiss,, KKeeyy,, MMooddiiffiieerrss,, CCmmdd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Key = integer()
+                 Modifiers = integer()
+                 Cmd = integer()
+
+              See external documentation.
+
+       ccmmddKKeeyyCClleeaarr((TThhiiss,, KKeeyy,, MMooddiiffiieerrss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Key = integer()
+                 Modifiers = integer()
+
+              See external documentation.
+
+       ccmmddKKeeyyCClleeaarrAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSttyylleeBByytteess((TThhiiss,, LLeennggtthh)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Length = integer()
+
+              See external documentation.
+
+       ssttyylleeSSeettVViissiibbllee((TThhiiss,, SSttyyllee,, VViissiibbllee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Visible = boolean()
+
+              See external documentation.
+
+       ggeettCCaarreettPPeerriioodd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCaarreettPPeerriioodd((TThhiiss,, PPeerriiooddMMiilllliisseeccoonnddss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PeriodMilliseconds = integer()
+
+              See external documentation.
+
+       sseettWWoorrddCChhaarrss((TThhiiss,, CChhaarraacctteerrss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Characters = chardata() (see module unicode)
+
+              See external documentation.
+
+       bbeeggiinnUUnnddooAAccttiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       eennddUUnnddooAAccttiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       iinnddiiccaattoorrSSeettSSttyyllee((TThhiiss,, IInnddiicc,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Indic = integer()
+                 Style = integer()
+
+              See external documentation.
+
+       iinnddiiccaattoorrGGeettSSttyyllee((TThhiiss,, IInnddiicc)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Indic = integer()
+
+              See external documentation.
+
+       iinnddiiccaattoorrSSeettFFoorreeggrroouunndd((TThhiiss,, IInnddiicc,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Indic = integer()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       iinnddiiccaattoorrGGeettFFoorreeggrroouunndd((TThhiiss,, IInnddiicc)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Indic = integer()
+
+              See external documentation.
+
+       sseettWWhhiitteessppaacceeFFoorreeggrroouunndd((TThhiiss,, UUsseeSSeettttiinngg,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettWWhhiitteessppaacceeBBaacckkggrroouunndd((TThhiiss,, UUsseeSSeettttiinngg,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ggeettSSttyylleeBBiittss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettLLiinneeSSttaattee((TThhiiss,, LLiinnee,, SSttaattee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 State = integer()
+
+              See external documentation.
+
+       ggeettLLiinneeSSttaattee((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettMMaaxxLLiinneeSSttaattee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettCCaarreettLLiinneeVViissiibbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCaarreettLLiinneeVViissiibbllee((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Show = boolean()
+
+              See external documentation.
+
+       ggeettCCaarreettLLiinneeBBaacckkggrroouunndd((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCaarreettLLiinneeBBaacckkggrroouunndd((TThhiiss,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       aauuttooCCoommppSShhooww((TThhiiss,, LLeennEEnntteerreedd,, IItteemmLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 LenEntered = integer()
+                 ItemList = chardata() (see module unicode)
+
+              See external documentation.
+
+       aauuttooCCoommppCCaanncceell((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppAAccttiivvee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppPPoossSSttaarrtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppCCoommpplleettee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSttooppss((TThhiiss,, CChhaarraacctteerrSSeett)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CharacterSet = chardata() (see module unicode)
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettSSeeppaarraattoorr((TThhiiss,, SSeeppaarraattoorrCChhaarraacctteerr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 SeparatorCharacter = integer()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettSSeeppaarraattoorr((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeelleecctt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettCCaanncceellAAttSSttaarrtt((TThhiiss,, CCaanncceell)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Cancel = boolean()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettCCaanncceellAAttSSttaarrtt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettFFiillllUUppss((TThhiiss,, CChhaarraacctteerrSSeett)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CharacterSet = chardata() (see module unicode)
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettCChhoooosseeSSiinnggllee((TThhiiss,, CChhoooosseeSSiinnggllee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 ChooseSingle = boolean()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettCChhoooosseeSSiinnggllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettIIggnnoorreeCCaassee((TThhiiss,, IIggnnoorreeCCaassee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 IgnoreCase = boolean()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettIIggnnoorreeCCaassee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       uusseerrLLiissttSShhooww((TThhiiss,, LLiissttTTyyppee,, IItteemmLLiisstt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 ListType = integer()
+                 ItemList = chardata() (see module unicode)
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettAAuuttooHHiiddee((TThhiiss,, AAuuttooHHiiddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 AutoHide = boolean()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettAAuuttooHHiiddee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettDDrrooppRReessttOOffWWoorrdd((TThhiiss,, DDrrooppRReessttOOffWWoorrdd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 DropRestOfWord = boolean()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettDDrrooppRReessttOOffWWoorrdd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       rreeggiisstteerrIImmaaggee((TThhiiss,, TTyyppee,, BBmmpp)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Type = integer()
+                 Bmp = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       cclleeaarrRReeggiisstteerreeddIImmaaggeess((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettTTyyppeeSSeeppaarraattoorr((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettTTyyppeeSSeeppaarraattoorr((TThhiiss,, SSeeppaarraattoorrCChhaarraacctteerr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 SeparatorCharacter = integer()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettMMaaxxWWiiddtthh((TThhiiss,, CChhaarraacctteerrCCoouunntt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CharacterCount = integer()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettMMaaxxWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppSSeettMMaaxxHHeeiigghhtt((TThhiiss,, RRoowwCCoouunntt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 RowCount = integer()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettMMaaxxHHeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettIInnddeenntt((TThhiiss,, IInnddeennttSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 IndentSize = integer()
+
+              See external documentation.
+
+       ggeettIInnddeenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettUUsseeTTaabbss((TThhiiss,, UUsseeTTaabbss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseTabs = boolean()
+
+              See external documentation.
+
+       ggeettUUsseeTTaabbss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettLLiinneeIInnddeennttaattiioonn((TThhiiss,, LLiinnee,, IInnddeennttSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 IndentSize = integer()
+
+              See external documentation.
+
+       ggeettLLiinneeIInnddeennttaattiioonn((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettLLiinneeIInnddeennttPPoossiittiioonn((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettCCoolluummnn((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       sseettUUsseeHHoorriizzoonnttaallSSccrroollllBBaarr((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Show = boolean()
+
+              See external documentation.
+
+       ggeettUUsseeHHoorriizzoonnttaallSSccrroollllBBaarr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettIInnddeennttaattiioonnGGuuiiddeess((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Show = boolean()
+
+              See external documentation.
+
+       ggeettIInnddeennttaattiioonnGGuuiiddeess((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettHHiigghhlliigghhttGGuuiiddee((TThhiiss,, CCoolluummnn)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Column = integer()
+
+              See external documentation.
+
+       ggeettHHiigghhlliigghhttGGuuiiddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettLLiinneeEEnnddPPoossiittiioonn((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettCCooddeePPaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettCCaarreettFFoorreeggrroouunndd((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettRReeaaddOOnnllyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCuurrrreennttPPooss((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonnSSttaarrtt((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnSSttaarrtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonnEEnndd((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnEEnndd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettPPrriinnttMMaaggnniiffiiccaattiioonn((TThhiiss,, MMaaggnniiffiiccaattiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Magnification = integer()
+
+              See external documentation.
+
+       ggeettPPrriinnttMMaaggnniiffiiccaattiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettPPrriinnttCCoolloouurrMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Mode = integer()
+
+              See external documentation.
+
+       ggeettPPrriinnttCCoolloouurrMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ffiinnddTTeexxtt((TThhiiss,, MMiinnPPooss,, MMaaxxPPooss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MinPos = integer()
+                 MaxPos = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to ffiinnddTTeexxtt((TThhiiss,, MMiinnPPooss,, MMaaxxPPooss,, TTeexxtt,, [[]])).
+
+       ffiinnddTTeexxtt((TThhiiss,, MMiinnPPooss,, MMaaxxPPooss,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 MinPos = integer()
+                 MaxPos = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {flags, integer()}
+
+              See external documentation.
+
+       ffoorrmmaattRRaannggee((TThhiiss,, DDooDDrraaww,, SSttaarrttPPooss,, EEnnddPPooss,, DDrraaww,, TTaarrggeett,, RReennddeerrRReecctt,,
+       PPaaggeeRReecctt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 DoDraw = boolean()
+                 StartPos = integer()
+                 EndPos = integer()
+                 Draw = wxDC() (see module wxDC)
+                 Target = wxDC() (see module wxDC)
+                 RenderRect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 PageRect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       ggeettFFiirrssttVViissiibblleeLLiinnee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettLLiinnee((TThhiiss,, LLiinnee)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettLLiinneeCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettMMaarrggiinnLLeefftt((TThhiiss,, PPiixxeellWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PixelWidth = integer()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnLLeefftt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettMMaarrggiinnRRiigghhtt((TThhiiss,, PPiixxeellWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PixelWidth = integer()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnRRiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettMMooddiiffyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, SSttaarrtt,, EEnndd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Start = integer()
+                 End = integer()
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettTTeexxttRRaannggee((TThhiiss,, SSttaarrttPPooss,, EEnnddPPooss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StartPos = integer()
+                 EndPos = integer()
+
+              See external documentation.
+
+       hhiiddeeSSeelleeccttiioonn((TThhiiss,, NNoorrmmaall)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Normal = boolean()
+
+              See external documentation.
+
+       lliinneeFFrroommPPoossiittiioonn((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ppoossiittiioonnFFrroommLLiinnee((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       lliinneeSSccrroollll((TThhiiss,, CCoolluummnnss,, LLiinneess)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Columns = integer()
+                 Lines = integer()
+
+              See external documentation.
+
+       eennssuurreeCCaarreettVViissiibbllee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       rreeppllaacceeSSeelleeccttiioonn((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettRReeaaddOOnnllyy((TThhiiss,, RReeaaddOOnnllyy)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 ReadOnly = boolean()
+
+              See external documentation.
+
+       ccaannPPaassttee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccaannUUnnddoo((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       eemmppttyyUUnnddooBBuuffffeerr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       uunnddoo((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccuutt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccooppyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaassttee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettTTeexxttLLeennggtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettOOvveerrttyyppee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCaarreettWWiiddtthh((TThhiiss,, PPiixxeellWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PixelWidth = integer()
+
+              See external documentation.
+
+       ggeettCCaarreettWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettTTaarrggeettSSttaarrtt((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettTTaarrggeettSSttaarrtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettTTaarrggeettEEnndd((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettTTaarrggeettEEnndd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       rreeppllaacceeTTaarrggeett((TThhiiss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseeaarrcchhIInnTTaarrggeett((TThhiiss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettSSeeaarrcchhFFllaaggss((TThhiiss,, FFllaaggss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Flags = integer()
+
+              See external documentation.
+
+       ggeettSSeeaarrcchhFFllaaggss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccaallllTTiippSShhooww((TThhiiss,, PPooss,, DDeeffiinniittiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+                 Definition = chardata() (see module unicode)
+
+              See external documentation.
+
+       ccaallllTTiippCCaanncceell((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccaallllTTiippAAccttiivvee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccaallllTTiippPPoossAAttSSttaarrtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccaallllTTiippSSeettHHiigghhlliigghhtt((TThhiiss,, SSttaarrtt,, EEnndd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Start = integer()
+                 End = integer()
+
+              See external documentation.
+
+       ccaallllTTiippSSeettBBaacckkggrroouunndd((TThhiiss,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccaallllTTiippSSeettFFoorreeggrroouunndd((TThhiiss,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccaallllTTiippSSeettFFoorreeggrroouunnddHHiigghhlliigghhtt((TThhiiss,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccaallllTTiippUUsseeSSttyyllee((TThhiiss,, TTaabbSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 TabSize = integer()
+
+              See external documentation.
+
+       vviissiibblleeFFrroommDDooccLLiinnee((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ddooccLLiinneeFFrroommVViissiibbllee((TThhiiss,, LLiinneeDDiissppllaayy)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 LineDisplay = integer()
+
+              See external documentation.
+
+       wwrraappCCoouunntt((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       sseettFFoollddLLeevveell((TThhiiss,, LLiinnee,, LLeevveell)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 Level = integer()
+
+              See external documentation.
+
+       ggeettFFoollddLLeevveell((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettLLaassttCChhiilldd((TThhiiss,, LLiinnee,, LLeevveell)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 Level = integer()
+
+              See external documentation.
+
+       ggeettFFoollddPPaarreenntt((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       sshhoowwLLiinneess((TThhiiss,, LLiinneeSSttaarrtt,, LLiinneeEEnndd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 LineStart = integer()
+                 LineEnd = integer()
+
+              See external documentation.
+
+       hhiiddeeLLiinneess((TThhiiss,, LLiinneeSSttaarrtt,, LLiinneeEEnndd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 LineStart = integer()
+                 LineEnd = integer()
+
+              See external documentation.
+
+       ggeettLLiinneeVViissiibbllee((TThhiiss,, LLiinnee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       sseettFFoollddEExxppaannddeedd((TThhiiss,, LLiinnee,, EExxppaannddeedd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 Expanded = boolean()
+
+              See external documentation.
+
+       ggeettFFoollddEExxppaannddeedd((TThhiiss,, LLiinnee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ttoogggglleeFFoolldd((TThhiiss,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       eennssuurreeVViissiibbllee((TThhiiss,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       sseettFFoollddFFllaaggss((TThhiiss,, FFllaaggss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Flags = integer()
+
+              See external documentation.
+
+       eennssuurreeVViissiibblleeEEnnffoorrcceePPoolliiccyy((TThhiiss,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       sseettTTaabbIInnddeennttss((TThhiiss,, TTaabbIInnddeennttss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 TabIndents = boolean()
+
+              See external documentation.
+
+       ggeettTTaabbIInnddeennttss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettBBaacckkSSppaacceeUUnnIInnddeennttss((TThhiiss,, BBssUUnnIInnddeennttss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 BsUnIndents = boolean()
+
+              See external documentation.
+
+       ggeettBBaacckkSSppaacceeUUnnIInnddeennttss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettMMoouusseeDDwweellllTTiimmee((TThhiiss,, PPeerriiooddMMiilllliisseeccoonnddss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PeriodMilliseconds = integer()
+
+              See external documentation.
+
+       ggeettMMoouusseeDDwweellllTTiimmee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddSSttaarrttPPoossiittiioonn((TThhiiss,, PPooss,, OOnnllyyWWoorrddCChhaarraacctteerrss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+                 OnlyWordCharacters = boolean()
+
+              See external documentation.
+
+       wwoorrddEEnnddPPoossiittiioonn((TThhiiss,, PPooss,, OOnnllyyWWoorrddCChhaarraacctteerrss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+                 OnlyWordCharacters = boolean()
+
+              See external documentation.
+
+       sseettWWrraappMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Mode = integer()
+
+              See external documentation.
+
+       ggeettWWrraappMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettWWrraappVViissuuaallFFllaaggss((TThhiiss,, WWrraappVViissuuaallFFllaaggss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 WrapVisualFlags = integer()
+
+              See external documentation.
+
+       ggeettWWrraappVViissuuaallFFllaaggss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettWWrraappVViissuuaallFFllaaggssLLooccaattiioonn((TThhiiss,, WWrraappVViissuuaallFFllaaggssLLooccaattiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 WrapVisualFlagsLocation = integer()
+
+              See external documentation.
+
+       ggeettWWrraappVViissuuaallFFllaaggssLLooccaattiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettWWrraappSSttaarrttIInnddeenntt((TThhiiss,, IInnddeenntt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Indent = integer()
+
+              See external documentation.
+
+       ggeettWWrraappSSttaarrttIInnddeenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettLLaayyoouuttCCaacchhee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Mode = integer()
+
+              See external documentation.
+
+       ggeettLLaayyoouuttCCaacchhee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSccrroollllWWiiddtthh((TThhiiss,, PPiixxeellWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PixelWidth = integer()
+
+              See external documentation.
+
+       ggeettSSccrroollllWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       tteexxttWWiiddtthh((TThhiiss,, SSttyyllee,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettEEnnddAAttLLaassttLLiinnee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       tteexxttHHeeiigghhtt((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       sseettUUsseeVVeerrttiiccaallSSccrroollllBBaarr((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Show = boolean()
+
+              See external documentation.
+
+       ggeettUUsseeVVeerrttiiccaallSSccrroollllBBaarr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aappppeennddTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettTTwwooPPhhaasseeDDrraaww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettTTwwooPPhhaasseeDDrraaww((TThhiiss,, TTwwooPPhhaassee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 TwoPhase = boolean()
+
+              See external documentation.
+
+       ttaarrggeettFFrroommSSeelleeccttiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneessJJooiinn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneessSSpplliitt((TThhiiss,, PPiixxeellWWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 PixelWidth = integer()
+
+              See external documentation.
+
+       sseettFFoollddMMaarrggiinnCCoolloouurr((TThhiiss,, UUsseeSSeettttiinngg,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettFFoollddMMaarrggiinnHHiiCCoolloouurr((TThhiiss,, UUsseeSSeettttiinngg,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       lliinneeDDoowwnn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeDDoowwnnEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeUUpp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeUUppEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhaarrLLeefftt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhaarrLLeeffttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhaarrRRiigghhtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhaarrRRiigghhttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddLLeefftt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddLLeeffttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddRRiigghhtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddRRiigghhttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       hhoommee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       hhoommeeEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnnddEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddooccuummeennttSSttaarrtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddooccuummeennttSSttaarrttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddooccuummeennttEEnndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddooccuummeennttEEnnddEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaaggeeUUpp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaaggeeUUppEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaaggeeDDoowwnn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaaggeeDDoowwnnEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       eeddiittTToogggglleeOOvveerrttyyppee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccaanncceell((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddeelleetteeBBaacckk((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ttaabb((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       bbaacckkTTaabb((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       nneewwLLiinnee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ffoorrmmFFeeeedd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       vvCCHHoommee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       vvCCHHoommeeEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       zzoooommIInn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       zzoooommOOuutt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddeellWWoorrddLLeefftt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddeellWWoorrddRRiigghhtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeCCuutt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeDDeelleettee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeTTrraannssppoossee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeDDuupplliiccaattee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lloowweerrCCaassee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       uuppppeerrCCaassee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeSSccrroollllDDoowwnn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeSSccrroollllUUpp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddeelleetteeBBaacckkNNoottLLiinnee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       hhoommeeDDiissppllaayy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       hhoommeeDDiissppllaayyEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnnddDDiissppllaayy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnnddDDiissppllaayyEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       hhoommeeWWrraappEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnnddWWrraapp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnnddWWrraappEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       vvCCHHoommeeWWrraapp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       vvCCHHoommeeWWrraappEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeCCooppyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       mmoovveeCCaarreettIInnssiiddeeVViieeww((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeLLeennggtthh((TThhiiss,, LLiinnee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       bbrraacceeHHiigghhlliigghhtt((TThhiiss,, PPooss11,, PPooss22)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos1 = integer()
+                 Pos2 = integer()
+
+              See external documentation.
+
+       bbrraacceeBBaaddLLiigghhtt((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       bbrraacceeMMaattcchh((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettVViieewwEEOOLL((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettVViieewwEEOOLL((TThhiiss,, VViissiibbllee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Visible = boolean()
+
+              See external documentation.
+
+       sseettMMooddEEvveennttMMaasskk((TThhiiss,, MMaasskk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Mask = integer()
+
+              See external documentation.
+
+       ggeettEEddggeeCCoolluummnn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettEEddggeeCCoolluummnn((TThhiiss,, CCoolluummnn)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Column = integer()
+
+              See external documentation.
+
+       sseettEEddggeeMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Mode = integer()
+
+              See external documentation.
+
+       ggeettEEddggeeMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettEEddggeeCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettEEddggeeCCoolloouurr((TThhiiss,, EEddggeeCCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 EdgeColour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseeaarrcchhAAnncchhoorr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseeaarrcchhNNeexxtt((TThhiiss,, FFllaaggss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Flags = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseeaarrcchhPPrreevv((TThhiiss,, FFllaaggss,, TTeexxtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Flags = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       lliinneessOOnnSSccrreeeenn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       uusseePPooppUUpp((TThhiiss,, AAlllloowwPPooppUUpp)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 AllowPopUp = boolean()
+
+              See external documentation.
+
+       sseelleeccttiioonnIIssRReeccttaannggllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettZZoooomm((TThhiiss,, ZZoooomm)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Zoom = integer()
+
+              See external documentation.
+
+       ggeettZZoooomm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettMMooddEEvveennttMMaasskk((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSTTCCFFooccuuss((TThhiiss,, FFooccuuss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Focus = boolean()
+
+              See external documentation.
+
+       ggeettSSTTCCFFooccuuss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSttaattuuss((TThhiiss,, SSttaattuussCCooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StatusCode = integer()
+
+              See external documentation.
+
+       ggeettSSttaattuuss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettMMoouusseeDDoowwnnCCaappttuurreess((TThhiiss,, CCaappttuurreess)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Captures = boolean()
+
+              See external documentation.
+
+       ggeettMMoouusseeDDoowwnnCCaappttuurreess((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettSSTTCCCCuurrssoorr((TThhiiss,, CCuurrssoorrTTyyppee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CursorType = integer()
+
+              See external documentation.
+
+       ggeettSSTTCCCCuurrssoorr((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCoonnttrroollCChhaarrSSyymmbbooll((TThhiiss,, SSyymmbbooll)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Symbol = integer()
+
+              See external documentation.
+
+       ggeettCCoonnttrroollCChhaarrSSyymmbbooll((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddPPaarrttLLeefftt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddPPaarrttLLeeffttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddPPaarrttRRiigghhtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddPPaarrttRRiigghhttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettVViissiibblleePPoolliiccyy((TThhiiss,, VViissiibblleePPoolliiccyy,, VViissiibblleeSSlloopp)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 VisiblePolicy = integer()
+                 VisibleSlop = integer()
+
+              See external documentation.
+
+       ddeellLLiinneeLLeefftt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ddeellLLiinneeRRiigghhtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettXXOOffffsseett((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhoooosseeCCaarreettXX((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettXXCCaarreettPPoolliiccyy((TThhiiss,, CCaarreettPPoolliiccyy,, CCaarreettSSlloopp)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CaretPolicy = integer()
+                 CaretSlop = integer()
+
+              See external documentation.
+
+       sseettYYCCaarreettPPoolliiccyy((TThhiiss,, CCaarreettPPoolliiccyy,, CCaarreettSSlloopp)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 CaretPolicy = integer()
+                 CaretSlop = integer()
+
+              See external documentation.
+
+       ggeettPPrriinnttWWrraappMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettHHoottssppoottAAccttiivveeFFoorreeggrroouunndd((TThhiiss,, UUsseeSSeettttiinngg,, FFoorree)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Fore = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettHHoottssppoottAAccttiivveeBBaacckkggrroouunndd((TThhiiss,, UUsseeSSeettttiinngg,, BBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseSetting = boolean()
+                 Back = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettHHoottssppoottAAccttiivveeUUnnddeerrlliinnee((TThhiiss,, UUnnddeerrlliinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Underline = boolean()
+
+              See external documentation.
+
+       sseettHHoottssppoottSSiinngglleeLLiinnee((TThhiiss,, SSiinngglleeLLiinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 SingleLine = boolean()
+
+              See external documentation.
+
+       ppaarraaDDoowwnnEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaarraaUUpp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaarraaUUppEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppoossiittiioonnBBeeffoorree((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ppoossiittiioonnAAfftteerr((TThhiiss,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ccooppyyRRaannggee((TThhiiss,, SSttaarrtt,, EEnndd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Start = integer()
+                 End = integer()
+
+              See external documentation.
+
+       ccooppyyTTeexxtt((TThhiiss,, LLeennggtthh,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Length = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonnMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Mode = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeDDoowwnnRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeUUppRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhaarrLLeeffttRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       cchhaarrRRiigghhttRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       hhoommeeRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       vvCCHHoommeeRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       lliinneeEEnnddRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaaggeeUUppRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppaaggeeDDoowwnnRReeccttEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttuutttteerreeddPPaaggeeUUpp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttuutttteerreeddPPaaggeeUUppEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttuutttteerreeddPPaaggeeDDoowwnn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttuutttteerreeddPPaaggeeDDoowwnnEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddLLeeffttEEnndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddLLeeffttEEnnddEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddRRiigghhttEEnndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       wwoorrddRRiigghhttEEnnddEExxtteenndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettWWhhiitteessppaacceeCChhaarrss((TThhiiss,, CChhaarraacctteerrss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Characters = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettCChhaarrssDDeeffaauulltt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aauuttooCCoommppGGeettCCuurrrreenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aallllooccaattee((TThhiiss,, BByytteess)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Bytes = integer()
+
+              See external documentation.
+
+       ffiinnddCCoolluummnn((TThhiiss,, LLiinnee,, CCoolluummnn)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+                 Column = integer()
+
+              See external documentation.
+
+       ggeettCCaarreettSSttiicckkyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCaarreettSSttiicckkyy((TThhiiss,, UUsseeCCaarreettSSttiicckkyyBBeehhaavviioouurr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 UseCaretStickyBehaviour = boolean()
+
+              See external documentation.
+
+       ttoogggglleeCCaarreettSSttiicckkyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettPPaasstteeCCoonnvveerrttEEnnddiinnggss((TThhiiss,, CCoonnvveerrtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Convert = boolean()
+
+              See external documentation.
+
+       ggeettPPaasstteeCCoonnvveerrttEEnnddiinnggss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseelleeccttiioonnDDuupplliiccaattee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettCCaarreettLLiinneeBBaacckkAAllpphhaa((TThhiiss,, AAllpphhaa)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Alpha = integer()
+
+              See external documentation.
+
+       ggeettCCaarreettLLiinneeBBaacckkAAllpphhaa((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttaarrttRReeccoorrdd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttooppRReeccoorrdd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettLLeexxeerr((TThhiiss,, LLeexxeerr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Lexer = integer()
+
+              See external documentation.
+
+       ggeettLLeexxeerr((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ccoolloouurriissee((TThhiiss,, SSttaarrtt,, EEnndd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Start = integer()
+                 End = integer()
+
+              See external documentation.
+
+       sseettPPrrooppeerrttyy((TThhiiss,, KKeeyy,, VVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Key = chardata() (see module unicode)
+                 Value = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettKKeeyyWWoorrddss((TThhiiss,, KKeeyywwoorrddSSeett,, KKeeyyWWoorrddss)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 KeywordSet = integer()
+                 KeyWords = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettLLeexxeerrLLaanngguuaaggee((TThhiiss,, LLaanngguuaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Language = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettPPrrooppeerrttyy((TThhiiss,, KKeeyy)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Key = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettSSttyylleeBBiittssNNeeeeddeedd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettCCuurrrreennttLLiinnee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ssttyylleeSSeettSSppeecc((TThhiiss,, SSttyylleeNNuumm,, SSppeecc)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StyleNum = integer()
+                 Spec = chardata() (see module unicode)
+
+              See external documentation.
+
+       ssttyylleeSSeettFFoonntt((TThhiiss,, SSttyylleeNNuumm,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StyleNum = integer()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       ssttyylleeSSeettFFoonnttAAttttrr((TThhiiss,, SSttyylleeNNuumm,, SSiizzee,, FFaacceeNNaammee,, BBoolldd,, IIttaalliicc,,
+       UUnnddeerrlliinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StyleNum = integer()
+                 Size = integer()
+                 FaceName = chardata() (see module unicode)
+                 Bold = boolean()
+                 Italic = boolean()
+                 Underline = boolean()
+
+              Equivalent to ssttyylleeSSeettFFoonnttAAttttrr((TThhiiss,, SSttyylleeNNuumm,, SSiizzee,, FFaacceeNNaammee,,
+              BBoolldd,, IIttaalliicc,, UUnnddeerrlliinnee,, [[]])).
+
+       ssttyylleeSSeettFFoonnttAAttttrr((TThhiiss,, SSttyylleeNNuumm,, SSiizzee,, FFaacceeNNaammee,, BBoolldd,, IIttaalliicc,,
+       UUnnddeerrlliinnee,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StyleNum = integer()
+                 Size = integer()
+                 FaceName = chardata() (see module unicode)
+                 Bold = boolean()
+                 Italic = boolean()
+                 Underline = boolean()
+                 Option = {encoding, wx_enum() (see module wx)}
+
+              See external documentation.
+              Encoding = ?wxFONTENCODING_SYSTEM | ?wxFONTENCODING_DEFAULT |
+              ?wxFONTENCODING_ISO8859_1 | ?wxFONTENCODING_ISO8859_2 |
+              ?wxFONTENCODING_ISO8859_3 | ?wxFONTENCODING_ISO8859_4 |
+              ?wxFONTENCODING_ISO8859_5 | ?wxFONTENCODING_ISO8859_6 |
+              ?wxFONTENCODING_ISO8859_7 | ?wxFONTENCODING_ISO8859_8 |
+              ?wxFONTENCODING_ISO8859_9 | ?wxFONTENCODING_ISO8859_10 |
+              ?wxFONTENCODING_ISO8859_11 | ?wxFONTENCODING_ISO8859_12 |
+              ?wxFONTENCODING_ISO8859_13 | ?wxFONTENCODING_ISO8859_14 |
+              ?wxFONTENCODING_ISO8859_15 | ?wxFONTENCODING_ISO8859_MAX |
+              ?wxFONTENCODING_KOI8 | ?wxFONTENCODING_KOI8_U |
+              ?wxFONTENCODING_ALTERNATIVE | ?wxFONTENCODING_BULGARIAN |
+              ?wxFONTENCODING_CP437 | ?wxFONTENCODING_CP850 |
+              ?wxFONTENCODING_CP852 | ?wxFONTENCODING_CP855 |
+              ?wxFONTENCODING_CP866 | ?wxFONTENCODING_CP874 |
+              ?wxFONTENCODING_CP932 | ?wxFONTENCODING_CP936 |
+              ?wxFONTENCODING_CP949 | ?wxFONTENCODING_CP950 |
+              ?wxFONTENCODING_CP1250 | ?wxFONTENCODING_CP1251 |
+              ?wxFONTENCODING_CP1252 | ?wxFONTENCODING_CP1253 |
+              ?wxFONTENCODING_CP1254 | ?wxFONTENCODING_CP1255 |
+              ?wxFONTENCODING_CP1256 | ?wxFONTENCODING_CP1257 |
+              ?wxFONTENCODING_CP12_MAX | ?wxFONTENCODING_UTF7 |
+              ?wxFONTENCODING_UTF8 | ?wxFONTENCODING_EUC_JP |
+              ?wxFONTENCODING_UTF16BE | ?wxFONTENCODING_UTF16LE |
+              ?wxFONTENCODING_UTF32BE | ?wxFONTENCODING_UTF32LE |
+              ?wxFONTENCODING_MACROMAN | ?wxFONTENCODING_MACJAPANESE |
+              ?wxFONTENCODING_MACCHINESETRAD | ?wxFONTENCODING_MACKOREAN |
+              ?wxFONTENCODING_MACARABIC | ?wxFONTENCODING_MACHEBREW |
+              ?wxFONTENCODING_MACGREEK | ?wxFONTENCODING_MACCYRILLIC |
+              ?wxFONTENCODING_MACDEVANAGARI | ?wxFONTENCODING_MACGURMUKHI |
+              ?wxFONTENCODING_MACGUJARATI | ?wxFONTENCODING_MACORIYA |
+              ?wxFONTENCODING_MACBENGALI | ?wxFONTENCODING_MACTAMIL |
+              ?wxFONTENCODING_MACTELUGU | ?wxFONTENCODING_MACKANNADA |
+              ?wxFONTENCODING_MACMALAJALAM | ?wxFONTENCODING_MACSINHALESE |
+              ?wxFONTENCODING_MACBURMESE | ?wxFONTENCODING_MACKHMER |
+              ?wxFONTENCODING_MACTHAI | ?wxFONTENCODING_MACLAOTIAN |
+              ?wxFONTENCODING_MACGEORGIAN | ?wxFONTENCODING_MACARMENIAN |
+              ?wxFONTENCODING_MACCHINESESIMP | ?wxFONTENCODING_MACTIBETAN |
+              ?wxFONTENCODING_MACMONGOLIAN | ?wxFONTENCODING_MACETHIOPIC |
+              ?wxFONTENCODING_MACCENTRALEUR | ?wxFONTENCODING_MACVIATNAMESE |
+              ?wxFONTENCODING_MACARABICEXT | ?wxFONTENCODING_MACSYMBOL |
+              ?wxFONTENCODING_MACDINGBATS | ?wxFONTENCODING_MACTURKISH |
+              ?wxFONTENCODING_MACCROATIAN | ?wxFONTENCODING_MACICELANDIC |
+              ?wxFONTENCODING_MACROMANIAN | ?wxFONTENCODING_MACCELTIC |
+              ?wxFONTENCODING_MACGAELIC | ?wxFONTENCODING_MACKEYBOARD |
+              ?wxFONTENCODING_MAX | ?wxFONTENCODING_MACMIN |
+              ?wxFONTENCODING_MACMAX | ?wxFONTENCODING_UTF16 |
+              ?wxFONTENCODING_UTF32 | ?wxFONTENCODING_UNICODE |
+              ?wxFONTENCODING_GB2312 | ?wxFONTENCODING_BIG5 |
+              ?wxFONTENCODING_SHIFT_JIS
+
+       ssttyylleeSSeettCChhaarraacctteerrSSeett((TThhiiss,, SSttyyllee,, CChhaarraacctteerrSSeett)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 CharacterSet = integer()
+
+              See external documentation.
+
+       ssttyylleeSSeettFFoonnttEEnnccooddiinngg((TThhiiss,, SSttyyllee,, EEnnccooddiinngg)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Style = integer()
+                 Encoding = wx_enum() (see module wx)
+
+              See external documentation.
+              Encoding = ?wxFONTENCODING_SYSTEM | ?wxFONTENCODING_DEFAULT |
+              ?wxFONTENCODING_ISO8859_1 | ?wxFONTENCODING_ISO8859_2 |
+              ?wxFONTENCODING_ISO8859_3 | ?wxFONTENCODING_ISO8859_4 |
+              ?wxFONTENCODING_ISO8859_5 | ?wxFONTENCODING_ISO8859_6 |
+              ?wxFONTENCODING_ISO8859_7 | ?wxFONTENCODING_ISO8859_8 |
+              ?wxFONTENCODING_ISO8859_9 | ?wxFONTENCODING_ISO8859_10 |
+              ?wxFONTENCODING_ISO8859_11 | ?wxFONTENCODING_ISO8859_12 |
+              ?wxFONTENCODING_ISO8859_13 | ?wxFONTENCODING_ISO8859_14 |
+              ?wxFONTENCODING_ISO8859_15 | ?wxFONTENCODING_ISO8859_MAX |
+              ?wxFONTENCODING_KOI8 | ?wxFONTENCODING_KOI8_U |
+              ?wxFONTENCODING_ALTERNATIVE | ?wxFONTENCODING_BULGARIAN |
+              ?wxFONTENCODING_CP437 | ?wxFONTENCODING_CP850 |
+              ?wxFONTENCODING_CP852 | ?wxFONTENCODING_CP855 |
+              ?wxFONTENCODING_CP866 | ?wxFONTENCODING_CP874 |
+              ?wxFONTENCODING_CP932 | ?wxFONTENCODING_CP936 |
+              ?wxFONTENCODING_CP949 | ?wxFONTENCODING_CP950 |
+              ?wxFONTENCODING_CP1250 | ?wxFONTENCODING_CP1251 |
+              ?wxFONTENCODING_CP1252 | ?wxFONTENCODING_CP1253 |
+              ?wxFONTENCODING_CP1254 | ?wxFONTENCODING_CP1255 |
+              ?wxFONTENCODING_CP1256 | ?wxFONTENCODING_CP1257 |
+              ?wxFONTENCODING_CP12_MAX | ?wxFONTENCODING_UTF7 |
+              ?wxFONTENCODING_UTF8 | ?wxFONTENCODING_EUC_JP |
+              ?wxFONTENCODING_UTF16BE | ?wxFONTENCODING_UTF16LE |
+              ?wxFONTENCODING_UTF32BE | ?wxFONTENCODING_UTF32LE |
+              ?wxFONTENCODING_MACROMAN | ?wxFONTENCODING_MACJAPANESE |
+              ?wxFONTENCODING_MACCHINESETRAD | ?wxFONTENCODING_MACKOREAN |
+              ?wxFONTENCODING_MACARABIC | ?wxFONTENCODING_MACHEBREW |
+              ?wxFONTENCODING_MACGREEK | ?wxFONTENCODING_MACCYRILLIC |
+              ?wxFONTENCODING_MACDEVANAGARI | ?wxFONTENCODING_MACGURMUKHI |
+              ?wxFONTENCODING_MACGUJARATI | ?wxFONTENCODING_MACORIYA |
+              ?wxFONTENCODING_MACBENGALI | ?wxFONTENCODING_MACTAMIL |
+              ?wxFONTENCODING_MACTELUGU | ?wxFONTENCODING_MACKANNADA |
+              ?wxFONTENCODING_MACMALAJALAM | ?wxFONTENCODING_MACSINHALESE |
+              ?wxFONTENCODING_MACBURMESE | ?wxFONTENCODING_MACKHMER |
+              ?wxFONTENCODING_MACTHAI | ?wxFONTENCODING_MACLAOTIAN |
+              ?wxFONTENCODING_MACGEORGIAN | ?wxFONTENCODING_MACARMENIAN |
+              ?wxFONTENCODING_MACCHINESESIMP | ?wxFONTENCODING_MACTIBETAN |
+              ?wxFONTENCODING_MACMONGOLIAN | ?wxFONTENCODING_MACETHIOPIC |
+              ?wxFONTENCODING_MACCENTRALEUR | ?wxFONTENCODING_MACVIATNAMESE |
+              ?wxFONTENCODING_MACARABICEXT | ?wxFONTENCODING_MACSYMBOL |
+              ?wxFONTENCODING_MACDINGBATS | ?wxFONTENCODING_MACTURKISH |
+              ?wxFONTENCODING_MACCROATIAN | ?wxFONTENCODING_MACICELANDIC |
+              ?wxFONTENCODING_MACROMANIAN | ?wxFONTENCODING_MACCELTIC |
+              ?wxFONTENCODING_MACGAELIC | ?wxFONTENCODING_MACKEYBOARD |
+              ?wxFONTENCODING_MAX | ?wxFONTENCODING_MACMIN |
+              ?wxFONTENCODING_MACMAX | ?wxFONTENCODING_UTF16 |
+              ?wxFONTENCODING_UTF32 | ?wxFONTENCODING_UNICODE |
+              ?wxFONTENCODING_GB2312 | ?wxFONTENCODING_BIG5 |
+              ?wxFONTENCODING_SHIFT_JIS
+
+       ccmmddKKeeyyEExxeeccuuttee((TThhiiss,, CCmmdd)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Cmd = integer()
+
+              See external documentation.
+
+       sseettMMaarrggiinnss((TThhiiss,, LLeefftt,, RRiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Left = integer()
+                 Right = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> {{SSttaarrttPPooss::::iinntteeggeerr(()),, EEnnddPPooss::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ppooiinnttFFrroommPPoossiittiioonn((TThhiiss,, PPooss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+
+              See external documentation.
+
+       ssccrroollllTTooLLiinnee((TThhiiss,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ssccrroollllTTooCCoolluummnn((TThhiiss,, CCoolluummnn)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Column = integer()
+
+              See external documentation.
+
+       sseennddMMssgg((TThhiiss,, MMssgg)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Msg = integer()
+
+              Equivalent to sseennddMMssgg((TThhiiss,, MMssgg,, [[]])).
+
+       sseennddMMssgg((TThhiiss,, MMssgg,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Msg = integer()
+                 Option = {wp, integer()} | {lp, integer()}
+
+              See external documentation.
+
+       sseettVVSSccrroollllBBaarr((TThhiiss,, BBaarr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Bar = wxScrollBar() (see module wxScrollBar)
+
+              See external documentation.
+
+       sseettHHSSccrroollllBBaarr((TThhiiss,, BBaarr)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Bar = wxScrollBar() (see module wxScrollBar)
+
+              See external documentation.
+
+       ggeettLLaassttKKeeyyddoowwnnPPrroocceesssseedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       sseettLLaassttKKeeyyddoowwnnPPrroocceesssseedd((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Val = boolean()
+
+              See external documentation.
+
+       ssaavveeFFiillee((TThhiiss,, FFiilleennaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Filename = chardata() (see module unicode)
+
+              See external documentation.
+
+       llooaaddFFiillee((TThhiiss,, FFiilleennaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Filename = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddooDDrraaggOOvveerr((TThhiiss,, XX,, YY,, DDeeff)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 X = integer()
+                 Y = integer()
+                 Def = wx_enum() (see module wx)
+
+              See external documentation.
+              Def = ?wxDragError | ?wxDragNone | ?wxDragCopy | ?wxDragMove |
+              ?wxDragLink | ?wxDragCancel
+              Res = ?wxDragError | ?wxDragNone | ?wxDragCopy | ?wxDragMove |
+              ?wxDragLink | ?wxDragCancel
+
+       ddooDDrrooppTTeexxtt((TThhiiss,, XX,, YY,, DDaattaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 X = integer()
+                 Y = integer()
+                 Data = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettUUsseeAAnnttiiAAlliiaassiinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aaddddTTeexxttRRaaww((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = binary()
+
+              See external documentation.
+
+       iinnsseerrttTTeexxttRRaaww((TThhiiss,, PPooss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Pos = integer()
+                 Text = binary()
+
+              See external documentation.
+
+       ggeettCCuurrLLiinneeRRaaww((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::binary(), LinePos::integer()}
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettLLiinneeRRaaww((TThhiiss,, LLiinnee)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Line = integer()
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddTTeexxttRRaaww((TThhiiss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       ggeettTTeexxttRRaannggeeRRaaww((TThhiiss,, SSttaarrttPPooss,, EEnnddPPooss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 StartPos = integer()
+                 EndPos = integer()
+
+              See external documentation.
+
+       sseettTTeexxttRRaaww((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = binary()
+
+              See external documentation.
+
+       ggeettTTeexxttRRaaww((TThhiiss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+
+              See external documentation.
+
+       aappppeennddTTeexxttRRaaww((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStyledTextCtrl()
+                 Text = binary()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSttyylleeddTTeexxttCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxStyledTextCtrl(3)

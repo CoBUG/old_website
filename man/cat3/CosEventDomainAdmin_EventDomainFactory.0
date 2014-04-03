@@ -1,0 +1,58 @@
+CosEventDomainAdmin_EventDomEarilnaFnagctMoordyuC(lo3es)EDveefnitnDiotmiaoinnAdmin_EventDomainFactory(3)
+
+
+
+NNAAMMEE
+       CosEventDomainAdmin_EventDomainFactory - This module implements an
+       Event Domain Factory interface, which  is used to create new Event
+       Domain instances.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to all definitions include necessary _h_r_l files by using:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_D_o_m_a_i_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccrreeaattee__eevveenntt__ddoommaaiinn((FFaaccttoorryy,, QQooSS,, AAddmmiinn)) -->> RReeppllyy
+
+              Types:
+
+                 Factory = #objref
+                 QoS = CosNotification::QoSProperties
+                 Admin = CosNotification::AdminProperties
+                 Reply = {EventDomain, DomainID} | {'EXCEPTION',
+                 #'CosNotification_UnsupportedQoS'{}} | {'EXCEPTION',
+                 #'CosNotification_UnsupportedAdmin'{}}
+                 EventDomain = #objref
+
+              To create a new EventDomain this operation is used. If it is not
+              possible to support the given _Q_o_S_P_r_o_p_e_r_t_i_e_s or _A_d_m_i_n_P_r_o_p_e_r_t_i_e_s
+              an exception is raised, which list the properties not supported.
+              For more information see the _c_o_s_N_o_t_i_f_i_c_a_t_i_o_n user's guide.
+
+       ggeett__aallll__ddoommaaiinnss((FFaaccttoorryy)) -->> DDoommaaiinnIIDDSSeeqq
+
+              Types:
+
+                 Factory = #objref
+                 DomainIDSeq = [long()]
+
+              This function returns a DomainID sequence of all domains
+              associated with the target object.
+
+       ggeett__eevveenntt__ddoommaaiinn((FFaaccttoorryy,, DDoommaaiinnIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 Factory = #objref
+                 DomainID = long()
+                 Reply = EventDomain | {'EXCEPTION',
+                 #'CosEventDomainAdmin_DomainNotFound'{}}
+                 EventDomain = #objref
+
+              This operation returns the EventDomain object associated with
+              the given DomainID. If no such binding exists an exception is
+              raised.
+
+
+
+Ericsson AB                  cosEventDCoomsaEivnen1t.D1o.m1a2inAdmin_EventDomainFactory(3)

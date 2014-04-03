@@ -1,0 +1,137 @@
+snmpa_mpd(3)               Erlang Module Definition               snmpa_mpd(3)
+
+
+
+NNAAMMEE
+       snmpa_mpd - Message Processing and Dispatch module for the SNMP agent
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_a___m_p_d implements the version independent Message
+       Processing and Dispatch functionality in SNMP for the agent. It is
+       supposed to be used from a Network Interface process (DDeeffiinniittiioonn ooff
+       AAggeenntt NNeett iiff).
+
+EEXXPPOORRTTSS
+       iinniitt((VVssnnss)) -->> mmppdd__ssttaattee(())
+
+              Types:
+
+                 Vsns = [Vsn]
+                 Vsn = v1 | v2 | v3
+
+              This function can be called from the net_if process at start-up.
+              The options list defines which versions to use.
+
+              It also initializes some SNMP counters.
+
+       pprroocceessss__ppaacckkeett((PPaacckkeett,, TTDDoommaaiinn,, TTAAddddrreessss,, SSttaattee,, NNootteeSSttoorree,, LLoogg)) -->>
+       {{ookk,, VVssnn,, PPdduu,, PPdduuMMSS,, AACCMMDDaattaa}} || {{ddiissccaarrddeedd,, RReeaassoonn}} || {{ddiissccoovveerryy,,
+       DDiissccooPPaacckkeett}}
+       pprroocceessss__ppaacckkeett((PPaacckkeett,, TTDDoommaaiinn,, TTAAddddrreessss,, LLooccaallEEnnggiinneeIIDD,, SSttaattee,,
+       NNootteeSSttoorree,, LLoogg)) -->> {{ookk,, VVssnn,, PPdduu,, PPdduuMMSS,, AACCMMDDaattaa}} || {{ddiissccaarrddeedd,, RReeaassoonn}}
+       || {{ddiissccoovveerryy,, DDiissccooPPaacckkeett}}
+
+              Types:
+
+                 Packet = binary()
+                 TDomain = snmpUDPDomain
+                 TAddress = {Ip, Udp}
+                 LocalEngineID = string()
+                 Ip = {integer(), integer(), integer(), integer()}
+                 Udp = integer()
+                 State = mpd_state()
+                 NoteStore = pid()
+                 Log = snmp_log()
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 Pdu = #pdu
+                 PduMs = integer()
+                 ACMData = acm_data()
+                 Reason = term()
+                 DiscoPacket = binary()
+
+              Processes an incoming packet. Performs authentication and
+              decryption as necessary. The return values should be passed the
+              agent.
+
+          NNoottee::
+              Note that the use of the LocalEngineID argument is only intended
+              for special cases, if the agent is to "emulate" multiple
+              EngineIDs! By default, the agent uses the value of _S_n_m_p_E_n_g_i_n_e_I_D
+              (see SNMP-FRAMEWORK-MIB).
+
+
+       ggeenneerraattee__rreessppoonnssee__mmssgg((VVssnn,, RReePPdduu,, TTyyppee,, AACCMMDDaattaa,, LLoogg)) -->> {{ookk,, PPaacckkeett}} ||
+       {{ddiissccaarrddeedd,, RReeaassoonn}}
+       ggeenneerraattee__rreessppoonnssee__mmssgg((VVssnn,, RReePPdduu,, TTyyppee,, AACCMMDDaattaa,, LLooccaallEEnnggiinneeIIDD,, LLoogg)) -->>
+       {{ookk,, PPaacckkeett}} || {{ddiissccaarrddeedd,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 RePdu = #pdu
+                 Type = atom()
+                 ACMData = acm_data()
+                 LocalEngineID = string()
+                 Packet = binary()
+
+              Generates a possibly encrypted response packet to be sent to the
+              network. _T_y_p_e is the _#_p_d_u_._t_y_p_e of the original request.
+
+          NNoottee::
+              Note that the use of the LocalEngineID argument is only intended
+              for special cases, if the agent is to "emulate" multiple
+              EngineIDs! By default, the agent uses the value of _S_n_m_p_E_n_g_i_n_e_I_D
+              (see SNMP-FRAMEWORK-MIB).
+
+
+       ggeenneerraattee__mmssgg((VVssnn,, NNootteeSSttoorree,, PPdduu,, MMssggDDaattaa,, TToo)) -->> {{ookk,,
+       PPaacckkeettssAAnnddAAddddrreesssseess}} || {{ddiissccaarrddeedd,, RReeaassoonn}}
+       ggeenneerraattee__mmssgg((VVssnn,, NNootteeSSttoorree,, PPdduu,, MMssggDDaattaa,, LLooccaallEEnnggiinneeIIDD,, TToo)) -->> {{ookk,,
+       PPaacckkeettssAAnnddAAddddrreesssseess}} || {{ddiissccaarrddeedd,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 NoteStore = pid()
+                 Pdu = #pdu
+                 MsgData = msg_data()
+                 LocalEngineID = string()
+                 To = [dest_addrs()]
+                 PacketsAndAddresses = [{TDomain, TAddress, Packet}]
+                 TDomain = snmpUDPDomain
+                 TAddress = {Ip, Udp}
+                 Ip = {integer(), integer(), integer(), integer()}
+                 Udp = integer()
+                 Packet = binary()
+
+              Generates a possibly encrypted request packet to be sent to the
+              network.
+
+              _M_s_g_D_a_t_a is the message specific data used in the SNMP message.
+              This value is received in a _s_e_n_d___p_d_u or _s_e_n_d___p_d_u___r_e_q message
+              from the agent. In SNMPv1 and SNMPv2c, this message data is the
+              community string. In SNMPv3, it is the context information. _T_o
+              is a list of the destination addresses and their corresponding
+              security parameters. This value is also received from the
+              requests mentioned above.
+
+          NNoottee::
+              Note that the use of the LocalEngineID argument is only intended
+              for special cases, if the agent is to "emulate" multiple
+              EngineIDs! By default, the agent uses the value of _S_n_m_p_E_n_g_i_n_e_I_D
+              (see SNMP-FRAMEWORK-MIB).
+
+
+       ddiissccaarrddeedd__ppdduu((VVaarriiaabbllee)) -->> vvooiidd(())
+
+              Types:
+
+                 Variable = atom()
+
+              Increments the variable associated with a discarded pdu. This
+              function can be used when the net_if process receives a
+              _d_i_s_c_a_r_d_e_d___p_d_u message from the agent.
+
+
+
+Ericsson AB                       snmp 4.22.1                     snmpa_mpd(3)

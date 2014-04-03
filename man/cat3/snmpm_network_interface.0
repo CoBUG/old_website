@@ -1,0 +1,158 @@
+snmpm_network_interface(3) Erlang Module Definition snmpm_network_interface(3)
+
+
+
+NNAAMMEE
+       snmpm_network_interface - Behaviour module for the SNMP manager network
+       interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the manager network interface. A
+       _s_n_m_p_m___n_e_t_w_o_r_k___i_n_t_e_r_f_a_c_e compliant module must export the following
+       functions:
+
+         * ssttaarrtt__lliinnkk//22
+
+         * ssttoopp//11
+
+         * sseenndd__ppdduu//77
+
+         * iinnffoorrmm__rreessppoonnssee//44
+
+         * nnoottee__ssttoorree//22
+
+         * iinnffoo//11
+
+         * ggeett__lloogg__ttyyppee//11
+
+         * sseett__lloogg__ttyyppee//22
+
+         * vveerrbboossiittyy//22
+
+       The semantics of them and their exact signatures are explained below.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__lliinnkk((SSeerrvveerr,, NNootteeSSttoorree)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = pid()
+                 NoteStore = pid()
+
+              Start-link the network interface process.
+
+              _S_e_r_v_e_r is the pid of the managing process.
+
+              _N_o_t_e_S_t_o_r_e is the pid of the note-store process.
+
+       ssttoopp((PPiidd)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+
+              Stop the network interface process.
+
+       sseenndd__ppdduu((PPiidd,, PPdduu,, VVssnn,, MMssggDDaattaa,, AAddddrr,, PPoorrtt,, EExxttrraaIInnffoo)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+                 Pdu = pdu()
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 MsgData = term()
+                 Addr = address()
+                 Port = integer()
+                 ExtraInfo = term()
+
+              Request the network interface process (_P_i_d) to send this pdu
+              (_P_d_u).
+
+              _E_x_t_r_a_I_n_f_o is some opaque data that is passed to the net-if
+              process. It originates from the _E_x_t_r_a_I_n_f_o parameter in the calls
+              to the ssyynncchhrroonnoouuss ggeett--rreeqquueesstt, aassyynncchhrroonnoouuss ggeett--rreeqquueesstt,
+              ssyynncchhrroonnoouuss ggeett--nneexxtt--rreeqquueesstt, aassyynncchhrroonnoouuss ggeett--nneexxtt--rreeqquueesstt,
+              ssyynncchhrroonnoouuss sseett--rreeqquueesstt and aassyynncchhrroonnoouuss sseett--rreeqquueesstt functions.
+              Whether the net-if process chooses to use this is implementation
+              dependent. The net-if process included in this application
+              ignores it.
+
+       iinnffoorrmm__rreessppoonnssee((PPiidd,, RReeff,, AAddddrr,, PPoorrtt)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+                 Ref = term()
+                 Addr = address()
+                 Port = integer()
+
+              Instruct the network interface process to send the response
+              (acknowledgment) to an inform-request.
+
+              _R_e_f is something that can be used to identify the inform-
+              request, e.g. request-id of the inform-request.
+
+              _A_d_d_r and _P_o_r_t identifies the agent, from which the inform-
+              request originated.
+
+       nnoottee__ssttoorree((PPiidd,, NNootteeSSttoorree)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+                 NoteStore = pid()
+
+              Change the pid of the note-store process. This is used when the
+              server re-starts the note_store (e.g. after a crach).
+
+       iinnffoo((PPiidd)) -->> [[{{KKeeyy,, VVaalluuee}}]]
+
+              Types:
+
+                 Pid = pid()
+
+              The info returned is basically up to the implementer to decide.
+              The implementation provided by this application provides info
+              about memory allocation and various socket information.
+
+              The info returned by this function is returned together with
+              other info collected by the manager when the iinnffoo function is
+              called (tagged with the key _n_e_t___i_f).
+
+       vveerrbboossiittyy((PPiidd,, VVeerrbboossiittyy)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+                 Verbosity = verbosity()
+
+              Change the verbosity of the network interface process.
+
+       ggeett__lloogg__ttyyppee((PPiidd)) -->> {{ookk,, LLooggTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 LogType = atl_type()
+                 Reason = term()
+
+              The Audit Trail Log is managed by the network interface process.
+              So, it is this process that has to return the actual log-type.
+
+       sseett__lloogg__ttyyppee((PPiidd,, NNeewwTTyyppee)) -->> {{ookk,, OOllddTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 NewType = OldType = atl_type()
+                 Reason = term()
+
+              The Audit Trail Log is managed by the network interface process.
+              So, it is this process that has to do the actual changing of the
+              type.
+
+              See sseett__lloogg__ttyyppee for more info.
+
+
+
+Ericsson AB                       snmp 4.22.1       snmpm_network_interface(3)

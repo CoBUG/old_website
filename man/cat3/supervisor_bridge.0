@@ -1,0 +1,134 @@
+supervisor_bridge(3)       Erlang Module Definition       supervisor_bridge(3)
+
+
+
+NNAAMMEE
+       supervisor_bridge - Generic Supervisor Bridge Behaviour.
+
+DDEESSCCRRIIPPTTIIOONN
+       A behaviour module for implementing a supervisor_bridge, a process
+       which connects a subsystem not designed according to the OTP design
+       principles to a supervision tree. The supervisor_bridge sits between a
+       supervisor and the subsystem. It behaves like a real supervisor to its
+       own supervisor, but has a different interface than a real supervisor to
+       the subsystem. Refer to _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s for more information.
+
+       A supervisor_bridge assumes the functions for starting and stopping the
+       subsystem to be located in a callback module exporting a pre-defined
+       set of functions.
+
+       The _s_y_s module can be used for debugging a supervisor_bridge.
+
+       Unless otherwise stated, all functions in this module will fail if the
+       specified supervisor_bridge does not exist or if bad arguments are
+       given.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__lliinnkk((MMoodduullee,, AArrggss)) -->> RReessuulltt
+
+       ssttaarrtt__lliinnkk((SSuuppBBrriiddggeeNNaammee,, MMoodduullee,, AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 SupBridgeName = {local, Name} | {global, Name}
+                 Name = atom()
+                 Module = module()
+                 Args = term()
+                 Result = {ok, Pid} | ignore | {error, Error}
+                 Error = {already_started, Pid} | term()
+                 Pid = pid()
+
+              Creates a supervisor_bridge process, linked to the calling
+              process, which calls _M_o_d_u_l_e_:_i_n_i_t_/_1 to start the subsystem. To
+              ensure a synchronized start-up procedure, this function does not
+              return until _M_o_d_u_l_e_:_i_n_i_t_/_1 has returned.
+
+              If _S_u_p_B_r_i_d_g_e_N_a_m_e_=_{_l_o_c_a_l_,_N_a_m_e_} the supervisor_bridge is
+              registered locally as _N_a_m_e using _r_e_g_i_s_t_e_r_/_2. If
+              _S_u_p_B_r_i_d_g_e_N_a_m_e_=_{_g_l_o_b_a_l_,_N_a_m_e_} the supervisor_bridge is registered
+              globally as _N_a_m_e using _g_l_o_b_a_l_:_r_e_g_i_s_t_e_r___n_a_m_e_/_2. If
+              _S_u_p_B_r_i_d_g_e_N_a_m_e_=_{_v_i_a_,_M_o_d_u_l_e_,_N_a_m_e_} the supervisor_bridge is
+              registered as _N_a_m_e using a registry represented by Module. The
+              _M_o_d_u_l_e callback should export the functions _r_e_g_i_s_t_e_r___n_a_m_e_/_2,
+              _u_n_r_e_g_i_s_t_e_r___n_a_m_e_/_1 and _s_e_n_d_/_2, which should behave like the
+              corresponding functions in _g_l_o_b_a_l. Thus, _{_v_i_a_,_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_}
+              is a valid reference. If no name is provided, the
+              supervisor_bridge is not registered. If there already exists a
+              process with the specified _S_u_p_B_r_i_d_g_e_N_a_m_e the function returns
+              _{_e_r_r_o_r_,_{_a_l_r_e_a_d_y___s_t_a_r_t_e_d_,_P_i_d_}_}, where _P_i_d is the pid of that
+              process.
+
+              _M_o_d_u_l_e is the name of the callback module.
+
+              _A_r_g_s is an arbitrary term which is passed as the argument to
+              _M_o_d_u_l_e_:_i_n_i_t_/_1.
+
+              If the supervisor_bridge and the subsystem are successfully
+              started the function returns _{_o_k_,_P_i_d_}, where _P_i_d is is the pid
+              of the supervisor_bridge.
+
+              If _M_o_d_u_l_e_:_i_n_i_t_/_1 returns _i_g_n_o_r_e, this function returns _i_g_n_o_r_e as
+              well and the supervisor_bridge terminates with reason _n_o_r_m_a_l. If
+              _M_o_d_u_l_e_:_i_n_i_t_/_1 fails or returns an error tuple or an incorrect
+              value, this function returns _{_e_r_r_o_r_,_E_r_r_o_r_r_} where _E_r_r_o_r is a
+              term with information about the error, and the supervisor_bridge
+              terminates with reason _E_r_r_o_r.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following functions should be exported from a _s_u_p_e_r_v_i_s_o_r___b_r_i_d_g_e
+       callback module.
+
+EEXXPPOORRTTSS
+       MMoodduullee::iinniitt((AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 Args = term()
+                 Result = {ok,Pid,State} | ignore | {error,Error}
+                  Pid = pid()
+                  State = term()
+                  Error = term()
+
+              Whenever a supervisor_bridge is started using
+              _s_u_p_e_r_v_i_s_o_r___b_r_i_d_g_e_:_s_t_a_r_t___l_i_n_k_/_2_,_3, this function is called by the
+              new process to start the subsystem and initialize.
+
+              _A_r_g_s is the _A_r_g_s argument provided to the start function.
+
+              The function should return _{_o_k_,_P_i_d_,_S_t_a_t_e_} where _P_i_d is the pid
+              of the main process in the subsystem and _S_t_a_t_e is any term.
+
+              If later _P_i_d terminates with a reason _R_e_a_s_o_n, the supervisor
+              bridge will terminate with reason _R_e_a_s_o_n as well. If later the
+              supervisor_bridge is stopped by its supervisor with reason
+              _R_e_a_s_o_n, it will call _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_(_R_e_a_s_o_n_,_S_t_a_t_e_) to
+              terminate.
+
+              If something goes wrong during the initialization the function
+              should return _{_e_r_r_o_r_,_E_r_r_o_r_} where _E_r_r_o_r is any term, or _i_g_n_o_r_e.
+
+       MMoodduullee::tteerrmmiinnaattee((RReeaassoonn,, SSttaattee))
+
+              Types:
+
+                 Reason = shutdown | term()
+                 State = term()
+
+              This function is called by the supervisor_bridge when it is
+              about to terminate. It should be the opposite of _M_o_d_u_l_e_:_i_n_i_t_/_1
+              and stop the subsystem and do any necessary cleaning up. The
+              return value is ignored.
+
+              _R_e_a_s_o_n is _s_h_u_t_d_o_w_n if the supervisor_bridge is terminated by its
+              supervisor. If the supervisor_bridge terminates because a a
+              linked process (apart from the main process of the subsystem)
+              has terminated with reason _T_e_r_m, _R_e_a_s_o_n will be _T_e_r_m.
+
+              _S_t_a_t_e is taken from the return value of _M_o_d_u_l_e_:_i_n_i_t_/_1.
+
+SSEEEE AALLSSOO
+       ssuuppeerrvviissoorr((33)), ssyyss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2            supervisor_bridge(3)

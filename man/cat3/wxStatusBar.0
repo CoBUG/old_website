@@ -1,0 +1,211 @@
+wxStatusBar(3)             Erlang Module Definition             wxStatusBar(3)
+
+
+
+NNAAMMEE
+       wxStatusBar - See external documentation: wxStatusBar.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxStatusBar.
+
+       This class is derived (and can use functions) from:
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_t_a_t_u_s_B_a_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSttaattuussBBaarr(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSttaattuussBBaarr(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSttaattuussBBaarr(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {winid, integer()} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStatusBar()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStatusBar()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {winid, integer()} | {style, integer()}
+
+              See external documentation.
+
+       ggeettFFiieellddRReecctt((TThhiiss,, II,, RReecctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStatusBar()
+                 I = integer()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       ggeettFFiieellddssCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStatusBar()
+
+              See external documentation.
+
+       ggeettSSttaattuussTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStatusBar()
+
+              Equivalent to ggeettSSttaattuussTTeexxtt((TThhiiss,, [[]])).
+
+       ggeettSSttaattuussTTeexxtt((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee
+       uunniiccooddee))
+
+              Types:
+
+                 This = wxStatusBar()
+                 Option = {number, integer()}
+
+              See external documentation.
+
+       ppooppSSttaattuussTTeexxtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+
+              Equivalent to ppooppSSttaattuussTTeexxtt((TThhiiss,, [[]])).
+
+       ppooppSSttaattuussTTeexxtt((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Option = {number, integer()}
+
+              See external documentation.
+
+       ppuusshhSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to ppuusshhSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt,, [[]])).
+
+       ppuusshhSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Text = chardata() (see module unicode)
+                 Option = {number, integer()}
+
+              See external documentation.
+
+       sseettFFiieellddssCCoouunntt((TThhiiss,, NNuummbbeerr)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Number = integer()
+
+              Equivalent to sseettFFiieellddssCCoouunntt((TThhiiss,, NNuummbbeerr,, [[]])).
+
+       sseettFFiieellddssCCoouunntt((TThhiiss,, NNuummbbeerr,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Number = integer()
+                 Option = {widths, [integer()]}
+
+              See external documentation.
+
+       sseettMMiinnHHeeiigghhtt((TThhiiss,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to sseettSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt,, [[]])).
+
+       sseettSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Text = chardata() (see module unicode)
+                 Option = {number, integer()}
+
+              See external documentation.
+
+       sseettSSttaattuussWWiiddtthhss((TThhiiss,, WWiiddtthhss__ffiieelldd)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Widths_field = [integer()]
+
+              See external documentation.
+
+       sseettSSttaattuussSSttyylleess((TThhiiss,, SSttyylleess)) -->> ookk
+
+              Types:
+
+                 This = wxStatusBar()
+                 Styles = [integer()]
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSttaattuussBBaarr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxStatusBar(3)

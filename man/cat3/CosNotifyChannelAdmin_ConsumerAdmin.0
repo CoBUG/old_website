@@ -1,0 +1,188 @@
+CosNotifyChannelAdmin_ConsumEerrlAadnmginM(o3d)uleCDoesfNiontiitfiyoCnhannelAdmin_ConsumerAdmin(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_ConsumerAdmin - This module implements the OMG
+       CosNotifyChannelAdmin::ConsumerAdmin interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyySSuubbssccrriibbee
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+EEXXPPOORRTTSS
+       __ggeett__MMyyIIDD((CCoonnssuummeerrAAddmmiinn)) -->> AAddmmiinnIIDD
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 AdminID = long()
+
+              The ID returned by the creating channel is equal to the value
+              encapsulated by this readonly attribute.
+
+       __ggeett__MMyyCChhaannnneell((CCoonnssuummeerrAAddmmiinn)) -->> CChhaannnneell
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 Channel = #objref
+
+              The creating channel's reference is maintained by this readonly
+              attribute.
+
+       __ggeett__MMyyOOppeerraattoorr((CCoonnssuummeerrAAddmmiinn)) -->> OOppTTyyppee
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 OpType = 'AND_OP' | 'OR_OP'
+
+              When _C_o_n_s_u_m_e_r_A_d_m_i_n_'_s are created an operation type, i.e.,
+              _'_A_N_D___O_P_' or _'_O_R___O_P_', is supplied, which determines the semantics
+              used by the target object concerning evaluation against any
+              associated _F_i_l_t_e_r objects.
+
+       __ggeett__pprriioorriittyy__ffiilltteerr((CCoonnssuummeerrAAddmmiinn)) -->> MMaappppiinnggFFiilltteerr
+
+              Types:
+
+                 ConsumerAdmin = MappingFilter = #objref
+
+              If set, this operation returns the associated priority
+              _M_a_p_p_i_n_g_F_i_l_t_e_r, otherwise a _N_I_L object reference is returned.
+
+       __sseett__pprriioorriittyy__ffiilltteerr((CCoonnssuummeerrAAddmmiinn,, MMaappppiinnggFFiilltteerr)) -->> ookk
+
+              Types:
+
+                 ConsumerAdmin = MappingFilter = #objref
+
+              To associate a priority _M_a_p_p_i_n_g_F_i_l_t_e_r with the target object
+              this operation must be used.
+
+       __ggeett__lliiffeettiimmee__ffiilltteerr((CCoonnssuummeerrAAddmmiinn)) -->> MMaappppiinnggFFiilltteerr
+
+              Types:
+
+                 ConsumerAdmin = MappingFilter = #objref
+
+              Unless a lifetime _M_a_p_p_i_n_g_F_i_l_t_e_r have been associated with the
+              target object a _N_I_L object reference is returned by this
+              operation.
+
+       __sseett__lliiffeettiimmee__ffiilltteerr((CCoonnssuummeerrAAddmmiinn,, MMaappppiinnggFFiilltteerr)) -->> ookk
+
+              Types:
+
+                 ConsumerAdmin = MappingFilter = #objref
+
+              This operation associate a lifetime _M_a_p_p_i_n_g_F_i_l_t_e_r with the
+              target object.
+
+       __ggeett__ppuullll__ssuupppplliieerrss((CCoonnssuummeerrAAddmmiinn)) -->> PPrrooxxyyIIDDSSeeqq
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 ProxyIDSeq = [ProxyID]
+                 ProxyID = long()
+
+              This readonly attribute maintains the Id's for all _P_u_l_l_P_r_o_x_i_e_s
+              created by the target object and still alive.
+
+       __ggeett__ppuusshh__ssuupppplliieerrss((CCoonnssuummeerrAAddmmiinn)) -->> PPrrooxxyyIIDDSSeeqq
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 ProxyIDSeq = [ProxyID]
+                 ProxyID = long()
+
+              This attribute is similar to the ___g_e_t___p_u_l_l___s_u_p_p_l_i_e_r_s attribute
+              but maintains the Id's for all _P_u_s_h_P_r_o_x_i_e_s created by the target
+              object and still alive.
+
+       ggeett__pprrooxxyy__ssuupppplliieerr((CCoonnssuummeerrAAddmmiinn,, PPrrooxxyyIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 ProxyID = long()
+                 Reply = Proxy | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ProxyNotFound'{}}
+                 Proxy = #objref
+
+              If a proxy with the given Id exists the reference to the object
+              is returned, but if the object have terminated, or an incorrect
+              Id is supplied, an exception is raised.
+
+       oobbttaaiinn__nnoottiiffiiccaattiioonn__ppuullll__ssuupppplliieerr((CCoonnssuummeerrAAddmmiinn,, CCoonnssuummeerrTTyyppee)) -->> RReeppllyy
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 ConsumerType = 'ANY_EVENT' | 'STRUCTURED_EVENT' |
+                 'SEQUENCE_EVENT'
+                 Reply = {Proxy, ProxyID}
+                 Proxy = #objref
+                 ProxyID = long()
+
+              Determined by the parameter _C_o_n_s_u_m_e_r_T_y_p_e, a proxy which will
+              accept events of the defined type is created. Along with the
+              object reference an Id is returned.
+
+       oobbttaaiinn__ppuullll__ssuupppplliieerr((CCoonnssuummeerrAAddmmiinn)) -->> PPrrooxxyy
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 Proxy = #objref
+
+              This operation creates a new proxy which accepts _#_a_n_y_{_} events.
+
+       oobbttaaiinn__nnoottiiffiiccaattiioonn__ppuusshh__ssuupppplliieerr((CCoonnssuummeerrAAddmmiinn,, CCoonnssuummeerrTTyyppee)) -->> RReeppllyy
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 ConsumerType = 'ANY_EVENT' | 'STRUCTURED_EVENT' |
+                 'SEQUENCE_EVENT'
+                 Reply = {Proxy, ProxyID}
+                 Proxy = #objref
+                 ProxyID = long()
+
+              A proxy which accepts events of the type described by the
+              parameter _C_o_n_s_u_m_e_r_T_y_p_e is created by this operation. A unique Id
+              is returned as an out parameter.
+
+       oobbttaaiinn__ppuusshh__ssuupppplliieerr((CCoonnssuummeerrAAddmmiinn)) -->> PPrrooxxyy
+
+              Types:
+
+                 ConsumerAdmin = #objref
+                 Proxy = #objref
+
+              The object created by this function is a proxy which accepts
+              _#_a_n_y_{_} events.
+
+       ddeessttrrooyy((CCoonnssuummeerrAAddmmiinn)) -->> ookk
+
+              Types:
+
+                 ConsumerAdmin = #objref
+
+              To terminate the target object this operation should be used.
+              The associated _C_h_a_n_n_e_l will be notified.
+
+
+
+Ericsson AB                 cosNotificatiCoonsN1o.t1i.f1y8ChannelAdmin_ConsumerAdmin(3)

@@ -1,0 +1,2232 @@
+mnesia(3)                  Erlang Module Definition                  mnesia(3)
+
+
+
+NNAAMMEE
+       mnesia - A Distributed Telecommunications DBMS
+
+DDEESSCCRRIIPPTTIIOONN
+       _M_n_e_s_i_a is a distributed DataBase Management System (DBMS), appropriate
+       for telecommunications applications and other Erlang applications which
+       require continuous operation and exhibit soft real-time properties.
+
+       Listed below are some of the most important and attractive
+       capabilities, Mnesia provides:
+
+         * A relational/object hybrid data model which is suitable for
+           telecommunications applications.
+
+         * A specifically designed DBMS query language, QLC (as an add-on
+           library).
+
+         * Persistence. Tables may be coherently kept on disc as well as in
+           main memory.
+
+         * Replication. Tables may be replicated at several nodes.
+
+         * Atomic transactions. A series of table manipulation operations can
+           be grouped into a single atomic transaction.
+
+         * Location transparency. Programs can be written without knowledge of
+           the actual location of data.
+
+         * Extremely fast real time data searches.
+
+         * Schema manipulation routines. It is possible to reconfigure the
+           DBMS at runtime without stopping the system.
+
+       This Reference Manual describes the Mnesia API. This includes functions
+       used to define and manipulate Mnesia tables.
+
+       All functions documented in these pages can be used in any combination
+       with queries using the list comprehension notation. The query notation
+       is described in the QLC's man page.
+
+       Data in Mnesia is organized as a set of tables. Each table has a name
+       which must be an atom. Each table is made up of Erlang records. The
+       user is responsible for the record definitions. Each table also has a
+       set of properties. Below are some of the properties that are associated
+       with each table:
+
+         * _t_y_p_e. Each table can either have 'set', 'ordered_set' or 'bag'
+           semantics. Note: currently 'ordered_set' is not supported for
+           'disc_only_copies'. If a table is of type 'set' it means that each
+           key leads to either one or zero records.
+           If a new item is inserted with the same key as an existing record,
+           the old record is overwritten. On the other hand, if a table is of
+           type 'bag', each key can map to several records. However, all
+           records in type bag tables are unique, only the keys may be
+           duplicated.
+
+         * _r_e_c_o_r_d___n_a_m_e. All records stored in a table must have the same name.
+           You may say that the records must be instances of the same record
+           type.
+
+         * _r_a_m___c_o_p_i_e_s A table can be replicated on a number of Erlang nodes.
+           The _r_a_m___c_o_p_i_e_s property specifies a list of Erlang nodes where RAM
+           copies are kept. These copies can be dumped to disc at regular
+           intervals. However, updates to these copies are not written to disc
+           on a transaction basis.
+
+         * _d_i_s_c___c_o_p_i_e_s The _d_i_s_c___c_o_p_i_e_s property specifies a list of Erlang
+           nodes where the table is kept in RAM as well as on disc. All
+           updates of the table are performed on the actual table and are also
+           logged to disc. If a table is of type _d_i_s_c___c_o_p_i_e_s at a certain
+           node, it means that the entire table is resident in RAM memory as
+           well as on disc. Each transaction performed on the table is
+           appended to a LOG file as well as written into the RAM table.
+
+         * _d_i_s_c___o_n_l_y___c_o_p_i_e_s Some, or all, table replicas can be kept on disc
+           only. These replicas are considerably slower than the RAM based
+           replicas.
+
+         * _i_n_d_e_x This is a list of attribute names, or integers, which specify
+           the tuple positions on which Mnesia shall build and maintain an
+           extra index table.
+
+         * _l_o_c_a_l___c_o_n_t_e_n_t When an application requires tables whose contents is
+           local to each node, _l_o_c_a_l___c_o_n_t_e_n_t tables may be used. The name of
+           the table is known to all Mnesia nodes, but its contents is unique
+           on each node. This means that access to such a table must be done
+           locally. Set the _l_o_c_a_l___c_o_n_t_e_n_t field to _t_r_u_e if you want to enable
+           the _l_o_c_a_l___c_o_n_t_e_n_t behavior. The default is _f_a_l_s_e.
+
+         * _m_a_j_o_r_i_t_y This attribute can be either _t_r_u_e or _f_a_l_s_e (default is
+           _f_a_l_s_e). When _t_r_u_e, a majority of the table replicas must be
+           available for an update to succeed. Majority checking can be
+           enabled on tables with mission-critical data, where it is vital to
+           avoid inconsistencies due to network splits.
+
+         * _s_n_m_p Each (set based) Mnesia table can be automatically turned into
+           an SNMP ordered table as well. This property specifies the types of
+           the SNMP keys.
+
+         * _a_t_t_r_i_b_u_t_e_s. The names of the attributes for the records that are
+           inserted in the table.
+
+       See _m_n_e_s_i_a_:_c_r_e_a_t_e___t_a_b_l_e_/_2 about the complete set of table properties
+       and their details.
+
+       This document uses a table of persons to illustrate various examples.
+       The following record definition is assumed:
+
+       -record(person, {name,
+                        age = 0,
+                        address = unknown,
+                        salary = 0,
+                        children = []}),
+
+
+       The first attribute of the record is the primary key, or key for short.
+
+       The function descriptions are sorted in alphabetic order. _H_i_n_t_: start
+       to read about _m_n_e_s_i_a_:_c_r_e_a_t_e___t_a_b_l_e_/_2, _m_n_e_s_i_a_:_l_o_c_k_/_2 and
+       _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 before you continue on and learn about the rest.
+
+       Writing or deleting in transaction context creates a local copy of each
+       modified record during the transaction. During iteration, i.e.
+       _m_n_e_s_i_a_:_f_o_l_d_[_l_r_]_/_4 _m_n_e_s_i_a_:_n_e_x_t_/_2 _m_n_e_s_i_a_:_p_r_e_v_/_2
+       _m_n_e_s_i_a_:_s_n_m_p___g_e_t___n_e_x_t___i_n_d_e_x_/_2, mnesia will compensate for every written
+       or deleted record, which may reduce the performance. If possible avoid
+       writing or deleting records in the same transaction before iterating
+       over the table.
+
+EEXXPPOORRTTSS
+       aabboorrtt((RReeaassoonn)) -->> ttrraannssaaccttiioonn aabboorrtt
+
+              Makes the transaction silently return the tuple _{_a_b_o_r_t_e_d_,
+              _R_e_a_s_o_n_}. The abortion of a Mnesia transaction means that an
+              exception will be thrown to an enclosing _c_a_t_c_h. Thus, the
+              expression _c_a_t_c_h _m_n_e_s_i_a_:_a_b_o_r_t_(_x_) does not abort the transaction.
+
+       aaccttiivvaattee__cchheecckkppooiinntt((AArrggss)) -->> {{ookk,,NNaammee,,NNooddeess}} || {{eerrrroorr,,RReeaassoonn}}
+
+              A checkpoint is a consistent view of the system. A checkpoint
+              can be activated on a set of tables. This checkpoint can then be
+              traversed and will present a view of the system as it existed at
+              the time when the checkpoint was activated, even if the tables
+              are being or have been manipulated.
+
+              _A_r_g_s is a list of the following tuples:
+
+                * _{_n_a_m_e_,_N_a_m_e_}. _N_a_m_e of checkpoint. Each checkpoint must have a
+                  name which is unique to the associated nodes. The name can
+                  be reused only once the checkpoint has been deactivated. By
+                  default, a name which is probably unique is generated.
+
+                * _{_m_a_x_,_M_a_x_T_a_b_s_}. _M_a_x_T_a_b_s is a list of tables that should be
+                  included in the checkpoint. The default is []. For these
+                  tables, the redundancy will be maximized and checkpoint
+                  information will be retained together with all replicas. The
+                  checkpoint becomes more fault tolerant if the tables have
+                  several replicas. When a new replica is added by means of
+                  the schema manipulation function _m_n_e_s_i_a_:_a_d_d___t_a_b_l_e___c_o_p_y_/_3, a
+                  retainer will also be attached automatically.
+
+                * _{_m_i_n_,_M_i_n_T_a_b_s_}. _M_i_n_T_a_b_s is a list of tables that should be
+                  included in the checkpoint. The default is []. For these
+                  tables, the redundancy will be minimized and the checkpoint
+                  information will only be retained with one replica,
+                  preferably on the local node.
+
+                * _{_a_l_l_o_w___r_e_m_o_t_e_,_B_o_o_l_}. _f_a_l_s_e means that all retainers must be
+                  local. The checkpoint cannot be activated if a table does
+                  not reside locally. _t_r_u_e allows retainers to be allocated on
+                  any node. Default is set to _t_r_u_e.
+
+                * _{_r_a_m___o_v_e_r_r_i_d_e_s___d_u_m_p_,_B_o_o_l_}. Only applicable for _r_a_m___c_o_p_i_e_s.
+                  _B_o_o_l allows you to choose to backup the table state as it is
+                  in RAM, or as it is on disc. _t_r_u_e means that the latest
+                  committed records in RAM should be included in the
+                  checkpoint. These are the records that the application
+                  accesses. _f_a_l_s_e means that the records dumped to DAT files
+                  should be included in the checkpoint. These are the records
+                  that will be loaded at startup. Default is _f_a_l_s_e.
+
+              Returns _{_o_k_,_N_a_m_e_,_N_o_d_e_s_} or _{_e_r_r_o_r_,_R_e_a_s_o_n_}. _N_a_m_e is the (possibly
+              generated) name of the checkpoint. _N_o_d_e_s are the nodes that are
+              involved in the checkpoint. Only nodes that keep a checkpoint
+              retainer know about the checkpoint.
+
+       aaccttiivviittyy((AAcccceessssCCoonntteexxtt,, FFuunn [[,, AArrggss]])) -->> RReessuullttOOffFFuunn || eexxiitt((RReeaassoonn))
+
+              Invokes _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_(_A_c_c_e_s_s_C_o_n_t_e_x_t_, _F_u_n_, _A_r_g_s_, _A_c_c_e_s_s_M_o_d_)
+              where _A_c_c_e_s_s_M_o_d is the default access callback module obtained
+              by _m_n_e_s_i_a_:_s_y_s_t_e_m___i_n_f_o_(_a_c_c_e_s_s___m_o_d_u_l_e_). _A_r_g_s defaults to the empty
+              list _[_].
+
+       aaccttiivviittyy((AAcccceessssCCoonntteexxtt,, FFuunn,, AArrggss,, AAcccceessssMMoodd)) -->> RReessuullttOOffFFuunn ||
+       eexxiitt((RReeaassoonn))
+
+              This function executes the functional object _F_u_n with the
+              arguments _A_r_g_s.
+
+              The code which executes inside the activity can consist of a
+              series of table manipulation functions, which is performed in a
+              _A_c_c_e_s_s_C_o_n_t_e_x_t. Currently, the following access contexts are
+              supported:
+
+                _t_r_a_n_s_a_c_t_i_o_n:
+                  Short for _{_t_r_a_n_s_a_c_t_i_o_n_, _i_n_f_i_n_i_t_y_}
+
+                _{_t_r_a_n_s_a_c_t_i_o_n_, _R_e_t_r_i_e_s_}:
+                  Invokes _m_n_e_s_i_a_:_t_r_a_n_s_a_c_t_i_o_n_(_F_u_n_, _A_r_g_s_, _R_e_t_r_i_e_s_). Note that
+                  the result from the _F_u_n is returned if the transaction was
+                  successful (atomic), otherwise the function exits with an
+                  abort reason.
+
+                _s_y_n_c___t_r_a_n_s_a_c_t_i_o_n:
+                  Short for _{_s_y_n_c___t_r_a_n_s_a_c_t_i_o_n_, _i_n_f_i_n_i_t_y_}
+
+                _{_s_y_n_c___t_r_a_n_s_a_c_t_i_o_n_, _R_e_t_r_i_e_s_}:
+                  Invokes _m_n_e_s_i_a_:_s_y_n_c___t_r_a_n_s_a_c_t_i_o_n_(_F_u_n_, _A_r_g_s_, _R_e_t_r_i_e_s_). Note
+                  that the result from the _F_u_n is returned if the transaction
+                  was successful (atomic), otherwise the function exits with
+                  an abort reason.
+
+                _a_s_y_n_c___d_i_r_t_y:
+                  Invokes _m_n_e_s_i_a_:_a_s_y_n_c___d_i_r_t_y_(_F_u_n_, _A_r_g_s_).
+
+                _s_y_n_c___d_i_r_t_y:
+                  Invokes _m_n_e_s_i_a_:_s_y_n_c___d_i_r_t_y_(_F_u_n_, _A_r_g_s_).
+
+                _e_t_s:
+                  Invokes _m_n_e_s_i_a_:_e_t_s_(_F_u_n_, _A_r_g_s_).
+
+              This function (_m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4) differs in an important aspect
+              from the _m_n_e_s_i_a_:_t_r_a_n_s_a_c_t_i_o_n, _m_n_e_s_i_a_:_s_y_n_c___t_r_a_n_s_a_c_t_i_o_n,
+              _m_n_e_s_i_a_:_a_s_y_n_c___d_i_r_t_y, _m_n_e_s_i_a_:_s_y_n_c___d_i_r_t_y and _m_n_e_s_i_a_:_e_t_s functions.
+              The _A_c_c_e_s_s_M_o_d argument is the name of a callback module which
+              implements the _m_n_e_s_i_a___a_c_c_e_s_s behavior.
+
+              Mnesia will forward calls to the following functions:
+
+                * mnesia:lock/2 (read_lock_table/1, write_lock_table/1)
+
+                * mnesia:write/3 (write/1, s_write/1)
+
+                * mnesia:delete/3 (delete/1, s_delete/1)
+
+                * mnesia:delete_object/3 (delete_object/1, s_delete_object/1)
+
+                * mnesia:read/3 (read/1, wread/1)
+
+                * mnesia:match_object/3 (match_object/1)
+
+                * mnesia:all_keys/1
+
+                * mnesia:first/1
+
+                * mnesia:last/1
+
+                * mnesia:prev/2
+
+                * mnesia:next/2
+
+                * mnesia:index_match_object/4 (index_match_object/2)
+
+                * mnesia:index_read/3
+
+                * mnesia:table_info/2
+
+              to the corresponding:
+
+                * AccessMod:lock(ActivityId, Opaque, LockItem, LockKind)
+
+                * AccessMod:write(ActivityId, Opaque, Tab, Rec, LockKind)
+
+                * AccessMod:delete(ActivityId, Opaque, Tab, Key, LockKind)
+
+                * AccessMod:delete_object(ActivityId, Opaque, Tab, RecXS,
+                  LockKind)
+
+                * AccessMod:read(ActivityId, Opaque, Tab, Key, LockKind)
+
+                * AccessMod:match_object(ActivityId, Opaque, Tab, Pattern,
+                  LockKind)
+
+                * AccessMod:all_keys(ActivityId, Opaque, Tab, LockKind)
+
+                * AccessMod:first(ActivityId, Opaque, Tab)
+
+                * AccessMod:last(ActivityId, Opaque, Tab)
+
+                * AccessMod:prev(ActivityId, Opaque, Tab, Key)
+
+                * AccessMod:next(ActivityId, Opaque, Tab, Key)
+
+                * AccessMod:index_match_object(ActivityId, Opaque, Tab,
+                  Pattern, Attr, LockKind)
+
+                * AccessMod:index_read(ActivityId, Opaque, Tab, SecondaryKey,
+                  Attr, LockKind)
+
+                * AccessMod:table_info(ActivityId, Opaque, Tab, InfoItem)
+
+              where _A_c_t_i_v_i_t_y_I_d is a record which represents the identity of
+              the enclosing Mnesia activity. The first field (obtained with
+              _e_l_e_m_e_n_t_(_1_, _A_c_t_i_v_i_t_y_I_d_) contains an atom which may be interpreted
+              as the type of the activity: _'_e_t_s_', _'_a_s_y_n_c___d_i_r_t_y_', _'_s_y_n_c___d_i_r_t_y_'
+              or _'_t_i_d_'. _'_t_i_d_' means that the activity is a transaction. The
+              structure of the rest of the identity record is internal to
+              Mnesia.
+
+              _O_p_a_q_u_e is an opaque data structure which is internal to Mnesia.
+
+       aadddd__ttaabbllee__ccooppyy((TTaabb,, NNooddee,, TTyyppee)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              This function makes another copy of a table at the node _N_o_d_e.
+              The _T_y_p_e argument must be either of the atoms _r_a_m___c_o_p_i_e_s,
+              _d_i_s_c___c_o_p_i_e_s, or _d_i_s_c___o_n_l_y___c_o_p_i_e_s. For example, the following
+              call ensures that a disc replica of the _p_e_r_s_o_n table also exists
+              at node _N_o_d_e.
+
+              mnesia:add_table_copy(person, Node, disc_copies)
+
+
+              This function can also be used to add a replica of the table
+              named _s_c_h_e_m_a.
+
+       aadddd__ttaabbllee__iinnddeexx((TTaabb,, AAttttrrNNaammee)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              Table indices can and should be used whenever the user wants to
+              frequently use some other field than the key field to look up
+              records. If this other field has an index associated with it,
+              these lookups can occur in constant time and space. For example,
+              if our application wishes to use the age field of persons to
+              efficiently find all person with a specific age, it might be a
+              good idea to have an index on the age field. This can be
+              accomplished with the following call:
+
+              mnesia:add_table_index(person, age)
+
+
+              Indices do not come free, they occupy space which is
+              proportional to the size of the table. They also cause
+              insertions into the table to execute slightly slower.
+
+       aallll__kkeeyyss((TTaabb)) -->> KKeeyyLLiisstt || ttrraannssaaccttiioonn aabboorrtt
+
+              This function returns a list of all keys in the table named _T_a_b.
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a read lock on the entire table.
+
+       aassyynncc__ddiirrttyy((FFuunn,, [[,, AArrggss]])) -->> RReessuullttOOffFFuunn || eexxiitt((RReeaassoonn))
+
+              Call the _F_u_n in a context which is not protected by a
+              transaction. The Mnesia function calls performed in the _F_u_n are
+              mapped to the corresponding dirty functions. This still involves
+              logging, replication and subscriptions, but there is no locking,
+              local transaction storage, or commit protocols involved.
+              Checkpoint retainers and indices are updated, but they will be
+              updated dirty. As for normal mnesia:dirty_* operations, the
+              operations are performed semi-asynchronously. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 and the Mnesia User's Guide for more details.
+
+              It is possible to manipulate the Mnesia tables without using
+              transactions. This has some serious disadvantages, but is
+              considerably faster since the transaction manager is not
+              involved and no locks are set. A dirty operation does, however,
+              guarantee a certain level of consistency and it is not possible
+              for the dirty operations to return garbled records. All dirty
+              operations provide location transparency to the programmer and a
+              program does not have to be aware of the whereabouts of a
+              certain table in order to function.
+
+              _N_o_t_e_:It is more than 10 times more efficient to read records
+              dirty than within a transaction.
+
+              Depending on the application, it may be a good idea to use the
+              dirty functions for certain operations. Almost all Mnesia
+              functions which can be called within transactions have a dirty
+              equivalent which is much more efficient. However, it must be
+              noted that it is possible for the database to be left in an
+              inconsistent state if dirty operations are used to update it.
+              Dirty operations should only be used for performance reasons
+              when it is absolutely necessary.
+
+              _N_o_t_e_: Calling (nesting) a _m_n_e_s_i_a_:_[_a_]_s_y_n_c___d_i_r_t_y inside a
+              transaction context will inherit the transaction semantics.
+
+       bbaacckkuupp((OOppaaqquuee [[,, BBaacckkuuppMMoodd]])) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Activates a new checkpoint covering all Mnesia tables, including
+              the schema, with maximum degree of redundancy and performs a
+              backup using _b_a_c_k_u_p___c_h_e_c_k_p_o_i_n_t_/_2_/_3. The default value of the
+              backup callback module _B_a_c_k_u_p_M_o_d is obtained by
+              _m_n_e_s_i_a_:_s_y_s_t_e_m___i_n_f_o_(_b_a_c_k_u_p___m_o_d_u_l_e_).
+
+       bbaacckkuupp__cchheecckkppooiinntt((NNaammee,, OOppaaqquuee [[,, BBaacckkuuppMMoodd]])) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              The tables are backed up to external media using the backup
+              module _B_a_c_k_u_p_M_o_d. Tables with the local contents property is
+              being backed up as they exist on the current node. _B_a_c_k_u_p_M_o_d is
+              the default backup callback module obtained by
+              _m_n_e_s_i_a_:_s_y_s_t_e_m___i_n_f_o_(_b_a_c_k_u_p___m_o_d_u_l_e_). See the User's Guide about
+              the exact callback interface (the _m_n_e_s_i_a___b_a_c_k_u_p _b_e_h_a_v_i_o_r).
+
+       cchhaannggee__ccoonnffiigg((CCoonnffiigg,, VVaalluuee)) -->> {{eerrrroorr,, RReeaassoonn}} || {{ookk,, RReettuurrnnVVaalluuee}}
+
+              The _C_o_n_f_i_g should be an atom of the following configuration
+              parameters:
+
+                _e_x_t_r_a___d_b___n_o_d_e_s:
+                  _V_a_l_u_e is a list of nodes which Mnesia should try to connect
+                  to. The _R_e_t_u_r_n_V_a_l_u_e will be those nodes in _V_a_l_u_e that Mnesia
+                  are connected to.
+                  Note: This function shall only be used to connect to newly
+                  started ram nodes (N.D.R.S.N.) with an empty schema. If for
+                  example it is used after the network have been partitioned
+                  it may lead to inconsistent tables.
+                  Note: Mnesia may be connected to other nodes than those
+                  returned in _R_e_t_u_r_n_V_a_l_u_e.
+
+                _d_c___d_u_m_p___l_i_m_i_t:
+                  _V_a_l_u_e is a number. See description in _C_o_n_f_i_g_u_r_a_t_i_o_n
+                  _P_a_r_a_m_e_t_e_r_s below. The _R_e_t_u_r_n_V_a_l_u_e is the new value. Note
+                  this configuration parameter is not persistent, it will be
+                  lost when mnesia stopped.
+
+       cchhaannggee__ttaabbllee__aacccceessss__mmooddee((TTaabb,, AAcccceessssMMooddee)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,,
+       ookk}}
+
+              The _A_c_c_c_e_s_s_M_o_d_e is by default the atom _r_e_a_d___w_r_i_t_e but it may
+              also be set to the atom _r_e_a_d___o_n_l_y. If the _A_c_c_e_s_s_M_o_d_e is set to
+              _r_e_a_d___o_n_l_y, it means that it is not possible to perform updates
+              to the table. At startup Mnesia always loads _r_e_a_d___o_n_l_y tables
+              locally regardless of when and if Mnesia was terminated on other
+              nodes.
+
+       cchhaannggee__ttaabbllee__ccooppyy__ttyyppee((TTaabb,, NNooddee,, TToo)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              For example:
+
+              mnesia:change_table_copy_type(person, node(), disc_copies)
+
+
+              Transforms our _p_e_r_s_o_n table from a RAM table into a disc based
+              table at _N_o_d_e.
+
+              This function can also be used to change the storage type of the
+              table named _s_c_h_e_m_a. The schema table can only have _r_a_m___c_o_p_i_e_s or
+              _d_i_s_c___c_o_p_i_e_s as the storage type. If the storage type of the
+              schema is _r_a_m___c_o_p_i_e_s, no other table can be disc resident on
+              that node.
+
+       cchhaannggee__ttaabbllee__llooaadd__oorrddeerr((TTaabb,, LLooaaddOOrrddeerr)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              The _L_o_a_d_O_r_d_e_r priority is by default _0 (zero) but may be set to
+              any integer. The tables with the highest _L_o_a_d_O_r_d_e_r priority will
+              be loaded first at startup.
+
+       cchhaannggee__ttaabbllee__mmaajjoorriittyy((TTaabb,, MMaajjoorriittyy)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              _M_a_j_o_r_i_t_y must be a boolean; the default is _f_a_l_s_e. When _t_r_u_e, a
+              majority of the table's replicas must be available for an update
+              to succeed. When used on fragmented tables, _T_a_b must be the name
+              base table. Directly changing the majority setting on individual
+              fragments is not allowed.
+
+       cclleeaarr__ttaabbllee((TTaabb)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              Deletes all entries in the table _T_a_b.
+
+       ccrreeaattee__sscchheemmaa((DDiissccNNooddeess)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Creates a new database on disc. Various files are created in the
+              local Mnesia directory of each node. Note that the directory
+              must be unique for each node. Two nodes may never share the same
+              directory. If possible, use a local disc device in order to
+              improve performance.
+
+              _m_n_e_s_i_a_:_c_r_e_a_t_e___s_c_h_e_m_a_/_1 fails if any of the Erlang nodes given as
+              _D_i_s_c_N_o_d_e_s are not alive, if Mnesia is running on anyone of the
+              nodes, or if anyone of the nodes already has a schema. Use
+              _m_n_e_s_i_a_:_d_e_l_e_t_e___s_c_h_e_m_a_/_1 to get rid of old faulty schemas.
+
+              _N_o_t_e_: Only nodes with disc should be included in _D_i_s_c_N_o_d_e_s.
+              Disc-less nodes, that is nodes where all tables including the
+              schema only resides in RAM, may not be included.
+
+       ccrreeaattee__ttaabbllee((NNaammee,, TTaabbDDeeff)) -->> {{aattoommiicc,, ookk}} || {{aabboorrtteedd,, RReeaassoonn}}
+
+              This function creates a Mnesia table called _N_a_m_e according to
+              the argument _T_a_b_D_e_f. This list must be a list of _{_I_t_e_m_, _V_a_l_u_e_}
+              tuples, where the following values are allowed:
+
+                * _{_a_c_c_e_s_s___m_o_d_e_, _A_t_o_m_}. The access mode is by default the atom
+                  _r_e_a_d___w_r_i_t_e but it may also be set to the atom _r_e_a_d___o_n_l_y. If
+                  the _A_c_c_e_s_s_M_o_d_e is set to _r_e_a_d___o_n_l_y, it means that it is not
+                  possible to perform updates to the table.
+
+                  At startup Mnesia always loads _r_e_a_d___o_n_l_y tables locally
+                  regardless of when and if Mnesia was terminated on other
+                  nodes. This argument returns the access mode of the table.
+                  The access mode may either be read_only or read_write.
+
+                * _{_a_t_t_r_i_b_u_t_e_s_, _A_t_o_m_L_i_s_t_} a list of the attribute names for the
+                  records that are supposed to populate the table. The default
+                  value is _[_k_e_y_, _v_a_l_]. The table must have at least one extra
+                  attribute in addition to the key.
+
+                  When accessing single attributes in a record, it is not
+                  necessary, or even recommended, to hard code any attribute
+                  names as atoms. Use the construct _r_e_c_o_r_d___i_n_f_o_(_f_i_e_l_d_s_,
+                  _R_e_c_o_r_d_N_a_m_e_) instead. It can be used for records of type
+                  _R_e_c_o_r_d_N_a_m_e
+
+                * _{_d_i_s_c___c_o_p_i_e_s_, _N_o_d_e_l_i_s_t_}, where _N_o_d_e_l_i_s_t is a list of the
+                  nodes where this table is supposed to have disc copies. If a
+                  table replica is of type _d_i_s_c___c_o_p_i_e_s, all write operations
+                  on this particular replica of the table are written to disc
+                  as well as to the RAM copy of the table.
+
+                  It is possible to have a replicated table of type
+                  _d_i_s_c___c_o_p_i_e_s on one node, and another type on another node.
+                  The default value is _[_]
+
+                * _{_d_i_s_c___o_n_l_y___c_o_p_i_e_s_, _N_o_d_e_l_i_s_t_}, where _N_o_d_e_l_i_s_t is a list of
+                  the nodes where this table is supposed to have
+                  _d_i_s_c___o_n_l_y___c_o_p_i_e_s. A disc only table replica is kept on disc
+                  only and unlike the other replica types, the contents of the
+                  replica will not reside in RAM. These replicas are
+                  considerably slower than replicas held in RAM.
+
+                * _{_i_n_d_e_x_, _I_n_t_l_i_s_t_}, where _I_n_t_l_i_s_t is a list of attribute names
+                  (atoms) or record fields for which Mnesia shall build and
+                  maintain an extra index table. The _q_l_c query compiler may or
+                  may not utilize any additional indices while processing
+                  queries on a table.
+
+                * _{_l_o_a_d___o_r_d_e_r_, _I_n_t_e_g_e_r_}. The load order priority is by default
+                  _0 (zero) but may be set to any integer. The tables with the
+                  highest load order priority will be loaded first at startup.
+
+                * _{_m_a_j_o_r_i_t_y_, _F_l_a_g_}, where _F_l_a_g must be a boolean. If _t_r_u_e, any
+                  (non-dirty) update to the table will abort unless a majority
+                  of the table's replicas are available for the commit. When
+                  used on a fragmented table, all fragments will be given the
+                  same majority setting.
+
+                * _{_r_a_m___c_o_p_i_e_s_, _N_o_d_e_l_i_s_t_}, where _N_o_d_e_l_i_s_t is a list of the
+                  nodes where this table is supposed to have RAM copies. A
+                  table replica of type _r_a_m___c_o_p_i_e_s is obviously not written to
+                  disc on a per transaction basis. It is possible to dump
+                  _r_a_m___c_o_p_i_e_s replicas to disc with the function
+                  _m_n_e_s_i_a_:_d_u_m_p___t_a_b_l_e_s_(_T_a_b_s_). The default value for this
+                  attribute is _[_n_o_d_e_(_)_].
+
+                * _{_r_e_c_o_r_d___n_a_m_e_, _N_a_m_e_}, where _N_a_m_e must be an atom. All
+                  records, stored in the table, must have this name as the
+                  first element. It defaults to the same name as the name of
+                  the table.
+
+                * _{_s_n_m_p_, _S_n_m_p_S_t_r_u_c_t_}. See _m_n_e_s_i_a_:_s_n_m_p___o_p_e_n___t_a_b_l_e_/_2 for a
+                  description of _S_n_m_p_S_t_r_u_c_t. If this attribute is present in
+                  the _A_r_g_L_i_s_t to _m_n_e_s_i_a_:_c_r_e_a_t_e___t_a_b_l_e_/_2, the table is
+                  immediately accessible by means of the Simple Network
+                  Management Protocol (SNMP). This means that applications
+                  which use SNMP to manipulate and control the system can be
+                  designed easily, since Mnesia provides a direct mapping
+                  between the logical tables that make up an SNMP control
+                  application and the physical data which makes up a Mnesia
+                  table.
+
+                * _{_s_t_o_r_a_g_e___p_r_o_p_e_r_t_i_e_s_, _[_{_B_a_c_k_e_n_d_, _P_r_o_p_e_r_t_i_e_s_}_]. Forwards
+                  additional properties to the backend storage. _B_a_c_k_e_n_d can
+                  currently be _e_t_s or _d_e_t_s and _P_r_o_p_e_r_t_i_e_s is a list of options
+                  sent to the backend storage during table creation.
+                  _P_r_o_p_e_r_t_i_e_s may not contain properties already used by mnesia
+                  such as _t_y_p_e or _n_a_m_e_d___t_a_b_l_e.
+
+                  For example:
+
+                mnesia:create_table(table, [{ram_copies, [node()]}, {disc_only_copies, nodes()},
+                                   {storage_properties,
+                                    [{ets, [compressed]}, {dets, [{auto_save, 5000}]} ]}])
+
+
+                * _{_t_y_p_e_, _T_y_p_e_}, where _T_y_p_e must be either of the atoms _s_e_t,
+                  _o_r_d_e_r_e_d___s_e_t or _b_a_g. The default value is _s_e_t. In a _s_e_t all
+                  records have unique keys and in a _b_a_g several records may
+                  have the same key, but the record content is unique. If a
+                  non-unique record is stored the old, conflicting record(s)
+                  will simply be overwritten. Note: currently 'ordered_set' is
+                  not supported for 'disc_only_copies'.
+
+                * _{_l_o_c_a_l___c_o_n_t_e_n_t_, _B_o_o_l_}, where _B_o_o_l must be either _t_r_u_e or
+                  _f_a_l_s_e. The default value is _f_a_l_s_e.
+
+              For example, the following call creates the _p_e_r_s_o_n table
+              previously defined and replicates it on 2 nodes:
+
+              mnesia:create_table(person,
+                  [{ram_copies, [N1, N2]},
+                   {attributes, record_info(fields,person)}]).
+
+
+              If it was required that Mnesia build and maintain an extra index
+              table on the _a_d_d_r_e_s_s attribute of all the _p_e_r_s_o_n records that
+              are inserted in the table, the following code would be issued:
+
+              mnesia:create_table(person,
+                  [{ram_copies, [N1, N2]},
+                   {index, [address]},
+                   {attributes, record_info(fields,person)}]).
+
+
+              The specification of _i_n_d_e_x and _a_t_t_r_i_b_u_t_e_s may be hard coded as
+              _{_i_n_d_e_x_, _[_2_]_} and _{_a_t_t_r_i_b_u_t_e_s_, _[_n_a_m_e_, _a_g_e_, _a_d_d_r_e_s_s_, _s_a_l_a_r_y_,
+              _c_h_i_l_d_r_e_n_]_} respectively.
+
+              _m_n_e_s_i_a_:_c_r_e_a_t_e___t_a_b_l_e_/_2 writes records into the _s_c_h_e_m_a table. This
+              function, as well as all other schema manipulation functions,
+              are implemented with the normal transaction management system.
+              This guarantees that schema updates are performed on all nodes
+              in an atomic manner.
+
+       ddeeaaccttiivvaattee__cchheecckkppooiinntt((NNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              The checkpoint is automatically deactivated when some of the
+              tables involved have no retainer attached to them. This may
+              happen when nodes go down or when a replica is deleted.
+              Checkpoints will also be deactivated with this function. _N_a_m_e is
+              the name of an active checkpoint.
+
+       ddeell__ttaabbllee__ccooppyy((TTaabb,, NNooddee)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              Deletes the replica of table _T_a_b at node _N_o_d_e. When the last
+              replica is deleted with this function, the table disappears
+              entirely.
+
+              This function may also be used to delete a replica of the table
+              named _s_c_h_e_m_a. Then the mnesia node will be removed. Note: Mnesia
+              must be stopped on the node first.
+
+       ddeell__ttaabbllee__iinnddeexx((TTaabb,, AAttttrrNNaammee)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              This function deletes the index on attribute with name _A_t_t_r_N_a_m_e
+              in a table.
+
+       ddeelleettee(({{TTaabb,, KKeeyy}})) -->> ttrraannssaaccttiioonn aabboorrtt || ookk
+
+              Invokes _m_n_e_s_i_a_:_d_e_l_e_t_e_(_T_a_b_, _K_e_y_, _w_r_i_t_e_)
+
+       ddeelleettee((TTaabb,, KKeeyy,, LLoocckkKKiinndd)) -->> ttrraannssaaccttiioonn aabboorrtt || ookk
+
+              Deletes all records in table _T_a_b with the key _K_e_y.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a lock of type _L_o_c_k_K_i_n_d in the record. Currently the
+              lock types _w_r_i_t_e and _s_t_i_c_k_y___w_r_i_t_e are supported.
+
+       ddeelleettee__oobbjjeecctt((RReeccoorrdd)) -->> ttrraannssaaccttiioonn aabboorrtt || ookk
+
+              Invokes _m_n_e_s_i_a_:_d_e_l_e_t_e___o_b_j_e_c_t_(_T_a_b_, _R_e_c_o_r_d_, _w_r_i_t_e_) where _T_a_b is
+              _e_l_e_m_e_n_t_(_1_, _R_e_c_o_r_d_).
+
+       ddeelleettee__oobbjjeecctt((TTaabb,, RReeccoorrdd,, LLoocckkKKiinndd)) -->> ttrraannssaaccttiioonn aabboorrtt || ookk
+
+              If a table is of type _b_a_g, we may sometimes want to delete only
+              some of the records with a certain key. This can be done with
+              the _d_e_l_e_t_e___o_b_j_e_c_t_/_3 function. A complete record must be supplied
+              to this function.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a lock of type _L_o_c_k_K_i_n_d on the record. Currently the
+              lock types _w_r_i_t_e and _s_t_i_c_k_y___w_r_i_t_e are supported.
+
+       ddeelleettee__sscchheemmaa((DDiissccNNooddeess)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Deletes a database created with _m_n_e_s_i_a_:_c_r_e_a_t_e___s_c_h_e_m_a_/_1.
+              _m_n_e_s_i_a_:_d_e_l_e_t_e___s_c_h_e_m_a_/_1 fails if any of the Erlang nodes given as
+              _D_i_s_c_N_o_d_e_s is not alive, or if Mnesia is running on any of the
+              nodes.
+
+              After the database has been deleted, it may still be possible to
+              start Mnesia as a disc-less node. This depends on how the
+              configuration parameter _s_c_h_e_m_a___l_o_c_a_t_i_o_n is set.
+
+          WWaarrnniinngg::
+              This function must be used with extreme caution since it makes
+              existing persistent data obsolete. Think twice before using it.
+
+
+       ddeelleettee__ttaabbllee((TTaabb)) -->> {{aabboorrtteedd,, RReeaassoonn}} || {{aattoommiicc,, ookk}}
+
+              Permanently deletes all replicas of table _T_a_b.
+
+       ddiirrttyy__aallll__kkeeyyss((TTaabb)) -->> KKeeyyLLiisstt || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))..
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_a_l_l___k_e_y_s_/_1 function.
+
+       ddiirrttyy__ddeelleettee(({{TTaabb,, KKeeyy}})) -->> ookk || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___d_e_l_e_t_e_(_T_a_b_, _K_e_y_).
+
+       ddiirrttyy__ddeelleettee((TTaabb,, KKeeyy)) -->> ookk || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_d_e_l_e_t_e_/_3 function.
+
+       ddiirrttyy__ddeelleettee__oobbjjeecctt((RReeccoorrdd))
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___d_e_l_e_t_e___o_b_j_e_c_t_(_T_a_b_, _R_e_c_o_r_d_) where _T_a_b is
+              _e_l_e_m_e_n_t_(_1_, _R_e_c_o_r_d_).
+
+       ddiirrttyy__ddeelleettee__oobbjjeecctt((TTaabb,, RReeccoorrdd))
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_d_e_l_e_t_e___o_b_j_e_c_t_/_3
+              function.
+
+       ddiirrttyy__ffiirrsstt((TTaabb)) -->> KKeeyy || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              Records in _s_e_t or _b_a_g tables are not ordered. However, there is
+              an ordering of the records which is not known to the user.
+              Accordingly, it is possible to traverse a table by means of this
+              function in conjunction with the _m_n_e_s_i_a_:_d_i_r_t_y___n_e_x_t_/_2 function.
+
+              If there are no records at all in the table, this function
+              returns the atom _'_$_e_n_d___o_f___t_a_b_l_e_'. For this reason, it is highly
+              undesirable, but not disallowed, to use this atom as the key for
+              any user records.
+
+       ddiirrttyy__iinnddeexx__mmaattcchh__oobbjjeecctt((PPaatttteerrnn,, PPooss))
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___i_n_d_e_x___m_a_t_c_h___o_b_j_e_c_t_(_T_a_b_, _P_a_t_t_e_r_n_, _P_o_s_) where
+              _T_a_b is _e_l_e_m_e_n_t_(_1_, _P_a_t_t_e_r_n_).
+
+       ddiirrttyy__iinnddeexx__mmaattcchh__oobbjjeecctt((TTaabb,, PPaatttteerrnn,, PPooss))
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_i_n_d_e_x___m_a_t_c_h___o_b_j_e_c_t_/_4
+              function.
+
+       ddiirrttyy__iinnddeexx__rreeaadd((TTaabb,, SSeeccoonnddaarryyKKeeyy,, PPooss))
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_i_n_d_e_x___r_e_a_d_/_3
+              function.
+
+       ddiirrttyy__llaasstt((TTaabb)) -->> KKeeyy || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              This function works exactly like _m_n_e_s_i_a_:_d_i_r_t_y___f_i_r_s_t_/_1 but
+              returns the last object in Erlang term order for the _o_r_d_e_r_e_d___s_e_t
+              table type. For all other table types, _m_n_e_s_i_a_:_d_i_r_t_y___f_i_r_s_t_/_1 and
+              _m_n_e_s_i_a_:_d_i_r_t_y___l_a_s_t_/_1 are synonyms.
+
+       ddiirrttyy__mmaattcchh__oobbjjeecctt((PPaatttteerrnn)) -->> RReeccoorrddLLiisstt || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))..
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___m_a_t_c_h___o_b_j_e_c_t_(_T_a_b_, _P_a_t_t_e_r_n_) where _T_a_b is
+              _e_l_e_m_e_n_t_(_1_, _P_a_t_t_e_r_n_).
+
+       ddiirrttyy__mmaattcchh__oobbjjeecctt((TTaabb,, PPaatttteerrnn)) -->> RReeccoorrddLLiisstt || eexxiitt(({{aabboorrtteedd,,
+       RReeaassoonn}}))..
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_m_a_t_c_h___o_b_j_e_c_t_/_3
+              function.
+
+       ddiirrttyy__nneexxtt((TTaabb,, KKeeyy)) -->> KKeeyy || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              This function makes it possible to traverse a table and perform
+              operations on all records in the table. When the end of the
+              table is reached, the special key _'_$_e_n_d___o_f___t_a_b_l_e_' is returned.
+              Otherwise, the function returns a key which can be used to read
+              the actual record.The behavior is undefined if another Erlang
+              process performs write operations on the table while it is being
+              traversed with the _m_n_e_s_i_a_:_d_i_r_t_y___n_e_x_t_/_2 function.
+
+       ddiirrttyy__pprreevv((TTaabb,, KKeeyy)) -->> KKeeyy || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              This function works exactly like _m_n_e_s_i_a_:_d_i_r_t_y___n_e_x_t_/_2 but returns
+              the previous object in Erlang term order for the ordered_set
+              table type. For all other table types, _m_n_e_s_i_a_:_d_i_r_t_y___n_e_x_t_/_2 and
+              _m_n_e_s_i_a_:_d_i_r_t_y___p_r_e_v_/_2 are synonyms.
+
+       ddiirrttyy__rreeaadd(({{TTaabb,, KKeeyy}})) -->> VVaalluueeLLiisstt || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___r_e_a_d_(_T_a_b_, _K_e_y_).
+
+       ddiirrttyy__rreeaadd((TTaabb,, KKeeyy)) -->> VVaalluueeLLiisstt || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_r_e_a_d_/_3 function.
+
+       ddiirrttyy__sseelleecctt((TTaabb,, MMaattcchhSSppeecc)) -->> VVaalluueeLLiisstt || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}
+
+              This is the dirty equivalent of the _m_n_e_s_i_a_:_s_e_l_e_c_t_/_2 function.
+
+       ddiirrttyy__sslloott((TTaabb,, SSlloott)) -->> RReeccoorrddLLiisstt || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              This function can be used to traverse a table in a manner
+              similar to the _m_n_e_s_i_a_:_d_i_r_t_y___n_e_x_t_/_2 function. A table has a
+              number of slots which range from 0 (zero) to some unknown upper
+              bound. The function _m_n_e_s_i_a_:_d_i_r_t_y___s_l_o_t_/_2 returns the special atom
+              _'_$_e_n_d___o_f___t_a_b_l_e_' when the end of the table is reached. The
+              behavior of this function is undefined if a write operation is
+              performed on the table while it is being traversed.
+
+       ddiirrttyy__uuppddaattee__ccoouunntteerr(({{TTaabb,, KKeeyy}},, IInnccrr)) -->> NNeewwVVaall || eexxiitt(({{aabboorrtteedd,,
+       RReeaassoonn}}))
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___u_p_d_a_t_e___c_o_u_n_t_e_r_(_T_a_b_, _K_e_y_, _I_n_c_r_).
+
+       ddiirrttyy__uuppddaattee__ccoouunntteerr((TTaabb,, KKeeyy,, IInnccrr)) -->> NNeewwVVaall || eexxiitt(({{aabboorrtteedd,,
+       RReeaassoonn}}))
+
+              There are no special counter records in Mnesia. However, records
+              of the form _{_T_a_b_, _K_e_y_, _I_n_t_e_g_e_r_} can be used as (possibly disc
+              resident) counters, when _T_a_b is a _s_e_t. This function updates a
+              counter with a positive or negative number. However, counters
+              can never become less than zero. There are two significant
+              differences between this function and the action of first
+              reading the record, performing the arithmetics, and then writing
+              the record:
+
+                * It is much more efficient
+
+                * _m_n_e_s_i_a_:_d_i_r_t_y___u_p_d_a_t_e___c_o_u_n_t_e_r_/_3 is performed as an atomic
+                  operation despite the fact that it is not protected by a
+                  transaction.
+
+              If two processes perform _m_n_e_s_i_a_:_d_i_r_t_y___u_p_d_a_t_e___c_o_u_n_t_e_r_/_3
+              simultaneously, both updates will take effect without the risk
+              of losing one of the updates. The new value _N_e_w_V_a_l of the
+              counter is returned.
+
+              If _K_e_y don't exits, a new record is created with the value _I_n_c_r
+              if it is larger than 0, otherwise it is set to 0.
+
+       ddiirrttyy__wwrriittee((RReeccoorrdd)) -->> ookk || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              Invokes _m_n_e_s_i_a_:_d_i_r_t_y___w_r_i_t_e_(_T_a_b_, _R_e_c_o_r_d_) where _T_a_b is _e_l_e_m_e_n_t_(_1_,
+              _R_e_c_o_r_d_).
+
+       ddiirrttyy__wwrriittee((TTaabb,, RReeccoorrdd)) -->> ookk || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              This is the dirty equivalent of _m_n_e_s_i_a_:_w_r_i_t_e_/_3.
+
+       dduummpp__lloogg(()) -->> dduummppeedd
+
+              Performs a user initiated dump of the local log file. This is
+              usually not necessary since Mnesia, by default, manages this
+              automatically.
+
+       dduummpp__ttaabblleess((TTaabbLLiisstt)) -->> {{aattoommiicc,, ookk}} || {{aabboorrtteedd,, RReeaassoonn}}
+
+              This function dumps a set of _r_a_m___c_o_p_i_e_s tables to disc. The next
+              time the system is started, these tables are initiated with the
+              data found in the files that are the result of this dump. None
+              of the tables may have disc resident replicas.
+
+       dduummpp__ttoo__tteexxttffiillee((FFiilleennaammee))
+
+              Dumps all local tables of a mnesia system into a text file which
+              can then be edited (by means of a normal text editor) and then
+              later be reloaded with _m_n_e_s_i_a_:_l_o_a_d___t_e_x_t_f_i_l_e_/_1. Only use this
+              function for educational purposes. Use other functions to deal
+              with real backups.
+
+       eerrrroorr__ddeessccrriippttiioonn((EErrrroorr)) -->> SSttrriinngg
+
+              All Mnesia transactions, including all the schema update
+              functions, either return the value _{_a_t_o_m_i_c_, _V_a_l_} or the tuple
+              _{_a_b_o_r_t_e_d_, _R_e_a_s_o_n_}. The _R_e_a_s_o_n can be either of the following
+              atoms. The _e_r_r_o_r___d_e_s_c_r_i_p_t_i_o_n_/_1 function returns a descriptive
+              string which describes the error.
+
+                * _n_e_s_t_e_d___t_r_a_n_s_a_c_t_i_o_n. Nested transactions are not allowed in
+                  this context.
+
+                * _b_a_d_a_r_g. Bad or invalid argument, possibly bad type.
+
+                * _n_o___t_r_a_n_s_a_c_t_i_o_n. Operation not allowed outside transactions.
+
+                * _c_o_m_b_i_n_e___e_r_r_o_r. Table options were illegally combined.
+
+                * _b_a_d___i_n_d_e_x. Index already exists or was out of bounds.
+
+                * _a_l_r_e_a_d_y___e_x_i_s_t_s. Schema option is already set.
+
+                * _i_n_d_e_x___e_x_i_s_t_s. Some operations cannot be performed on tabs
+                  with index.
+
+                * _n_o___e_x_i_s_t_s. Tried to perform operation on non-existing, or
+                  not alive, item.
+
+                * _s_y_s_t_e_m___l_i_m_i_t. Some system_limit was exhausted.
+
+                * _m_n_e_s_i_a___d_o_w_n. A transaction involving records at some remote
+                  node which died while transaction was executing. Record(s)
+                  are no longer available elsewhere in the network.
+
+                * _n_o_t___a___d_b___n_o_d_e. A node which does not exist in the schema was
+                  mentioned.
+
+                * _b_a_d___t_y_p_e. Bad type on some arguments.
+
+                * _n_o_d_e___n_o_t___r_u_n_n_i_n_g. Node not running.
+
+                * _t_r_u_n_c_a_t_e_d___b_i_n_a_r_y___f_i_l_e. Truncated binary in file.
+
+                * _a_c_t_i_v_e. Some delete operations require that all active
+                  records are removed.
+
+                * _i_l_l_e_g_a_l. Operation not supported on record.
+
+              The _E_r_r_o_r may be _R_e_a_s_o_n, _{_e_r_r_o_r_, _R_e_a_s_o_n_}, or _{_a_b_o_r_t_e_d_, _R_e_a_s_o_n_}.
+              The _R_e_a_s_o_n may be an atom or a tuple with _R_e_a_s_o_n as an atom in
+              the first field.
+
+       eettss((FFuunn,, [[,, AArrggss]])) -->> RReessuullttOOffFFuunn || eexxiitt((RReeaassoonn))
+
+              Call the _F_u_n in a raw context which is not protected by a
+              transaction. The Mnesia function call is performed in the _F_u_n
+              are performed directly on the local _e_t_s tables on the assumption
+              that the local storage type is _r_a_m___c_o_p_i_e_s and the tables are not
+              replicated to other nodes. Subscriptions are not triggered and
+              checkpoints are not updated, but it is extremely fast. This
+              function can also be applied to _d_i_s_c___c_o_p_i_e_s tables if all
+              operations are read only. See _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 and the Mnesia
+              User's Guide for more details.
+
+              _N_o_t_e_: Calling (nesting) a _m_n_e_s_i_a_:_e_t_s inside a transaction
+              context will inherit the transaction semantics.
+
+       ffiirrsstt((TTaabb)) -->> KKeeyy || ttrraannssaaccttiioonn aabboorrtt
+
+              Records in _s_e_t or _b_a_g tables are not ordered. However, there is
+              an ordering of the records which is not known to the user.
+              Accordingly, it is possible to traverse a table by means of this
+              function in conjunction with the _m_n_e_s_i_a_:_n_e_x_t_/_2 function.
+
+              If there are no records at all in the table, this function
+              returns the atom _'_$_e_n_d___o_f___t_a_b_l_e_'. For this reason, it is highly
+              undesirable, but not disallowed, to use this atom as the key for
+              any user records.
+
+       ffoollddll((FFuunnccttiioonn,, AAcccc,, TTaabbllee)) -->> NNeewwAAcccc || ttrraannssaaccttiioonn aabboorrtt
+
+              Iterates over the table _T_a_b_l_e and calls _F_u_n_c_t_i_o_n_(_R_e_c_o_r_d_, _N_e_w_A_c_c_)
+              for each _R_e_c_o_r_d in the table. The term returned from _F_u_n_c_t_i_o_n
+              will be used as the second argument in the next call to the
+              _F_u_n_c_t_i_o_n.
+
+              _f_o_l_d_l returns the same term as the last call to _F_u_n_c_t_i_o_n
+              returned.
+
+       ffoollddrr((FFuunnccttiioonn,, AAcccc,, TTaabbllee)) -->> NNeewwAAcccc || ttrraannssaaccttiioonn aabboorrtt
+
+              This function works exactly like _f_o_l_d_l_/_3 but iterates the table
+              in the opposite order for the _o_r_d_e_r_e_d___s_e_t table type. For all
+              other table types, _f_o_l_d_r_/_3 and _f_o_l_d_l_/_3 are synonyms.
+
+       ffoorrccee__llooaadd__ttaabbllee((TTaabb)) -->> yyeess || EErrrroorrDDeessccrriippttiioonn
+
+              The Mnesia algorithm for table load might lead to a situation
+              where a table cannot be loaded. This situation occurs when a
+              node is started and Mnesia concludes, or suspects, that another
+              copy of the table was active after this local copy became
+              inactive due to a system crash.
+
+              If this situation is not acceptable, this function can be used
+              to override the strategy of the Mnesia table load algorithm.
+              This could lead to a situation where some transaction effects
+              are lost with a inconsistent database as result, but for some
+              applications high availability is more important than consistent
+              data.
+
+       iinnddeexx__mmaattcchh__oobbjjeecctt((PPaatttteerrnn,, PPooss)) -->> ttrraannssaaccttiioonn aabboorrtt || OObbjjLLiisstt
+
+              Invokes _m_n_e_s_i_a_:_i_n_d_e_x___m_a_t_c_h___o_b_j_e_c_t_(_T_a_b_, _P_a_t_t_e_r_n_, _P_o_s_, _r_e_a_d_) where
+              _T_a_b is _e_l_e_m_e_n_t_(_1_, _P_a_t_t_e_r_n_).
+
+       iinnddeexx__mmaattcchh__oobbjjeecctt((TTaabb,, PPaatttteerrnn,, PPooss,, LLoocckkKKiinndd)) -->> ttrraannssaaccttiioonn aabboorrtt ||
+       OObbjjLLiisstt
+
+              In a manner similar to the _m_n_e_s_i_a_:_i_n_d_e_x___r_e_a_d_/_3 function, we can
+              also utilize any index information when we try to match records.
+              This function takes a pattern which obeys the same rules as the
+              _m_n_e_s_i_a_:_m_a_t_c_h___o_b_j_e_c_t_/_3 function with the exception that this
+              function requires the following conditions:
+
+                * The table _T_a_b must have an index on position _P_o_s.
+
+                * The element in position _P_o_s in _P_a_t_t_e_r_n must be bound. _P_o_s
+                  may either be an integer (#record.Field), or an attribute
+                  name.
+
+              The two index search functions described here are automatically
+              invoked when searching tables with _q_l_c list comprehensions and
+              also when using the low level _m_n_e_s_i_a_:_[_d_i_r_t_y___]_m_a_t_c_h___o_b_j_e_c_t
+              functions.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a lock of type _L_o_c_k_K_i_n_d on the entire table or on a
+              single record. Currently, the lock type _r_e_a_d is supported.
+
+       iinnddeexx__rreeaadd((TTaabb,, SSeeccoonnddaarryyKKeeyy,, PPooss)) -->> ttrraannssaaccttiioonn aabboorrtt || RReeccoorrddLLiisstt
+
+              Assume there is an index on position _P_o_s for a certain record
+              type. This function can be used to read the records without
+              knowing the actual key for the record. For example, with an
+              index in position 1 of the _p_e_r_s_o_n table, the call
+              _m_n_e_s_i_a_:_i_n_d_e_x___r_e_a_d_(_p_e_r_s_o_n_, _3_6_, _#_p_e_r_s_o_n_._a_g_e_) returns a list of all
+              persons with age equal to 36. _P_o_s may also be an attribute name
+              (atom), but if the notation _m_n_e_s_i_a_:_i_n_d_e_x___r_e_a_d_(_p_e_r_s_o_n_, _3_6_, _a_g_e_)
+              is used, the field position will be searched for in runtime, for
+              each call.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a read lock on the entire table.
+
+       iinnffoo(()) -->> ookk
+
+              Prints some information about the system on the tty. This
+              function may be used even if Mnesia is not started. However,
+              more information will be displayed if Mnesia is started.
+
+       iinnssttaallll__ffaallllbbaacckk((OOppaaqquuee)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Invokes _m_n_e_s_i_a_:_i_n_s_t_a_l_l___f_a_l_l_b_a_c_k_(_O_p_a_q_u_e_, _A_r_g_s_) where _A_r_g_s is
+              _[_{_s_c_o_p_e_, _g_l_o_b_a_l_}_].
+
+       iinnssttaallll__ffaallllbbaacckk((OOppaaqquuee)),, BBaacckkuuppMMoodd)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Invokes _m_n_e_s_i_a_:_i_n_s_t_a_l_l___f_a_l_l_b_a_c_k_(_O_p_a_q_u_e_, _A_r_g_s_) where _A_r_g_s is
+              _[_{_s_c_o_p_e_, _g_l_o_b_a_l_}_, _{_m_o_d_u_l_e_, _B_a_c_k_u_p_M_o_d_}_].
+
+       iinnssttaallll__ffaallllbbaacckk((OOppaaqquuee,, AArrggss)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              This function is used to install a backup as fallback. The
+              fallback will be used to restore the database at the next start-
+              up. Installation of fallbacks requires Erlang to be up and
+              running on all the involved nodes, but it does not matter if
+              Mnesia is running or not. The installation of the fallback will
+              fail if the local node is not one of the disc resident nodes in
+              the backup.
+
+              _A_r_g_s is a list of the following tuples:
+
+                * _{_m_o_d_u_l_e_, _B_a_c_k_u_p_M_o_d_}. All accesses of the backup media is
+                  performed via a callback module named _B_a_c_k_u_p_M_o_d. The _O_p_a_q_u_e
+                  argument is forwarded to the callback module which may
+                  interpret it as it wish. The default callback module is
+                  called _m_n_e_s_i_a___b_a_c_k_u_p and it interprets the _O_p_a_q_u_e argument
+                  as a local filename. The default for this module is also
+                  configurable via the _-_m_n_e_s_i_a _m_n_e_s_i_a___b_a_c_k_u_p configuration
+                  parameter.
+
+                * _{_s_c_o_p_e_, _S_c_o_p_e_} The _S_c_o_p_e of a fallback may either be _g_l_o_b_a_l
+                  for the entire database or _l_o_c_a_l for one node. By default,
+                  the installation of a fallback is a global operation which
+                  either is performed all nodes with disc resident schema or
+                  none. Which nodes that are disc resident or not, is
+                  determined from the schema info in the backup.
+
+                  If the _S_c_o_p_e of the operation is _l_o_c_a_l the fallback will
+                  only be installed on the local node.
+
+                * _{_m_n_e_s_i_a___d_i_r_, _A_l_t_e_r_n_a_t_e_D_i_r_} This argument is only valid if
+                  the scope of the installation is _l_o_c_a_l. Normally the
+                  installation of a fallback is targeted towards the Mnesia
+                  directory as configured with the _-_m_n_e_s_i_a _d_i_r configuration
+                  parameter. But by explicitly supplying an _A_l_t_e_r_n_a_t_e_D_i_r the
+                  fallback will be installed there regardless of the Mnesia
+                  directory configuration parameter setting. After
+                  installation of a fallback on an alternate Mnesia directory
+                  that directory is fully prepared for usage as an active
+                  Mnesia directory.
+
+                  This is a somewhat dangerous feature which must be used with
+                  care. By unintentional mixing of directories you may easily
+                  end up with a inconsistent database, if the same backup is
+                  installed on more than one directory.
+
+       iiss__ttrraannssaaccttiioonn(()) -->> bboooolleeaann
+
+              When this function is executed inside a transaction context it
+              returns _t_r_u_e, otherwise _f_a_l_s_e.
+
+       llaasstt((TTaabb)) -->> KKeeyy || ttrraannssaaccttiioonn aabboorrtt
+
+              This function works exactly like _m_n_e_s_i_a_:_f_i_r_s_t_/_1 but returns the
+              last object in Erlang term order for the _o_r_d_e_r_e_d___s_e_t table type.
+              For all other table types, _m_n_e_s_i_a_:_f_i_r_s_t_/_1 and _m_n_e_s_i_a_:_l_a_s_t_/_1 are
+              synonyms.
+
+       llooaadd__tteexxttffiillee((FFiilleennaammee))
+
+              Loads a series of definitions and data found in the text file
+              (generated with _m_n_e_s_i_a_:_d_u_m_p___t_o___t_e_x_t_f_i_l_e_/_1) into Mnesia. This
+              function also starts Mnesia and possibly creates a new schema.
+              This function is intended for educational purposes only and
+              using other functions to deal with real backups, is recommended.
+
+       lloocckk((LLoocckkIItteemm,, LLoocckkKKiinndd)) -->> NNooddeess || ookk || ttrraannssaaccttiioonn aabboorrtt
+
+              Write locks are normally acquired on all nodes where a replica
+              of the table resides (and is active). Read locks are acquired on
+              one node (the local node if a local replica exists). Most of the
+              context sensitive access functions acquire an implicit lock if
+              they are invoked in a transaction context. The granularity of a
+              lock may either be a single record or an entire table.
+
+              The normal usage is to call the function without checking the
+              return value since it exits if it fails and the transaction is
+              restarted by the transaction manager. It returns all the locked
+              nodes if a write lock is acquired, and _o_k if it was a read lock.
+
+              This function _m_n_e_s_i_a_:_l_o_c_k_/_2 is intended to support explicit
+              locking on tables but also intended for situations when locks
+              need to be acquired regardless of how tables are replicated.
+              Currently, two _L_o_c_k_K_i_n_d's are supported:
+
+                _w_r_i_t_e:
+                  Write locks are exclusive, which means that if one
+                  transaction manages to acquire a write lock on an item, no
+                  other transaction may acquire any kind of lock on the same
+                  item.
+
+                _r_e_a_d:
+                  Read locks may be shared, which means that if one
+                  transaction manages to acquire a read lock on an item, other
+                  transactions may also acquire a read lock on the same item.
+                  However, if someone has a read lock no one can acquire a
+                  write lock at the same item. If some one has a write lock no
+                  one can acquire a read lock nor a write lock at the same
+                  item.
+
+              Conflicting lock requests are automatically queued if there is
+              no risk of a deadlock. Otherwise the transaction must be aborted
+              and executed again. Mnesia does this automatically as long as
+              the upper limit of maximum _r_e_t_r_i_e_s is not reached. See
+              _m_n_e_s_i_a_:_t_r_a_n_s_a_c_t_i_o_n_/_3 for the details.
+
+              For the sake of completeness sticky write locks will also be
+              described here even if a sticky write lock is not supported by
+              this particular function:
+
+                _s_t_i_c_k_y___w_r_i_t_e:
+                  Sticky write locks are a mechanism which can be used to
+                  optimize write lock acquisition. If your application uses
+                  replicated tables mainly for fault tolerance (as opposed to
+                  read access optimization purpose), sticky locks may be the
+                  best option available.
+
+                  When a sticky write lock is acquired, all nodes will be
+                  informed which node is locked. Subsequently, sticky lock
+                  requests from the same node will be performed as a local
+                  operation without any communication with other nodes. The
+                  sticky lock lingers on the node even after the transaction
+                  has ended. See the Mnesia User's Guide for more information.
+
+              Currently, two kinds of _L_o_c_k_I_t_e_m's are supported by this
+              function:
+
+                _{_t_a_b_l_e_, _T_a_b_}:
+                  This acquires a lock of type _L_o_c_k_K_i_n_d on the entire table
+                  _T_a_b.
+
+                _{_g_l_o_b_a_l_, _G_l_o_b_a_l_K_e_y_, _N_o_d_e_s_}:
+                  This acquires a lock of type _L_o_c_k_K_i_n_d on the global resource
+                  _G_l_o_b_a_l_K_e_y. The lock is acquired on all active nodes in the
+                  _N_o_d_e_s list.
+
+              Locks are released when the outermost transaction ends.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires locks otherwise it just ignores the request.
+
+       mmaattcchh__oobbjjeecctt((PPaatttteerrnn)) -->>ttrraannssaaccttiioonn aabboorrtt || RReeccLLiisstt
+
+              Invokes _m_n_e_s_i_a_:_m_a_t_c_h___o_b_j_e_c_t_(_T_a_b_, _P_a_t_t_e_r_n_, _r_e_a_d_) where _T_a_b is
+              _e_l_e_m_e_n_t_(_1_, _P_a_t_t_e_r_n_).
+
+       mmaattcchh__oobbjjeecctt((TTaabb,, PPaatttteerrnn,, LLoocckkKKiinndd)) -->>ttrraannssaaccttiioonn aabboorrtt || RReeccLLiisstt
+
+              This function takes a pattern with 'don't care' variables
+              denoted as a '_' parameter. This function returns a list of
+              records which matched the pattern. Since the second element of a
+              record in a table is considered to be the key for the record,
+              the performance of this function depends on whether this key is
+              bound or not.
+
+              For example, the call _m_n_e_s_i_a_:_m_a_t_c_h___o_b_j_e_c_t_(_p_e_r_s_o_n_, _{_p_e_r_s_o_n_, _'___'_,
+              _3_6_, _'___'_, _'___'_}_, _r_e_a_d_) returns a list of all person records with
+              an age field of thirty-six (36).
+
+              The function _m_n_e_s_i_a_:_m_a_t_c_h___o_b_j_e_c_t_/_3 automatically uses indices if
+              these exist. However, no heuristics are performed in order to
+              select the best index.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a lock of type _L_o_c_k_K_i_n_d on the entire table or a
+              single record. Currently, the lock type _r_e_a_d is supported.
+
+       mmoovvee__ttaabbllee__ccooppyy((TTaabb,, FFrroomm,, TToo)) -->> {{aabboorrtteedd,, RReeaassoonn}} || {{aattoommiicc,, ookk}}
+
+              Moves the copy of table _T_a_b from node _F_r_o_m to node _T_o.
+
+              The storage type is preserved. For example, a RAM table moved
+              from one node remains a RAM on the new node. It is still
+              possible for other transactions to read and write in the table
+              while it is being moved.
+
+              This function cannot be used on _l_o_c_a_l___c_o_n_t_e_n_t tables.
+
+       nneexxtt((TTaabb,, KKeeyy)) -->> KKeeyy || ttrraannssaaccttiioonn aabboorrtt
+
+              This function makes it possible to traverse a table and perform
+              operations on all records in the table. When the end of the
+              table is reached, the special key _'_$_e_n_d___o_f___t_a_b_l_e_' is returned.
+              Otherwise, the function returns a key which can be used to read
+              the actual record.
+
+       pprreevv((TTaabb,, KKeeyy)) -->> KKeeyy || ttrraannssaaccttiioonn aabboorrtt
+
+              This function works exactly like _m_n_e_s_i_a_:_n_e_x_t_/_2 but returns the
+              previous object in Erlang term order for the ordered_set table
+              type. For all other table types, _m_n_e_s_i_a_:_n_e_x_t_/_2 and _m_n_e_s_i_a_:_p_r_e_v_/_2
+              are synonyms.
+
+       rreeaadd(({{TTaabb,, KKeeyy}})) -->> ttrraannssaaccttiioonn aabboorrtt || RReeccoorrddLLiisstt
+
+              Invokes _m_n_e_s_i_a_:_r_e_a_d_(_T_a_b_, _K_e_y_, _r_e_a_d_).
+
+       rreeaadd((TTaabb,, KKeeyy)) -->> ttrraannssaaccttiioonn aabboorrtt || RReeccoorrddLLiisstt
+
+              Invokes _m_n_e_s_i_a_:_r_e_a_d_(_T_a_b_, _K_e_y_, _r_e_a_d_).
+
+       rreeaadd((TTaabb,, KKeeyy,, LLoocckkKKiinndd)) -->> ttrraannssaaccttiioonn aabboorrtt || RReeccoorrddLLiisstt
+
+              This function reads all records from table _T_a_b with key _K_e_y.
+              This function has the same semantics regardless of the location
+              of _T_a_b. If the table is of type _b_a_g, the _m_n_e_s_i_a_:_r_e_a_d_(_T_a_b_, _K_e_y_)
+              can return an arbitrarily long list. If the table is of type
+              _s_e_t, the list is either of length 1, or _[_].
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a lock of type _L_o_c_k_K_i_n_d. Currently, the lock types
+              _r_e_a_d, _w_r_i_t_e and _s_t_i_c_k_y___w_r_i_t_e are supported.
+
+              If the user wants to update the record it is more efficient to
+              use _w_r_i_t_e_/_s_t_i_c_k_y___w_r_i_t_e as the LockKind. If majority checking is
+              active on the table, it will be checked as soon as a write lock
+              is attempted. This can be used to quickly abort if the majority
+              condition isn't met.
+
+       rreeaadd__lloocckk__ttaabbllee((TTaabb)) -->> ookk || ttrraannssaaccttiioonn aabboorrtt
+
+              Invokes _m_n_e_s_i_a_:_l_o_c_k_(_{_t_a_b_l_e_, _T_a_b_}_, _r_e_a_d_).
+
+       rreeppoorrtt__eevveenntt((EEvveenntt)) -->> ookk
+
+              When tracing a system of Mnesia applications it is useful to be
+              able to interleave Mnesia's own events with application related
+              events that give information about the application context.
+
+              Whenever the application begins a new and demanding Mnesia task,
+              or if it is entering a new interesting phase in its execution,
+              it may be a good idea to use _m_n_e_s_i_a_:_r_e_p_o_r_t___e_v_e_n_t_/_1. The _E_v_e_n_t
+              may be any term and generates a _{_m_n_e_s_i_a___u_s_e_r_, _E_v_e_n_t_} event for
+              any processes that subscribe to Mnesia system events.
+
+       rreessttoorree((OOppaaqquuee,, AArrggss)) -->> {{aattoommiicc,, RReessttoorreeddTTaabbss}} ||{{aabboorrtteedd,, RReeaassoonn}}
+
+              With this function, tables may be restored online from a backup
+              without restarting Mnesia. _O_p_a_q_u_e is forwarded to the backup
+              module. _A_r_g_s is a list of the following tuples:
+
+                * _{_m_o_d_u_l_e_,_B_a_c_k_u_p_M_o_d_} The backup module _B_a_c_k_u_p_M_o_d will be used
+                  to access the backup media. If omitted, the default backup
+                  module will be used.
+
+                * _{_s_k_i_p___t_a_b_l_e_s_, _T_a_b_L_i_s_t_} Where _T_a_b_L_i_s_t is a list of tables
+                  which should not be read from the backup.
+
+                * _{_c_l_e_a_r___t_a_b_l_e_s_, _T_a_b_L_i_s_t_} Where _T_a_b_L_i_s_t is a list of tables
+                  which should be cleared, before the records from the backup
+                  are inserted, ie. all records in the tables are deleted
+                  before the tables are restored. Schema information about the
+                  tables is not cleared or read from backup.
+
+                * _{_k_e_e_p___t_a_b_l_e_s_, _T_a_b_L_i_s_t_} Where _T_a_b_L_i_s_t is a list of tables
+                  which should be not be cleared, before the records from the
+                  backup are inserted, i.e. the records in the backup will be
+                  added to the records in the table. Schema information about
+                  the tables is not cleared or read from backup.
+
+                * _{_r_e_c_r_e_a_t_e___t_a_b_l_e_s_, _T_a_b_L_i_s_t_} Where _T_a_b_L_i_s_t is a list of tables
+                  which should be re-created, before the records from the
+                  backup are inserted. The tables are first deleted and then
+                  created with the schema information from the backup. All the
+                  nodes in the backup needs to be up and running.
+
+                * _{_d_e_f_a_u_l_t___o_p_, _O_p_e_r_a_t_i_o_n_} Where _O_p_e_r_a_t_i_o_n is one of the
+                  following operations _s_k_i_p___t_a_b_l_e_s, _c_l_e_a_r___t_a_b_l_e_s, _k_e_e_p___t_a_b_l_e_s
+                  or _r_e_c_r_e_a_t_e___t_a_b_l_e_s. The default operation specifies which
+                  operation should be used on tables from the backup which are
+                  not specified in any of the lists above. If omitted, the
+                  operation _c_l_e_a_r___t_a_b_l_e_s will be used.
+
+              The affected tables are write locked during the restoration, but
+              regardless of the lock conflicts caused by this, the
+              applications can continue to do their work while the restoration
+              is being performed. The restoration is performed as one single
+              transaction.
+
+              If the database is huge, it may not be possible to restore it
+              online. In such cases, the old database must be restored by
+              installing a fallback and then restart.
+
+       ss__ddeelleettee(({{TTaabb,, KKeeyy}})) -->> ookk || ttrraannssaaccttiioonn aabboorrtt
+
+              Invokes _m_n_e_s_i_a_:_d_e_l_e_t_e_(_T_a_b_, _K_e_y_, _s_t_i_c_k_y___w_r_i_t_e_)
+
+       ss__ddeelleettee__oobbjjeecctt((RReeccoorrdd)) -->> ookk || ttrraannssaaccttiioonn aabboorrtt
+
+              Invokes _m_n_e_s_i_a_:_d_e_l_e_t_e___o_b_j_e_c_t_(_T_a_b_, _R_e_c_o_r_d_, _s_t_i_c_k_y___w_r_i_t_e_) where
+              _T_a_b is _e_l_e_m_e_n_t_(_1_, _R_e_c_o_r_d_).
+
+       ss__wwrriittee((RReeccoorrdd)) -->> ookk || ttrraannssaaccttiioonn aabboorrtt
+
+              Invokes _m_n_e_s_i_a_:_w_r_i_t_e_(_T_a_b_, _R_e_c_o_r_d_, _s_t_i_c_k_y___w_r_i_t_e_) where _T_a_b is
+              _e_l_e_m_e_n_t_(_1_, _R_e_c_o_r_d_).
+
+       sscchheemmaa(()) -->> ookk
+
+              Prints information about all table definitions on the tty.
+
+       sscchheemmaa((TTaabb)) -->> ookk
+
+              Prints information about one table definition on the tty.
+
+       sseelleecctt((TTaabb,, MMaattcchhSSppeecc [[,, LLoocckk]])) -->> ttrraannssaaccttiioonn aabboorrtt || [[OObbjjeecctt]]
+
+              Matches the objects in the table _T_a_b using a match_spec as
+              described in the ERTS Users Guide. Optionally a lock _r_e_a_d or
+              _w_r_i_t_e can be given as the third argument, default is _r_e_a_d. The
+              return value depends on the _M_a_t_c_h_S_p_e_c.
+
+              _N_o_t_e_: for best performance _s_e_l_e_c_t should be used before any
+              modifying operations are done on that table in the same
+              transaction, i.e. don't use _w_r_i_t_e or _d_e_l_e_t_e before a _s_e_l_e_c_t.
+
+              In its simplest forms the match_spec's look like this:
+
+                * MatchSpec = [MatchFunction]
+
+                * MatchFunction = {MatchHead, [Guard], [Result]}
+
+                * MatchHead = tuple() | record()
+
+                * Guard = {"Guardtest name", ...}
+
+                * Result = "Term construct"
+
+              See the ERTS Users Guide and _e_t_s documentation for a complete
+              description of the select.
+
+              For example to find the names of all male persons with an age
+              over 30 in table Tab do:
+
+              MatchHead = #person{name='$1', sex=male, age='$2', _='_'},
+              Guard = {'>', '$2', 30},
+              Result = '$1',
+              mnesia:select(Tab,[{MatchHead, [Guard], [Result]}]),
+
+
+       sseelleecctt((TTaabb,, MMaattcchhSSppeecc,, NNOObbjjeeccttss,, LLoocckk)) -->> ttrraannssaaccttiioonn aabboorrtt ||
+       {{[[OObbjjeecctt]],,CCoonntt}} || ''$$eenndd__ooff__ttaabbllee''
+
+              Matches the objects in the table _T_a_b using a match_spec as
+              described in ERTS users guide, and returns a chunk of terms and
+              a continuation, the wanted number of returned terms is specified
+              by the _N_O_b_j_e_c_t_s argument. The lock argument can be _r_e_a_d or
+              _w_r_i_t_e. The continuation should be used as argument to
+              _m_n_e_s_i_a_:_s_e_l_e_c_t_/_1, if more or all answers are needed.
+
+              _N_o_t_e_: for best performance _s_e_l_e_c_t should be used before any
+              modifying operations are done on that table in the same
+              transaction, i.e. don't use _m_n_e_s_i_a_:_w_r_i_t_e or _m_n_e_s_i_a_:_d_e_l_e_t_e before
+              a _m_n_e_s_i_a_:_s_e_l_e_c_t. For efficiency the _N_O_b_j_e_c_t_s is a recommendation
+              only and the result may contain anything from an empty list to
+              all available results.
+
+       sseelleecctt((CCoonntt)) -->> ttrraannssaaccttiioonn aabboorrtt || {{[[OObbjjeecctt]],,CCoonntt}} || ''$$eenndd__ooff__ttaabbllee''
+
+              Selects more objects with the match specification initiated by
+              _m_n_e_s_i_a_:_s_e_l_e_c_t_/_4.
+
+              _N_o_t_e_: Any modifying operations, i.e. _m_n_e_s_i_a_:_w_r_i_t_e or
+              _m_n_e_s_i_a_:_d_e_l_e_t_e, that are done between the _m_n_e_s_i_a_:_s_e_l_e_c_t_/_4 and
+              _m_n_e_s_i_a_:_s_e_l_e_c_t_/_1 calls will not be visible in the result.
+
+       sseett__ddeebbuugg__lleevveell((LLeevveell)) -->> OOllddLLeevveell
+
+              Changes the internal debug level of Mnesia. See the chapter
+              about configuration parameters for details.
+
+       sseett__mmaasstteerr__nnooddeess((MMaasstteerrNNooddeess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              For each table Mnesia will determine its replica nodes
+              (_T_a_b_N_o_d_e_s) and invoke _m_n_e_s_i_a_:_s_e_t___m_a_s_t_e_r___n_o_d_e_s_(_T_a_b_,
+              _T_a_b_M_a_s_t_e_r_N_o_d_e_s_) where _T_a_b_M_a_s_t_e_r_N_o_d_e_s is the intersection of
+              _M_a_s_t_e_r_N_o_d_e_s and _T_a_b_N_o_d_e_s. See _m_n_e_s_i_a_:_s_e_t___m_a_s_t_e_r___n_o_d_e_s_/_2 about
+              the semantics.
+
+       sseett__mmaasstteerr__nnooddeess((TTaabb,, MMaasstteerrNNooddeess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              If the application detects that there has been a communication
+              failure (in a potentially partitioned network) which may have
+              caused an inconsistent database, it may use the function
+              _m_n_e_s_i_a_:_s_e_t___m_a_s_t_e_r___n_o_d_e_s_(_T_a_b_, _M_a_s_t_e_r_N_o_d_e_s_) to define from which
+              nodes each table will be loaded. At startup Mnesia's normal
+              table load algorithm will be bypassed and the table will be
+              loaded from one of the master nodes defined for the table,
+              regardless of when and if Mnesia was terminated on other nodes.
+              The _M_a_s_t_e_r_N_o_d_e_s may only contain nodes where the table has a
+              replica and if the _M_a_s_t_e_r_N_o_d_e_s list is empty, the master node
+              recovery mechanism for the particular table will be reset and
+              the normal load mechanism will be used at next restart.
+
+              The master node setting is always local and it may be changed
+              regardless of whether Mnesia is started or not.
+
+              The database may also become inconsistent if the
+              _m_a_x___w_a_i_t___f_o_r___d_e_c_i_s_i_o_n configuration parameter is used or if
+              _m_n_e_s_i_a_:_f_o_r_c_e___l_o_a_d___t_a_b_l_e_/_1 is used.
+
+       ssnnmmpp__cclloossee__ttaabbllee((TTaabb)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              Removes the possibility for SNMP to manipulate the table.
+
+       ssnnmmpp__ggeett__mmnneessiiaa__kkeeyy((TTaabb,, RRoowwIInnddeexx)) -->> {{ookk,, KKeeyy}} || uunnddeeffiinneedd
+
+              Types:
+
+                 Tab ::= atom()
+                 RowIndex ::= [integer()]
+                 Key ::= key() | {key(), key(), ...}
+                 key() ::= integer() | string() | [integer()]
+
+              Transforms an SNMP index to the corresponding Mnesia key. If the
+              SNMP table has multiple keys, the key is a tuple of the key
+              columns.
+
+       ssnnmmpp__ggeett__nneexxtt__iinnddeexx((TTaabb,, RRoowwIInnddeexx)) -->> {{ookk,, NNeexxttIInnddeexx}} || eennddOOffTTaabbllee
+
+              Types:
+
+                 Tab ::= atom()
+                 RowIndex ::= [integer()]
+                 NextIndex ::= [integer()]
+
+              The _R_o_w_I_n_d_e_x may specify a non-existing row. Specifically, it
+              might be the empty list. Returns the index of the next
+              lexicographical row. If _R_o_w_I_n_d_e_x is the empty list, this
+              function will return the index of the first row in the table.
+
+       ssnnmmpp__ggeett__rrooww((TTaabb,, RRoowwIInnddeexx)) -->> {{ookk,, RRooww}} || uunnddeeffiinneedd
+
+              Types:
+
+                 Tab ::= atom()
+                 RowIndex ::= [integer()]
+                 Row ::= record(Tab)
+
+              Makes it possible to read a row by its SNMP index. This index is
+              specified as an SNMP OBJECT IDENTIFIER, a list of integers.
+
+       ssnnmmpp__ooppeenn__ttaabbllee((TTaabb,, SSnnmmppSSttrruucctt)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,, ookk}}
+
+              Types:
+
+                 Tab ::= atom()
+                 SnmpStruct ::= [{key, type()}]
+                 type() ::= type_spec() | {type_spec(), type_spec(), ...}
+                 type_spec() ::= fix_string | string | integer
+
+              It is possible to establish a direct one to one mapping between
+              Mnesia tables and SNMP tables. Many telecommunication
+              applications are controlled and monitored by the SNMP protocol.
+              This connection between Mnesia and SNMP makes it simple and
+              convenient to achieve this.
+
+              The _S_n_m_p_S_t_r_u_c_t argument is a list of SNMP information.
+              Currently, the only information needed is information about the
+              key types in the table. It is not possible to handle multiple
+              keys in Mnesia, but many SNMP tables have multiple keys.
+              Therefore, the following convention is used: if a table has
+              multiple keys, these must always be stored as a tuple of the
+              keys. Information about the key types is specified as a tuple of
+              atoms describing the types. The only significant type is
+              _f_i_x___s_t_r_i_n_g. This means that a string has fixed size. For
+              example:
+
+              mnesia:snmp_open_table(person, [{key, string}])
+
+
+              causes the _p_e_r_s_o_n table to be ordered as an SNMP table.
+
+              Consider the following schema for a table of company employees.
+              Each employee is identified by department number and name. The
+              other table column stores the telephone number:
+
+              mnesia:create_table(employee,
+                  [{snmp, [{key, {integer, string}}]},
+                   {attributes, record_info(fields, employees)}]),
+
+
+              The corresponding SNMP table would have three columns;
+              _d_e_p_a_r_t_m_e_n_t, _n_a_m_e and _t_e_l_n_o.
+
+              It is possible to have table columns that are not visible
+              through the SNMP protocol. These columns must be the last
+              columns of the table. In the previous example, the SNMP table
+              could have columns _d_e_p_a_r_t_m_e_n_t and _n_a_m_e only. The application
+              could then use the _t_e_l_n_o column internally, but it would not be
+              visible to the SNMP managers.
+
+              In a table monitored by SNMP, all elements must be integers,
+              strings, or lists of integers.
+
+              When a table is SNMP ordered, modifications are more expensive
+              than usual, O(logN). And more memory is used.
+
+              _N_o_t_e_:Only the lexicographical SNMP ordering is implemented in
+              Mnesia, not the actual SNMP monitoring.
+
+       ssttaarrtt(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              The start-up procedure for a set of Mnesia nodes is a fairly
+              complicated operation. A Mnesia system consists of a set of
+              nodes, with Mnesia started locally on all participating nodes.
+              Normally, each node has a directory where all the Mnesia files
+              are written. This directory will be referred to as the Mnesia
+              directory. Mnesia may also be started on disc-less nodes. See
+              _m_n_e_s_i_a_:_c_r_e_a_t_e___s_c_h_e_m_a_/_1 and the Mnesia User's Guide for more
+              information about disc-less nodes.
+
+              The set of nodes which makes up a Mnesia system is kept in a
+              schema and it is possible to add and remove Mnesia nodes from
+              the schema. The initial schema is normally created on disc with
+              the function _m_n_e_s_i_a_:_c_r_e_a_t_e___s_c_h_e_m_a_/_1. On disc-less nodes, a tiny
+              default schema is generated each time Mnesia is started. During
+              the start-up procedure, Mnesia will exchange schema information
+              between the nodes in order to verify that the table definitions
+              are compatible.
+
+              Each schema has a unique cookie which may be regarded as a
+              unique schema identifier. The cookie must be the same on all
+              nodes where Mnesia is supposed to run. See the Mnesia User's
+              Guide for more information about these details.
+
+              The schema file, as well as all other files which Mnesia needs,
+              are kept in the Mnesia directory. The command line option
+              _-_m_n_e_s_i_a _d_i_r _D_i_r can be used to specify the location of this
+              directory to the Mnesia system. If no such command line option
+              is found, the name of the directory defaults to _M_n_e_s_i_a_._N_o_d_e.
+
+              _a_p_p_l_i_c_a_t_i_o_n_:_s_t_a_r_t_(_m_n_e_s_i_a_) may also be used.
+
+       ssttoopp(()) -->> ssttooppppeedd
+
+              Stops Mnesia locally on the current node.
+
+              _a_p_p_l_i_c_a_t_i_o_n_:_s_t_o_p_(_m_n_e_s_i_a_) may also be used.
+
+       ssuubbssccrriibbee((EEvveennttCCaatteeggoorryy))
+
+              Ensures that a copy of all events of type _E_v_e_n_t_C_a_t_e_g_o_r_y are sent
+              to the caller. The event types available are described in the
+              Mnesia User's Guide.
+
+       ssyynncc__ddiirrttyy((FFuunn,, [[,, AArrggss]])) -->> RReessuullttOOffFFuunn || eexxiitt((RReeaassoonn))
+
+              Call the _F_u_n in a context which is not protected by a
+              transaction. The Mnesia function calls performed in the _F_u_n are
+              mapped to the corresponding dirty functions. It is performed in
+              almost the same context as _m_n_e_s_i_a_:_a_s_y_n_c___d_i_r_t_y_/_1_,_2. The
+              difference is that the operations are performed synchronously.
+              The caller waits for the updates to be performed on all active
+              replicas before the _F_u_n returns. See _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 and the
+              Mnesia User's Guide for more details.
+
+       ssyynncc__ttrraannssaaccttiioonn((FFuunn,, [[[[,, AArrggss]],, RReettrriieess]])) -->> {{aabboorrtteedd,, RReeaassoonn}} ||
+       {{aattoommiicc,, RReessuullttOOffFFuunn}}
+
+              This function waits until data have been committed and logged to
+              disk (if disk is used) on every involved node before it returns,
+              otherwise it behaves as _m_n_e_s_i_a_:_t_r_a_n_s_a_c_t_i_o_n_/_[_1_,_2_,_3_].
+
+              This functionality can be used to avoid that one process may
+              overload a database on another node.
+
+       ssyysstteemm__iinnffoo((IInnffooKKeeyy)) -->> IInnffoo || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              Returns information about the Mnesia system, such as transaction
+              statistics, db_nodes, and configuration parameters. Valid keys
+              are:
+
+                * _a_l_l. This argument returns a list of all local system
+                  information. Each element is a _{_I_n_f_o_K_e_y_, _I_n_f_o_V_a_l_}
+                  tuples._N_o_t_e_: New _I_n_f_o_K_e_y's may be added and old undocumented
+                  _I_n_f_o_K_e_y's may be removed without notice.
+
+                * _a_c_c_e_s_s___m_o_d_u_l_e. This argument returns the name of the module
+                  which is configured to be the activity access callback
+                  module.
+
+                * _a_u_t_o___r_e_p_a_i_r. This argument returns _t_r_u_e or _f_a_l_s_e to indicate
+                  if Mnesia is configured to invoke the auto repair facility
+                  on corrupted disc files.
+
+                * _b_a_c_k_u_p___m_o_d_u_l_e. This argument returns the name of the module
+                  which is configured to be the backup callback module.
+
+                * _c_h_e_c_k_p_o_i_n_t_s. This argument returns a list of the names of
+                  the checkpoints currently active on this node.
+
+                * _e_v_e_n_t___m_o_d_u_l_e. This argument returns the name of the module
+                  which is the event handler callback module.
+
+                * _d_b___n_o_d_e_s. This argument returns the nodes which make up the
+                  persistent database. Disc less nodes will only be included
+                  in the list of nodes if they explicitly has been added to
+                  the schema, e.g. with _m_n_e_s_i_a_:_a_d_d___t_a_b_l_e___c_o_p_y_/_3. The function
+                  can be invoked even if Mnesia is not yet running.
+
+                * _d_e_b_u_g. This argument returns the current debug level of
+                  Mnesia.
+
+                * _d_i_r_e_c_t_o_r_y. This argument returns the name of the Mnesia
+                  directory. It can be invoked even if Mnesia is not yet
+                  running.
+
+                * _d_u_m_p___l_o_g___l_o_a_d___r_e_g_u_l_a_t_i_o_n. This argument returns a boolean
+                  which tells whether Mnesia is configured to load regulate
+                  the dumper process or not. This feature is temporary and
+                  will disappear in future releases.
+
+                * _d_u_m_p___l_o_g___t_i_m_e___t_h_r_e_s_h_o_l_d. This argument returns the time
+                  threshold for transaction log dumps in milliseconds.
+
+                * _d_u_m_p___l_o_g___u_p_d_a_t_e___i_n___p_l_a_c_e. This argument returns a boolean
+                  which tells whether Mnesia is configured to perform the
+                  updates in the dets files directly or if the updates should
+                  be performed in a copy of the dets files.
+
+                * _d_u_m_p___l_o_g___w_r_i_t_e___t_h_r_e_s_h_o_l_d. This argument returns the write
+                  threshold for transaction log dumps as the number of writes
+                  to the transaction log.
+
+                * _e_x_t_r_a___d_b___n_o_d_e_s. This argument returns a list of extra
+                  db_nodes to be contacted at start-up.
+
+                * _f_a_l_l_b_a_c_k___a_c_t_i_v_a_t_e_d. This argument returns true if a fallback
+                  is activated, otherwise false.
+
+                * _h_e_l_d___l_o_c_k_s. This argument returns a list of all locks held
+                  by the local Mnesia lock manager.
+
+                * _i_s___r_u_n_n_i_n_g. This argument returns _y_e_s or _n_o to indicate if
+                  Mnesia is running. It may also return _s_t_a_r_t_i_n_g or _s_t_o_p_p_i_n_g.
+                  Can be invoked even if Mnesia is not yet running.
+
+                * _l_o_c_a_l___t_a_b_l_e_s. This argument returns a list of all tables
+                  which are configured to reside locally.
+
+                * _l_o_c_k___q_u_e_u_e. This argument returns a list of all transactions
+                  that are queued for execution by the local lock manager.
+
+                * _l_o_g___v_e_r_s_i_o_n. This argument returns the version number of the
+                  Mnesia transaction log format.
+
+                * _m_a_s_t_e_r___n_o_d_e___t_a_b_l_e_s. This argument returns a list of all
+                  tables with at least one master node.
+
+                * _p_r_o_t_o_c_o_l___v_e_r_s_i_o_n. This argument returns the version number
+                  of the Mnesia inter-process communication protocol.
+
+                * _r_u_n_n_i_n_g___d_b___n_o_d_e_s. This argument returns a list of nodes
+                  where Mnesia currently is running. This function can be
+                  invoked even if Mnesia is not yet running, but it will then
+                  have slightly different semantics. If Mnesia is down on the
+                  local node, the function will return those other _d_b___n_o_d_e_s
+                  and _e_x_t_r_a___d_b___n_o_d_e_s that for the moment are up and running.
+                  If Mnesia is started, the function will return those nodes
+                  that Mnesia on the local node is fully connected to. Only
+                  those nodes that Mnesia has exchanged schema information
+                  with are included as _r_u_n_n_i_n_g___d_b___n_o_d_e_s. After the merge of
+                  schemas, the local Mnesia system is fully operable and
+                  applications may perform access of remote replicas. Before
+                  the schema merge Mnesia will only operate locally. Sometimes
+                  there may be more nodes included in the _r_u_n_n_i_n_g___d_b___n_o_d_e_s
+                  list than all _d_b___n_o_d_e_s and _e_x_t_r_a___d_b___n_o_d_e_s together.
+
+                * _s_c_h_e_m_a___l_o_c_a_t_i_o_n. This argument returns the initial schema
+                  location.
+
+                * _s_u_b_s_c_r_i_b_e_r_s. This argument returns a list of local processes
+                  currently subscribing to system events.
+
+                * _t_a_b_l_e_s. This argument returns a list of all locally known
+                  tables.
+
+                * _t_r_a_n_s_a_c_t_i_o_n_s. This argument returns a list of all currently
+                  active local transactions.
+
+                * _t_r_a_n_s_a_c_t_i_o_n___f_a_i_l_u_r_e_s. This argument returns a number which
+                  indicates how many transactions have failed since Mnesia was
+                  started.
+
+                * _t_r_a_n_s_a_c_t_i_o_n___c_o_m_m_i_t_s. This argument returns a number which
+                  indicates how many transactions have terminated successfully
+                  since Mnesia was started.
+
+                * _t_r_a_n_s_a_c_t_i_o_n___r_e_s_t_a_r_t_s. This argument returns a number which
+                  indicates how many transactions have been restarted since
+                  Mnesia was started.
+
+                * _t_r_a_n_s_a_c_t_i_o_n___l_o_g___w_r_i_t_e_s. This argument returns a number which
+                  indicates the number of write operation that have been
+                  performed to the transaction log since start-up.
+
+                * _u_s_e___d_i_r. This argument returns a boolean which indicates
+                  whether the Mnesia directory is used or not. Can be invoked
+                  even if Mnesia is not yet running.
+
+                * _v_e_r_s_i_o_n. This argument returns the current version number of
+                  Mnesia.
+
+       ttaabbllee((TTaabb [[,,[[OOppttiioonn]]]])) -->> QQuueerryyHHaannddllee
+
+              Returns a QLC (Query List Comprehension) query handle, see
+              qqllcc((33)).The module _q_l_c implements a query language, it can use
+              mnesia tables as sources of data. Calling _m_n_e_s_i_a_:_t_a_b_l_e_/_1_,_2 is
+              the means to make the _m_n_e_s_i_a table _T_a_b usable to QLC.
+
+              The list of Options may contain mnesia options or QLC options,
+              the following options are recognized by Mnesia: _{_t_r_a_v_e_r_s_e_,
+              _S_e_l_e_c_t_M_e_t_h_o_d_}_,_{_l_o_c_k_, _L_o_c_k_}_,_{_n___o_b_j_e_c_t_s_,_N_u_m_b_e_r_}, any other option
+              is forwarded to QLC. The _l_o_c_k option may be _r_e_a_d or _w_r_i_t_e,
+              default is _r_e_a_d. The option _n___o_b_j_e_c_t_s specifies (roughly) the
+              number of objects returned from mnesia to QLC. Queries to remote
+              tables may need a larger chunks to reduce network overhead,
+              default _1_0_0 objects at a time are returned. The option _t_r_a_v_e_r_s_e
+              determines the method to traverse the whole table (if needed),
+              the default method is _s_e_l_e_c_t:
+
+                * _s_e_l_e_c_t. The table is traversed by calling _m_n_e_s_i_a_:_s_e_l_e_c_t_/_4
+                  and _m_n_e_s_i_a_:_s_e_l_e_c_t_/_1. The match specification (the second
+                  argument of _s_e_l_e_c_t_/_3) is assembled by QLC: simple filters
+                  are translated into equivalent match specifications while
+                  more complicated filters have to be applied to all objects
+                  returned by _s_e_l_e_c_t_/_3 given a match specification that
+                  matches all objects.
+
+                * _{_s_e_l_e_c_t_, _M_a_t_c_h_S_p_e_c_}. As for _s_e_l_e_c_t the table is traversed by
+                  calling _m_n_e_s_i_a_:_s_e_l_e_c_t_/_3 and _m_n_e_s_i_a_:_s_e_l_e_c_t_/_1. The difference
+                  is that the match specification is explicitly given. This is
+                  how to state match specifications that cannot easily be
+                  expressed within the syntax provided by QLC.
+
+       ttaabbllee__iinnffoo((TTaabb,, IInnffooKKeeyy)) -->> IInnffoo || eexxiitt(({{aabboorrtteedd,, RReeaassoonn}}))
+
+              The _t_a_b_l_e___i_n_f_o_/_2 function takes two arguments. The first is the
+              name of a Mnesia table, the second is one of the following keys:
+
+                * _a_l_l. This argument returns a list of all local table
+                  information. Each element is a _{_I_n_f_o_K_e_y_, _I_t_e_m_V_a_l_} tuples.
+                  _N_o_t_e_: New _I_n_f_o_I_t_e_m's may be added and old undocumented
+                  _I_n_f_o_I_t_e_m's may be removed without notice.
+
+                * _a_c_c_e_s_s___m_o_d_e. This argument returns the access mode of the
+                  table. The access mode may either be read_only or
+                  read_write.
+
+                * _a_r_i_t_y. This argument returns the arity of records in the
+                  table as specified in the schema.
+
+                * _a_t_t_r_i_b_u_t_e_s. This argument returns the table attribute names
+                  which are specified in the schema.
+
+                * _c_h_e_c_k_p_o_i_n_t_s. This argument returns the names of the
+                  currently active checkpoints which involves this table on
+                  this node.
+
+                * _c_o_o_k_i_e. This argument returns a table cookie which is a
+                  unique system generated identifier for the table. The cookie
+                  is used internally to ensure that two different table
+                  definitions using the same table name cannot accidentally be
+                  intermixed. The cookie is generated when the table is
+                  initially created.
+
+                * _d_i_s_c___c_o_p_i_e_s. This argument returns the nodes where a
+                  disc_copy of the table resides according to the schema.
+
+                * _d_i_s_c___o_n_l_y___c_o_p_i_e_s . This argument returns the nodes where a
+                  disc_only_copy of the table resides according to the schema.
+
+                * _i_n_d_e_x. This argument returns the list of index position
+                  integers for the table.
+
+                * _l_o_a_d___n_o_d_e. This argument returns the name of the node that
+                  Mnesia loaded the table from. The structure of the returned
+                  value is unspecified but may be useful for debugging
+                  purposes.
+
+                * _l_o_a_d___o_r_d_e_r. This argument returns the load order priority of
+                  the table. It is an integer and defaults to _0 (zero).
+
+                * _l_o_a_d___r_e_a_s_o_n. This argument returns the reason of why Mnesia
+                  decided to load the table. The structure of the returned
+                  value is unspecified but may be useful for debugging
+                  purposes.
+
+                * _l_o_c_a_l___c_o_n_t_e_n_t. This argument returns _t_r_u_e or _f_a_l_s_e to
+                  indicate whether the table is configured to have locally
+                  unique content on each node.
+
+                * _m_a_s_t_e_r___n_o_d_e_s. This argument returns the master nodes of a
+                  table.
+
+                * _m_e_m_o_r_y. This argument returns the number of words allocated
+                  to the table on this node.
+
+                * _r_a_m___c_o_p_i_e_s. This argument returns the nodes where a ram_copy
+                  of the table resides according to the schema.
+
+                * _r_e_c_o_r_d___n_a_m_e. This argument returns the record name, common
+                  for all records in the table
+
+                * _s_i_z_e. This argument returns the number of records inserted
+                  in the table.
+
+                * _s_n_m_p. This argument returns the SNMP struct. _[_]meaning that
+                  the table currently has no SNMP properties.
+
+                * _s_t_o_r_a_g_e___t_y_p_e.This argument returns the local storage type of
+                  the table. It can be _d_i_s_c___c_o_p_i_e_s, _r_a_m___c_o_p_i_e_s,
+                  _d_i_s_c___o_n_l_y___c_o_p_i_e_s, or the atom _u_n_k_n_o_w_n. _u_n_k_n_o_w_n is returned
+                  for all tables which only reside remotely.
+
+                * _s_u_b_s_c_r_i_b_e_r_s. This argument returns a list of local processes
+                  currently subscribing to local table events which involve
+                  this table on this node.
+
+                * _t_y_p_e. This argument returns the table type, which is either
+                  _b_a_g, _s_e_t or _o_r_d_e_r_e_d___s_e_t..
+
+                * _u_s_e_r___p_r_o_p_e_r_t_i_e_s. This argument returns the user associated
+                  table properties of the table. It is a list of the stored
+                  property records.
+
+                * _v_e_r_s_i_o_n. This argument returns the current version of the
+                  table definition. The table version is incremented when the
+                  table definition is changed. The table definition may be
+                  incremented directly when the table definition has been
+                  changed in a schema transaction, or when a committed table
+                  definition is merged with table definitions from other nodes
+                  during start-up.
+
+                * _w_h_e_r_e___t_o___r_e_a_d.This argument returns the node where the table
+                  can be read. If the value _n_o_w_h_e_r_e is returned, the table is
+                  not loaded, or it resides at a remote node which is not
+                  running.
+
+                * _w_h_e_r_e___t_o___w_r_i_t_e. This argument returns a list of the nodes
+                  that currently hold an active replica of the table.
+
+                * _w_i_l_d___p_a_t_t_e_r_n. This argument returns a structure which can be
+                  given to the various match functions for a certain table. A
+                  record tuple is where all record fields have the value _'___'.
+
+       ttrraannssaaccttiioonn((FFuunn [[[[,, AArrggss]],, RReettrriieess]])) -->> {{aabboorrtteedd,, RReeaassoonn}} || {{aattoommiicc,,
+       RReessuullttOOffFFuunn}}
+
+              This function executes the functional object _F_u_n with arguments
+              _A_r_g_s as a transaction.
+
+              The code which executes inside the transaction can consist of a
+              series of table manipulation functions. If something goes wrong
+              inside the transaction as a result of a user error or a certain
+              table not being available, the entire transaction is aborted and
+              the function _t_r_a_n_s_a_c_t_i_o_n_/_1 returns the tuple _{_a_b_o_r_t_e_d_, _R_e_a_s_o_n_}.
+
+              If all is well, _{_a_t_o_m_i_c_, _R_e_s_u_l_t_O_f_F_u_n_} is returned where
+              _R_e_s_u_l_t_O_f_F_u_n is the value of the last expression in _F_u_n.
+
+              A function which adds a family to the database can be written as
+              follows if we have a structure _{_f_a_m_i_l_y_, _F_a_t_h_e_r_, _M_o_t_h_e_r_,
+              _C_h_i_l_d_r_e_n_L_i_s_t_}:
+
+              add_family({family, F, M, Children}) ->
+                  ChildOids = lists:map(fun oid/1, Children),
+                  Trans = fun() ->
+                      mnesia:write(F#person{children = ChildOids},
+                      mnesia:write(M#person{children = ChildOids},
+                      Write = fun(Child) -> mnesia:write(Child) end,
+                      lists:foreach(Write, Children)
+                  end,
+                  mnesia:transaction(Trans).
+
+              oid(Rec) -> {element(1, Rec), element(2, Rec)}.
+
+
+              This code adds a set of people to the database. Running this
+              code within one transaction will ensure that either the whole
+              family is added to the database, or the whole transaction
+              aborts. For example, if the last child is badly formatted, or
+              the executing process terminates due to an _'_E_X_I_T_' signal while
+              executing the family code, the transaction aborts. Accordingly,
+              the situation where half a family is added can never occur.
+
+              It is also useful to update the database within a transaction if
+              several processes concurrently update the same records. For
+              example, the function _r_a_i_s_e_(_N_a_m_e_, _A_m_o_u_n_t_), which adds _A_m_o_u_n_t to
+              the salary field of a person, should be implemented as follows:
+
+              raise(Name, Amount) ->
+                  mnesia:transaction(fun() ->
+                      case mnesia:wread({person, Name}) of
+                          [P] ->
+                              Salary = Amount + P#person.salary,
+                              P2 = P#person{salary = Salary},
+                              mnesia:write(P2);
+                          _ ->
+                              mnesia:abort("No such person")
+                      end
+                  end).
+
+
+              When this function executes within a transaction, several
+              processes running on different nodes can concurrently execute
+              the _r_a_i_s_e_/_2 function without interfering with each other.
+
+              Since Mnesia detects deadlocks, a transaction can be restarted
+              any number of times. This function will attempt a restart as
+              specified in _R_e_t_r_i_e_s. _R_e_t_r_i_e_s must be an integer greater than 0
+              or the atom _i_n_f_i_n_i_t_y. Default is _i_n_f_i_n_i_t_y.
+
+       ttrraannssffoorrmm__ttaabbllee((TTaabb,, FFuunn,, NNeewwAAttttrriibbuutteeLLiisstt,, NNeewwRReeccoorrddNNaammee)) -->> {{aabboorrtteedd,,
+       RR}} || {{aattoommiicc,, ookk}}
+
+              This function applies the argument _F_u_n to all records in the
+              table. _F_u_n is a function which takes a record of the old type
+              and returns a transformed record of the new type. The _F_u_n
+              argument can also be the atom _i_g_n_o_r_e, it indicates that only the
+              meta data about the table will be updated. Usage of _i_g_n_o_r_e is
+              not recommended but included as a possibility for the user do to
+              his own transform. _N_e_w_A_t_t_r_i_b_u_t_e_L_i_s_t and _N_e_w_R_e_c_o_r_d_N_a_m_e specifies
+              the attributes and the new record type of converted table. Table
+              name will always remain unchanged, if the record_name is changed
+              only the mnesia functions which uses table identifiers will
+              work, e.g. _m_n_e_s_i_a_:_w_r_i_t_e_/_3 will work but _m_n_e_s_i_a_:_w_r_i_t_e_/_1 will not.
+
+       ttrraannssffoorrmm__ttaabbllee((TTaabb,, FFuunn,, NNeewwAAttttrriibbuutteeLLiisstt)) -->> {{aabboorrtteedd,, RR}} || {{aattoommiicc,,
+       ookk}}
+
+              Invokes _m_n_e_s_i_a_:_t_r_a_n_s_f_o_r_m___t_a_b_l_e_(_T_a_b_, _F_u_n_, _N_e_w_A_t_t_r_i_b_u_t_e_L_i_s_t_,
+              _R_e_c_N_a_m_e_) where _R_e_c_N_a_m_e is _m_n_e_s_i_a_:_t_a_b_l_e___i_n_f_o_(_T_a_b_, _r_e_c_o_r_d___n_a_m_e_).
+
+       ttrraavveerrssee__bbaacckkuupp((SSoouurrccee,, [[SSoouurrcceeMMoodd,,]] TTaarrggeett,, [[TTaarrggeettMMoodd,,]] FFuunn,, AAcccc)) -->>
+       {{ookk,, LLaassttAAcccc}} || {{eerrrroorr,, RReeaassoonn}}
+
+              With this function it is possible to iterate over a backup,
+              either for the purpose of transforming it into a new backup, or
+              just reading it. The arguments are explained briefly below. See
+              the Mnesia User's Guide for additional details.
+
+                * _S_o_u_r_c_e_M_o_d and _T_a_r_g_e_t_M_o_d are the names of the modules which
+                  actually access the backup media.
+
+                * _S_o_u_r_c_e and _T_a_r_g_e_t are opaque data used exclusively by the
+                  modules _S_o_u_r_c_e_M_o_d and _T_a_r_g_e_t_M_o_d for the purpose of
+                  initializing the backup media.
+
+                * _A_c_c is an initial accumulator value.
+
+                * _F_u_n_(_B_a_c_k_u_p_I_t_e_m_s_, _A_c_c_) is applied to each item in the backup.
+                  The Fun must return a tuple _{_B_a_c_k_u_p_I_t_e_m_s_,_N_e_w_A_c_c_}, where
+                  _B_a_c_k_u_p_I_t_e_m_s is a list of valid backup items, and _N_e_w_A_c_c is a
+                  new accumulator value. The returned backup items are written
+                  in the target backup.
+
+                * _L_a_s_t_A_c_c is the last accumulator value. This is the last
+                  _N_e_w_A_c_c value that was returned by _F_u_n.
+
+       uunniinnssttaallll__ffaallllbbaacckk(()) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Invokes _m_n_e_s_i_a_:_u_n_i_n_s_t_a_l_l___f_a_l_l_b_a_c_k_(_[_{_s_c_o_p_e_, _g_l_o_b_a_l_}_]_).
+
+       uunniinnssttaallll__ffaallllbbaacckk((AArrggss)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              This function is used to de-install a fallback before it has
+              been used to restore the database. This is normally a
+              distributed operation that is either performed on all nodes with
+              disc resident schema or none. Uninstallation of fallbacks
+              requires Erlang to be up and running on all involved nodes, but
+              it does not matter if Mnesia is running or not. Which nodes that
+              are considered as disc-resident nodes is determined from the
+              schema info in the local fallback.
+
+              _A_r_g_s is a list of the following tuples:
+
+                * _{_m_o_d_u_l_e_, _B_a_c_k_u_p_M_o_d_}. See _m_n_e_s_i_a_:_i_n_s_t_a_l_l___f_a_l_l_b_a_c_k_/_2 about the
+                  semantics.
+
+                * _{_s_c_o_p_e_, _S_c_o_p_e_} See _m_n_e_s_i_a_:_i_n_s_t_a_l_l___f_a_l_l_b_a_c_k_/_2 about the
+                  semantics.
+
+                * _{_m_n_e_s_i_a___d_i_r_, _A_l_t_e_r_n_a_t_e_D_i_r_} See _m_n_e_s_i_a_:_i_n_s_t_a_l_l___f_a_l_l_b_a_c_k_/_2
+                  about the semantics.
+
+       uunnssuubbssccrriibbee((EEvveennttCCaatteeggoorryy))
+
+              Stops sending events of type _E_v_e_n_t_C_a_t_e_g_o_r_y to the caller.
+
+       wwaaiitt__ffoorr__ttaabblleess((TTaabbLLiisstt,,TTiimmeeoouutt)) -->> ookk || {{ttiimmeeoouutt,, BBaaddTTaabbLLiisstt}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Some applications need to wait for certain tables to be
+              accessible in order to do useful work. _m_n_e_s_i_a_:_w_a_i_t___f_o_r___t_a_b_l_e_s_/_2
+              hangs until all tables in the _T_a_b_L_i_s_t are accessible, or until
+              _t_i_m_e_o_u_t is reached.
+
+       wwrreeaadd(({{TTaabb,, KKeeyy}})) -->> ttrraannssaaccttiioonn aabboorrtt || RReeccoorrddLLiisstt
+
+              Invoke _m_n_e_s_i_a_:_r_e_a_d_(_T_a_b_, _K_e_y_, _w_r_i_t_e_).
+
+       wwrriittee((RReeccoorrdd)) -->> ttrraannssaaccttiioonn aabboorrtt || ookk
+
+              Invoke _m_n_e_s_i_a_:_w_r_i_t_e_(_T_a_b_, _R_e_c_o_r_d_, _w_r_i_t_e_) where _T_a_b is _e_l_e_m_e_n_t_(_1_,
+              _R_e_c_o_r_d_).
+
+       wwrriittee((TTaabb,, RReeccoorrdd,, LLoocckkKKiinndd)) -->> ttrraannssaaccttiioonn aabboorrtt || ookk
+
+              Writes the record _R_e_c_o_r_d to the table _T_a_b.
+
+              The function returns _o_k, or aborts if an error occurs. For
+              example, the transaction aborts if no _p_e_r_s_o_n table exists.
+
+              The semantics of this function is context sensitive. See
+              _m_n_e_s_i_a_:_a_c_t_i_v_i_t_y_/_4 for more information. In transaction context
+              it acquires a lock of type _L_o_c_k_K_i_n_d. The following lock types
+              are supported: _w_r_i_t_e and _s_t_i_c_k_y___w_r_i_t_e.
+
+       wwrriittee__lloocckk__ttaabbllee((TTaabb)) -->> ookk || ttrraannssaaccttiioonn aabboorrtt
+
+              Invokes _m_n_e_s_i_a_:_l_o_c_k_(_{_t_a_b_l_e_, _T_a_b_}_, _w_r_i_t_e_).
+
+CCOONNFFIIGGUURRAATTIIOONN PPAARRAAMMEETTEERRSS
+       Mnesia reads the following application configuration parameters:
+
+         * _-_m_n_e_s_i_a _a_c_c_e_s_s___m_o_d_u_l_e _M_o_d_u_l_e. The name of the Mnesia activity
+           access callback module. The default is _m_n_e_s_i_a.
+
+         * _-_m_n_e_s_i_a _a_u_t_o___r_e_p_a_i_r _t_r_u_e _| _f_a_l_s_e. This flag controls whether Mnesia
+           will try to automatically repair files that have not been properly
+           closed. The default is _t_r_u_e.
+
+         * _-_m_n_e_s_i_a _b_a_c_k_u_p___m_o_d_u_l_e _M_o_d_u_l_e. The name of the Mnesia backup
+           callback module. The default is _m_n_e_s_i_a___b_a_c_k_u_p.
+
+         * _-_m_n_e_s_i_a _d_e_b_u_g _L_e_v_e_l Controls the debug level of Mnesia. Possible
+           values are:
+
+           _n_o_n_e:
+             No trace outputs at all. This is the default setting.
+
+           _v_e_r_b_o_s_e:
+             Activates tracing of important debug events. These debug events
+             generate _{_m_n_e_s_i_a___i_n_f_o_, _F_o_r_m_a_t_, _A_r_g_s_} system events. Processes may
+             subscribe to these events with _m_n_e_s_i_a_:_s_u_b_s_c_r_i_b_e_/_1. The events are
+             always sent to Mnesia's event handler.
+
+           _d_e_b_u_g:
+             Activates all events at the verbose level plus full trace of all
+             debug events. These debug events generate _{_m_n_e_s_i_a___i_n_f_o_, _F_o_r_m_a_t_,
+             _A_r_g_s_} system events. Processes may subscribe to these events with
+             _m_n_e_s_i_a_:_s_u_b_s_c_r_i_b_e_/_1. The events are always sent to the Mnesia
+             event handler. On this debug level, the Mnesia event handler
+             starts subscribing to updates in the schema table.
+
+           _t_r_a_c_e:
+             Activates all events at the level debug. On this debug level, the
+             Mnesia event handler starts subscribing to updates on all Mnesia
+             tables. This level is only intended for debugging small toy
+             systems since many large events may be generated.
+
+           _f_a_l_s_e:
+             An alias for none.
+
+           _t_r_u_e:
+             An alias for debug.
+
+         * _-_m_n_e_s_i_a _c_o_r_e___d_i_r _D_i_r_e_c_t_o_r_y. The name of the directory where Mnesia
+           core files is stored or false. Setting it implies that also ram
+           only nodes, will generate a core file if a crash occurs.
+
+         * _-_m_n_e_s_i_a _d_c___d_u_m_p___l_i_m_i_t _N_u_m_b_e_r. Controls how often _d_i_s_c___c_o_p_i_e_s tables
+           are dumped from memory. Tables are dumped when _f_i_l_e_s_i_z_e_(_L_o_g_) _>
+           _(_f_i_l_e_s_i_z_e_(_T_a_b_)_/_D_c___d_u_m_p___l_i_m_i_t_). Lower values reduces cpu overhead
+           but increases disk space and startup times. The default is 4.
+
+         * _-_m_n_e_s_i_a _d_i_r _D_i_r_e_c_t_o_r_y. The name of the directory where all Mnesia
+           data is stored. The name of the directory must be unique for the
+           current node. Two nodes may, under no circumstances, share the same
+           Mnesia directory. The results are totally unpredictable.
+
+         * _-_m_n_e_s_i_a _d_u_m_p___l_o_g___l_o_a_d___r_e_g_u_l_a_t_i_o_n _t_r_u_e _| _f_a_l_s_e. Controls if the log
+           dumps should be performed as fast as possible or if the dumper
+           should do its own load regulation. This feature is temporary and
+           will disappear in a future release. The default is _f_a_l_s_e.
+
+         * _-_m_n_e_s_i_a _d_u_m_p___l_o_g___u_p_d_a_t_e___i_n___p_l_a_c_e _t_r_u_e _| _f_a_l_s_e. Controls if log
+           dumps are performed on a copy of the original data file, or if the
+           log dump is performed on the original data file. The default is
+           _t_r_u_e
+
+         * _-_m_n_e_s_i_a _d_u_m_p___l_o_g___w_r_i_t_e___t_h_r_e_s_h_o_l_d _M_a_x, where _M_a_x is an integer which
+           specifies the maximum number of writes allowed to the transaction
+           log before a new dump of the log is performed. It defaults to 100
+           log writes.
+
+         * _-_m_n_e_s_i_a _d_u_m_p___l_o_g___t_i_m_e___t_h_r_e_s_h_o_l_d _M_a_x, where _M_a_x is an integer which
+           specifies the dump log interval in milliseconds. It defaults to 3
+           minutes. If a dump has not been performed within
+           _d_u_m_p___l_o_g___t_i_m_e___t_h_r_e_s_h_o_l_d milliseconds, then a new dump is performed
+           regardless of how many writes have been performed.
+
+         * _-_m_n_e_s_i_a _e_v_e_n_t___m_o_d_u_l_e _M_o_d_u_l_e. The name of the Mnesia event handler
+           callback module. The default is _m_n_e_s_i_a___e_v_e_n_t.
+
+         * _-_m_n_e_s_i_a _e_x_t_r_a___d_b___n_o_d_e_s _N_o_d_e_s specifies a list of nodes, in addition
+           to the ones found in the schema, with which Mnesia should also
+           establish contact. The default value is the empty list _[_].
+
+         * _-_m_n_e_s_i_a _f_a_l_l_b_a_c_k___e_r_r_o_r___f_u_n_c_t_i_o_n _{_U_s_e_r_M_o_d_u_l_e_, _U_s_e_r_F_u_n_c_} specifies a
+           user supplied callback function which will be called if a fallback
+           is installed and mnesia goes down on another node. Mnesia will call
+           the function with one argument the name of the dying node, e.g.
+           _U_s_e_r_M_o_d_u_l_e_:_U_s_e_r_F_u_n_c_(_D_y_i_n_g_N_o_d_e_). Mnesia should be restarted or else
+           the database could be inconsistent. The default behaviour is to
+           terminate mnesia.
+
+         * _-_m_n_e_s_i_a _m_a_x___w_a_i_t___f_o_r___d_e_c_i_s_i_o_n _T_i_m_e_o_u_t. Specifies how long Mnesia
+           will wait for other nodes to share their knowledge regarding the
+           outcome of an unclear transaction. By default the _T_i_m_e_o_u_t is set to
+           the atom _i_n_f_i_n_i_t_y, which implies that if Mnesia upon startup
+           encounters a "heavyweight transaction" whose outcome is unclear,
+           the local Mnesia will wait until Mnesia is started on some (in
+           worst cases all) of the other nodes that were involved in the
+           interrupted transaction. This is a very rare situation, but when/if
+           it happens, Mnesia does not guess if the transaction on the other
+           nodes was committed or aborted. Mnesia will wait until it knows the
+           outcome and then act accordingly.
+
+           If _T_i_m_e_o_u_t is set to an integer value in milliseconds, Mnesia will
+           force "heavyweight transactions" to be finished, even if the
+           outcome of the transaction for the moment is unclear. After _T_i_m_e_o_u_t
+           milliseconds, Mnesia will commit/abort the transaction and continue
+           with the startup. This may lead to a situation where the
+           transaction is committed on some nodes and aborted on other nodes.
+           If the transaction was a schema transaction, the inconsistency may
+           be fatal.
+
+         * _-_m_n_e_s_i_a _n_o___t_a_b_l_e___l_o_a_d_e_r_s _N_U_M_B_E_R specifies the number of parallel
+           table loaders during start. More loaders can be good if the network
+           latency is high or if many tables contains few records. The default
+           value is _2.
+
+         * _-_m_n_e_s_i_a _s_e_n_d___c_o_m_p_r_e_s_s_e_d _L_e_v_e_l specifies the level of compression to
+           be used when copying a table from the local node to another one.
+           The default level is 0.
+
+           _L_e_v_e_l must be an integer in the interval [0, 9], with 0
+           representing no compression and 9 representing maximum compression.
+           Before setting it to a non-zero value, make sure the remote nodes
+           understand this configuration.
+
+         * _-_m_n_e_s_i_a _s_c_h_e_m_a___l_o_c_a_t_i_o_n _L_o_c controls where Mnesia will look for its
+           schema. The parameter _L_o_c may be one of the following atoms:
+
+           _d_i_s_c:
+             Mandatory disc. The schema is assumed to be located in the Mnesia
+             directory. If the schema cannot be found, Mnesia refuses to
+             start. This is the old behavior.
+
+           _r_a_m:
+             Mandatory RAM. The schema resides in RAM only. At start-up, a
+             tiny new schema is generated. This default schema just contains
+             the definition of the schema table and only resides on the local
+             node. Since no other nodes are found in the default schema, the
+             configuration parameter _e_x_t_r_a___d_b___n_o_d_e_s must be used in order to
+             let the node share its table definitions with other nodes. (The
+             _e_x_t_r_a___d_b___n_o_d_e_s parameter may also be used on disc based nodes.)
+
+           _o_p_t___d_i_s_c:
+             Optional disc. The schema may reside either on disc or in RAM. If
+             the schema is found on disc, Mnesia starts as a disc based node
+             and the storage type of the schema table is _d_i_s_c___c_o_p_i_e_s. If no
+             schema is found on disc, Mnesia starts as a disc-less node and
+             the storage type of the schema table is _r_a_m___c_o_p_i_e_s. The default
+             value for the application parameter is _o_p_t___d_i_s_c.
+
+       First the SASL application parameters are checked, then the command
+       line flags are checked, and finally, the default value is chosen.
+
+SSEEEE AALLSSOO
+       mnesia_registry(3), mnesia_session(3), qlc(3), dets(3), ets(3),
+       disk_log(3), application(3)
+
+
+
+Ericsson AB                      mnesia 4.7.1                        mnesia(3)

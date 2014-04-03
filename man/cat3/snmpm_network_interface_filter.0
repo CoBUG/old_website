@@ -1,0 +1,106 @@
+snmpm_network_interface_filtEerrl(a3n)g Module Definsintmipomn_network_interface_filter(3)
+
+
+
+NNAAMMEE
+       snmpm_network_interface_filter - Behaviour module for the SNMP manager
+       network-interface filter.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the manager network interface
+       filter. A _s_n_m_p_m___n_e_t_w_o_r_k___i_n_t_e_r_f_a_c_e___f_i_l_t_e_r compliant module must export
+       the following functions:
+
+         * aacccceepptt__rreeccvv//22
+
+         * aacccceepptt__sseenndd//22
+
+         * aacccceepptt__rreeccvv__ppdduu//33
+
+         * aacccceepptt__sseenndd__ppdduu//22
+
+       The semantics of them and their exact signatures are explained below.
+
+       The purpose of the network interface filter is to allow for filtering
+       of messages (accept or reject) receive and send. This is done on two
+       levels:
+
+         * The first level is at the UDP entry / exit point, i.e. immediately
+           after the receipt of the message, before any message processing is
+           done (accept_recv) and immediately before sending the message,
+           after all message processing is done (accept_send).
+
+         * The second level is at the MPD entry / exit point, i.e. immediately
+           after the basic message processing (accept_recv_pdu) / immediately
+           before the basic message processing (accept_send_pdu).
+
+       Note that the network interface filter is something which is used by
+       the network interface implementation provided by the application
+       (_s_n_m_p_m___n_e_t___i_f and _s_n_m_p_m___n_e_t___i_f___m_t). The default filter accepts all
+       messages.
+
+       A network interface filter can e.g. be used during testing or for load
+       regulation.
+
+DDAATTAA TTYYPPEESS
+       port() = integer() > 0
+       pdu_type() = 'get-request' | 'get-next-request' | 'get-response' |
+                    'set-request' | trap | 'get-bulk-request' | 'inform-request' |
+                    report | trappdu
+
+
+EEXXPPOORRTTSS
+       aacccceepptt__rreeccvv((AAddddrr,, PPoorrtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Addr = ip_address()
+                 Port = port()
+
+              Called at the reception of a message (before _a_n_y processing has
+              been done).
+
+              For the message to be rejected, the function _m_u_s_t return _f_a_l_s_e.
+
+       aacccceepptt__sseenndd((AAddddrr,, PPoorrtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Addr = ip_address()
+                 Port = port()
+
+              Called before the sending of a message (after _a_l_l processing has
+              been done).
+
+              For the message to be rejected, the function _m_u_s_t return _f_a_l_s_e.
+
+       aacccceepptt__rreeccvv__ppdduu((AAddddrr,, PPoorrtt,, PPdduuTTyyppee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Addr = ip_address()
+                 Port = port()
+                 PduType = pdu_type()
+
+              Called after the basic message processing (MPD) has been done,
+              but before the pdu is handed over to the server for primary
+              processing.
+
+              For the pdu to be rejected, the function _m_u_s_t return _f_a_l_s_e.
+
+       aacccceepptt__sseenndd__ppdduu((AAddddrr,, PPoorrtt,, PPdduuTTyyppee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Addr = ip_address()
+                 Port = port()
+                 PduType = pdu_type() > 0
+
+              Called before the basic message processing (MPD) is done, when a
+              pdu has been received from the master-agent.
+
+              For the message to be rejected, the function _m_u_s_t return _f_a_l_s_e.
+
+
+
+Ericsson AB                       snmp 4.22.1snmpm_network_interface_filter(3)

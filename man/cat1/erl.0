@@ -1,0 +1,950 @@
+erl(1)                           User Commands                          erl(1)
+
+
+
+NNAAMMEE
+       erl - The Erlang Emulator
+
+DDEESSCCRRIIPPTTIIOONN
+       The _e_r_l program starts an Erlang runtime system. The exact details (for
+       example, whether _e_r_l is a script or a program and which other programs
+       it calls) are system-dependent.
+
+       Windows users probably wants to use the _w_e_r_l program instead, which
+       runs in its own window with scrollbars and supports command-line
+       editing. The _e_r_l program on Windows provides no line editing in its
+       shell, and on Windows 95 there is no way to scroll back to text which
+       has scrolled off the screen. The _e_r_l program must be used, however, in
+       pipelines or if you want to redirect standard input or output.
+
+   NNoottee::
+       As of ERTS version 5.9 (OTP-R15B) the runtime system will by default
+       _n_o_t bind schedulers to logical processors. For more information see
+       documentation of the ++ssbbtt system flag.
+
+
+EEXXPPOORRTTSS
+       eerrll <<aarrgguummeennttss>>
+
+              Starts an Erlang runtime system.
+
+              The arguments can be divided into _e_m_u_l_a_t_o_r _f_l_a_g_s, _f_l_a_g_s and
+              _p_l_a_i_n _a_r_g_u_m_e_n_t_s:
+
+                * Any argument starting with the character _+ is interpreted as
+                  an eemmuullaattoorr ffllaagg.
+
+                  As indicated by the name, emulator flags controls the
+                  behavior of the emulator.
+
+                * Any argument starting with the character _- (hyphen) is
+                  interpreted as a ffllaagg which should be passed to the Erlang
+                  part of the runtime system, more specifically to the _i_n_i_t
+                  system process, see iinniitt((33)).
+
+                  The _i_n_i_t process itself interprets some of these flags, the
+                  _i_n_i_t _f_l_a_g_s. It also stores any remaining flags, the _u_s_e_r
+                  _f_l_a_g_s. The latter can be retrieved by calling
+                  _i_n_i_t_:_g_e_t___a_r_g_u_m_e_n_t_/_1.
+
+                  It can be noted that there are a small number of "-" flags
+                  which now actually are emulator flags, see the description
+                  below.
+
+                * Plain arguments are not interpreted in any way. They are
+                  also stored by the _i_n_i_t process and can be retrieved by
+                  calling _i_n_i_t_:_g_e_t___p_l_a_i_n___a_r_g_u_m_e_n_t_s_/_0. Plain arguments can
+                  occur before the first flag, or after a _-_- flag.
+                  Additionally, the flag _-_e_x_t_r_a causes everything that follows
+                  to become plain arguments.
+
+              Example:
+
+              % erl +W w -sname arnie +R 9 -s my_init -extra +bertie
+              (arnie@host)1> init:get_argument(sname).
+              {ok,[["arnie"]]}
+              (arnie@host)2> init:get_plain_arguments().
+              ["+bertie"]
+
+              Here _+_W _w and _+_R _9 are emulator flags. _-_s _m_y___i_n_i_t is an init
+              flag, interpreted by _i_n_i_t. _-_s_n_a_m_e _a_r_n_i_e is a user flag, stored
+              by _i_n_i_t. It is read by Kernel and will cause the Erlang runtime
+              system to become distributed. Finally, everything after _-_e_x_t_r_a
+              (that is, _+_b_e_r_t_i_e) is considered as plain arguments.
+
+              % erl -myflag 1
+              1> init:get_argument(myflag).
+              {ok,[["1"]]}
+              2> init:get_plain_arguments().
+              []
+
+              Here the user flag _-_m_y_f_l_a_g _1 is passed to and stored by the _i_n_i_t
+              process. It is a user defined flag, presumably used by some user
+              defined application.
+
+FFLLAAGGSS
+       In the following list, init flags are marked (init flag). Unless
+       otherwise specified, all other flags are user flags, for which the
+       values can be retrieved by calling _i_n_i_t_:_g_e_t___a_r_g_u_m_e_n_t_/_1. Note that the
+       list of user flags is not exhaustive, there may be additional,
+       application specific flags which instead are documented in the
+       corresponding application documentation.
+
+         _-_-(init flag):
+           Everything following _-_- up to the next flag (_-_f_l_a_g or _+_f_l_a_g) is
+           considered plain arguments and can be retrieved using
+           _i_n_i_t_:_g_e_t___p_l_a_i_n___a_r_g_u_m_e_n_t_s_/_0.
+
+         _-_A_p_p_l_i_c_a_t_i_o_n _P_a_r _V_a_l:
+           Sets the application configuration parameter _P_a_r to the value _V_a_l
+           for the application _A_p_p_l_i_c_a_t_i_o_n, see aapppp((44)) and aapppplliiccaattiioonn((33)).
+
+         _-_a_r_g_s___f_i_l_e _F_i_l_e_N_a_m_e:
+           Command line arguments are read from the file _F_i_l_e_N_a_m_e. The
+           arguments read from the file replace the '_-_a_r_g_s___f_i_l_e _F_i_l_e_N_a_m_e' flag
+           on the resulting command line.
+
+           The file _F_i_l_e_N_a_m_e should be a plain text file and may contain
+           comments and command line arguments. A comment begins with a #
+           character and continues until next end of line character. Backslash
+           (\\) is used as quoting character. All command line arguments
+           accepted by _e_r_l are allowed, also the _-_a_r_g_s___f_i_l_e _F_i_l_e_N_a_m_e flag. Be
+           careful not to cause circular dependencies between files containing
+           the _-_a_r_g_s___f_i_l_e flag, though.
+
+           The _-_e_x_t_r_a flag is treated specially. Its scope ends at the end of
+           the file. Arguments following an _-_e_x_t_r_a flag are moved on the
+           command line into the _-_e_x_t_r_a section, i.e. the end of the command
+           line following after an _-_e_x_t_r_a flag.
+
+         _-_a_s_y_n_c___s_h_e_l_l___s_t_a_r_t:
+           The initial Erlang shell does not read user input until the system
+           boot procedure has been completed (Erlang 5.4 and later). This flag
+           disables the start synchronization feature and lets the shell start
+           in parallel with the rest of the system.
+
+         _-_b_o_o_t _F_i_l_e:
+           Specifies the name of the boot file, _F_i_l_e_._b_o_o_t, which is used to
+           start the system. See iinniitt((33)). Unless _F_i_l_e contains an absolute
+           path, the system searches for _F_i_l_e_._b_o_o_t in the current and
+           _$_R_O_O_T_/_b_i_n directories.
+
+           Defaults to _$_R_O_O_T_/_b_i_n_/_s_t_a_r_t_._b_o_o_t.
+
+         _-_b_o_o_t___v_a_r _V_a_r _D_i_r:
+           If the boot script contains a path variable _V_a_r other than _$_R_O_O_T,
+           this variable is expanded to _D_i_r. Used when applications are
+           installed in another directory than _$_R_O_O_T_/_l_i_b, see
+           ssyyssttoooollss::mmaakkee__ssccrriipptt//11,,22.
+
+         _-_c_o_d_e___p_a_t_h___c_a_c_h_e:
+           Enables the code path cache of the code server, see ccooddee((33)).
+
+         _-_c_o_m_p_i_l_e _M_o_d_1 _M_o_d_2 _._._.:
+           Compiles the specified modules and then terminates (with non-zero
+           exit code if the compilation of some file did not succeed). Implies
+           _-_n_o_i_n_p_u_t. Not recommended - use eerrllcc instead.
+
+         _-_c_o_n_f_i_g _C_o_n_f_i_g:
+           Specifies the name of a configuration file, _C_o_n_f_i_g_._c_o_n_f_i_g, which is
+           used to configure applications. See aapppp((44)) and aapppplliiccaattiioonn((33)).
+
+         _-_c_o_n_n_e_c_t___a_l_l _f_a_l_s_e:
+           If this flag is present, _g_l_o_b_a_l will not maintain a fully connected
+           network of distributed Erlang nodes, and then global name
+           registration cannot be used. See gglloobbaall((33)).
+
+         _-_c_o_o_k_i_e _C_o_o_k_i_e:
+           Obsolete flag without any effect and common misspelling for
+           _-_s_e_t_c_o_o_k_i_e. Use _-_s_e_t_c_o_o_k_i_e instead.
+
+         _-_d_e_t_a_c_h_e_d:
+           Starts the Erlang runtime system detached from the system console.
+           Useful for running daemons and backgrounds processes. Implies
+           _-_n_o_i_n_p_u_t.
+
+         _-_e_m_u___a_r_g_s:
+           Useful for debugging. Prints out the actual arguments sent to the
+           emulator.
+
+         _-_e_n_v _V_a_r_i_a_b_l_e _V_a_l_u_e:
+           Sets the host OS environment variable _V_a_r_i_a_b_l_e to the value _V_a_l_u_e
+           for the Erlang runtime system. Example:
+
+         % erl -env DISPLAY gin:0
+
+           In this example, an Erlang runtime system is started with the
+           _D_I_S_P_L_A_Y environment variable set to _g_i_n_:_0.
+
+         _-_e_v_a_l _E_x_p_r(init flag):
+           Makes _i_n_i_t evaluate the expression _E_x_p_r, see iinniitt((33)).
+
+         _-_e_x_t_r_a(init flag):
+           Everything following _-_e_x_t_r_a is considered plain arguments and can
+           be retrieved using _i_n_i_t_:_g_e_t___p_l_a_i_n___a_r_g_u_m_e_n_t_s_/_0.
+
+         _-_h_e_a_r_t:
+           Starts heart beat monitoring of the Erlang runtime system. See
+           hheeaarrtt((33)).
+
+         _-_h_i_d_d_e_n:
+           Starts the Erlang runtime system as a hidden node, if it is run as
+           a distributed node. Hidden nodes always establish hidden
+           connections to all other nodes except for nodes in the same global
+           group. Hidden connections are not published on either of the
+           connected nodes, i.e. neither of the connected nodes are part of
+           the result from _n_o_d_e_s_/_0 on the other node. See also hidden global
+           groups, gglloobbaall__ggrroouupp((33)).
+
+         _-_h_o_s_t_s _H_o_s_t_s:
+           Specifies the IP addresses for the hosts on which Erlang boot
+           servers are running, see eerrll__bboooott__sseerrvveerr((33)). This flag is mandatory
+           if the _-_l_o_a_d_e_r _i_n_e_t flag is present.
+
+           The IP addresses must be given in the standard form (four decimal
+           numbers separated by periods, for example _"_1_5_0_._2_3_6_._2_0_._7_4_". Hosts
+           names are not acceptable, but a broadcast address (preferably
+           limited to the local network) is.
+
+         _-_i_d _I_d:
+           Specifies the identity of the Erlang runtime system. If it is run
+           as a distributed node, _I_d must be identical to the name supplied
+           together with the _-_s_n_a_m_e or _-_n_a_m_e flag.
+
+         _-_i_n_i_t___d_e_b_u_g:
+           Makes _i_n_i_t write some debug information while interpreting the boot
+           script.
+
+         _-_i_n_s_t_r(emulator flag):
+           Selects an instrumented Erlang runtime system (virtual machine) to
+           run, instead of the ordinary one. When running an instrumented
+           runtime system, some resource usage data can be obtained and
+           analysed using the module _i_n_s_t_r_u_m_e_n_t. Functionally, it behaves
+           exactly like an ordinary Erlang runtime system.
+
+         _-_l_o_a_d_e_r _L_o_a_d_e_r:
+           Specifies the method used by _e_r_l___p_r_i_m___l_o_a_d_e_r to load Erlang modules
+           into the system. See eerrll__pprriimm__llooaaddeerr((33)). Two _L_o_a_d_e_r methods are
+           supported, _e_f_i_l_e and _i_n_e_t. _e_f_i_l_e means use the local file system,
+           this is the default. _i_n_e_t means use a boot server on another
+           machine, and the _-_i_d, _-_h_o_s_t_s and _-_s_e_t_c_o_o_k_i_e flags must be specified
+           as well. If _L_o_a_d_e_r is something else, the user supplied _L_o_a_d_e_r port
+           program is started.
+
+         _-_m_a_k_e:
+           Makes the Erlang runtime system invoke _m_a_k_e_:_a_l_l_(_) in the current
+           working directory and then terminate. See mmaakkee((33)). Implies
+           _-_n_o_i_n_p_u_t.
+
+         _-_m_a_n _M_o_d_u_l_e:
+           Displays the manual page for the Erlang module _M_o_d_u_l_e. Only
+           supported on Unix.
+
+         _-_m_o_d_e _i_n_t_e_r_a_c_t_i_v_e _| _e_m_b_e_d_d_e_d:
+           Indicates if the system should load code dynamically (_i_n_t_e_r_a_c_t_i_v_e),
+           or if all code should be loaded during system initialization
+           (_e_m_b_e_d_d_e_d), see ccooddee((33)). Defaults to _i_n_t_e_r_a_c_t_i_v_e.
+
+         _-_n_a_m_e _N_a_m_e:
+           Makes the Erlang runtime system into a distributed node. This flag
+           invokes all network servers necessary for a node to become
+           distributed. See nneett__kkeerrnneell((33)). It is also ensured that _e_p_m_d runs
+           on the current host before Erlang is started. See eeppmmdd((11)).
+
+           The name of the node will be _N_a_m_e_@_H_o_s_t, where _H_o_s_t is the fully
+           qualified host name of the current host. For short names, use the
+           _-_s_n_a_m_e flag instead.
+
+         _-_n_o_i_n_p_u_t:
+           Ensures that the Erlang runtime system never tries to read any
+           input. Implies _-_n_o_s_h_e_l_l.
+
+         _-_n_o_s_h_e_l_l:
+           Starts an Erlang runtime system with no shell. This flag makes it
+           possible to have the Erlang runtime system as a component in a
+           series of UNIX pipes.
+
+         _-_n_o_s_t_i_c_k:
+           Disables the sticky directory facility of the Erlang code server,
+           see ccooddee((33)).
+
+         _-_o_l_d_s_h_e_l_l:
+           Invokes the old Erlang shell from Erlang 3.3. The old shell can
+           still be used.
+
+         _-_p_a _D_i_r_1 _D_i_r_2 _._._.:
+           Adds the specified directories to the beginning of the code path,
+           similar to _c_o_d_e_:_a_d_d___p_a_t_h_s_a_/_1. See ccooddee((33)). As an alternative to
+           _-_p_a, if several directories are to be prepended to the code and the
+           directories have a common parent directory, that parent directory
+           could be specified in the _E_R_L___L_I_B_S environment variable. See
+           ccooddee((33)).
+
+         _-_p_z _D_i_r_1 _D_i_r_2 _._._.:
+           Adds the specified directories to the end of the code path, similar
+           to _c_o_d_e_:_a_d_d___p_a_t_h_s_z_/_1. See ccooddee((33)).
+
+         _-_r_e_m_s_h _N_o_d_e:
+           Starts Erlang with a remote shell connected to _N_o_d_e.
+
+         _-_r_s_h _P_r_o_g_r_a_m:
+           Specifies an alternative to _r_s_h for starting a slave node on a
+           remote host. See ssllaavvee((33)).
+
+         _-_r_u_n _M_o_d _[_F_u_n_c _[_A_r_g_1_, _A_r_g_2_, _._._._]_](init flag):
+           Makes _i_n_i_t call the specified function. _F_u_n_c defaults to _s_t_a_r_t. If
+           no arguments are provided, the function is assumed to be of arity
+           0. Otherwise it is assumed to be of arity 1, taking the list
+           _[_A_r_g_1_,_A_r_g_2_,_._._._] as argument. All arguments are passed as strings.
+           See iinniitt((33)).
+
+         _-_s _M_o_d _[_F_u_n_c _[_A_r_g_1_, _A_r_g_2_, _._._._]_](init flag):
+           Makes _i_n_i_t call the specified function. _F_u_n_c defaults to _s_t_a_r_t. If
+           no arguments are provided, the function is assumed to be of arity
+           0. Otherwise it is assumed to be of arity 1, taking the list
+           _[_A_r_g_1_,_A_r_g_2_,_._._._] as argument. All arguments are passed as atoms. See
+           iinniitt((33)).
+
+         _-_s_e_t_c_o_o_k_i_e _C_o_o_k_i_e:
+           Sets the magic cookie of the node to _C_o_o_k_i_e, see
+           eerrllaanngg::sseett__ccooookkiiee//22.
+
+         _-_s_h_u_t_d_o_w_n___t_i_m_e _T_i_m_e:
+           Specifies how long time (in milliseconds) the _i_n_i_t process is
+           allowed to spend shutting down the system. If _T_i_m_e ms have elapsed,
+           all processes still existing are killed. Defaults to _i_n_f_i_n_i_t_y.
+
+         _-_s_n_a_m_e _N_a_m_e:
+           Makes the Erlang runtime system into a distributed node, similar to
+           _-_n_a_m_e, but the host name portion of the node name _N_a_m_e_@_H_o_s_t will be
+           the short name, not fully qualified.
+
+           This is sometimes the only way to run distributed Erlang if the DNS
+           (Domain Name System) is not running. There can be no communication
+           between nodes running with the _-_s_n_a_m_e flag and those running with
+           the _-_n_a_m_e flag, as node names must be unique in distributed Erlang
+           systems.
+
+         _-_s_m_p _[_e_n_a_b_l_e_|_a_u_t_o_|_d_i_s_a_b_l_e_]:
+           _-_s_m_p _e_n_a_b_l_e and _-_s_m_p starts the Erlang runtime system with SMP
+           support enabled. This may fail if no runtime system with SMP
+           support is available. _-_s_m_p _a_u_t_o starts the Erlang runtime system
+           with SMP support enabled if it is available and more than one
+           logical processor are detected. _-_s_m_p _d_i_s_a_b_l_e starts a runtime
+           system without SMP support.
+
+           _N_O_T_E: The runtime system with SMP support will not be available on
+           all supported platforms. See also the ++SS flag.
+
+         _-_v_e_r_s_i_o_n(emulator flag):
+           Makes the emulator print out its version number. The same as _e_r_l
+           _+_V.
+
+EEMMUULLAATTOORR FFLLAAGGSS
+       _e_r_l invokes the code for the Erlang emulator (virtual machine), which
+       supports the following flags:
+
+         _+_a _s_i_z_e:
+           Suggested stack size, in kilowords, for threads in the async-thread
+           pool. Valid range is 16-8192 kilowords. The default suggested stack
+           size is 16 kilowords, i.e, 64 kilobyte on 32-bit architectures.
+           This small default size has been chosen since the amount of async-
+           threads might be quite large. The default size is enough for
+           drivers delivered with Erlang/OTP, but might not be sufficiently
+           large for other dynamically linked in drivers that use the
+           ddrriivveerr__aassyynncc(()) functionality. Note that the value passed is only a
+           suggestion, and it might even be ignored on some platforms.
+
+         _+_A _s_i_z_e:
+           Sets the number of threads in async thread pool, valid range is
+           0-1024. Default is 0.
+
+         _+_B _[_c _| _d _| _i_]:
+           The _c option makes _C_t_r_l_-_C interrupt the current shell instead of
+           invoking the emulator break handler. The _d option (same as
+           specifying _+_B without an extra option) disables the break handler.
+           The _i option makes the emulator ignore any break signal.
+
+           If the _c option is used with _o_l_d_s_h_e_l_l on Unix, _C_t_r_l_-_C will restart
+           the shell process rather than interrupt it.
+
+           Note that on Windows, this flag is only applicable for _w_e_r_l, not
+           _e_r_l (_o_l_d_s_h_e_l_l). Note also that _C_t_r_l_-_B_r_e_a_k is used instead of _C_t_r_l_-_C
+           on Windows.
+
+         _+_c:
+           Disable compensation for sudden changes of system time.
+
+           Normally, _e_r_l_a_n_g_:_n_o_w_/_0 will not immediately reflect sudden changes
+           in the system time, in order to keep timers (including _r_e_c_e_i_v_e_-
+           _a_f_t_e_r) working. Instead, the time maintained by _e_r_l_a_n_g_:_n_o_w_/_0 is
+           slowly adjusted towards the new system time. (Slowly means in one
+           percent adjustments; if the time is off by one minute, the time
+           will be adjusted in 100 minutes.)
+
+           When the _+_c option is given, this slow adjustment will not take
+           place. Instead _e_r_l_a_n_g_:_n_o_w_/_0 will always reflect the current system
+           time. Note that timers are based on _e_r_l_a_n_g_:_n_o_w_/_0. If the system
+           time jumps, timers then time out at the wrong time.
+
+         _+_d:
+           If the emulator detects an internal error (or runs out of memory),
+           it will by default generate both a crash dump and a core dump. The
+           core dump will, however, not be very useful since the content of
+           process heaps is destroyed by the crash dump generation.
+
+           The _+_d option instructs the emulator to only produce a core dump
+           and no crash dump if an internal error is detected.
+
+           Calling _e_r_l_a_n_g_:_h_a_l_t_/_1 with a string argument will still produce a
+           crash dump.
+
+         _+_e _N_u_m_b_e_r:
+           Set max number of ETS tables.
+
+         _+_e_c:
+           Force the _c_o_m_p_r_e_s_s_e_d option on all ETS tables. Only intended for
+           test and evaluation.
+
+         _+_f_n_l:
+           The VM works with file names as if they are encoded using the ISO-
+           latin-1 encoding, disallowing Unicode characters with codepoints
+           beyond 255. This is default on operating systems that have
+           transparent file naming, i.e. all Unixes except MacOSX.
+
+         _+_f_n_u:
+           The VM works with file names as if they are encoded using UTF-8 (or
+           some other system specific Unicode encoding). This is the default
+           on operating systems that enforce Unicode encoding, i.e. Windows
+           and MacOSX.
+
+           By enabling Unicode file name translation on systems where this is
+           not default, you open up to the possibility that some file names
+           can not be interpreted by the VM and therefore will be returned to
+           the program as raw binaries. The option is therefore considered
+           experimental.
+
+         _+_f_n_a:
+           Selection between _+_f_n_l and _+_f_n_u is done based on the current locale
+           settings in the OS, meaning that if you have set your terminal for
+           UTF-8 encoding, the filesystem is expected to use the same encoding
+           for filenames (use with care).
+
+         _+_h_m_s _S_i_z_e:
+           Sets the default heap size of processes to the size _S_i_z_e.
+
+         _+_h_m_b_s _S_i_z_e:
+           Sets the default binary virtual heap size of processes to the size
+           _S_i_z_e.
+
+         _+_K _t_r_u_e _| _f_a_l_s_e:
+           Enables or disables the kernel poll functionality if the emulator
+           supports it. Default is _f_a_l_s_e (disabled). If the emulator does not
+           support kernel poll, and the _+_K flag is passed to the emulator, a
+           warning is issued at startup.
+
+         _+_l:
+           Enables auto load tracing, displaying info while loading code.
+
+         _+_L:
+           Don't load information about source filenames and line numbers.
+           This will save some memory, but exceptions will not contain
+           information about the filenames and line numbers.
+
+         _+_M_F_l_a_g _V_a_l_u_e:
+           Memory allocator specific flags, see eerrttss__aalllloocc((33)) for further
+           information.
+
+         _+_P _N_u_m_b_e_r:
+           Sets the maximum number of concurrent processes for this system.
+           _N_u_m_b_e_r must be in the range 16..134217727. Default is 32768.
+
+         _+_R _R_e_l_e_a_s_e_N_u_m_b_e_r:
+           Sets the compatibility mode.
+
+           The distribution mechanism is not backwards compatible by default.
+           This flags sets the emulator in compatibility mode with an earlier
+           Erlang/OTP release _R_e_l_e_a_s_e_N_u_m_b_e_r. The release number must be in the
+           range _7_._._<_c_u_r_r_e_n_t _r_e_l_e_a_s_e_>. This limits the emulator, making it
+           possible for it to communicate with Erlang nodes (as well as C- and
+           Java nodes) running that earlier release.
+
+           For example, an R10 node is not automatically compatible with an R9
+           node, but R10 nodes started with the _+_R _9 flag can co-exist with R9
+           nodes in the same distributed Erlang system, they are
+           R9-compatible.
+
+           Note: Make sure all nodes (Erlang-, C-, and Java nodes) of a
+           distributed Erlang system is of the same Erlang/OTP release, or
+           from two different Erlang/OTP releases X and Y, where _a_l_l Y nodes
+           have compatibility mode X.
+
+           For example: A distributed Erlang system can consist of R10 nodes,
+           or of R9 nodes and R9-compatible R10 nodes, but not of R9 nodes,
+           R9-compatible R10 nodes and "regular" R10 nodes, as R9 and
+           "regular" R10 nodes are not compatible.
+
+         _+_r:
+           Force ets memory block to be moved on realloc.
+
+         _+_r_g _R_e_a_d_e_r_G_r_o_u_p_s_L_i_m_i_t:
+           Limits the amount of reader groups used by read/write locks
+           optimized for read operations in the Erlang runtime system. By
+           default the reader groups limit equals 8.
+
+           When the amount of schedulers is less than or equal to the reader
+           groups limit, each scheduler has its own reader group. When the
+           amount of schedulers is larger than the reader groups limit,
+           schedulers share reader groups. Shared reader groups degrades read
+           lock and read unlock performance while a large amount of reader
+           groups degrades write lock performance, so the limit is a tradeoff
+           between performance for read operations and performance for write
+           operations. Each reader group currently consumes 64 byte in each
+           read/write lock. Also note that a runtime system using shared
+           reader groups benefits from bbiinnddiinngg sscchheedduulleerrss ttoo llooggiiccaall
+           pprroocceessssoorrss, since the reader groups are distributed better between
+           schedulers.
+
+         _+_S _S_c_h_e_d_u_l_e_r_s_:_S_c_h_e_d_u_l_e_r_O_n_l_i_n_e:
+           Sets the amount of scheduler threads to create and scheduler
+           threads to set online when SMP support has been enabled. Valid
+           range for both values are 1-1024. If the Erlang runtime system is
+           able to determine the amount of logical processors configured and
+           logical processors available, _S_c_h_e_d_u_l_e_r_s will default to logical
+           processors configured, and _S_c_h_e_d_u_l_e_r_s_O_n_l_i_n_e will default to logical
+           processors available; otherwise, the default values will be 1.
+           _S_c_h_e_d_u_l_e_r_s may be omitted if _:_S_c_h_e_d_u_l_e_r_O_n_l_i_n_e is not and vice
+           versa. The amount of schedulers online can be changed at run time
+           via eerrllaanngg::ssyysstteemm__ffllaagg((sscchheedduulleerrss__oonnlliinnee,, SScchheedduulleerrssOOnnlliinnee)).
+
+           This flag will be ignored if the emulator doesn't have SMP support
+           enabled (see the --ssmmpp flag).
+
+         _+_s_F_l_a_g _V_a_l_u_e:
+           Scheduling specific flags.
+
+           _+_s_b_t _B_i_n_d_T_y_p_e:
+             Set scheduler bind type. Currently valid _B_i_n_d_T_y_p_es:
+
+             _u:
+               _u_n_b_o_u_n_d - Schedulers will not be bound to logical processors,
+               i.e., the operating system decides where the scheduler threads
+               execute, and when to migrate them. This is the default.
+
+             _n_s:
+               _n_o___s_p_r_e_a_d - Schedulers with close scheduler identifiers will be
+               bound as close as possible in hardware.
+
+             _t_s:
+               _t_h_r_e_a_d___s_p_r_e_a_d - Thread refers to hardware threads (e.g. Intel's
+               hyper-threads). Schedulers with low scheduler identifiers, will
+               be bound to the first hardware thread of each core, then
+               schedulers with higher scheduler identifiers will be bound to
+               the second hardware thread of each core, etc.
+
+             _p_s:
+               _p_r_o_c_e_s_s_o_r___s_p_r_e_a_d - Schedulers will be spread like
+               _t_h_r_e_a_d___s_p_r_e_a_d, but also over physical processor chips.
+
+             _s:
+               _s_p_r_e_a_d - Schedulers will be spread as much as possible.
+
+             _n_n_t_s:
+               _n_o___n_o_d_e___t_h_r_e_a_d___s_p_r_e_a_d - Like _t_h_r_e_a_d___s_p_r_e_a_d, but if multiple
+               NUMA (Non-Uniform Memory Access) nodes exists, schedulers will
+               be spread over one NUMA node at a time, i.e., all logical
+               processors of one NUMA node will be bound to schedulers in
+               sequence.
+
+             _n_n_p_s:
+               _n_o___n_o_d_e___p_r_o_c_e_s_s_o_r___s_p_r_e_a_d - Like _p_r_o_c_e_s_s_o_r___s_p_r_e_a_d, but if
+               multiple NUMA nodes exists, schedulers will be spread over one
+               NUMA node at a time, i.e., all logical processors of one NUMA
+               node will be bound to schedulers in sequence.
+
+             _t_n_n_p_s:
+               _t_h_r_e_a_d___n_o___n_o_d_e___p_r_o_c_e_s_s_o_r___s_p_r_e_a_d - A combination of
+               _t_h_r_e_a_d___s_p_r_e_a_d, and _n_o___n_o_d_e___p_r_o_c_e_s_s_o_r___s_p_r_e_a_d. Schedulers will be
+               spread over hardware threads across NUMA nodes, but schedulers
+               will only be spread over processors internally in one NUMA node
+               at a time.
+
+             _d_b:
+               _d_e_f_a_u_l_t___b_i_n_d - Binds schedulers the default way. Currently the
+               default is _t_h_r_e_a_d___n_o___n_o_d_e___p_r_o_c_e_s_s_o_r___s_p_r_e_a_d (which might change
+               in the future).
+
+             Binding of schedulers is currently only supported on newer Linux,
+             Solaris, FreeBSD, and Windows systems.
+
+             If no CPU topology is available when the _+_s_b_t flag is processed
+             and _B_i_n_d_T_y_p_e is any other type than _u, the runtime system will
+             fail to start. CPU topology can be defined using the ++sscctt flag.
+             Note that the _+_s_c_t flag may have to be passed before the _+_s_b_t
+             flag on the command line (in case no CPU topology has been
+             automatically detected).
+
+             The runtime system will by default _n_o_t bind schedulers to logical
+             processors.
+
+             _N_O_T_E_: If the Erlang runtime system is the only operating system
+             process that binds threads to logical processors, this improves
+             the performance of the runtime system. However, if other
+             operating system processes (as for example another Erlang runtime
+             system) also bind threads to logical processors, there might be a
+             performance penalty instead. In some cases this performance
+             penalty might be severe. If this is the case, you are advised to
+             not bind the schedulers.
+
+             How schedulers are bound matters. For example, in situations when
+             there are fewer running processes than schedulers online, the
+             runtime system tries to migrate processes to schedulers with low
+             scheduler identifiers. The more the schedulers are spread over
+             the hardware, the more resources will be available to the runtime
+             system in such situations.
+
+             _N_O_T_E_: If a scheduler fails to bind, this will often be silently
+             ignored. This since it isn't always possible to verify valid
+             logical processor identifiers. If an error is reported, it will
+             be reported to the _e_r_r_o_r___l_o_g_g_e_r. If you want to verify that the
+             schedulers actually have bound as requested, call
+             eerrllaanngg::ssyysstteemm__iinnffoo((sscchheedduulleerr__bbiinnddiinnggss)).
+
+           _+_s_b_w_t _n_o_n_e_|_v_e_r_y___s_h_o_r_t_|_s_h_o_r_t_|_m_e_d_i_u_m_|_l_o_n_g_|_v_e_r_y___l_o_n_g:
+             Set scheduler busy wait threshold. Default is _m_e_d_i_u_m. The
+             threshold determines how long schedulers should busy wait when
+             running out of work before going to sleep.
+
+             _N_O_T_E_: This flag may be removed or changed at any time without
+             prior notice.
+
+           _+_s_c_l _t_r_u_e_|_f_a_l_s_e:
+             Enable or disable scheduler compaction of load. By default
+             scheduler compaction of load is enabled. When enabled, load
+             balancing will strive for a load distribution which causes as
+             many scheduler threads as possible to be fully loaded (i.e., not
+             run out of work). This is accomplished by migrating load (e.g.
+             runnable processes) into a smaller set of schedulers when
+             schedulers frequently run out of work. When disabled, the
+             frequency with which schedulers run out of work will not be taken
+             into account by the load balancing logic.
+
+           _+_s_c_t _C_p_u_T_o_p_o_l_o_g_y:
+
+
+             * _<_I_d_> _= _i_n_t_e_g_e_r_(_)_; _w_h_e_n _0 _=_< _<_I_d_> _=_< _6_5_5_3_5
+
+             * _<_I_d_R_a_n_g_e_> _= _<_I_d_>_-_<_I_d_>
+
+             * _<_I_d_O_r_I_d_R_a_n_g_e_> _= _<_I_d_> _| _<_I_d_R_a_n_g_e_>
+
+             * _<_I_d_L_i_s_t_> _= _<_I_d_O_r_I_d_R_a_n_g_e_>_,_<_I_d_O_r_I_d_R_a_n_g_e_> _| _<_I_d_O_r_I_d_R_a_n_g_e_>
+
+             * _<_L_o_g_i_c_a_l_I_d_s_> _= _L_<_I_d_L_i_s_t_>
+
+             * _<_T_h_r_e_a_d_I_d_s_> _= _T_<_I_d_L_i_s_t_> _| _t_<_I_d_L_i_s_t_>
+
+             * _<_C_o_r_e_I_d_s_> _= _C_<_I_d_L_i_s_t_> _| _c_<_I_d_L_i_s_t_>
+
+             * _<_P_r_o_c_e_s_s_o_r_I_d_s_> _= _P_<_I_d_L_i_s_t_> _| _p_<_I_d_L_i_s_t_>
+
+             * _<_N_o_d_e_I_d_s_> _= _N_<_I_d_L_i_s_t_> _| _n_<_I_d_L_i_s_t_>
+
+             * _<_I_d_D_e_f_s_> _=
+               _<_L_o_g_i_c_a_l_I_d_s_>_<_T_h_r_e_a_d_I_d_s_>_<_C_o_r_e_I_d_s_>_<_P_r_o_c_e_s_s_o_r_I_d_s_>_<_N_o_d_e_I_d_s_> _|
+               _<_L_o_g_i_c_a_l_I_d_s_>_<_T_h_r_e_a_d_I_d_s_>_<_C_o_r_e_I_d_s_>_<_N_o_d_e_I_d_s_>_<_P_r_o_c_e_s_s_o_r_I_d_s_>
+
+             * _C_p_u_T_o_p_o_l_o_g_y _= _<_I_d_D_e_f_s_>_:_<_I_d_D_e_f_s_> _| _<_I_d_D_e_f_s_>
+
+             Set a user defined CPU topology. The user defined CPU topology
+             will override any automatically detected CPU topology. The CPU
+             topology is used when bbiinnddiinngg sscchheedduulleerrss ttoo llooggiiccaall pprroocceessssoorrss.
+
+             Upper-case letters signify real identifiers and lower-case
+             letters signify fake identifiers only used for description of the
+             topology. Identifiers passed as real identifiers may be used by
+             the runtime system when trying to access specific hardware and if
+             they are not correct the behavior is undefined. Faked logical CPU
+             identifiers are not accepted since there is no point in defining
+             the CPU topology without real logical CPU identifiers. Thread,
+             core, processor, and node identifiers may be left out. If left
+             out, thread id defaults to _t_0, core id defaults to _c_0, processor
+             id defaults to _p_0, and node id will be left undefined. Either
+             each logical processor must belong to one and only one NUMA node,
+             or no logical processors must belong to any NUMA nodes.
+
+             Both increasing and decreasing _<_I_d_R_a_n_g_e_>s are allowed.
+
+             NUMA node identifiers are system wide. That is, each NUMA node on
+             the system have to have a unique identifier. Processor
+             identifiers are also system wide. Core identifiers are processor
+             wide. Thread identifiers are core wide.
+
+             The order of the identifier types imply the hierarchy of the CPU
+             topology. Valid orders are either
+             _<_L_o_g_i_c_a_l_I_d_s_>_<_T_h_r_e_a_d_I_d_s_>_<_C_o_r_e_I_d_s_>_<_P_r_o_c_e_s_s_o_r_I_d_s_>_<_N_o_d_e_I_d_s_>, or
+             _<_L_o_g_i_c_a_l_I_d_s_>_<_T_h_r_e_a_d_I_d_s_>_<_C_o_r_e_I_d_s_>_<_N_o_d_e_I_d_s_>_<_P_r_o_c_e_s_s_o_r_I_d_s_>. That is,
+             thread is part of a core which is part of a processor which is
+             part of a NUMA node, or thread is part of a core which is part of
+             a NUMA node which is part of a processor. A cpu topology can
+             consist of both processor external, and processor internal NUMA
+             nodes as long as each logical processor belongs to one and only
+             one NUMA node. If _<_P_r_o_c_e_s_s_o_r_I_d_s_> is left out, its default
+             position will be before _<_N_o_d_e_I_d_s_>. That is, the default is
+             processor external NUMA nodes.
+
+             If a list of identifiers is used in an _<_I_d_D_e_f_s_>:
+
+             * _<_L_o_g_i_c_a_l_I_d_s_> have to be a list of identifiers.
+
+             * At least one other identifier type apart from _<_L_o_g_i_c_a_l_I_d_s_> also
+               have to have a list of identifiers.
+
+             * All lists of identifiers have to produce the same amount of
+               identifiers.
+
+             A simple example. A single quad core processor may be described
+             this way:
+
+           % erl +sct L0-3c0-3
+           1> erlang:system_info(cpu_topology).
+           [{processor,[{core,{logical,0}},
+                        {core,{logical,1}},
+                        {core,{logical,2}},
+                        {core,{logical,3}}]}]
+
+
+             A little more complicated example. Two quad core processors. Each
+             processor in its own NUMA node. The ordering of logical
+             processors is a little weird. This in order to give a better
+             example of identifier lists:
+
+           % erl +sct L0-1,3-2c0-3p0N0:L7,4,6-5c0-3p1N1
+           1> erlang:system_info(cpu_topology).
+           [{node,[{processor,[{core,{logical,0}},
+                               {core,{logical,1}},
+                               {core,{logical,3}},
+                               {core,{logical,2}}]}]},
+            {node,[{processor,[{core,{logical,7}},
+                               {core,{logical,4}},
+                               {core,{logical,6}},
+                               {core,{logical,5}}]}]}]
+
+
+             As long as real identifiers are correct it is okay to pass a CPU
+             topology that is not a correct description of the CPU topology.
+             When used with care this can actually be very useful. This in
+             order to trick the emulator to bind its schedulers as you want.
+             For example, if you want to run multiple Erlang runtime systems
+             on the same machine, you want to reduce the amount of schedulers
+             used and manipulate the CPU topology so that they bind to
+             different logical CPUs. An example, with two Erlang runtime
+             systems on a quad core machine:
+
+           % erl +sct L0-3c0-3 +sbt db +S3:2 -detached -noinput -noshell -sname one
+           % erl +sct L3-0c0-3 +sbt db +S3:2 -detached -noinput -noshell -sname two
+
+
+             In this example each runtime system have two schedulers each
+             online, and all schedulers online will run on different cores. If
+             we change to one scheduler online on one runtime system, and
+             three schedulers online on the other, all schedulers online will
+             still run on different cores.
+
+             Note that a faked CPU topology that does not reflect how the real
+             CPU topology looks like is likely to decrease the performance of
+             the runtime system.
+
+             For more information, see eerrllaanngg::ssyysstteemm__iinnffoo((ccppuu__ttooppoollooggyy)).
+
+           _+_s_w_s _d_e_f_a_u_l_t_|_l_e_g_a_c_y_|_p_r_o_p_o_s_a_l:
+             Set scheduler wakeup strategy. Default is _l_e_g_a_c_y (has been used
+             since OTP-R13B). The _p_r_o_p_o_s_a_l strategy is the currently proposed
+             strategy for OTP-R16. Note that the _p_r_o_p_o_s_a_l strategy might
+             change during OTP-R15.
+
+             _N_O_T_E_: This flag may be removed or changed at any time without
+             prior notice.
+
+           _+_s_w_t _v_e_r_y___l_o_w_|_l_o_w_|_m_e_d_i_u_m_|_h_i_g_h_|_v_e_r_y___h_i_g_h:
+             Set scheduler wakeup threshold. Default is _m_e_d_i_u_m. The threshold
+             determines when to wake up sleeping schedulers when more work
+             than can be handled by currently awake schedulers exist. A low
+             threshold will cause earlier wakeups, and a high threshold will
+             cause later wakeups. Early wakeups will distribute work over
+             multiple schedulers faster, but work will more easily bounce
+             between schedulers.
+
+             _N_O_T_E_: This flag may be removed or changed at any time without
+             prior notice.
+
+           _+_s_s_s _s_i_z_e:
+             Suggested stack size, in kilowords, for scheduler threads. Valid
+             range is 4-8192 kilowords. The default stack size is OS
+             dependent.
+
+         _+_t _s_i_z_e:
+           Set the maximum number of atoms the VM can handle. Default is
+           1048576.
+
+         _+_T _L_e_v_e_l:
+           Enables modified timing and sets the modified timing level.
+           Currently valid range is 0-9. The timing of the runtime system will
+           change. A high level usually means a greater change than a low
+           level. Changing the timing can be very useful for finding timing
+           related bugs.
+
+           Currently, modified timing affects the following:
+
+           PPrroocceessss ssppaawwnniinngg::
+             A process calling _s_p_a_w_n, _s_p_a_w_n___l_i_n_k, _s_p_a_w_n___m_o_n_i_t_o_r, or _s_p_a_w_n___o_p_t
+             will be scheduled out immediately after completing the call. When
+             higher modified timing levels are used, the caller will also
+             sleep for a while after being scheduled out.
+
+           CCoonntteexxtt rreedduuccttiioonnss::
+             The amount of reductions a process is a allowed to use before
+             being scheduled out is increased or reduced.
+
+           IInnppuutt rreedduuccttiioonnss::
+             The amount of reductions performed before checking I/O is
+             increased or reduced.
+
+           _N_O_T_E_: Performance will suffer when modified timing is enabled. This
+           flag is _o_n_l_y intended for testing and debugging. Also note that
+           _r_e_t_u_r_n___t_o and _r_e_t_u_r_n___f_r_o_m trace messages will be lost when tracing
+           on the spawn BIFs. This flag may be removed or changed at any time
+           without prior notice.
+
+         _+_V:
+           Makes the emulator print out its version number.
+
+         _+_v:
+           Verbose.
+
+         _+_W _w _| _i:
+           Sets the mapping of warning messages for _e_r_r_o_r___l_o_g_g_e_r. Messages
+           sent to the error logger using one of the warning routines can be
+           mapped either to errors (default), warnings (_+_W _w), or info reports
+           (_+_W _i). The current mapping can be retrieved using
+           _e_r_r_o_r___l_o_g_g_e_r_:_w_a_r_n_i_n_g___m_a_p_/_0. See eerrrroorr__llooggggeerr((33)) for further
+           information.
+
+         _+_z_F_l_a_g _V_a_l_u_e:
+           Miscellaneous flags.
+
+           _+_z_d_b_b_l _s_i_z_e:
+             Set the distribution buffer busy limit (ddiisstt__bbuuff__bbuussyy__lliimmiitt) in
+             kilobytes. Valid range is 1-2097151. Default is 1024.
+
+             A larger buffer limit will allow processes to buffer more
+             outgoing messages over the distribution. When the buffer limit
+             has been reached, sending processes will be suspended until the
+             buffer size has shrunk. The buffer limit is per distribution
+             channel. A higher limit will give lower latency and higher
+             throughput at the expense of higher memory usage.
+
+EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
+         _E_R_L___C_R_A_S_H___D_U_M_P:
+           If the emulator needs to write a crash dump, the value of this
+           variable will be the file name of the crash dump file. If the
+           variable is not set, the name of the crash dump file will be
+           _e_r_l___c_r_a_s_h_._d_u_m_p in the current directory.
+
+         _E_R_L___C_R_A_S_H___D_U_M_P___N_I_C_E:
+           _U_n_i_x _s_y_s_t_e_m_s: If the emulator needs to write a crash dump, it will
+           use the value of this variable to set the nice value for the
+           process, thus lowering its priority. The allowable range is 1
+           through 39 (higher values will be replaced with 39). The highest
+           value, 39, will give the process the lowest priority.
+
+         _E_R_L___C_R_A_S_H___D_U_M_P___S_E_C_O_N_D_S:
+           _U_n_i_x _s_y_s_t_e_m_s: This variable gives the number of seconds that the
+           emulator will be allowed to spend writing a crash dump. When the
+           given number of seconds have elapsed, the emulator will be
+           terminated by a SIGALRM signal.
+
+         _E_R_L___A_F_L_A_G_S:
+           The content of this environment variable will be added to the
+           beginning of the command line for _e_r_l.
+
+           The _-_e_x_t_r_a flag is treated specially. Its scope ends at the end of
+           the environment variable content. Arguments following an _-_e_x_t_r_a
+           flag are moved on the command line into the _-_e_x_t_r_a section, i.e.
+           the end of the command line following after an _-_e_x_t_r_a flag.
+
+         _E_R_L___Z_F_L_A_G_S and _E_R_L___F_L_A_G_S:
+           The content of these environment variables will be added to the end
+           of the command line for _e_r_l.
+
+           The _-_e_x_t_r_a flag is treated specially. Its scope ends at the end of
+           the environment variable content. Arguments following an _-_e_x_t_r_a
+           flag are moved on the command line into the _-_e_x_t_r_a section, i.e.
+           the end of the command line following after an _-_e_x_t_r_a flag.
+
+         _E_R_L___L_I_B_S:
+           This environment variable contains a list of additional library
+           directories that the code server will search for applications and
+           add to the code path. See ccooddee((33)).
+
+         _E_R_L___E_P_M_D___A_D_D_R_E_S_S:
+           This environment variable may be set to a comma-separated list of
+           IP addresses, in which case the eeppmmdd daemon will listen only on the
+           specified address(es) and on the loopback address (which is
+           implicitly added to the list if it has not been specified).
+
+         _E_R_L___E_P_M_D___P_O_R_T:
+           This environment variable can contain the port number to use when
+           communicating with eeppmmdd. The default port will work fine in most
+           cases. A different port can be specified to allow nodes of
+           independent clusters to co-exist on the same host. All nodes in a
+           cluster must use the same epmd port number.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The standard Erlang/OTP system can be re-configured to change the
+       default behavior on start-up.
+
+         TThhee ..eerrllaanngg SSttaarrtt--uupp FFiillee::
+           When Erlang/OTP is started, the system searches for a file named
+           .erlang in the directory where Erlang/OTP is started. If not found,
+           the user's home directory is searched for an .erlang file.
+
+           If an .erlang file is found, it is assumed to contain valid Erlang
+           expressions. These expressions are evaluated as if they were input
+           to the shell.
+
+           A typical .erlang file contains a set of search paths, for example:
+
+                 io:format("executing user profile in HOME/.erlang\n",[]).
+                 code:add_path("/home/calvin/test/ebin").
+                 code:add_path("/home/hobbes/bigappl-1.2/ebin").
+                 io:format(".erlang rc finished\n",[]).
+
+
+         uusseerr__ddeeffaauulltt aanndd sshheellll__ddeeffaauulltt::
+           Functions in the shell which are not prefixed by a module name are
+           assumed to be functional objects (Funs), built-in functions (BIFs),
+           or belong to the module user_default or shell_default.
+
+           To include private shell commands, define them in a module
+           user_default and add the following argument as the first line in
+           the .erlang file.
+
+                  code:load_abs("..../user_default").
+
+
+         eerrll::
+           If the contents of .erlang are changed and a private version of
+           user_default is defined, it is possible to customize the Erlang/OTP
+           environment. More powerful changes can be made by supplying command
+           line arguments in the start-up script erl. Refer to erl(1) and
+           iinniitt((33)) for further information.
+
+SSEEEE AALLSSOO
+       iinniitt((33)), eerrll__pprriimm__llooaaddeerr((33)), eerrll__bboooott__sseerrvveerr((33)), ccooddee((33)),
+       aapppplliiccaattiioonn((33)), hheeaarrtt((33)), nneett__kkeerrnneell((33)), aauutthh((33)), mmaakkee((33)), eeppmmdd((11)),
+       eerrttss__aalllloocc((33))
+
+
+
+Ericsson AB                       erts 5.9.2                            erl(1)

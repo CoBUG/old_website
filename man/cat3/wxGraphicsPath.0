@@ -1,0 +1,268 @@
+wxGraphicsPath(3)          Erlang Module Definition          wxGraphicsPath(3)
+
+
+
+NNAAMMEE
+       wxGraphicsPath - See external documentation: wxGraphicsPath.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGraphicsPath.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrraapphhiiccssOObbjjeecctt
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_a_p_h_i_c_s_P_a_t_h_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       mmoovveeTTooPPooiinntt((TThhiiss,, PP)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 P = {X::float(), Y::float()}
+
+              See external documentation.
+
+       mmoovveeTTooPPooiinntt((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+
+       aaddddAArrcc((TThhiiss,, CC,, RR,, SSttaarrttAAnnggllee,, EEnnddAAnnggllee,, CClloocckkwwiissee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 C = {X::float(), Y::float()}
+                 R = number()
+                 StartAngle = number()
+                 EndAngle = number()
+                 Clockwise = boolean()
+
+              See external documentation.
+
+       aaddddAArrcc((TThhiiss,, XX,, YY,, RR,, SSttaarrttAAnnggllee,, EEnnddAAnnggllee,, CClloocckkwwiissee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+                 R = number()
+                 StartAngle = number()
+                 EndAngle = number()
+                 Clockwise = boolean()
+
+              See external documentation.
+
+       aaddddAArrccTTooPPooiinntt((TThhiiss,, XX11,, YY11,, XX22,, YY22,, RR)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X1 = number()
+                 Y1 = number()
+                 X2 = number()
+                 Y2 = number()
+                 R = number()
+
+              See external documentation.
+
+       aaddddCCiirrccllee((TThhiiss,, XX,, YY,, RR)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+                 R = number()
+
+              See external documentation.
+
+       aaddddCCuurrvveeTTooPPooiinntt((TThhiiss,, CC11,, CC22,, EE)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 C1 = {X::float(), Y::float()}
+                 C2 = {X::float(), Y::float()}
+                 E = {X::float(), Y::float()}
+
+              See external documentation.
+
+       aaddddCCuurrvveeTTooPPooiinntt((TThhiiss,, CCxx11,, CCyy11,, CCxx22,, CCyy22,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 Cx1 = number()
+                 Cy1 = number()
+                 Cx2 = number()
+                 Cy2 = number()
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+
+       aaddddEElllliippssee((TThhiiss,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       aaddddLLiinneeTTooPPooiinntt((TThhiiss,, PP)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 P = {X::float(), Y::float()}
+
+              See external documentation.
+
+       aaddddLLiinneeTTooPPooiinntt((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+
+       aaddddPPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 Path = wxGraphicsPath()
+
+              See external documentation.
+
+       aaddddQQuuaaddCCuurrvveeTTooPPooiinntt((TThhiiss,, CCxx,, CCyy,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 Cx = number()
+                 Cy = number()
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+
+       aaddddRReeccttaannggllee((TThhiiss,, XX,, YY,, WW,, HH)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+
+              See external documentation.
+
+       aaddddRRoouunnddeeddRReeccttaannggllee((TThhiiss,, XX,, YY,, WW,, HH,, RRaaddiiuuss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+                 W = number()
+                 H = number()
+                 Radius = number()
+
+              See external documentation.
+
+       cclloosseeSSuubbppaatthh((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+
+              See external documentation.
+
+       ccoonnttaaiinnss((TThhiiss,, CC)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 C = {X::float(), Y::float()}
+
+              Equivalent to ccoonnttaaiinnss((TThhiiss,, CC,, [[]])).
+
+       ccoonnttaaiinnss((TThhiiss,, XX,, YY)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+              Also:
+              contains(This, C, [Option]) -> boolean() when
+              This::wxGraphicsPath(), C::{X::float(), Y::float()},
+              Option :: {fillStyle, integer()}.
+
+
+       ccoonnttaaiinnss((TThhiiss,, XX,, YY,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 X = number()
+                 Y = number()
+                 Option = {fillStyle, integer()}
+
+              See external documentation.
+
+       ggeettBBooxx((TThhiiss)) -->> {{XX::::ffllooaatt(()),, YY::::ffllooaatt(()),, WW::::ffllooaatt(()),, HH::::ffllooaatt(())}}
+
+              Types:
+
+                 This = wxGraphicsPath()
+
+              See external documentation.
+
+       ggeettCCuurrrreennttPPooiinntt((TThhiiss)) -->> {{XX::::ffllooaatt(()),, YY::::ffllooaatt(())}}
+
+              Types:
+
+                 This = wxGraphicsPath()
+
+              See external documentation.
+
+       ttrraannssffoorrmm((TThhiiss,, MMaattrriixx)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsPath()
+                 Matrix = wxGraphicsMatrix() (see module wxGraphicsMatrix)
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxGraphicsPath(3)

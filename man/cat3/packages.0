@@ -1,0 +1,164 @@
+packages(3)                Erlang Module Definition                packages(3)
+
+
+
+NNAAMMEE
+       packages - Packages in Erlang
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       Packages has since it was introduced more than 5 years ago been an
+       experimental feature. Use it at your own risk, we do not actively
+       maintain and develop this feature. It might however be supported some
+       day.
+
+       In spite of this packages work quite well, but there are some known
+       issues in tools and other parts where packages don't work well.
+
+
+       _I_n_t_r_o_d_u_c_t_i_o_n
+
+       Packages are simply namespaces for modules. All old Erlang modules
+       automatically belong to the top level ("empty-string") namespace, and
+       do not need any changes.
+
+       The full name of a packaged module is written as e.g.
+       "_f_e_e_._f_i_e_._f_o_e_._f_o_o", i.e., as atoms separated by periods, where the
+       package name is the part up to but not including the last period; in
+       this case "_f_e_e_._f_i_e_._f_o_e". A more concrete example is the module
+       _e_r_l_._l_a_n_g_._t_e_r_m, which is in the package _e_r_l_._l_a_n_g. Package names can have
+       any number of segments, as in _e_r_l_._l_a_n_g_._l_i_s_t_._s_o_r_t. The atoms in the name
+       can be quoted, as in _f_o_o_._'_B_a_r_'_._b_a_z, or even the whole name, as in
+       _'_f_o_o_._b_a_r_._b_a_z_' but the concatenation of atoms and periods must not
+       contain two consecutive period characters or end with a period, as in
+       _'_f_o_o_._._b_a_r_', _f_o_o_._'_._b_a_r_', or _f_o_o_._'_b_a_r_._'. The periods must not be followed
+       by whitespace.
+
+       The code loader maps module names onto the file system directory
+       structure. E.g., the module _e_r_l_._l_a_n_g_._t_e_r_m corresponds to a file
+       _._._._/_e_r_l_/_l_a_n_g_/_t_e_r_m_._b_e_a_m in the search path. Note that the name of the
+       actual object file corresponds to the last part only of the full module
+       name. (Thus, old existing modules such as _l_i_s_t_s simply map to
+       _._._._/_l_i_s_t_s_._b_e_a_m, exactly as before.)
+
+       A packaged module in a file "_f_o_o_/_b_a_r_/_f_r_e_d_._e_r_l" is declared as:
+
+       -module(foo.bar.fred).
+
+       This can be compiled and loaded from the Erlang shell using _c_(_f_r_e_d_), if
+       your current directory is the same as that of the file. The object file
+       will be named _f_r_e_d_._b_e_a_m.
+
+       The Erlang search path works exactly as before, except that the package
+       segments will be appended to each directory in the path in order to
+       find the file. E.g., assume the path is _[_"_/_u_s_r_/_l_i_b_/_e_r_l_"_,
+       _"_/_u_s_r_/_l_o_c_a_l_/_l_i_b_/_o_t_p_/_l_e_g_a_c_y_/_e_b_i_n_"_, _"_/_h_o_m_e_/_b_a_r_n_e_y_/_e_r_l_"_]. Then, the code
+       for a module named _f_o_o_._b_a_r_._f_r_e_d will be searched for first as
+       _"_/_u_s_r_/_l_i_b_/_e_r_l_/_f_o_o_/_b_a_r_/_f_r_e_d_._b_e_a_m_", then
+       _"_/_u_s_r_/_l_o_c_a_l_/_l_i_b_/_o_t_p_/_l_e_g_a_c_y_/_e_b_i_n_/_f_o_o_/_b_a_r_/_f_r_e_d_._b_e_a_m_" and lastly
+       _"_/_h_o_m_e_/_b_a_r_n_e_y_/_e_r_l_/_f_o_o_/_b_a_r_/_f_r_e_d_._b_e_a_m_". A module like _l_i_s_t_s, which is in
+       the top-level package, will be looked for as _"_/_u_s_r_/_l_i_b_/_e_r_l_/_l_i_s_t_s_._b_e_a_m_",
+       _"_/_u_s_r_/_l_o_c_a_l_/_l_i_b_/_o_t_p_/_l_e_g_a_c_y_/_e_b_i_n_/_l_i_s_t_s_._b_e_a_m_" and
+       _"_/_h_o_m_e_/_b_a_r_n_e_y_/_e_r_l_/_l_i_s_t_s_._b_e_a_m_".
+
+       _P_r_o_g_r_a_m_m_i_n_g
+
+       Normally, if a call is made from one module to another, it is assumed
+       that the called module belongs to the same package as the source
+       module. The compiler automatically expands such calls. E.g., in:
+
+       -module(foo.bar.m1).
+       -export([f/1]).
+
+       f(X) -> m2:g(X).
+
+       _m_2_:_g_(_X_) becomes a call to _f_o_o_._b_a_r_._m_2 If this is not what was intended,
+       the call can be written explicitly, as in
+
+       -module(foo.bar.m1).
+       -export([f/1]).
+
+       f(X) -> fee.fie.foe.m2:g(X).
+
+       Because the called module is given with an explicit package name, no
+       expansion is done in this case.
+
+       If a module from another package is used repeatedly in a module, an
+       import declaration can make life easier:
+
+       -module(foo.bar.m1).
+       -export([f/1, g/1]).
+       -import(fee.fie.foe.m2).
+
+       f(X) -> m2:g(X).
+       g(X) -> m2:h(X).
+
+       will make the calls to _m_2 refer to _f_e_e_._f_i_e_._f_o_e_._m_2. More generally, a
+       declaration _-_i_m_p_o_r_t_(_P_a_c_k_a_g_e_._M_o_d_u_l_e_)_. will cause calls to _M_o_d_u_l_e to be
+       expanded to _P_a_c_k_a_g_e_._M_o_d_u_l_e.
+
+       Old-style function imports work as normal (but full module names must
+       be used); e.g.:
+
+       -import(fee.fie.foe.m2, [g/1, h/1]).
+
+       however, it is probably better to avoid this form of import altogether
+       in new code, since it makes it hard to see what calls are really
+       "remote".
+
+       If it is necessary to call a module in the top-level package from
+       within a named package, the module name can be written either with an
+       initial period as in e.g. "_._l_i_s_t_s", or with an empty initial atom, as
+       in "_'_'_._l_i_s_t_s". However, the best way is to use an import declaration -
+       this is most obvious to the eye, and makes sure we don't forget adding
+       a period somewhere:
+
+       -module(foo.bar.fred).
+       -export([f/1]).
+       -import(lists).
+
+       f(X) -> lists:reverse(X).
+
+       The dot-syntax for module names can be used in any expression. All
+       segments must be constant atoms, and the result must be a well-formed
+       package/module name. E.g.:
+
+       spawn(foo.bar.fred, f, [X])
+
+       is equivalent to _s_p_a_w_n_(_'_f_o_o_._b_a_r_._f_r_e_d_'_, _f_, _[_X_]_).
+
+       _T_h_e _E_r_l_a_n_g _S_h_e_l_l
+
+       The shell also automatically expands remote calls, however currently no
+       expansions are made by default. The user can change the behaviour by
+       using the _i_m_p_o_r_t_/_1 shell command (or its abbreviation _u_s_e_/_1). E.g.:
+
+       1> import(foo.bar.m).
+       ok
+       2> m:f().
+
+       will evaluate _f_o_o_._b_a_r_._m_:_f_(_). If a new import is made of the same name,
+       this overrides any previous import. (It is likely that in the future,
+       some system packages will be pre-imported.)
+
+       In addition, the shell command _i_m_p_o_r_t___a_l_l_/_1 (and its alias _u_s_e___a_l_l_/_1)
+       imports all modules currently found in the path for a given package
+       name. E.g., assuming the files "_._._._/_f_o_o_/_b_a_r_/_f_r_e_d_._b_e_a_m",
+       "_._._._/_f_o_o_/_b_a_r_/_b_a_r_n_e_y_._b_e_a_m" and "_._._._/_f_o_o_/_b_a_r_/_b_a_m_b_a_m_._b_e_a_m" can be found
+       from our current path,
+
+       1> import_all(foo.bar).
+
+       will make _f_r_e_d, _b_a_r_n_e_y and _b_a_m_b_a_m expand to _f_o_o_._b_a_r_._f_r_e_d,
+       _f_o_o_._b_a_r_._b_a_r_n_e_y and _f_o_o_._b_a_r_._b_a_m_b_a_m, respectively.
+
+       Note: The compiler does not have an "import all" directive, for the
+       reason that Erlang has no compile time type checking. E.g. if the wrong
+       search path is used at compile time, a call _m_:_f_(_._._._) could be expanded
+       to _f_o_o_._b_a_r_._m_:_f_(_._._._) without any warning, instead of the intended
+       _f_r_o_b_._o_z_z_._m_:_f_(_._._._), if package _f_o_o_._b_a_r happens to be found first in the
+       path. Explicitly declaring each use of a module makes for safe code.
+
+
+
+Ericsson AB                      kernel 2.15.2                     packages(3)

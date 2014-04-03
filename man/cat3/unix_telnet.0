@@ -1,0 +1,49 @@
+unix_telnet(3)             Erlang Module Definition             unix_telnet(3)
+
+
+
+NNAAMMEE
+       unix_telnet - Callback module for ct_telnet for talking telnet to a
+       unix host.
+
+DDEESSCCRRIIPPTTIIOONN
+       Callback module for ct_telnet for talking telnet to a unix host.
+
+       It requires the following entry in the config file:
+
+          {unix,[{telnet,HostNameOrIpAddress},
+                 {port,PortNum},                 % optional
+                 {username,UserName},
+                 {password,Password},
+                 {keep_alive,Bool}]}.            % optional
+
+       To talk telnet to the host specified by _H_o_s_t_N_a_m_e_O_r_I_p_A_d_d_r_e_s_s, use the
+       interface functions in _c_t, e.g. _o_p_e_n_(_N_a_m_e_)_, _c_m_d_(_N_a_m_e_,_C_m_d_)_, _._._..
+
+       _N_a_m_e is the name you allocated to the unix host in your _r_e_q_u_i_r_e
+       statement. E.g.
+
+          suite() -> [{require,Name,{unix,[telnet,username,password]}}].
+
+       or
+
+          ct:require(Name,{unix,[telnet,username,password]}).
+
+       The "keep alive" activity (i.e. that Common Test sends NOP to the
+       server every 10 seconds if the connection is idle) may be enabled or
+       disabled for one particular connection as described here. It may be
+       disabled for all connections using _t_e_l_n_e_t___s_e_t_t_i_n_g_s (see _c_t___t_e_l_n_e_t).
+
+       Note that the _{_p_o_r_t_,_P_o_r_t_N_u_m_} tuple is optional and if omitted, default
+       telnet port 23 will be used. Also the _k_e_e_p___a_l_i_v_e tuple is optional, and
+       the value defauls to true (enabled).
+
+SSEEEE AALLSSOO
+       cctt, cctt__tteellnneett
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                unix_telnet(3)

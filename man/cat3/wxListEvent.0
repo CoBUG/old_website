@@ -1,0 +1,148 @@
+wxListEvent(3)             Erlang Module Definition             wxListEvent(3)
+
+
+
+NNAAMMEE
+       wxListEvent - See external documentation: wxListEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxListEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_o_m_m_a_n_d___l_i_s_t___b_e_g_i_n___d_r_a_g, _c_o_m_m_a_n_d___l_i_s_t___b_e_g_i_n___r_d_r_a_g,
+           _c_o_m_m_a_n_d___l_i_s_t___b_e_g_i_n___l_a_b_e_l___e_d_i_t, _c_o_m_m_a_n_d___l_i_s_t___e_n_d___l_a_b_e_l___e_d_i_t,
+           _c_o_m_m_a_n_d___l_i_s_t___d_e_l_e_t_e___i_t_e_m, _c_o_m_m_a_n_d___l_i_s_t___d_e_l_e_t_e___a_l_l___i_t_e_m_s,
+           _c_o_m_m_a_n_d___l_i_s_t___k_e_y___d_o_w_n, _c_o_m_m_a_n_d___l_i_s_t___i_n_s_e_r_t___i_t_e_m,
+           _c_o_m_m_a_n_d___l_i_s_t___c_o_l___c_l_i_c_k, _c_o_m_m_a_n_d___l_i_s_t___c_o_l___r_i_g_h_t___c_l_i_c_k,
+           _c_o_m_m_a_n_d___l_i_s_t___c_o_l___b_e_g_i_n___d_r_a_g, _c_o_m_m_a_n_d___l_i_s_t___c_o_l___d_r_a_g_g_i_n_g,
+           _c_o_m_m_a_n_d___l_i_s_t___c_o_l___e_n_d___d_r_a_g, _c_o_m_m_a_n_d___l_i_s_t___i_t_e_m___s_e_l_e_c_t_e_d,
+           _c_o_m_m_a_n_d___l_i_s_t___i_t_e_m___d_e_s_e_l_e_c_t_e_d, _c_o_m_m_a_n_d___l_i_s_t___i_t_e_m___r_i_g_h_t___c_l_i_c_k,
+           _c_o_m_m_a_n_d___l_i_s_t___i_t_e_m___m_i_d_d_l_e___c_l_i_c_k, _c_o_m_m_a_n_d___l_i_s_t___i_t_e_m___a_c_t_i_v_a_t_e_d,
+           _c_o_m_m_a_n_d___l_i_s_t___i_t_e_m___f_o_c_u_s_e_d, _c_o_m_m_a_n_d___l_i_s_t___c_a_c_h_e___h_i_n_t
+
+       See also the message variant ##wwxxLLiisstt{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxNNoottiiffyyEEvveenntt
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_i_s_t_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettCCaacchheeFFrroomm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettCCaacchheeTToo((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettKKeeyyCCooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettIInnddeexx((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettCCoolluummnn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettPPooiinntt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettLLaabbeell((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettIImmaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettDDaattaa((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettMMaasskk((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       ggeettIItteemm((TThhiiss)) -->> wwxxLLiissttIItteemm(()) ((sseeee mmoodduullee wwxxLLiissttIItteemm))
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+       iissEEddiittCCaanncceelllleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxListEvent(3)

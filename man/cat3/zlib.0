@@ -1,0 +1,510 @@
+zlib(3)                    Erlang Module Definition                    zlib(3)
+
+
+
+NNAAMMEE
+       zlib - Zlib Compression interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       The zlib module provides an API for the zlib library
+       (http://www.zlib.org). It is used to compress and decompress data. The
+       data format is described by RFCs 1950 to 1952.
+
+       A typical (compress) usage looks like:
+
+       Z = zlib:open(),
+       ok = zlib:deflateInit(Z,default),
+
+       Compress = fun(end_of_data, _Cont) -> [];
+                     (Data, Cont) ->
+                        [zlib:deflate(Z, Data)|Cont(Read(),Cont)]
+                  end,
+       Compressed = Compress(Read(),Compress),
+       Last = zlib:deflate(Z, [], finish),
+       ok = zlib:deflateEnd(Z),
+       zlib:close(Z),
+       list_to_binary([Compressed|Last])
+
+       In all functions errors, _{_'_E_X_I_T_'_,_{_R_e_a_s_o_n_,_B_a_c_k_t_r_a_c_e_}_}, might be thrown,
+       where _R_e_a_s_o_n describes the error. Typical reasons are:
+
+         _b_a_d_a_r_g:
+           Bad argument
+
+         _d_a_t_a___e_r_r_o_r:
+           The data contains errors
+
+         _s_t_r_e_a_m___e_r_r_o_r:
+           Inconsistent stream state
+
+         _e_i_n_v_a_l:
+           Bad value or wrong function called
+
+         _{_n_e_e_d___d_i_c_t_i_o_n_a_r_y_,_A_d_l_e_r_3_2_}:
+           See _i_n_f_l_a_t_e_/_2
+
+DDAATTAA TTYYPPEESS
+       zzssttrreeaamm(()) = port()
+
+              A zlib stream, see ooppeenn//00.
+
+       zzlleevveell(()) = none
+                | default
+                | best_compression
+                | best_speed
+                | 0..9
+
+       zzmmeemmlleevveell(()) = 1..9
+
+       zzmmeetthhoodd(()) = deflated
+
+       zzssttrraatteeggyy(()) = default | filtered | huffman_only
+
+       zzwwiinnddoowwbbiittss(()) = -15..-9 | 9..47
+
+              Normally in the range _-_1_5_._._-_9 _| _9_._._1_5.
+
+EEXXPPOORRTTSS
+       ooppeenn(()) -->> zzssttrreeaamm(())
+
+              Open a zlib stream.
+
+       cclloossee((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              Closes the stream referenced by _Z.
+
+       ddeeffllaatteeIInniitt((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              Same as _z_l_i_b_:_d_e_f_l_a_t_e_I_n_i_t_(_Z_, _d_e_f_a_u_l_t_).
+
+       ddeeffllaatteeIInniitt((ZZ,, LLeevveell)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Level = zzlleevveell(())
+
+              Initialize a zlib stream for compression.
+
+              _L_e_v_e_l decides the compression level to be used, 0 (_n_o_n_e), gives
+              no compression at all, 1 (_b_e_s_t___s_p_e_e_d) gives best speed and 9
+              (_b_e_s_t___c_o_m_p_r_e_s_s_i_o_n) gives best compression.
+
+       ddeeffllaatteeIInniitt((ZZ,, LLeevveell,, MMeetthhoodd,, WWiinnddoowwBBiittss,, MMeemmLLeevveell,, SSttrraatteeggyy)) -->>
+                      ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Level = zzlleevveell(())
+                 Method = zzmmeetthhoodd(())
+                 WindowBits = zzwwiinnddoowwbbiittss(())
+                 MemLevel = zzmmeemmlleevveell(())
+                 Strategy = zzssttrraatteeggyy(())
+
+              Initiates a zlib stream for compression.
+
+              The _L_e_v_e_l parameter decides the compression level to be used, 0
+              (_n_o_n_e), gives no compression at all, 1 (_b_e_s_t___s_p_e_e_d) gives best
+              speed and 9 (_b_e_s_t___c_o_m_p_r_e_s_s_i_o_n) gives best compression.
+
+              The _M_e_t_h_o_d parameter decides which compression method to use,
+              currently the only supported method is _d_e_f_l_a_t_e_d.
+
+              The _W_i_n_d_o_w_B_i_t_s parameter is the base two logarithm of the window
+              size (the size of the history buffer). It should be in the range
+              9 through 15. Larger values of this parameter result in better
+              compression at the expense of memory usage. The default value is
+              15 if _d_e_f_l_a_t_e_I_n_i_t_/_2. A negative _W_i_n_d_o_w_B_i_t_s value suppresses the
+              zlib header (and checksum) from the stream. Note that the zlib
+              source mentions this only as a undocumented feature.
+
+              The _M_e_m_L_e_v_e_l parameter specifies how much memory should be
+              allocated for the internal compression state. _M_e_m_L_e_v_e_l=1 uses
+              minimum memory but is slow and reduces compression ratio;
+              _M_e_m_L_e_v_e_l=9 uses maximum memory for optimal speed. The default
+              value is 8.
+
+              The _S_t_r_a_t_e_g_y parameter is used to tune the compression
+              algorithm. Use the value _d_e_f_a_u_l_t for normal data, _f_i_l_t_e_r_e_d for
+              data produced by a filter (or predictor), or _h_u_f_f_m_a_n___o_n_l_y to
+              force Huffman encoding only (no string match). Filtered data
+              consists mostly of small values with a somewhat random
+              distribution. In this case, the compression algorithm is tuned
+              to compress them better. The effect of _f_i_l_t_e_r_e_dis to force more
+              Huffman coding and less string matching; it is somewhat
+              intermediate between _d_e_f_a_u_l_t and _h_u_f_f_m_a_n___o_n_l_y. The _S_t_r_a_t_e_g_y
+              parameter only affects the compression ratio but not the
+              correctness of the compressed output even if it is not set
+              appropriately.
+
+       ddeeffllaattee((ZZ,, DDaattaa)) -->> CCoommpprreesssseedd
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Data = iodata()
+                 Compressed = iolist()
+
+              Same as _d_e_f_l_a_t_e_(_Z_, _D_a_t_a_, _n_o_n_e_).
+
+       ddeeffllaattee((ZZ,, DDaattaa,, FFlluusshh)) -->> CCoommpprreesssseedd
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Data = iodata()
+                 Flush = none | sync | full | finish
+                 Compressed = iolist()
+
+              _d_e_f_l_a_t_e_/_3 compresses as much data as possible, and stops when
+              the input buffer becomes empty. It may introduce some output
+              latency (reading input without producing any output) except when
+              forced to flush.
+
+              If the parameter _F_l_u_s_h is set to _s_y_n_c, all pending output is
+              flushed to the output buffer and the output is aligned on a byte
+              boundary, so that the decompressor can get all input data
+              available so far. Flushing may degrade compression for some
+              compression algorithms and so it should be used only when
+              necessary.
+
+              If _F_l_u_s_h is set to _f_u_l_l, all output is flushed as with _s_y_n_c, and
+              the compression state is reset so that decompression can restart
+              from this point if previous compressed data has been damaged or
+              if random access is desired. Using _f_u_l_l too often can seriously
+              degrade the compression.
+
+              If the parameter _F_l_u_s_h is set to _f_i_n_i_s_h, pending input is
+              processed, pending output is flushed and _d_e_f_l_a_t_e_/_3 returns.
+              Afterwards the only possible operations on the stream are
+              _d_e_f_l_a_t_e_R_e_s_e_t_/_1 or _d_e_f_l_a_t_e_E_n_d_/_1.
+
+              _F_l_u_s_h can be set to _f_i_n_i_s_h immediately after _d_e_f_l_a_t_e_I_n_i_t if all
+              compression is to be done in one step.
+
+              zlib:deflateInit(Z),
+              B1 = zlib:deflate(Z,Data),
+              B2 = zlib:deflate(Z,<< >>,finish),
+              zlib:deflateEnd(Z),
+              list_to_binary([B1,B2])
+
+       ddeeffllaatteeSSeettDDiiccttiioonnaarryy((ZZ,, DDiiccttiioonnaarryy)) -->> AAddlleerr3322
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Dictionary = iodata()
+                 Adler32 = integer()
+
+              Initializes the compression dictionary from the given byte
+              sequence without producing any compressed output. This function
+              must be called immediately after _d_e_f_l_a_t_e_I_n_i_t_/_[_1_|_2_|_6_] or
+              _d_e_f_l_a_t_e_R_e_s_e_t_/_1, before any call of _d_e_f_l_a_t_e_/_3. The compressor and
+              decompressor must use exactly the same dictionary (see
+              _i_n_f_l_a_t_e_S_e_t_D_i_c_t_i_o_n_a_r_y_/_2). The adler checksum of the dictionary is
+              returned.
+
+       ddeeffllaatteeRReesseett((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              This function is equivalent to _d_e_f_l_a_t_e_E_n_d_/_1 followed by
+              _d_e_f_l_a_t_e_I_n_i_t_/_[_1_|_2_|_6_], but does not free and reallocate all the
+              internal compression state. The stream will keep the same
+              compression level and any other attributes.
+
+       ddeeffllaatteePPaarraammss((ZZ,, LLeevveell,, SSttrraatteeggyy)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Level = zzlleevveell(())
+                 Strategy = zzssttrraatteeggyy(())
+
+              Dynamically update the compression level and compression
+              strategy. The interpretation of _L_e_v_e_l and _S_t_r_a_t_e_g_y is as in
+              _d_e_f_l_a_t_e_I_n_i_t_/_6. This can be used to switch between compression
+              and straight copy of the input data, or to switch to a different
+              kind of input data requiring a different strategy. If the
+              compression level is changed, the input available so far is
+              compressed with the old level (and may be flushed); the new
+              level will take effect only at the next call of _d_e_f_l_a_t_e_/_3.
+
+              Before the call of _d_e_f_l_a_t_e_P_a_r_a_m_s, the stream state must be set
+              as for a call of _d_e_f_l_a_t_e_/_3, since the currently available input
+              may have to be compressed and flushed.
+
+       ddeeffllaatteeEEnndd((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              End the deflate session and cleans all data used. Note that this
+              function will throw an _d_a_t_a___e_r_r_o_r exception if the last call to
+              _d_e_f_l_a_t_e_/_3 was not called with _F_l_u_s_h set to _f_i_n_i_s_h.
+
+       iinnffllaatteeIInniitt((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              Initialize a zlib stream for decompression.
+
+       iinnffllaatteeIInniitt((ZZ,, WWiinnddoowwBBiittss)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 WindowBits = zzwwiinnddoowwbbiittss(())
+
+              Initialize decompression session on zlib stream.
+
+              The _W_i_n_d_o_w_B_i_t_s parameter is the base two logarithm of the
+              maximum window size (the size of the history buffer). It should
+              be in the range 9 through 15. The default value is 15 if
+              _i_n_f_l_a_t_e_I_n_i_t_/_1 is used. If a compressed stream with a larger
+              window size is given as input, inflate() will throw the
+              _d_a_t_a___e_r_r_o_r exception. A negative _W_i_n_d_o_w_B_i_t_s value makes zlib
+              ignore the zlib header (and checksum) from the stream. Note that
+              the zlib source mentions this only as a undocumented feature.
+
+       iinnffllaattee((ZZ,, DDaattaa)) -->> DDeeccoommpprreesssseedd
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Data = iodata()
+                 Decompressed = iolist()
+
+              _i_n_f_l_a_t_e_/_2 decompresses as much data as possible. It may some
+              introduce some output latency (reading input without producing
+              any output).
+
+              If a preset dictionary is needed at this point (see
+              _i_n_f_l_a_t_e_S_e_t_D_i_c_t_i_o_n_a_r_y below), _i_n_f_l_a_t_e_/_2 throws a
+              _{_n_e_e_d___d_i_c_t_i_o_n_a_r_y_,_A_d_l_e_r_} exception where _A_d_l_e_r is the adler32
+              checksum of the dictionary chosen by the compressor.
+
+       iinnffllaatteeSSeettDDiiccttiioonnaarryy((ZZ,, DDiiccttiioonnaarryy)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Dictionary = iodata()
+
+              Initializes the decompression dictionary from the given
+              uncompressed byte sequence. This function must be called
+              immediately after a call of _i_n_f_l_a_t_e_/_2 if this call threw a
+              _{_n_e_e_d___d_i_c_t_i_o_n_a_r_y_,_A_d_l_e_r_} exception. The dictionary chosen by the
+              compressor can be determined from the Adler value thrown by the
+              call to _i_n_f_l_a_t_e_/_2. The compressor and decompressor must use
+              exactly the same dictionary (see _d_e_f_l_a_t_e_S_e_t_D_i_c_t_i_o_n_a_r_y_/_2).
+
+              Example:
+
+              unpack(Z, Compressed, Dict) ->
+                   case catch zlib:inflate(Z, Compressed) of
+                        {'EXIT',{{need_dictionary,DictID},_}} ->
+                                 zlib:inflateSetDictionary(Z, Dict),
+                               Uncompressed = zlib:inflate(Z, []);
+                        Uncompressed ->
+                               Uncompressed
+                   end.
+
+       iinnffllaatteeRReesseett((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              This function is equivalent to _i_n_f_l_a_t_e_E_n_d_/_1 followed by
+              _i_n_f_l_a_t_e_I_n_i_t_/_1, but does not free and reallocate all the internal
+              decompression state. The stream will keep attributes that may
+              have been set by _i_n_f_l_a_t_e_I_n_i_t_/_[_1_|_2_].
+
+       iinnffllaatteeEEnndd((ZZ)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+
+              End the inflate session and cleans all data used. Note that this
+              function will throw a _d_a_t_a___e_r_r_o_r exception if no end of stream
+              was found (meaning that not all data has been uncompressed).
+
+       sseettBBuuffSSiizzee((ZZ,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Size = integer() >= 0
+
+              Sets the intermediate buffer size.
+
+       ggeettBBuuffSSiizzee((ZZ)) -->> SSiizzee
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Size = integer() >= 0
+
+              Get the size of intermediate buffer.
+
+       ccrrcc3322((ZZ)) -->> CCRRCC
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 CRC = integer()
+
+              Get the current calculated CRC checksum.
+
+       ccrrcc3322((ZZ,, DDaattaa)) -->> CCRRCC
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Data = iodata()
+                 CRC = integer()
+
+              Calculate the CRC checksum for _D_a_t_a.
+
+       ccrrcc3322((ZZ,, PPrreevvCCRRCC,, DDaattaa)) -->> CCRRCC
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 PrevCRC = integer()
+                 Data = iodata()
+                 CRC = integer()
+
+              Update a running CRC checksum for _D_a_t_a. If _D_a_t_a is the empty
+              binary or the empty iolist, this function returns the required
+              initial value for the crc.
+
+              Crc = lists:foldl(fun(Data,Crc0) ->
+                                    zlib:crc32(Z, Crc0, Data),
+                                end, zlib:crc32(Z,<< >>), Datas)
+
+       ccrrcc3322__ccoommbbiinnee((ZZ,, CCRRCC11,, CCRRCC22,, SSiizzee22)) -->> CCRRCC
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 CRC = CRC1 = CRC2 = Size2 = integer()
+
+              Combine two CRC checksums into one. For two binaries or iolists,
+              _D_a_t_a_1 and _D_a_t_a_2 with sizes of _S_i_z_e_1 and _S_i_z_e_2, with CRC
+              checksums _C_R_C_1 and _C_R_C_2. _c_r_c_3_2___c_o_m_b_i_n_e_/_4 returns the _C_R_C
+              checksum of _[_D_a_t_a_1_,_D_a_t_a_2_], requiring only _C_R_C_1, _C_R_C_2, and _S_i_z_e_2.
+
+       aaddlleerr3322((ZZ,, DDaattaa)) -->> CChheecckkSSuumm
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Data = iodata()
+                 CheckSum = integer()
+
+              Calculate the Adler-32 checksum for _D_a_t_a.
+
+       aaddlleerr3322((ZZ,, PPrreevvAAddlleerr,, DDaattaa)) -->> CChheecckkSSuumm
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 PrevAdler = integer()
+                 Data = iodata()
+                 CheckSum = integer()
+
+              Update a running Adler-32 checksum for _D_a_t_a. If _D_a_t_a is the
+              empty binary or the empty iolist, this function returns the
+              required initial value for the checksum.
+
+              Crc = lists:foldl(fun(Data,Crc0) ->
+                                    zlib:adler32(Z, Crc0, Data),
+                                end, zlib:adler32(Z,<< >>), Datas)
+
+       aaddlleerr3322__ccoommbbiinnee((ZZ,, AAddlleerr11,, AAddlleerr22,, SSiizzee22)) -->> AAddlleerr
+
+              Types:
+
+                 Z = zzssttrreeaamm(())
+                 Adler = Adler1 = Adler2 = Size2 = integer()
+
+              Combine two Adler-32 checksums into one. For two binaries or
+              iolists, _D_a_t_a_1 and _D_a_t_a_2 with sizes of _S_i_z_e_1 and _S_i_z_e_2, with
+              Adler-32 checksums _A_d_l_e_r_1 and _A_d_l_e_r_2. _a_d_l_e_r_3_2___c_o_m_b_i_n_e_/_4 returns
+              the _A_d_l_e_r checksum of _[_D_a_t_a_1_,_D_a_t_a_2_], requiring only _A_d_l_e_r_1,
+              _A_d_l_e_r_2, and _S_i_z_e_2.
+
+       ccoommpprreessss((DDaattaa)) -->> CCoommpprreesssseedd
+
+              Types:
+
+                 Data = iodata()
+                 Compressed = binary()
+
+              Compress data (with zlib headers and checksum).
+
+       uunnccoommpprreessss((DDaattaa)) -->> DDeeccoommpprreesssseedd
+
+              Types:
+
+                 Data = iodata()
+                 Decompressed = binary()
+
+              Uncompress data (with zlib headers and checksum).
+
+       zziipp((DDaattaa)) -->> CCoommpprreesssseedd
+
+              Types:
+
+                 Data = iodata()
+                 Compressed = binary()
+
+              Compress data (without zlib headers and checksum).
+
+       uunnzziipp((DDaattaa)) -->> DDeeccoommpprreesssseedd
+
+              Types:
+
+                 Data = iodata()
+                 Decompressed = binary()
+
+              Uncompress data (without zlib headers and checksum).
+
+       ggzziipp((DDaattaa)) -->> CCoommpprreesssseedd
+
+              Types:
+
+                 Data = iodata()
+                 Compressed = binary()
+
+              Compress data (with gz headers and checksum).
+
+       gguunnzziipp((DDaattaa)) -->> DDeeccoommpprreesssseedd
+
+              Types:
+
+                 Data = iodata()
+                 Decompressed = binary()
+
+              Uncompress data (with gz headers and checksum).
+
+
+
+Ericsson AB                       erts 5.9.2                           zlib(3)

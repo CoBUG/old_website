@@ -1,0 +1,250 @@
+mod_auth(3)                Erlang Module Definition                mod_auth(3)
+
+
+
+NNAAMMEE
+       mod_auth - User authentication using text files, dets or mnesia
+       database.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides for basic user authentication using textual files,
+       dets databases as well as mnesia databases.
+
+EEXXPPOORRTTSS
+       aadddd__uusseerr((UUsseerrNNaammee,, OOppttiioonnss)) -->> ttrruuee|| {{eerrrroorr,, RReeaassoonn}}
+       aadddd__uusseerr((UUsseerrNNaammee,, PPaasssswwoorrdd,, UUsseerrDDaattaa,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,,
+       RReeaassoonn}}
+       aadddd__uusseerr((UUsseerrNNaammee,, PPaasssswwoorrdd,, UUsseerrDDaattaa,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> ttrruuee ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserName = string()
+                 Options = [Option]
+                 Option = {password,Password} | {userData,UserData} |
+                 {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Password = string()
+                 UserData = term()
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 AuthPassword =string()
+                 Reason = term()
+
+              _a_d_d___u_s_e_r_/_2_, _a_d_d___u_s_e_r_/_5 and _a_d_d___u_s_e_r_/_6 adds a user to the user
+              database. If the operation is successful, this function returns
+              _t_r_u_e. If an error occurs, _{_e_r_r_o_r_,_R_e_a_s_o_n_} is returned. When
+              _a_d_d___u_s_e_r_/_2 is called the Password, UserData Port and Dir options
+              is mandatory.
+
+       ddeelleettee__uusseerr((UUsseerrNNaammee,,OOppttiioonnss)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       ddeelleettee__uusseerr((UUsseerrNNaammee,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       ddeelleettee__uusseerr((UUsseerrNNaammee,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserName = string()
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _d_e_l_e_t_e___u_s_e_r_/_2_, _d_e_l_e_t_e___u_s_e_r_/_3 and _d_e_l_e_t_e___u_s_e_r_/_4 deletes a user
+              from the user database. If the operation is successful, this
+              function returns _t_r_u_e. If an error occurs, _{_e_r_r_o_r_,_R_e_a_s_o_n_} is
+              returned. When _d_e_l_e_t_e___u_s_e_r_/_2 is called the Port and Dir options
+              are mandatory.
+
+       ggeett__uusseerr((UUsseerrNNaammee,,OOppttiioonnss)) -->> {{ookk,, ##hhttttppdd__uusseerr}} ||{{eerrrroorr,, RReeaassoonn}}
+       ggeett__uusseerr((UUsseerrNNaammee,, PPoorrtt,, DDiirr)) -->> {{ookk,, ##hhttttppdd__uusseerr}} || {{eerrrroorr,, RReeaassoonn}}
+       ggeett__uusseerr((UUsseerrNNaammee,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> {{ookk,, ##hhttttppdd__uusseerr}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 UserName = string()
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _g_e_t___u_s_e_r_/_2_, _g_e_t___u_s_e_r_/_3 and _g_e_t___u_s_e_r_/_4 returns a _h_t_t_p_d___u_s_e_r
+              record containing the userdata for a specific user. If the user
+              cannot be found, _{_e_r_r_o_r_, _R_e_a_s_o_n_} is returned. When _g_e_t___u_s_e_r_/_2 is
+              called the Port and Dir options are mandatory.
+
+       lliisstt__uusseerrss((OOppttiioonnss)) -->> {{ookk,, UUsseerrss}} || {{eerrrroorr,, RReeaassoonn}}
+       lliisstt__uusseerrss((PPoorrtt,, DDiirr)) -->> {{ookk,, UUsseerrss}} || {{eerrrroorr,, RReeaassoonn}}
+       lliisstt__uusseerrss((AAddddrreessss,, PPoorrtt,, DDiirr)) -->> {{ookk,, UUsseerrss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Users = list()
+                 AuthPassword = string()
+                 Reason = atom()
+
+              _l_i_s_t___u_s_e_r_s_/_1_, _l_i_s_t___u_s_e_r_s_/_2 and _l_i_s_t___u_s_e_r_s_/_3 returns a list of
+              users in the user database for a specific _P_o_r_t_/_D_i_r. When
+              _l_i_s_t___u_s_e_r_s_/_1 is called the Port and Dir options are mandatory.
+
+       aadddd__ggrroouupp__mmeemmbbeerr((GGrroouuppNNaammee,, UUsseerrNNaammee,, OOppttiioonnss)) -->> ttrruuee || {{eerrrroorr,,
+       RReeaassoonn}}
+       aadddd__ggrroouupp__mmeemmbbeerr((GGrroouuppNNaammee,, UUsseerrNNaammee,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,,
+       RReeaassoonn}}
+       aadddd__ggrroouupp__mmeemmbbeerr((GGrroouuppNNaammee,, UUsseerrNNaammee,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> ttrruuee ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 GroupName = string()
+                 UserName = string()
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _a_d_d___g_r_o_u_p___m_e_m_b_e_r_/_3_, _a_d_d___g_r_o_u_p___m_e_m_b_e_r_/_4 and _a_d_d___g_r_o_u_p___m_e_m_b_e_r_/_5
+              adds a user to a group. If the group does not exist, it is
+              created and the user is added to the group. Upon successful
+              operation, this function returns _t_r_u_e. When _a_d_d___g_r_o_u_p___m_e_m_b_e_r_s_/_3
+              is called the Port and Dir options are mandatory.
+
+       ddeelleettee__ggrroouupp__mmeemmbbeerr((GGrroouuppNNaammee,, UUsseerrNNaammee,, OOppttiioonnss)) -->> ttrruuee || {{eerrrroorr,,
+       RReeaassoonn}}
+       ddeelleettee__ggrroouupp__mmeemmbbeerr((GGrroouuppNNaammee,, UUsseerrNNaammee,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,,
+       RReeaassoonn}}
+       ddeelleettee__ggrroouupp__mmeemmbbeerr((GGrroouuppNNaammee,, UUsseerrNNaammee,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> ttrruuee ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 GroupName = string()
+                 UserName = string()
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _d_e_l_e_t_e___g_r_o_u_p___m_e_m_b_e_r_/_3_, _d_e_l_e_t_e___g_r_o_u_p___m_e_m_b_e_r_/_4 and
+              _d_e_l_e_t_e___g_r_o_u_p___m_e_m_b_e_r_/_5 deletes a user from a group. If the group
+              or the user does not exist, this function returns an error,
+              otherwise it returns _t_r_u_e. When _d_e_l_e_t_e___g_r_o_u_p___m_e_m_b_e_r_/_3 is called
+              the Port and Dir options are mandatory.
+
+       lliisstt__ggrroouupp__mmeemmbbeerrss((GGrroouuppNNaammee,, OOppttiioonnss)) -->> {{ookk,, UUsseerrss}} || {{eerrrroorr,, RReeaassoonn}}
+       lliisstt__ggrroouupp__mmeemmbbeerrss((GGrroouuppNNaammee,, PPoorrtt,, DDiirr)) -->> {{ookk,, UUsseerrss}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       lliisstt__ggrroouupp__mmeemmbbeerrss((GGrroouuppNNaammee,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> {{ookk,, UUsseerrss}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 GroupName = string()
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Users = list()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _l_i_s_t___g_r_o_u_p___m_e_m_b_e_r_s_/_2_, _l_i_s_t___g_r_o_u_p___m_e_m_b_e_r_s_/_3 and
+              _l_i_s_t___g_r_o_u_p___m_e_m_b_e_r_s_/_4 lists the members of a specified group. If
+              the group does not exist or there is an error, _{_e_r_r_o_r_, _R_e_a_s_o_n_}
+              is returned. When _l_i_s_t___g_r_o_u_p___m_e_m_b_e_r_s_/_2 is called the Port and
+              Dir options are mandatory.
+
+       lliisstt__ggrroouuppss((OOppttiioonnss)) -->> {{ookk,, GGrroouuppss}} || {{eerrrroorr,, RReeaassoonn}}
+       lliisstt__ggrroouuppss((PPoorrtt,, DDiirr)) -->> {{ookk,, GGrroouuppss}} || {{eerrrroorr,, RReeaassoonn}}
+       lliisstt__ggrroouuppss((AAddddrreessss,, PPoorrtt,, DDiirr)) -->> {{ookk,, GGrroouuppss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Groups = list()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _l_i_s_t___g_r_o_u_p_s_/_1_, _l_i_s_t___g_r_o_u_p_s_/_2 and _l_i_s_t___g_r_o_u_p_s_/_3 lists all the
+              groups available. If there is an error, _{_e_r_r_o_r_, _R_e_a_s_o_n_} is
+              returned. When _l_i_s_t___g_r_o_u_p_s_/_1 is called the Port and Dir options
+              are mandatory.
+
+       ddeelleettee__ggrroouupp((GGrroouuppNNaammee,, OOppttiioonnss)) -->> ttrruuee || {{eerrrroorr,,RReeaassoonn}}
+       <<nnaammee>>ddeelleettee__ggrroouupp((GGrroouuppNNaammee,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       ddeelleettee__ggrroouupp((GGrroouuppNNaammee,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [Option]
+                 Option = {port,Port} | {addr,Address} | {dir,Directory} |
+                 {authPassword,AuthPassword}
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 GroupName = string()
+                 AuthPassword = string()
+                 Reason = term()
+
+              _d_e_l_e_t_e___g_r_o_u_p_/_2_, _d_e_l_e_t_e___g_r_o_u_p_/_3 and _d_e_l_e_t_e___g_r_o_u_p_/_4 deletes the
+              group specified and returns _t_r_u_e. If there is an error, _{_e_r_r_o_r_,
+              _R_e_a_s_o_n_} is returned. When _d_e_l_e_t_e___g_r_o_u_p_/_2 is called the Port and
+              Dir options are mandatory.
+
+       uuppddaattee__ppaasssswwoorrdd((PPoorrtt,, DDiirr,, OOllddPPaasssswwoorrdd,, NNeewwPPaasssswwoorrdd,, NNeewwPPaasssswwoorrdd)) -->> ookk
+       || {{eerrrroorr,, RReeaassoonn}}
+       uuppddaattee__ppaasssswwoorrdd((AAddddrreessss,,PPoorrtt,, DDiirr,, OOllddPPaasssswwoorrdd,, NNeewwPPaasssswwoorrdd,,
+       NNeewwPPaasssswwoorrdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 GroupName = string()
+                 OldPassword = string()
+                 NewPassword = string()
+                 Reason = term()
+
+              _u_p_d_a_t_e___p_a_s_s_w_o_r_d_/_5 and _u_p_d_a_t_e___p_a_s_s_w_o_r_d_/_6 Updates the
+              AuthAccessPassword for the specified directory. If NewPassword
+              is equal to "NoPassword" no password is requires to change
+              authorisation data. If NewPassword is equal to "DummyPassword"
+              no changes can be done without changing the password first.
+
+SSEEEE AALLSSOO
+       hhttttppdd((33)), mmoodd__aalliiaass((33)),
+
+
+
+Ericsson AB                       inets 5.9.1                      mod_auth(3)

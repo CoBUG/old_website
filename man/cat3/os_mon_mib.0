@@ -1,0 +1,37 @@
+os_mon_mib(3)              Erlang Module Definition              os_mon_mib(3)
+
+
+
+NNAAMMEE
+       os_mon_mib - Loading and Unloading of OTP-OS-MON-MIB
+
+DDEESSCCRRIIPPTTIIOONN
+       Functions for loading and unloading the OTP-OS-MON-MIB into/from an
+       SNMP agent. The instrumentation of the OTP-OS-MON-MIB uses Mnesia,
+       hence Mnesia must be started prior to loading the OTP-OS-MON-MIB.
+
+EEXXPPOORRTTSS
+       llooaadd((AAggeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Reason = term()
+
+              Loads the OTP-OS-MON-MIB.
+
+       uunnllooaadd((AAggeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Reason = term()
+
+              Unloads the OTP-OS-MON-MIB.
+
+SSEEEE AALLSSOO
+       ooss__mmoonn((66)), ssnnmmpp((33))
+
+
+
+Ericsson AB                      os_mon 2.2.10                   os_mon_mib(3)

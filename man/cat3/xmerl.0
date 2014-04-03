@@ -1,0 +1,173 @@
+xmerl(3)                   Erlang Module Definition                   xmerl(3)
+
+
+
+NNAAMMEE
+       xmerl - Functions for exporting XML data to an external format.
+
+DDEESSCCRRIIPPTTIIOONN
+       Functions for exporting XML data to an external format.
+
+EEXXPPOORRTTSS
+       ccaallllbbaacckkss((MMoodduullee)) -->> RReessuulltt
+
+              Types:
+
+                 Module = atom()
+                 Result = [atom()]
+
+              Find the list of inherited callback modules for a given module.
+
+       eexxppoorrtt((CCoonntteenntt,, CCaallllbbaacckk)) -->> EExxppoorrtteeddFFoorrmmaatt
+
+              Equivalent to eexxppoorrtt((DDaattaa,, CCaallllbbaacckk,, [[]])).
+
+       eexxppoorrtt((CCoonntteenntt,, CCaallllbbaacckk,, RRoooottAAttttrriibbuutteess)) -->> EExxppoorrtteeddFFoorrmmaatt
+
+              Types:
+
+                 Content = [Element]
+                 Callback = atom()
+                 RootAttributes = [XmlAttributes]
+
+              Exports normal, well-formed XML content, using the specified
+              callback-module.
+
+              _E_l_e_m_e_n_t is any of:
+
+                * _#_x_m_l_T_e_x_t_{_}
+
+                * _#_x_m_l_E_l_e_m_e_n_t_{_}
+
+                * _#_x_m_l_P_I_{_}
+
+                * _#_x_m_l_C_o_m_m_e_n_t_{_}
+
+                * _#_x_m_l_D_e_c_l_{_}
+
+              (See _x_m_e_r_l_._h_r_l for the record definitions.) Text in _#_x_m_l_T_e_x_t_{_}
+              elements can be deep lists of characters and/or binaries.
+
+              _R_o_o_t_A_t_t_r_i_b_u_t_e_s is a list of _#_x_m_l_A_t_t_r_i_b_u_t_e_{_} attributes for the
+              _#_r_o_o_t_# element, which implicitly becomes the parent of the given
+              _C_o_n_t_e_n_t. The tag-handler function for _#_r_o_o_t_# is thus called with
+              the complete exported data of _C_o_n_t_e_n_t. Root attributes can be
+              used to specify e.g. encoding or other metadata of an XML or
+              HTML document.
+
+              The _C_a_l_l_b_a_c_k module should contain hook functions for all tags
+              present in the data structure. A hook function must have the
+              following format:
+
+                  Tag(Data, Attributes, Parents, E)
+
+              where _E is the corresponding _#_x_m_l_E_l_e_m_e_n_t_{_}, _D_a_t_a is the already-
+              exported contents of _E and _A_t_t_r_i_b_u_t_e_s is the list of
+              _#_x_m_l_A_t_t_r_i_b_u_t_e_{_} records of _E. Finally, _P_a_r_e_n_t_s is the list of
+              parent nodes of _E, on the form _[_{_P_a_r_e_n_t_T_a_g_:_:_a_t_o_m_(_)_,
+              _P_a_r_e_n_t_P_o_s_i_t_i_o_n_:_:_i_n_t_e_g_e_r_(_)_}_].
+
+              The hook function should return either the data to be exported,
+              or a tuple _{_'_#_x_m_l_-_a_l_i_a_s_#_'_, _N_e_w_T_a_g_:_:_a_t_o_m_(_)_}, or a tuple _{_'_#_x_m_l_-
+              _r_e_d_e_f_i_n_e_#_'_, _C_o_n_t_e_n_t_}, where _C_o_n_t_e_n_t is a content list (which can
+              be on simple-form; see _e_x_p_o_r_t___s_i_m_p_l_e_/_2 for details).
+
+              A callback module can inherit definitions from other callback
+              modules, through the required function _'_#_x_m_l_-_i_n_t_e_r_i_t_a_n_c_e_#_(_) _-_>
+              _[_M_o_d_u_l_e_N_a_m_e_:_:_a_t_o_m_(_)_].
+
+              _S_e_e _a_l_s_o_: eexxppoorrtt//22, eexxppoorrtt__ssiimmppllee//33.
+
+       eexxppoorrtt__ccoonntteenntt((EEss::::CCoonntteenntt,, CCaallllbbaacckkss)) -->> tteerrmm(())
+
+              Types:
+
+                 Content = [Element]
+                 Callback = [atom()]
+
+              Exports normal XML content directly, without further context.
+
+       eexxppoorrtt__eelleemmeenntt((EE,, CCBB)) -->> tteerrmm(())
+
+              Exports a normal XML element directly, without further context.
+
+       eexxppoorrtt__eelleemmeenntt((EE,, CCaallllbbaacckkMMoodduullee,, CCaallllbbaacckkSSttaattee)) -->> EExxppoorrtteeddFFoorrmmaatt
+
+              For on-the-fly exporting during parsing (SAX style) of the XML
+              document.
+
+       eexxppoorrtt__ssiimmppllee((CCoonntteenntt,, CCaallllbbaacckk)) -->> EExxppoorrtteeddFFoorrmmaatt
+
+              Equivalent to eexxppoorrtt__ssiimmppllee((CCoonntteenntt,, CCaallllbbaacckk,, [[]])).
+
+       eexxppoorrtt__ssiimmppllee((CCoonntteenntt,, CCaallllbbaacckk,, RRoooottAAttttrrss::::RRoooottAAttttrriibbuutteess)) -->>
+       EExxppoorrtteeddFFoorrmmaatt
+
+              Types:
+
+                 Content = [Element]
+                 Callback = atom()
+                 RootAttributes = [XmlAttributes]
+
+              Exports "simple-form" XML content, using the specified callback-
+              module.
+
+              _E_l_e_m_e_n_t is any of:
+
+                * _{_T_a_g_, _A_t_t_r_i_b_u_t_e_s_, _C_o_n_t_e_n_t_}
+
+                * _{_T_a_g_, _C_o_n_t_e_n_t_}
+
+                * _T_a_g
+
+                * _I_O_S_t_r_i_n_g
+
+                * _#_x_m_l_T_e_x_t_{_}
+
+                * _#_x_m_l_E_l_e_m_e_n_t_{_}
+
+                * _#_x_m_l_P_I_{_}
+
+                * _#_x_m_l_C_o_m_m_e_n_t_{_}
+
+                * _#_x_m_l_D_e_c_l_{_}
+
+              where
+
+                * _T_a_g _= _a_t_o_m_(_)
+
+                * _A_t_t_r_i_b_u_t_e_s _= _[_{_N_a_m_e_, _V_a_l_u_e_}_]
+
+                * _N_a_m_e _= _a_t_o_m_(_)
+
+                * _V_a_l_u_e _= _I_O_S_t_r_i_n_g _| _a_t_o_m_(_) _| _i_n_t_e_g_e_r_(_)
+
+              Normal-form XML elements can thus be included in the simple-form
+              representation. Note that content lists must be flat. An
+              _I_O_S_t_r_i_n_g is a (possibly deep) list of characters and/or
+              binaries.
+
+              _R_o_o_t_A_t_t_r_i_b_u_t_e_s is a list of:
+
+                * _X_m_l_A_t_t_r_i_b_u_t_e_s _= _#_x_m_l_A_t_t_r_i_b_u_t_e_{_}
+
+              See _e_x_p_o_r_t_/_3 for details on the callback module and the root
+              attributes. The XML-data is always converted to normal form
+              before being passed to the callback module.
+
+              _S_e_e _a_l_s_o_: eexxppoorrtt//33, eexxppoorrtt__ssiimmppllee//22.
+
+       eexxppoorrtt__ssiimmppllee__ccoonntteenntt((CCoonntteenntt,, CCaallllbbaacckk)) -->> tteerrmm(())
+
+              Exports simple XML content directly, without further context.
+
+       eexxppoorrtt__ssiimmppllee__eelleemmeenntt((CCoonntteenntt,, CCaallllbbaacckk)) -->> tteerrmm(())
+
+              Exports a simple XML element directly, without further context.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                  xmerl 1.3.2                         xmerl(3)

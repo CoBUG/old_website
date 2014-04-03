@@ -1,0 +1,55 @@
+toolbar(3)                 Erlang Module Definition                 toolbar(3)
+
+
+
+NNAAMMEE
+       toolbar - GUI for Starting Tools and User Contributions
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       The Toolbar application is deprecated and will be removed in R16.
+
+
+       Toolbar makes it easier to use the different Erlang tools - and the
+       user contributions - which are provided. It has a graphical user
+       interface with an icon for each tool. Clicking the icon activates the
+       corresponding tool.
+
+       All tools to be included on Toolbar must have a configuration file
+       containing information about the tool, for example its start function
+       and help information location. Configuration files must have the _._t_o_o_l
+       suffix.
+
+       When started, Toolbar automatically checks for _*_._t_o_o_l files in the
+       current path and adds the corresponding tools. For each _e_b_i_n directory
+       found in the path, it will also look in a _p_r_i_v directory next to it.
+       This is a feature of the Erlang file structure.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> ookk || aallrreeaaddyy__ssttaarrtteedd
+
+              Creates a window containing tool icons.
+
+       vveerrssiioonn(()) -->> ssttrriinngg(())
+
+              Returns the current version number of Toolbar.
+
+       uuppddaattee(()) -->> ookk || {{eerrrroorr,,nnoott__ssttaarrtteedd}}
+
+              Makes a search for new tool files in the current path and adds
+              the corresponding tools to Toolbar window.
+
+       qquuiitt(()) -->> ookk || {{eerrrroorr,,nnoott__ssttaarrtteedd}}
+
+       ccrreeaattee__ttooooll__ffiillee(()) -->> ookk || {{eerrrroorr,,nnoott__ssttaarrtteedd}}
+
+              Starts the GUI used for creating and editing tool files.
+
+       aadddd__ggss__ccoonnttrriibbss(()) -->> ookk || {{eerrrroorr,,nnoott__ssttaarrtteedd}}
+
+              Adds the path to the directory where the GS contributions are
+              situated and add the tools found there, if any.
+
+
+
+Ericsson AB                     toolbar 1.4.2.2                     toolbar(3)

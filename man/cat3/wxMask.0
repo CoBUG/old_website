@@ -1,0 +1,78 @@
+wxMask(3)                  Erlang Module Definition                  wxMask(3)
+
+
+
+NNAAMMEE
+       wxMask - See external documentation: wxMask.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMask.
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_a_s_k_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMaasskk(())
+
+              See external documentation.
+
+       nneeww((BBiittmmaapp)) -->> wwxxMMaasskk(())
+
+              Types:
+
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       nneeww((BBiittmmaapp,, PPaalleetttteeIInnddeexx)) -->> wwxxMMaasskk(())
+
+              Types:
+
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 PaletteIndex = integer()
+
+              See external documentation.
+              Also:
+              new(Bitmap, Colour) -> wxMask() when
+              Bitmap::wxBitmap:wxBitmap(), Colour::wx:wx_colour().
+
+
+       ccrreeaattee((TThhiiss,, BBiittmmaapp)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMask()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, BBiittmmaapp,, PPaalleetttteeIInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMask()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 PaletteIndex = integer()
+
+              See external documentation.
+              Also:
+              create(This, Bitmap, Colour) -> boolean() when
+              This::wxMask(), Bitmap::wxBitmap:wxBitmap(),
+              Colour::wx:wx_colour().
+
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMaasskk(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                         wxMask(3)

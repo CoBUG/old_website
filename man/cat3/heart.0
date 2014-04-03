@@ -1,0 +1,88 @@
+heart(3)                   Erlang Module Definition                   heart(3)
+
+
+
+NNAAMMEE
+       heart - Heartbeat Monitoring of an Erlang Runtime System
+
+DDEESSCCRRIIPPTTIIOONN
+       This modules contains the interface to the _h_e_a_r_t process. _h_e_a_r_t sends
+       periodic heartbeats to an external port program, which is also named
+       _h_e_a_r_t. The purpose of the heart port program is to check that the
+       Erlang runtime system it is supervising is still running. If the port
+       program has not received any heartbeats within _H_E_A_R_T___B_E_A_T___T_I_M_E_O_U_T
+       seconds (default is 60 seconds), the system can be rebooted. Also, if
+       the system is equipped with a hardware watchdog timer and is running
+       Solaris, the watchdog can be used to supervise the entire system.
+
+       An Erlang runtime system to be monitored by a heart program, should be
+       started with the command line flag _-_h_e_a_r_t (see also eerrll((11))). The _h_e_a_r_t
+       process is then started automatically:
+
+       % erl -heart ...
+
+       If the system should be rebooted because of missing heart-beats, or a
+       terminated Erlang runtime system, the environment variable
+       _H_E_A_R_T___C_O_M_M_A_N_D has to be set before the system is started. If this
+       variable is not set, a warning text will be printed but the system will
+       not reboot. However, if the hardware watchdog is used, it will trigger
+       a reboot _H_E_A_R_T___B_E_A_T___B_O_O_T___D_E_L_A_Y seconds later nevertheless (default is
+       60).
+
+       To reboot on the WINDOWS platform _H_E_A_R_T___C_O_M_M_A_N_D can be set to _h_e_a_r_t
+       _-_s_h_u_t_d_o_w_n (included in the Erlang delivery) or of course to any other
+       suitable program which can activate a reboot.
+
+       The hardware watchdog will not be started under Solaris if the
+       environment variable _H_W___W_D___D_I_S_A_B_L_E is set.
+
+       The _H_E_A_R_T___B_E_A_T___T_I_M_E_O_U_T and _H_E_A_R_T___B_E_A_T___B_O_O_T___D_E_L_A_Y environment variables
+       can be used to configure the heart timeouts, they can be set in the
+       operating system shell before Erlang is started or be specified at the
+       command line:
+
+       % erl -heart -env HEART_BEAT_TIMEOUT 30 ...
+
+       The value (in seconds) must be in the range 10 < X <= 65535.
+
+       It should be noted that if the system clock is adjusted with more than
+       _H_E_A_R_T___B_E_A_T___T_I_M_E_O_U_T seconds, _h_e_a_r_t will timeout and try to reboot the
+       system. This can happen, for example, if the system clock is adjusted
+       automatically by use of NTP (Network Time Protocol).
+
+       In the following descriptions, all function fails with reason _b_a_d_a_r_g if
+       _h_e_a_r_t is not started.
+
+EEXXPPOORRTTSS
+       sseett__ccmmdd((CCmmdd)) -->> ookk || {{eerrrroorr,, {{bbaadd__ccmmdd,, CCmmdd}}}}
+
+              Types:
+
+                 Cmd = string()
+
+              Sets a temporary reboot command. This command is used if a
+              _H_E_A_R_T___C_O_M_M_A_N_D other than the one specified with the environment
+              variable should be used in order to reboot the system. The new
+              Erlang runtime system will (if it misbehaves) use the
+              environment variable _H_E_A_R_T___C_O_M_M_A_N_D to reboot.
+
+              Limitations: The length of the _C_m_d command string must be less
+              than 2047 characters.
+
+       cclleeaarr__ccmmdd(()) -->> ookk
+
+              Clears the temporary boot command. If the system terminates, the
+              normal _H_E_A_R_T___C_O_M_M_A_N_D is used to reboot.
+
+       ggeett__ccmmdd(()) -->> {{ookk,, CCmmdd}}
+
+              Types:
+
+                 Cmd = string()
+
+              Get the temporary reboot command. If the command is cleared, the
+              empty string will be returned.
+
+
+
+Ericsson AB                      kernel 2.15.2                        heart(3)

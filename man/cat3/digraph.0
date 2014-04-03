@@ -1,0 +1,434 @@
+digraph(3)                 Erlang Module Definition                 digraph(3)
+
+
+
+NNAAMMEE
+       digraph - Directed Graphs
+
+DDEESSCCRRIIPPTTIIOONN
+       The _d_i_g_r_a_p_h module implements a version of labeled directed graphs.
+       What makes the graphs implemented here non-proper directed graphs is
+       that multiple edges between vertices are allowed. However, the
+       customary definition of directed graphs will be used in the text that
+       follows.
+
+       A _d_i_r_e_c_t_e_d _g_r_a_p_h (or just "digraph") is a pair (V, E) of a finite set V
+       of _v_e_r_t_i_c_e_s and a finite set E of _d_i_r_e_c_t_e_d _e_d_g_e_s (or just "edges"). The
+       set of edges E is a subset of V x V (the Cartesian product of V with
+       itself). In this module, V is allowed to be empty; the so obtained
+       unique digraph is called the _e_m_p_t_y _d_i_g_r_a_p_h. Both vertices and edges are
+       represented by unique Erlang terms.
+
+       Digraphs can be annotated with additional information. Such information
+       may be attached to the vertices and to the edges of the digraph. A
+       digraph which has been annotated is called a _l_a_b_e_l_e_d _d_i_g_r_a_p_h, and the
+       information attached to a vertex or an edge is called a _l_a_b_e_l. Labels
+       are Erlang terms.
+
+       An edge e = (v, w) is said to _e_m_a_n_a_t_e from vertex v and to be _i_n_c_i_d_e_n_t
+       on vertex w. The _o_u_t_-_d_e_g_r_e_e of a vertex is the number of edges
+       emanating from that vertex. The _i_n_-_d_e_g_r_e_e of a vertex is the number of
+       edges incident on that vertex. If there is an edge emanating from v and
+       incident on w, then w is said to be an _o_u_t_-_n_e_i_g_h_b_o_u_r of v, and v is
+       said to be an _i_n_-_n_e_i_g_h_b_o_u_r of w. A _p_a_t_h P from v[1] to v[k] in a
+       digraph (V, E) is a non-empty sequence v[1], v[2], ..., v[k] of
+       vertices in V such that there is an edge (v[i],v[i+1]) in E for 1 <= i
+       < k. The _l_e_n_g_t_h of the path P is k-1. P is _s_i_m_p_l_e if all vertices are
+       distinct, except that the first and the last vertices may be the same.
+       P is a _c_y_c_l_e if the length of P is not zero and v[1] = v[k]. A _l_o_o_p is
+       a cycle of length one. A _s_i_m_p_l_e _c_y_c_l_e is a path that is both a cycle
+       and simple. An _a_c_y_c_l_i_c _d_i_g_r_a_p_h is a digraph that has no cycles.
+
+DDAATTAA TTYYPPEESS
+       dd__ttyyppee(()) = dd__ccyycclliicciittyy(()) | dd__pprrootteeccttiioonn(())
+
+       dd__ccyycclliicciittyy(()) = acyclic | cyclic
+
+       dd__pprrootteeccttiioonn(()) = private | protected
+
+       ddiiggrraapphh(())
+
+              A digraph as returned by _n_e_w_/_0_,_1.
+
+       eeddggee(())
+
+       llaabbeell(()) = term()
+
+       vveerrtteexx(())
+
+EEXXPPOORRTTSS
+       aadddd__eeddggee((GG,, VV11,, VV22)) -->> eeddggee(()) || {{eerrrroorr,, aadddd__eeddggee__eerrrr__rrssnn(())}}
+
+       aadddd__eeddggee((GG,, VV11,, VV22,, LLaabbeell)) -->> eeddggee(()) || {{eerrrroorr,, aadddd__eeddggee__eerrrr__rrssnn(())}}
+
+       aadddd__eeddggee((GG,, EE,, VV11,, VV22,, LLaabbeell)) -->>
+                   eeddggee(()) || {{eerrrroorr,, aadddd__eeddggee__eerrrr__rrssnn(())}}
+
+              Types:
+
+                 G = digraph()
+                 E = eeddggee(())
+                 V1 = V2 = vveerrtteexx(())
+                 Label = llaabbeell(())
+                 aadddd__eeddggee__eerrrr__rrssnn(()) = {bad_edge, Path :: [vveerrtteexx(())]}
+                                    | {bad_vertex, V :: vveerrtteexx(())}
+
+              _a_d_d___e_d_g_e_/_5 creates (or modifies) the edge _E of the digraph _G,
+              using _L_a_b_e_l as the (new) llaabbeell of the edge. The edge is
+              eemmaannaattiinngg from _V_1 and iinncciiddeenntt on _V_2. Returns _E.
+
+              _a_d_d___e_d_g_e_(_G_, _V_1_, _V_2_, _L_a_b_e_l_) is equivalent to _a_d_d___e_d_g_e_(_G_, _E_, _V_1_,
+              _V_2_, _L_a_b_e_l_), where _E is a created edge. The created edge is
+              represented by the term _[_'_$_e_' _| _N_], where N is an integer >= 0.
+
+              _a_d_d___e_d_g_e_(_G_, _V_1_, _V_2_) is equivalent to _a_d_d___e_d_g_e_(_G_, _V_1_, _V_2_, _[_]_).
+
+              If the edge would create a cycle in an aaccyycclliicc ddiiggrraapphh, then
+              _{_e_r_r_o_r_, _{_b_a_d___e_d_g_e_, _P_a_t_h_}_} is returned. If either of _V_1 or _V_2 is
+              not a vertex of the digraph _G, then _{_e_r_r_o_r_, _{_b_a_d___v_e_r_t_e_x_, V_}_} is
+              returned, V = _V_1 or V = _V_2.
+
+       aadddd__vveerrtteexx((GG)) -->> vveerrtteexx(())
+
+       aadddd__vveerrtteexx((GG,, VV)) -->> vveerrtteexx(())
+
+       aadddd__vveerrtteexx((GG,, VV,, LLaabbeell)) -->> vveerrtteexx(())
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Label = llaabbeell(())
+
+              _a_d_d___v_e_r_t_e_x_/_3 creates (or modifies) the vertex _V of the digraph
+              _G, using _L_a_b_e_l as the (new) llaabbeell of the vertex. Returns _V.
+
+              _a_d_d___v_e_r_t_e_x_(_G_, _V_) is equivalent to _a_d_d___v_e_r_t_e_x_(_G_, _V_, _[_]_).
+
+              _a_d_d___v_e_r_t_e_x_/_1 creates a vertex using the empty list as label, and
+              returns the created vertex. The created vertex is represented by
+              the term _[_'_$_v_' _| _N_], where N is an integer >= 0.
+
+       ddeell__eeddggee((GG,, EE)) -->> ttrruuee
+
+              Types:
+
+                 G = digraph()
+                 E = eeddggee(())
+
+              Deletes the edge _E from the digraph _G.
+
+       ddeell__eeddggeess((GG,, EEddggeess)) -->> ttrruuee
+
+              Types:
+
+                 G = digraph()
+                 Edges = [eeddggee(())]
+
+              Deletes the edges in the list _E_d_g_e_s from the digraph _G.
+
+       ddeell__ppaatthh((GG,, VV11,, VV22)) -->> ttrruuee
+
+              Types:
+
+                 G = digraph()
+                 V1 = V2 = vveerrtteexx(())
+
+              Deletes edges from the digraph _G until there are no ppaatthhss from
+              the vertex _V_1 to the vertex _V_2.
+
+              A sketch of the procedure employed: Find an arbitrary ssiimmppllee
+              ppaatthh v[1], v[2], ..., v[k] from _V_1 to _V_2 in _G. Remove all edges
+              of _G eemmaannaattiinngg from v[i] and iinncciiddeenntt to v[i+1] for 1 <= i < k
+              (including multiple edges). Repeat until there is no path
+              between _V_1 and _V_2.
+
+       ddeell__vveerrtteexx((GG,, VV)) -->> ttrruuee
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+
+              Deletes the vertex _V from the digraph _G. Any edges eemmaannaattiinngg
+              from _V or iinncciiddeenntt on _V are also deleted.
+
+       ddeell__vveerrttiicceess((GG,, VVeerrttiicceess)) -->> ttrruuee
+
+              Types:
+
+                 G = digraph()
+                 Vertices = [vveerrtteexx(())]
+
+              Deletes the vertices in the list _V_e_r_t_i_c_e_s from the digraph _G.
+
+       ddeelleettee((GG)) -->> ttrruuee
+
+              Types:
+
+                 G = digraph()
+
+              Deletes the digraph _G. This call is important because digraphs
+              are implemented with _E_T_S. There is no garbage collection of _E_T_S
+              tables. The digraph will, however, be deleted if the process
+              that created the digraph terminates.
+
+       eeddggee((GG,, EE)) -->> {{EE,, VV11,, VV22,, LLaabbeell}} || ffaallssee
+
+              Types:
+
+                 G = digraph()
+                 E = eeddggee(())
+                 V1 = V2 = vveerrtteexx(())
+                 Label = llaabbeell(())
+
+              Returns _{_E_, _V_1_, _V_2_, _L_a_b_e_l_} where _L_a_b_e_l is the llaabbeell of the edge
+              _E eemmaannaattiinngg from _V_1 and iinncciiddeenntt on _V_2 of the digraph _G. If
+              there is no edge _E of the digraph _G, then _f_a_l_s_e is returned.
+
+       eeddggeess((GG)) -->> EEddggeess
+
+              Types:
+
+                 G = digraph()
+                 Edges = [eeddggee(())]
+
+              Returns a list of all edges of the digraph _G, in some
+              unspecified order.
+
+       eeddggeess((GG,, VV)) -->> EEddggeess
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Edges = [eeddggee(())]
+
+              Returns a list of all edges eemmaannaattiinngg from or iinncciiddeenntt on _V of
+              the digraph _G, in some unspecified order.
+
+       ggeett__ccyyccllee((GG,, VV)) -->> VVeerrttiicceess || ffaallssee
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Vertices = [vveerrtteexx(()), ...]
+
+              If there is a ssiimmppllee ccyyccllee of length two or more through the
+              vertex _V, then the cycle is returned as a list _[_V_, _._._._, _V_] of
+              vertices, otherwise if there is a lloooopp through _V, then the loop
+              is returned as a list _[_V_]. If there are no cycles through _V,
+              then _f_a_l_s_e is returned.
+
+              _g_e_t___p_a_t_h_/_3 is used for finding a simple cycle through _V.
+
+       ggeett__ppaatthh((GG,, VV11,, VV22)) -->> VVeerrttiicceess || ffaallssee
+
+              Types:
+
+                 G = digraph()
+                 V1 = V2 = vveerrtteexx(())
+                 Vertices = [vveerrtteexx(()), ...]
+
+              Tries to find a ssiimmppllee ppaatthh from the vertex _V_1 to the vertex _V_2
+              of the digraph _G. Returns the path as a list _[_V_1_, _._._._, _V_2_] of
+              vertices, or _f_a_l_s_e if no simple path from _V_1 to _V_2 of length one
+              or more exists.
+
+              The digraph _G is traversed in a depth-first manner, and the
+              first path found is returned.
+
+       ggeett__sshhoorrtt__ccyyccllee((GG,, VV)) -->> VVeerrttiicceess || ffaallssee
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Vertices = [vveerrtteexx(()), ...]
+
+              Tries to find an as short as possible ssiimmppllee ccyyccllee through the
+              vertex _V of the digraph _G. Returns the cycle as a list _[_V_, _._._._,
+              _V_] of vertices, or _f_a_l_s_e if no simple cycle through _V exists.
+              Note that a lloooopp through _V is returned as the list _[_V_, _V_].
+
+              _g_e_t___s_h_o_r_t___p_a_t_h_/_3 is used for finding a simple cycle through _V.
+
+       ggeett__sshhoorrtt__ppaatthh((GG,, VV11,, VV22)) -->> VVeerrttiicceess || ffaallssee
+
+              Types:
+
+                 G = digraph()
+                 V1 = V2 = vveerrtteexx(())
+                 Vertices = [vveerrtteexx(()), ...]
+
+              Tries to find an as short as possible ssiimmppllee ppaatthh from the
+              vertex _V_1 to the vertex _V_2 of the digraph _G. Returns the path as
+              a list _[_V_1_, _._._._, _V_2_] of vertices, or _f_a_l_s_e if no simple path
+              from _V_1 to _V_2 of length one or more exists.
+
+              The digraph _G is traversed in a breadth-first manner, and the
+              first path found is returned.
+
+       iinn__ddeeggrreeee((GG,, VV)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+
+              Returns the iinn--ddeeggrreeee of the vertex _V of the digraph _G.
+
+       iinn__eeddggeess((GG,, VV)) -->> EEddggeess
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Edges = [eeddggee(())]
+
+              Returns a list of all edges iinncciiddeenntt on _V of the digraph _G, in
+              some unspecified order.
+
+       iinn__nneeiigghhbboouurrss((GG,, VV)) -->> VVeerrtteexx
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Vertex = [vveerrtteexx(())]
+
+              Returns a list of all iinn--nneeiigghhbboouurrss of _V of the digraph _G, in
+              some unspecified order.
+
+       iinnffoo((GG)) -->> IInnffooLLiisstt
+
+              Types:
+
+                 G = digraph()
+                 InfoList =
+                     [{cyclicity, Cyclicity :: dd__ccyycclliicciittyy(())} |
+                      {memory, NoWords :: integer() >= 0} |
+                      {protection, Protection :: dd__pprrootteeccttiioonn(())}]
+                 dd__ccyycclliicciittyy(()) = acyclic | cyclic
+                 dd__pprrootteeccttiioonn(()) = private | protected
+
+              Returns a list of _{_T_a_g_, _V_a_l_u_e_} pairs describing the digraph _G.
+              The following pairs are returned:
+
+                * _{_c_y_c_l_i_c_i_t_y_, _C_y_c_l_i_c_i_t_y_}, where _C_y_c_l_i_c_i_t_y is _c_y_c_l_i_c or
+                  _a_c_y_c_l_i_c, according to the options given to _n_e_w.
+
+                * _{_m_e_m_o_r_y_, _N_o_W_o_r_d_s_}, where _N_o_W_o_r_d_s is the number of words
+                  allocated to the _E_T_S tables.
+
+                * _{_p_r_o_t_e_c_t_i_o_n_, _P_r_o_t_e_c_t_i_o_n_}, where _P_r_o_t_e_c_t_i_o_n is _p_r_o_t_e_c_t_e_d or
+                  _p_r_i_v_a_t_e, according to the options given to _n_e_w.
+
+       nneeww(()) -->> ddiiggrraapphh(())
+
+              Equivalent to _n_e_w_(_[_]_).
+
+       nneeww((TTyyppee)) -->> ddiiggrraapphh(())
+
+              Types:
+
+                 Type = [dd__ttyyppee(())]
+                 dd__ttyyppee(()) = dd__ccyycclliicciittyy(()) | dd__pprrootteeccttiioonn(())
+                 dd__ccyycclliicciittyy(()) = acyclic | cyclic
+                 dd__pprrootteeccttiioonn(()) = private | protected
+
+              Returns an eemmppttyy ddiiggrraapphh with properties according to the
+              options in _T_y_p_e:
+
+                _c_y_c_l_i_c:
+                  Allow ccyycclleess in the digraph (default).
+
+                _a_c_y_c_l_i_c:
+                  The digraph is to be kept aaccyycclliicc.
+
+                _p_r_o_t_e_c_t_e_d:
+                  Other processes can read the digraph (default).
+
+                _p_r_i_v_a_t_e:
+                  The digraph can be read and modified by the creating process
+                  only.
+
+              If an unrecognized type option _T is given or _T_y_p_e is not a
+              proper list, there will be a _b_a_d_a_r_g exception.
+
+       nnoo__eeddggeess((GG)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 G = digraph()
+
+              Returns the number of edges of the digraph _G.
+
+       nnoo__vveerrttiicceess((GG)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 G = digraph()
+
+              Returns the number of vertices of the digraph _G.
+
+       oouutt__ddeeggrreeee((GG,, VV)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+
+              Returns the oouutt--ddeeggrreeee of the vertex _V of the digraph _G.
+
+       oouutt__eeddggeess((GG,, VV)) -->> EEddggeess
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Edges = [eeddggee(())]
+
+              Returns a list of all edges eemmaannaattiinngg from _V of the digraph _G,
+              in some unspecified order.
+
+       oouutt__nneeiigghhbboouurrss((GG,, VV)) -->> VVeerrttiicceess
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Vertices = [vveerrtteexx(())]
+
+              Returns a list of all oouutt--nneeiigghhbboouurrss of _V of the digraph _G, in
+              some unspecified order.
+
+       vveerrtteexx((GG,, VV)) -->> {{VV,, LLaabbeell}} || ffaallssee
+
+              Types:
+
+                 G = digraph()
+                 V = vveerrtteexx(())
+                 Label = llaabbeell(())
+
+              Returns _{_V_, _L_a_b_e_l_} where _L_a_b_e_l is the llaabbeell of the vertex _V of
+              the digraph _G, or _f_a_l_s_e if there is no vertex _V of the digraph
+              _G.
+
+       vveerrttiicceess((GG)) -->> VVeerrttiicceess
+
+              Types:
+
+                 G = digraph()
+                 Vertices = [vveerrtteexx(())]
+
+              Returns a list of all vertices of the digraph _G, in some
+              unspecified order.
+
+SSEEEE AALLSSOO
+       ddiiggrraapphh__uuttiillss((33)), eettss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                      digraph(3)

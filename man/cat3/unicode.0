@@ -1,0 +1,311 @@
+unicode(3)                 Erlang Module Definition                 unicode(3)
+
+
+
+NNAAMMEE
+       unicode - Functions for converting Unicode characters
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for converting between different
+       character representations. Basically it converts between iso-latin-1
+       characters and Unicode ditto, but it can also convert between different
+       Unicode encodings (like UTF-8, UTF-16 and UTF-32).
+
+       The default Unicode encoding in Erlang is in binaries UTF-8, which is
+       also the format in which built in functions and libraries in OTP expect
+       to find binary Unicode data. In lists, Unicode data is encoded as
+       integers, each integer representing one character and encoded simply as
+       the Unicode codepoint for the character.
+
+       Other Unicode encodings than integers representing codepoints or UTF-8
+       in binaries are referred to as "external encodings". The iso-latin-1
+       encoding is in binaries and lists referred to as latin1-encoding.
+
+       It is recommended to only use external encodings for communication with
+       external entities where this is required. When working inside the
+       Erlang/OTP environment, it is recommended to keep binaries in UTF-8
+       when representing Unicode characters. Latin1 encoding is supported both
+       for backward compatibility and for communication with external entities
+       not supporting Unicode character sets.
+
+DDAATTAA TTYYPPEESS
+       eennccooddiinngg(()) = latin1
+                  | unicode
+                  | utf8
+                  | utf16
+                  | {utf16, eennddiiaann(())}
+                  | utf32
+                  | {utf32, eennddiiaann(())}
+
+       eennddiiaann(()) = big | little
+
+       uunniiccooddee__bbiinnaarryy(()) = binary()
+
+              A binary() with characters encoded in the UTF-8 coding standard.
+
+       uunniiccooddee__cchhaarr(()) = integer() >= 0
+
+              An integer() representing a valid unicode codepoint.
+
+       cchhaarrddaattaa(()) = cchhaarrlliisstt(()) | uunniiccooddee__bbiinnaarryy(())
+
+       cchhaarrlliisstt(()) = [uunniiccooddee__cchhaarr(()) | uunniiccooddee__bbiinnaarryy(()) | cchhaarrlliisstt(())]
+
+              A unicode_binary is allowed as the tail of the list.
+
+       eexxtteerrnnaall__uunniiccooddee__bbiinnaarryy(()) = binary()
+
+              A _b_i_n_a_r_y_(_) with characters coded in a user specified Unicode
+              encoding other than UTF-8 (UTF-16 or UTF-32).
+
+       eexxtteerrnnaall__cchhaarrddaattaa(()) = eexxtteerrnnaall__cchhaarrlliisstt(())
+                           | eexxtteerrnnaall__uunniiccooddee__bbiinnaarryy(())
+
+       eexxtteerrnnaall__cchhaarrlliisstt(()) =
+           [uunniiccooddee__cchhaarr(()) |
+            eexxtteerrnnaall__uunniiccooddee__bbiinnaarryy(()) |
+            eexxtteerrnnaall__cchhaarrlliisstt(())]
+
+              An _e_x_t_e_r_n_a_l___u_n_i_c_o_d_e___b_i_n_a_r_y_(_) is allowed as the tail of the list.
+
+       llaattiinn11__bbiinnaarryy(()) = binary()
+
+              A _b_i_n_a_r_y_(_) with characters coded in iso-latin-1.
+
+       llaattiinn11__cchhaarr(()) = byte()
+
+              An _i_n_t_e_g_e_r_(_) representing valid latin1 character (0-255).
+
+       llaattiinn11__cchhaarrddaattaa(()) = llaattiinn11__cchhaarrlliisstt(()) | llaattiinn11__bbiinnaarryy(())
+
+       llaattiinn11__cchhaarrlliisstt(()) =
+           [llaattiinn11__cchhaarr(()) | llaattiinn11__bbiinnaarryy(()) | llaattiinn11__cchhaarrlliisstt(())]
+
+              A _l_a_t_i_n_1___b_i_n_a_r_y_(_) is allowed as the tail of the list.
+
+EEXXPPOORRTTSS
+       bboomm__ttoo__eennccooddiinngg((BBiinn)) -->> {{EEnnccooddiinngg,, LLeennggtthh}}
+
+              Types:
+
+                 Bin = binary()
+                   A binary() of byte_size 4 or more.
+                 Encoding = latin1
+                          | utf8
+                          | {utf16, eennddiiaann(())}
+                          | {utf32, eennddiiaann(())}
+                 Length = integer() >= 0
+                 eennddiiaann(()) = big | little
+
+              Check for a UTF byte order mark (BOM) in the beginning of a
+              binary. If the supplied binary _B_i_n begins with a valid byte
+              order mark for either UTF-8, UTF-16 or UTF-32, the function
+              returns the encoding identified along with the length of the BOM
+              in bytes.
+
+              If no BOM is found, the function returns _{_l_a_t_i_n_1_,_0_}
+
+       cchhaarraacctteerrss__ttoo__lliisstt((DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Data = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) | eexxtteerrnnaall__cchhaarrddaattaa(())
+                 Result = list()
+                        | {error, list(), RestData}
+                        | {incomplete, list(), binary()}
+                 RestData = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) |
+                 eexxtteerrnnaall__cchhaarrddaattaa(())
+
+              Same as characters_to_list(Data,unicode).
+
+       cchhaarraacctteerrss__ttoo__lliisstt((DDaattaa,, IInnEEnnccooddiinngg)) -->> RReessuulltt
+
+              Types:
+
+                 Data = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) | eexxtteerrnnaall__cchhaarrddaattaa(())
+                 Result = list() | {error, list(), RestData} | {incomplete,
+                 list(), binary()}
+                 RestData = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) |
+                 eexxtteerrnnaall__cchhaarrddaattaa(())
+                 InEncoding = eennccooddiinngg(())
+
+              This function converts a possibly deep list of integers and
+              binaries into a list of integers representing unicode
+              characters. The binaries in the input may have characters
+              encoded as latin1 (0 - 255, one character per byte), in which
+              case the _I_n_E_n_c_o_d_i_n_g parameter should be given as _l_a_t_i_n_1, or have
+              characters encoded as one of the UTF-encodings, which is given
+              as the _I_n_E_n_c_o_d_i_n_g parameter. Only when the _I_n_E_n_c_o_d_i_n_g is one of
+              the UTF encodings, integers in the list are allowed to be grater
+              than 255.
+
+              If _I_n_E_n_c_o_d_i_n_g is _l_a_t_i_n_1, the _D_a_t_a parameter corresponds to the
+              _i_o_d_a_t_a_(_) type, but for _u_n_i_c_o_d_e, the _D_a_t_a parameter can contain
+              integers greater than 255 (unicode characters beyond the iso-
+              latin-1 range), which would make it invalid as _i_o_d_a_t_a_(_).
+
+              The purpose of the function is mainly to be able to convert
+              combinations of unicode characters into a pure unicode string in
+              list representation for further processing. For writing the data
+              to an external entity, the reverse function
+              cchhaarraacctteerrss__ttoo__bbiinnaarryy//33 comes in handy.
+
+              The option _u_n_i_c_o_d_e is an alias for _u_t_f_8, as this is the
+              preferred encoding for Unicode characters in binaries. _u_t_f_1_6 is
+              an alias for _{_u_t_f_1_6_,_b_i_g_} and _u_t_f_3_2 is an alias for _{_u_t_f_3_2_,_b_i_g_}.
+              The _b_i_g and _l_i_t_t_l_e atoms denote big or little endian encoding.
+
+              If for some reason, the data cannot be converted, either because
+              of illegal unicode/latin1 characters in the list, or because of
+              invalid UTF encoding in any binaries, an error tuple is
+              returned. The error tuple contains the tag _e_r_r_o_r, a list
+              representing the characters that could be converted before the
+              error occurred and a representation of the characters including
+              and after the offending integer/bytes. The last part is mostly
+              for debugging as it still constitutes a possibly deep and/or
+              mixed list, not necessarily of the same depth as the original
+              data. The error occurs when traversing the list and whatever's
+              left to decode is simply returned as is.
+
+              However, if the input _D_a_t_a is a pure binary, the third part of
+              the error tuple is guaranteed to be a binary as well.
+
+              Errors occur for the following reasons:
+
+                * Integers out of range - If _I_n_E_n_c_o_d_i_n_g is _l_a_t_i_n_1, an error
+                  occurs whenever an integer greater than 255 is found in the
+                  lists. If _I_n_E_n_c_o_d_i_n_g is of a Unicode type, an error occurs
+                  whenever an integer
+
+                  * greater than _1_6_#_1_0_F_F_F_F (the maximum unicode character),
+
+                  * in the range _1_6_#_D_8_0_0 to _1_6_#_D_F_F_F (invalid range reserved
+                    for UTF-16 surrogate pairs)
+
+                 is found.
+
+                * UTF encoding incorrect - If _I_n_E_n_c_o_d_i_n_g is one of the UTF
+                  types, the bytes in any binaries have to be valid in that
+                  encoding. Errors can occur for various reasons, including
+                  "pure" decoding errors (like the upper bits of the bytes
+                  being wrong), the bytes are decoded to a too large number,
+                  the bytes are decoded to a code-point in the invalid unicode
+                  range or encoding is "overlong", meaning that a number
+                  should have been encoded in fewer bytes. The case of a
+                  truncated UTF is handled specially, see the paragraph about
+                  incomplete binaries below. If _I_n_E_n_c_o_d_i_n_g is _l_a_t_i_n_1, binaries
+                  are always valid as long as they contain whole bytes, as
+                  each byte falls into the valid iso-latin-1 range.
+
+              A special type of error is when no actual invalid integers or
+              bytes are found, but a trailing _b_i_n_a_r_y_(_) consists of too few
+              bytes to decode the last character. This error might occur if
+              bytes are read from a file in chunks or binaries in other ways
+              are split on non UTF character boundaries. In this case an
+              _i_n_c_o_m_p_l_e_t_e tuple is returned instead of the _e_r_r_o_r tuple. It
+              consists of the same parts as the _e_r_r_o_r tuple, but the tag is
+              _i_n_c_o_m_p_l_e_t_e instead of _e_r_r_o_r and the last element is always
+              guaranteed to be a binary consisting of the first part of a (so
+              far) valid UTF character.
+
+              If one UTF characters is split over two consecutive binaries in
+              the _D_a_t_a, the conversion succeeds. This means that a character
+              can be decoded from a range of binaries as long as the whole
+              range is given as input without errors occurring. Example:
+
+                   decode_data(Data) ->
+                       case unicode:characters_to_list(Data,unicode) of
+                           {incomplete,Encoded, Rest} ->
+                              More = get_some_more_data(),
+                           Encoded ++ decode_data([Rest, More]);
+                        {error,Encoded,Rest} ->
+                              handle_error(Encoded,Rest);
+                           List ->
+                              List
+                       end.
+
+
+              Bit-strings that are not whole bytes are however not allowed, so
+              a UTF character has to be split along 8-bit boundaries to ever
+              be decoded.
+
+              If any parameters are of the wrong type, the list structure is
+              invalid (a number as tail) or the binaries does not contain
+              whole bytes (bit-strings), a _b_a_d_a_r_g exception is thrown.
+
+       cchhaarraacctteerrss__ttoo__bbiinnaarryy((DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Data = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) | eexxtteerrnnaall__cchhaarrddaattaa(())
+                 Result = binary()
+                        | {error, binary(), RestData}
+                        | {incomplete, binary(), binary()}
+                 RestData = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) |
+                 eexxtteerrnnaall__cchhaarrddaattaa(())
+
+              Same as characters_to_binary(Data, unicode, unicode).
+
+       cchhaarraacctteerrss__ttoo__bbiinnaarryy((DDaattaa,,IInnEEnnccooddiinngg)) -->> RReessuulltt
+
+              Types:
+
+                 Data = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) | eexxtteerrnnaall__cchhaarrddaattaa(())
+                 Result = binary() | {error, binary(), RestData} |
+                 {incomplete, binary(), binary()}
+                 RestData = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) |
+                 eexxtteerrnnaall__cchhaarrddaattaa(())
+                 InEncoding = eennccooddiinngg(())
+
+              Same as characters_to_binary(Data, InEncoding, unicode).
+
+       cchhaarraacctteerrss__ttoo__bbiinnaarryy((DDaattaa,, IInnEEnnccooddiinngg,, OOuuttEEnnccooddiinngg)) -->> RReessuulltt
+
+              Types:
+
+                 Data = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) | eexxtteerrnnaall__cchhaarrddaattaa(())
+                 InEncoding = OutEncoding = eennccooddiinngg(())
+                 Result = binary()
+                        | {error, binary(), RestData}
+                        | {incomplete, binary(), binary()}
+                 RestData = llaattiinn11__cchhaarrddaattaa(()) | cchhaarrddaattaa(()) |
+                 eexxtteerrnnaall__cchhaarrddaattaa(())
+
+              This function behaves as  cchhaarraacctteerrss__ttoo__lliisstt//22, but produces an
+              binary instead of a unicode list. The _I_n_E_n_c_o_d_i_n_g defines how
+              input is to be interpreted if binaries are present in the _D_a_t_a,
+              while _O_u_t_E_n_c_o_d_i_n_g defines in what format output is to be
+              generated.
+
+              The option _u_n_i_c_o_d_e is an alias for _u_t_f_8, as this is the
+              preferred encoding for Unicode characters in binaries. _u_t_f_1_6 is
+              an alias for _{_u_t_f_1_6_,_b_i_g_} and _u_t_f_3_2 is an alias for _{_u_t_f_3_2_,_b_i_g_}.
+              The _b_i_g and _l_i_t_t_l_e atoms denote big or little endian encoding.
+
+              Errors and exceptions occur as in  cchhaarraacctteerrss__ttoo__lliisstt//22, but the
+              second element in the _e_r_r_o_r or _i_n_c_o_m_p_l_e_t_e tuple will be a
+              _b_i_n_a_r_y_(_) and not a _l_i_s_t_(_).
+
+       eennccooddiinngg__ttoo__bboomm((IInnEEnnccooddiinngg)) -->> BBiinn
+
+              Types:
+
+                 Bin = binary()
+                   A binary() of byte_size 4 or more.
+                 InEncoding = eennccooddiinngg(())
+
+              Create an UTF byte order mark (BOM) as a binary from the
+              supplied _I_n_E_n_c_o_d_i_n_g. The BOM is, if supported at all, expected
+              to be placed first in UTF encoded files or messages.
+
+              The function returns _<_<_>_> for the _l_a_t_i_n_1 encoding, there is no
+              BOM for ISO-latin-1.
+
+              It can be noted that the BOM for UTF-8 is seldom used, and it is
+              really not a _b_y_t_e _o_r_d_e_r mark. There are obviously no byte order
+              issues with UTF-8, so the BOM is only there to differentiate
+              UTF-8 encoding from other UTF formats.
+
+
+
+Ericsson AB                      stdlib 1.18.2                      unicode(3)

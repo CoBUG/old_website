@@ -1,0 +1,587 @@
+wxMenu(3)                  Erlang Module Definition                  wxMenu(3)
+
+
+
+NNAAMMEE
+       wxMenu - See external documentation: wxMenu.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMenu.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_e_n_u_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMeennuu(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuu(())
+
+              Types:
+
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       nneeww((TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuu(())
+
+              Types:
+
+                 Title = chardata() (see module unicode)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       aappppeenndd((TThhiiss,, IItteemm)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Item = wxMenuItem() (see module wxMenuItem)
+
+              See external documentation.
+
+       aappppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to aappppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       aappppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt,, SSuubbmmeennuu)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Submenu = wxMenu()
+
+              See external documentation.
+              Also:
+              append(This, Itemid, Text, [Option]) -> wxMenuItem:wxMenuItem()
+              when
+              This::wxMenu(), Itemid::integer(), Text::unicode:chardata(),
+              Option :: {help, unicode:chardata()}
+              | {kind, wx:wx_enum()}.
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       aappppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt,, HHeellpp,, IIssCChheecckkaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Help = chardata() (see module unicode)
+                 IsCheckable = boolean()
+
+              See external documentation.
+              Also:
+              append(This, Itemid, Text, Submenu, [Option]) ->
+              wxMenuItem:wxMenuItem() when
+              This::wxMenu(), Itemid::integer(), Text::unicode:chardata(),
+              Submenu::wxMenu(),
+              Option :: {help, unicode:chardata()}.
+
+
+       aappppeennddCChheecckkIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to aappppeennddCChheecckkIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       aappppeennddCChheecckkIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(())
+       ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {help, chardata() (see module unicode)}
+
+              See external documentation.
+
+       aappppeennddRRaaddiiooIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to aappppeennddRRaaddiiooIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       aappppeennddRRaaddiiooIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(())
+       ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {help, chardata() (see module unicode)}
+
+              See external documentation.
+
+       aappppeennddSSeeppaarraattoorr((TThhiiss)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+
+              See external documentation.
+
+       bbrreeaakk((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+
+              See external documentation.
+
+       cchheecckk((TThhiiss,, IItteemmiidd,, CChheecckk)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Check = boolean()
+
+              See external documentation.
+
+       ddeelleettee((TThhiiss,, IItteemmiidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+              Also:
+              delete(This, Item) -> boolean() when
+              This::wxMenu(), Item::wxMenuItem:wxMenuItem().
+
+
+       DDeessttrrooyy((TThhiiss,, IItteemmiidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+              Also:
+              'Destroy'(This, Item) -> boolean() when
+              This::wxMenu(), Item::wxMenuItem:wxMenuItem().
+
+
+       eennaabbllee((TThhiiss,, IItteemmiidd,, EEnnaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Enable = boolean()
+
+              See external documentation.
+
+       ffiinnddIItteemm((TThhiiss,, IItteemmiidd)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+              Also:
+              findItem(This, Item) -> integer() when
+              This::wxMenu(), Item::unicode:chardata().
+
+
+       ffiinnddIItteemmBByyPPoossiittiioonn((TThhiiss,, PPoossiittiioonn)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Position = integer()
+
+              See external documentation.
+
+       ggeettHHeellppSSttrriinngg((TThhiiss,, IItteemmiidd)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+
+       ggeettLLaabbeell((TThhiiss,, IItteemmiidd)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+
+       ggeettMMeennuuIItteemmCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMenu()
+
+              See external documentation.
+
+       ggeettMMeennuuIItteemmss((TThhiiss)) -->> [[wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))]]
+
+              Types:
+
+                 This = wxMenu()
+
+              See external documentation.
+
+       ggeettTTiittllee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenu()
+
+              See external documentation.
+
+       iinnsseerrtt((TThhiiss,, PPooss,, IItteemmiidd)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+
+              See external documentation.
+              Also:
+              insert(This, Pos, Item) -> wxMenuItem:wxMenuItem() when
+              This::wxMenu(), Pos::integer(), Item::wxMenuItem:wxMenuItem().
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       iinnsseerrtt((TThhiiss,, PPooss,, IItteemmiidd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Option = {text, chardata() (see module unicode)} | {help,
+                 chardata() (see module unicode)} | {kind, wx_enum() (see
+                 module wx)}
+
+              See external documentation.
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       iinnsseerrtt((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, SSuubbmmeennuu)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Submenu = wxMenu()
+
+              Equivalent to iinnsseerrtt((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, SSuubbmmeennuu,, [[]])).
+
+       iinnsseerrtt((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, HHeellpp,, IIssCChheecckkaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Help = chardata() (see module unicode)
+                 IsCheckable = boolean()
+
+              See external documentation.
+              Also:
+              insert(This, Pos, Itemid, Text, Submenu, [Option]) ->
+              wxMenuItem:wxMenuItem() when
+              This::wxMenu(), Pos::integer(), Itemid::integer(),
+              Text::unicode:chardata(), Submenu::wxMenu(),
+              Option :: {help, unicode:chardata()}.
+
+
+       iinnsseerrttCChheecckkIItteemm((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to iinnsseerrttCChheecckkIItteemm((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       iinnsseerrttCChheecckkIItteemm((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {help, chardata() (see module unicode)}
+
+              See external documentation.
+
+       iinnsseerrttRRaaddiiooIItteemm((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to iinnsseerrttRRaaddiiooIItteemm((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       iinnsseerrttRRaaddiiooIItteemm((TThhiiss,, PPooss,, IItteemmiidd,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {help, chardata() (see module unicode)}
+
+              See external documentation.
+
+       iinnsseerrttSSeeppaarraattoorr((TThhiiss,, PPooss)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Pos = integer()
+
+              See external documentation.
+
+       iissCChheecckkeedd((TThhiiss,, IItteemmiidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+
+       iissEEnnaabblleedd((TThhiiss,, IItteemmiidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+
+       pprreeppeenndd((TThhiiss,, IItteemmiidd)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+              Also:
+              prepend(This, Item) -> wxMenuItem:wxMenuItem() when
+              This::wxMenu(), Item::wxMenuItem:wxMenuItem().
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       pprreeppeenndd((TThhiiss,, IItteemmiidd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Option = {text, chardata() (see module unicode)} | {help,
+                 chardata() (see module unicode)} | {kind, wx_enum() (see
+                 module wx)}
+
+              See external documentation.
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       pprreeppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt,, SSuubbmmeennuu)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Submenu = wxMenu()
+
+              Equivalent to pprreeppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt,, SSuubbmmeennuu,, [[]])).
+
+       pprreeppeenndd((TThhiiss,, IItteemmiidd,, TTeexxtt,, HHeellpp,, IIssCChheecckkaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Help = chardata() (see module unicode)
+                 IsCheckable = boolean()
+
+              See external documentation.
+              Also:
+              prepend(This, Itemid, Text, Submenu, [Option]) ->
+              wxMenuItem:wxMenuItem() when
+              This::wxMenu(), Itemid::integer(), Text::unicode:chardata(),
+              Submenu::wxMenu(),
+              Option :: {help, unicode:chardata()}.
+
+
+       pprreeppeennddCChheecckkIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to pprreeppeennddCChheecckkIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       pprreeppeennddCChheecckkIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(())
+       ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {help, chardata() (see module unicode)}
+
+              See external documentation.
+
+       pprreeppeennddRRaaddiiooIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee
+       wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to pprreeppeennddRRaaddiiooIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, [[]])).
+
+       pprreeppeennddRRaaddiiooIItteemm((TThhiiss,, IItteemmiidd,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(())
+       ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Text = chardata() (see module unicode)
+                 Option = {help, chardata() (see module unicode)}
+
+              See external documentation.
+
+       pprreeppeennddSSeeppaarraattoorr((TThhiiss)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+
+              See external documentation.
+
+       rreemmoovvee((TThhiiss,, IItteemmiidd)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+
+              See external documentation.
+              Also:
+              remove(This, Item) -> wxMenuItem:wxMenuItem() when
+              This::wxMenu(), Item::wxMenuItem:wxMenuItem().
+
+
+       sseettHHeellppSSttrriinngg((TThhiiss,, IItteemmiidd,, HHeellppSSttrriinngg)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 HelpString = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettLLaabbeell((TThhiiss,, IItteemmiidd,, LLaabbeell)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Itemid = integer()
+                 Label = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettTTiittllee((TThhiiss,, TTiittllee)) -->> ookk
+
+              Types:
+
+                 This = wxMenu()
+                 Title = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMeennuu(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                         wxMenu(3)

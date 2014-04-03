@@ -1,0 +1,595 @@
+application(3)             Erlang Module Definition             application(3)
+
+
+
+NNAAMMEE
+       application - Generic OTP application functions
+
+DDEESSCCRRIIPPTTIIOONN
+       In OTP, _a_p_p_l_i_c_a_t_i_o_n denotes a component implementing some specific
+       functionality, that can be started and stopped as a unit, and which can
+       be re-used in other systems as well. This module interfaces the
+       _a_p_p_l_i_c_a_t_i_o_n _c_o_n_t_r_o_l_l_e_r, a process started at every Erlang runtime
+       system, and contains functions for controlling applications (for
+       example starting and stopping applications), and functions to access
+       information about applications (for example configuration parameters).
+
+       An application is defined by an _a_p_p_l_i_c_a_t_i_o_n _s_p_e_c_i_f_i_c_a_t_i_o_n. The
+       specification is normally located in an _a_p_p_l_i_c_a_t_i_o_n _r_e_s_o_u_r_c_e _f_i_l_e
+       called _A_p_p_l_i_c_a_t_i_o_n_._a_p_p, where _A_p_p_l_i_c_a_t_i_o_n is the name of the
+       application. Refer to aapppp((44)) for more information about the application
+       specification.
+
+       This module can also be viewed as a behaviour for an application
+       implemented according to the OTP design principles as a supervision
+       tree. The definition of how to start and stop the tree should be
+       located in an _a_p_p_l_i_c_a_t_i_o_n _c_a_l_l_b_a_c_k _m_o_d_u_l_e exporting a pre-defined set
+       of functions.
+
+       Refer to OOTTPP DDeessiiggnn PPrriinncciipplleess for more information about applications
+       and behaviours.
+
+DDAATTAA TTYYPPEESS
+       ssttaarrtt__ttyyppee(()) = normal
+                    | {takeover, Node :: node()}
+                    | {failover, Node :: node()}
+
+       rreessttaarrtt__ttyyppee(()) = permanent | transient | temporary
+
+       ttuuppllee__ooff((TT))
+
+              A tuple where the elements are of type _T.
+
+EEXXPPOORRTTSS
+       ggeett__aallll__eennvv(()) -->> EEnnvv
+
+       ggeett__aallll__eennvv((AApppplliiccaattiioonn)) -->> EEnnvv
+
+              Types:
+
+                 Application = atom()
+                 Env = [{Par :: atom(), Val :: term()}]
+
+              Returns the configuration parameters and their values for
+              _A_p_p_l_i_c_a_t_i_o_n. If the argument is omitted, it defaults to the
+              application of the calling process.
+
+              If the specified application is not loaded, or if the process
+              executing the call does not belong to any application, the
+              function returns _[_].
+
+       ggeett__aallll__kkeeyy(()) -->> [[]] || {{ookk,, KKeeyyss}}
+
+       ggeett__aallll__kkeeyy((AApppplliiccaattiioonn)) -->> uunnddeeffiinneedd || KKeeyyss
+
+              Types:
+
+                 Application = atom()
+                 Keys = {ok, [{Key :: atom(), Val :: term()}, ...]}
+
+              Returns the application specification keys and their values for
+              _A_p_p_l_i_c_a_t_i_o_n. If the argument is omitted, it defaults to the
+              application of the calling process.
+
+              If the specified application is not loaded, the function returns
+              _u_n_d_e_f_i_n_e_d. If the process executing the call does not belong to
+              any application, the function returns _[_].
+
+       ggeett__aapppplliiccaattiioonn(()) -->> uunnddeeffiinneedd || {{ookk,, AApppplliiccaattiioonn}}
+
+       ggeett__aapppplliiccaattiioonn((PPiiddOOrrMMoodduullee)) -->> uunnddeeffiinneedd || {{ookk,, AApppplliiccaattiioonn}}
+
+              Types:
+
+                 PidOrModule = (Pid :: pid()) | (Module :: module())
+                 Application = atom()
+
+              Returns the name of the application to which the process _P_i_d or
+              the module _M_o_d_u_l_e belongs. Providing no argument is the same as
+              calling _g_e_t___a_p_p_l_i_c_a_t_i_o_n_(_s_e_l_f_(_)_).
+
+              If the specified process does not belong to any application, or
+              if the specified process or module does not exist, the function
+              returns _u_n_d_e_f_i_n_e_d.
+
+       ggeett__eennvv((PPaarr)) -->> uunnddeeffiinneedd || {{ookk,, VVaall}}
+
+       ggeett__eennvv((AApppplliiccaattiioonn,, PPaarr)) -->> uunnddeeffiinneedd || {{ookk,, VVaall}}
+
+              Types:
+
+                 Application = Par = atom()
+                 Val = term()
+
+              Returns the value of the configuration parameter _P_a_r for
+              _A_p_p_l_i_c_a_t_i_o_n. If the application argument is omitted, it defaults
+              to the application of the calling process.
+
+              If the specified application is not loaded, or the configuration
+              parameter does not exist, or if the process executing the call
+              does not belong to any application, the function returns
+              _u_n_d_e_f_i_n_e_d.
+
+       ggeett__kkeeyy((KKeeyy)) -->> uunnddeeffiinneedd || {{ookk,, VVaall}}
+
+       ggeett__kkeeyy((AApppplliiccaattiioonn,, KKeeyy)) -->> uunnddeeffiinneedd || {{ookk,, VVaall}}
+
+              Types:
+
+                 Application = Key = atom()
+                 Val = term()
+
+              Returns the value of the application specification key _K_e_y for
+              _A_p_p_l_i_c_a_t_i_o_n. If the application argument is omitted, it defaults
+              to the application of the calling process.
+
+              If the specified application is not loaded, or the specification
+              key does not exist, or if the process executing the call does
+              not belong to any application, the function returns _u_n_d_e_f_i_n_e_d.
+
+       llooaadd((AAppppDDeessccrr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       llooaadd((AAppppDDeessccrr,, DDiissttrriibbuutteedd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 AppDescr = Application | (AppSpec :: aapppplliiccaattiioonn__ssppeecc(()))
+                 Application = atom()
+                 Distributed = {Application, Nodes}
+                             | {Application, Time, Nodes}
+                             | default
+                 Nodes = [node() | ttuuppllee__ooff(node())]
+                 Time = integer() >= 1
+                 Reason = term()
+                 aapppplliiccaattiioonn__ssppeecc(()) =
+                     {application,
+                      Application :: atom(),
+                      AppSpecKeys :: [aapppplliiccaattiioonn__oopptt(())]}
+                 aapppplliiccaattiioonn__oopptt(()) = {description, Description :: string()}
+                                   | {vsn, Vsn :: string()}
+                                   | {id, Id :: string()}
+                                   | {modules,
+                                      [(Module :: module()) |
+                                       {Module :: module(), Version :: term()}]}
+                                   | {registered, Names :: [Name :: atom()]}
+                                   | {applications, [Application :: atom()]}
+                                   | {included_applications,
+                                      [Application :: atom()]}
+                                   | {env, [{Par :: atom(), Val :: term()}]}
+                                   | {start_phases,
+                                      [{Phase :: atom(), PhaseArgs :: term()}] |
+                                      undefined}
+                                   | {maxT, MaxT :: timeout()}
+                                   | {maxP, MaxP :: integer() >= 1 | infinity}
+                                   | {mod,
+                                      Start ::
+                                          {Module :: module(),
+                                           StartArgs :: term()}}
+
+              Loads the application specification for an application into the
+              application controller. It will also load the application
+              specifications for any included applications. Note that the
+              function does not load the actual Erlang object code.
+
+              The application can be given by its name _A_p_p_l_i_c_a_t_i_o_n. In this
+              case the application controller will search the code path for
+              the application resource file _A_p_p_l_i_c_a_t_i_o_n_._a_p_p and load the
+              specification it contains.
+
+              The application specification can also be given directly as a
+              tuple _A_p_p_S_p_e_c. This tuple should have the format and contents as
+              described in _a_p_p_(_4_).
+
+              If _D_i_s_t_r_i_b_u_t_e_d _=_= _{_A_p_p_l_i_c_a_t_i_o_n_,_[_T_i_m_e_,_]_N_o_d_e_s_}, the application
+              will be distributed. The argument overrides the value for the
+              application in the Kernel configuration parameter _d_i_s_t_r_i_b_u_t_e_d.
+              _A_p_p_l_i_c_a_t_i_o_n must be the name of the application (same as in the
+              first argument). If a node crashes and _T_i_m_e has been specified,
+              then the application controller will wait for _T_i_m_e milliseconds
+              before attempting to restart the application on another node. If
+              _T_i_m_e is not specified, it will default to 0 and the application
+              will be restarted immediately.
+
+              _N_o_d_e_s is a list of node names where the application may run, in
+              priority from left to right. Node names can be grouped using
+              tuples to indicate that they have the same priority. Example:
+
+              Nodes = [cp1@cave, {cp2@cave, cp3@cave}]
+
+              This means that the application should preferably be started at
+              _c_p_1_@_c_a_v_e. If _c_p_1_@_c_a_v_e is down, the application should be started
+              at either _c_p_2_@_c_a_v_e or _c_p_3_@_c_a_v_e.
+
+              If _D_i_s_t_r_i_b_u_t_e_d _=_= _d_e_f_a_u_l_t, the value for the application in the
+              Kernel configuration parameter _d_i_s_t_r_i_b_u_t_e_d will be used.
+
+       llooaaddeedd__aapppplliiccaattiioonnss(()) -->> [[{{AApppplliiccaattiioonn,, DDeessccrriippttiioonn,, VVssnn}}]]
+
+              Types:
+
+                 Application = atom()
+                 Description = Vsn = string()
+
+              Returns a list with information about the applications which
+              have been loaded using _l_o_a_d_/_1_,_2, also included applications.
+              _A_p_p_l_i_c_a_t_i_o_n is the application name. _D_e_s_c_r_i_p_t_i_o_n and _V_s_n are the
+              values of its _d_e_s_c_r_i_p_t_i_o_n and _v_s_n application specification
+              keys, respectively.
+
+       ppeerrmmiitt((AApppplliiccaattiioonn,, PPeerrmmiissssiioonn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Application = atom()
+                 Permission = boolean()
+                 Reason = term()
+
+              Changes the permission for _A_p_p_l_i_c_a_t_i_o_n to run at the current
+              node. The application must have been loaded using _l_o_a_d_/_1_,_2 for
+              the function to have effect.
+
+              If the permission of a loaded, but not started, application is
+              set to _f_a_l_s_e, _s_t_a_r_t will return _o_k but the application will not
+              be started until the permission is set to _t_r_u_e.
+
+              If the permission of a running application is set to _f_a_l_s_e, the
+              application will be stopped. If the permission later is set to
+              _t_r_u_e, it will be restarted.
+
+              If the application is distributed, setting the permission to
+              _f_a_l_s_e means that the application will be started at, or moved
+              to, another node according to how its distribution is configured
+              (see _l_o_a_d_/_2 above).
+
+              The function does not return until the application is started,
+              stopped or successfully moved to another node. However, in some
+              cases where permission is set to _t_r_u_e the function may return _o_k
+              even though the application itself has not started. This is true
+              when an application cannot start because it has dependencies to
+              other applications which have not yet been started. When they
+              have been started, _A_p_p_l_i_c_a_t_i_o_n will be started as well.
+
+              By default, all applications are loaded with permission _t_r_u_e on
+              all nodes. The permission is configurable by using the Kernel
+              configuration parameter _p_e_r_m_i_s_s_i_o_n_s.
+
+       sseett__eennvv((AApppplliiccaattiioonn,, PPaarr,, VVaall)) -->> ookk
+
+       sseett__eennvv((AApppplliiccaattiioonn,, PPaarr,, VVaall,, TTiimmeeoouutt)) -->> ookk
+
+              Types:
+
+                 Application = Par = atom()
+                 Val = term()
+                 Timeout = timeout()
+
+              Sets the value of the configuration parameter _P_a_r for
+              _A_p_p_l_i_c_a_t_i_o_n.
+
+              _s_e_t___e_n_v_/_3 uses the standard _g_e_n___s_e_r_v_e_r timeout value (5000 ms).
+              A _T_i_m_e_o_u_t argument can be provided if another timeout value is
+              useful, for example, in situations where the application
+              controller is heavily loaded.
+
+          WWaarrnniinngg::
+              Use this function only if you know what you are doing, that is,
+              on your own applications. It is very application and
+              configuration parameter dependent when and how often the value
+              is read by the application, and careless use of this function
+              may put the application in a weird, inconsistent, and
+              malfunctioning state.
+
+
+       ssttaarrtt((AApppplliiccaattiioonn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       ssttaarrtt((AApppplliiccaattiioonn,, TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Application = atom()
+                 Type = rreessttaarrtt__ttyyppee(())
+                 Reason = term()
+
+              Starts _A_p_p_l_i_c_a_t_i_o_n. If it is not loaded, the application
+              controller will first load it using _l_o_a_d_/_1. It will make sure
+              any included applications are loaded, but will not start them.
+              That is assumed to be taken care of in the code for _A_p_p_l_i_c_a_t_i_o_n.
+
+              The application controller checks the value of the application
+              specification key _a_p_p_l_i_c_a_t_i_o_n_s, to ensure that all applications
+              that should be started before this application are running. If
+              not, _{_e_r_r_o_r_,_{_n_o_t___s_t_a_r_t_e_d_,_A_p_p_}_} is returned, where _A_p_p is the
+              name of the missing application.
+
+              The application controller then creates an _a_p_p_l_i_c_a_t_i_o_n _m_a_s_t_e_r
+              for the application. The application master is the group leader
+              of all the processes in the application. The application master
+              starts the application by calling the application callback
+              function _M_o_d_u_l_e_:_s_t_a_r_t_/_2 as defined by the application
+              specification key _m_o_d.
+
+              The _T_y_p_e argument specifies the type of the application. If
+              omitted, it defaults to _t_e_m_p_o_r_a_r_y.
+
+                * If a permanent application terminates, all other
+                  applications and the entire Erlang node are also terminated.
+
+                * If a transient application terminates with _R_e_a_s_o_n _=_= _n_o_r_m_a_l,
+                  this is reported but no other applications are terminated.
+                  If a transient application terminates abnormally, all other
+                  applications and the entire Erlang node are also terminated.
+
+                * If a temporary application terminates, this is reported but
+                  no other applications are terminated.
+
+              Note that it is always possible to stop an application
+              explicitly by calling _s_t_o_p_/_1. Regardless of the type of the
+              application, no other applications will be affected.
+
+              Note also that the transient type is of little practical use,
+              since when a supervision tree terminates, the reason is set to
+              _s_h_u_t_d_o_w_n, not _n_o_r_m_a_l.
+
+       ssttaarrtt__ttyyppee(()) -->> SSttaarrttTTyyppee || uunnddeeffiinneedd || llooccaall
+
+              Types:
+
+                 StartType = ssttaarrtt__ttyyppee(())
+
+              This function is intended to be called by a process belonging to
+              an application, when the application is being started, to
+              determine the start type which is either _S_t_a_r_t_T_y_p_e or _l_o_c_a_l.
+
+              See _M_o_d_u_l_e_:_s_t_a_r_t_/_2 for a description of _S_t_a_r_t_T_y_p_e.
+
+              _l_o_c_a_l is returned if only parts of the application is being
+              restarted (by a supervisor), or if the function is called
+              outside a startup.
+
+              If the process executing the call does not belong to any
+              application, the function returns _u_n_d_e_f_i_n_e_d.
+
+       ssttoopp((AApppplliiccaattiioonn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Application = atom()
+                 Reason = term()
+
+              Stops _A_p_p_l_i_c_a_t_i_o_n. The application master calls
+              _M_o_d_u_l_e_:_p_r_e_p___s_t_o_p_/_1, if such a function is defined, and then
+              tells the top supervisor of the application to shutdown (see
+              _s_u_p_e_r_v_i_s_o_r_(_3_)). This means that the entire supervision tree,
+              including included applications, is terminated in reversed start
+              order. After the shutdown, the application master calls
+              _M_o_d_u_l_e_:_s_t_o_p_/_1. _M_o_d_u_l_e is the callback module as defined by the
+              application specification key _m_o_d.
+
+              Last, the application master itself terminates. Note that all
+              processes with the application master as group leader, i.e.
+              processes spawned from a process belonging to the application,
+              thus are terminated as well.
+
+              When stopped, the application is still loaded.
+
+              In order to stop a distributed application, _s_t_o_p_/_1 has to be
+              called on all nodes where it can execute (that is, on all nodes
+              where it has been started). The call to _s_t_o_p_/_1 on the node where
+              the application currently executes will stop its execution. The
+              application will not be moved between nodes due to _s_t_o_p_/_1 being
+              called on the node where the application currently executes
+              before _s_t_o_p_/_1 is called on the other nodes.
+
+       ttaakkeeoovveerr((AApppplliiccaattiioonn,, TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Application = atom()
+                 Type = rreessttaarrtt__ttyyppee(())
+                 Reason = term()
+
+              Performs a takeover of the distributed application _A_p_p_l_i_c_a_t_i_o_n,
+              which executes at another node _N_o_d_e. At the current node, the
+              application is restarted by calling
+              _M_o_d_u_l_e_:_s_t_a_r_t_(_{_t_a_k_e_o_v_e_r_,_N_o_d_e_}_,_S_t_a_r_t_A_r_g_s_). _M_o_d_u_l_e and _S_t_a_r_t_A_r_g_s
+              are retrieved from the loaded application specification. The
+              application at the other node is not stopped until the startup
+              is completed, i.e. when _M_o_d_u_l_e_:_s_t_a_r_t_/_2 and any calls to
+              _M_o_d_u_l_e_:_s_t_a_r_t___p_h_a_s_e_/_3 have returned.
+
+              Thus two instances of the application will run simultaneously
+              during the takeover, which makes it possible to transfer data
+              from the old to the new instance. If this is not acceptable
+              behavior, parts of the old instance may be shut down when the
+              new instance is started. Note that the application may not be
+              stopped entirely however, at least the top supervisor must
+              remain alive.
+
+              See _s_t_a_r_t_/_1_,_2 for a description of _T_y_p_e.
+
+       uunnllooaadd((AApppplliiccaattiioonn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Application = atom()
+                 Reason = term()
+
+              Unloads the application specification for _A_p_p_l_i_c_a_t_i_o_n from the
+              application controller. It will also unload the application
+              specifications for any included applications. Note that the
+              function does not purge the actual Erlang object code.
+
+       uunnsseett__eennvv((AApppplliiccaattiioonn,, PPaarr)) -->> ookk
+
+       uunnsseett__eennvv((AApppplliiccaattiioonn,, PPaarr,, TTiimmeeoouutt)) -->> ookk
+
+              Types:
+
+                 Application = Par = atom()
+                 Timeout = timeout()
+
+              Removes the configuration parameter _P_a_r and its value for
+              _A_p_p_l_i_c_a_t_i_o_n.
+
+              _u_n_s_e_t___e_n_v_/_2 uses the standard _g_e_n___s_e_r_v_e_r timeout value (5000
+              ms). A _T_i_m_e_o_u_t argument can be provided if another timeout value
+              is useful, for example, in situations where the application
+              controller is heavily loaded.
+
+          WWaarrnniinngg::
+              Use this function only if you know what you are doing, that is,
+              on your own applications. It is very application and
+              configuration parameter dependent when and how often the value
+              is read by the application, and careless use of this function
+              may put the application in a weird, inconsistent, and
+              malfunctioning state.
+
+
+       wwhhiicchh__aapppplliiccaattiioonnss(()) -->> [[{{AApppplliiccaattiioonn,, DDeessccrriippttiioonn,, VVssnn}}]]
+
+       wwhhiicchh__aapppplliiccaattiioonnss((TTiimmeeoouutt)) -->> [[{{AApppplliiccaattiioonn,, DDeessccrriippttiioonn,, VVssnn}}]]
+
+              Types:
+
+                 Timeout = timeout()
+                 Application = atom()
+                 Description = Vsn = string()
+
+              Returns a list with information about the applications which are
+              currently running. _A_p_p_l_i_c_a_t_i_o_n is the application name.
+              _D_e_s_c_r_i_p_t_i_o_n and _V_s_n are the values of its _d_e_s_c_r_i_p_t_i_o_n and _v_s_n
+              application specification keys, respectively.
+
+              _w_h_i_c_h___a_p_p_l_i_c_a_t_i_o_n_s_/_0 uses the standard _g_e_n___s_e_r_v_e_r timeout value
+              (5000 ms). A _T_i_m_e_o_u_t argument can be provided if another timeout
+              value is useful, for example, in situations where the
+              application controller is heavily loaded.
+
+CCAALLLLBBAACCKK MMOODDUULLEE
+       The following functions should be exported from an _a_p_p_l_i_c_a_t_i_o_n callback
+       module.
+
+EEXXPPOORRTTSS
+       MMoodduullee::ssttaarrtt((SSttaarrttTTyyppee,, SSttaarrttAArrggss)) -->> {{ookk,, PPiidd}} || {{ookk,, PPiidd,, SSttaattee}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 StartType = normal | {takeover,Node} | {failover,Node}
+                  Node = node()
+                 StartArgs = term()
+                 Pid = pid()
+                 State = term()
+
+              This function is called whenever an application is started using
+              _a_p_p_l_i_c_a_t_i_o_n_:_s_t_a_r_t_/_1_,_2, and should start the processes of the
+              application. If the application is structured according to the
+              OTP design principles as a supervision tree, this means starting
+              the top supervisor of the tree.
+
+              _S_t_a_r_t_T_y_p_e defines the type of start:
+
+                * _n_o_r_m_a_l if it's a normal startup.
+
+                * _n_o_r_m_a_l also if the application is distributed and started at
+                  the current node due to a failover from another node, and
+                  the application specification key _s_t_a_r_t___p_h_a_s_e_s _=_= _u_n_d_e_f_i_n_e_d.
+
+                * _{_t_a_k_e_o_v_e_r_,_N_o_d_e_} if the application is distributed and
+                  started at the current node due to a takeover from _N_o_d_e,
+                  either because _a_p_p_l_i_c_a_t_i_o_n_:_t_a_k_e_o_v_e_r_/_2 has been called or
+                  because the current node has higher priority than _N_o_d_e.
+
+                * _{_f_a_i_l_o_v_e_r_,_N_o_d_e_} if the application is distributed and
+                  started at the current node due to a failover from _N_o_d_e, and
+                  the application specification key _s_t_a_r_t___p_h_a_s_e_s _/_= _u_n_d_e_f_i_n_e_d.
+
+              _S_t_a_r_t_A_r_g_s is the _S_t_a_r_t_A_r_g_s argument defined by the application
+              specification key _m_o_d.
+
+              The function should return _{_o_k_,_P_i_d_} or _{_o_k_,_P_i_d_,_S_t_a_t_e_} where _P_i_d
+              is the pid of the top supervisor and _S_t_a_t_e is any term. If
+              omitted, _S_t_a_t_e defaults to _[_]. If later the application is
+              stopped, _S_t_a_t_e is passed to _M_o_d_u_l_e_:_p_r_e_p___s_t_o_p_/_1.
+
+       MMoodduullee::ssttaarrtt__pphhaassee((PPhhaassee,, SSttaarrttTTyyppee,, PPhhaasseeAArrggss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Phase = atom()
+                 StartType = ssttaarrtt__ttyyppee(())
+                 PhaseArgs = term()
+                 Pid = pid()
+                 State = state()
+
+              This function is used to start an application with included
+              applications, when there is a need for synchronization between
+              processes in the different applications during startup.
+
+              The start phases is defined by the application specification key
+              _s_t_a_r_t___p_h_a_s_e_s _=_= _[_{_P_h_a_s_e_,_P_h_a_s_e_A_r_g_s_}_]. For included applications,
+              the set of phases must be a subset of the set of phases defined
+              for the including application.
+
+              The function is called for each start phase (as defined for the
+              primary application) for the primary application and all
+              included applications, for which the start phase is defined.
+
+              See _M_o_d_u_l_e_:_s_t_a_r_t_/_2 for a description of _S_t_a_r_t_T_y_p_e.
+
+       MMoodduullee::pprreepp__ssttoopp((SSttaattee)) -->> NNeewwSSttaattee
+
+              Types:
+
+                 State = NewState = term()
+
+              This function is called when an application is about to be
+              stopped, before shutting down the processes of the application.
+
+              _S_t_a_t_e is the state returned from _M_o_d_u_l_e_:_s_t_a_r_t_/_2, or _[_] if no
+              state was returned. _N_e_w_S_t_a_t_e is any term and will be passed to
+              _M_o_d_u_l_e_:_s_t_o_p_/_1.
+
+              The function is optional. If it is not defined, the processes
+              will be terminated and then _M_o_d_u_l_e_:_s_t_o_p_(_S_t_a_t_e_) is called.
+
+       MMoodduullee::ssttoopp((SSttaattee))
+
+              Types:
+
+                 State = term()
+
+              This function is called whenever an application has stopped. It
+              is intended to be the opposite of _M_o_d_u_l_e_:_s_t_a_r_t_/_2 and should do
+              any necessary cleaning up. The return value is ignored.
+
+              _S_t_a_t_e is the return value of _M_o_d_u_l_e_:_p_r_e_p___s_t_o_p_/_1, if such a
+              function exists. Otherwise _S_t_a_t_e is taken from the return value
+              of _M_o_d_u_l_e_:_s_t_a_r_t_/_2.
+
+       MMoodduullee::ccoonnffiigg__cchhaannggee((CChhaannggeedd,, NNeeww,, RReemmoovveedd)) -->> ookk
+
+              Types:
+
+                 Changed = [{Par,Val}]
+                 New = [{Par,Val}]
+                 Removed = [Par]
+                  Par = atom()
+                  Val = term()
+
+              This function is called by an application after a code
+              replacement, if there are any changes to the configuration
+              parameters.
+
+              _C_h_a_n_g_e_d is a list of parameter-value tuples with all
+              configuration parameters with changed values, _N_e_w is a list of
+              parameter-value tuples with all configuration parameters that
+              have been added, and _R_e_m_o_v_e_d is a list of all parameters that
+              have been removed.
+
+SSEEEE AALLSSOO
+       OOTTPP DDeessiiggnn PPrriinncciipplleess, kkeerrnneell((66)), aapppp((44))
+
+
+
+Ericsson AB                      kernel 2.15.2                  application(3)

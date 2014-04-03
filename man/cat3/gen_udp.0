@@ -1,0 +1,216 @@
+gen_udp(3)                 Erlang Module Definition                 gen_udp(3)
+
+
+
+NNAAMMEE
+       gen_udp - Interface to UDP sockets
+
+DDEESSCCRRIIPPTTIIOONN
+       The _g_e_n___u_d_p module provides functions for communicating with sockets
+       using the UDP protocol.
+
+DDAATTAA TTYYPPEESS
+       ooppttiioonn(()) = {active, true | false | once}
+                | {add_membership,
+                   {iinneett::iipp__aaddddrreessss(()), iinneett::iipp__aaddddrreessss(())}}
+                | {broadcast, boolean()}
+                | {buffer, integer() >= 0}
+                | {deliver, port | term}
+                | {dontroute, boolean()}
+                | {drop_membership,
+                   {iinneett::iipp__aaddddrreessss(()), iinneett::iipp__aaddddrreessss(())}}
+                | {header, integer() >= 0}
+                | {mode, list | binary}
+                | list
+                | binary
+                | {multicast_if, iinneett::iipp__aaddddrreessss(())}
+                | {multicast_loop, boolean()}
+                | {multicast_ttl, integer() >= 0}
+                | {priority, integer() >= 0}
+                | {raw,
+                   Protocol :: integer() >= 0,
+                   OptionNum :: integer() >= 0,
+                   ValueBin :: binary()}
+                | {read_packets, integer() >= 0}
+                | {recbuf, integer() >= 0}
+                | {reuseaddr, boolean()}
+                | {sndbuf, integer() >= 0}
+                | {tos, integer() >= 0}
+
+       ooppttiioonn__nnaammee(()) = active
+                     | broadcast
+                     | buffer
+                     | deliver
+                     | dontroute
+                     | header
+                     | mode
+                     | multicast_if
+                     | multicast_loop
+                     | multicast_ttl
+                     | priority
+                     | {raw,
+                        Protocol :: integer() >= 0,
+                        OptionNum :: integer() >= 0,
+                        ValueSpec :: (ValueSize :: integer() >= 0)
+                                   | (ValueBin :: binary())}
+                     | read_packets
+                     | recbuf
+                     | reuseaddr
+                     | sndbuf
+                     | tos
+
+       ssoocckkeett(())
+
+              As returned by open/1,2.
+
+EEXXPPOORRTTSS
+       ooppeenn((PPoorrtt)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ooppeenn((PPoorrtt,, OOppttss)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Opts = [Option]
+                 Option = {ip, iinneett::iipp__aaddddrreessss(())}
+                        | {fd, integer() >= 0}
+                        | {ifaddr, iinneett::iipp__aaddddrreessss(())}
+                        | iinneett::aaddddrreessss__ffaammiillyy(())
+                        | {port, iinneett::ppoorrtt__nnuummbbeerr(())}
+                        | ooppttiioonn(())
+                 Socket = ssoocckkeett(())
+                 Reason = iinneett::ppoossiixx(())
+
+              Associates a UDP port number (_P_o_r_t) with the calling process.
+
+              The available options are:
+
+                _l_i_s_t:
+                  Received _P_a_c_k_e_t is delivered as a list.
+
+                _b_i_n_a_r_y:
+                  Received _P_a_c_k_e_t is delivered as a binary.
+
+                _{_i_p_, _i_p___a_d_d_r_e_s_s_(_)_}:
+                  If the host has several network interfaces, this option
+                  specifies which one to use.
+
+                _{_i_f_a_d_d_r_, _i_p___a_d_d_r_e_s_s_(_)_}:
+                  Same as _{_i_p_, _i_p___a_d_d_r_e_s_s_(_)_}. If the host has several network
+                  interfaces, this option specifies which one to use.
+
+                _{_f_d_, _i_n_t_e_g_e_r_(_) _>_= _0_}:
+                  If a socket has somehow been opened without using _g_e_n___u_d_p,
+                  use this option to pass the file descriptor for it.
+
+                _i_n_e_t_6:
+                  Set up the socket for IPv6.
+
+                _i_n_e_t:
+                  Set up the socket for IPv4.
+
+                _{_u_d_p___m_o_d_u_l_e_, _m_o_d_u_l_e_(_)_}:
+                  Override which callback module is used. Defaults to _i_n_e_t___u_d_p
+                  for IPv4 and _i_n_e_t_6___u_d_p for IPv6.
+
+                _{_m_u_l_t_i_c_a_s_t___i_f_, _A_d_d_r_e_s_s_}:
+                  Set the local device for a multicast socket.
+
+                _{_m_u_l_t_i_c_a_s_t___l_o_o_p_, _t_r_u_e _| _f_a_l_s_e_}:
+                  When _t_r_u_e sent multicast packets will be looped back to the
+                  local sockets.
+
+                _{_m_u_l_t_i_c_a_s_t___t_t_l_, _I_n_t_e_g_e_r_}:
+                  The _m_u_l_t_i_c_a_s_t___t_t_l option changes the time-to-live (TTL) for
+                  outgoing multicast datagrams in order to control the scope
+                  of the multicasts.
+
+                  Datagrams with a TTL of 1 are not forwarded beyond the local
+                  network.
+                  Default: 1
+
+                _{_a_d_d___m_e_m_b_e_r_s_h_i_p_, _{_M_u_l_t_i_A_d_d_r_e_s_s_, _I_n_t_e_r_f_a_c_e_A_d_d_r_e_s_s_}_}:
+                  Join a multicast group.
+
+                _{_d_r_o_p___m_e_m_b_e_r_s_h_i_p_, _{_M_u_l_t_i_A_d_d_r_e_s_s_, _I_n_t_e_r_f_a_c_e_A_d_d_r_e_s_s_}_}:
+                  Leave multicast group.
+
+                _O_p_t:
+                  See iinneett::sseettooppttss//22.
+
+              The returned socket _S_o_c_k_e_t is used to send packets from this
+              port with _s_e_n_d_/_4. When UDP packets arrive at the opened port,
+              they are delivered as messages:
+
+              {udp, Socket, IP, InPortNo, Packet}
+
+              Note that arriving UDP packets that are longer than the receive
+              buffer option specifies, might be truncated without warning.
+
+              _I_P and _I_n_P_o_r_t_N_o define the address from which _P_a_c_k_e_t came.
+              _P_a_c_k_e_t is a list of bytes if the option _l_i_s_t was specified.
+              _P_a_c_k_e_t is a binary if the option _b_i_n_a_r_y was specified.
+
+              Default value for the receive buffer option is _{_r_e_c_b_u_f_, _8_1_9_2_}.
+
+              If _P_o_r_t _=_= _0, the underlying OS assigns a free UDP port, use
+              _i_n_e_t_:_p_o_r_t_/_1 to retrieve it.
+
+       sseenndd((SSoocckkeett,, AAddddrreessss,, PPoorrtt,, PPaacckkeett)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 Address = iinneett::iipp__aaddddrreessss(()) | iinneett::hhoossttnnaammee(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Packet = iodata()
+                 Reason = not_owner | iinneett::ppoossiixx(())
+
+              Sends a packet to the specified address and port. The _A_d_d_r_e_s_s
+              argument can be either a hostname, or an IP address.
+
+       rreeccvv((SSoocckkeett,, LLeennggtthh)) -->>
+               {{ookk,, {{AAddddrreessss,, PPoorrtt,, PPaacckkeett}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+       rreeccvv((SSoocckkeett,, LLeennggtthh,, TTiimmeeoouutt)) -->>
+               {{ookk,, {{AAddddrreessss,, PPoorrtt,, PPaacckkeett}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 Length = integer() >= 0
+                 Timeout = timeout()
+                 Address = iinneett::iipp__aaddddrreessss(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Packet = string() | binary()
+                 Reason = not_owner | iinneett::ppoossiixx(())
+
+              This function receives a packet from a socket in passive mode.
+
+              The optional _T_i_m_e_o_u_t parameter specifies a timeout in
+              milliseconds. The default value is _i_n_f_i_n_i_t_y.
+
+       ccoonnttrroolllliinngg__pprroocceessss((SSoocckkeett,, PPiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 Pid = pid()
+                 Reason = closed | not_owner | iinneett::ppoossiixx(())
+
+              Assigns a new controlling process _P_i_d to _S_o_c_k_e_t. The controlling
+              process is the process which receives messages from the socket.
+              If called by any other process than the current controlling
+              process, _{_e_r_r_o_r_, _n_o_t___o_w_n_e_r_} is returned.
+
+       cclloossee((SSoocckkeett)) -->> ookk
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+
+              Closes a UDP socket.
+
+
+
+Ericsson AB                      kernel 2.15.2                      gen_udp(3)

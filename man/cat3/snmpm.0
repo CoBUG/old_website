@@ -1,0 +1,1327 @@
+snmpm(3)                   Erlang Module Definition                   snmpm(3)
+
+
+
+NNAAMMEE
+       snmpm - Interface functions to the SNMP toolkit manager
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_m contains interface functions to the SNMP manager.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       The following data types are used in the functions below:
+
+       oid() = [byte()]  -  The oid() type is used to represent an ASN.1 OBJECT IDENTIFIER
+       snmp_reply() = {error_status(), error_index(), varbinds()}
+       error_status() = noError | atom()
+       error_index() = integer()
+       varbinds() = [varbind()]
+       atl_type() = read | write | read_write
+       target_name() = string()  -  Is a unique *non-empty* string
+       vars_and_vals() = [var_and_val()]
+       var_and_val() = {oid(), value_type(), value()} | {oid(), value()}
+       value_type() = o ('OBJECT IDENTIFIER') |
+                      i ('INTEGER') |
+                      u ('Unsigned32') |
+                      g ('Unsigned32') |
+                      s ('OCTET SRING') |
+                      b ('BITS') |
+                      ip ('IpAddress') |
+                      op ('Opaque') |
+                      c32 ('Counter32') |
+                      c64 ('Counter64') |
+                      tt ('TimeTicks')
+       value() = term()
+       community() = string()
+       sec_model() = any | v1 | v2c | usm
+       sec_name() = string()
+       sec_level() = noAuthNoPriv | authNoPriv | authPriv
+
+
+EEXXPPOORRTTSS
+       mmoonniittoorr(()) -->> RReeff
+
+              Types:
+
+                 Ref = reference()
+
+              Monitor the SNMP manager. In case of a crash, the calling
+              (monitoring) process will get a 'DOWN' message (see the erlang
+              module for more info).
+
+       ddeemmoonniittoorr((RReeff)) -->> vvooiidd(())
+
+              Types:
+
+                 Ref = reference()
+
+              Turn off monitoring of the SNMP manager.
+
+       nnoottiiffyy__ssttaarrtteedd((TTiimmeeoouutt)) -->> PPiidd
+
+              Types:
+
+                 Timeout = integer()
+                 Pid = pid()
+
+              Request a notification (message) when the SNMP manager has
+              started.
+
+              The _T_i_m_e_o_u_t is the time the request is valid. The value has to
+              be greater then zero.
+
+              The _P_i_d is the process handling the supervision of the SNMP
+              manager start. When the manager has started a completion message
+              will be sent to the client from this process: _{_s_n_m_p_m___s_t_a_r_t_e_d_,
+              _P_i_d_}. If the SNMP manager was not started in time, a timeout
+              message will be sent to the client: _{_s_n_m_p_m___s_t_a_r_t___t_i_m_e_o_u_t_, _P_i_d_}.
+
+              A client application that is dependent on the SNMP manager will
+              use this function in order to be notified of when the manager
+              has started. There are two situations when this is useful:
+
+                * During the start of a system, when a client application
+                  _c_o_u_l_d start prior to the SNMP manager but is dependent upon
+                  it, and therefor has to wait for it to start.
+
+                * When the SNMP manager has crashed, the dependent client
+                  application has to wait for the SNMP manager to be restarted
+                  before it can _r_e_c_o_n_n_e_c_t.
+
+              The function returns the pid() of a handler process, that does
+              the supervision on behalf of the client application. Note that
+              the client application is linked to this handler.
+
+              This function is used in conjunction with the monitor function.
+
+       ccaanncceell__nnoottiiffyy__ssttaarrtteedd((PPiidd)) -->> vvooiidd(())
+
+              Types:
+
+                 Pid = pid()
+
+              Cancel a previous request to be notified of SNMP manager start.
+
+       rreeggiisstteerr__uusseerr((IIdd,, MMoodduullee,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       rreeggiisstteerr__uusseerr((IIdd,, MMoodduullee,, DDaattaa,, DDeeffaauullttAAggeennttCCoonnffiigg)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Id = term()
+                 Module = snmpm_user()
+                 Data = term()
+                 DefaultAgentConfig = [default_agent_config()]
+                 default_agent_config() = {Item, Val}
+                 Item = community | timeout | max_message_size | version |
+                 sec_model | sec_name | sec_level
+                 Val = term()
+                 Reason = term()
+                 snmpm_user() = Module implementing the snmpm_user behaviour
+
+              Register the manager entity (=user) responsible for specific
+              agent(s).
+
+              _M_o_d_u_l_e is the callback module (snmpm_user behaviour) which will
+              be called whenever something happens (detected agent, incoming
+              reply or incoming trap/notification). Note that this could have
+              already been done as a consequence of the node config. (see
+              users.conf).
+
+              The argument _D_e_f_a_u_l_t_A_g_e_n_t_C_o_n_f_i_g is used as default values when
+              this user register agents.
+
+              The type of _V_a_l depends on _I_t_e_m:
+
+              community = string()
+              timeout = integer() | snmp_timer()
+              max_message_size = integer()
+              version = v1 | v2 | v3
+              sec_model = any | v1 | v2c | usm
+              sec_name = string()
+              sec_level = noAuthNoPriv | authNoPriv | authPriv
+
+
+       rreeggiisstteerr__uusseerr__mmoonniittoorr((IIdd,, MMoodduullee,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       rreeggiisstteerr__uusseerr__mmoonniittoorr((IIdd,, MMoodduullee,, DDaattaa,, DDeeffaauullttAAggeennttCCoonnffiigg)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Id = term()
+                 Module = snmpm_user()
+                 DefaultAgentConfig = [default_agent_config()]
+                 default_agent_config() = {Item, Val}
+                 Item = community | timeout | max_message_size | version |
+                 sec_model | sec_name | sec_level
+                 Val = term()
+                 Data = term()
+                 Reason = term()
+                 snmpm_user() = Module implementing the snmpm_user behaviour
+
+              Register the monitored manager entity (=user) responsible for
+              specific agent(s).
+
+              The process performing the registration will be monitored. Which
+              means that if that process should die, all agents registered by
+              that user process will be unregistered. All outstanding requests
+              will be canceled.
+
+              _M_o_d_u_l_e is the callback module (snmpm_user behaviour) which will
+              be called whenever something happens (detected agent, incoming
+              reply or incoming trap/notification). Note that this could have
+              already been done as a consequence of the node config. (see
+              users.conf).
+
+              The argument _D_e_f_a_u_l_t_A_g_e_n_t_C_o_n_f_i_g is used as default values when
+              this user register agents.
+
+              The type of _V_a_l depends on _I_t_e_m:
+
+              community = string()
+              timeout = integer() | snmp_timer()
+              max_message_size = integer()
+              version = v1 | v2 | v3
+              sec_model = any | v1 | v2c | usm
+              sec_name = string()
+              sec_level = noAuthNoPriv | authNoPriv | authPriv
+
+
+       uunnrreeggiisstteerr__uusseerr((IIdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Id = term()
+
+              Unregister the user.
+
+       wwhhiicchh__uusseerrss(()) -->> UUsseerrss
+
+              Types:
+
+                 Users = [UserId]
+                 UserId = term()
+
+              Get a list of the identities of all registered users.
+
+       rreeggiisstteerr__aaggeenntt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonnffiigg)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 Addr = ip_address()
+                 TargetName = target_name()
+                 Config = [agent_config()]
+                 agent_config() = {Item, Val}
+                 Item = engine_id | address | port | community | timeout |
+                 max_message_size | version | sec_model | sec_name | sec_level
+                 | tdomain
+                 Val = term()
+                 Reason = term()
+
+              Explicitly instruct the manager to handle this agent, with
+              _U_s_e_r_I_d as the responsible user.
+
+              Called to instruct the manager that this agent shall be handled.
+              This function is used when the user knows in advance which
+              agents the manager shall handle. Note that there is an alternate
+              way to do the same thing: Add the agent to the manager config
+              files (see aaggeennttss..ccoonnff).
+
+              _T_a_r_g_e_t_N_a_m_e is a non-empty string, uniquely identifying the
+              agent.
+
+              The type of _V_a_l depends on _I_t_e_m:
+
+              [mandatory] engine_id = string()
+              [mandatory] address = ip_address()
+              [optional]  port = integer()
+              [optional]  tdomain = transportDomainUdpIpv4 | transportDomainUdpIpv6
+              [optional]  community = string()
+              [optional]  timeout = integer() | snmp_timer()
+              [optional]  max_message_size = integer()
+              [optional]  version = v1 | v2 | v3
+              [optional]  sec_model = any | v1 | v2c | usm
+              [optional]  sec_name = string()
+              [optional]  sec_level = noAuthNoPriv | authNoPriv | authPriv
+
+
+              Note that if no _t_d_o_m_a_i_n is given, the default value,
+              _t_r_a_n_s_p_o_r_t_D_o_m_a_i_n_U_d_p_I_p_v_4, is used.
+
+              Note that if no _p_o_r_t is given, the default value is used.
+
+       uunnrreeggiisstteerr__aaggeenntt((UUsseerrIIdd,, TTaarrggeettNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+
+              Unregister the agent.
+
+       aaggeenntt__iinnffoo((TTaarrggeettNNaammee,, IItteemm)) -->> {{ookk,, VVaall}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TargetName = target_name()
+                 Item = atom()
+                 Reason = term()
+
+              Retrieve agent config.
+
+       uuppddaattee__aaggeenntt__iinnffoo((UUsseerrIIdd,, TTaarrggeettNNaammee,, IInnffoo)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       uuppddaattee__aaggeenntt__iinnffoo((UUsseerrIIdd,, TTaarrggeettNNaammee,, IItteemm,, VVaall)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 Info = [{item(), item_value()}]
+                 Item = item()
+                 item() = atom()
+                 Val = item_value()
+                 item_value() = term()
+                 Reason = term()
+
+              Update agent config. The function _u_p_d_a_t_e___a_g_e_n_t___i_n_f_o_/_3 should be
+              used when several values needs to be updated atomically.
+
+              See function rreeggiisstteerr__aaggeenntt) for more info about what kind of
+              items are allowed.
+
+       wwhhiicchh__aaggeennttss(()) -->> AAggeennttss
+       wwhhiicchh__aaggeennttss((UUsseerrIIdd)) -->> AAggeennttss
+
+              Types:
+
+                 UserId = term()
+                 Agents = [TargetName]
+                 TargetName = target_name()
+
+              Get a list of all registered agents or all agents registered by
+              a specific user.
+
+       rreeggiisstteerr__uussmm__uusseerr((EEnnggiinneeIIDD,, UUsseerrNNaammee,, CCoonnff)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 EngineID = string()
+                 UserName = string()
+                 Conf = [usm_config()]
+                 usm_config() = {Item, Val}
+                 Item = sec_name | auth | auth_key | priv | priv_key
+                 Val = term()
+                 Reason = term()
+
+              Explicitly instruct the manager to handle this USM user. Note
+              that there is an alternate way to do the same thing: Add the usm
+              user to the manager config files (see uussmm..ccoonnff).
+
+              The type of _V_a_l depends on _I_t_e_m:
+
+              sec_name = string()
+              auth = usmNoAuthProtocol | usmHMACMD5AuthProtocol | usmHMACSHAAuthProtocoltimeout
+              auth_key = [integer()]   (length 16 if auth = usmHMACMD5AuthProtocol,
+                                        length 20 if auth = usmHMACSHAAuthProtocol)
+              priv = usmNoPrivProtocol | usmDESPrivProtocol | usmAesCfb128Protocol
+              priv_key = [integer()]   (length is 16 if priv = usmDESPrivProtocol | usmAesCfb128Protocol).
+
+
+       uunnrreeggiisstteerr__uussmm__uusseerr((EEnnggiinneeIIDD,, UUsseerrNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 EngineID = string()
+                 UserName = string()
+                 Reason = term()
+
+              Unregister this USM user.
+
+       uussmm__uusseerr__iinnffoo((EEnnggiinneeIIDD,, UUsseerrNNaammee,, IItteemm)) -->> {{ookk,, VVaall}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 EngineID = string()
+                 UsmName = string()
+                 Item = sec_name | auth | auth_key | priv | priv_key
+                 Reason = term()
+
+              Retrieve usm user config.
+
+       uuppddaattee__uussmm__uusseerr__iinnffoo((EEnnggiinneeIIDD,, UUsseerrNNaammee,, IItteemm,, VVaall)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 EngineID = string()
+                 UsmName = string()
+                 Item = sec_name | auth | auth_key | priv | priv_key
+                 Val = term()
+                 Reason = term()
+
+              Update usm user config.
+
+       wwhhiicchh__uussmm__uusseerrss(()) -->> UUssmmUUsseerrss
+
+              Types:
+
+                 UsmUsers = [{EngineID,UserName}]
+                 EngineID = string()
+                 UsmName = string()
+
+              Get a list of all registered usm users.
+
+       wwhhiicchh__uussmm__uusseerrss((EEnnggiinneeIIDD)) -->> UUssmmUUsseerrss
+
+              Types:
+
+                 UsmUsers = [UserName]
+                 UserName = string()
+
+              Get a list of all registered usm users with engine-id _E_n_g_i_n_e_I_D.
+
+       ssyynncc__ggeett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, SSeennddOOppttss)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 Oids = [oid()]
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, ActualReason} |
+                 {invalid_sec_info, SecInfo, SnmpInfo} | term()
+                 ReqId = term()
+                 ActualReason = term()
+                 SecInfo = [sec_info()]
+                 sec_info() = {sec_tag(), ExpectedValue, ReceivedValue}
+                 sec_tag() = atom()
+                 ExpectedValue = ReceivedValue = term()
+                 SnmpInfo = term()
+
+              Synchronous _g_e_t_-_r_e_q_u_e_s_t.
+
+              _R_e_m_a_i_n_i_n_g is the remaining time of the given (or default)
+              timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _A_c_t_u_a_l_R_e_a_s_o_n is the
+              actual reason in this case.
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+              For _S_n_m_p_I_n_f_o, see the user callback function hhaannddllee__rreeppoorrtt.
+
+       ssyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, TTiimmeeoouutt)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, TTiimmeeoouutt)) -->> {{ookk,,
+       SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, TTiimmeeoouutt,, EExxttrraaIInnffoo)) -->>
+       {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 ContextName = string()
+                 Oids = [oid()]
+                 Timeout = integer()
+                 ExtraInfo = term()
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, R} | {invalid_sec_info,
+                 SecInfo, SnmpInfo} | term()
+                 R = term()
+                 SecInfo = [sec_info()]
+                 sec_info() = {sec_tag(), ExpectedValue, ReceivedValue}
+                 sec_tag() = atom()
+                 ExpectedValue = ReceivedValue = term()
+                 SnmpInfo = term()
+
+              Synchronous _g_e_t_-_r_e_q_u_e_s_t.
+
+              _R_e_m_a_i_n_i_n_g is the remaining time of the given or default timeout
+              time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _R is the actual
+              reason in this case.
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              For _S_n_m_p_I_n_f_o, see the user callback function hhaannddllee__rreeppoorrtt.
+
+       aassyynncc__ggeett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, SSeennddOOppttss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 Oids = [oid()]
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 ReqId = term()
+                 Reason = term()
+
+              Asynchronous _g_e_t_-_r_e_q_u_e_s_t.
+
+              The reply, if it arrives, will be delivered to the user through
+              a call to the snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The send option _t_i_m_e_o_u_t specifies for how long the request is
+              valid (after which the manager is free to delete it).
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+       aassyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, EExxppiirree)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       aassyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, EExxppiirree)) -->> {{ookk,, RReeqqIIdd}}
+       || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, EExxppiirree,, EExxttrraaIInnffoo)) -->>
+       {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 ContextName = string()
+                 Oids = [oid()]
+                 Expire = integer()
+                 ExtraInfo = term()
+                 ReqId = term()
+                 Reason = term()
+
+              Asynchronous _g_e_t_-_r_e_q_u_e_s_t.
+
+              The reply, if it arrives, will be delivered to the user through
+              a call to the snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The _E_x_p_i_r_e time indicates for how long the request is valid
+              (after which the manager is free to delete it).
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       ssyynncc__ggeett__nneexxtt22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}}
+       || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__nneexxtt22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, SSeennddOOppttss)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 Oids = [oid()]
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, ActualReason} |
+                 {invalid_sec_info, SecInfo, SnmpInfo} | term()
+                 ReqId = term()
+                 ActualReason = term()
+                 SecInfo = [sec_info()]
+                 sec_info() = {sec_tag(), ExpectedValue, ReceivedValue}
+                 sec_tag() = atom()
+                 ExpectedValue = ReceivedValue = term()
+                 SnmpInfo = term()
+
+              Synchronous _g_e_t_-_n_e_x_t_-_r_e_q_u_e_s_t.
+
+              _R_e_m_a_i_n_i_n_g is the remaining time of the given (or default)
+              timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _A_c_t_u_a_l_R_e_a_s_o_n is the
+              actual reason in this case.
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+              For _S_n_m_p_I_n_f_o, see the user callback function hhaannddllee__rreeppoorrtt.
+
+       ssyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, TTiimmeeoouutt)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, TTiimmeeoouutt)) -->> {{ookk,,
+       SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, TTiimmeeoouutt,,
+       EExxttrraaIInnffoo)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 ContextName = string()
+                 Oids = [oid()]
+                 Timeout = integer()
+                 ExtraInfo = term()
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, R} | {invalid_sec_info,
+                 SecInfo, SnmpInfo} | term()
+                 R = term()
+
+              Synchronous _g_e_t_-_n_e_x_t_-_r_e_q_u_e_s_t.
+
+              _R_e_m_a_i_n_i_n_g time of the given or default timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _R is the actual
+              reason in this case.
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       aassyynncc__ggeett__nneexxtt22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       aassyynncc__ggeett__nneexxtt22((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, SSeennddOOppttss)) -->> {{ookk,, RReeqqIIdd}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 Oids = [oid()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 ReqId = integer()
+                 Reason = term()
+
+              Asynchronous _g_e_t_-_n_e_x_t_-_r_e_q_u_e_s_t.
+
+              The reply will be delivered to the user through a call to the
+              snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The send option _t_i_m_e_o_u_t specifies for how long the request is
+              valid (after which the manager is free to delete it).
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+       aassyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       aassyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, OOiiddss,, EExxppiirree)) -->> {{ookk,, RReeqqIIdd}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, EExxppiirree)) -->> {{ookk,,
+       RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__nneexxtt((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, OOiiddss,, EExxppiirree,,
+       EExxttrraaIInnffoo)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 ContextName = string()
+                 Oids = [oid()]
+                 Expire = integer()
+                 ExtraInfo = term()
+                 ReqId = integer()
+                 Reason = term()
+
+              Asynchronous _g_e_t_-_n_e_x_t_-_r_e_q_u_e_s_t.
+
+              The reply will be delivered to the user through a call to the
+              snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The _E_x_p_i_r_e time indicates for how long the request is valid
+              (after which the manager is free to delete it).
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       ssyynncc__sseett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__sseett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss,, SSeennddOOppttss)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 VarsAndVals = vars_and_vals()
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, ActualReason} |
+                 {invalid_sec_info, SecInfo, SnmpInfo} | term()
+                 ReqId = term()
+                 ActualReason = term()
+                 SecInfo = [sec_info()]
+                 sec_info() = {sec_tag(), ExpectedValue, ReceivedValue}
+                 sec_tag() = atom()
+                 ExpectedValue = ReceivedValue = term()
+                 SnmpInfo = term()
+
+              Synchronous _s_e_t_-_r_e_q_u_e_s_t.
+
+              _R_e_m_a_i_n_i_n_g is the remaining time of the given (or default)
+              timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _A_c_t_u_a_l_R_e_a_s_o_n is the
+              actual reason in this case.
+
+              When _v_a_r___a_n_d___v_a_l_(_) is _{_o_i_d_(_)_, _v_a_l_u_e_(_)_}, the manager makes an
+              educated guess based on the loaded mibs.
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+              For _S_n_m_p_I_n_f_o, see the user callback function hhaannddllee__rreeppoorrtt.
+
+       ssyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}}
+       || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, VVaarrssAAnnddVVaallss)) -->> {{ookk,,
+       SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss,, TTiimmeeoouutt)) -->> {{ookk,, SSnnmmppRReeppllyy,,
+       RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, VVaarrssAAnnddVVaallss,, TTiimmeeoouutt)) -->> {{ookk,,
+       SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, VVaarrssAAnnddVVaallss,, TTiimmeeoouutt,,
+       EExxttrraaIInnffoo)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 ContextName = string()
+                 VarsAndVals = vars_and_vals()
+                 Timeout = integer()
+                 ExtraInfo = term()
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, ActualReason} |
+                 {invalid_sec_info, SecInfo, SnmpInfo} | term()
+                 ActualReason = term()
+
+              Synchronous _s_e_t_-_r_e_q_u_e_s_t.
+
+              _R_e_m_a_i_n_i_n_g time of the given or default timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _R is the actual
+              reason in this case.
+
+              When _v_a_r___a_n_d___v_a_l_(_) is _{_o_i_d_(_)_, _v_a_l_u_e_(_)_}, the manager makes an
+              educated guess based on the loaded mibs.
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       aassyynncc__sseett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       aassyynncc__sseett22((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss,, SSeennddOOppttss)) -->> {{ookk,, RReeqqIIdd}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 VarsAndVals = vars_and_vals()
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 ReqId = term()
+                 Reason = term()
+
+              Asynchronous _s_e_t_-_r_e_q_u_e_s_t.
+
+              The reply will be delivered to the user through a call to the
+              snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The send option _t_i_m_e_o_u_t specifies for how long the request is
+              valid (after which the manager is free to delete it).
+
+              When _v_a_r___a_n_d___v_a_l_(_) is _{_o_i_d_(_)_, _v_a_l_u_e_(_)_}, the manager makes an
+              educated guess based on the loaded mibs.
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+       aassyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,,
+       RReeaassoonn}}
+       aassyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, VVaarrssAAnnddVVaallss)) -->> {{ookk,, RReeqqIIdd}}
+       || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, VVaarrssAAnnddVVaallss,, EExxppiirree)) -->> {{ookk,, RReeqqIIdd}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, VVaarrssAAnnddVVaallss,, EExxppiirree)) -->> {{ookk,,
+       RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__sseett((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoonntteexxttNNaammee,, VVaarrssAAnnddVVaallss,, EExxppiirree,,
+       EExxttrraaIInnffoo)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 VarsAndVals = vars_and_vals()
+                 Expire = integer()
+                 ExtraInfo = term()
+                 ReqId = term()
+                 Reason = term()
+
+              Asynchronous _s_e_t_-_r_e_q_u_e_s_t.
+
+              The reply will be delivered to the user through a call to the
+              snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The _E_x_p_i_r_e time indicates for how long the request is valid
+              (after which the manager is free to delete it).
+
+              When _v_a_r___a_n_d___v_a_l_(_) is _{_o_i_d_(_)_, _v_a_l_u_e_(_)_}, the manager makes an
+              educated guess based on the loaded mibs.
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       ssyynncc__ggeett__bbuullkk22((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss)) -->> {{ookk,,
+       SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__bbuullkk22((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss,, SSeennddOOppttss)) -->>
+       {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 NonRep = integer()
+                 MaxRep = integer()
+                 Oids = [oid()]
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, ActualReason} |
+                 {invalid_sec_info, SecInfo, SnmpInfo} | term()
+                 ReqId = term()
+                 ActualReason = term()
+                 SecInfo = [sec_info()]
+                 sec_info() = {sec_tag(), ExpectedValue, ReceivedValue}
+                 sec_tag() = atom()
+                 ExpectedValue = ReceivedValue = term()
+                 SnmpInfo = term()
+
+              Synchronous _g_e_t_-_b_u_l_k_-_r_e_q_u_e_s_t (See RFC1905).
+
+              _R_e_m_a_i_n_i_n_g is the remaining time of the given (or default)
+              timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _A_c_t_u_a_l_R_e_a_s_o_n is the
+              actual reason in this case.
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes, with one exception, no use of this info, so
+              the only use for it in such a option (when using the built in
+              net-if) would be tracing. The one usage exception is: _A_n_y tuple
+              with _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+              For _S_n_m_p_I_n_f_o, see the user callback function hhaannddllee__rreeppoorrtt.
+
+       ssyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss)) -->> {{ookk,,
+       SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, CCoonntteexxttNNaammee,, OOiiddss)) -->>
+       {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss,, TTiimmeeoouutt)) -->>
+       {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, CCoonntteexxttNNaammee,, OOiiddss,,
+       TTiimmeeoouutt)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+       ssyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTrraaggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, CCoonntteexxttNNaammee,, OOiiddss,,
+       TTiimmeeoouutt,, EExxttrraaIInnffoo)) -->> {{ookk,, SSnnmmppRReeppllyy,, RReemmaaiinniinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 NonRep = integer()
+                 MaxRep = integer()
+                 ContextName = string()
+                 Oids = [oid()]
+                 Timeout = integer()
+                 ExtraInfo = term()
+                 SnmpReply = snmp_reply()
+                 Remaining = integer()
+                 Reason = {send_failed, ReqId, R} | {invalid_sec_info,
+                 SecInfo, SnmpInfo} | term()
+
+              Synchronous _g_e_t_-_b_u_l_k_-_r_e_q_u_e_s_t (See RFC1905).
+
+              _R_e_m_a_i_n_i_n_g time of the given or default timeout time.
+
+              When _R_e_a_s_o_n is _{_s_e_n_d___f_a_i_l_e_d_, _._._._} it means that the net_if
+              process failed to send the message. This could happen because of
+              any number of reasons, i.e. encoding error. _R is the actual
+              reason in this case.
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       aassyynncc__ggeett__bbuullkk22((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss)) -->> {{ookk,,
+       RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__bbuullkk22((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss,, SSeennddOOppttss)) -->>
+       {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 NonRep = integer()
+                 MaxRep = integer()
+                 Oids = [oid()]
+                 SendOpts = send_opts()
+                 send_opts() = [send_opt()]
+                 send_opt() = {context, string()} | {timeout, pos_integer()} |
+                 {extra, term()} | {community, community()} | {sec_model,
+                 sec_model()} | {sec_name, string()} | {sec_level,
+                 sec_level()} | {max_message_size, pos_integer()}
+                 ReqId = integer()
+                 Reason = term()
+
+              Asynchronous _g_e_t_-_b_u_l_k_-_r_e_q_u_e_s_t (See RFC1905).
+
+              The reply will be delivered to the user through a call to the
+              snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The send option _t_i_m_e_o_u_t specifies for how long the request is
+              valid (after which the manager is free to delete it).
+
+              The send option _e_x_t_r_a specifies an opaque data structure passed
+              on to the net-if process. The net-if process included in this
+              application makes no use of this info, so the only use for it in
+              such a configuration (when using the built in net-if) would be
+              tracing.
+
+              Some of the send options (_c_o_m_m_u_n_i_t_y, _s_e_c___m_o_d_e_l, _s_e_c___n_a_m_e,
+              _s_e_c___l_e_v_e_l and _m_a_x___m_e_s_s_a_g_e___s_i_z_e) are _o_v_e_r_r_i_d_e _o_p_t_i_o_n_s. That is,
+              for _t_h_i_s request, they override any configuration done when the
+              agent was registered.
+
+       aassyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss)) -->> {{ookk,, RReeqqIIdd}}
+       || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, CCoonntteexxttNNaammee,, OOiiddss))
+       -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, OOiiddss,, EExxppiirree)) -->>
+       {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, CCoonntteexxttNNaammee,, OOiiddss,,
+       EExxppiirree)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+       aassyynncc__ggeett__bbuullkk((UUsseerrIIdd,, TTaarrggeettNNaammee,, NNoonnRReepp,, MMaaxxRReepp,, CCoonntteexxttNNaammee,, OOiiddss,,
+       EExxppiirree,, EExxttrraaIInnffoo)) -->> {{ookk,, RReeqqIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 TargetName = target_name()
+                 NonRep = integer()
+                 MaxRep = integer()
+                 ContextName = string()
+                 Oids = [oid()]
+                 Expire = integer()
+                 ExtraInfo = term()
+                 ReqId = integer()
+                 Reason = term()
+
+              Asynchronous _g_e_t_-_b_u_l_k_-_r_e_q_u_e_s_t (See RFC1905).
+
+              The reply will be delivered to the user through a call to the
+              snmpm_user callback function _h_a_n_d_l_e___p_d_u.
+
+              The _E_x_p_i_r_e time indicates for how long the request is valid
+              (after which the manager is free to delete it).
+
+              _E_x_t_r_a_I_n_f_o is an opaque data structure passed on to the net-if
+              process. The net-if process included in this application makes,
+              with one exception, no use of this info, so the only use for it
+              in such a configuration (when using the built in net-if) would
+              be tracing. The one usage exception is: _A_n_y tuple with
+              _s_n_m_p_m___e_x_t_r_a___i_n_f_o___t_a_g as its first element is reserved for
+              internal use.
+
+       ccaanncceell__aassyynncc__rreeqquueesstt((UUsseerrIIdd,, RReeqqIIdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UserId = term()
+                 ReqId = term()
+                 Reason = term()
+
+              Cancel a previous asynchronous request.
+
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss))
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt,, SSttoopp)) -->> ookk
+       || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 LogDir = string()
+                 Mibs = [MibName]
+                 MibName = string()
+                 OutFile = string()
+                 LogName = string()
+                 LogFile = string()
+                 Start = Stop = null | datetime() | {local_time,datetime()} |
+                 {universal_time,datetime()}
+                 Reason = disk_log_open_error() | file_open_error() | term()
+                 disk_log_open_error() = {LogName, term()}
+                 file_open_error() = {OutFile, term()}
+
+              Converts an Audit Trail Log to a readable text file. _O_u_t_F_i_l_e
+              defaults to "./snmpm_log.txt". _L_o_g_N_a_m_e defaults to "snmpm_log".
+              _L_o_g_F_i_l_e defaults to "snmpm.log". See ssnnmmpp::lloogg__ttoo__ttxxtt for more
+              info.
+
+       lloogg__ttoo__iioo((LLooggDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt,, SSttoopp)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 LogDir = string()
+                 Mibs = [MibName]
+                 MibName = string()
+                 LogName = string()
+                 LogFile = string()
+                 Start = Stop = null | datetime() | {local_time,datetime()} |
+                 {universal_time,datetime()}
+                 Reason = disk_log_open_error() | file_open_error() | term()
+                 disk_log_open_error() = {LogName, term()}
+                 file_open_error() = {OutFile, term()}
+
+              Converts an Audit Trail Log to a readable format and prints it
+              on stdio. _L_o_g_N_a_m_e defaults to "snmpm_log". _L_o_g_F_i_l_e defaults to
+              "snmpm.log". See ssnnmmpp::lloogg__ttoo__iioo for more info.
+
+       cchhaannggee__lloogg__ssiizzee((NNeewwSSiizzee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 NewSize = {MaxBytes, MaxFiles}
+                 MaxBytes = integer()
+                 MaxFiles = integer()
+                 Reason = term()
+
+              Changes the log size of the Audit Trail Log. The application
+              must be configured to use the audit trail log function. Please
+              refer to disk_log(3) in Kernel Reference Manual for a
+              description of how to change the log size.
+
+              The change is permanent, as long as the log is not deleted. That
+              means, the log size is remembered across reboots.
+
+       sseett__lloogg__ttyyppee((NNeewwTTyyppee)) -->> {{ookk,, OOllddTTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 NewType = OldType = atl_type()
+                 Reason = term()
+
+              Changes the run-time Audit Trail log type.
+
+              Note that this has no effect on the application configuration as
+              defined by configuration files, so a node restart will revert
+              the config to whatever is in those files.
+
+              This function is primarily useful in testing/debugging
+              scenarios.
+
+       llooaadd__mmiibb((MMiibb)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Mib = MibName
+                 MibName = string()
+                 Reason = term()
+
+              Load a _M_i_b into the manager. The _M_i_b_N_a_m_e is the name of the Mib,
+              including the path to where the compiled mib is found. For
+              example,
+
+                        Dir = code:priv_dir(my_app) ++ "/mibs/",
+                        snmpm:load_mib(Dir ++ "MY-MIB").
+
+
+       uunnllooaadd__mmiibb((MMiibb)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Mib = MibName
+                 MibName = string()
+                 Reason = term()
+
+              Unload a _M_i_b from the manager. The _M_i_b_N_a_m_e is the name of the
+              Mib, including the path to where the compiled mib is found. For
+              example,
+
+                        Dir = code:priv_dir(my_app) ++ "/mibs/",
+                        snmpm:unload_mib(Dir ++ "MY-MIB").
+
+
+       wwhhiicchh__mmiibbss(()) -->> MMiibbss
+
+              Types:
+
+                 Mibs = [{MibName, MibFile}]
+                 MibName = atom()
+                 MibFile = string()
+
+              Get a list of all the mib's loaded into the manager.
+
+       nnaammee__ttoo__ooiidd((NNaammee)) -->> {{ookk,, OOiiddss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = atom()
+                 Oids = [oid()]
+
+              Transform a alias-name to its oid.
+
+              Note that an alias-name is only unique within the mib, so when
+              loading several mib's into a manager, there might be several
+              instances of the same aliasname.
+
+       ooiidd__ttoo__nnaammee((OOiidd)) -->> {{ookk,, NNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Oid = oid()
+                 Name = atom()
+                 Reason = term()
+
+              Transform a oid to its aliasname.
+
+       ooiidd__ttoo__ttyyppee((OOiidd)) -->> {{ookk,, TTyyppee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Oid = oid()
+                 Type = atom()
+                 Reason = term()
+
+              Retreive the type (asn1 bertype) of an oid.
+
+       bbaacckkuupp((BBaacckkuuppDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 BackupDir = string()
+
+              Backup persistent data handled by the manager.
+
+              BackupDir cannot be identical to DbDir.
+
+       iinnffoo(()) -->> [[{{KKeeyy,, VVaalluuee}}]]
+
+              Types:
+
+                 Key = atom()
+                 Value = term()
+
+              Returns a list (a dictionary) containing information about the
+              manager. Information includes statistics counters, miscellaneous
+              info about each process (e.g. memory allocation), and so on.
+
+       vveerrbboossiittyy((RReeff,, VVeerrbboossiittyy)) -->> vvooiidd(())
+
+              Types:
+
+                 Ref = server | config | net_if | note_store | all
+                 Verbosity = verbosity()
+                 verbosity() = silence | info | log | debug | trace
+
+              Sets verbosity for the designated process. For the lowest
+              verbosity _s_i_l_e_n_c_e, nothing is printed. The higher the verbosity,
+              the more is printed.
+
+       ffoorrmmaatt__rreeaassoonn((RReeaassoonn)) -->> ssttrriinngg(())
+       ffoorrmmaatt__rreeaassoonn((PPrreeffiixx,, RReeaassoonn)) -->> ssttrriinngg(())
+
+              Types:
+
+                 Reason = term()
+                 Prefix = integer() | string()
+
+              This utility function is used to create a formatted (pretty
+              printable) string of the error reason received from either:
+
+                * The _R_e_a_s_o_n returned value if any of the sync/async get/get-
+                  next/set/get-bulk functions returns _{_e_r_r_o_r_, _R_e_a_s_o_n_}
+
+                * The _R_e_a_s_o_n parameter in the hhaannddllee__eerrrroorr user callback
+                  function.
+
+              _P_r_e_f_i_x should either be an indention string (e.g. a list of
+              spaces) or a positive integer (which will be used to create the
+              indention string of that length).
+
+
+
+Ericsson AB                       snmp 4.22.1                         snmpm(3)

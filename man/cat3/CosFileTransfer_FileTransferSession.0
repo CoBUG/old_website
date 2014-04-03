@@ -1,0 +1,151 @@
+CosFileTransfer_FileTransferESrelsasnigonM(o3d)uleCDoesfFiinlietTiroannsfer_FileTransferSession(3)
+
+
+
+NNAAMMEE
+       CosFileTransfer_FileTransferSession - This module implements the OMG
+       CosFileTransfer::FileTransferSession interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_F_i_l_e_T_r_a_n_s_f_e_r_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ''__ggeett__pprroottooccoollss__ssuuppppoorrtteedd''((FFTTSS)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = #objref
+                 Return =
+                 [#'CosFileTransfer_ProtocolSupport'{protocol_name=Type,
+                 addresses=[Address]}]
+                 Type = Address = string()
+
+              This read only attribute returns the protocols supported by the
+              target object.
+
+       sseett__ddiirreeccttoorryy((FFTTSS,, DDiirreeccttoorryy)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = Directory = #objref
+                 Return = ok | {'EXCEPTION, E}
+
+              Invoking this operation will change the current working
+              directory of the target object's associated file system. If fail
+              to do so the appropriate exception is raised.
+
+       ccrreeaattee__ffiillee((FFTTSS,, FFiilleeNNaammeeLLiisstt)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = #objref
+                 FileNameList = [string()]
+                 Return = File | {'EXCEPTION, E}
+                 File = #objref
+
+              This operation creates a _F_i_l_e Object representing a file which
+              may or may not exist. For this operation to be independent of
+              the working directory the supplied _F_i_l_e_N_a_m_e_L_i_s_t must represent
+              the absolute name.
+
+       ccrreeaattee__ddiirreeccttoorryy((FFTTSS,, FFiilleeNNaammeeLLiisstt)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = #objref
+                 FileNameList = [string()]
+                 Return = Directory | {'EXCEPTION, E}
+                 Directory = #objref
+
+              This operation creates a new directory in the target objects
+              associated file systems domain. If fail to do so an exception is
+              raised but, if successful, a _D_i_r_e_c_t_o_r_y object representing the
+              new directory is returned.
+
+       ggeett__ffiillee((FFTTSS,, FFiilleeNNaammeeLLiisstt)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = #objref
+                 FileNameList = [string()]
+                 Return = FileWrapper | {'EXCEPTION, E}
+                 FileWrapper = #'CosFileTransfer_FileWrapper'{the_file = File
+                 file_type = Type}
+                 File = #objref
+                 Type = nfile | ndirectory
+
+              This operation, creates a _F_i_l_e_W_r_a_p_p_e_r which represents a file or
+              directory, and should be independent of the working Directory,
+              i.e., a full path name must be supplied. Furthermore, the file
+              or directory represented by the _F_i_l_e_N_a_m_e_L_i_s_t must exist.
+
+       ddeelleettee((FFTTSS,, FFiillee)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = File = #objref
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation removes the file or directory, represented by the
+              _F_i_l_e object, from the target objects associated file system. If
+              it is a non-empty directory or non-existing file or directory an
+              exception is raised.
+
+       ttrraannssffeerr((FFTTSS,, SSoouurrcceeFFiillee,, DDeessttiinnaattiioonnFFiillee)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = SourceFile = DestinationFile = #objref
+                 Return = ok | {'EXCEPTION', E}
+
+              If the target object's and the _D_e_s_t_i_n_a_t_i_o_n_F_i_l_e_'_s associated
+              _F_i_l_e_T_r_a_n_s_f_e_r_S_e_s_s_i_o_n_'_s support the same protocol(s) this
+              operation will copy the file represented by the _S_o_u_r_c_e_F_i_l_e from
+              the target object's file system to a file in the destination
+              _F_i_l_e_T_r_a_n_s_f_e_r_S_e_s_s_i_o_n_'_s file system. The file is represented by
+              the _D_e_s_t_i_n_a_t_i_o_n_F_i_l_e object and may not exist. This operation
+              must be invoked on the _F_i_l_e_T_r_a_n_s_f_e_r_S_e_s_s_i_o_n associated with the
+              _S_o_u_r_c_e_F_i_l_e object.
+
+       aappppeenndd((FFTTSS,, SSoouurrcceeFFiillee,, DDeessttiinnaattiioonnFFiillee)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = SourceFile = DestinationFile = #objref
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation behaves almost like the _t_r_a_n_s_f_e_r_/_3 operation. The
+              difference is that the _D_e_s_t_i_n_a_t_i_o_n_F_i_l_e must exist since the
+              _S_o_u_r_c_e_F_i_l_e will be appended to the _D_e_s_t_i_n_a_t_i_o_n_F_i_l_e.
+
+              Currently, it is not possible to use this operation when the
+              target object represents FTP.
+
+       iinnsseerrtt((FFTTSS,, SSoouurrcceeFFiillee,, DDeessttiinnaattiioonnFFiillee,, OOffffsseett)) -->> RReettuurrnn
+
+              Types:
+
+                 FTS = SourceFile = DestinationFile = #objref
+                 Offset = long()
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation behaves almost like the _a_p_p_e_n_d_/_3 operation. The
+              difference is that the _S_o_u_r_c_e_F_i_l_e will be inserted into the
+              _D_e_s_t_i_n_a_t_i_o_n_F_i_l_e _O_f_f_s_e_t bytes from the start of the file.
+
+              Currently, it is not possible to use this operation when the
+              target object represents FTP.
+
+       llooggoouutt((FFTTSS)) -->> ookk
+
+              Types:
+
+                 FTS = #objref
+
+              This operation terminates the target object and closes the
+              connection to the file system it represents.
+
+
+
+Ericsson AB                 cosFileTransfCeorsF1i.l1e.T1r3ansfer_FileTransferSession(3)

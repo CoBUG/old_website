@@ -1,0 +1,106 @@
+wxBufferedDC(3)            Erlang Module Definition            wxBufferedDC(3)
+
+
+
+NNAAMMEE
+       wxBufferedDC - See external documentation: wxBufferedDC.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxBufferedDC.
+
+       This class is derived (and can use functions) from:
+       wwxxMMeemmoorryyDDCC
+       wwxxDDCC
+
+DDAATTAA TTYYPPEESS
+         _w_x_B_u_f_f_e_r_e_d_D_C_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxBBuuffffeerreeddDDCC(())
+
+              See external documentation.
+
+       nneeww((DDcc)) -->> wwxxBBuuffffeerreeddDDCC(())
+
+              Types:
+
+                 Dc = wxDC() (see module wxDC)
+
+              Equivalent to nneeww((DDcc,, [[]])).
+
+       nneeww((DDcc,, AArreeaa)) -->> wwxxBBuuffffeerreeddDDCC(())
+
+              Types:
+
+                 Dc = wxDC() (see module wxDC)
+                 Area = {W::integer(), H::integer()}
+
+              See external documentation.
+              Also:
+              new(Dc, [Option]) -> wxBufferedDC() when
+              Dc::wxDC:wxDC(),
+              Option :: {buffer, wxBitmap:wxBitmap()}
+              | {style, integer()}.
+
+
+       nneeww((DDcc,, AArreeaa,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBuuffffeerreeddDDCC(())
+
+              Types:
+
+                 Dc = wxDC() (see module wxDC)
+                 Area = {W::integer(), H::integer()}
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       iinniitt((TThhiiss,, DDcc)) -->> ookk
+
+              Types:
+
+                 This = wxBufferedDC()
+                 Dc = wxDC() (see module wxDC)
+
+              Equivalent to iinniitt((TThhiiss,, DDcc,, [[]])).
+
+       iinniitt((TThhiiss,, DDcc,, AArreeaa)) -->> ookk
+
+              Types:
+
+                 This = wxBufferedDC()
+                 Dc = wxDC() (see module wxDC)
+                 Area = {W::integer(), H::integer()}
+
+              See external documentation.
+              Also:
+              init(This, Dc, [Option]) -> ok when
+              This::wxBufferedDC(), Dc::wxDC:wxDC(),
+              Option :: {buffer, wxBitmap:wxBitmap()}
+              | {style, integer()}.
+
+
+       iinniitt((TThhiiss,, DDcc,, AArreeaa,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxBufferedDC()
+                 Dc = wxDC() (see module wxDC)
+                 Area = {W::integer(), H::integer()}
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxBBuuffffeerreeddDDCC(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxBufferedDC(3)

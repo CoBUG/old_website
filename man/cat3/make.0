@@ -1,0 +1,111 @@
+make(3)                    Erlang Module Definition                    make(3)
+
+
+
+NNAAMMEE
+       make - A Make Utility for Erlang
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _m_a_k_e provides a set of functions similar to the UNIX type
+       _M_a_k_e functions.
+
+EEXXPPOORRTTSS
+       aallll(()) -->> uupp__ttoo__ddaattee || eerrrroorr
+       aallll((OOppttiioonnss)) -->> uupp__ttoo__ddaattee || eerrrroorr
+
+              Types:
+
+                 Options = [Option]
+                  Option = noexec | load | netload | <compiler option>
+
+              This function first looks in the current working directory for a
+              file named _E_m_a_k_e_f_i_l_e (see below) specifying the set of modules
+              to compile and the compile options to use. If no such file is
+              found, the set of modules to compile defaults to all modules in
+              the current working directory.
+
+              Traversing the set of modules, it then recompiles every module
+              for which at least one of the following conditions apply:
+
+                * there is no object file, or
+
+                * the source file has been modified since it was last
+                  compiled, or,
+
+                * an include file has been modified since the source file was
+                  last compiled.
+
+              As a side effect, the function prints the name of each module it
+              tries to compile. If compilation fails for a module, the make
+              procedure stops and _e_r_r_o_r is returned.
+
+              _O_p_t_i_o_n_s is a list of make- and compiler options. The following
+              make options exist:
+
+                * _n_o_e_x_e_c
+                   No execution mode. Just prints the name of each module that
+                  needs to be compiled.
+
+                * _l_o_a_d
+                   Load mode. Loads all recompiled modules.
+
+                * _n_e_t_l_o_a_d
+                   Net load mode. Loads all recompiled modules an all known
+                  nodes.
+
+              All items in _O_p_t_i_o_n_s that are not make options are assumed to be
+              compiler options and are passed as-is to _c_o_m_p_i_l_e_:_f_i_l_e_/_2. _O_p_t_i_o_n_s
+              defaults to _[_].
+
+       ffiilleess((MMooddFFiilleess)) -->> uupp__ttoo__ddaattee || eerrrroorr
+       ffiilleess((MMooddFFiilleess,, OOppttiioonnss)) -->> uupp__ttoo__ddaattee || eerrrroorr
+
+              Types:
+
+                 ModFiles = [Module | File]
+                  Module = atom()
+                  File = string()
+                 Options = [Option]
+                  Option = noexec | load | netload | <compiler option>
+
+              _f_i_l_e_s_/_1_,_2 does exactly the same thing as _a_l_l_/_0_,_1 but for the
+              specified _M_o_d_F_i_l_e_s, which is a list of module or file names. The
+              file extension _._e_r_l may be omitted.
+
+              The _E_m_a_k_e_f_i_l_e (if it exists) in the current directory is
+              searched for compiler options for each module. If a given module
+              does not exist in _E_m_a_k_e_f_i_l_e or if _E_m_a_k_e_f_i_l_e does not exist, the
+              module is still compiled.
+
+EEMMAAKKEEFFIILLEE
+       _m_a_k_e_:_a_l_l_/_0_,_1 and _m_a_k_e_:_f_i_l_e_s_/_1_,_2 looks in the current working directory
+       for a file named _E_m_a_k_e_f_i_l_e. If it exists, _E_m_a_k_e_f_i_l_e should contain
+       elements like this:
+
+       Modules.
+       {Modules,Options}.
+
+       _M_o_d_u_l_e_s is an atom or a list of atoms. It can be
+
+         * a module name, e.g. _f_i_l_e_1
+
+         * a module name in another directory, e.g. _._._/_f_o_o_/_f_i_l_e_3
+
+         * a set of modules specified with a wildcards, e.g. _'_f_i_l_e_*_'
+
+         * a wildcard indicating all modules in current directory, i.e. _'_*_'
+
+         * a list of any of the above, e.g. _[_'_f_i_l_e_*_'_,_'_._._/_f_o_o_/_f_i_l_e_3_'_,_'_F_i_l_e_4_'_]
+
+       _O_p_t_i_o_n_s is a list of compiler options.
+
+       _E_m_a_k_e_f_i_l_e is read from top to bottom. If a module matches more than one
+       entry, the first match is valid. For example, the following _E_m_a_k_e_f_i_l_e
+       means that _f_i_l_e_1 shall be compiled with the options
+       _[_d_e_b_u_g___i_n_f_o_,_{_i_,_"_._._/_f_o_o_"_}_], while all other files in the current
+       directory shall be compiled with only the _d_e_b_u_g___i_n_f_o flag.
+
+       {'file1',[debug_info,{i,"../foo"}]}.
+       {'*',[debug_info]}.
+
+Ericsson AB                       tools 2.6.8                          make(3)

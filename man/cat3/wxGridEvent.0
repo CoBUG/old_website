@@ -1,0 +1,105 @@
+wxGridEvent(3)             Erlang Module Definition             wxGridEvent(3)
+
+
+
+NNAAMMEE
+       wxGridEvent - See external documentation: wxGridEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _g_r_i_d___c_e_l_l___l_e_f_t___c_l_i_c_k, _g_r_i_d___c_e_l_l___r_i_g_h_t___c_l_i_c_k, _g_r_i_d___c_e_l_l___l_e_f_t___d_c_l_i_c_k,
+           _g_r_i_d___c_e_l_l___r_i_g_h_t___d_c_l_i_c_k, _g_r_i_d___l_a_b_e_l___l_e_f_t___c_l_i_c_k,
+           _g_r_i_d___l_a_b_e_l___r_i_g_h_t___c_l_i_c_k, _g_r_i_d___l_a_b_e_l___l_e_f_t___d_c_l_i_c_k,
+           _g_r_i_d___l_a_b_e_l___r_i_g_h_t___d_c_l_i_c_k, _g_r_i_d___r_o_w___s_i_z_e, _g_r_i_d___c_o_l___s_i_z_e,
+           _g_r_i_d___r_a_n_g_e___s_e_l_e_c_t, _g_r_i_d___c_e_l_l___c_h_a_n_g_e, _g_r_i_d___s_e_l_e_c_t___c_e_l_l,
+           _g_r_i_d___e_d_i_t_o_r___s_h_o_w_n, _g_r_i_d___e_d_i_t_o_r___h_i_d_d_e_n, _g_r_i_d___e_d_i_t_o_r___c_r_e_a_t_e_d,
+           _g_r_i_d___c_e_l_l___b_e_g_i_n___d_r_a_g
+
+       See also the message variant ##wwxxGGrriidd{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxNNoottiiffyyEEvveenntt
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       aallttDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       ccoonnttrroollDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       ggeettCCooll((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       ggeettRRooww((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       mmeettaaDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       sseelleeccttiinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+       sshhiiffttDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxGridEvent(3)

@@ -1,0 +1,90 @@
+wxCheckListBox(3)          Erlang Module Definition          wxCheckListBox(3)
+
+
+
+NNAAMMEE
+       wxCheckListBox - See external documentation: wxCheckListBox.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCheckListBox.
+
+       This class is derived (and can use functions) from:
+       wwxxLLiissttBBooxx
+       wwxxCCoonnttrroollWWiitthhIItteemmss
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_h_e_c_k_L_i_s_t_B_o_x_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCChheecckkLLiissttBBooxx(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxCChheecckkLLiissttBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxCChheecckkLLiissttBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {choices, [chardata() (see
+                 module unicode)]} | {style, integer()} | {validator,
+                 wx_object() (see module wx)}
+
+              See external documentation.
+
+       cchheecckk((TThhiiss,, IInnddeexx)) -->> ookk
+
+              Types:
+
+                 This = wxCheckListBox()
+                 Index = integer()
+
+              Equivalent to cchheecckk((TThhiiss,, IInnddeexx,, [[]])).
+
+       cchheecckk((TThhiiss,, IInnddeexx,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxCheckListBox()
+                 Index = integer()
+                 Option = {check, boolean()}
+
+              See external documentation.
+
+       iissCChheecckkeedd((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckListBox()
+                 Index = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxCChheecckkLLiissttBBooxx(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxCheckListBox(3)

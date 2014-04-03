@@ -1,0 +1,796 @@
+ct_ssh(3)                  Erlang Module Definition                  ct_ssh(3)
+
+
+
+NNAAMMEE
+       ct_ssh - SSH/SFTP client module.
+
+DDEESSCCRRIIPPTTIIOONN
+       SSH/SFTP client module.
+
+       ct_ssh uses the OTP ssh application and more detailed information about
+       e.g. functions, types and options can be found in the documentation for
+       this application.
+
+       The _S_e_r_v_e_r argument in the SFTP functions should only be used for SFTP
+       sessions that have been started on existing SSH connections (i.e. when
+       the original connection type is _s_s_h). Whenever the connection type is
+       _s_f_t_p, use the SSH connection reference only.
+
+       The following options are valid for specifying an SSH/SFTP connection
+       (i.e. may be used as config elements):
+
+           [{ConnType, Addr},
+            {port, Port},
+            {user, UserName}
+            {password, Pwd}
+            {user_dir, String}
+            {public_key_alg, PubKeyAlg}
+            {connect_timeout, Timeout}
+            {key_cb, KeyCallbackMod}]
+
+
+       _C_o_n_n_T_y_p_e _= _s_s_h _| _s_f_t_p.
+
+       Please see ssh(3) for other types.
+
+       All timeout parameters in ct_ssh functions are values in milliseconds.
+
+DDAATTAA TTYYPPEESS
+         _c_o_n_n_e_c_t_i_o_n_(_) _= _h_a_n_d_l_e_(_) _| _t_a_r_g_e_t___n_a_m_e_(_) _(_s_e_e _m_o_d_u_l_e _c_t_):
+
+
+         _h_a_n_d_l_e_(_) _= _h_a_n_d_l_e_(_) _(_s_e_e _m_o_d_u_l_e _c_t___g_e_n___c_o_n_n_):
+
+
+           Handle for a specific SSH/SFTP connection.
+
+         _s_s_h___s_f_t_p___r_e_t_u_r_n_(_) _= _t_e_r_m_(_):
+
+
+           A return value from an ssh_sftp function.
+
+EEXXPPOORRTTSS
+       aapprreeaadd((SSSSHH,, HHaannddllee,, PPoossiittiioonn,, LLeennggtthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aapprreeaadd((SSSSHH,, SSeerrvveerr,, HHaannddllee,, PPoossiittiioonn,, LLeennggtthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aappwwrriittee((SSSSHH,, HHaannddllee,, PPoossiittiioonn,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aappwwrriittee((SSSSHH,, SSeerrvveerr,, HHaannddllee,, PPoossiittiioonn,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aarreeaadd((SSSSHH,, HHaannddllee,, LLeenn)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aarreeaadd((SSSSHH,, SSeerrvveerr,, HHaannddllee,, LLeenn)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aawwrriittee((SSSSHH,, HHaannddllee,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       aawwrriittee((SSSSHH,, SSeerrvveerr,, HHaannddllee,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       cclloossee((SSSSHH,, HHaannddllee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       cclloossee((SSSSHH,, SSeerrvveerr,, HHaannddllee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ccoonnnneecctt((KKeeyyOOrrNNaammee)) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to ccoonnnneecctt((KKeeyyOOrrNNaammee,, hhoosstt,, [[]])).
+
+       ccoonnnneecctt((KKeeyyOOrrNNaammee,, CCoonnnnTTyyppee)) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to ccoonnnneecctt((KKeeyyOOrrNNaammee,, CCoonnnnTTyyppee,, [[]])).
+
+       ccoonnnneecctt((KKeeyyOOrrNNaammee,, CCoonnnnTTyyppee,, EExxttrraaOOppttss)) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 KeyOrName = Key | Name
+                 Key = atom()
+                 Name = target_name() (see module ct)
+                 ConnType = ssh | sftp | host
+                 ExtraOpts = ssh_connect_options()
+                 Handle = handle()
+                 Reason = term()
+
+              Open an SSH or SFTP connection using the information associated
+              with _K_e_y_O_r_N_a_m_e.
+
+              If _N_a_m_e (an alias name for _K_e_y), is used to identify the
+              connection, this name may be used as connection reference for
+              subsequent calls. It's only possible to have one open connection
+              at a time associated with _N_a_m_e. If _K_e_y is used, the returned
+              handle must be used for subsequent calls (multiple connections
+              may be opened using the config data specified by _K_e_y). See
+              _c_t_:_r_e_q_u_i_r_e_/_2 for how to create a new _N_a_m_e
+
+              _C_o_n_n_T_y_p_e will always override the type specified in the address
+              tuple in the configuration data (and in _E_x_t_r_a_O_p_t_s). So it is
+              possible to for example open an sftp connection directly using
+              data originally specifying an ssh connection. The value _h_o_s_t
+              means the connection type specified by the host option (either
+              in the configuration data or in _E_x_t_r_a_O_p_t_s) will be used.
+
+              _E_x_t_r_a_O_p_t_s (optional) are extra SSH options to be added to the
+              config data for _K_e_y_O_r_N_a_m_e. The extra options will override any
+              existing options with the same key in the config data. For
+              details on valid SSH options, see the documentation for the OTP
+              ssh application.
+
+              _S_e_e _a_l_s_o_: cctt::rreeqquuiirree//22.
+
+       ddeell__ddiirr((SSSSHH,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ddeell__ddiirr((SSSSHH,, SSeerrvveerr,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ddeelleettee((SSSSHH,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ddeelleettee((SSSSHH,, SSeerrvveerr,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ddiissccoonnnneecctt((SSSSHH)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 Reason = term()
+
+              Close an SSH/SFTP connection.
+
+       eexxeecc((SSSSHH,, CCoommmmaanndd)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to eexxeecc((SSSSHH,, CCoommmmaanndd,, DDeeffaauullttTTiimmeeoouutt)).
+
+       eexxeecc((SSSSHH,, CCoommmmaanndd,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 Command = string()
+                 Timeout = integer()
+                 Data = list()
+                 Reason = term()
+
+              Requests server to perform _C_o_m_m_a_n_d. A session channel is opened
+              automatically for the request. _D_a_t_a is received from the server
+              as a result of the command.
+
+       eexxeecc((SSSSHH,, CChhaannnneellIIdd,, CCoommmmaanndd,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 ChannelId = integer()
+                 Command = string()
+                 Timeout = integer()
+                 Data = list()
+                 Reason = term()
+
+              Requests server to perform _C_o_m_m_a_n_d. A previously opened session
+              channel is used for the request. _D_a_t_a is received from the
+              server as a result of the command.
+
+       ggeett__ffiillee__iinnffoo((SSSSHH,, HHaannddllee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ggeett__ffiillee__iinnffoo((SSSSHH,, SSeerrvveerr,, HHaannddllee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       lliisstt__ddiirr((SSSSHH,, PPaatthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       lliisstt__ddiirr((SSSSHH,, SSeerrvveerr,, PPaatthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       mmaakkee__ddiirr((SSSSHH,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       mmaakkee__ddiirr((SSSSHH,, SSeerrvveerr,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       mmaakkee__ssyymmlliinnkk((SSSSHH,, NNaammee,, TTaarrggeett)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       mmaakkee__ssyymmlliinnkk((SSSSHH,, SSeerrvveerr,, NNaammee,, TTaarrggeett)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ooppeenn((SSSSHH,, FFiillee,, MMooddee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ooppeenn((SSSSHH,, SSeerrvveerr,, FFiillee,, MMooddee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ooppeennddiirr((SSSSHH,, PPaatthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ooppeennddiirr((SSSSHH,, SSeerrvveerr,, PPaatthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ppoossiittiioonn((SSSSHH,, HHaannddllee,, LLooccaattiioonn)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ppoossiittiioonn((SSSSHH,, SSeerrvveerr,, HHaannddllee,, LLooccaattiioonn)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       pprreeaadd((SSSSHH,, HHaannddllee,, PPoossiittiioonn,, LLeennggtthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       pprreeaadd((SSSSHH,, SSeerrvveerr,, HHaannddllee,, PPoossiittiioonn,, LLeennggtthh)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ppwwrriittee((SSSSHH,, HHaannddllee,, PPoossiittiioonn,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       ppwwrriittee((SSSSHH,, SSeerrvveerr,, HHaannddllee,, PPoossiittiioonn,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd((SSSSHH,, HHaannddllee,, LLeenn)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd((SSSSHH,, SSeerrvveerr,, HHaannddllee,, LLeenn)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__ffiillee((SSSSHH,, FFiillee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__ffiillee((SSSSHH,, SSeerrvveerr,, FFiillee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__ffiillee__iinnffoo((SSSSHH,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__ffiillee__iinnffoo((SSSSHH,, SSeerrvveerr,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__lliinnkk((SSSSHH,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__lliinnkk((SSSSHH,, SSeerrvveerr,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__lliinnkk__iinnffoo((SSSSHH,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreeaadd__lliinnkk__iinnffoo((SSSSHH,, SSeerrvveerr,, NNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreecceeiivvee__rreessppoonnssee((SSSSHH,, CChhaannnneellIIdd)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to rreecceeiivvee__rreessppoonnssee((SSSSHH,, CChhaannnneellIIdd,, cclloossee)).
+
+       rreecceeiivvee__rreessppoonnssee((SSSSHH,, CChhaannnneellIIdd,, EEnndd)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to rreecceeiivvee__rreessppoonnssee((SSSSHH,, CChhaannnneellIIdd,, EEnndd,,
+              DDeeffaauullttTTiimmeeoouutt)).
+
+       rreecceeiivvee__rreessppoonnssee((SSSSHH,, CChhaannnneellIIdd,, EEnndd,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} ||
+       {{ttiimmeeoouutt,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 ChannelId = integer()
+                 End = Fun | close | timeout
+                 Timeout = integer()
+                 Data = list()
+                 Reason = term()
+
+              Receives expected data from server on the specified session
+              channel.
+
+              If _E_n_d _=_= _c_l_o_s_e, data is returned to the caller when the channel
+              is closed by the server. If a timeout occurs before this
+              happens, the function returns _{_t_i_m_e_o_u_t_,_D_a_t_a_} (where _D_a_t_a is the
+              data received so far). If _E_n_d _=_= _t_i_m_e_o_u_t, a timeout is expected
+              and _{_o_k_,_D_a_t_a_} is returned both in the case of a timeout and when
+              the channel is closed. If _E_n_d is a fun, this fun will be called
+              with one argument - the data value in a received _s_s_h___c_m message
+              (see ssh_connection(3)). The fun should return _t_r_u_e to end the
+              receiving operation (and have the so far collected data
+              returned), or _f_a_l_s_e to wait for more data from the server. (Note
+              that even if a fun is supplied, the function returns immediately
+              if the server closes the channel).
+
+       rreennaammee((SSSSHH,, OOllddNNaammee,, NNeewwNNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       rreennaammee((SSSSHH,, SSeerrvveerr,, OOllddNNaammee,, NNeewwNNaammee)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       sseenndd((SSSSHH,, CChhaannnneellIIdd,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to sseenndd((SSSSHH,, CChhaannnneellIIdd,, 00,, DDaattaa,, DDeeffaauullttTTiimmeeoouutt)).
+
+       sseenndd((SSSSHH,, CChhaannnneellIIdd,, DDaattaa,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to sseenndd((SSSSHH,, CChhaannnneellIIdd,, 00,, DDaattaa,, TTiimmeeoouutt)).
+
+       sseenndd((SSSSHH,, CChhaannnneellIIdd,, TTyyppee,, DDaattaa,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 ChannelId = integer()
+                 Type = integer()
+                 Data = list()
+                 Timeout = integer()
+                 Reason = term()
+
+              Send data to server on specified session channel.
+
+       sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, DDaattaa)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, DDaattaa,, cclloossee)).
+
+       sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, DDaattaa,, EEnndd)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Equivalent to sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, 00,, DDaattaa,, EEnndd,,
+              DDeeffaauullttTTiimmeeoouutt)).
+
+       sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, DDaattaa,, EEnndd,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, 00,, DDaattaa,, EEnndd,,
+              TTiimmeeoouutt)).
+
+       sseenndd__aanndd__rreecceeiivvee((SSSSHH,, CChhaannnneellIIdd,, TTyyppee,, DDaattaa,, EEnndd,, TTiimmeeoouutt)) -->> {{ookk,,
+       DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 ChannelId = integer()
+                 Type = integer()
+                 Data = list()
+                 End = Fun | close | timeout
+                 Timeout = integer()
+                 Reason = term()
+
+              Send data to server on specified session channel and wait to
+              receive the server response.
+
+              See _r_e_c_e_i_v_e___r_e_s_p_o_n_s_e_/_4 for details on the _E_n_d argument.
+
+       sseessssiioonn__cclloossee((SSSSHH,, CChhaannnneellIIdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 ChannelId = integer()
+                 Reason = term()
+
+              Closes an SSH session channel.
+
+       sseessssiioonn__ooppeenn((SSSSHH)) -->> {{ookk,, CChhaannnneellIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to sseessssiioonn__ooppeenn((SSSSHH,, DDeeffaauullttTTiimmeeoouutt)).
+
+       sseessssiioonn__ooppeenn((SSSSHH,, TTiimmeeoouutt)) -->> {{ookk,, CChhaannnneellIIdd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 Timeout = integer()
+                 ChannelId = integer()
+                 Reason = term()
+
+              Opens a channel for an SSH session.
+
+       ssffttpp__ccoonnnneecctt((SSSSHH)) -->> {{ookk,, SSeerrvveerr}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 Server = pid()
+                 Reason = term()
+
+              Starts an SFTP session on an already existing SSH connection.
+              _S_e_r_v_e_r identifies the new session and must be specified whenever
+              SFTP requests are to be sent.
+
+       ssuubbssyysstteemm((SSSSHH,, CChhaannnneellIIdd,, SSuubbssyysstteemm)) -->> SSttaattuuss || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to ssuubbssyysstteemm((SSSSHH,, CChhaannnneellIIdd,, SSuubbssyysstteemm,,
+              DDeeffaauullttTTiimmeeoouutt)).
+
+       ssuubbssyysstteemm((SSSSHH,, CChhaannnneellIIdd,, SSuubbssyysstteemm,, TTiimmeeoouutt)) -->> SSttaattuuss || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 SSH = connection()
+                 ChannelId = integer()
+                 Subsystem = string()
+                 Timeout = integer()
+                 Status = success | failure
+                 Reason = term()
+
+              Sends a request to execute a predefined subsystem.
+
+       wwrriittee((SSSSHH,, HHaannddllee,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       wwrriittee((SSSSHH,, SSeerrvveerr,, HHaannddllee,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       wwrriittee__ffiillee((SSSSHH,, FFiillee,, IIoolliisstt)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       wwrriittee__ffiillee((SSSSHH,, SSeerrvveerr,, FFiillee,, IIoolliisstt)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       wwrriittee__ffiillee__iinnffoo((SSSSHH,, NNaammee,, IInnffoo)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+       wwrriittee__ffiillee__iinnffoo((SSSSHH,, SSeerrvveerr,, NNaammee,, IInnffoo)) -->> RReessuulltt
+
+              Types:
+
+                 SSH = connection()
+                 Result = ssh_sftp_return() | {error, Reason}
+                 Reason = term()
+
+              For info and other types, see ssh_sftp(3).
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                     ct_ssh(3)

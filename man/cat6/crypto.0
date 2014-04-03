@@ -1,0 +1,61 @@
+crypto(7)                Erlang Application Definition               crypto(7)
+
+
+
+NNAAMMEE
+       crypto - The Crypto Application
+
+DDEESSCCRRIIPPTTIIOONN
+       The purpose of the Crypto application is to provide message digest and
+       DES encryption for SMNPv3. It provides computation of message digests
+       MD5 and SHA, and CBC-DES encryption and decryption.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following environment configuration parameters are defined for the
+       Crypto application. Refer to application(3) for more information about
+       configuration parameters.
+
+         _d_e_b_u_g _= _t_r_u_e _| _f_a_l_s_e _<_o_p_t_i_o_n_a_l_>:
+           Causes debug information to be written to standard error or
+           standard output. Default is _f_a_l_s_e.
+
+OOPPEENNSSSSLL LLIIBBRRAARRIIEESS
+       The current implementation of the Erlang Crypto application is based on
+       the _O_p_e_n_S_S_L package version 0.9.7 or higher. There are source and
+       binary releases on the web.
+
+       Source releases of OpenSSL can be downloaded from the OpenSSL project
+       home page, or mirror sites listed there.
+
+       The same URL also contains links to some compiled binaries and
+       libraries of OpenSSL (see the _R_e_l_a_t_e_d_/_B_i_n_a_r_i_e_s menu) of which the
+       Shining Light Productions Win32 and OpenSSL pages are of interest for
+       the Win32 user.
+
+       For some Unix flavours there are binary packages available on the net.
+
+       If you cannot find a suitable binary OpenSSL package, you have to fetch
+       an OpenSSL source release and compile it.
+
+       You then have to compile and install the library _l_i_b_c_r_y_p_t_o_._s_o (Unix),
+       or the library _l_i_b_e_a_y_3_2_._d_l_l (Win32).
+
+       For Unix The _c_r_y_p_t_o___d_r_v dynamic driver is delivered linked to OpenSSL
+       libraries in _/_u_s_r_/_l_o_c_a_l_/_l_i_b, but the default dynamic linking will also
+       accept libraries in _/_l_i_b and _/_u_s_r_/_l_i_b.
+
+       If that is not applicable to the particular Unix operating system used,
+       the example _M_a_k_e_f_i_l_e in the Crypto _p_r_i_v_/_o_b_j directory, should be used
+       as a basis for relinking the final version of the port program.
+
+       For _W_i_n_3_2 it is only required that the library can be found from the
+       _P_A_T_H environment variable, or that they reside in the appropriate
+       _S_Y_S_T_E_M_3_2 directory; hence no particular relinking is need. Hence no
+       example _M_a_k_e_f_i_l_e for Win32 is provided.
+
+SSEEEE AALLSSOO
+       application(3)
+
+
+
+Ericsson AB                       crypto 2.2                         crypto(7)

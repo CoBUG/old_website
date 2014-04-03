@@ -1,0 +1,450 @@
+snmp(3)                    Erlang Module Definition                    snmp(3)
+
+
+
+NNAAMMEE
+       snmp - Interface functions to the SNMP toolkit
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p contains interface functions to the SNMP toolkit.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       The following data-types are used in the functions below:
+
+         * _d_a_t_e_t_i_m_e_(_) _= _{_d_a_t_e_(_)_, _t_i_m_e_(_)_}
+
+           See ccaalleennddaarr for more info.
+
+EEXXPPOORRTTSS
+       ccoonnffiigg(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              A simple interactive configuration tool. Simple configuration
+              files can be generated, but more complex configurations still
+              have to be edited manually.
+
+              The tool is a textual based tool that asks some questions and
+              generates _s_y_s_._c_o_n_f_i_g and _*_._c_o_n_f files.
+
+              _N_o_t_e that if the application shall support version 3, then the
+              crypto app must be started before running this function
+              (password generation).
+
+              _N_o_t_e also that some of the configuration files for the agent and
+              manager share the same names. This means that they have to be
+              stored in _d_i_f_f_e_r_e_n_t directories!
+
+       ssttaarrtt(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       ssttaarrtt((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = start_type()
+
+              Starts the SNMP application.
+
+              See aapppplliiccaattiioonn for more info.
+
+       ssttaarrtt__aaggeenntt(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       ssttaarrtt__aaggeenntt((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = start_type()
+
+              The SNMP application consists of several entities, of which the
+              agent is one. This function starts the agent entity of the
+              application.
+
+              Note that the only way to actually start the agent in this way
+              is to add the agent related config after starting the
+              application (e.g it cannot be part of the normal application
+              config; sys.config). This is done by calling:
+              _a_p_p_l_i_c_a_t_i_o_n_:_s_e_t___e_n_v_(_s_n_m_p_, _a_g_e_n_t_, _C_o_n_f_).
+
+              The default value for _T_y_p_e is _n_o_r_m_a_l.
+
+       ssttaarrtt__mmaannaaggeerr(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       ssttaarrtt__mmaannaaggeerr((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = start_type()
+
+              The SNMP application consists of several entities, of which the
+              manager is one. This function starts the manager entity of the
+              application.
+
+              Note that the only way to actually start the manager in this way
+              is to add the manager related config after starting the
+              application (e.g it cannot be part of the normal application
+              config; sys.config). This is done by calling:
+              _a_p_p_l_i_c_a_t_i_o_n_:_s_e_t___e_n_v_(_s_n_m_p_, _m_a_n_a_g_e_r_, _C_o_n_f_).
+
+              The default value for _T_y_p_e is _n_o_r_m_a_l.
+
+       ddaattee__aanndd__ttiimmee(()) -->> DDaatteeAAnnddTTiimmee
+
+              Types:
+
+                 DateAndTime = [int()]
+
+              Returns current date and time as the data type DateAndTime, as
+              specified in RFC1903. This is an OCTET STRING.
+
+       ddaattee__aanndd__ttiimmee__ttoo__uunniivveerrssaall__ttiimmee__ddsstt((DDaatteeAAnnddTTiimmee)) -->> [[uuttcc(())]]
+
+              Types:
+
+                 DateAndTime = [int()]
+                 utc() = {{Y,Mo,D},{H,M,S}}
+
+              Converts a DateAndTime list to a list of possible universal
+              time(s). The universal time value on the same format as defined
+              in calendar(3).
+
+       ddaattee__aanndd__ttiimmee__ttoo__ssttrriinngg((DDaatteeAAnnddTTiimmee)) -->> ssttrriinngg(())
+       ddaattee__aanndd__ttiimmee__ttoo__ssttrriinngg((DDaatteeAAnnddTTiimmee,, VVaalliiddaattee)) -->> ssttrriinngg(())
+
+              Types:
+
+                 DateAndTime = [int()]
+                 Validate = fun(Kind, Data) -> boolean()
+
+              Converts a DateAndTime list to a printable string, according to
+              the DISPLAY-HINT definition in RFC2579.
+
+              The validation fun, _V_a_l_i_d_a_t_e, allows for a more "flexible"
+              validation of the _D_a_t_e_A_n_d_T_i_m_e argument. Whenever the data is
+              found to not follow RFC2579, the fun is called to allow a more
+              "lax" validation. See the vvaalliiddaattee__ddaattee__aanndd__ttiimmee//22 function for
+              more info on the _V_a_l_i_d_a_t_e fun.
+
+       ddaattee__aanndd__ttiimmee__ttoo__ssttrriinngg22((DDaatteeAAnnddTTiimmee)) -->> ssttrriinngg(())
+
+              Types:
+
+                 DateAndTime = [int()]
+
+              Converts a DateAndTime list to a printable string, according to
+              the DISPLAY-HINT definition in RFC2579, with the extension that
+              it also allows the values "hours from UTC" = 14 together with
+              "minutes from UTC" = 0.
+
+       llooccaall__ttiimmee__ttoo__ddaattee__aanndd__ttiimmee__ddsstt((LLooccaall)) -->> [[DDaatteeAAnnddTTiimmee]]
+
+              Types:
+
+                 Local = {{Y,Mo,D},{H,M,S}}
+                 DateAndTime = [int()]
+
+              Converts a local time value to a list of possible DateAndTime
+              list(s). The local time value on the same format as defined in
+              calendar(3).
+
+       uunniivveerrssaall__ttiimmee__ttoo__ddaattee__aanndd__ttiimmee((UUTTCC)) -->> DDaatteeAAnnddTTiimmee
+
+              Types:
+
+                 UTC = {{Y,Mo,D},{H,M,S}}
+                 DateAndTime = [int()]
+
+              Converts a universal time value to a DateAndTime list. The
+              universal time value on the same format as defined in
+              calendar(3).
+
+       vvaalliiddaattee__ddaattee__aanndd__ttiimmee((DDaatteeAAnnddTTiimmee)) -->> bbooooll(())
+       vvaalliiddaattee__ddaattee__aanndd__ttiimmee((DDaatteeAAnnddTTiimmee,, VVaalliiddaattee)) -->> bbooooll(())
+
+              Types:
+
+                 DateAndTime = term()
+                 Validate = fun(Kind, Data) -> boolean()
+
+              Checks if _D_a_t_e_A_n_d_T_i_m_e is a correct DateAndTime value, as
+              specified in RFC2579. This function can be used in
+              instrumentation functions to validate a DateAndTime value.
+
+              The validation fun, _V_a_l_i_d_a_t_e, allows for a more "flexible"
+              validation of the _D_a_t_e_A_n_d_T_i_m_e argument. Whenever the data is
+              found to not follow RFC2579, the fun is called to allow a more
+              "lax" validation. The input to the validation fun looks like
+              this:
+
+                        Kind             Data
+                        --------------   ----------------------
+                        year             {Year1, Year2}
+                        month            Month
+                        day              Day
+                        hour             Hour
+                        minute           Minute
+                        seconds          Seconds
+                        deci_seconds     DeciSeconds
+                        diff             [Sign, Hour, Minute]
+                        valid_date       {Year, Month, Day}
+
+
+       ppaasssswwdd22llooccaalliizzeedd__kkeeyy((AAllgg,, PPaasssswwdd,, EEnnggiinneeIIDD)) -->> KKeeyy
+
+              Types:
+
+                 Alg = algorithm()
+                 algorithm() = md5 | sha
+                 Passwd = string()
+                 EngineID = string()
+                 Key = list()
+
+              Generates a key that can be used as an authentication or privacy
+              key using MD5 och SHA. The key is localized for EngineID.
+
+       oocctteett__ssttrriinngg__ttoo__bbiittss((SS)) -->> VVaall
+
+              Types:
+
+                 Val = bits()
+
+              Utility function for converting a value of type _O_C_T_E_T_-_S_T_R_I_N_G to
+              _B_I_T_S.
+
+       bbiittss__ttoo__oocctteett__ssttrriinngg((BB)) -->> VVaall
+
+              Types:
+
+                 Val = octet_string()
+
+              Utility function for converting a value of type _B_I_T_S to _O_C_T_E_T_-
+              _S_T_R_I_N_G.
+
+       rreeaadd__mmiibb((FFiilleeNNaammee)) -->> {{ookk,, mmiibb(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 FileName = string()
+                 mib() = #mib{}
+                 Reason = term()
+
+              Read a compiled mib.
+
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__ttxxtt((LLooggDDiirr,, MMiibbss,, OOuuttFFiillee,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt,, SSttoopp)) -->> ookk
+       || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 LogDir = string()
+                 Mibs = [MibName]
+                 OutFile = string()
+                 MibName = string()
+                 LogName = string()
+                 LogFile = string()
+                 Start = Stop = null | datetime() | {local_time,datetime()} |
+                 {universal_time,datetime()}
+                 Reason = term()
+
+              Converts an Audit Trail Log to a readable text file, where each
+              item has a trailing TAB character, and any TAB character in the
+              body of an item has been replaced by ESC TAB.
+
+              The function can be used on a running system, or by copying the
+              entire log directory and calling this function. SNMP must be
+              running in order to provide MIB information.
+
+              _L_o_g_D_i_r is the name of the directory where the audit trail log is
+              stored. _M_i_b_s is a list of Mibs to be used. The function uses the
+              information in the Mibs to convert for example object
+              identifiers to their symbolic name. _O_u_t_F_i_l_e is the name of the
+              generated text-file. _L_o_g_N_a_m_e is the name of the log, _L_o_g_F_i_l_e is
+              the name of the log file. _S_t_a_r_t is the start (first) date and
+              time from which log events will be converted and _S_t_o_p is the
+              stop (last) date and time to which log events will be converted.
+
+              The format of an audit trail log text item is as follows:
+
+              _T_a_g _A_d_d_r _- _C_o_m_m_u_n_i_t_y _[_T_i_m_e_S_t_a_m_p_] _V_s_n
+              _P_D_U
+
+              where _T_a_g is _r_e_q_u_e_s_t, _r_e_s_p_o_n_s_e, _r_e_p_o_r_t, _t_r_a_p or _i_n_f_o_r_m; Addr is
+              _I_P_:_P_o_r_t (or comma space separated list of such); _C_o_m_m_u_n_i_t_y is
+              the community parameter (SNMP version v1 and v2), or
+              _S_e_c_L_e_v_e_l_:_"_A_u_t_h_E_n_g_i_n_e_I_D_"_:_"_U_s_e_r_N_a_m_e_" (SNMP v3); _T_i_m_e_S_t_a_m_p is a
+              date and time stamp, and _V_s_n is the SNMP version. _P_D_U is a
+              textual version of the protocol data unit. There is a new line
+              between _V_s_n and _P_D_U.
+
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+       lloogg__ttoo__iioo((LLooggDDiirr,, MMiibbss,, LLooggNNaammee,, LLooggFFiillee,, SSttaarrtt,, SSttoopp)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 LogDir = string()
+                 Mibs = [MibName]
+                 MibName = string()
+                 LogName = string()
+                 LogFile = string()
+                 Start = Stop = null | datetime() | {local_time,datetime()} |
+                 {universal_time,datetime()}
+                 Reason = term()
+
+              Converts an Audit Trail Log to a readable format and prints it
+              on stdio. See lloogg__ttoo__ttxxtt above for more info.
+
+       cchhaannggee__lloogg__ssiizzee((LLooggNNaammee,, NNeewwSSiizzee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 LogName = string()
+                 NewSize = {MaxBytes, MaxFiles}
+                 MaxBytes = integer()
+                 MaxFiles = integer()
+                 Reason = term()
+
+              Changes the log size of the Audit Trail Log. The application
+              must be configured to use the audit trail log function. Please
+              refer to disk_log(3) in Kernel Reference Manual for a
+              description of how to change the log size.
+
+              The change is permanent, as long as the log is not deleted. That
+              means, the log size is remembered across reboots.
+
+       pprriinntt__vveerrssiioonn__iinnffoo(()) -->> vvooiidd(())
+       pprriinntt__vveerrssiioonn__iinnffoo((PPrreeffiixx)) -->> vvooiidd(())
+
+              Types:
+
+                 Prefix = string() | integer()
+
+              Utility function(s) to produce a formatted printout of the
+              versions info generated by the _v_e_r_s_i_o_n_s_1 function
+
+              This is the same as doing, e.g.:
+
+                         {ok, V} = snmp:versions1(),
+                         snmp:print_versions(V).
+
+
+       vveerrssiioonnss11(()) -->> {{ookk,, IInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+       vveerrssiioonnss22(()) -->> {{ookk,, IInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Info = [info()]
+                 info() = term()
+                 Reason = term()
+
+              Utility functions used to retrieve some system and application
+              info.
+
+              The difference between the two functions is in how they get the
+              modules to check. _v_e_r_s_i_o_n_s_1 uses the app-file and _v_e_r_s_i_o_n_s_2 uses
+              the function _a_p_p_l_i_c_a_t_i_o_n_:_g_e_t___k_e_y.
+
+       pprriinntt__vveerrssiioonnss((VVeerrssiioonnIInnffoo)) -->> vvooiidd(())
+       pprriinntt__vveerrssiioonnss((PPrreeffiixx,, VVeerrssiioonnIInnffoo)) -->> vvooiidd(())
+
+              Types:
+
+                 VersionInfo = [version_info()]
+                 version_info() = term()
+                 Prefix = string() | integer()
+
+              Utility function to produce a formatted printout of the versions
+              info generated by the _v_e_r_s_i_o_n_s_1 and _v_e_r_s_i_o_n_s_2 functions
+
+              Example:
+
+                         {ok, V} = snmp:versions1(),
+                         snmp:print_versions(V).
+
+
+       eennaabbllee__ttrraaccee(()) -->> vvooiidd(())
+
+              Starts a dbg tracer that prints trace events to stdout (using
+              plain io:format after a minor formatting).
+
+       ddiissaabbllee__ttrraaccee(()) -->> vvooiidd(())
+
+              Stop the tracer.
+
+       sseett__ttrraaccee((TTaarrggeettss)) -->> vvooiidd(())
+
+              Types:
+
+                 Targets = target() | targets()
+                 target() = module()
+                 module() = atom()
+                 targets() = [target() | {target(), target_options()}]
+                 target_options() = [target_option()]
+                 target_option() = {return_trace, boolean()} | {scope,
+                 scope()}
+                 scope() = all_functions | exported_functions |
+                 function_name() | {function_name(), function_arity()}
+                 function_name() = atom()
+                 function_arity() = integer() >= 0
+
+              This function is used to set up default trace on function(s) for
+              the given module or modules. The scope of the trace will be all
+              _e_x_p_o_r_t_e_d functions (both the call info and the return value).
+              Timestamp info will also be included.
+
+       rreesseett__ttrraaccee((TTaarrggeettss)) -->> vvooiidd(())
+
+              Types:
+
+                 Targets = module() | modules()
+                 modules() = [module()]
+                 module() = atom()
+
+              This function is used to reset (disable) trace for the given
+              module(s).
+
+       sseett__ttrraaccee((TTaarrggeettss,, OOppttss)) -->> vvooiidd(())
+
+              Types:
+
+                 Targets = target() | targets()
+                 target() = module()
+                 module() = atom()
+                 targets() = [target() | {target(), target_options()}]
+                 target_options() = [target_option()]
+                 target_option() = {return_trace, boolean()} | {scope,
+                 scope()}
+                 scope() = all_functions | exported_functions |
+                 function_name() | {function_name(), function_arity()}
+                 function_name() = atom()
+                 function_arity() = integer() >= 0
+                 Opts = disable | trace_options()
+                 trace_options() = [trace_option()]
+                 trace_option() = {timestamp, boolean()} | target_option()
+
+              This function is used to set up trace on function(s) for the
+              given module or modules.
+
+              The example below sets up trace on the exported functions
+              (default) of module _s_n_m_p___g_e_n_e_r_i_c and all functions of module
+              _s_n_m_p___g_e_n_e_r_i_c___m_n_e_s_i_a. With return values (which is default) and
+              timestamps in both cases (which is also default):
+
+                     snmp:enable_trace(),
+                     snmp:set_trace([snmp_generic,
+                                        {snmp_generic_mnesia, [{scope, all_functions}]}]),
+                     .
+                     .
+                     .
+                        snmp:set_trace(snmp_generic, disable),
+                     .
+                     .
+                     .
+                     snmp:disable_trace(),
+
+
+SSEEEE AALLSSOO
+       calendar(3)
+
+
+
+Ericsson AB                       snmp 4.22.1                          snmp(3)

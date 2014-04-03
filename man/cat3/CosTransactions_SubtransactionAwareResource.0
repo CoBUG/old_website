@@ -1,0 +1,51 @@
+CosTransactions_SubtransactiEornlAawnagCroeMsRoTedrsuaolnuesracDceet(fi3io)nnist_iSounbtransactionAwareResource(3)
+
+
+
+NNAAMMEE
+       CosTransactions_SubtransactionAwareResource - This module implements
+       the OMG CosTransactions::SubtransactionAwareResource interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       This interface inherits the CosTransactions::Resource interface. Hence,
+       it must also support all operations defined in the Resource interface.
+
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccoommmmiitt__ssuubbttrraannssaaccttiioonn((SSuubbttrraannssaaccttiioonnAAwwaarreeRReessoouurrccee,, CCoooorrddiinnaattoorr)) -->>
+       RReettuurrnn
+
+              Types:
+
+                 SubtransactionAwareResource = #objref
+                 Coordinator = #objref
+                 Return = ok
+
+              If the _S_u_b_t_r_a_n_s_a_c_t_i_o_n_A_w_a_r_e_R_e_s_o_u_r_c_e have been registered with a
+              _s_u_b_t_r_a_n_s_a_c_t_i_o_n using the operation
+              _C_o_s_T_r_a_n_s_a_c_t_i_o_n_s___C_o_o_r_d_i_n_a_t_o_r_:_r_e_g_i_s_t_e_r___s_u_b_t_r_a_n___a_w_a_r_e_/_2, it will be
+              notified when the transaction has committed.
+
+          NNoottee::
+              The results of a committed subtransaction are relative to the
+              completion of its ancestor transactions, that is, these results
+              can be undone if any ancestor transaction is rolled back.
+
+
+       rroollllbbaacckk__ssuubbttrraannssaaccttiioonn((SSuubbttrraannssaaccttiioonnAAwwaarreeRReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 SubtransactionAwareResource = #objref
+                 Return = ok
+
+              If the _S_u_b_t_r_a_n_s_a_c_t_i_o_n_A_w_a_r_e_R_e_s_o_u_r_c_e have been registered with a
+              transactions using the operation
+              _C_o_s_T_r_a_n_s_a_c_t_i_o_n_s___C_o_o_r_d_i_n_a_t_o_r_:_r_e_g_i_s_t_e_r___s_u_b_t_r_a_n___a_w_a_r_e_/_2 it will be
+              notified when the transaction has rolled back.
+
+
+
+Ericsson AB                 cosTrCaonssTarcatnisoancsti1o.n2s._1S2ubtransactionAwareResource(3)

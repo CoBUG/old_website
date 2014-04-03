@@ -1,0 +1,74 @@
+start_webtool(1)                 User Commands                start_webtool(1)
+
+
+
+NNAAMMEE
+       start_webtool - WebTool Start Script
+
+DDEESSCCRRIIPPTTIIOONN
+       The _s_t_a_r_t___w_e_b_t_o_o_l script starts WebTool, a WebTool application and a
+       web browser pointing to this application.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__wweebbttooooll aapppplliiccaattiioonn [[ bbrroowwsseerr ]]
+
+              Starts WebTool, the given WebTool Application and a web browser
+              pointing to this application.
+
+              If no argument is given, a list of available applications is
+              displayed, e.g.
+
+              >start_webtool
+              Starting webtool...
+              WebTool is available at http://localhost:8888/
+              Or  http://127.0.0.1:8888/
+
+              Usage: start_webtool application [ browser ]
+
+              Available applications are: [orber,appmon,crashdump_viewer,webcover]
+              Default browser is 'iexplore' (Internet Explorer) on Windows or else 'firefox'
+
+              To start any of the listed applications, give the application
+              name as the first argument, e.g.
+
+              >start_webtool webcover
+              Starting webtool...
+              WebTool is available at http://localhost:8888/
+              Or  http://127.0.0.1:8888/
+              Starting webcover...
+              Sending URL to netscape...done
+
+              The WebTool application WebCover is then started and the default
+              browser is used. The default browser is Internet Explorer on
+              Windows or else Firefox.
+
+              To use another browser, give the browser's start command as the
+              second argument, e.g.
+
+              >start_webtool webcover mozilla
+              Starting webtool...
+              WebTool is available at http://localhost:8888/
+              Or  http://127.0.0.1:8888/
+              Starting webcover...
+              Sending URL to mozilla...done
+
+              If the given browser name is not known to WebTool, WebTool will
+              run it as a command with the start URL as the only argument,
+              e.g.
+
+              >start_webtool webcover mybrowser
+              Starting webtool...
+              WebTool is available at http://localhost:8888/
+              Or  http://127.0.0.1:8888/
+              Starting webcover...
+              Starting mybrowser...
+
+              Here the command _"_m_y_b_r_o_w_s_e_r _h_t_t_p_:_/_/_l_o_c_a_l_h_o_s_t_:_8_8_8_8_/_w_e_b_c_o_v_e_r_" is
+              executed.
+
+SSEEEE AALLSSOO
+       wweebbttooooll((33))
+
+
+
+Ericsson AB                     webtool 0.8.9.1               start_webtool(1)

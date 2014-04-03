@@ -1,0 +1,233 @@
+io_lib(3)                  Erlang Module Definition                  io_lib(3)
+
+
+
+NNAAMMEE
+       io_lib - IO Library Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for converting to and from strings
+       (lists of characters). They are used for implementing the functions in
+       the _i_o module. There is no guarantee that the character lists returned
+       from some of the functions are flat, they can be deep lists.
+       _l_i_s_t_s_:_f_l_a_t_t_e_n_/_1 can be used for flattening deep lists.
+
+DDAATTAA TTYYPPEESS
+       cchhaarrss(()) = [char() | cchhaarrss(())]
+
+       ccoonnttiinnuuaattiioonn(())
+
+              A continuation as returned by _f_r_e_a_d_/_3.
+
+       ddeepptthh(()) = -1 | integer() >= 0
+
+EEXXPPOORRTTSS
+       nnll(()) -->> ssttrriinngg(())
+
+              Returns a character list which represents a new line character.
+
+       wwrriittee((TTeerrmm)) -->> cchhaarrss(())
+
+       wwrriittee((TTeerrmm,, DDeepptthh)) -->> cchhaarrss(())
+
+              Types:
+
+                 Term = term()
+                 Depth = ddeepptthh(())
+
+              Returns a character list which represents _T_e_r_m. The _D_e_p_t_h (-1)
+              argument controls the depth of the structures written. When the
+              specified depth is reached, everything below this level is
+              replaced by "...". For example:
+
+              1> lists:flatten(io_lib:write({1,[2],[3],[4,5],6,7,8,9})).
+              "{1,[2],[3],[4,5],6,7,8,9}"
+              2> lists:flatten(io_lib:write({1,[2],[3],[4,5],6,7,8,9}, 5)).
+              "{1,[2],[3],[...],...}"
+
+       pprriinntt((TTeerrmm)) -->> cchhaarrss(())
+
+       pprriinntt((TTeerrmm,, CCoolluummnn,, LLiinneeLLeennggtthh,, DDeepptthh)) -->> cchhaarrss(())
+
+              Types:
+
+                 Term = term()
+                 Column = LineLength = integer() >= 0
+                 Depth = ddeepptthh(())
+
+              Also returns a list of characters which represents _T_e_r_m, but
+              breaks representations which are longer than one line into many
+              lines and indents each line sensibly. It also tries to detect
+              and output lists of printable characters as strings. _C_o_l_u_m_n is
+              the starting column (1), _L_i_n_e_L_e_n_g_t_h the maximum line length
+              (80), and _D_e_p_t_h (-1) the maximum print depth.
+
+       ffwwrriittee((FFoorrmmaatt,, DDaattaa)) -->> cchhaarrss(()) || UUnniiccooddeeLLiisstt
+
+       ffoorrmmaatt((FFoorrmmaatt,, DDaattaa)) -->> cchhaarrss(()) || UUnniiccooddeeLLiisstt
+
+              Types:
+
+                 Format = iioo::ffoorrmmaatt(())
+                 Data = [term()]
+                 UnicodeList = [uunniiccooddee::uunniiccooddee__cchhaarr(())]
+
+              Returns a character list which represents _D_a_t_a formatted in
+              accordance with _F_o_r_m_a_t. See iioo::ffwwrriittee//11,,22,,33 for a detailed
+              description of the available formatting options. A fault is
+              generated if there is an error in the format string or argument
+              list.
+
+              If (and only if) the Unicode translation modifier is used in the
+              format string (i.e. ~ts or ~tc), the resulting list may contain
+              characters beyond the ISO-latin-1 character range (in other
+              words, numbers larger than 255). If so, the result is not an
+              ordinary Erlang string(), but can well be used in any context
+              where Unicode data is allowed.
+
+       ffrreeaadd((FFoorrmmaatt,, SSttrriinngg)) -->> RReessuulltt
+
+              Types:
+
+                 Format = String = string()
+                 Result = {ok, InputList :: [term()], LeftOverChars ::
+                 string()}
+                        | {more,
+                           RestFormat :: string(),
+                           Nchars :: integer() >= 0,
+                           InputStack :: cchhaarrss(())}
+                        | {error, What :: term()}
+
+              Tries to read _S_t_r_i_n_g in accordance with the control sequences in
+              _F_o_r_m_a_t. See iioo::ffrreeaadd//33 for a detailed description of the
+              available formatting options. It is assumed that _S_t_r_i_n_g contains
+              whole lines. It returns:
+
+                _{_o_k_, _I_n_p_u_t_L_i_s_t_, _L_e_f_t_O_v_e_r_C_h_a_r_s_}:
+                  The string was read. _I_n_p_u_t_L_i_s_t is the list of successfully
+                  matched and read items, and _L_e_f_t_O_v_e_r_C_h_a_r_s are the input
+                  characters not used.
+
+                _{_m_o_r_e_, _R_e_s_t_F_o_r_m_a_t_, _N_c_h_a_r_s_, _I_n_p_u_t_S_t_a_c_k_}:
+                  The string was read, but more input is needed in order to
+                  complete the original format string. _R_e_s_t_F_o_r_m_a_t is the
+                  remaining format string, _N_c_h_a_r_s the number of characters
+                  scanned, and _I_n_p_u_t_S_t_a_c_k is the reversed list of inputs
+                  matched up to that point.
+
+                _{_e_r_r_o_r_, _W_h_a_t_}:
+                  The read operation failed and the parameter _W_h_a_t gives a
+                  hint about the error.
+
+              Example:
+
+              3> io_lib:fread("~f~f~f", "15.6 17.3e-6 24.5").
+              {ok,[15.6,1.73e-5,24.5],[]}
+
+       ffrreeaadd((CCoonnttiinnuuaattiioonn,, CChhaarrSSppeecc,, FFoorrmmaatt)) -->> RReettuurrnn
+
+              Types:
+
+                 Continuation = ccoonnttiinnuuaattiioonn(()) | []
+                 CharSpec = string() | eof
+                 Format = string()
+                 Return = {more, Continuation1 :: ccoonnttiinnuuaattiioonn(())}
+                        | {done, Result, LeftOverChars :: string()}
+                 Result = {ok, InputList :: [term()]}
+                        | eof
+                        | {error, What :: term()}
+
+              This is the re-entrant formatted reader. The continuation of the
+              first call to the functions must be _[_]. Refer to Armstrong,
+              Virding, Williams, 'Concurrent Programming in Erlang', Chapter
+              13 for a complete description of how the re-entrant input scheme
+              works.
+
+              The function returns:
+
+                _{_d_o_n_e_, _R_e_s_u_l_t_, _L_e_f_t_O_v_e_r_C_h_a_r_s_}:
+                  The input is complete. The result is one of the following:
+
+                  _{_o_k_, _I_n_p_u_t_L_i_s_t_}:
+                    The string was read. _I_n_p_u_t_L_i_s_t is the list of successfully
+                    matched and read items, and _L_e_f_t_O_v_e_r_C_h_a_r_s are the
+                    remaining characters.
+
+                  _e_o_f:
+                    End of file has been encountered. _L_e_f_t_O_v_e_r_C_h_a_r_s are the
+                    input characters not used.
+
+                  _{_e_r_r_o_r_, _W_h_a_t_}:
+                    An error occurred and the parameter _W_h_a_t gives a hint
+                    about the error.
+
+                _{_m_o_r_e_, _C_o_n_t_i_n_u_a_t_i_o_n_}:
+                  More data is required to build a term. _C_o_n_t_i_n_u_a_t_i_o_n must be
+                  passed to _f_r_e_a_d_/_3, when more data becomes available.
+
+       wwrriittee__aattoomm((AAttoomm)) -->> cchhaarrss(())
+
+              Types:
+
+                 Atom = atom()
+
+              Returns the list of characters needed to print the atom _A_t_o_m.
+
+       wwrriittee__ssttrriinngg((SSttrriinngg)) -->> cchhaarrss(())
+
+              Types:
+
+                 String = string()
+
+              Returns the list of characters needed to print _S_t_r_i_n_g as a
+              string.
+
+       wwrriittee__cchhaarr((CChhaarr)) -->> cchhaarrss(())
+
+              Types:
+
+                 Char = char()
+
+              Returns the list of characters needed to print a character
+              constant in the ISO-latin-1 character set.
+
+       iinnddeennttaattiioonn((SSttrriinngg,, SSttaarrttIInnddeenntt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 String = string()
+                 StartIndent = integer()
+
+              Returns the indentation if _S_t_r_i_n_g has been printed, starting at
+              _S_t_a_r_t_I_n_d_e_n_t.
+
+       cchhaarr__lliisstt((TTeerrmm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Term = term()
+
+              Returns _t_r_u_e if _T_e_r_m is a flat list of characters in the ISO-
+              latin-1 range, otherwise it returns _f_a_l_s_e.
+
+       ddeeeepp__cchhaarr__lliisstt((TTeerrmm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Term = term()
+
+              Returns _t_r_u_e if _T_e_r_m is a, possibly deep, list of characters in
+              the ISO-latin-1 range, otherwise it returns _f_a_l_s_e.
+
+       pprriinnttaabbllee__lliisstt((TTeerrmm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Term = term()
+
+              Returns _t_r_u_e if _T_e_r_m is a flat list of printable ISO-latin-1
+              characters, otherwise it returns _f_a_l_s_e.
+
+
+
+Ericsson AB                      stdlib 1.18.2                       io_lib(3)

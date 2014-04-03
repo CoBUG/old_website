@@ -1,0 +1,1491 @@
+sofs(3)                    Erlang Module Definition                    sofs(3)
+
+
+
+NNAAMMEE
+       sofs - Functions for Manipulating Sets of Sets
+
+DDEESSCCRRIIPPTTIIOONN
+       The _s_o_f_s module implements operations on finite sets and relations
+       represented as sets. Intuitively, a set is a collection of elements;
+       every element belongs to the set, and the set contains every element.
+
+       Given a set A and a sentence S(x), where x is a free variable, a new
+       set B whose elements are exactly those elements of A for which S(x)
+       holds can be formed, this is denoted B = {x in A : S(x)}. Sentences are
+       expressed using the logical operators "for some" (or "there exists"),
+       "for all", "and", "or", "not". If the existence of a set containing all
+       the specified elements is known (as will always be the case in this
+       module), we write B = {x : S(x)}.
+
+       The _u_n_o_r_d_e_r_e_d _s_e_t containing the elements a, b and c is denoted {a, b,
+       c}. This notation is not to be confused with tuples. The _o_r_d_e_r_e_d _p_a_i_r
+       of a and b, with first _c_o_o_r_d_i_n_a_t_e a and second coordinate b, is denoted
+       (a, b). An ordered pair is an _o_r_d_e_r_e_d _s_e_t of two elements. In this
+       module ordered sets can contain one, two or more elements, and
+       parentheses are used to enclose the elements. Unordered sets and
+       ordered sets are orthogonal, again in this module; there is no
+       unordered set equal to any ordered set.
+
+       The set that contains no elements is called the _e_m_p_t_y _s_e_t. If two sets
+       A and B contain the same elements, then A is _e_q_u_a_l to B, denoted A = B.
+       Two ordered sets are equal if they contain the same number of elements
+       and have equal elements at each coordinate. If a set A contains all
+       elements that B contains, then B is a _s_u_b_s_e_t of A. The _u_n_i_o_n of two
+       sets A and B is the smallest set that contains all elements of A and
+       all elements of B. The _i_n_t_e_r_s_e_c_t_i_o_n of two sets A and B is the set that
+       contains all elements of A that belong to B. Two sets are _d_i_s_j_o_i_n_t if
+       their intersection is the empty set. The _d_i_f_f_e_r_e_n_c_e of two sets A and B
+       is the set that contains all elements of A that do not belong to B. The
+       _s_y_m_m_e_t_r_i_c _d_i_f_f_e_r_e_n_c_e of two sets is the set that contains those element
+       that belong to either of the two sets, but not both. The _u_n_i_o_n of a
+       collection of sets is the smallest set that contains all the elements
+       that belong to at least one set of the collection. The _i_n_t_e_r_s_e_c_t_i_o_n of
+       a non-empty collection of sets is the set that contains all elements
+       that belong to every set of the collection.
+
+       The _C_a_r_t_e_s_i_a_n _p_r_o_d_u_c_t of two sets X and Y, denoted X x Y, is the set {a
+       : a = (x, y) for some x in X and for some y in Y}. A _r_e_l_a_t_i_o_n is a
+       subset of X x Y. Let R be a relation. The fact that (x, y) belongs to R
+       is written as x R y. Since relations are sets, the definitions of the
+       last paragraph (subset, union, and so on) apply to relations as well.
+       The _d_o_m_a_i_n of R is the set {x : x R y for some y in Y}. The _r_a_n_g_e of R
+       is the set {y : x R y for some x in X}. The _c_o_n_v_e_r_s_e of R is the set {a
+       : a = (y, x) for some (x, y) in R}. If A is a subset of X, then the
+       _i_m_a_g_e of A under R is the set {y : x R y for some x in A}, and if B is
+       a subset of Y, then the _i_n_v_e_r_s_e _i_m_a_g_e of B is the set {x : x R y for
+       some y in B}. If R is a relation from X to Y and S is a relation from Y
+       to Z, then the _r_e_l_a_t_i_v_e _p_r_o_d_u_c_t of R and S is the relation T from X to
+       Z defined so that x T z if and only if there exists an element y in Y
+       such that x R y and y S z. The _r_e_s_t_r_i_c_t_i_o_n of R to A is the set S
+       defined so that x S y if and only if there exists an element x in A
+       such that x R y. If S is a restriction of R to A, then R is an
+       _e_x_t_e_n_s_i_o_n of S to X. If X = Y then we call R a relation _i_n X. The _f_i_e_l_d
+       of a relation R in X is the union of the domain of R and the range of
+       R. If R is a relation in X, and if S is defined so that x S y if x R y
+       and not x = y, then S is the _s_t_r_i_c_t relation corresponding to R, and
+       vice versa, if S is a relation in X, and if R is defined so that x R y
+       if x S y or x = y, then R is the _w_e_a_k relation corresponding to S. A
+       relation R in X is _r_e_f_l_e_x_i_v_e if x R x for every element x of X; it is
+       _s_y_m_m_e_t_r_i_c if x R y implies that y R x; and it is _t_r_a_n_s_i_t_i_v_e if x R y
+       and y R z imply that x R z.
+
+       A _f_u_n_c_t_i_o_n F is a relation, a subset of X x Y, such that the domain of
+       F is equal to X and such that for every x in X there is a unique
+       element y in Y with (x, y) in F. The latter condition can be formulated
+       as follows: if x F y and x F z then y = z. In this module, it will not
+       be required that the domain of F be equal to X for a relation to be
+       considered a function. Instead of writing (x, y) in F or x F y, we
+       write F(x) = y when F is a function, and say that F maps x onto y, or
+       that the value of F at x is y. Since functions are relations, the
+       definitions of the last paragraph (domain, range, and so on) apply to
+       functions as well. If the converse of a function F is a function F',
+       then F' is called the _i_n_v_e_r_s_e of F. The relative product of two
+       functions F1 and F2 is called the _c_o_m_p_o_s_i_t_e of F1 and F2 if the range
+       of F1 is a subset of the domain of F2.
+
+       Sometimes, when the range of a function is more important than the
+       function itself, the function is called a _f_a_m_i_l_y. The domain of a
+       family is called the _i_n_d_e_x _s_e_t, and the range is called the _i_n_d_e_x_e_d
+       _s_e_t. If x is a family from I to X, then x[i] denotes the value of the
+       function at index i. The notation "a family in X" is used for such a
+       family. When the indexed set is a set of subsets of a set X, then we
+       call x a _f_a_m_i_l_y _o_f _s_u_b_s_e_t_s of X. If x is a family of subsets of X, then
+       the union of the range of x is called the _u_n_i_o_n _o_f _t_h_e _f_a_m_i_l_y x. If x
+       is non-empty (the index set is non-empty), the _i_n_t_e_r_s_e_c_t_i_o_n _o_f _t_h_e
+       _f_a_m_i_l_y x is the intersection of the range of x. In this module, the
+       only families that will be considered are families of subsets of some
+       set X; in the following the word "family" will be used for such
+       families of subsets.
+
+       A _p_a_r_t_i_t_i_o_n of a set X is a collection S of non-empty subsets of X
+       whose union is X and whose elements are pairwise disjoint. A relation
+       in a set is an _e_q_u_i_v_a_l_e_n_c_e _r_e_l_a_t_i_o_n if it is reflexive, symmetric and
+       transitive. If R is an equivalence relation in X, and x is an element
+       of X, the _e_q_u_i_v_a_l_e_n_c_e _c_l_a_s_s of x with respect to R is the set of all
+       those elements y of X for which x R y holds. The equivalence classes
+       constitute a partitioning of X. Conversely, if C is a partition of X,
+       then the relation that holds for any two elements of X if they belong
+       to the same equivalence class, is an equivalence relation induced by
+       the partition C. If R is an equivalence relation in X, then the
+       _c_a_n_o_n_i_c_a_l _m_a_p is the function that maps every element of X onto its
+       equivalence class.
+
+       Relations as defined above (as sets of ordered pairs) will from now on
+       be referred to as _b_i_n_a_r_y _r_e_l_a_t_i_o_n_s. We call a set of ordered sets
+       (x[1], ..., x[n]) an _(_n_-_a_r_y_) _r_e_l_a_t_i_o_n, and say that the relation is a
+       subset of the Cartesian product X[1] x ... x X[n] where x[i] is an
+       element of X[i], 1 <= i <= n. The _p_r_o_j_e_c_t_i_o_n of an n-ary relation R
+       onto coordinate i is the set {x[i] : (x[1], ..., x[i], ..., x[n]) in R
+       for some x[j] in X[j], 1 <= j <= n and not i = j}. The projections of a
+       binary relation R onto the first and second coordinates are the domain
+       and the range of R respectively. The relative product of binary
+       relations can be generalized to n-ary relations as follows. Let TR be
+       an ordered set (R[1], ..., R[n]) of binary relations from X to Y[i] and
+       S a binary relation from (Y[1] x ... x Y[n]) to Z. The _r_e_l_a_t_i_v_e _p_r_o_d_u_c_t
+       of TR and S is the binary relation T from X to Z defined so that x T z
+       if and only if there exists an element y[i] in Y[i] for each 1 <= i <=
+       n such that x R[i] y[i] and (y[1], ..., y[n]) S z. Now let TR be a an
+       ordered set (R[1], ..., R[n]) of binary relations from X[i] to Y[i] and
+       S a subset of X[1] x ... x X[n]. The _m_u_l_t_i_p_l_e _r_e_l_a_t_i_v_e _p_r_o_d_u_c_t of TR
+       and S is defined to be the set {z : z = ((x[1], ..., x[n]),
+       (y[1],...,y[n])) for some (x[1], ..., x[n]) in S and for some (x[i],
+       y[i]) in R[i], 1 <= i <= n}. The _n_a_t_u_r_a_l _j_o_i_n of an n-ary relation R
+       and an m-ary relation S on coordinate i and j is defined to be the set
+       {z : z = (x[1], ..., x[n], y[1], ..., y[j-1], y[j+1], ..., y[m]) for
+       some (x[1], ..., x[n]) in R and for some (y[1], ..., y[m]) in S such
+       that x[i] = y[j]}.
+
+       The sets recognized by this module will be represented by elements of
+       the relation Sets, defined as the smallest set such that:
+
+         * for every atom T except '_' and for every term X, (T, X) belongs to
+           Sets (_a_t_o_m_i_c _s_e_t_s);
+
+         * (['_'], []) belongs to Sets (the _u_n_t_y_p_e_d _e_m_p_t_y _s_e_t);
+
+         * for every tuple T = {T[1], ..., T[n]} and for every tuple X =
+           {X[1], ..., X[n]}, if (T[i], X[i]) belongs to Sets for every 1 <= i
+           <= n then (T, X) belongs to Sets (_o_r_d_e_r_e_d _s_e_t_s);
+
+         * for every term T, if X is the empty list or a non-empty sorted list
+           [X[1], ..., X[n]] without duplicates such that (T, X[i]) belongs to
+           Sets for every 1 <= i <= n, then ([T], X) belongs to Sets (_t_y_p_e_d
+           _u_n_o_r_d_e_r_e_d _s_e_t_s).
+
+       An _e_x_t_e_r_n_a_l _s_e_t is an element of the range of Sets. A _t_y_p_e is an
+       element of the domain of Sets. If S is an element (T, X) of Sets, then
+       T is a _v_a_l_i_d _t_y_p_e of X, T is the type of S, and X is the external set
+       of S. ffrroomm__tteerrmm//22 creates a set from a type and an Erlang term turned
+       into an external set.
+
+       The actual sets represented by Sets are the elements of the range of
+       the function Set from Sets to Erlang terms and sets of Erlang terms:
+
+         * Set(T,Term) = Term, where T is an atom;
+
+         * Set({T[1], ..., T[n]}, {X[1], ..., X[n]}) = (Set(T[1], X[1]), ...,
+           Set(T[n], X[n]));
+
+         * Set([T], [X[1], ..., X[n]]) = {Set(T, X[1]), ..., Set(T, X[n])};
+
+         * Set([T], []) = {}.
+
+       When there is no risk of confusion, elements of Sets will be identified
+       with the sets they represent. For instance, if U is the result of
+       calling _u_n_i_o_n_/_2 with S1 and S2 as arguments, then U is said to be the
+       union of S1 and S2. A more precise formulation would be that Set(U) is
+       the union of Set(S1) and Set(S2).
+
+       The types are used to implement the various conditions that sets need
+       to fulfill. As an example, consider the relative product of two sets R
+       and S, and recall that the relative product of R and S is defined if R
+       is a binary relation to Y and S is a binary relation from Y. The
+       function that implements the relative product, rreellaattiivvee__pprroodduucctt//22,
+       checks that the arguments represent binary relations by matching
+       [{A,B}] against the type of the first argument (Arg1 say), and [{C,D}]
+       against the type of the second argument (Arg2 say). The fact that
+       [{A,B}] matches the type of Arg1 is to be interpreted as Arg1
+       representing a binary relation from X to Y, where X is defined as all
+       sets Set(x) for some element x in Sets the type of which is A, and
+       similarly for Y. In the same way Arg2 is interpreted as representing a
+       binary relation from W to Z. Finally it is checked that B matches C,
+       which is sufficient to ensure that W is equal to Y. The untyped empty
+       set is handled separately: its type, ['_'], matches the type of any
+       unordered set.
+
+       A few functions of this module (_d_r_e_s_t_r_i_c_t_i_o_n_/_3, _f_a_m_i_l_y___p_r_o_j_e_c_t_i_o_n_/_2,
+       _p_a_r_t_i_t_i_o_n_/_2, _p_a_r_t_i_t_i_o_n___f_a_m_i_l_y_/_2, _p_r_o_j_e_c_t_i_o_n_/_2, _r_e_s_t_r_i_c_t_i_o_n_/_3,
+       _s_u_b_s_t_i_t_u_t_i_o_n_/_2) accept an Erlang function as a means to modify each
+       element of a given unordered set. Such a function, called SetFun in the
+       following, can be specified as a functional object (fun), a tuple
+       _{_e_x_t_e_r_n_a_l_, _F_u_n_}, or an integer. If SetFun is specified as a fun, the
+       fun is applied to each element of the given set and the return value is
+       assumed to be a set. If SetFun is specified as a tuple _{_e_x_t_e_r_n_a_l_, _F_u_n_},
+       Fun is applied to the external set of each element of the given set and
+       the return value is assumed to be an external set. Selecting the
+       elements of an unordered set as external sets and assembling a new
+       unordered set from a list of external sets is in the present
+       implementation more efficient than modifying each element as a set.
+       However, this optimization can only be utilized when the elements of
+       the unordered set are atomic or ordered sets. It must also be the case
+       that the type of the elements matches some clause of Fun (the type of
+       the created set is the result of applying Fun to the type of the given
+       set), and that Fun does nothing but selecting, duplicating or
+       rearranging parts of the elements. Specifying a SetFun as an integer I
+       is equivalent to specifying _{_e_x_t_e_r_n_a_l_, _f_u_n_(_X_) _-_> _e_l_e_m_e_n_t_(_I_, _X_) _e_n_d_},
+       but is to be preferred since it makes it possible to handle this case
+       even more efficiently. Examples of SetFuns:
+
+       fun sofs:union/1
+       fun(S) -> sofs:partition(1, S) end
+       {external, fun(A) -> A end}
+       {external, fun({A,_,C}) -> {C,A} end}
+       {external, fun({_,{_,C}}) -> C end}
+       {external, fun({_,{_,{_,E}=C}}) -> {E,{E,C}} end}
+       2
+
+       The order in which a SetFun is applied to the elements of an unordered
+       set is not specified, and may change in future versions of sofs.
+
+       The execution time of the functions of this module is dominated by the
+       time it takes to sort lists. When no sorting is needed, the execution
+       time is in the worst case proportional to the sum of the sizes of the
+       input arguments and the returned value. A few functions execute in
+       constant time: _f_r_o_m___e_x_t_e_r_n_a_l, _i_s___e_m_p_t_y___s_e_t, _i_s___s_e_t, _i_s___s_o_f_s___s_e_t,
+       _t_o___e_x_t_e_r_n_a_l, _t_y_p_e.
+
+       The functions of this module exit the process with a _b_a_d_a_r_g,
+       _b_a_d___f_u_n_c_t_i_o_n, or _t_y_p_e___m_i_s_m_a_t_c_h message when given badly formed
+       arguments or sets the types of which are not compatible.
+
+       When comparing external sets the operator _=_=_/_2 is used.
+
+DDAATTAA TTYYPPEESS
+       aannyysseett(()) = oorrddsseett(()) | aa__sseett(())
+
+              Any kind of set (also included are the atomic sets).
+
+       bbiinnaarryy__rreellaattiioonn(()) = rreellaattiioonn(())
+
+              A bbiinnaarryy rreellaattiioonn.
+
+       eexxtteerrnnaall__sseett(()) = term()
+
+              An eexxtteerrnnaall sseett.
+
+       ffaammiillyy(()) = aa__ffuunnccttiioonn(())
+
+              A ffaammiillyy (of subsets).
+
+       aa__ffuunnccttiioonn(()) = rreellaattiioonn(())
+
+              A ffuunnccttiioonn.
+
+       oorrddsseett(())
+
+              An oorrddeerreedd sseett.
+
+       rreellaattiioonn(()) = aa__sseett(())
+
+              An nn--aarryy rreellaattiioonn.
+
+       aa__sseett(())
+
+              An uunnoorrddeerreedd sseett.
+
+       sseett__ooff__sseettss(()) = aa__sseett(())
+
+              An uunnoorrddeerreedd sseett of unordered sets.
+
+       sseett__ffuunn(()) = integer() >= 1
+                 | {external, fun((eexxtteerrnnaall__sseett(())) -> eexxtteerrnnaall__sseett(()))}
+                 | fun((aannyysseett(())) -> aannyysseett(()))
+
+              A SSeettFFuunn.
+
+       ssppeecc__ffuunn(()) = {external, fun((eexxtteerrnnaall__sseett(())) -> boolean())}
+                  | fun((aannyysseett(())) -> boolean())
+
+       ttyyppee(()) = term()
+
+              A ttyyppee.
+
+       ttuuppllee__ooff((TT))
+
+              A tuple where the elements are of type _T.
+
+EEXXPPOORRTTSS
+       aa__ffuunnccttiioonn((TTuupplleess)) -->> FFuunnccttiioonn
+
+       aa__ffuunnccttiioonn((TTuupplleess,, TTyyppee)) -->> FFuunnccttiioonn
+
+              Types:
+
+                 Function = aa__ffuunnccttiioonn(())
+                 Tuples = [tuple()]
+                 Type = ttyyppee(())
+
+              Creates a ffuunnccttiioonn. _a___f_u_n_c_t_i_o_n_(_F_, _T_) is equivalent to
+              _f_r_o_m___t_e_r_m_(_F_, _T_), if the result is a function. If no ttyyppee is
+              explicitly given, _[_{_a_t_o_m_, _a_t_o_m_}_] is used as type of the
+              function.
+
+       ccaannoonniiccaall__rreellaattiioonn((SSeettOOffSSeettss)) -->> BBiinnRReell
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 SetOfSets = sseett__ooff__sseettss(())
+
+              Returns the binary relation containing the elements (E, Set)
+              such that Set belongs to SetOfSets and E belongs to Set. If
+              SetOfSets is a ppaarrttiittiioonn of a set X and R is the equivalence
+              relation in X induced by SetOfSets, then the returned relation
+              is the ccaannoonniiccaall mmaapp from X onto the equivalence classes with
+              respect to R.
+
+              1> Ss = sofs:from_term([[a,b],[b,c]]),
+              CR = sofs:canonical_relation(Ss),
+              sofs:to_external(CR).
+              [{a,[a,b]},{b,[a,b]},{b,[b,c]},{c,[b,c]}]
+
+       ccoommppoossiittee((FFuunnccttiioonn11,, FFuunnccttiioonn22)) -->> FFuunnccttiioonn33
+
+              Types:
+
+                 Function1 = Function2 = Function3 = aa__ffuunnccttiioonn(())
+
+              Returns the ccoommppoossiittee of the functions Function1 and Function2.
+
+              1> F1 = sofs:a_function([{a,1},{b,2},{c,2}]),
+              F2 = sofs:a_function([{1,x},{2,y},{3,z}]),
+              F = sofs:composite(F1, F2),
+              sofs:to_external(F).
+              [{a,x},{b,y},{c,y}]
+
+       ccoonnssttaanntt__ffuunnccttiioonn((SSeett,, AAnnyySSeett)) -->> FFuunnccttiioonn
+
+              Types:
+
+                 AnySet = aannyysseett(())
+                 Function = aa__ffuunnccttiioonn(())
+                 Set = aa__sseett(())
+
+              Creates the ffuunnccttiioonn that maps each element of the set Set onto
+              AnySet.
+
+              1> S = sofs:set([a,b]),
+              E = sofs:from_term(1),
+              R = sofs:constant_function(S, E),
+              sofs:to_external(R).
+              [{a,1},{b,1}]
+
+       ccoonnvveerrssee((BBiinnRReell11)) -->> BBiinnRReell22
+
+              Types:
+
+                 BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns the ccoonnvveerrssee of the binary relation BinRel1.
+
+              1> R1 = sofs:relation([{1,a},{2,b},{3,a}]),
+              R2 = sofs:converse(R1),
+              sofs:to_external(R2).
+              [{a,1},{a,3},{b,2}]
+
+       ddiiffffeerreennccee((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = aa__sseett(())
+
+              Returns the ddiiffffeerreennccee of the sets Set1 and Set2.
+
+       ddiiggrraapphh__ttoo__ffaammiillyy((GGrraapphh)) -->> FFaammiillyy
+
+       ddiiggrraapphh__ttoo__ffaammiillyy((GGrraapphh,, TTyyppee)) -->> FFaammiillyy
+
+              Types:
+
+                 Graph = digraph()
+                 Family = ffaammiillyy(())
+                 Type = ttyyppee(())
+
+              Creates a ffaammiillyy from the directed graph Graph. Each vertex a of
+              Graph is represented by a pair (a, {b[1], ..., b[n]}) where the
+              b[i]'s are the out-neighbours of a. If no type is explicitly
+              given, [{atom, [atom]}] is used as type of the family. It is
+              assumed that Type is a vvaalliidd ttyyppee of the external set of the
+              family.
+
+              If G is a directed graph, it holds that the vertices and edges
+              of G are the same as the vertices and edges of
+              _f_a_m_i_l_y___t_o___d_i_g_r_a_p_h_(_d_i_g_r_a_p_h___t_o___f_a_m_i_l_y_(_G_)_).
+
+       ddoommaaiinn((BBiinnRReell)) -->> SSeett
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 Set = aa__sseett(())
+
+              Returns the ddoommaaiinn of the binary relation BinRel.
+
+              1> R = sofs:relation([{1,a},{1,b},{2,b},{2,c}]),
+              S = sofs:domain(R),
+              sofs:to_external(S).
+              [1,2]
+
+       ddrreessttrriiccttiioonn((BBiinnRReell11,, SSeett)) -->> BBiinnRReell22
+
+              Types:
+
+                 BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+                 Set = aa__sseett(())
+
+              Returns the difference between the binary relation BinRel1 and
+              the rreessttrriiccttiioonn of BinRel1 to Set.
+
+              1> R1 = sofs:relation([{1,a},{2,b},{3,c}]),
+              S = sofs:set([2,4,6]),
+              R2 = sofs:drestriction(R1, S),
+              sofs:to_external(R2).
+              [{1,a},{3,c}]
+
+              _d_r_e_s_t_r_i_c_t_i_o_n_(_R_, _S_) is equivalent to _d_i_f_f_e_r_e_n_c_e_(_R_, _r_e_s_t_r_i_c_t_i_o_n_(_R_,
+              _S_)_).
+
+       ddrreessttrriiccttiioonn((SSeettFFuunn,, SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Set1 = Set2 = Set3 = aa__sseett(())
+
+              Returns a subset of Set1 containing those elements that do not
+              yield an element in Set2 as the result of applying SetFun.
+
+              1> SetFun = {external, fun({_A,B,C}) -> {B,C} end},
+              R1 = sofs:relation([{a,aa,1},{b,bb,2},{c,cc,3}]),
+              R2 = sofs:relation([{bb,2},{cc,3},{dd,4}]),
+              R3 = sofs:drestriction(SetFun, R1, R2),
+              sofs:to_external(R3).
+              [{a,aa,1}]
+
+              _d_r_e_s_t_r_i_c_t_i_o_n_(_F_, _S_1_, _S_2_) is equivalent to _d_i_f_f_e_r_e_n_c_e_(_S_1_,
+              _r_e_s_t_r_i_c_t_i_o_n_(_F_, _S_1_, _S_2_)_).
+
+       eemmppttyy__sseett(()) -->> SSeett
+
+              Types:
+
+                 Set = aa__sseett(())
+
+              Returns the uunnttyyppeedd eemmppttyy sseett. _e_m_p_t_y___s_e_t_(_) is equivalent to
+              _f_r_o_m___t_e_r_m_(_[_]_, _[_'___'_]_).
+
+       eexxtteennssiioonn((BBiinnRReell11,, SSeett,, AAnnyySSeett)) -->> BBiinnRReell22
+
+              Types:
+
+                 AnySet = aannyysseett(())
+                 BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+                 Set = aa__sseett(())
+
+              Returns the eexxtteennssiioonn of BinRel1 such that for each element E in
+              Set that does not belong to the ddoommaaiinn of BinRel1, BinRel2
+              contains the pair (E, AnySet).
+
+              1> S = sofs:set([b,c]),
+              A = sofs:empty_set(),
+              R = sofs:family([{a,[1,2]},{b,[3]}]),
+              X = sofs:extension(R, S, A),
+              sofs:to_external(X).
+              [{a,[1,2]},{b,[3]},{c,[]}]
+
+       ffaammiillyy((TTuupplleess)) -->> FFaammiillyy
+
+       ffaammiillyy((TTuupplleess,, TTyyppee)) -->> FFaammiillyy
+
+              Types:
+
+                 Family = ffaammiillyy(())
+                 Tuples = [tuple()]
+                 Type = ttyyppee(())
+
+              Creates a ffaammiillyy ooff ssuubbsseettss. _f_a_m_i_l_y_(_F_, _T_) is equivalent to
+              _f_r_o_m___t_e_r_m_(_F_, _T_), if the result is a family. If no ttyyppee is
+              explicitly given, _[_{_a_t_o_m_, _[_a_t_o_m_]_}_] is used as type of the
+              family.
+
+       ffaammiillyy__ddiiffffeerreennccee((FFaammiillyy11,, FFaammiillyy22)) -->> FFaammiillyy33
+
+              Types:
+
+                 Family1 = Family2 = Family3 = ffaammiillyy(())
+
+              If Family1 and Family2 are ffaammiilliieess, then Family3 is the family
+              such that the index set is equal to the index set of Family1,
+              and Family3[i] is the difference between Family1[i] and
+              Family2[i] if Family2 maps i, Family1[i] otherwise.
+
+              1> F1 = sofs:family([{a,[1,2]},{b,[3,4]}]),
+              F2 = sofs:family([{b,[4,5]},{c,[6,7]}]),
+              F3 = sofs:family_difference(F1, F2),
+              sofs:to_external(F3).
+              [{a,[1,2]},{b,[3]}]
+
+       ffaammiillyy__ddoommaaiinn((FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy and Family1[i] is a binary relation for
+              every i in the index set of Family1, then Family2 is the family
+              with the same index set as Family1 such that Family2[i] is the
+              ddoommaaiinn of Family1[i].
+
+              1> FR = sofs:from_term([{a,[{1,a},{2,b},{3,c}]},{b,[]},{c,[{4,d},{5,e}]}]),
+              F = sofs:family_domain(FR),
+              sofs:to_external(F).
+              [{a,[1,2,3]},{b,[]},{c,[4,5]}]
+
+       ffaammiillyy__ffiieelldd((FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy and Family1[i] is a binary relation for
+              every i in the index set of Family1, then Family2 is the family
+              with the same index set as Family1 such that Family2[i] is the
+              ffiieelldd of Family1[i].
+
+              1> FR = sofs:from_term([{a,[{1,a},{2,b},{3,c}]},{b,[]},{c,[{4,d},{5,e}]}]),
+              F = sofs:family_field(FR),
+              sofs:to_external(F).
+              [{a,[1,2,3,a,b,c]},{b,[]},{c,[4,5,d,e]}]
+
+              _f_a_m_i_l_y___f_i_e_l_d_(_F_a_m_i_l_y_1_) is equivalent to
+              _f_a_m_i_l_y___u_n_i_o_n_(_f_a_m_i_l_y___d_o_m_a_i_n_(_F_a_m_i_l_y_1_)_, _f_a_m_i_l_y___r_a_n_g_e_(_F_a_m_i_l_y_1_)_).
+
+       ffaammiillyy__iinntteerrsseeccttiioonn((FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy and Family1[i] is a set of sets for every
+              i in the index set of Family1, then Family2 is the family with
+              the same index set as Family1 such that Family2[i] is the
+              iinntteerrsseeccttiioonn of Family1[i].
+
+              If Family1[i] is an empty set for some i, then the process exits
+              with a _b_a_d_a_r_g message.
+
+              1> F1 = sofs:from_term([{a,[[1,2,3],[2,3,4]]},{b,[[x,y,z],[x,y]]}]),
+              F2 = sofs:family_intersection(F1),
+              sofs:to_external(F2).
+              [{a,[2,3]},{b,[x,y]}]
+
+       ffaammiillyy__iinntteerrsseeccttiioonn((FFaammiillyy11,, FFaammiillyy22)) -->> FFaammiillyy33
+
+              Types:
+
+                 Family1 = Family2 = Family3 = ffaammiillyy(())
+
+              If Family1 and Family2 are ffaammiilliieess, then Family3 is the family
+              such that the index set is the intersection of Family1's and
+              Family2's index sets, and Family3[i] is the intersection of
+              Family1[i] and Family2[i].
+
+              1> F1 = sofs:family([{a,[1,2]},{b,[3,4]},{c,[5,6]}]),
+              F2 = sofs:family([{b,[4,5]},{c,[7,8]},{d,[9,10]}]),
+              F3 = sofs:family_intersection(F1, F2),
+              sofs:to_external(F3).
+              [{b,[4]},{c,[]}]
+
+       ffaammiillyy__pprroojjeeccttiioonn((SSeettFFuunn,, FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy then Family2 is the family with the same
+              index set as Family1 such that Family2[i] is the result of
+              calling SetFun with Family1[i] as argument.
+
+              1> F1 = sofs:from_term([{a,[[1,2],[2,3]]},{b,[[]]}]),
+              F2 = sofs:family_projection(fun sofs:union/1, F1),
+              sofs:to_external(F2).
+              [{a,[1,2,3]},{b,[]}]
+
+       ffaammiillyy__rraannggee((FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy and Family1[i] is a binary relation for
+              every i in the index set of Family1, then Family2 is the family
+              with the same index set as Family1 such that Family2[i] is the
+              rraannggee of Family1[i].
+
+              1> FR = sofs:from_term([{a,[{1,a},{2,b},{3,c}]},{b,[]},{c,[{4,d},{5,e}]}]),
+              F = sofs:family_range(FR),
+              sofs:to_external(F).
+              [{a,[a,b,c]},{b,[]},{c,[d,e]}]
+
+       ffaammiillyy__ssppeecciiffiiccaattiioonn((FFuunn,, FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 Fun = ssppeecc__ffuunn(())
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy, then Family2 is the rreessttrriiccttiioonn of
+              Family1 to those elements i of the index set for which Fun
+              applied to Family1[i] returns _t_r_u_e. If Fun is a tuple _{_e_x_t_e_r_n_a_l_,
+              _F_u_n_2_}, Fun2 is applied to the eexxtteerrnnaall sseett of Family1[i],
+              otherwise Fun is applied to Family1[i].
+
+              1> F1 = sofs:family([{a,[1,2,3]},{b,[1,2]},{c,[1]}]),
+              SpecFun = fun(S) -> sofs:no_elements(S) =:= 2 end,
+              F2 = sofs:family_specification(SpecFun, F1),
+              sofs:to_external(F2).
+              [{b,[1,2]}]
+
+       ffaammiillyy__ttoo__ddiiggrraapphh((FFaammiillyy)) -->> GGrraapphh
+
+       ffaammiillyy__ttoo__ddiiggrraapphh((FFaammiillyy,, GGrraapphhTTyyppee)) -->> GGrraapphh
+
+              Types:
+
+                 Graph = digraph()
+                 Family = ffaammiillyy(())
+                 GraphType = [ddiiggrraapphh::dd__ttyyppee(())]
+
+              Creates a directed graph from the ffaammiillyy Family. For each pair
+              (a, {b[1], ..., b[n]}) of Family, the vertex a as well the edges
+              (a, b[i]) for 1 <= i <= n are added to a newly created directed
+              graph.
+
+              If no graph type is given  ddiiggrraapphh::nneeww//00 is used for creating
+              the directed graph, otherwise the GraphType argument is passed
+              on as second argument to ddiiggrraapphh::nneeww//11.
+
+              It F is a family, it holds that F is a subset of
+              _d_i_g_r_a_p_h___t_o___f_a_m_i_l_y_(_f_a_m_i_l_y___t_o___d_i_g_r_a_p_h_(_F_)_, _t_y_p_e_(_F_)_). Equality holds
+              if _u_n_i_o_n___o_f___f_a_m_i_l_y_(_F_) is a subset of _d_o_m_a_i_n_(_F_).
+
+              Creating a cycle in an acyclic graph exits the process with a
+              _c_y_c_l_i_c message.
+
+       ffaammiillyy__ttoo__rreellaattiioonn((FFaammiillyy)) -->> BBiinnRReell
+
+              Types:
+
+                 Family = ffaammiillyy(())
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+
+              If Family is a ffaammiillyy, then BinRel is the binary relation
+              containing all pairs (i, x) such that i belongs to the index set
+              of Family and x belongs to Family[i].
+
+              1> F = sofs:family([{a,[]}, {b,[1]}, {c,[2,3]}]),
+              R = sofs:family_to_relation(F),
+              sofs:to_external(R).
+              [{b,1},{c,2},{c,3}]
+
+       ffaammiillyy__uunniioonn((FFaammiillyy11)) -->> FFaammiillyy22
+
+              Types:
+
+                 Family1 = Family2 = ffaammiillyy(())
+
+              If Family1 is a ffaammiillyy and Family1[i] is a set of sets for each
+              i in the index set of Family1, then Family2 is the family with
+              the same index set as Family1 such that Family2[i] is the uunniioonn
+              of Family1[i].
+
+              1> F1 = sofs:from_term([{a,[[1,2],[2,3]]},{b,[[]]}]),
+              F2 = sofs:family_union(F1),
+              sofs:to_external(F2).
+              [{a,[1,2,3]},{b,[]}]
+
+              _f_a_m_i_l_y___u_n_i_o_n_(_F_) is equivalent to _f_a_m_i_l_y___p_r_o_j_e_c_t_i_o_n_(_f_u_n
+              _s_o_f_s_:_u_n_i_o_n_/_1_, _F_).
+
+       ffaammiillyy__uunniioonn((FFaammiillyy11,, FFaammiillyy22)) -->> FFaammiillyy33
+
+              Types:
+
+                 Family1 = Family2 = Family3 = ffaammiillyy(())
+
+              If Family1 and Family2 are ffaammiilliieess, then Family3 is the family
+              such that the index set is the union of Family1's and Family2's
+              index sets, and Family3[i] is the union of Family1[i] and
+              Family2[i] if both maps i, Family1[i] or Family2[i] otherwise.
+
+              1> F1 = sofs:family([{a,[1,2]},{b,[3,4]},{c,[5,6]}]),
+              F2 = sofs:family([{b,[4,5]},{c,[7,8]},{d,[9,10]}]),
+              F3 = sofs:family_union(F1, F2),
+              sofs:to_external(F3).
+              [{a,[1,2]},{b,[3,4,5]},{c,[5,6,7,8]},{d,[9,10]}]
+
+       ffiieelldd((BBiinnRReell)) -->> SSeett
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 Set = aa__sseett(())
+
+              Returns the ffiieelldd of the binary relation BinRel.
+
+              1> R = sofs:relation([{1,a},{1,b},{2,b},{2,c}]),
+              S = sofs:field(R),
+              sofs:to_external(S).
+              [1,2,a,b,c]
+
+              _f_i_e_l_d_(_R_) is equivalent to _u_n_i_o_n_(_d_o_m_a_i_n_(_R_)_, _r_a_n_g_e_(_R_)_).
+
+       ffrroomm__eexxtteerrnnaall((EExxtteerrnnaallSSeett,, TTyyppee)) -->> AAnnyySSeett
+
+              Types:
+
+                 ExternalSet = eexxtteerrnnaall__sseett(())
+                 AnySet = aannyysseett(())
+                 Type = ttyyppee(())
+
+              Creates a set from the eexxtteerrnnaall sseett ExternalSet and the ttyyppee
+              Type. It is assumed that Type is a vvaalliidd ttyyppee of ExternalSet.
+
+       ffrroomm__sseettss((LLiissttOOffSSeettss)) -->> SSeett
+
+              Types:
+
+                 Set = aa__sseett(())
+                 ListOfSets = [aannyysseett(())]
+
+              Returns the uunnoorrddeerreedd sseett containing the sets of the list
+              ListOfSets.
+
+              1> S1 = sofs:relation([{a,1},{b,2}]),
+              S2 = sofs:relation([{x,3},{y,4}]),
+              S = sofs:from_sets([S1,S2]),
+              sofs:to_external(S).
+              [[{a,1},{b,2}],[{x,3},{y,4}]]
+
+       ffrroomm__sseettss((TTuupplleeOOffSSeettss)) -->> OOrrddsseett
+
+              Types:
+
+                 Ordset = oorrddsseett(())
+                 TupleOfSets = ttuuppllee__ooff(aannyysseett(()))
+
+              Returns the oorrddeerreedd sseett containing the sets of the non-empty
+              tuple TupleOfSets.
+
+       ffrroomm__tteerrmm((TTeerrmm)) -->> AAnnyySSeett
+
+       ffrroomm__tteerrmm((TTeerrmm,, TTyyppee)) -->> AAnnyySSeett
+
+              Types:
+
+                 AnySet = aannyysseett(())
+                 Term = term()
+                 Type = ttyyppee(())
+
+              Creates an element of SSeettss by traversing the term Term, sorting
+              lists, removing duplicates and deriving or verifying a vvaalliidd
+              ttyyppee for the so obtained external set. An explicitly given ttyyppee
+              Type can be used to limit the depth of the traversal; an atomic
+              type stops the traversal, as demonstrated by this example where
+              "foo" and {"foo"} are left unmodified:
+
+              1> S = sofs:from_term([{{"foo"},[1,1]},{"foo",[2,2]}], [{atom,[atom]}]),
+              sofs:to_external(S).
+              [{{"foo"},[1]},{"foo",[2]}]
+
+              _f_r_o_m___t_e_r_m can be used for creating atomic or ordered sets. The
+              only purpose of such a set is that of later building unordered
+              sets since all functions in this module that _d_o anything operate
+              on unordered sets. Creating unordered sets from a collection of
+              ordered sets may be the way to go if the ordered sets are big
+              and one does not want to waste heap by rebuilding the elements
+              of the unordered set. An example showing that a set can be built
+              "layer by layer":
+
+              1> A = sofs:from_term(a),
+              S = sofs:set([1,2,3]),
+              P1 = sofs:from_sets({A,S}),
+              P2 = sofs:from_term({b,[6,5,4]}),
+              Ss = sofs:from_sets([P1,P2]),
+              sofs:to_external(Ss).
+              [{a,[1,2,3]},{b,[4,5,6]}]
+
+              Other functions that create sets are _f_r_o_m___e_x_t_e_r_n_a_l_/_2 and
+              _f_r_o_m___s_e_t_s_/_1. Special cases of _f_r_o_m___t_e_r_m_/_2 are _a___f_u_n_c_t_i_o_n_/_1_,_2,
+              _e_m_p_t_y___s_e_t_/_0, _f_a_m_i_l_y_/_1_,_2, _r_e_l_a_t_i_o_n_/_1_,_2, and _s_e_t_/_1_,_2.
+
+       iimmaaggee((BBiinnRReell,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns the iimmaaggee of the set Set1 under the binary relation
+              BinRel.
+
+              1> R = sofs:relation([{1,a},{2,b},{2,c},{3,d}]),
+              S1 = sofs:set([1,2]),
+              S2 = sofs:image(R, S1),
+              sofs:to_external(S2).
+              [a,b,c]
+
+       iinntteerrsseeccttiioonn((SSeettOOffSSeettss)) -->> SSeett
+
+              Types:
+
+                 Set = aa__sseett(())
+                 SetOfSets = sseett__ooff__sseettss(())
+
+              Returns the iinntteerrsseeccttiioonn of the set of sets SetOfSets.
+
+              Intersecting an empty set of sets exits the process with a
+              _b_a_d_a_r_g message.
+
+       iinntteerrsseeccttiioonn((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = aa__sseett(())
+
+              Returns the iinntteerrsseeccttiioonn of Set1 and Set2.
+
+       iinntteerrsseeccttiioonn__ooff__ffaammiillyy((FFaammiillyy)) -->> SSeett
+
+              Types:
+
+                 Family = ffaammiillyy(())
+                 Set = aa__sseett(())
+
+              Returns the intersection of the ffaammiillyy Family.
+
+              Intersecting an empty family exits the process with a _b_a_d_a_r_g
+              message.
+
+              1> F = sofs:family([{a,[0,2,4]},{b,[0,1,2]},{c,[2,3]}]),
+              S = sofs:intersection_of_family(F),
+              sofs:to_external(S).
+              [2]
+
+       iinnvveerrssee((FFuunnccttiioonn11)) -->> FFuunnccttiioonn22
+
+              Types:
+
+                 Function1 = Function2 = aa__ffuunnccttiioonn(())
+
+              Returns the iinnvveerrssee of the function Function1.
+
+              1> R1 = sofs:relation([{1,a},{2,b},{3,c}]),
+              R2 = sofs:inverse(R1),
+              sofs:to_external(R2).
+              [{a,1},{b,2},{c,3}]
+
+       iinnvveerrssee__iimmaaggee((BBiinnRReell,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns the iinnvveerrssee iimmaaggee of Set1 under the binary relation
+              BinRel.
+
+              1> R = sofs:relation([{1,a},{2,b},{2,c},{3,d}]),
+              S1 = sofs:set([c,d,e]),
+              S2 = sofs:inverse_image(R, S1),
+              sofs:to_external(S2).
+              [2,3]
+
+       iiss__aa__ffuunnccttiioonn((BBiinnRReell)) -->> BBooooll
+
+              Types:
+
+                 Bool = boolean()
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns _t_r_u_e if the binary relation BinRel is a ffuunnccttiioonn or the
+              untyped empty set, _f_a_l_s_e otherwise.
+
+       iiss__ddiissjjooiinntt((SSeett11,, SSeett22)) -->> BBooooll
+
+              Types:
+
+                 Bool = boolean()
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns _t_r_u_e if Set1 and Set2 are ddiissjjooiinntt, _f_a_l_s_e otherwise.
+
+       iiss__eemmppttyy__sseett((AAnnyySSeett)) -->> BBooooll
+
+              Types:
+
+                 AnySet = aannyysseett(())
+                 Bool = boolean()
+
+              Returns _t_r_u_e if AnySet is an empty unordered set, _f_a_l_s_e
+              otherwise.
+
+       iiss__eeqquuaall((AAnnyySSeett11,, AAnnyySSeett22)) -->> BBooooll
+
+              Types:
+
+                 AnySet1 = AnySet2 = aannyysseett(())
+                 Bool = boolean()
+
+              Returns _t_r_u_e if the AnySet1 and AnySet2 are eeqquuaall, _f_a_l_s_e
+              otherwise. This example shows that _=_=_/_2 is used when comparing
+              sets for equality:
+
+              1> S1 = sofs:set([1.0]),
+              S2 = sofs:set([1]),
+              sofs:is_equal(S1, S2).
+              true
+
+       iiss__sseett((AAnnyySSeett)) -->> BBooooll
+
+              Types:
+
+                 AnySet = aannyysseett(())
+                 Bool = boolean()
+
+              Returns _t_r_u_e if AnySet is an uunnoorrddeerreedd sseett, and _f_a_l_s_e if AnySet
+              is an ordered set or an atomic set.
+
+       iiss__ssooffss__sseett((TTeerrmm)) -->> BBooooll
+
+              Types:
+
+                 Bool = boolean()
+                 Term = term()
+
+              Returns _t_r_u_e if Term is an uunnoorrddeerreedd sseett, an ordered set or an
+              atomic set, _f_a_l_s_e otherwise.
+
+       iiss__ssuubbsseett((SSeett11,, SSeett22)) -->> BBooooll
+
+              Types:
+
+                 Bool = boolean()
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns _t_r_u_e if Set1 is a ssuubbsseett of Set2, _f_a_l_s_e otherwise.
+
+       iiss__ttyyppee((TTeerrmm)) -->> BBooooll
+
+              Types:
+
+                 Bool = boolean()
+                 Term = term()
+
+              Returns _t_r_u_e if the term Term is a ttyyppee.
+
+       jjooiinn((RReellaattiioonn11,, II,, RReellaattiioonn22,, JJ)) -->> RReellaattiioonn33
+
+              Types:
+
+                 Relation1 = Relation2 = Relation3 = rreellaattiioonn(())
+                 I = J = integer() >= 1
+
+              Returns the nnaattuurraall jjooiinn of the relations Relation1 and
+              Relation2 on coordinates I and J.
+
+              1> R1 = sofs:relation([{a,x,1},{b,y,2}]),
+              R2 = sofs:relation([{1,f,g},{1,h,i},{2,3,4}]),
+              J = sofs:join(R1, 3, R2, 1),
+              sofs:to_external(J).
+              [{a,x,1,f,g},{a,x,1,h,i},{b,y,2,3,4}]
+
+       mmuullttiippllee__rreellaattiivvee__pprroodduucctt((TTuupplleeOOffBBiinnRReellss,, BBiinnRReell11)) -->> BBiinnRReell22
+
+              Types:
+
+                 TupleOfBinRels = ttuuppllee__ooff(BinRel)
+                 BinRel = BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+
+              If TupleOfBinRels is a non-empty tuple {R[1], ..., R[n]} of
+              binary relations and BinRel1 is a binary relation, then BinRel2
+              is the mmuullttiippllee rreellaattiivvee pprroodduucctt of the ordered set (R[i], ...,
+              R[n]) and BinRel1.
+
+              1> Ri = sofs:relation([{a,1},{b,2},{c,3}]),
+              R = sofs:relation([{a,b},{b,c},{c,a}]),
+              MP = sofs:multiple_relative_product({Ri, Ri}, R),
+              sofs:to_external(sofs:range(MP)).
+              [{1,2},{2,3},{3,1}]
+
+       nnoo__eelleemmeennttss((AASSeett)) -->> NNooEElleemmeennttss
+
+              Types:
+
+                 ASet = aa__sseett(()) | oorrddsseett(())
+                 NoElements = integer() >= 0
+
+              Returns the number of elements of the ordered or unordered set
+              ASet.
+
+       ppaarrttiittiioonn((SSeettOOffSSeettss)) -->> PPaarrttiittiioonn
+
+              Types:
+
+                 SetOfSets = sseett__ooff__sseettss(())
+                 Partition = aa__sseett(())
+
+              Returns the ppaarrttiittiioonn of the union of the set of sets SetOfSets
+              such that two elements are considered equal if they belong to
+              the same elements of SetOfSets.
+
+              1> Sets1 = sofs:from_term([[a,b,c],[d,e,f],[g,h,i]]),
+              Sets2 = sofs:from_term([[b,c,d],[e,f,g],[h,i,j]]),
+              P = sofs:partition(sofs:union(Sets1, Sets2)),
+              sofs:to_external(P).
+              [[a],[b,c],[d],[e,f],[g],[h,i],[j]]
+
+       ppaarrttiittiioonn((SSeettFFuunn,, SSeett)) -->> PPaarrttiittiioonn
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Partition = Set = aa__sseett(())
+
+              Returns the ppaarrttiittiioonn of Set such that two elements are
+              considered equal if the results of applying SetFun are equal.
+
+              1> Ss = sofs:from_term([[a],[b],[c,d],[e,f]]),
+              SetFun = fun(S) -> sofs:from_term(sofs:no_elements(S)) end,
+              P = sofs:partition(SetFun, Ss),
+              sofs:to_external(P).
+              [[[a],[b]],[[c,d],[e,f]]]
+
+       ppaarrttiittiioonn((SSeettFFuunn,, SSeett11,, SSeett22)) -->> {{SSeett33,, SSeett44}}
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Set1 = Set2 = Set3 = Set4 = aa__sseett(())
+
+              Returns a pair of sets that, regarded as constituting a set,
+              forms a ppaarrttiittiioonn of Set1. If the result of applying SetFun to
+              an element of Set1 yields an element in Set2, the element
+              belongs to Set3, otherwise the element belongs to Set4.
+
+              1> R1 = sofs:relation([{1,a},{2,b},{3,c}]),
+              S = sofs:set([2,4,6]),
+              {R2,R3} = sofs:partition(1, R1, S),
+              {sofs:to_external(R2),sofs:to_external(R3)}.
+              {[{2,b}],[{1,a},{3,c}]}
+
+              _p_a_r_t_i_t_i_o_n_(_F_, _S_1_, _S_2_) is equivalent to _{_r_e_s_t_r_i_c_t_i_o_n_(_F_, _S_1_, _S_2_)_,
+              _d_r_e_s_t_r_i_c_t_i_o_n_(_F_, _S_1_, _S_2_)_}.
+
+       ppaarrttiittiioonn__ffaammiillyy((SSeettFFuunn,, SSeett)) -->> FFaammiillyy
+
+              Types:
+
+                 Family = ffaammiillyy(())
+                 SetFun = sseett__ffuunn(())
+                 Set = aa__sseett(())
+
+              Returns the ffaammiillyy Family where the indexed set is a ppaarrttiittiioonn
+              of Set such that two elements are considered equal if the
+              results of applying SetFun are the same value i. This i is the
+              index that Family maps onto the eeqquuiivvaalleennccee ccllaassss.
+
+              1> S = sofs:relation([{a,a,a,a},{a,a,b,b},{a,b,b,b}]),
+              SetFun = {external, fun({A,_,C,_}) -> {A,C} end},
+              F = sofs:partition_family(SetFun, S),
+              sofs:to_external(F).
+              [{{a,a},[{a,a,a,a}]},{{a,b},[{a,a,b,b},{a,b,b,b}]}]
+
+       pprroodduucctt((TTuupplleeOOffSSeettss)) -->> RReellaattiioonn
+
+              Types:
+
+                 Relation = rreellaattiioonn(())
+                 TupleOfSets = ttuuppllee__ooff(aa__sseett(()))
+
+              Returns the CCaarrtteessiiaann pprroodduucctt of the non-empty tuple of sets
+              TupleOfSets. If (x[1], ..., x[n]) is an element of the n-ary
+              relation Relation, then x[i] is drawn from element i of
+              TupleOfSets.
+
+              1> S1 = sofs:set([a,b]),
+              S2 = sofs:set([1,2]),
+              S3 = sofs:set([x,y]),
+              P3 = sofs:product({S1,S2,S3}),
+              sofs:to_external(P3).
+              [{a,1,x},{a,1,y},{a,2,x},{a,2,y},{b,1,x},{b,1,y},{b,2,x},{b,2,y}]
+
+       pprroodduucctt((SSeett11,, SSeett22)) -->> BBiinnRReell
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns the CCaarrtteessiiaann pprroodduucctt of Set1 and Set2.
+
+              1> S1 = sofs:set([1,2]),
+              S2 = sofs:set([a,b]),
+              R = sofs:product(S1, S2),
+              sofs:to_external(R).
+              [{1,a},{1,b},{2,a},{2,b}]
+
+              _p_r_o_d_u_c_t_(_S_1_, _S_2_) is equivalent to _p_r_o_d_u_c_t_(_{_S_1_, _S_2_}_).
+
+       pprroojjeeccttiioonn((SSeettFFuunn,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns the set created by substituting each element of Set1 by
+              the result of applying SetFun to the element.
+
+              If SetFun is a number i >= 1 and Set1 is a relation, then the
+              returned set is the pprroojjeeccttiioonn of Set1 onto coordinate i.
+
+              1> S1 = sofs:from_term([{1,a},{2,b},{3,a}]),
+              S2 = sofs:projection(2, S1),
+              sofs:to_external(S2).
+              [a,b]
+
+       rraannggee((BBiinnRReell)) -->> SSeett
+
+              Types:
+
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+                 Set = aa__sseett(())
+
+              Returns the rraannggee of the binary relation BinRel.
+
+              1> R = sofs:relation([{1,a},{1,b},{2,b},{2,c}]),
+              S = sofs:range(R),
+              sofs:to_external(S).
+              [a,b,c]
+
+       rreellaattiioonn((TTuupplleess)) -->> RReellaattiioonn
+
+       rreellaattiioonn((TTuupplleess,, TTyyppee)) -->> RReellaattiioonn
+
+              Types:
+
+                 N = integer()
+                 Type = N | ttyyppee(())
+                 Relation = rreellaattiioonn(())
+                 Tuples = [tuple()]
+
+              Creates a rreellaattiioonn. _r_e_l_a_t_i_o_n_(_R_, _T_) is equivalent to _f_r_o_m___t_e_r_m_(_R_,
+              _T_), if T is a ttyyppee and the result is a relation. If Type is an
+              integer N, then _[_{_a_t_o_m_, _._._._, _a_t_o_m_}_]_), where the size of the
+              tuple is N, is used as type of the relation. If no type is
+              explicitly given, the size of the first tuple of Tuples is used
+              if there is such a tuple. _r_e_l_a_t_i_o_n_(_[_]_) is equivalent to
+              _r_e_l_a_t_i_o_n_(_[_]_, _2_).
+
+       rreellaattiioonn__ttoo__ffaammiillyy((BBiinnRReell)) -->> FFaammiillyy
+
+              Types:
+
+                 Family = ffaammiillyy(())
+                 BinRel = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns the ffaammiillyy Family such that the index set is equal to
+              the ddoommaaiinn of the binary relation BinRel, and Family[i] is the
+              iimmaaggee of the set of i under BinRel.
+
+              1> R = sofs:relation([{b,1},{c,2},{c,3}]),
+              F = sofs:relation_to_family(R),
+              sofs:to_external(F).
+              [{b,[1]},{c,[2,3]}]
+
+       rreellaattiivvee__pprroodduucctt((LLiissttOOffBBiinnRReellss)) -->> BBiinnRReell22
+
+       rreellaattiivvee__pprroodduucctt((LLiissttOOffBBiinnRReellss,, BBiinnRReell11)) -->> BBiinnRReell22
+
+              Types:
+
+                 ListOfBinRels = [BinRel, ...]
+                 BinRel = BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+
+              If ListOfBinRels is a non-empty list [R[1], ..., R[n]] of binary
+              relations and BinRel1 is a binary relation, then BinRel2 is the
+              rreellaattiivvee pprroodduucctt of the ordered set (R[i], ..., R[n]) and
+              BinRel1.
+
+              If BinRel1 is omitted, the relation of equality between the
+              elements of the CCaarrtteessiiaann pprroodduucctt of the ranges of R[i], range
+              R[1] x ... x range R[n], is used instead (intuitively, nothing
+              is "lost").
+
+              1> TR = sofs:relation([{1,a},{1,aa},{2,b}]),
+              R1 = sofs:relation([{1,u},{2,v},{3,c}]),
+              R2 = sofs:relative_product([TR, R1]),
+              sofs:to_external(R2).
+              [{1,{a,u}},{1,{aa,u}},{2,{b,v}}]
+
+              Note that _r_e_l_a_t_i_v_e___p_r_o_d_u_c_t_(_[_R_1_]_, _R_2_) is different from
+              _r_e_l_a_t_i_v_e___p_r_o_d_u_c_t_(_R_1_, _R_2_); the list of one element is not
+              identified with the element itself.
+
+       rreellaattiivvee__pprroodduucctt((BBiinnRReell11,, BBiinnRReell22)) -->> BBiinnRReell33
+
+              Types:
+
+                 BinRel1 = BinRel2 = BinRel3 = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns the rreellaattiivvee pprroodduucctt of the binary relations BinRel1 and
+              BinRel2.
+
+       rreellaattiivvee__pprroodduucctt11((BBiinnRReell11,, BBiinnRReell22)) -->> BBiinnRReell33
+
+              Types:
+
+                 BinRel1 = BinRel2 = BinRel3 = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns the rreellaattiivvee pprroodduucctt of the ccoonnvveerrssee of the binary
+              relation BinRel1 and the binary relation BinRel2.
+
+              1> R1 = sofs:relation([{1,a},{1,aa},{2,b}]),
+              R2 = sofs:relation([{1,u},{2,v},{3,c}]),
+              R3 = sofs:relative_product1(R1, R2),
+              sofs:to_external(R3).
+              [{a,u},{aa,u},{b,v}]
+
+              _r_e_l_a_t_i_v_e___p_r_o_d_u_c_t_1_(_R_1_, _R_2_) is equivalent to
+              _r_e_l_a_t_i_v_e___p_r_o_d_u_c_t_(_c_o_n_v_e_r_s_e_(_R_1_)_, _R_2_).
+
+       rreessttrriiccttiioonn((BBiinnRReell11,, SSeett)) -->> BBiinnRReell22
+
+              Types:
+
+                 BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+                 Set = aa__sseett(())
+
+              Returns the rreessttrriiccttiioonn of the binary relation BinRel1 to Set.
+
+              1> R1 = sofs:relation([{1,a},{2,b},{3,c}]),
+              S = sofs:set([1,2,4]),
+              R2 = sofs:restriction(R1, S),
+              sofs:to_external(R2).
+              [{1,a},{2,b}]
+
+       rreessttrriiccttiioonn((SSeettFFuunn,, SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Set1 = Set2 = Set3 = aa__sseett(())
+
+              Returns a subset of Set1 containing those elements that yield an
+              element in Set2 as the result of applying SetFun.
+
+              1> S1 = sofs:relation([{1,a},{2,b},{3,c}]),
+              S2 = sofs:set([b,c,d]),
+              S3 = sofs:restriction(2, S1, S2),
+              sofs:to_external(S3).
+              [{2,b},{3,c}]
+
+       sseett((TTeerrmmss)) -->> SSeett
+
+       sseett((TTeerrmmss,, TTyyppee)) -->> SSeett
+
+              Types:
+
+                 Set = aa__sseett(())
+                 Terms = [term()]
+                 Type = ttyyppee(())
+
+              Creates an uunnoorrddeerreedd sseett. _s_e_t_(_L_, _T_) is equivalent to
+              _f_r_o_m___t_e_r_m_(_L_, _T_), if the result is an unordered set. If no ttyyppee
+              is explicitly given, _[_a_t_o_m_] is used as type of the set.
+
+       ssppeecciiffiiccaattiioonn((FFuunn,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Fun = ssppeecc__ffuunn(())
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns the set containing every element of Set1 for which Fun
+              returns _t_r_u_e. If Fun is a tuple _{_e_x_t_e_r_n_a_l_, _F_u_n_2_}, Fun2 is
+              applied to the eexxtteerrnnaall sseett of each element, otherwise Fun is
+              applied to each element.
+
+              1> R1 = sofs:relation([{a,1},{b,2}]),
+              R2 = sofs:relation([{x,1},{x,2},{y,3}]),
+              S1 = sofs:from_sets([R1,R2]),
+              S2 = sofs:specification(fun sofs:is_a_function/1, S1),
+              sofs:to_external(S2).
+              [[{a,1},{b,2}]]
+
+       ssttrriicctt__rreellaattiioonn((BBiinnRReell11)) -->> BBiinnRReell22
+
+              Types:
+
+                 BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns the ssttrriicctt rreellaattiioonn corresponding to the binary relation
+              BinRel1.
+
+              1> R1 = sofs:relation([{1,1},{1,2},{2,1},{2,2}]),
+              R2 = sofs:strict_relation(R1),
+              sofs:to_external(R2).
+              [{1,2},{2,1}]
+
+       ssuubbssttiittuuttiioonn((SSeettFFuunn,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 SetFun = sseett__ffuunn(())
+                 Set1 = Set2 = aa__sseett(())
+
+              Returns a function, the domain of which is Set1. The value of an
+              element of the domain is the result of applying SetFun to the
+              element.
+
+              1> L = [{a,1},{b,2}].
+              [{a,1},{b,2}]
+              2> sofs:to_external(sofs:projection(1,sofs:relation(L))).
+              [a,b]
+              3> sofs:to_external(sofs:substitution(1,sofs:relation(L))).
+              [{{a,1},a},{{b,2},b}]
+              4> SetFun = {external, fun({A,_}=E) -> {E,A} end},
+              sofs:to_external(sofs:projection(SetFun,sofs:relation(L))).
+              [{{a,1},a},{{b,2},b}]
+
+              The relation of equality between the elements of {a,b,c}:
+
+              1> I = sofs:substitution(fun(A) -> A end, sofs:set([a,b,c])),
+              sofs:to_external(I).
+              [{a,a},{b,b},{c,c}]
+
+              Let SetOfSets be a set of sets and BinRel a binary relation. The
+              function that maps each element Set of SetOfSets onto the iimmaaggee
+              of Set under BinRel is returned by this function:
+
+              images(SetOfSets, BinRel) ->
+                 Fun = fun(Set) -> sofs:image(BinRel, Set) end,
+                 sofs:substitution(Fun, SetOfSets).
+
+              Here might be the place to reveal something that was more or
+              less stated before, namely that external unordered sets are
+              represented as sorted lists. As a consequence, creating the
+              image of a set under a relation R may traverse all elements of R
+              (to that comes the sorting of results, the image). In _i_m_a_g_e_s_/_2,
+              BinRel will be traversed once for each element of SetOfSets,
+              which may take too long. The following efficient function could
+              be used instead under the assumption that the image of each
+              element of SetOfSets under BinRel is non-empty:
+
+              images2(SetOfSets, BinRel) ->
+                 CR = sofs:canonical_relation(SetOfSets),
+                 R = sofs:relative_product1(CR, BinRel),
+                 sofs:relation_to_family(R).
+
+       ssyymmddiiffff((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = aa__sseett(())
+
+              Returns the ssyymmmmeettrriicc ddiiffffeerreennccee (or the Boolean sum) of Set1
+              and Set2.
+
+              1> S1 = sofs:set([1,2,3]),
+              S2 = sofs:set([2,3,4]),
+              P = sofs:symdiff(S1, S2),
+              sofs:to_external(P).
+              [1,4]
+
+       ssyymmmmeettrriicc__ppaarrttiittiioonn((SSeett11,, SSeett22)) -->> {{SSeett33,, SSeett44,, SSeett55}}
+
+              Types:
+
+                 Set1 = Set2 = Set3 = Set4 = Set5 = aa__sseett(())
+
+              Returns a triple of sets: Set3 contains the elements of Set1
+              that do not belong to Set2; Set4 contains the elements of Set1
+              that belong to Set2; Set5 contains the elements of Set2 that do
+              not belong to Set1.
+
+       ttoo__eexxtteerrnnaall((AAnnyySSeett)) -->> EExxtteerrnnaallSSeett
+
+              Types:
+
+                 ExternalSet = eexxtteerrnnaall__sseett(())
+                 AnySet = aannyysseett(())
+
+              Returns the eexxtteerrnnaall sseett of an atomic, ordered or unordered set.
+
+       ttoo__sseettss((AASSeett)) -->> SSeettss
+
+              Types:
+
+                 ASet = aa__sseett(()) | oorrddsseett(())
+                 Sets = ttuuppllee__ooff(AnySet) | [AnySet]
+                 AnySet = aannyysseett(())
+
+              Returns the elements of the ordered set ASet as a tuple of sets,
+              and the elements of the unordered set ASet as a sorted list of
+              sets without duplicates.
+
+       ttyyppee((AAnnyySSeett)) -->> TTyyppee
+
+              Types:
+
+                 AnySet = aannyysseett(())
+                 Type = ttyyppee(())
+
+              Returns the ttyyppee of an atomic, ordered or unordered set.
+
+       uunniioonn((SSeettOOffSSeettss)) -->> SSeett
+
+              Types:
+
+                 Set = aa__sseett(())
+                 SetOfSets = sseett__ooff__sseettss(())
+
+              Returns the uunniioonn of the set of sets SetOfSets.
+
+       uunniioonn((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = aa__sseett(())
+
+              Returns the uunniioonn of Set1 and Set2.
+
+       uunniioonn__ooff__ffaammiillyy((FFaammiillyy)) -->> SSeett
+
+              Types:
+
+                 Family = ffaammiillyy(())
+                 Set = aa__sseett(())
+
+              Returns the union of the ffaammiillyy Family.
+
+              1> F = sofs:family([{a,[0,2,4]},{b,[0,1,2]},{c,[2,3]}]),
+              S = sofs:union_of_family(F),
+              sofs:to_external(S).
+              [0,1,2,3,4]
+
+       wweeaakk__rreellaattiioonn((BBiinnRReell11)) -->> BBiinnRReell22
+
+              Types:
+
+                 BinRel1 = BinRel2 = bbiinnaarryy__rreellaattiioonn(())
+
+              Returns a subset S of the wweeaakk rreellaattiioonn W corresponding to the
+              binary relation BinRel1. Let F be the ffiieelldd of BinRel1. The
+              subset S is defined so that x S y if x W y for some x in F and
+              for some y in F.
+
+              1> R1 = sofs:relation([{1,1},{1,2},{3,1}]),
+              R2 = sofs:weak_relation(R1),
+              sofs:to_external(R2).
+              [{1,1},{1,2},{2,2},{3,1},{3,3}]
+
+SSEEEE AALLSSOO
+       ddiicctt((33)), ddiiggrraapphh((33)), oorrddddiicctt((33)), oorrddsseettss((33)), sseettss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                         sofs(3)

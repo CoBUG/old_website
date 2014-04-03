@@ -1,0 +1,588 @@
+binary(3)                  Erlang Module Definition                  binary(3)
+
+
+
+NNAAMMEE
+       binary - Library for handling binary data
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for manipulating byte-oriented binaries.
+       Although the majority of functions could be implemented using bit-
+       syntax, the functions in this library are highly optimized and are
+       expected to either execute faster or consume less memory (or both) than
+       a counterpart written in pure Erlang.
+
+       The module is implemented according to the EEP (Erlang Enhancement
+       Proposal) 31.
+
+   NNoottee::
+       The library handles byte-oriented data. Bitstrings that are not
+       binaries (does not contain whole octets of bits) will result in a
+       _b_a_d_a_r_g exception being thrown from any of the functions in this module.
+
+
+DDAATTAA TTYYPPEESS
+       ccpp(())
+
+              Opaque data-type representing a compiled search-pattern.
+              Guaranteed to be a tuple() to allow programs to distinguish it
+              from non precompiled search patterns.
+
+       ppaarrtt(()) = {Start :: integer() >= 0, Length :: integer()}
+
+              A representaion of a part (or range) in a binary. Start is a
+              zero-based offset into a binary() and Length is the length of
+              that part. As input to functions in this module, a reverse part
+              specification is allowed, constructed with a negative Length, so
+              that the part of the binary begins at Start + Length and is
+              -Length long. This is useful for referencing the last N bytes of
+              a binary as {size(Binary), -N}. The functions in this module
+              always return part()'s with positive Length.
+
+EEXXPPOORRTTSS
+       aatt((SSuubbjjeecctt,, PPooss)) -->> bbyyttee(())
+
+              Types:
+
+                 Subject = binary()
+                 Pos = integer() >= 0
+
+              Returns the byte at position _P_o_s (zero-based) in the binary
+              _S_u_b_j_e_c_t as an integer. If _P_o_s >= _b_y_t_e___s_i_z_e_(_S_u_b_j_e_c_t_), a _b_a_d_a_r_g
+              exception is raised.
+
+       bbiinn__ttoo__lliisstt((SSuubbjjeecctt)) -->> [[bbyyttee(())]]
+
+              Types:
+
+                 Subject = binary()
+
+              The same as _b_i_n___t_o___l_i_s_t_(_S_u_b_j_e_c_t_,_{_0_,_b_y_t_e___s_i_z_e_(_S_u_b_j_e_c_t_)_}_).
+
+       bbiinn__ttoo__lliisstt((SSuubbjjeecctt,, PPoossLLeenn)) -->> [[bbyyttee(())]]
+
+              Types:
+
+                 Subject = binary()
+                 PosLen = part()
+
+              Converts _S_u_b_j_e_c_t to a list of _b_y_t_e_(_)s, each representing the
+              value of one byte. The _p_a_r_t_(_) denotes which part of the _b_i_n_a_r_y_(_)
+              to convert. Example:
+
+              1> binary:bin_to_list(<<"erlang">>,{1,3}).
+              "rla"
+              %% or [114,108,97] in list notation.
+
+
+              If _P_o_s_L_e_n in any way references outside the binary, a _b_a_d_a_r_g
+              exception is raised.
+
+       bbiinn__ttoo__lliisstt((SSuubbjjeecctt,, PPooss,, LLeenn)) -->> [[bbyyttee(())]]
+
+              Types:
+
+                 Subject = binary()
+                 Pos = integer() >= 0
+                 Len = integer() >= 0
+
+              The same as _b_i_n___t_o___l_i_s_t_(_S_u_b_j_e_c_t_,_{_P_o_s_,_L_e_n_}_).
+
+       ccoommppiillee__ppaatttteerrnn((PPaatttteerrnn)) -->> ccpp(())
+
+              Types:
+
+                 Pattern = binary() | [ binary() ]
+
+              Builds an internal structure representing a compilation of a
+              search-pattern, later to be used in the mmaattcchh//33, mmaattcchheess//33,
+              sspplliitt//33 or rreeppllaaccee//44 functions. The _c_p_(_) returned is guaranteed
+              to be a _t_u_p_l_e_(_) to allow programs to distinguish it from non
+              pre-compiled search patterns
+
+              When a list of binaries is given, it denotes a set of
+              alternative binaries to search for. I.e if
+              _[_<_<_"_f_u_n_c_t_i_o_n_a_l_"_>_>_,_<_<_"_p_r_o_g_r_a_m_m_i_n_g_"_>_>_] is given as _P_a_t_t_e_r_n, this
+              means "either _<_<_"_f_u_n_c_t_i_o_n_a_l_"_>_> or _<_<_"_p_r_o_g_r_a_m_m_i_n_g_"_>_>". The
+              pattern is a set of alternatives; when only a single binary is
+              given, the set has only one element. The order of alternatives
+              in a pattern is not significant.
+
+              The list of binaries used for search alternatives shall be flat
+              and proper.
+
+              If _P_a_t_t_e_r_n is not a binary or a flat proper list of binaries
+              with length > 0, a _b_a_d_a_r_g exception will be raised.
+
+       ccooppyy((SSuubbjjeecctt)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Subject = binary()
+
+              The same as _c_o_p_y_(_S_u_b_j_e_c_t_, _1_).
+
+       ccooppyy((SSuubbjjeecctt,,NN)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Subject = binary()
+                 N = integer() >= 0
+
+              Creates a binary with the content of _S_u_b_j_e_c_t duplicated _N times.
+
+              This function will always create a new binary, even if _N _= _1. By
+              using _c_o_p_y_/_1 on a binary referencing a larger binary, one might
+              free up the larger binary for garbage collection.
+
+          NNoottee::
+              By deliberately copying a single binary to avoid referencing a
+              larger binary, one might, instead of freeing up the larger
+              binary for later garbage collection, create much more binary
+              data than needed. Sharing binary data is usually good. Only in
+              special cases, when small parts reference large binaries and the
+              large binaries are no longer used in any process, deliberate
+              copying might be a good idea.
+
+
+              If _N < _0, a _b_a_d_a_r_g exception is raised.
+
+       ddeeccooddee__uunnssiiggnneedd((SSuubbjjeecctt)) -->> UUnnssiiggnneedd
+
+              Types:
+
+                 Subject = binary()
+                 Unsigned = integer() >= 0
+
+              The same as _d_e_c_o_d_e___u_n_s_i_g_n_e_d_(_S_u_b_j_e_c_t_,_b_i_g_).
+
+       ddeeccooddee__uunnssiiggnneedd((SSuubbjjeecctt,, EEnnddiiaanneessss)) -->> UUnnssiiggnneedd
+
+              Types:
+
+                 Subject = binary()
+                 Endianess = big | little
+                 Unsigned = integer() >= 0
+
+              Converts the binary digit representation, in big or little
+              endian, of a positive integer in _S_u_b_j_e_c_t to an Erlang _i_n_t_e_g_e_r_(_).
+
+              Example:
+
+              1> binary:decode_unsigned(<<169,138,199>>,big).
+              11111111
+
+
+       eennccooddee__uunnssiiggnneedd((UUnnssiiggnneedd)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Unsigned = integer() >= 0
+
+              The same as _e_n_c_o_d_e___u_n_s_i_g_n_e_d_(_U_n_s_i_g_n_e_d_,_b_i_g_).
+
+       eennccooddee__uunnssiiggnneedd((UUnnssiiggnneedd,,EEnnddiiaanneessss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Unsigned = integer() >= 0
+                 Endianess = big | little
+
+              Converts a positive integer to the smallest possible
+              representation in a binary digit representation, either big or
+              little endian.
+
+              Example:
+
+              1> binary:encode_unsigned(11111111,big).
+              <<169,138,199>>
+
+
+       ffiirrsstt((SSuubbjjeecctt)) -->> bbyyttee(())
+
+              Types:
+
+                 Subject = binary()
+
+              Returns the first byte of the binary _S_u_b_j_e_c_t as an integer. If
+              the size of _S_u_b_j_e_c_t is zero, a _b_a_d_a_r_g exception is raised.
+
+       llaasstt((SSuubbjjeecctt)) -->> bbyyttee(())
+
+              Types:
+
+                 Subject = binary()
+
+              Returns the last byte of the binary _S_u_b_j_e_c_t as an integer. If
+              the size of _S_u_b_j_e_c_t is zero, a _b_a_d_a_r_g exception is raised.
+
+       lliisstt__ttoo__bbiinn((BByytteeLLiisstt)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 ByteList = iodata() (see module erlang)
+
+              Works exactly as _e_r_l_a_n_g_:_l_i_s_t___t_o___b_i_n_a_r_y_/_1, added for
+              completeness.
+
+       lloonnggeesstt__ccoommmmoonn__pprreeffiixx((BBiinnaarriieess)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Binaries = [ binary() ]
+
+              Returns the length of the longest common prefix of the binaries
+              in the list _B_i_n_a_r_i_e_s. Example:
+
+              1> binary:longest_common_prefix([<<"erlang">>,<<"ergonomy">>]).
+              2
+              2> binary:longest_common_prefix([<<"erlang">>,<<"perl">>]).
+              0
+
+
+              If _B_i_n_a_r_i_e_s is not a flat list of binaries, a _b_a_d_a_r_g exception
+              is raised.
+
+       lloonnggeesstt__ccoommmmoonn__ssuuffffiixx((BBiinnaarriieess)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Binaries = [ binary() ]
+
+              Returns the length of the longest common suffix of the binaries
+              in the list _B_i_n_a_r_i_e_s. Example:
+
+              1> binary:longest_common_suffix([<<"erlang">>,<<"fang">>]).
+              3
+              2> binary:longest_common_suffix([<<"erlang">>,<<"perl">>]).
+              0
+
+
+              If _B_i_n_a_r_i_e_s is not a flat list of binaries, a _b_a_d_a_r_g exception
+              is raised.
+
+       mmaattcchh((SSuubbjjeecctt,, PPaatttteerrnn)) -->> FFoouunndd || _n_o_m_a_t_c_h
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [ binary() ] | cp()
+                 Found = part()
+
+              The same as _m_a_t_c_h_(_S_u_b_j_e_c_t_, _P_a_t_t_e_r_n_, _[_]_).
+
+       mmaattcchh((SSuubbjjeecctt,,PPaatttteerrnn,,OOppttiioonnss)) -->> FFoouunndd || _n_o_m_a_t_c_h
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [ binary() ] | cp()
+                 Found = part()
+                 Options = [ Option ]
+                 Option = {scope, part()}
+
+              Searches for the first occurrence of _P_a_t_t_e_r_n in _S_u_b_j_e_c_t and
+              returns the position and length.
+
+              The function will return _{_P_o_s_,_L_e_n_g_t_h_} for the binary in _P_a_t_t_e_r_n
+              starting at the lowest position in _S_u_b_j_e_c_t, Example:
+
+              1> binary:match(<<"abcde">>, [<<"bcde">>,<<"cd">>],[]).
+              {1,4}
+
+
+              Even though _<_<_"_c_d_"_>_> ends before _<_<_"_b_c_d_e_"_>_>, _<_<_"_b_c_d_e_"_>_> begins
+              first and is therefore the first match. If two overlapping
+              matches begin at the same position, the longest is returned.
+
+              Summary of the options:
+
+                {{ssccooppee,, {{SSttaarrtt,, LLeennggtthh}}}}::
+                  Only the given part is searched. Return values still have
+                  offsets from the beginning of _S_u_b_j_e_c_t. A negative _L_e_n_g_t_h is
+                  allowed as described in the _T_Y_P_E_S section of this manual.
+
+              If none of the strings in _P_a_t_t_e_r_n is found, the atom _n_o_m_a_t_c_h is
+              returned.
+
+              For a description of _P_a_t_t_e_r_n, see ccoommppiillee__ppaatttteerrnn//11.
+
+              If _{_s_c_o_p_e_, _{_S_t_a_r_t_,_L_e_n_g_t_h_}_} is given in the options such that
+              _S_t_a_r_t is larger than the size of _S_u_b_j_e_c_t, _S_t_a_r_t _+ _L_e_n_g_t_h is less
+              than zero or _S_t_a_r_t _+ _L_e_n_g_t_h is larger than the size of _S_u_b_j_e_c_t,
+              a _b_a_d_a_r_g exception is raised.
+
+       mmaattcchheess((SSuubbjjeecctt,, PPaatttteerrnn)) -->> FFoouunndd
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [ binary() ] | cp()
+                 Found = [ part() ] | []
+
+              The same as _m_a_t_c_h_e_s_(_S_u_b_j_e_c_t_, _P_a_t_t_e_r_n_, _[_]_).
+
+       mmaattcchheess((SSuubbjjeecctt,,PPaatttteerrnn,,OOppttiioonnss)) -->> FFoouunndd
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [ binary() ] | cp()
+                 Found = [ part() ] | []
+                 Options = [ Option ]
+                 Option = {scope, part()}
+
+              Works like match, but the _S_u_b_j_e_c_t is searched until exhausted
+              and a list of all non-overlapping parts matching _P_a_t_t_e_r_n is
+              returned (in order).
+
+              The first and longest match is preferred to a shorter, which is
+              illustrated by the following example:
+
+              1> binary:matches(<<"abcde">>,
+                                [<<"bcde">>,<<"bc">>>,<<"de">>],[]).
+              [{1,4}]
+
+
+              The result shows that <<"bcde">> is selected instead of the
+              shorter match <<"bc">> (which would have given raise to one more
+              match,<<"de">>). This corresponds to the behavior of posix
+              regular expressions (and programs like awk), but is not
+              consistent with alternative matches in re (and Perl), where
+              instead lexical ordering in the search pattern selects which
+              string matches.
+
+              If none of the strings in pattern is found, an empty list is
+              returned.
+
+              For a description of _P_a_t_t_e_r_n, see ccoommppiillee__ppaatttteerrnn//11 and for a
+              description of available options, see mmaattcchh//33.
+
+              If _{_s_c_o_p_e_, _{_S_t_a_r_t_,_L_e_n_g_t_h_}_} is given in the options such that
+              _S_t_a_r_t is larger than the size of _S_u_b_j_e_c_t, _S_t_a_r_t _+ _L_e_n_g_t_h is less
+              than zero or _S_t_a_r_t _+ _L_e_n_g_t_h is larger than the size of _S_u_b_j_e_c_t,
+              a _b_a_d_a_r_g exception is raised.
+
+       ppaarrtt((SSuubbjjeecctt,, PPoossLLeenn)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Subject = binary()
+                 PosLen = part()
+
+              Extracts the part of the binary _S_u_b_j_e_c_t described by _P_o_s_L_e_n.
+
+              Negative length can be used to extract bytes at the end of a
+              binary:
+
+              1> Bin = <<1,2,3,4,5,6,7,8,9,10>>.
+              2> binary:part(Bin,{byte_size(Bin), -5}).
+              <<6,7,8,9,10>>
+
+
+          NNoottee::
+              ppaarrtt//22and ppaarrtt//33 are also available in the _e_r_l_a_n_g module under
+              the names _b_i_n_a_r_y___p_a_r_t_/_2 and _b_i_n_a_r_y___p_a_r_t_/_3. Those BIFs are
+              allowed in guard tests.
+
+
+              If _P_o_s_L_e_n in any way references outside the binary, a _b_a_d_a_r_g
+              exception is raised.
+
+       ppaarrtt((SSuubbjjeecctt,, PPooss,, LLeenn)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Subject = binary()
+                 Pos = integer() >= 0
+                 Len = integer()
+
+              The same as _p_a_r_t_(_S_u_b_j_e_c_t_, _{_P_o_s_, _L_e_n_}_).
+
+       rreeffeerreenncceedd__bbyyttee__ssiizzee((bbiinnaarryy(()))) -->> iinntteeggeerr(()) >>== 00
+
+              If a binary references a larger binary (often described as being
+              a sub-binary), it can be useful to get the size of the actual
+              referenced binary. This function can be used in a program to
+              trigger the use of _c_o_p_y_/_1. By copying a binary, one might
+              dereference the original, possibly large, binary which a smaller
+              binary is a reference to.
+
+              Example:
+
+              store(Binary, GBSet) ->
+                NewBin =
+                    case binary:referenced_byte_size(Binary) of
+                        Large when Large > 2 * byte_size(Binary) ->
+                           binary:copy(Binary);
+                        _ ->
+                           Binary
+                    end,
+                gb_sets:insert(NewBin,GBSet).
+
+
+              In this example, we chose to copy the binary content before
+              inserting it in the _g_b___s_e_t_(_) if it references a binary more than
+              twice the size of the data we're going to keep. Of course
+              different rules for when copying will apply to different
+              programs.
+
+              Binary sharing will occur whenever binaries are taken apart,
+              this is the fundamental reason why binaries are fast,
+              decomposition can always be done with O(1) complexity. In rare
+              circumstances this data sharing is however undesirable, why this
+              function together with _c_o_p_y_/_1 might be useful when optimizing
+              for memory use.
+
+              Example of binary sharing:
+
+              1> A = binary:copy(<<1>>,100).
+              <<1,1,1,1,1 ...
+              2> byte_size(A).
+              100
+              3> binary:referenced_byte_size(A)
+              100
+              4> <<_:10/binary,B:10/binary,_/binary>> = A.
+              <<1,1,1,1,1 ...
+              5> byte_size(B).
+              10
+              6> binary:referenced_byte_size(B)
+              100
+
+
+          NNoottee::
+              Binary data is shared among processes. If another process still
+              references the larger binary, copying the part this process uses
+              only consumes more memory and will not free up the larger binary
+              for garbage collection. Use this kind of intrusive functions
+              with extreme care, and only if a real problem is detected.
+
+
+       rreeppllaaccee((SSuubbjjeecctt,, PPaatttteerrnn,, RReeppllaacceemmeenntt)) -->> RReessuulltt
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [binary()] | ccpp(())
+                 Replacement = Result = binary()
+
+              The same as _r_e_p_l_a_c_e_(_S_u_b_j_e_c_t_,_P_a_t_t_e_r_n_,_R_e_p_l_a_c_e_m_e_n_t_,_[_]_).
+
+       rreeppllaaccee((SSuubbjjeecctt,, PPaatttteerrnn,, RReeppllaacceemmeenntt,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [binary()] | ccpp(())
+                 Replacement = binary()
+                 Options = [Option]
+                 Option = global | {scope, ppaarrtt(())} | {insert_replaced, InsPos}
+                 InsPos = OnePos | [OnePos]
+                 OnePos = integer() >= 0
+                   An integer() =< byte_size(Replacement)
+                 Result = binary()
+
+              Constructs a new binary by replacing the parts in _S_u_b_j_e_c_t
+              matching _P_a_t_t_e_r_n with the content of _R_e_p_l_a_c_e_m_e_n_t.
+
+              If the matching sub-part of _S_u_b_j_e_c_t giving raise to the
+              replacement is to be inserted in the result, the option
+              _{_i_n_s_e_r_t___r_e_p_l_a_c_e_d_, _I_n_s_P_o_s_} will insert the matching part into
+              _R_e_p_l_a_c_e_m_e_n_t at the given position (or positions) before actually
+              inserting _R_e_p_l_a_c_e_m_e_n_t into the _S_u_b_j_e_c_t. Example:
+
+              1> binary:replace(<<"abcde">>,<<"b">>,<<"[]">>,[{insert_replaced,1}]).
+              <<"a[b]cde">>
+              2> binary:replace(<<"abcde">>,[<<"b">>,<<"d">>],<<"[]">>,
+                               [global,{insert_replaced,1}]).
+              <<"a[b]c[d]e">>
+              3> binary:replace(<<"abcde">>,[<<"b">>,<<"d">>],<<"[]">>,
+                               [global,{insert_replaced,[1,1]}]).
+              <<"a[bb]c[dd]e">>
+              4> binary:replace(<<"abcde">>,[<<"b">>,<<"d">>],<<"[-]">>,
+                               [global,{insert_replaced,[1,2]}]).
+              <<"a[b-b]c[d-d]e">>
+
+
+              If any position given in _I_n_s_P_o_s is greater than the size of the
+              replacement binary, a _b_a_d_a_r_g exception is raised.
+
+              The options _g_l_o_b_a_l and _{_s_c_o_p_e_, _p_a_r_t_(_)_} work as for sspplliitt//33. The
+              return type is always a _b_i_n_a_r_y_(_).
+
+              For a description of _P_a_t_t_e_r_n, see ccoommppiillee__ppaatttteerrnn//11.
+
+       sspplliitt((SSuubbjjeecctt,, PPaatttteerrnn)) -->> PPaarrttss
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [binary()] | ccpp(())
+                 Parts = [binary()]
+
+              The same as _s_p_l_i_t_(_S_u_b_j_e_c_t_, _P_a_t_t_e_r_n_, _[_]_).
+
+       sspplliitt((SSuubbjjeecctt,, PPaatttteerrnn,, OOppttiioonnss)) -->> PPaarrttss
+
+              Types:
+
+                 Subject = binary()
+                 Pattern = binary() | [binary()] | ccpp(())
+                 Options = [Option]
+                 Option = {scope, ppaarrtt(())} | trim | global
+                 Parts = [binary()]
+
+              Splits _S_u_b_j_e_c_t into a list of binaries based on _P_a_t_t_e_r_n. If the
+              option global is not given, only the first occurrence of _P_a_t_t_e_r_n
+              in _S_u_b_j_e_c_t will give rise to a split.
+
+              The parts of _P_a_t_t_e_r_n actually found in _S_u_b_j_e_c_t are not included
+              in the result.
+
+              Example:
+
+              1> binary:split(<<1,255,4,0,0,0,2,3>>, [<<0,0,0>>,<<2>>],[]).
+              [<<1,255,4>>, <<2,3>>]
+              2> binary:split(<<0,1,0,0,4,255,255,9>>, [<<0,0>>, <<255,255>>],[global]).
+              [<<0,1>>,<<4>>,<<9>>]
+
+
+              Summary of options:
+
+                {{ssccooppee,, ppaarrtt(())}}::
+                  Works as in mmaattcchh//33 and mmaattcchheess//33. Note that this only
+                  defines the scope of the search for matching strings, it
+                  does not cut the binary before splitting. The bytes before
+                  and after the scope will be kept in the result. See example
+                  below.
+
+                ttrriimm::
+                  Removes trailing empty parts of the result (as does trim in
+                  _r_e_:_s_p_l_i_t_/_3)
+
+                gglloobbaall::
+                  Repeats the split until the _S_u_b_j_e_c_t is exhausted.
+                  Conceptually the global option makes split work on the
+                  positions returned by mmaattcchheess//33, while it normally works on
+                  the position returned by mmaattcchh//33.
+
+              Example of the difference between a scope and taking the binary
+              apart before splitting:
+
+              1> binary:split(<<"banana">>,[<<"a">>],[{scope,{2,3}}]).
+              [<<"ban">>,<<"na">>]
+              2> binary:split(binary:part(<<"banana">>,{2,3}),[<<"a">>],[]).
+              [<<"n">>,<<"n">>]
+
+
+              The return type is always a list of binaries that are all
+              referencing _S_u_b_j_e_c_t. This means that the data in _S_u_b_j_e_c_t is not
+              actually copied to new binaries and that _S_u_b_j_e_c_t cannot be
+              garbage collected until the results of the split are no longer
+              referenced.
+
+              For a description of _P_a_t_t_e_r_n, see ccoommppiillee__ppaatttteerrnn//11.
+
+
+
+Ericsson AB                      stdlib 1.18.2                       binary(3)

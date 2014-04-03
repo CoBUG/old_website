@@ -1,0 +1,112 @@
+cosTransactions(3)         Erlang Module Definition         cosTransactions(3)
+
+
+
+NNAAMMEE
+       cosTransactions - The main module of the cosTransactions application.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application. If the application is started using
+       _a_p_p_l_i_c_a_t_i_o_n_:_s_t_a_r_t_(_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_) the default configuration is used
+       (see listing below). The Factory reference is stored using the
+       CosNaming Service under the id _"_o_e___c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_F_a_c___I_P_N_o_".
+
+       The following application configuration parameters exist:
+
+         * _m_a_x_R_e_t_r_i_e_s - default is 40 times, i.e., if a transaction
+           participant is unreachable the application will retry to contact it
+           _N times. Reaching the maximum is considered to be a disaster.
+
+         * _c_o_m_F_a_i_l_W_a_i_t - default is 5000 milliseconds, i.e., before the
+           application retries to contact unreachable transaction participants
+           the application wait _T_i_m_e milliseconds.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosTransactions application.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosTransactions application.
+
+       ssttaarrtt__ffaaccttoorryy(()) -->> TTrraannssaaccttiioonnFFaaccttoorryy
+
+              Types:
+
+                 TransactionFactory = #objref
+
+              This operation creates a TTrraannssaaccttiioonn FFaaccttoorryy. The Factory is
+              used to create a new top-level ttrraannssaaccttiioonn using default options
+              (see listing below).
+
+       ssttaarrtt__ffaaccttoorryy((FFaaccDDeeff)) -->> TTrraannssaaccttiioonnFFaaccttoorryy
+
+              Types:
+
+                 FacDef = [Options], see Option listing below.
+                 TransactionFactory = #objref
+
+              This operation creates a TTrraannssaaccttiioonn FFaaccttoorryy. The Factory is
+              used to create a new top-level transaction.
+
+              The FacDef list must be a list of {Item, Value} tuples, where
+              the following values are allowed:
+
+                * {hash_max, HashValue} - This value denotes the upper bound
+                  of the hash value the CCoooorrddiinnaattoorr uses. Default is _1_0_1_3.
+                  HashValue must be an integer.
+
+                * {allow_subtr, Boolean} - If set to true it is possible to
+                  create ssuubbttrraannssaaccttiioonnss. Default is _t_r_u_e.
+
+                * {typecheck, Boolean} - If set to to true all transaction
+                  operation's arguments will be type-checked. Default is _t_r_u_e.
+
+                * {tty, Boolean} - Enables or disables error printouts to the
+                  tty. If Flag is false, all text that the error logger would
+                  have sent to the terminal is discarded. If Flag is true,
+                  error messages are sent to the terminal screen.
+
+                * {logfile, FileName} - This function makes it possible to
+                  store all system information in _F_i_l_e_N_a_m_e (string()). It can
+                  be used in combination with the tty(false) item in to have a
+                  silent system, where all system information are logged to a
+                  file. As default no logfile is used.
+
+                * _{_m_a_x_R_e_t_r_i_e_s_, _I_n_t_e_g_e_r_} - default is 40 times, i.e., if a
+                  transaction participant is unreachable the application will
+                  retry to contact it _N times. Reaching the maximum is
+                  considered to be a disaster. This option overrides the
+                  application configuration parameter.
+
+                * _{_c_o_m_F_a_i_l_W_a_i_t_, _I_n_t_e_g_e_r_} - default is 5000 milliseconds, i.e.,
+                  before the application retries to contact unreachable
+                  transaction participants the application wait _T_i_m_e
+                  milliseconds. This option overrides the application
+                  configuration parameter.
+
+       ssttoopp__ffaaccttoorryy((TTrraannssaaccttiioonnFFaaccttoorryy)) -->> RReeppllyy
+
+              Types:
+
+                 TransactionFactory = #objref
+                 Reply = ok | {'EXCEPTION', E}
+
+              This operation stop the target transaction factory.
+
+
+
+Ericsson AB                 cosTransactions 1.2.12          cosTransactions(3)

@@ -1,0 +1,61 @@
+wxArtProvider(3)           Erlang Module Definition           wxArtProvider(3)
+
+
+
+NNAAMMEE
+       wxArtProvider - See external documentation: wxArtProvider.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxArtProvider.
+
+DDAATTAA TTYYPPEESS
+         _w_x_A_r_t_P_r_o_v_i_d_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettBBiittmmaapp((IIdd)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 Id = chardata() (see module unicode)
+
+              Equivalent to ggeettBBiittmmaapp((IIdd,, [[]])).
+
+       ggeettBBiittmmaapp((IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 Id = chardata() (see module unicode)
+                 Option = {client, chardata() (see module unicode)} | {size,
+                 {W::integer(), H::integer()}}
+
+              See external documentation.
+
+       ggeettIIccoonn((IIdd)) -->> wwxxIIccoonn(()) ((sseeee mmoodduullee wwxxIIccoonn))
+
+              Types:
+
+                 Id = chardata() (see module unicode)
+
+              Equivalent to ggeettIIccoonn((IIdd,, [[]])).
+
+       ggeettIIccoonn((IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIIccoonn(()) ((sseeee mmoodduullee wwxxIIccoonn))
+
+              Types:
+
+                 Id = chardata() (see module unicode)
+                 Option = {client, chardata() (see module unicode)} | {size,
+                 {W::integer(), H::integer()}}
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                  wxArtProvider(3)

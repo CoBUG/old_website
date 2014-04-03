@@ -1,0 +1,137 @@
+wxGraphicsRenderer(3)      Erlang Module Definition      wxGraphicsRenderer(3)
+
+
+
+NNAAMMEE
+       wxGraphicsRenderer - See external documentation: wxGraphicsRenderer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGraphicsRenderer.
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_a_p_h_i_c_s_R_e_n_d_e_r_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettDDeeffaauullttRReennddeerreerr(()) -->> wwxxGGrraapphhiiccssRReennddeerreerr(())
+
+              See external documentation.
+
+       ccrreeaatteeCCoonntteexxtt((TThhiiss,, DDcc)) -->> wwxxGGrraapphhiiccssCCoonntteexxtt(()) ((sseeee mmoodduullee
+       wwxxGGrraapphhiiccssCCoonntteexxtt))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Dc = wxWindowDC() (see module wxWindowDC) | wxWindow() (see
+                 module wxWindow)
+
+              See external documentation.
+
+       ccrreeaatteePPeenn((TThhiiss,, PPeenn)) -->> wwxxGGrraapphhiiccssPPeenn(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssPPeenn))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Pen = wxPen() (see module wxPen)
+
+              See external documentation.
+
+       ccrreeaatteeBBrruusshh((TThhiiss,, BBrruusshh)) -->> wwxxGGrraapphhiiccssBBrruusshh(()) ((sseeee mmoodduullee
+       wwxxGGrraapphhiiccssBBrruusshh))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Brush = wxBrush() (see module wxBrush)
+
+              See external documentation.
+
+       ccrreeaatteeLLiinneeaarrGGrraaddiieennttBBrruusshh((TThhiiss,, XX11,, YY11,, XX22,, YY22,, CC11,, CC22)) -->>
+       wwxxGGrraapphhiiccssBBrruusshh(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssBBrruusshh))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 X1 = number()
+                 Y1 = number()
+                 X2 = number()
+                 Y2 = number()
+                 C1 = wx_colour() (see module wx)
+                 C2 = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccrreeaatteeRRaaddiiaallGGrraaddiieennttBBrruusshh((TThhiiss,, XXoo,, YYoo,, XXcc,, YYcc,, RRaaddiiuuss,, OOCCoolloorr,, CCCCoolloorr))
+       -->> wwxxGGrraapphhiiccssBBrruusshh(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssBBrruusshh))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Xo = number()
+                 Yo = number()
+                 Xc = number()
+                 Yc = number()
+                 Radius = number()
+                 OColor = wx_colour() (see module wx)
+                 CColor = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ccrreeaatteeFFoonntt((TThhiiss,, FFoonntt)) -->> wwxxGGrraapphhiiccssFFoonntt(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssFFoonntt))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Font = wxFont() (see module wxFont)
+
+              Equivalent to ccrreeaatteeFFoonntt((TThhiiss,, FFoonntt,, [[]])).
+
+       ccrreeaatteeFFoonntt((TThhiiss,, FFoonntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrraapphhiiccssFFoonntt(()) ((sseeee
+       mmoodduullee wwxxGGrraapphhiiccssFFoonntt))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Font = wxFont() (see module wxFont)
+                 Option = {col, wx_colour() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaatteeMMaattrriixx((TThhiiss)) -->> wwxxGGrraapphhiiccssMMaattrriixx(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssMMaattrriixx))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+
+              Equivalent to ccrreeaatteeMMaattrriixx((TThhiiss,, [[]])).
+
+       ccrreeaatteeMMaattrriixx((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrraapphhiiccssMMaattrriixx(()) ((sseeee mmoodduullee
+       wwxxGGrraapphhiiccssMMaattrriixx))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+                 Option = {a, number()} | {b, number()} | {c, number()} | {d,
+                 number()} | {tx, number()} | {ty, number()}
+
+              See external documentation.
+
+       ccrreeaatteePPaatthh((TThhiiss)) -->> wwxxGGrraapphhiiccssPPaatthh(()) ((sseeee mmoodduullee wwxxGGrraapphhiiccssPPaatthh))
+
+              Types:
+
+                 This = wxGraphicsRenderer()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxGraphicsRenderer(3)

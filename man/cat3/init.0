@@ -1,0 +1,292 @@
+init(3)                    Erlang Module Definition                    init(3)
+
+
+
+NNAAMMEE
+       init - Coordination of System Startup
+
+DDEESSCCRRIIPPTTIIOONN
+       The _i_n_i_t module is pre-loaded and contains the code for the _i_n_i_t system
+       process which coordinates the start-up of the system. The first
+       function evaluated at start-up is _b_o_o_t_(_B_o_o_t_A_r_g_s_), where _B_o_o_t_A_r_g_s is a
+       list of command line arguments supplied to the Erlang runtime system
+       from the local operating system. See eerrll((11)).
+
+       _i_n_i_t reads the boot script which contains instructions on how to
+       initiate the system. See ssccrriipptt((44)) for more information about boot
+       scripts.
+
+       _i_n_i_t also contains functions to restart, reboot, and stop the system.
+
+EEXXPPOORRTTSS
+       bboooott((BBoooottAArrggss)) -->> nnoo__rreettuurrnn(())
+
+              Types:
+
+                 BootArgs = [binary()]
+
+              Starts the Erlang runtime system. This function is called when
+              the emulator is started and coordinates system start-up.
+
+              _B_o_o_t_A_r_g_s are all command line arguments except the emulator
+              flags, that is, flags and plain arguments. See eerrll((11)).
+
+              _i_n_i_t itself interprets some of the flags, see CCoommmmaanndd LLiinnee FFllaaggss
+              below. The remaining flags ("user flags") and plain arguments
+              are passed to the _i_n_i_t loop and can be retrieved by calling
+              _g_e_t___a_r_g_u_m_e_n_t_s_/_0 and _g_e_t___p_l_a_i_n___a_r_g_u_m_e_n_t_s_/_0, respectively.
+
+       ggeett__aarrgguummeenntt((FFllaagg)) -->> {{ookk,, AArrgg}} || eerrrroorr
+
+              Types:
+
+                 Flag = atom()
+                 Arg = [Values :: [string()]]
+
+              Returns all values associated with the command line user flag
+              _F_l_a_g. If _F_l_a_g is provided several times, each _V_a_l_u_e_s is returned
+              in preserved order.
+
+              % erl -a b c -a d
+              1> init:get_argument(a).
+              {ok,[["b","c"],["d"]]}
+
+              There are also a number of flags, which are defined
+              automatically and can be retrieved using this function:
+
+                _r_o_o_t:
+                  The installation directory of Erlang/OTP, _$_R_O_O_T.
+
+                2> init:get_argument(root).
+                {ok,[["/usr/local/otp/releases/otp_beam_solaris8_r10b_patched"]]}
+
+                _p_r_o_g_n_a_m_e:
+                  The name of the program which started Erlang.
+
+                3> init:get_argument(progname).
+                {ok,[["erl"]]}
+
+                _h_o_m_e:
+                  The home directory.
+
+                4> init:get_argument(home).
+                {ok,[["/home/harry"]]}
+
+              Returns _e_r_r_o_r if there is no value associated with _F_l_a_g.
+
+       ggeett__aarrgguummeennttss(()) -->> FFllaaggss
+
+              Types:
+
+                 Flags = [{Flag :: atom(), Values :: [string()]}]
+
+              Returns all command line flags, as well as the system defined
+              flags, see _g_e_t___a_r_g_u_m_e_n_t_/_1.
+
+       ggeett__ppllaaiinn__aarrgguummeennttss(()) -->> [[AArrgg]]
+
+              Types:
+
+                 Arg = string()
+
+              Returns any plain command line arguments as a list of strings
+              (possibly empty).
+
+       ggeett__ssttaattuuss(()) -->> {{IInntteerrnnaallSSttaattuuss,, PPrroovviiddeeddSSttaattuuss}}
+
+              Types:
+
+                 InternalStatus = iinntteerrnnaall__ssttaattuuss(())
+                 ProvidedStatus = term()
+                 iinntteerrnnaall__ssttaattuuss(()) = starting | started | stopping
+
+              The current status of the _i_n_i_t process can be inspected. During
+              system startup (initialization), _I_n_t_e_r_n_a_l_S_t_a_t_u_s is _s_t_a_r_t_i_n_g, and
+              _P_r_o_v_i_d_e_d_S_t_a_t_u_s indicates how far the boot script has been
+              interpreted. Each _{_p_r_o_g_r_e_s_s_, _I_n_f_o_} term interpreted in the boot
+              script affects _P_r_o_v_i_d_e_d_S_t_a_t_u_s, that is, _P_r_o_v_i_d_e_d_S_t_a_t_u_s gets the
+              value of _I_n_f_o.
+
+       rreebboooott(()) -->> ookk
+
+              All applications are taken down smoothly, all code is unloaded,
+              and all ports are closed before the system terminates. If the
+              _-_h_e_a_r_t command line flag was given, the _h_e_a_r_t program will try
+              to reboot the system. Refer to _h_e_a_r_t_(_3_) for more information.
+
+              To limit the shutdown time, the time _i_n_i_t is allowed to spend
+              taking down applications, the _-_s_h_u_t_d_o_w_n___t_i_m_e command line flag
+              should be used.
+
+       rreessttaarrtt(()) -->> ookk
+
+              The system is restarted _i_n_s_i_d_e the running Erlang node, which
+              means that the emulator is not restarted. All applications are
+              taken down smoothly, all code is unloaded, and all ports are
+              closed before the system is booted again in the same way as
+              initially started. The same _B_o_o_t_A_r_g_s are used again.
+
+              To limit the shutdown time, the time _i_n_i_t is allowed to spend
+              taking down applications, the _-_s_h_u_t_d_o_w_n___t_i_m_e command line flag
+              should be used.
+
+       ssccrriipptt__iidd(()) -->> IIdd
+
+              Types:
+
+                 Id = term()
+
+              Get the identity of the boot script used to boot the system. _I_d
+              can be any Erlang term. In the delivered boot scripts, _I_d is
+              _{_N_a_m_e_, _V_s_n_}. _N_a_m_e and _V_s_n are strings.
+
+       ssttoopp(()) -->> ookk
+
+              All applications are taken down smoothly, all code is unloaded,
+              and all ports are closed before the system terminates. If the
+              _-_h_e_a_r_t command line flag was given, the _h_e_a_r_t program is
+              terminated before the Erlang node terminates. Refer to _h_e_a_r_t_(_3_)
+              for more information.
+
+              To limit the shutdown time, the time _i_n_i_t is allowed to spend
+              taking down applications, the _-_s_h_u_t_d_o_w_n___t_i_m_e command line flag
+              should be used.
+
+       ssttoopp((SSttaattuuss)) -->> ookk
+
+              Types:
+
+                 Status = integer() >= 0 | string()
+
+              All applications are taken down smoothly, all code is unloaded,
+              and all ports are closed before the system terminates by calling
+              _h_a_l_t_(_S_t_a_t_u_s_). If the _-_h_e_a_r_t command line flag was given, the
+              _h_e_a_r_t program is terminated before the Erlang node terminates.
+              Refer to _h_e_a_r_t_(_3_) for more information.
+
+              To limit the shutdown time, the time _i_n_i_t is allowed to spend
+              taking down applications, the _-_s_h_u_t_d_o_w_n___t_i_m_e command line flag
+              should be used.
+
+CCOOMMMMAANNDD LLIINNEE FFLLAAGGSS
+   WWaarrnniinngg::
+       The support for loading of code from archive files is experimental. The
+       sole purpose of releasing it before it is ready is to obtain early
+       feedback. The file format, semantics, interfaces etc. may be changed in
+       a future release. The _-_c_o_d_e___p_a_t_h___c_h_o_i_c_e flag is also experimental.
+
+
+       The _i_n_i_t module interprets the following command line flags:
+
+         _-_-:
+           Everything following _-_- up to the next flag is considered plain
+           arguments and can be retrieved using _g_e_t___p_l_a_i_n___a_r_g_u_m_e_n_t_s_/_0.
+
+         _-_c_o_d_e___p_a_t_h___c_h_o_i_c_e _C_h_o_i_c_e:
+           This flag can be set to _s_t_r_i_c_t or _r_e_l_a_x_e_d. It controls whether each
+           directory in the code path should be interpreted strictly as it
+           appears in the _b_o_o_t _s_c_r_i_p_t or if _i_n_i_t should be more relaxed and
+           try to find a suitable directory if it can choose from a regular
+           ebin directory and an ebin directory in an archive file. This flag
+           is particular useful when you want to elaborate with code loading
+           from archives without editing the _b_o_o_t _s_c_r_i_p_t. See ssccrriipptt((44)) for
+           more information about interpretation of boot scripts. The flag
+           does also have a similar affect on how the code server works. See
+           ccooddee((33)).
+
+         _-_e_v_a_l _E_x_p_r:
+           Scans, parses and evaluates an arbitrary expression _E_x_p_r during
+           system initialization. If any of these steps fail (syntax error,
+           parse error or exception during evaluation), Erlang stops with an
+           error message. Here is an example that seeds the random number
+           generator:
+
+         % erl -eval '{X,Y,Z}' = now(), random:seed(X,Y,Z).'
+
+           This example uses Erlang as a hexadecimal calculator:
+
+         % erl -noshell -eval 'R = 16#1F+16#A0, io:format("~.16B~n", [R])' \\
+         -s erlang halt
+         BF
+
+           If multiple _-_e_v_a_l expressions are specified, they are evaluated
+           sequentially in the order specified. _-_e_v_a_l expressions are
+           evaluated sequentially with _-_s and _-_r_u_n function calls (this also
+           in the order specified). As with _-_s and _-_r_u_n, an evaluation that
+           does not terminate, blocks the system initialization process.
+
+         _-_e_x_t_r_a:
+           Everything following _-_e_x_t_r_a is considered plain arguments and can
+           be retrieved using _g_e_t___p_l_a_i_n___a_r_g_u_m_e_n_t_s_/_0.
+
+         _-_r_u_n _M_o_d _[_F_u_n_c _[_A_r_g_1_, _A_r_g_2_, _._._._]_]:
+           Evaluates the specified function call during system initialization.
+           _F_u_n_c defaults to _s_t_a_r_t. If no arguments are provided, the function
+           is assumed to be of arity 0. Otherwise it is assumed to be of arity
+           1, taking the list _[_A_r_g_1_,_A_r_g_2_,_._._._] as argument. All arguments are
+           passed as strings. If an exception is raised, Erlang stops with an
+           error message.
+
+           Example:
+
+         % erl -run foo -run foo bar -run foo bar baz 1 2
+
+           This starts the Erlang runtime system and evaluates the following
+           functions:
+
+         foo:start()
+         foo:bar()
+         foo:bar(["baz", "1", "2"]).
+
+           The functions are executed sequentially in an initialization
+           process, which then terminates normally and passes control to the
+           user. This means that a _-_r_u_n call which does not return will block
+           further processing; to avoid this, use some variant of _s_p_a_w_n in
+           such cases.
+
+         _-_s _M_o_d _[_F_u_n_c _[_A_r_g_1_, _A_r_g_2_, _._._._]_]:
+           Evaluates the specified function call during system initialization.
+           _F_u_n_c defaults to _s_t_a_r_t. If no arguments are provided, the function
+           is assumed to be of arity 0. Otherwise it is assumed to be of arity
+           1, taking the list _[_A_r_g_1_,_A_r_g_2_,_._._._] as argument. All arguments are
+           passed as atoms. If an exception is raised, Erlang stops with an
+           error message.
+
+           Example:
+
+         % erl -s foo -s foo bar -s foo bar baz 1 2
+
+           This starts the Erlang runtime system and evaluates the following
+           functions:
+
+         foo:start()
+         foo:bar()
+         foo:bar([baz, '1', '2']).
+
+           The functions are executed sequentially in an initialization
+           process, which then terminates normally and passes control to the
+           user. This means that a _-_s call which does not return will block
+           further processing; to avoid this, use some variant of _s_p_a_w_n in
+           such cases.
+
+           Due to the limited length of atoms, it is recommended that _-_r_u_n be
+           used instead.
+
+EEXXAAMMPPLLEE
+       % erl -- a b -children thomas claire -ages 7 3 -- x y
+
+       1> init:get_plain_arguments().
+       ["a","b","x","y"]
+       2> init:get_argument(children).
+       {ok,[["thomas","claire"]]}
+       3> init:get_argument(ages).
+       {ok, [["7","3"]]}
+       4> init:get_argument(silly).
+       error
+
+SSEEEE AALLSSOO
+       eerrll__pprriimm__llooaaddeerr((33)), hheeaarrtt((33))
+
+
+
+Ericsson AB                       erts 5.9.2                           init(3)

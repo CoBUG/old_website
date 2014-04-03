@@ -1,0 +1,59 @@
+wxGridCellChoiceEditor(3)  Erlang Module Definition  wxGridCellChoiceEditor(3)
+
+
+
+NNAAMMEE
+       wxGridCellChoiceEditor - See external documentation:
+       wxGridCellChoiceEditor.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridCellChoiceEditor.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrriiddCCeellllEEddiittoorr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_C_e_l_l_C_h_o_i_c_e_E_d_i_t_o_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((CChhooiicceess)) -->> wwxxGGrriiddCCeellllCChhooiicceeEEddiittoorr(())
+
+              Types:
+
+                 Choices = [chardata() (see module unicode)]
+
+              Equivalent to nneeww((CChhooiicceess,, [[]])).
+
+       nneeww((CChhooiicceess,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrriiddCCeellllCChhooiicceeEEddiittoorr(())
+
+              Types:
+
+                 Choices = [chardata() (see module unicode)]
+                 Option = {allowOthers, boolean()}
+
+              See external documentation.
+
+       sseettPPaarraammeetteerrss((TThhiiss,, PPaarraammss)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellChoiceEditor()
+                 Params = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrriiddCCeellllCChhooiicceeEEddiittoorr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2         wxGridCellChoiceEditor(3)

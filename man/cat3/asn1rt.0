@@ -1,0 +1,101 @@
+asn1rt(3)                  Erlang Module Definition                  asn1rt(3)
+
+
+
+NNAAMMEE
+       asn1rt - ASN.1 runtime support functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is the interface module for the ASN.1 runtime support
+       functions. To encode and decode ASN.1 types in runtime the functions in
+       this module should be used.
+
+EEXXPPOORRTTSS
+       ddeeccooddee((MMoodduullee,,TTyyppee,,BByytteess)) -->> {{ookk,,VVaalluuee}}||{{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Module = Type = atom()
+                 Value = Reason = term()
+                 Bytes = binary | [Int] when integer(Int), Int >= 0, Int =<
+                 255 | binary
+
+              Decodes _T_y_p_e from _M_o_d_u_l_e from the list of bytes or binary _B_y_t_e_s.
+              If the module is compiled with _b_e_r___b_i_n or _p_e_r___b_i_n option _B_y_t_e_s
+              must be a binary. Returns _{_o_k_,_V_a_l_u_e_} if successful.
+
+       eennccooddee((MMoodduullee,,TTyyppee,,VVaalluuee))-->> {{ookk,,BBiinnOOrrLLiisstt}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Module = Type = atom()
+                 Value = term()
+                 BinOrList = Bytes | binary()
+                 Bytes = [Int|binary|Bytes] when integer(Int), Int >= 0, Int
+                 =< 255
+                 Reason = term()
+
+              Encodes _V_a_l_u_e of _T_y_p_e defined in the ASN.1 module _M_o_d_u_l_e.
+              Returns a possibly nested list of bytes and or binaries if
+              successful. If _M_o_d_u_l_e was compiled with the options _p_e_r___b_i_n and
+              _o_p_t_i_m_i_z_e the result is a binary. To get as fast execution as
+              possible the encode function only performs rudimentary tests
+              that the input _V_a_l_u_e is a correct instance of _T_y_p_e. The length
+              of strings is for example not always checked.
+
+       iinnffoo((MMoodduullee)) -->> {{ookk,,IInnffoo}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Module = atom()
+                 Info = list()
+                 Reason = term()
+
+              _i_n_f_o_/_1 returns the version of the asn1 compiler that was used to
+              compile the module. It also returns the compiler options that
+              was used.
+
+       llooaadd__ddrriivveerr(()) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              This function is obsolete and will be removed in R16A
+
+       uunnllooaadd__ddrriivveerr(()) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              This function is obsolete and will be removed in R16A
+
+       uuttff88__bbiinnaarryy__ttoo__lliisstt((UUTTFF88BBiinnaarryy)) -->> {{ookk,,UUnniiccooddeeLLiisstt}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 UTF8Binary = binary()
+                 UnicodeList = [integer()]
+                 Reason = term()
+
+              _u_t_f_8___b_i_n_a_r_y___t_o___l_i_s_t_/_1 Transforms a UTF8 encoded binary to a list
+              of integers, where each integer represents one character as its
+              unicode value. The function fails if the binary is not a
+              properly encoded UTF8 string.
+
+       uuttff88__lliisstt__ttoo__bbiinnaarryy((UUnniiccooddeeLLiisstt)) -->> {{ookk,,UUTTFF88BBiinnaarryy}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 UnicodeList = [integer()]
+                 UTF8Binary = binary()
+                 Reason = term()
+
+              _u_t_f_8___l_i_s_t___t_o___b_i_n_a_r_y_/_1 Transforms a list of integers, where each
+              integer represents one character as its unicode value, to a UTF8
+              encoded binary.
+
+
+
+Ericsson AB                        asn1 1.8                          asn1rt(3)

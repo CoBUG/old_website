@@ -1,0 +1,72 @@
+wxTaskBarIcon(3)           Erlang Module Definition           wxTaskBarIcon(3)
+
+
+
+NNAAMMEE
+       wxTaskBarIcon - See external documentation: wxTaskBarIcon.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxTaskBarIcon.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_T_a_s_k_B_a_r_I_c_o_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxTTaasskkBBaarrIIccoonn(())
+
+              See external documentation.
+
+       ppooppuuppMMeennuu((TThhiiss,, MMeennuu)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTaskBarIcon()
+                 Menu = wxMenu() (see module wxMenu)
+
+              See external documentation.
+
+       rreemmoovveeIIccoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTaskBarIcon()
+
+              See external documentation.
+
+       sseettIIccoonn((TThhiiss,, IIccoonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTaskBarIcon()
+                 Icon = wxIcon() (see module wxIcon)
+
+              Equivalent to sseettIIccoonn((TThhiiss,, IIccoonn,, [[]])).
+
+       sseettIIccoonn((TThhiiss,, IIccoonn,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTaskBarIcon()
+                 Icon = wxIcon() (see module wxIcon)
+                 Option = {tooltip, chardata() (see module unicode)}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxTTaasskkBBaarrIIccoonn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                  wxTaskBarIcon(3)

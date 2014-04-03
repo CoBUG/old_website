@@ -1,0 +1,196 @@
+os(3)                      Erlang Module Definition                      os(3)
+
+
+
+NNAAMMEE
+       os - Operating System Specific Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       The functions in this module are operating system specific. Careless
+       use of these functions will result in programs that will only run on a
+       specific platform. On the other hand, with careful use these functions
+       can be of help in enabling a program to run on most platforms.
+
+EEXXPPOORRTTSS
+       ccmmdd((CCoommmmaanndd)) -->> ssttrriinngg(())
+
+              Types:
+
+                 Command = atom() | iioo__lliibb::cchhaarrss(())
+
+              Executes _C_o_m_m_a_n_d in a command shell of the target OS, captures
+              the standard output of the command and returns this result as a
+              string. This function is a replacement of the previous
+              _u_n_i_x_:_c_m_d_/_1; on a Unix platform they are equivalent.
+
+              Examples:
+
+              LsOut = os:cmd("ls"), % on unix platform
+              DirOut = os:cmd("dir"), % on Win32 platform
+
+              Note that in some cases, standard output of a command when
+              called from another program (for example, _o_s_:_c_m_d_/_1) may differ,
+              compared to the standard output of the command when called
+              directly from an OS command shell.
+
+       ffiinndd__eexxeeccuuttaabbllee((NNaammee)) -->> FFiilleennaammee || ffaallssee
+
+       ffiinndd__eexxeeccuuttaabbllee((NNaammee,, PPaatthh)) -->> FFiilleennaammee || ffaallssee
+
+              Types:
+
+                 Name = Path = Filename = string()
+
+              These two functions look up an executable program given its name
+              and a search path, in the same way as the underlying operating
+              system. _f_i_n_d___e_x_e_c_u_t_a_b_l_e_/_1 uses the current execution path (that
+              is, the environment variable PATH on Unix and Windows).
+
+              _P_a_t_h, if given, should conform to the syntax of execution paths
+              on the operating system. The absolute filename of the executable
+              program _N_a_m_e is returned, or _f_a_l_s_e if the program was not found.
+
+       ggeetteennvv(()) -->> [[ssttrriinngg(())]]
+
+              Returns a list of all environment variables. Each environment
+              variable is given as a single string on the format
+              _"_V_a_r_N_a_m_e_=_V_a_l_u_e_", where _V_a_r_N_a_m_e is the name of the variable and
+              _V_a_l_u_e its value.
+
+              If Unicode file name encoding is in effect (see the eerrll mmaannuuaall
+              ppaaggee), the strings may contain characters with codepoints > 255.
+
+       ggeetteennvv((VVaarrNNaammee)) -->> VVaalluuee || ffaallssee
+
+              Types:
+
+                 VarName = string()
+                 Value = string()
+
+              Returns the _V_a_l_u_e of the environment variable _V_a_r_N_a_m_e, or _f_a_l_s_e
+              if the environment variable is undefined.
+
+              If Unicode file name encoding is in effect (see the eerrll mmaannuuaall
+              ppaaggee), the strings (both _V_a_r_N_a_m_e and _V_a_l_u_e) may contain
+              characters with codepoints > 255.
+
+       ggeettppiidd(()) -->> VVaalluuee
+
+              Types:
+
+                 Value = string()
+
+              Returns the process identifier of the current Erlang emulator in
+              the format most commonly used by the operating system
+              environment. _V_a_l_u_e is returned as a string containing the
+              (usually) numerical identifier for a process. On Unix, this is
+              typically the return value of the _g_e_t_p_i_d_(_) system call. On
+              VxWorks, _V_a_l_u_e contains the task id (decimal notation) of the
+              Erlang task. On Windows, the process id as returned by the
+              _G_e_t_C_u_r_r_e_n_t_P_r_o_c_e_s_s_I_d_(_) system call is used.
+
+       ppuutteennvv((VVaarrNNaammee,, VVaalluuee)) -->> ttrruuee
+
+              Types:
+
+                 VarName = string()
+                 Value = string()
+
+              Sets a new _V_a_l_u_e for the environment variable _V_a_r_N_a_m_e.
+
+              If Unicode filename encoding is in effect (see the eerrll mmaannuuaall
+              ppaaggee), the strings (both _V_a_r_N_a_m_e and _V_a_l_u_e) may contain
+              characters with codepoints > 255.
+
+              On Unix platforms, the environment will be set using UTF-8
+              encoding if Unicode file name translation is in effect. On
+              Windows the environment is set using wide character interfaces.
+
+       ttiimmeessttaammpp(()) -->> TTiimmeessttaammpp
+
+              Types:
+
+                 Timestamp = {MegaSecs, Secs, MicroSecs} = eerrllaanngg::ttiimmeessttaammpp(())
+                 MegaSecs = Secs = MicroSecs = integer() >= 0
+
+              Returns a tuple in the same format as eerrllaanngg::nnooww//00. The
+              difference is that this function returns what the operating
+              system thinks (a.k.a. the wall clock time) without any attempts
+              at time correction. The result of two different calls to this
+              function is _n_o_t guaranteed to be different.
+
+              The most obvious use for this function is logging. The tuple can
+              be used together with the function
+              ccaalleennddaarr::nnooww__ttoo__uunniivveerrssaall__ttiimmee//11 or ccaalleennddaarr::nnooww__ttoo__llooccaall__ttiimmee//11
+              to get calendar time. Using the calendar time together with the
+              _M_i_c_r_o_S_e_c_s part of the return tuple from this function allows you
+              to log timestamps in high resolution and consistent with the
+              time in the rest of the operating system.
+
+              Example of code formatting a string in the format "DD Mon YYYY
+              HH:MM:SS.mmmmmm", where DD is the day of month, Mon is the
+              textual month name, YYYY is the year, HH:MM:SS is the time and
+              mmmmmm is the microseconds in six positions:
+
+              -module(print_time).
+              -export([format_utc_timestamp/0]).
+              format_utc_timestamp() ->
+                  TS = {_,_,Micro} = os:timestamp(),
+                  {{Year,Month,Day},{Hour,Minute,Second}} =
+                   calendar:now_to_universal_time(TS),
+                  Mstr = element(Month,{"Jan","Feb","Mar","Apr","May","Jun","Jul",
+                               "Aug","Sep","Oct","Nov","Dec"}),
+                  io_lib:format("~2w ~s ~4w ~2w:~2..0w:~2..0w.~6..0w",
+                          [Day,Mstr,Year,Hour,Minute,Second,Micro]).
+
+
+              The module above could be used in the following way:
+
+              1> io:format("~s~n",[print_time:format_utc_timestamp()]).
+              29 Apr 2009  9:55:30.051711
+
+
+       ttyyppee(()) -->> vvxxwwoorrkkss || {{OOssffaammiillyy,, OOssnnaammee}}
+
+              Types:
+
+                 Osfamily = unix | win32
+                 Osname = atom()
+
+              Returns the _O_s_f_a_m_i_l_y and, in some cases, _O_s_n_a_m_e of the current
+              operating system.
+
+              On Unix, _O_s_n_a_m_e will have same value as _u_n_a_m_e _-_s returns, but in
+              lower case. For example, on Solaris 1 and 2, it will be _s_u_n_o_s.
+
+              In Windows, _O_s_n_a_m_e will be either _n_t (on Windows NT), or _w_i_n_d_o_w_s
+              (on Windows 95).
+
+              On VxWorks the OS family alone is returned, that is _v_x_w_o_r_k_s.
+
+          NNoottee::
+              Think twice before using this function. Use the _f_i_l_e_n_a_m_e module
+              if you want to inspect or build file names in a portable way.
+              Avoid matching on the _O_s_n_a_m_e atom.
+
+
+       vveerrssiioonn(()) -->> VVeerrssiioonnSSttrriinngg || {{MMaajjoorr,, MMiinnoorr,, RReelleeaassee}}
+
+              Types:
+
+                 VersionString = string()
+                 Major = Minor = Release = integer() >= 0
+
+              Returns the operating system version. On most systems, this
+              function returns a tuple, but a string will be returned instead
+              if the system has versions which cannot be expressed as three
+              numbers.
+
+          NNoottee::
+              Think twice before using this function. If you still need to use
+              it, always _c_a_l_l _o_s_:_t_y_p_e_(_) first.
+
+
+
+
+Ericsson AB                      kernel 2.15.2                           os(3)

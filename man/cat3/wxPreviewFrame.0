@@ -1,0 +1,89 @@
+wxPreviewFrame(3)          Erlang Module Definition          wxPreviewFrame(3)
+
+
+
+NNAAMMEE
+       wxPreviewFrame - See external documentation: wxPreviewFrame.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPreviewFrame.
+
+       This class is derived (and can use functions) from:
+       wwxxFFrraammee
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_r_e_v_i_e_w_F_r_a_m_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPrreevviieeww,, PPaarreenntt)) -->> wwxxPPrreevviieewwFFrraammee(())
+
+              Types:
+
+                 Preview = wxPrintPreview() (see module wxPrintPreview)
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPrreevviieeww,, PPaarreenntt,, [[]])).
+
+       nneeww((PPrreevviieeww,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxPPrreevviieewwFFrraammee(())
+
+              Types:
+
+                 Preview = wxPrintPreview() (see module wxPrintPreview)
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {title, chardata() (see module unicode)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaatteeCCoonnttrroollBBaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxPreviewFrame()
+
+              See external documentation.
+
+       ccrreeaatteeCCaannvvaass((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxPreviewFrame()
+
+              See external documentation.
+
+       iinniittiiaalliizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxPreviewFrame()
+
+              See external documentation.
+
+       oonnCClloosseeWWiinnddooww((TThhiiss,, EEvveenntt)) -->> ookk
+
+              Types:
+
+                 This = wxPreviewFrame()
+                 Event = wxCloseEvent() (see module wxCloseEvent)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPrreevviieewwFFrraammee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxPreviewFrame(3)

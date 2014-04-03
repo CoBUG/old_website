@@ -1,0 +1,190 @@
+rb(3)                      Erlang Module Definition                      rb(3)
+
+
+
+NNAAMMEE
+       rb - The Report Browser Tool
+
+DDEESSCCRRIIPPTTIIOONN
+       The Report Browser (RB) tool makes it possible to browse and format
+       error reports written by the error logger handler _l_o_g___m_f___h.
+
+EEXXPPOORRTTSS
+       ffiilltteerr((FFiilltteerrss))
+       ffiilltteerr((FFiilltteerrss,, DDaatteess))
+
+              Types:
+
+                 Filters = [filter()]
+                 filter() = {Key, Value} | {Key, Value, no} | {Key, RegExp,
+                 re} | {Key, RegExp, re, no}
+                 Key = term()
+                 Value = term()
+                 RegExp = string() | {string, Options} | mp(), {mp(), Options}
+                 Dates = {DateFrom, DateTo} | {DateFrom, from} | {DateTo, to}
+                 DateFrom = DateTo = {date(), time()}
+                 date() and time() are the same type as in the _c_a_l_e_n_d_a_r module
+
+              This function displays the reports that match the provided
+              filters.
+
+              When a filter includes the _n_o atom it will exclude the reports
+              that match that filter.
+
+              The reports are matched using the _p_r_o_p_l_i_s_t_s module. The report
+              must be a proplist to be matched against any of the _f_i_l_t_e_r_s_(_).
+
+              If the filter is of the form _{_K_e_y_, _R_e_g_E_x_p_, _r_e_} the report must
+              contain an element with _k_e_y _= _K_e_y and _V_a_l_u_e must match the
+              RegExp regular expression.
+
+              If the Dates parameter is provided, then the reports are
+              filtered according to the date when they occurred. If Dates is
+              of the form _{_D_a_t_e_F_r_o_m_, _f_r_o_m_} then reports that occurred after
+              DateFrom are displayed.
+
+              If Dates is of the form _{_D_a_t_e_T_o_, _t_o_} then reports that occurred
+              before DateTo are displayed.
+
+              If two Dates are provided, then reports that occurred between
+              those dates are returned.
+
+              If you only want to filter only by dates, then you can provide
+              the empty list as the Filters parameter.
+
+              See _r_b_:_g_r_e_p_/_1 for more information on the RegExp parameter.
+
+       ggrreepp((RReeggEExxpp))
+
+              Types:
+
+                 RegExp = string() | {string, Options} | mp(), {mp(), Options}
+
+              All reports containing the regular expression _R_e_g_E_x_p are
+              printed.
+
+              _R_e_g_E_x_p can be a string containing the regular expression; a
+              tuple with the string and the options for compilation; a
+              compiled regular expression; a compiled regular expression and
+              the options for running it. Refer to the module _r_e and specially
+              the function _r_e_:_r_u_n_/_3 for a definition of valid regular
+              expressions and options.
+
+       hh(())
+       hheellpp(())
+
+              Prints the on-line help information.
+
+       lliisstt(())
+       lliisstt((TTyyppee))
+
+              Types:
+
+                 Type = type()
+                 type() = error | error_report | info_msg | info_report |
+                 warning_msg | warning_report | crash_report |
+                 supervisor_report | progress
+
+              This function lists all reports loaded in the _r_b___s_e_r_v_e_r. Each
+              report is given a unique number that can be used as a reference
+              to the report in the _s_h_o_w_/_1 function.
+
+              If no _T_y_p_e is given, all reports are listed.
+
+       rreessccaann(())
+       rreessccaann((OOppttiioonnss))
+
+              Types:
+
+                 Options = [opt()]
+
+              Rescans the report directory. _O_p_t_i_o_n_s is the same as for
+              _s_t_a_r_t_(_).
+
+       sshhooww(())
+       sshhooww((RReeppoorrtt))
+
+              Types:
+
+                 Report = int() | type()
+
+              If a type argument is given, all loaded reports of this type are
+              printed. If an integer argument is given, the report with this
+              reference number is printed. If no argument is given, all
+              reports are shown.
+
+       ssttaarrtt(())
+       ssttaarrtt((OOppttiioonnss))
+
+              Types:
+
+                 Options = [opt()]
+                 opt() = {start_log, FileName} | {max, MaxNoOfReports} |
+                 {report_dir, DirString} | {type, ReportType} |
+                 {abort_on_error, Bool}
+                 FileName = string() | standard_io
+                 MaxNoOfReports = int() | all
+                 DirString = string()
+                 ReportType = type() | [type()] | all
+                 Bool = true | false
+
+              The function _s_t_a_r_t_/_1 starts the _r_b___s_e_r_v_e_r with the specified
+              options, while _s_t_a_r_t_/_0 starts with default options. The
+              _r_b___s_e_r_v_e_r must be started before reports can be browsed. When
+              the _r_b___s_e_r_v_e_r is started, the files in the specified directory
+              are scanned. The other functions assume that the server has
+              started.
+
+              _{_s_t_a_r_t___l_o_g_, _F_i_l_e_N_a_m_e_} starts logging to file. All reports will
+              be printed to the named file. The default is _s_t_a_n_d_a_r_d___i_o.
+
+              _{_m_a_x_, _M_a_x_N_o_O_f_R_e_p_o_r_t_s_}. Controls how many reports the _r_b___s_e_r_v_e_r
+              should read on start-up. This option is useful as the directory
+              may contain 20.000 reports. If this option is given, the
+              _M_a_x_N_o_O_f_R_e_p_o_r_t_s latest reports will be read. The default is
+              'all'.
+
+              _{_r_e_p_o_r_t___d_i_r_, _D_i_r_S_t_r_i_n_g_}. Defines the directory where the error
+              log files are located. The default is _{_s_a_s_l_,
+              _e_r_r_o_r___l_o_g_g_e_r___m_f___d_i_r_}.
+
+              _{_t_y_p_e_, _R_e_p_o_r_t_T_y_p_e_}. Controls what kind of reports the _r_b___s_e_r_v_e_r
+              should read on start-up. _R_e_p_o_r_t_T_y_p_e is a supported type, 'all',
+              or a list of supported types. The default is 'all'.
+
+              _{_a_b_o_r_t___o_n___e_r_r_o_r_, _B_o_o_l_}. This option specifies whether or not
+              logging should be aborted if rb encounters an unprintable
+              report. (You may get a report on incorrect form if the
+              _e_r_r_o_r___l_o_g_g_e_r function _e_r_r_o_r___m_s_g or _i_n_f_o___m_s_g has been called with
+              an invalid format string). If _B_o_o_l is _t_r_u_e, rb will stop logging
+              (and print an error message to stdout) if it encounters a badly
+              formatted report. If logging to file is enabled, an error
+              message will be appended to the log file as well. If _B_o_o_l is
+              _f_a_l_s_e (which is the default value), rb will print an error
+              message to stdout for every bad report it encounters, but the
+              logging process is never aborted. All printable reports will be
+              written. If logging to file is enabled, rb prints _* _U_N_P_R_I_N_T_A_B_L_E
+              _R_E_P_O_R_T _* in the log file at the location of an unprintable
+              report.
+
+       ssttaarrtt__lloogg((FFiilleeNNaammee))
+
+              Types:
+
+                 FileName = string()
+
+              Redirects all report output from the RB tool to the specified
+              file.
+
+       ssttoopp(())
+
+              Stops the _r_b___s_e_r_v_e_r.
+
+       ssttoopp__lloogg(())
+
+              Closes the log file. The output from the RB tool will be
+              directed to _s_t_a_n_d_a_r_d___i_o.
+
+
+
+Ericsson AB                       sasl 2.2.1                             rb(3)

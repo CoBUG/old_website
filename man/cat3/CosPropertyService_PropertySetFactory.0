@@ -1,0 +1,67 @@
+CosPropertyService_PropertySEertlFaancgtoMroyd(u3lC)eosDPerfoipneirttiyoSnervice_PropertySetFactory(3)
+
+
+
+NNAAMMEE
+       CosPropertyService_PropertySetFactory - This module implements the OMG
+       CosPropertyService::PropertySetFactory interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_P_r_o_p_e_r_t_y_/_i_n_c_l_u_d_e_/_C_o_s_P_r_o_p_e_r_t_y_S_e_r_v_i_c_e_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccrreeaattee__pprrooppeerrttyysseett((FFaaccttoorryy)) -->> PPrrooppeerrttyySSeett
+
+              Types:
+
+                 Factory = PropertySet = #objref
+
+              This operation creates a new _P_r_o_p_e_r_t_y_S_et with no predefined
+              properties.
+
+       ccrreeaattee__ccoonnssttrraaiinneedd__pprrooppeerrttyysseett((FFaaccttoorryy,, PPrrooppeerrttyyTTyyppeess,, PPrrooppeerrttiieess)) -->>
+       RReeppllyy
+
+              Types:
+
+                 Factory = #objref
+                 PropertyTypes = [CORBA::TypeCode]
+                 Properties = [#'CosPropertyService_Property'{property_name =
+                 Name, property_value = Value}]
+                 Name = string()
+                 Value = #any
+                 Reply = {'EXCEPTION',
+                 #CosPropertyService_ConstraintNotSupported{}} | PropertySet
+                 PropertySet = #objref
+
+              This operation creates a new _P_r_o_p_e_r_t_y_S_e_t with specific
+              constraints. PropertyTypes states allowed TypeCode's and
+              Properties valid _C_o_s_P_r_o_p_e_r_t_y_S_e_r_v_i_c_e_:_:_P_r_o_p_e_r_t_y data.
+
+       ccrreeaattee__iinniittiiaall__pprrooppeerrttyysseett((FFaaccttoorryy,, PPrrooppeerrttiieess)) -->> RReeppllyy
+
+              Types:
+
+                 Factory = #objref
+                 Properties = [#'CosPropertyService_Property'{property_name =
+                 Name, property_value = Value}]
+                 Name = string()
+                 Value = #any
+                 Reply = {'EXCEPTION',
+                 #CosPropertyService_MultipleExceptions{exceptions = Excs}} |
+                 PropertySet
+                 Excs = [#'CosPropertyService_PropertyException{reason =
+                 Reason, failing_property_name = Name}]
+                 Reason = invalid_property_name | conflicting_property |
+                 property_not_found | unsupported_type_code |
+                 unsupported_property | unsupported_mode | fixed_property |
+                 read_only_property
+                 PropertySet = #objref
+
+              This operation creates a new _P_r_o_p_e_r_t_y_S_e_t with specific initial
+              properties.
+
+
+
+Ericsson AB                   cosProperCtoysP1r.o1p.e1r5tyService_PropertySetFactory(3)

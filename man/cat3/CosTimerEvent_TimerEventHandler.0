@@ -1,0 +1,93 @@
+CosTimerEvent_TimerEventHandElrelra(n3g)Module DefiCnoistTiiomnerEvent_TimerEventHandler(3)
+
+
+
+NNAAMMEE
+       CosTimerEvent_TimerEventHandler - This module implements the OMG
+       CosTimerEvent::TimerEventHandler interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_i_m_e_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ''__ggeett__ssttaattuuss''((TTiimmeerrEEvveennttHHaannddlleerr)) -->> RReeppllyy
+
+              Types:
+
+                 TimerEventHandler = #objref
+                 Reply = 'ESTimeSet' | 'ESTimeCleared' | 'ESTriggered' |
+                 'ESFailedTrigger'
+
+              This operation returns the status of the target object.
+
+                * 'ESTimeSet' - timer is set to trigger event(s).
+
+                * 'ESTimeCleared' - no time set or the timer have been reset.
+
+                * 'ESTriggered' - event has already been sent.
+
+                * 'ESFailedTrigger' - tried to, but failed, sending the event.
+
+              If the target object is of type 'TTPeriodic' the status value
+              'ESTriggered' is not valid.
+
+       ttiimmee__sseett((TTiimmeerrEEvveennttHHaannddlleerr)) -->> RReeppllyy
+
+              Types:
+
+                 TimerEventHandler = #objref
+                 Reply = {boolean(), UTO}
+                 UTO = #objref
+
+              This operation returns _t_r_u_e if the time has been set for an
+              event that is yet to be triggered, _f_a_l_s_e otherwise. The
+              outparameter represents the current time value of the target
+              object.
+
+       sseett__ttiimmeerr((TTiimmeerrEEvveennttHHaannddlleerr,, TTiimmeeTTyyppee,, TTrriiggggeerrTTiimmee)) -->> vvooiidd(())
+
+              Types:
+
+                 TimerEventHandler = #objref
+                 TimeType = 'TTAbsolute' | 'TTRelative' | 'TTPeriodic'
+                 TriggerTime = UTO
+                 UTO = #objref
+
+              This operation terminates any previous set trigger, and set a
+              new trigger specified by the _T_i_m_e_T_y_p_e and _U_T_O objects.
+
+              The relation between the UTO object and the TimeTypes are:
+
+                * 'TTAbsolute' - the UTO object must represent absolute time,
+                  i.e., number of 100 nanoseconds passed since 15 october 1582
+                  00:00.
+
+                * 'TTRelative' - the UTO object must represent the from now
+                  until when the event should be triggered, e.g., within
+                  30*10^7 nanoseconds.
+
+                * 'TTPeriodic' - the same as for 'TTRelative', but this option
+                  will trigger an event periodically until timer cancelled.
+
+       ccaanncceell__ttiimmeerr((TTiimmeerrEEvveennttHHaannddlleerr)) -->> bboooolleeaann(())
+
+              Types:
+
+                 TimerEventHandler = #objref
+
+              This operation cancel, if possible, the triggering of event(s).
+              Returns _t_r_u_e if an event is actually cancelled, _f_a_l_s_e otherwise.
+
+       sseett__ddaattaa((TTiimmeerrEEvveennttHHaannddlleerr,, EEvveennttDDaattaa)) -->> ookk
+
+              Types:
+
+                 TimerEventHandler = #objref
+                 EventData = #any
+
+              This operation changes the event data sent when triggered.
+
+
+
+Ericsson AB                     cosTime 1.1.1C2osTimerEvent_TimerEventHandler(3)

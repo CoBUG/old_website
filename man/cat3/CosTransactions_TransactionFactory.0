@@ -1,0 +1,32 @@
+CosTransactions_TransactionFEarcltaonrgy(M3o)dule DCeofsiTnriatnisoanctions_TransactionFactory(3)
+
+
+
+NNAAMMEE
+       CosTransactions_TransactionFactory - This module implements the OMG
+       CosTransactions::TransactionFactory interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccrreeaattee((TTrraannssaaccttiioonnFFaaccttoorryy,, TTiimmeeoouutt)) -->> CCoonnttrrooll
+
+              Types:
+
+                 TransactionFactory = #objref
+                 Timeout = integer()
+                 Control = #objref
+
+              This operation creates a new top-level transaction.
+
+              The _T_i_m_e_o_u_t argument can be:
+
+                * 0 - no timeout.
+
+                * N (integer() > 0) - the transaction will be subject to being
+                  rolled back if it does not complete before N seconds have
+                  elapsed.
+
+Ericsson AB                 cosTransactionCsos1T.r2a.n1s2actions_TransactionFactory(3)

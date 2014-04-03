@@ -1,0 +1,1479 @@
+xref(3)                    Erlang Module Definition                    xref(3)
+
+
+
+NNAAMMEE
+       xref - A Cross Reference Tool for analyzing dependencies between
+       functions, modules, applications and releases.
+
+DDEESSCCRRIIPPTTIIOONN
+       Xref is a cross reference tool that can be used for finding
+       dependencies between functions, modules, applications and releases.
+
+       Calls between functions are either _l_o_c_a_l _c_a_l_l_s like _f_(_), or _e_x_t_e_r_n_a_l
+       _c_a_l_l_s like _m_:_f_(_). _M_o_d_u_l_e _d_a_t_a, which are extracted from BEAM files,
+       include local functions, exported functions, local calls and external
+       calls. By default, calls to built-in functions () are ignored, but if
+       the option _b_u_i_l_t_i_n_s, accepted by some of this module's functions, is
+       set to _t_r_u_e, calls to BIFs are included as well. It is the analyzing
+       OTP version that decides what functions are BIFs. Functional objects
+       are assumed to be called where they are created (and nowhere else).
+       _U_n_r_e_s_o_l_v_e_d _c_a_l_l_s are calls to _a_p_p_l_y or _s_p_a_w_n with variable module,
+       variable function, or variable arguments. Examples are _M_:_F_(_a_), _a_p_p_l_y_(_M_,
+       _f_, _[_a_]_), and _s_p_a_w_n_(_m_, _f_(_)_, _A_r_g_s_). Unresolved calls are represented by
+       calls where variable modules have been replaced with the atom
+       _'_$_M___E_X_P_R_', variable functions have been replaced with the atom
+       _'_$_F___E_X_P_R_', and variable number of arguments have been replaced with the
+       number _-_1. The above mentioned examples are represented by calls to
+       _'_$_M___E_X_P_R_'_:_'_$_F___E_X_P_R_'_/_1, _'_$_M___E_X_P_R_'_:_f_/_1, and _m_:_'_$_F___E_X_P_R_'_/_-_1. The
+       unresolved calls are a subset of the external calls.
+
+   WWaarrnniinngg::
+       Unresolved calls make module data incomplete, which implies that the
+       results of analyses may be invalid.
+
+
+       _A_p_p_l_i_c_a_t_i_o_n_s are collections of modules. The modules' BEAM files are
+       located in the _e_b_i_n subdirectory of the application directory. The name
+       of the application directory determines the name and version of the
+       application. _R_e_l_e_a_s_e_s are collections of applications located in the
+       _l_i_b subdirectory of the release directory. There is more to read about
+       applications and releases in the Design Principles book.
+
+       _X_r_e_f _s_e_r_v_e_r_s are identified by names, supplied when creating new
+       servers. Each Xref server holds a set of releases, a set of
+       applications, and a set of modules with module data. Xref servers are
+       independent of each other, and all analyses are evaluated in the
+       context of one single Xref server (exceptions are the functions _m_/_1 and
+       _d_/_1 which do not use servers at all). The _m_o_d_e of an Xref server
+       determines what module data are extracted from BEAM files as modules
+       are added to the server. Starting with R7, BEAM files compiled with the
+       option _d_e_b_u_g___i_n_f_o contain so called debug information, which is an
+       abstract representation of the code. In _f_u_n_c_t_i_o_n_s mode, which is the
+       default mode, function calls and line numbers are extracted from debug
+       information. In _m_o_d_u_l_e_s mode, debug information is ignored if present,
+       but dependencies between modules are extracted from other parts of the
+       BEAM files. The _m_o_d_u_l_e_s mode is significantly less time and space
+       consuming than the _f_u_n_c_t_i_o_n_s mode, but the analyses that can be done
+       are limited.
+
+       An _a_n_a_l_y_z_e_d _m_o_d_u_l_e is a module that has been added to an Xref server
+       together with its module data. A _l_i_b_r_a_r_y _m_o_d_u_l_e is a module located in
+       some directory mentioned in the _l_i_b_r_a_r_y _p_a_t_h. A library module is said
+       to be used if some of its exported functions are used by some analyzed
+       module. An _u_n_k_n_o_w_n _m_o_d_u_l_e is a module that is neither an analyzed
+       module nor a library module, but whose exported functions are used by
+       some analyzed module. An _u_n_k_n_o_w_n _f_u_n_c_t_i_o_n is a used function that is
+       neither local or exported by any analyzed module nor exported by any
+       library module. An _u_n_d_e_f_i_n_e_d _f_u_n_c_t_i_o_n is an externally used function
+       that is not exported by any analyzed module or library module. With
+       this notion, a local function can be an undefined function, namely if
+       it is externally used from some module. All unknown functions are also
+       undefined functions; there is a ffiigguurree in the User's Guide that
+       illustrates this relationship.
+
+       Starting with R9C, the module attribute tag _d_e_p_r_e_c_a_t_e_d can be used to
+       inform Xref about _d_e_p_r_e_c_a_t_e_d _f_u_n_c_t_i_o_n_s and optionally when functions
+       are planned to be removed. A few examples show the idea:
+
+         --ddeepprreeccaatteedd(({{ff,,11}}))..::
+           The exported function _f_/_1 is deprecated. Nothing is said whether
+           _f_/_1 will be removed or not.
+
+         --ddeepprreeccaatteedd(({{ff,,''__''}}))..::
+           All exported functions _f_/_0, _f_/_1 and so on are deprecated.
+
+         --ddeepprreeccaatteedd((mmoodduullee))..::
+           All exported functions in the module are deprecated. Equivalent to
+           _-_d_e_p_r_e_c_a_t_e_d_(_{_'___'_,_'___'_}_)_..
+
+         --ddeepprreeccaatteedd(([[{{gg,,11,,nneexxtt__vveerrssiioonn}}]]))..::
+           The function _g_/_1 is deprecated and will be removed in next version.
+
+         --ddeepprreeccaatteedd(([[{{gg,,22,,nneexxtt__mmaajjoorr__rreelleeaassee}}]]))..::
+           The function _g_/_2 is deprecated and will be removed in next major
+           release.
+
+         --ddeepprreeccaatteedd(([[{{gg,,33,,eevveennttuuaallllyy}}]]))..::
+           The function _g_/_3 is deprecated and will eventually be removed.
+
+         --ddeepprreeccaatteedd(({{''__'',,''__'',,eevveennttuuaallllyy}}))..::
+           All exported functions in the module are deprecated and will
+           eventually be removed.
+
+       Before any analysis can take place, module data must be _s_e_t _u_p. For
+       instance, the cross reference and the unknown functions are computed
+       when all module data are known. The functions that need complete data
+       (_a_n_a_l_y_z_e, _q, _v_a_r_i_a_b_l_e_s) take care of setting up data automatically.
+       Module data need to be set up (again) after calls to any of the _a_d_d,
+       _r_e_p_l_a_c_e, _r_e_m_o_v_e, _s_e_t___l_i_b_r_a_r_y___p_a_t_h or _u_p_d_a_t_e functions.
+
+       The result of setting up module data is the _C_a_l_l _G_r_a_p_h. A (directed)
+       graph consists of a set of vertices and a set of (directed) edges. The
+       edges represent _c_a_l_l_s (From, To) between functions, modules,
+       applications or releases. From is said to call To, and To is said to be
+       used by From. The vertices of the Call Graph are the functions of all
+       module data: local and exported functions of analyzed modules; used
+       BIFs; used exported functions of library modules; and unknown
+       functions. The functions _m_o_d_u_l_e___i_n_f_o_/_0_,_1 added by the compiler are
+       included among the exported functions, but only when called from some
+       module. The edges are the function calls of all module data. A
+       consequence of the edges being a set is that there is only one edge if
+       a function is locally or externally used several times on one and the
+       same line of code.
+
+       The Call Graph is represented by Erlang terms (the sets are lists),
+       which is suitable for many analyses. But for analyses that look at
+       chains of calls, a list representation is much too slow. Instead the
+       representation offered by the _d_i_g_r_a_p_h module is used. The translation
+       of the list representation of the Call Graph - or a subgraph thereof -
+       to the _d_i_g_r_a_p_h representation does not come for free, so the language
+       used for expressing queries to be described below has a special
+       operator for this task and a possibility to save the _d_i_g_r_a_p_h
+       representation for subsequent analyses.
+
+       In addition to the Call Graph there is a graph called the _I_n_t_e_r _C_a_l_l
+       _G_r_a_p_h. This is a graph of calls (From, To) such that there is a chain
+       of calls from From to To in the Call Graph, and every From and To is an
+       exported function or an unused local function. The vertices are the
+       same as for the Call Graph.
+
+       Calls between modules, applications and releases are also directed
+       graphs. The _t_y_p_e_s of the vertices and edges of these graphs are
+       (ranging from the most special to the most general): _F_u_n for functions;
+       _M_o_d for modules; _A_p_p for applications; and _R_e_l for releases. The
+       following paragraphs will describe the different constructs of the
+       language used for selecting and analyzing parts of the graphs,
+       beginning with the _c_o_n_s_t_a_n_t_s:
+
+         * Expression ::= Constants
+
+         * Constants ::= Consts | Consts _: Type | RegExpr
+
+         * Consts ::= Constant | _[Constant_, ..._] | _{Constant_, ..._}
+
+         * Constant ::= Call | Const
+
+         * Call ::= FunSpec _-_> FunSpec | _{MFA_, MFA_} | AtomConst _-_> AtomConst |
+           _{AtomConst_, AtomConst_}
+
+         * Const ::= AtomConst | FunSpec | MFA
+
+         * AtomConst ::= Application | Module | Release
+
+         * FunSpec ::= Module _: Function _/ Arity
+
+         * MFA ::= _{Module_, Function_, Arity_}
+
+         * RegExpr ::= RegString _: Type | RegFunc | RegFunc _: Type
+
+         * RegFunc ::= RegModule _: RegFunction _/ RegArity
+
+         * RegModule ::= RegAtom
+
+         * RegFunction ::= RegAtom
+
+         * RegArity ::= RegString | Number | __ | _-_1
+
+         * RegAtom ::= RegString | Atom | __
+
+         * RegString ::= - a regular expression, as described in the _r_e
+           module, enclosed in double quotes -
+
+         * Type ::= _F_u_n | _M_o_d | _A_p_p | _R_e_l
+
+         * Function ::= Atom
+
+         * Application ::= Atom
+
+         * Module ::= Atom
+
+         * Release ::= Atom
+
+         * Arity ::= Number | _-_1
+
+         * Atom ::= - same as Erlang atoms -
+
+         * Number ::= - same as non-negative Erlang integers -
+
+       Examples of constants are: _k_e_r_n_e_l, _k_e_r_n_e_l_-_>_s_t_d_l_i_b, _[_k_e_r_n_e_l_, _s_a_s_l_], _[_p_g
+       _-_> _m_n_e_s_i_a_, _{_t_v_, _m_n_e_s_i_a_}_] _: _M_o_d. It is an error if an instance of _C_o_n_s_t
+       does not match any vertex of any graph. If there are more than one
+       vertex matching an untyped instance of _A_t_o_m_C_o_n_s_t, then the one of the
+       most general type is chosen. A list of constants is interpreted as a
+       set of constants, all of the same type. A tuple of constants constitute
+       a chain of calls (which may, but does not have to, correspond to an
+       actual chain of calls of some graph). Assigning a type to a list or
+       tuple of _C_o_n_s_t_a_n_t is equivalent to assigning the type to each _C_o_n_s_t_a_n_t.
+
+       _R_e_g_u_l_a_r _e_x_p_r_e_s_s_i_o_n_s are used as a means to select some of the vertices
+       of a graph. A _R_e_g_E_x_p_r consisting of a _R_e_g_S_t_r_i_n_g and a type - an example
+       is _"_x_r_e_f___._*_" _: _M_o_d - is interpreted as those modules (or applications
+       or releases, depending on the type) that match the expression.
+       Similarly, a _R_e_g_F_u_n_c is interpreted as those vertices of the Call Graph
+       that match the expression. An example is _"_x_r_e_f___._*_"_:_"_a_d_d___._*_"_/_"_(_2_|_3_)_",
+       which matches all _a_d_d functions of arity two or three of any of the
+       xref modules. Another example, one that matches all functions of arity
+       10 or more: ___:___/_"_[_1_-_9_]_._+_". Here __ is an abbreviation for _"_._*_", that is,
+       the regular expression that matches anything.
+
+       The syntax of _v_a_r_i_a_b_l_e_s is simple:
+
+         * Expression ::= Variable
+
+         * Variable ::= - same as Erlang variables -
+
+       There are two kinds of variables: predefined variables and user
+       variables. _P_r_e_d_e_f_i_n_e_d _v_a_r_i_a_b_l_e_s hold set up module data, and cannot be
+       assigned to but only used in queries. _U_s_e_r _v_a_r_i_a_b_l_e_s on the other hand
+       can be assigned to, and are typically used for temporary results while
+       evaluating a query, and for keeping results of queries for use in
+       subsequent queries. The predefined variables are (variables marked with
+       (*) are available in _f_u_n_c_t_i_o_n_s mode only):
+
+         _E:
+           Call Graph Edges (*).
+
+         _V:
+           Call Graph Vertices (*).
+
+         _M:
+           Modules. All modules: analyzed modules, used library modules, and
+           unknown modules.
+
+         _A:
+           Applications.
+
+         _R:
+           Releases.
+
+         _M_E:
+           Module Edges. All module calls.
+
+         _A_E:
+           Application Edges. All application calls.
+
+         _R_E:
+           Release Edges. All release calls.
+
+         _L:
+           Local Functions (*). All local functions of analyzed modules.
+
+         _X:
+           Exported Functions. All exported functions of analyzed modules and
+           all used exported functions of library modules.
+
+         _F:
+           Functions (*).
+
+         _B:
+           Used BIFs. _B is empty if _b_u_i_l_t_i_n_s is _f_a_l_s_e for all analyzed
+           modules.
+
+         _U:
+           Unknown Functions.
+
+         _U_U:
+           Unused Functions (*). All local and exported functions of analyzed
+           modules that have not been used.
+
+         _X_U:
+           Externally Used Functions. Functions of all modules - including
+           local functions - that have been used in some external call.
+
+         _L_U:
+           Locally Used Functions (*). Functions of all modules that have been
+           used in some local call.
+
+         _L_C:
+           Local Calls (*).
+
+         _X_C:
+           External Calls (*).
+
+         _A_M:
+           Analyzed Modules.
+
+         _U_M:
+           Unknown Modules.
+
+         _L_M:
+           Used Library Modules.
+
+         _U_C:
+           Unresolved Calls. Empty in _m_o_d_u_l_e_s mode.
+
+         _E_E:
+           Inter Call Graph Edges (*).
+
+         _D_F:
+           Deprecated Functions. All deprecated exported functions and all
+           used deprecated BIFs.
+
+         _D_F___1:
+           Deprecated Functions. All deprecated functions to be removed in
+           next version.
+
+         _D_F___2:
+           Deprecated Functions. All deprecated functions to be removed in
+           next version or next major release.
+
+         _D_F___3:
+           Deprecated Functions. All deprecated functions to be removed in
+           next version, next major release, or later.
+
+       These are a few facts about the predefined variables (the set operators
+       _+ (union) and _- (difference) as well as the cast operator _(Type_) are
+       described below):
+
+         * _F is equal to _L _+ _X.
+
+         * _V is equal to _X _+ _L _+ _B _+ _U, where _X, _L, _B and _U are pairwise
+           disjoint (that is, have no elements in common).
+
+         * _U_U is equal to _V _- _(_X_U _+ _L_U_), where _L_U and _X_U may have elements in
+           common. Put in another way:
+
+         * _V is equal to _U_U _+ _X_U _+ _L_U.
+
+         * _E is equal to _L_C _+ _X_C. Note that _L_C and _X_C may have elements in
+           common, namely if some function is locally and externally used from
+           one and the same function.
+
+         * _U is a subset of _X_U.
+
+         * _B is a subset of _X_U.
+
+         * _L_U is equal to _r_a_n_g_e _L_C.
+
+         * _X_U is equal to _r_a_n_g_e _X_C.
+
+         * _L_U is a subset of _F.
+
+         * _U_U is a subset of _F.
+
+         * _r_a_n_g_e _U_C is a subset of _U.
+
+         * _M is equal to _A_M _+ _L_M _+ _U_M, where _A_M, _L_M and _U_M are pairwise
+           disjoint.
+
+         * _M_E is equal to _(_M_o_d_) _E.
+
+         * _A_E is equal to _(_A_p_p_) _E.
+
+         * _R_E is equal to _(_R_e_l_) _E.
+
+         * _(_M_o_d_) _V is a subset of _M. Equality holds if all analyzed modules
+           have some local, exported, or unknown function.
+
+         * _(_A_p_p_) _M is a subset of _A. Equality holds if all applications have
+           some module.
+
+         * _(_R_e_l_) _A is a subset of _R. Equality holds if all releases have some
+           application.
+
+         * _D_F___1 is a subset of _D_F___2.
+
+         * _D_F___2 is a subset of _D_F___3.
+
+         * _D_F___3 is a subset of _D_F.
+
+         * _D_F is a subset of _X _+ _B.
+
+       An important notion is that of _c_o_n_v_e_r_s_i_o_n of expressions. The syntax of
+       a cast expression is:
+
+         * Expression ::= _( Type _) Expression
+
+       The interpretation of the cast operator depends on the named type _T_y_p_e,
+       the type of _E_x_p_r_e_s_s_i_o_n, and the structure of the elements of the
+       interpretation of _E_x_p_r_e_s_s_i_o_n. If the named type is equal to the
+       expression type, no conversion is done. Otherwise, the conversion is
+       done one step at a time; _(_F_u_n_) _(_A_p_p_) _R_E, for instance, is equivalent to
+       _(_F_u_n_) _(_M_o_d_) _(_A_p_p_) _R_E. Now assume that the interpretation of _E_x_p_r_e_s_s_i_o_n
+       is a set of constants (functions, modules, applications or releases).
+       If the named type is more general than the expression type, say _M_o_d and
+       _F_u_n respectively, then the interpretation of the cast expression is the
+       set of modules that have at least one of their functions mentioned in
+       the interpretation of the expression. If the named type is more special
+       than the expression type, say _F_u_n and _M_o_d, then the interpretation is
+       the set of all the functions of the modules (in _m_o_d_u_l_e_s mode, the
+       conversion is partial since the local functions are not known). The
+       conversions to and from applications and releases work analogously. For
+       instance, _(_A_p_p_) _"_x_r_e_f___._*_" _: _M_o_d returns all applications containing at
+       least one module such that _x_r_e_f__ is a prefix of the module name.
+
+       Now assume that the interpretation of _E_x_p_r_e_s_s_i_o_n is a set of calls. If
+       the named type is more general than the expression type, say _M_o_d and
+       _F_u_n respectively, then the interpretation of the cast expression is the
+       set of calls (M1, M2) such that the interpretation of the expression
+       contains a call from some function of M1 to some function of M2. If the
+       named type is more special than the expression type, say _F_u_n and _M_o_d,
+       then the interpretation is the set of all function calls (F1, F2) such
+       that the interpretation of the expression contains a call (M1, M2) and
+       F1 is a function of M1 and F2 is a function of M2 (in _m_o_d_u_l_e_s mode,
+       there are no functions calls, so a cast to _F_u_n always yields an empty
+       set). Again, the conversions to and from applications and releases work
+       analogously.
+
+       The interpretation of constants and variables are sets, and those sets
+       can be used as the basis for forming new sets by the application of _s_e_t
+       _o_p_e_r_a_t_o_r_s. The syntax:
+
+         * Expression ::= Expression BinarySetOp Expression
+
+         * BinarySetOp ::= _+ | _* | _-
+
+       _+, _* and _- are interpreted as union, intersection and difference
+       respectively: the union of two sets contains the elements of both sets;
+       the intersection of two sets contains the elements common to both sets;
+       and the difference of two sets contains the elements of the first set
+       that are not members of the second set. The elements of the two sets
+       must be of the same structure; for instance, a function call cannot be
+       combined with a function. But if a cast operator can make the elements
+       compatible, then the more general elements are converted to the less
+       general element type. For instance, _M _+ _F is equivalent to _(_F_u_n_) _M _+ _F,
+       and _E _- _A_E is equivalent to _E _- _(_F_u_n_) _A_E. One more example: _X _* _x_r_e_f _:
+       _M_o_d is interpreted as the set of functions exported by the module _x_r_e_f;
+       _x_r_e_f _: _M_o_d is converted to the more special type of _X (_F_u_n, that is)
+       yielding all functions of _x_r_e_f, and the intersection with _X (all
+       functions exported by analyzed modules and library modules) is
+       interpreted as those functions that are exported by some module _a_n_d
+       functions of _x_r_e_f.
+
+       There are also unary set operators:
+
+         * Expression ::= UnarySetOp Expression
+
+         * UnarySetOp ::= _d_o_m_a_i_n | _r_a_n_g_e | _s_t_r_i_c_t
+
+       Recall that a call is a pair (From, To). _d_o_m_a_i_n applied to a set of
+       calls is interpreted as the set of all vertices From, and _r_a_n_g_e as the
+       set of all vertices To. The interpretation of the _s_t_r_i_c_t operator is
+       the operand with all calls on the form (A, A) removed.
+
+       The interpretation of the _r_e_s_t_r_i_c_t_i_o_n _o_p_e_r_a_t_o_r_s is a subset of the
+       first operand, a set of calls. The second operand, a set of vertices,
+       is converted to the type of the first operand. The syntax of the
+       restriction operators:
+
+         * Expression ::= Expression RestrOp Expression
+
+         * RestrOp ::= _|
+
+         * RestrOp ::= _|_|
+
+         * RestrOp ::= _|_|_|
+
+       The interpretation in some detail for the three operators:
+
+         _|:
+           The subset of calls from any of the vertices.
+
+         _|_|:
+           The subset of calls to any of the vertices.
+
+         _|_|_|:
+           The subset of calls to and from any of the vertices. For all sets
+           of calls _C_S and all sets of vertices _V_S, _C_S _|_|_| _V_S  is equivalent
+           to _C_S _| _V_S _* _C_S _|_| _V_S.
+
+       Two functions (modules, applications, releases) belong to the same
+       strongly connected component if they call each other (in)directly. The
+       interpretation of the _c_o_m_p_o_n_e_n_t_s operator is the set of strongly
+       connected components of a set of calls. The _c_o_n_d_e_n_s_a_t_i_o_n of a set of
+       calls is a new set of calls between the strongly connected components
+       such that there is an edge between two components if there is some
+       constant of the first component that calls some constant of the second
+       component.
+
+       The interpretation of the _o_f operator is a chain of calls of the second
+       operand (a set of calls) that passes throw all of the vertices of the
+       first operand (a tuple of constants), in the given order. The second
+       operand is converted to the type of the first operand. For instance,
+       the _o_f operator can be used for finding out whether a function calls
+       another function indirectly, and the chain of calls demonstrates how.
+       The syntax of the graph analyzing operators:
+
+         * Expression ::= Expression GraphOp Expression
+
+         * GraphOp ::= _c_o_m_p_o_n_e_n_t_s | _c_o_n_d_e_n_s_a_t_i_o_n | _o_f
+
+       As was mentioned before, the graph analyses operate on the _d_i_g_r_a_p_h
+       representation of graphs. By default, the _d_i_g_r_a_p_h representation is
+       created when needed (and deleted when no longer used), but it can also
+       be created explicitly by use of the _c_l_o_s_u_r_e operator:
+
+         * Expression ::= ClosureOp Expression
+
+         * ClosureOp ::= _c_l_o_s_u_r_e
+
+       The interpretation of the _c_l_o_s_u_r_e operator is the transitive closure of
+       the operand.
+
+       The restriction operators are defined for closures as well; _c_l_o_s_u_r_e _E _|
+       _x_r_e_f _: _M_o_d is interpreted as the direct or indirect function calls from
+       the _x_r_e_f module, while the interpretation of _E _| _x_r_e_f _: _M_o_d is the set
+       of direct calls from _x_r_e_f. If some graph is to be used in several graph
+       analyses, it saves time to assign the _d_i_g_r_a_p_h representation of the
+       graph to a user variable, and then make sure that every graph analysis
+       operates on that variable instead of the list representation of the
+       graph.
+
+       The lines where functions are defined (more precisely: where the first
+       clause begins) and the lines where functions are used are available in
+       _f_u_n_c_t_i_o_n_s mode. The line numbers refer to the files where the functions
+       are defined. This holds also for files included with the _-_i_n_c_l_u_d_e and
+       _-_i_n_c_l_u_d_e___l_i_b directives, which may result in functions defined
+       apparently in the same line. The _l_i_n_e _o_p_e_r_a_t_o_r_s are used for assigning
+       line numbers to functions and for assigning sets of line numbers to
+       function calls. The syntax is similar to the one of the cast operator:
+
+         * Expression ::= _( LineOp_) Expression
+
+         * Expression ::= _( XLineOp_) Expression
+
+         * LineOp ::= _L_i_n | _E_L_i_n | _L_L_i_n | _X_L_i_n
+
+         * XLineOp ::= _X_X_L
+
+       The interpretation of the _L_i_n operator applied to a set of functions
+       assigns to each function the line number where the function is defined.
+       Unknown functions and functions of library modules are assigned the
+       number 0.
+
+       The interpretation of some LineOp operator applied to a set of function
+       calls assigns to each call the set of line numbers where the first
+       function calls the second function. Not all calls are assigned line
+       numbers by all operators:
+
+         * the _L_i_n operator is defined for Call Graph Edges;
+
+         * the _L_L_i_n operator is defined for Local Calls.
+
+         * the _X_L_i_n operator is defined for External Calls.
+
+         * the _E_L_i_n operator is defined for Inter Call Graph Edges.
+
+       The _L_i_n (_L_L_i_n, _X_L_i_n) operator assigns the lines where calls (local
+       calls, external calls) are made. The _E_L_i_n operator assigns to each call
+       (From, To), for which it is defined, every line L such that there is a
+       chain of calls from From to To beginning with a call on line L.
+
+       The _X_X_L operator is defined for the interpretation of any of the LineOp
+       operators applied to a set of function calls. The result is that of
+       replacing the function call with a line numbered function call, that
+       is, each of the two functions of the call is replaced by a pair of the
+       function and the line where the function is defined. The effect of the
+       _X_X_L operator can be undone by the LineOp operators. For instance, _(_L_i_n_)
+       _(_X_X_L_) _(_L_i_n_) _E is equivalent to _(_L_i_n_) _E.
+
+       The _+, _-, _* and _# operators are defined for line number expressions,
+       provided the operands are compatible. The LineOp operators are also
+       defined for modules, applications, and releases; the operand is
+       implicitly converted to functions. Similarly, the cast operator is
+       defined for the interpretation of the LineOp operators.
+
+       The interpretation of the _c_o_u_n_t_i_n_g _o_p_e_r_a_t_o_r is the number of elements
+       of a set. The operator is undefined for closures. The _+, _- and _*
+       operators are interpreted as the obvious arithmetical operators when
+       applied to numbers. The syntax of the counting operator:
+
+         * Expression ::= CountOp Expression
+
+         * CountOp ::= _#
+
+       All binary operators are left associative; for instance, _A _| _B _|_| _C is
+       equivalent to _(_A _| _B_) _|_| _C. The following is a list of all operators,
+       in increasing order of _p_r_e_c_e_d_e_n_c_e:
+
+         * _+, _-
+
+         * _*
+
+         * _#
+
+         * _|, _|_|, _|_|_|
+
+         * _o_f
+
+         * _(Type_)
+
+         * _c_l_o_s_u_r_e, _c_o_m_p_o_n_e_n_t_s, _c_o_n_d_e_n_s_a_t_i_o_n, _d_o_m_a_i_n, _r_a_n_g_e, _s_t_r_i_c_t
+
+       Parentheses are used for grouping, either to make an expression more
+       readable or to override the default precedence of operators:
+
+         * Expression ::= _( Expression _)
+
+       A _q_u_e_r_y is a non-empty sequence of statements. A statement is either an
+       assignment of a user variable or an expression. The value of an
+       assignment is the value of the right hand side expression. It makes no
+       sense to put a plain expression anywhere else but last in queries. The
+       syntax of queries is summarized by these productions:
+
+         * Query ::= Statement_, ...
+
+         * Statement ::= Assignment | Expression
+
+         * Assignment ::= Variable _:_= Expression | Variable _= Expression
+
+       A variable cannot be assigned a new value unless first removed.
+       Variables assigned to by the _= operator are removed at the end of the
+       query, while variables assigned to by the _:_= operator can only be
+       removed by calls to _f_o_r_g_e_t. There are no user variables when module
+       data need to be set up again; if any of the functions that make it
+       necessary to set up module data again is called, all user variables are
+       forgotten.
+
+       _T_y_p_e_s
+
+       application() = atom()
+       arity() = int() | -1
+       bool() = true | false
+       call() = {atom(), atom()} | funcall()
+       constant() = mfa() | module() | application() | release()
+       directory() = string()
+       file() = string()
+       funcall() = {mfa(), mfa()}
+       function() = atom()
+       int() = integer() >= 0
+       library() = atom()
+       library_path() = path() | code_path
+       mfa() = {module(), function(), arity()}
+       mode() = functions | modules
+       module() = atom()
+       release() = atom()
+       string_position() = int() | at_end
+       variable() = atom()
+       xref() = atom() | pid()
+
+EEXXPPOORRTTSS
+       aadddd__aapppplliiccaattiioonn((XXrreeff,, DDiirreeccttoorryy [[,, OOppttiioonnss]])) -->> {{ookk,, aapppplliiccaattiioonn(())}} ||
+       EErrrroorr
+
+              Types:
+
+                 Directory = directory()
+                 Error = {error, module(), Reason}
+                 Options = [Option] | Option
+                 Option = {builtins, bool()} | {name, application()} |
+                 {verbose, bool()} | {warnings, bool()}
+                 Reason = {application_clash, {application(), directory(),
+                 directory()}} | {file_error, file(), error()} |
+                 {invalid_filename, term()} | {invalid_options, term()} | -
+                 see also add_directory -
+                 Xref = xref()
+
+              Adds an application, the modules of the application and mmoodduullee
+              ddaattaa of the modules to an XXrreeff sseerrvveerr. The modules will be
+              members of the application. The default is to use the base name
+              of the directory with the version removed as application name,
+              but this can be overridden by the _n_a_m_e option. Returns the name
+              of the application.
+
+              If the given directory has a subdirectory named _e_b_i_n, modules
+              (BEAM files) are searched for in that directory, otherwise
+              modules are searched for in the given directory.
+
+              If the mmooddee of the Xref server is _f_u_n_c_t_i_o_n_s, BEAM files that
+              contain no ddeebbuugg iinnffoorrmmaattiioonn are ignored.
+
+       aadddd__ddiirreeccttoorryy((XXrreeff,, DDiirreeccttoorryy [[,, OOppttiioonnss]])) -->> {{ookk,, MMoodduulleess}} || EErrrroorr
+
+              Types:
+
+                 Directory = directory()
+                 Error = {error, module(), Reason}
+                 Modules = [module()]
+                 Options = [Option] | Option
+                 Option = {builtins, bool()} | {recurse, bool()} | {verbose,
+                 bool()} | {warnings, bool()}
+                 Reason = {file_error, file(), error()} | {invalid_filename,
+                 term()} | {invalid_options, term()} | {unrecognized_file,
+                 file()} | - error from beam_lib:chunks/2 -
+                 Xref = xref()
+
+              Adds the modules found in the given directory and the mmoodduulleess''
+              ddaattaa to an XXrreeff sseerrvveerr. The default is not to examine
+              subdirectories, but if the option _r_e_c_u_r_s_e has the value _t_r_u_e,
+              modules are searched for in subdirectories on all levels as well
+              as in the given directory. Returns a sorted list of the names of
+              the added modules.
+
+              The modules added will not be members of any applications.
+
+              If the mmooddee of the Xref server is _f_u_n_c_t_i_o_n_s, BEAM files that
+              contain no ddeebbuugg iinnffoorrmmaattiioonn are ignored.
+
+       aadddd__mmoodduullee((XXrreeff,, FFiillee [[,, OOppttiioonnss]])) -->> {{ookk,, mmoodduullee(())}} || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 File = file()
+                 Options = [Option] | Option
+                 Option = {builtins, bool()} | {verbose, bool()} | {warnings,
+                 bool()}
+                 Reason = {file_error, file(), error()} | {invalid_filename,
+                 term()} | {invalid_options, term()} | {module_clash,
+                 {module(), file(), file()}} | {no_debug_info, file()} | -
+                 error from beam_lib:chunks/2 -
+                 Xref = xref()
+
+              Adds a module and its mmoodduullee ddaattaa to an XXrreeff sseerrvveerr. The module
+              will not be member of any application. Returns the name of the
+              module.
+
+              If the mmooddee of the Xref server is _f_u_n_c_t_i_o_n_s, and the BEAM file
+              contains no ddeebbuugg iinnffoorrmmaattiioonn, the error message _n_o___d_e_b_u_g___i_n_f_o
+              is returned.
+
+       aadddd__rreelleeaassee((XXrreeff,, DDiirreeccttoorryy [[,, OOppttiioonnss]])) -->> {{ookk,, rreelleeaassee(())}} || EErrrroorr
+
+              Types:
+
+                 Directory = directory()
+                 Error = {error, module(), Reason}
+                 Options = [Option] | Option
+                 Option = {builtins, bool()} | {name, release()} | {verbose,
+                 bool()} | {warnings, bool()}
+                 Reason = {application_clash, {application(), directory(),
+                 directory()}} | {file_error, file(), error()} |
+                 {invalid_filename, term()} | {invalid_options, term()} |
+                 {release_clash, {release(), directory(), directory()}} | -
+                 see also add_directory -
+                 Xref = xref()
+
+              Adds a release, the applications of the release, the modules of
+              the applications, and mmoodduullee ddaattaa of the modules to an XXrreeff
+              sseerrvveerr. The applications will be members of the release, and the
+              modules will be members of the applications. The default is to
+              use the base name of the directory as release name, but this can
+              be overridden by the _n_a_m_e option. Returns the name of the
+              release.
+
+              If the given directory has a subdirectory named _l_i_b, the
+              directories in that directory are assumed to be application
+              directories, otherwise all subdirectories of the given directory
+              are assumed to be application directories. If there are several
+              versions of some application, the one with the highest version
+              is chosen.
+
+              If the mmooddee of the Xref server is _f_u_n_c_t_i_o_n_s, BEAM files that
+              contain no ddeebbuugg iinnffoorrmmaattiioonn are ignored.
+
+       aannaallyyzzee((XXrreeff,, AAnnaallyyssiiss [[,, OOppttiioonnss]])) -->> {{ookk,, AAnnsswweerr}} || EErrrroorr
+
+              Types:
+
+                 Analysis = undefined_function_calls | undefined_functions |
+                 locals_not_used | exports_not_used |
+                 deprecated_function_calls | {deprecated_function_calls,
+                 DeprFlag} | deprecated_functions | {deprecated_functions,
+                 DeprFlag} | {call, FuncSpec} | {use, FuncSpec} |
+                 {module_call, ModSpec} | {module_use, ModSpec} |
+                 {application_call, AppSpec} | {application_use, AppSpec} |
+                 {release_call, RelSpec} | {release_use, RelSpec}
+                 Answer = [term()]
+                 AppSpec = application() | [application()]
+                 DeprFlag = next_version | next_major_release | eventually
+                 Error = {error, module(), Reason}
+                 FuncSpec = mfa() | [mfa()]
+                 ModSpec = module() | [module()]
+                 Options = [Option] | Option
+                 Option = {verbose, bool()}
+                 RelSpec = release() | [release()]
+                 Reason = {invalid_options, term()} | {parse_error,
+                 string_position(), term()} | {unavailable_analysis, term()} |
+                 {unknown_analysis, term()} | {unknown_constant, string()} |
+                 {unknown_variable, variable()}
+                 Xref = xref()
+
+              Evaluates a predefined analysis. Returns a sorted list without
+              duplicates of _c_a_l_l_(_) or _c_o_n_s_t_a_n_t_(_), depending on the chosen
+              analysis. The predefined analyses, which operate on all aannaallyyzzeedd
+              mmoodduulleess, are (analyses marked with (*) are available in
+              _f_u_n_c_t_i_o_n_smmooddee only):
+
+                _u_n_d_e_f_i_n_e_d___f_u_n_c_t_i_o_n___c_a_l_l_s(*):
+                  Returns a list of calls to uunnddeeffiinneedd ffuunnccttiioonnss.
+
+                _u_n_d_e_f_i_n_e_d___f_u_n_c_t_i_o_n_s:
+                  Returns a list of uunnddeeffiinneedd ffuunnccttiioonnss.
+
+                _l_o_c_a_l_s___n_o_t___u_s_e_d(*):
+                  Returns a list of local functions that have not been locally
+                  used.
+
+                _e_x_p_o_r_t_s___n_o_t___u_s_e_d:
+                  Returns a list of exported functions that have not been
+                  externally used.
+
+                _d_e_p_r_e_c_a_t_e_d___f_u_n_c_t_i_o_n___c_a_l_l_s(*):
+                  Returns a list of external calls to ddeepprreeccaatteedd ffuunnccttiioonnss.
+
+                _{_d_e_p_r_e_c_a_t_e_d___f_u_n_c_t_i_o_n___c_a_l_l_s_, _D_e_p_r_F_l_a_g_}(*):
+                  Returns a list of external calls to deprecated functions. If
+                  _D_e_p_r_F_l_a_g is equal to _n_e_x_t___v_e_r_s_i_o_n, calls to functions to be
+                  removed in next version are returned. If _D_e_p_r_F_l_a_g is equal
+                  to _n_e_x_t___m_a_j_o_r___r_e_l_e_a_s_e, calls to functions to be removed in
+                  next major release are returned as well as calls to
+                  functions to be removed in next version. Finally, if
+                  _D_e_p_r_F_l_a_g is equal to _e_v_e_n_t_u_a_l_l_y, all calls to functions to
+                  be removed are returned, including calls to functions to be
+                  removed in next version or next major release.
+
+                _d_e_p_r_e_c_a_t_e_d___f_u_n_c_t_i_o_n_s:
+                  Returns a list of externally used deprecated functions.
+
+                _{_d_e_p_r_e_c_a_t_e_d___f_u_n_c_t_i_o_n_s_, _D_e_p_r_F_l_a_g_}:
+                  Returns a list of externally used deprecated functions. If
+                  _D_e_p_r_F_l_a_g is equal to _n_e_x_t___v_e_r_s_i_o_n, functions to be removed
+                  in next version are returned. If _D_e_p_r_F_l_a_g is equal to
+                  _n_e_x_t___m_a_j_o_r___r_e_l_e_a_s_e, functions to be removed in next major
+                  release are returned as well as functions to be removed in
+                  next version. Finally, if _D_e_p_r_F_l_a_g is equal to _e_v_e_n_t_u_a_l_l_y,
+                  all functions to be removed are returned, including
+                  functions to be removed in next version or next major
+                  release.
+
+                _{_c_a_l_l_, _F_u_n_c_S_p_e_c_}(*):
+                  Returns a list of functions called by some of the given
+                  functions.
+
+                _{_u_s_e_, _F_u_n_c_S_p_e_c_}(*):
+                  Returns a list of functions that use some of the given
+                  functions.
+
+                _{_m_o_d_u_l_e___c_a_l_l_, _M_o_d_S_p_e_c_}:
+                  Returns a list of modules called by some of the given
+                  modules.
+
+                _{_m_o_d_u_l_e___u_s_e_, _M_o_d_S_p_e_c_}:
+                  Returns a list of modules that use some of the given
+                  modules.
+
+                _{_a_p_p_l_i_c_a_t_i_o_n___c_a_l_l_, _A_p_p_S_p_e_c_}:
+                  Returns a list of applications called by some of the given
+                  applications.
+
+                _{_a_p_p_l_i_c_a_t_i_o_n___u_s_e_, _A_p_p_S_p_e_c_}:
+                  Returns a list of applications that use some of the given
+                  applications.
+
+                _{_r_e_l_e_a_s_e___c_a_l_l_, _R_e_l_S_p_e_c_}:
+                  Returns a list of releases called by some of the given
+                  releases.
+
+                _{_r_e_l_e_a_s_e___u_s_e_, _R_e_l_S_p_e_c_}:
+                  Returns a list of releases that use some of the given
+                  releases.
+
+       dd((DDiirreeccttoorryy)) -->> [[DDeebbuuggIInnffooRReessuulltt]] || [[NNooDDeebbuuggIInnffooRReessuulltt]] || EErrrroorr
+
+              Types:
+
+                 Directory = directory()
+                 DebugInfoResult = {deprecated, [funcall()]} | {undefined,
+                 [funcall()]} | {unused, [mfa()]}
+                 Error = {error, module(), Reason}
+                 NoDebugInfoResult = {deprecated, [mfa()]} | {undefined,
+                 [mfa()]}
+                 Reason = {file_error, file(), error()} | {invalid_filename,
+                 term()} | {unrecognized_file, file()} | - error from
+                 beam_lib:chunks/2 -
+
+              The modules found in the given directory are checked for calls
+              to ddeepprreeccaatteedd ffuunnccttiioonnss, calls to uunnddeeffiinneedd ffuunnccttiioonnss, and for
+              unused local functions. The code path is used as lliibbrraarryy ppaatthh.
+
+              If some of the found BEAM files contain ddeebbuugg iinnffoorrmmaattiioonn, then
+              those modules are checked and a list of tuples is returned. The
+              first element of each tuple is one of:
+
+                * _d_e_p_r_e_c_a_t_e_d, the second element is a sorted list of calls to
+                  deprecated functions;
+
+                * _u_n_d_e_f_i_n_e_d, the second element is a sorted list of calls to
+                  undefined functions;
+
+                * _u_n_u_s_e_d, the second element is a sorted list of unused local
+                  functions.
+
+              If no BEAM file contains debug information, then a list of
+              tuples is returned. The first element of each tuple is one of:
+
+                * _d_e_p_r_e_c_a_t_e_d, the second element is a sorted list of
+                  externally used deprecated functions;
+
+                * _u_n_d_e_f_i_n_e_d, the second element is a sorted list of undefined
+                  functions.
+
+       ffoorrggeett((XXrreeff)) -->> ookk
+       ffoorrggeett((XXrreeff,, VVaarriiaabblleess)) -->> ookk || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 Reason = {not_user_variable, term()}
+                 Variables = [variable()] | variable()
+                 Xref = xref()
+
+              _f_o_r_g_e_t_/_1 and _f_o_r_g_e_t_/_2 remove all or some of the uusseerr vvaarriiaabblleess
+              of an xxrreeff sseerrvveerr.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorr)) -->> CChhaarrss
+
+              Types:
+
+                 Error = {error, module(), term()}
+                 Chars = [char() | Chars]
+
+              Given the error returned by any function of this module, the
+              function _f_o_r_m_a_t___e_r_r_o_r returns a descriptive string of the error
+              in English. For file errors, the function _f_o_r_m_a_t___e_r_r_o_r_/_1 in the
+              _f_i_l_e module is called.
+
+       ggeett__ddeeffaauulltt((XXrreeff)) -->> [[{{OOppttiioonn,, VVaalluuee}}]]
+       ggeett__ddeeffaauulltt((XXrreeff,, OOppttiioonn)) -->> {{ookk,, VVaalluuee}} || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 Option = builtins | recurse | verbose | warnings
+                 Reason = {invalid_options, term()}
+                 Value = bool()
+                 Xref = xref()
+
+              Returns the default values of one or more options.
+
+       ggeett__lliibbrraarryy__ppaatthh((XXrreeff)) -->> {{ookk,, LLiibbrraarryyPPaatthh}}
+
+              Types:
+
+                 LibraryPath = library_path()
+                 Xref = xref()
+
+              Returns the lliibbrraarryy ppaatthh.
+
+       iinnffoo((XXrreeff)) -->> [[IInnffoo]]
+       iinnffoo((XXrreeff,, CCaatteeggoorryy)) -->> [[{{IItteemm,, [[IInnffoo]]}}]]
+       iinnffoo((XXrreeff,, CCaatteeggoorryy,, IItteemmss)) -->> [[{{IItteemm,, [[IInnffoo]]}}]]
+
+              Types:
+
+                 Application = [] | [application()]
+                 Category = modules | applications | releases | libraries
+                 Info = {application, Application} | {builtins, bool()} |
+                 {directory, directory()} | {library_path, library_path()} |
+                 {mode, mode()} | {no_analyzed_modules, int()} |
+                 {no_applications, int()} | {no_calls, {NoResolved,
+                 NoUnresolved}} | {no_function_calls, {NoLocal,
+                 NoResolvedExternal, NoUnresolved}} | {no_functions, {NoLocal,
+                 NoExternal}} | {no_inter_function_calls, int()} |
+                 {no_releases, int()} | {release, Release} | {version,
+                 Version}
+                 Item = module() | application() | release() | library()
+                 Items = Item | [Item]
+                 NoLocal = NoExternal = NoResolvedExternal, NoResolved =
+                 NoUnresolved = int()
+                 Release = [] | [release()]
+                 Version = [int()]
+                 Xref = xref()
+
+              The _i_n_f_o functions return information as a list of pairs {Tag,
+              term()} in some order about the state and the mmoodduullee ddaattaa of an
+              XXrreeff sseerrvveerr.
+
+              _i_n_f_o_/_1 returns information with the following tags (tags marked
+              with (*) are available in _f_u_n_c_t_i_o_n_s mode only):
+
+                * _l_i_b_r_a_r_y___p_a_t_h, the lliibbrraarryy ppaatthh;
+
+                * _m_o_d_e, the mmooddee;
+
+                * _n_o___r_e_l_e_a_s_e_s, number of releases;
+
+                * _n_o___a_p_p_l_i_c_a_t_i_o_n_s, total number of applications (of all
+                  releases);
+
+                * _n_o___a_n_a_l_y_z_e_d___m_o_d_u_l_e_s, total number of aannaallyyzzeedd mmoodduulleess;
+
+                * _n_o___c_a_l_l_s (*), total number of calls (in all modules),
+                  regarding instances of one function call in different lines
+                  as separate calls;
+
+                * _n_o___f_u_n_c_t_i_o_n___c_a_l_l_s (*), total number of llooccaall ccaallllss, resolved
+                  eexxtteerrnnaall ccaallllss and uunnrreessoollvveedd ccaallllss;
+
+                * _n_o___f_u_n_c_t_i_o_n_s (*), total number of local and exported
+                  functions;
+
+                * _n_o___i_n_t_e_r___f_u_n_c_t_i_o_n___c_a_l_l_s (*), total number of calls of the
+                  IInntteerr CCaallll GGrraapphh.
+
+              _i_n_f_o_/_2 and _i_n_f_o_/_3 return information about all or some of the
+              analyzed modules, applications, releases or library modules of
+              an Xref server. The following information is returned for every
+              analyzed module:
+
+                * _a_p_p_l_i_c_a_t_i_o_n, an empty list if the module does not belong to
+                  any application, otherwise a list of the application name;
+
+                * _b_u_i_l_t_i_n_s, whether calls to BIFs are included in the module's
+                  data;
+
+                * _d_i_r_e_c_t_o_r_y, the directory where the module's BEAM file is
+                  located;
+
+                * _n_o___c_a_l_l_s (*), number of calls, regarding instances of one
+                  function call in different lines as separate calls;
+
+                * _n_o___f_u_n_c_t_i_o_n___c_a_l_l_s (*), number of local calls, resolved
+                  external calls and unresolved calls;
+
+                * _n_o___f_u_n_c_t_i_o_n_s (*), number of local and exported functions;
+
+                * _n_o___i_n_t_e_r___f_u_n_c_t_i_o_n___c_a_l_l_s (*), number of calls of the Inter
+                  Call Graph;
+
+              The following information is returned for every application:
+
+                * _d_i_r_e_c_t_o_r_y, the directory where the modules' BEAM files are
+                  located;
+
+                * _n_o___a_n_a_l_y_z_e_d___m_o_d_u_l_e_s, number of analyzed modules;
+
+                * _n_o___c_a_l_l_s (*), number of calls of the application's modules,
+                  regarding instances of one function call in different lines
+                  as separate calls;
+
+                * _n_o___f_u_n_c_t_i_o_n___c_a_l_l_s (*), number of local calls, resolved
+                  external calls and unresolved calls of the application's
+                  modules;
+
+                * _n_o___f_u_n_c_t_i_o_n_s (*), number of local and exported functions of
+                  the application's modules;
+
+                * _n_o___i_n_t_e_r___f_u_n_c_t_i_o_n___c_a_l_l_s (*), number of calls of the Inter
+                  Call Graph of the application's modules;
+
+                * _r_e_l_e_a_s_e, an empty list if the application does not belong to
+                  any release, otherwise a list of the release name;
+
+                * _v_e_r_s_i_o_n, the application's version as a list of numbers. For
+                  instance, the directory "kernel-2.6" results in the
+                  application name _k_e_r_n_e_l and the application version [2,6];
+                  "kernel" yields the name _k_e_r_n_e_l and the version [].
+
+              The following information is returned for every release:
+
+                * _d_i_r_e_c_t_o_r_y, the release directory;
+
+                * _n_o___a_n_a_l_y_z_e_d___m_o_d_u_l_e_s, number of analyzed modules;
+
+                * _n_o___a_p_p_l_i_c_a_t_i_o_n_s, number of applications;
+
+                * _n_o___c_a_l_l_s (*), number of calls of the release's modules,
+                  regarding instances of one function call in different lines
+                  as separate calls;
+
+                * _n_o___f_u_n_c_t_i_o_n___c_a_l_l_s (*), number of local calls, resolved
+                  external calls and unresolved calls of the release's
+                  modules;
+
+                * _n_o___f_u_n_c_t_i_o_n_s (*), number of local and exported functions of
+                  the release's modules;
+
+                * _n_o___i_n_t_e_r___f_u_n_c_t_i_o_n___c_a_l_l_s (*), number of calls of the Inter
+                  Call Graph of the release's modules.
+
+              The following information is returned for every library module:
+
+                * _d_i_r_e_c_t_o_r_y, the directory where the lliibbrraarryy mmoodduullee''ss BEAM
+                  file is located.
+
+              For every number of calls, functions etc. returned by the _n_o__
+              tags, there is a query returning the same number. Listed below
+              are examples of such queries. Some of the queries return the sum
+              of a two or more of the _n_o__ tags numbers. _m_o_d (_a_p_p, _r_e_l) refers
+              to any module (application, release).
+
+                * _n_o___a_n_a_l_y_z_e_d___m_o_d_u_l_e_s
+
+                  * _"_# _A_M_" (info/1)
+
+                  * _"_# _(_M_o_d_) _a_p_p_:_A_p_p_" (application)
+
+                  * _"_# _(_M_o_d_) _r_e_l_:_R_e_l_" (release)
+
+                * _n_o___a_p_p_l_i_c_a_t_i_o_n_s
+
+                  * _"_# _A_" (info/1)
+
+                * _n_o___c_a_l_l_s. The sum of the number of resolved and unresolved
+                  calls:
+
+                  * _"_# _(_X_L_i_n_) _E _+ _# _(_L_L_i_n_) _E_" (info/1)
+
+                  * _"_T _= _E _| _m_o_d_:_M_o_d_, _# _(_L_L_i_n_) _T _+ _# _(_X_L_i_n_) _T_" (module)
+
+                  * _"_T _= _E _| _a_p_p_:_A_p_p_, _# _(_L_L_i_n_) _T _+ _# _(_X_L_i_n_) _T_" (application)
+
+                  * _"_T _= _E _| _r_e_l_:_R_e_l_, _# _(_L_L_i_n_) _T _+ _# _(_X_L_i_n_) _T_" (release)
+
+                * _n_o___f_u_n_c_t_i_o_n_s. Functions in library modules and the functions
+                  _m_o_d_u_l_e___i_n_f_o_/_0_,_1 are not counted by _i_n_f_o. Assuming that
+                  _"_E_x_t_r_a _:_= ___:_m_o_d_u_l_e___i_n_f_o_/_\_"_(_0_|_1_)_\_" _+ _L_M_" has been evaluated,
+                  the sum of the number of local and exported functions are:
+
+                  * _"_# _(_F _- _E_x_t_r_a_)_" (info/1)
+
+                  * _"_# _(_F _* _m_o_d_:_M_o_d _- _E_x_t_r_a_)_" (module)
+
+                  * _"_# _(_F _* _a_p_p_:_A_p_p _- _E_x_t_r_a_)_" (application)
+
+                  * _"_# _(_F _* _r_e_l_:_R_e_l _- _E_x_t_r_a_)_" (release)
+
+                * _n_o___f_u_n_c_t_i_o_n___c_a_l_l_s. The sum of the number of local calls,
+                  resolved external calls and unresolved calls:
+
+                  * _"_# _L_C _+ _# _X_C_" (info/1)
+
+                  * _"_# _L_C _| _m_o_d_:_M_o_d _+ _# _X_C _| _m_o_d_:_M_o_d_" (module)
+
+                  * _"_# _L_C _| _a_p_p_:_A_p_p _+ _# _X_C _| _a_p_p_:_A_p_p_" (application)
+
+                  * _"_# _L_C _| _r_e_l_:_R_e_l _+ _# _X_C _| _m_o_d_:_R_e_l_" (release)
+
+                * _n_o___i_n_t_e_r___f_u_n_c_t_i_o_n___c_a_l_l_s
+
+                  * _"_# _E_E_" (info/1)
+
+                  * _"_# _E_E _| _m_o_d_:_M_o_d_" (module)
+
+                  * _"_# _E_E _| _a_p_p_:_A_p_p_" (application)
+
+                  * _"_# _E_E _| _r_e_l_:_R_e_l_" (release)
+
+                * _n_o___r_e_l_e_a_s_e_s
+
+                  * _"_# _R_" (info/1)
+
+       mm((MMoodduullee)) -->> [[DDeebbuuggIInnffooRReessuulltt]] || [[NNooDDeebbuuggIInnffooRReessuulltt]] || EErrrroorr
+       mm((FFiillee)) -->> [[DDeebbuuggIInnffooRReessuulltt]] || [[NNooDDeebbuuggIInnffooRReessuulltt]] || EErrrroorr
+
+              Types:
+
+                 DebugInfoResult = {deprecated, [funcall()]} | {undefined,
+                 [funcall()]} | {unused, [mfa()]}
+                 Error = {error, module(), Reason}
+                 File = file()
+                 Module = module()
+                 NoDebugInfoResult = {deprecated, [mfa()]} | {undefined,
+                 [mfa()]}
+                 Reason = {file_error, file(), error()} | {interpreted,
+                 module()} | {invalid_filename, term()} | {cover_compiled,
+                 module()} | {no_such_module, module()} | - error from
+                 beam_lib:chunks/2 -
+
+              The given BEAM file (with or without the _._b_e_a_m extension) or the
+              file found by calling _c_o_d_e_:_w_h_i_c_h_(_M_o_d_u_l_e_) is checked for calls to
+              ddeepprreeccaatteedd ffuunnccttiioonnss, calls to uunnddeeffiinneedd ffuunnccttiioonnss, and for
+              unused local functions. The code path is used as lliibbrraarryy ppaatthh.
+
+              If the BEAM file contains ddeebbuugg iinnffoorrmmaattiioonn, then a list of
+              tuples is returned. The first element of each tuple is one of:
+
+                * _d_e_p_r_e_c_a_t_e_d, the second element is a sorted list of calls to
+                  deprecated functions;
+
+                * _u_n_d_e_f_i_n_e_d, the second element is a sorted list of calls to
+                  undefined functions;
+
+                * _u_n_u_s_e_d, the second element is a sorted list of unused local
+                  functions.
+
+              If the BEAM file does not contain debug information, then a list
+              of tuples is returned. The first element of each tuple is one
+              of:
+
+                * _d_e_p_r_e_c_a_t_e_d, the second element is a sorted list of
+                  externally used deprecated functions;
+
+                * _u_n_d_e_f_i_n_e_d, the second element is a sorted list of undefined
+                  functions.
+
+       qq((XXrreeff,, QQuueerryy [[,, OOppttiioonnss]])) -->> {{ookk,, AAnnsswweerr}} || EErrrroorr
+
+              Types:
+
+                 Answer = false | [constant()] | [Call] | [Component] | int()
+                 | [DefineAt] | [CallAt] | [AllLines]
+                 Call = call() | ComponentCall
+                 ComponentCall = {Component, Component}
+                 Component = [constant()]
+                 DefineAt = {mfa(), LineNumber}
+                 CallAt = {funcall(), LineNumbers}
+                 AllLines = {{DefineAt, DefineAt}, LineNumbers}
+                 Error = {error, module(), Reason}
+                 LineNumbers = [LineNumber]
+                 LineNumber = int()
+                 Options = [Option] | Option
+                 Option = {verbose, bool()}
+                 Query = string() | atom()
+                 Reason = {invalid_options, term()} | {parse_error,
+                 string_position(), term()} | {type_error, string()} |
+                 {type_mismatch, string(), string()} | {unknown_analysis,
+                 term()} | {unknown_constant, string()} | {unknown_variable,
+                 variable()} | {variable_reassigned, string()}
+                 Xref = xref()
+
+              Evaluates a qquueerryy in the context of an XXrreeff sseerrvveerr, and returns
+              the value of the last statement. The syntax of the value depends
+              on the expression:
+
+                * A set of calls is represented by a sorted list without
+                  duplicates of _c_a_l_l_(_).
+
+                * A set of constants is represented by a sorted list without
+                  duplicates of _c_o_n_s_t_a_n_t_(_).
+
+                * A set of strongly connected components is a sorted list
+                  without duplicates of _C_o_m_p_o_n_e_n_t.
+
+                * A set of calls between strongly connected components is a
+                  sorted list without duplicates of _C_o_m_p_o_n_e_n_t_C_a_l_l.
+
+                * A chain of calls is represented by a list of _c_o_n_s_t_a_n_t_(_). The
+                  list contains the From vertex of every call and the To
+                  vertex of the last call.
+
+                * The _o_f operator returns _f_a_l_s_e if no chain of calls between
+                  the given constants can be found.
+
+                * The value of the _c_l_o_s_u_r_e operator (the _d_i_g_r_a_p_h
+                  representation) is represented by the atom _'_c_l_o_s_u_r_e_(_)_'.
+
+                * A set of line numbered functions is represented by a sorted
+                  list without duplicates of _D_e_f_i_n_e_A_t.
+
+                * A set of line numbered function calls is represented by a
+                  sorted list without duplicates of _C_a_l_l_A_t.
+
+                * A set of line numbered functions and function calls is
+                  represented by a sorted list without duplicates of _A_l_l_L_i_n_e_s.
+
+              For both _C_a_l_l_A_t and _A_l_l_L_i_n_e_s it holds that for no list element
+              is _L_i_n_e_N_u_m_b_e_r_s an empty list; such elements have been removed.
+              The constants of _c_o_m_p_o_n_e_n_t and the integers of _L_i_n_e_N_u_m_b_e_r_s are
+              sorted and without duplicates.
+
+       rreemmoovvee__aapppplliiccaattiioonn((XXrreeff,, AApppplliiccaattiioonnss)) -->> ookk || EErrrroorr
+
+              Types:
+
+                 Applications = application() | [application()]
+                 Error = {error, module(), Reason}
+                 Reason = {no_such_application, application()}
+                 Xref = xref()
+
+              Removes applications and their modules and mmoodduullee ddaattaa from an
+              XXrreeff sseerrvveerr.
+
+       rreemmoovvee__mmoodduullee((XXrreeff,, MMoodduulleess)) -->> ookk || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 Modules = module() | [module()]
+                 Reason = {no_such_module, module()}
+                 Xref = xref()
+
+              Removes aannaallyyzzeedd mmoodduulleess and mmoodduullee ddaattaa from an XXrreeff sseerrvveerr.
+
+       rreemmoovvee__rreelleeaassee((XXrreeff,, RReelleeaasseess)) -->> ookk || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 Reason = {no_such_release, release()}
+                 Releases = release() | [release()]
+                 Xref = xref()
+
+              Removes releases and their applications, modules and mmoodduullee ddaattaa
+              from an XXrreeff sseerrvveerr.
+
+       rreeppllaaccee__aapppplliiccaattiioonn((XXrreeff,, AApppplliiccaattiioonn,, DDiirreeccttoorryy [[,, OOppttiioonnss]])) -->> {{ookk,,
+       aapppplliiccaattiioonn(())}} || EErrrroorr
+
+              Types:
+
+                 Application = application()
+                 Directory = directory()
+                 Error = {error, module(), Reason}
+                 Options = [Option] | Option
+                 Option = {builtins, bool()} | {verbose, bool()} | {warnings,
+                 bool()}
+                 Reason = {no_such_application, application()} | - see also
+                 add_application -
+                 Xref = xref()
+
+              Replaces the modules of an application with other modules read
+              from an application directory. Release membership of the
+              application is retained. Note that the name of the application
+              is kept; the name of the given directory is not used.
+
+       rreeppllaaccee__mmoodduullee((XXrreeff,, MMoodduullee,, FFiillee [[,, OOppttiioonnss]])) -->> {{ookk,, mmoodduullee(())}} ||
+       EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 File = file()
+                 Module = module()
+                 Options = [Option] | Option
+                 Option = {verbose, bool()} | {warnings, bool()}
+                 ReadModule = module()
+                 Reason = {module_mismatch, module(), ReadModule} |
+                 {no_such_module, module()} | - see also add_module -
+                 Xref = xref()
+
+              Replaces mmoodduullee ddaattaa of an aannaallyyzzeedd mmoodduullee with data read from a
+              BEAM file. Application membership of the module is retained, and
+              so is the value of the _b_u_i_l_t_i_n_s option of the module. An error
+              is returned if the name of the read module differs from the
+              given module.
+
+              The _u_p_d_a_t_e function is an alternative for updating module data
+              of recompiled modules.
+
+       sseett__ddeeffaauulltt((XXrreeff,, OOppttiioonn,, VVaalluuee)) -->> {{ookk,, OOllddVVaalluuee}} || EErrrroorr
+       sseett__ddeeffaauulltt((XXrreeff,, OOppttiioonnVVaalluueess)) -->> ookk || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 OptionValues = [OptionValue] | OptionValue
+                 OptionValue = {Option, Value}
+                 Option = builtins | recurse | verbose | warnings
+                 Reason = {invalid_options, term()}
+                 Value = bool()
+                 Xref = xref()
+
+              Sets the default value of one or more options. The options that
+              can be set this way are:
+
+                * _b_u_i_l_t_i_n_s, with initial default value _f_a_l_s_e;
+
+                * _r_e_c_u_r_s_e, with initial default value _f_a_l_s_e;
+
+                * _v_e_r_b_o_s_e, with initial default value _f_a_l_s_e;
+
+                * _w_a_r_n_i_n_g_s, with initial default value _t_r_u_e.
+
+              The initial default values are set when creating an XXrreeff sseerrvveerr.
+
+       sseett__lliibbrraarryy__ppaatthh((XXrreeff,, LLiibbrraarryyPPaatthh [[,, OOppttiioonnss]])) -->> ookk || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 LibraryPath = library_path()
+                 Options = [Option] | Option
+                 Option = {verbose, bool()}
+                 Reason = {invalid_options, term()} | {invalid_path, term()}
+                 Xref = xref()
+
+              Sets the lliibbrraarryy ppaatthh. If the given path is a list of
+              directories, the set of lliibbrraarryy mmoodduulleess is determined by
+              choosing the first module encountered while traversing the
+              directories in the given order, for those modules that occur in
+              more than one directory. By default, the library path is an
+              empty list.
+
+              The library path _c_o_d_e___p_a_t_h is used by the functions _m_/_1 and _d_/_1,
+              but can also be set explicitly. Note however that the code path
+              will be traversed once for each used lliibbrraarryy mmoodduullee while
+              setting up module data. On the other hand, if there are only a
+              few modules that are used by not analyzed, using _c_o_d_e___p_a_t_h may
+              be faster than setting the library path to _c_o_d_e_:_g_e_t___p_a_t_h_(_).
+
+              If the library path is set to _c_o_d_e___p_a_t_h, the set of library
+              modules is not determined, and the _i_n_f_o functions will return
+              empty lists of library modules.
+
+       ssttaarrtt((NNaammeeOOrrOOppttiioonnss)) -->> RReettuurrnn
+
+              Types:
+
+                 NameOrOptions = Name | Options
+                 Name = atom()
+                 Options = [Option] | Option
+                 Option = {xref_mode, mode()} | term()
+                 Return = {ok, pid()} | {error, {already_started, pid()}}
+
+              Creates an XXrreeff sseerrvveerr. The process may optionally be given a
+              name. The default mmooddee is _f_u_n_c_t_i_o_n_s. Options that are not
+              recognized by Xref are passed on to _g_e_n___s_e_r_v_e_r_:_s_t_a_r_t_/_4.
+
+       ssttaarrtt((NNaammee,, OOppttiioonnss)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = atom()
+                 Options = [Option] | Option
+                 Option = {xref_mode, mode()} | term()
+                 Return = {ok, pid()} | {error, {already_started, pid()}}
+
+              Creates an XXrreeff sseerrvveerr with a given name. The default mmooddee is
+              _f_u_n_c_t_i_o_n_s. Options that are not recognized by Xref are passed on
+              to _g_e_n___s_e_r_v_e_r_:_s_t_a_r_t_/_4.
+
+       ssttoopp((XXrreeff))
+
+              Types:
+
+                 Xref = xref()
+
+              Stops an XXrreeff sseerrvveerr.
+
+       uuppddaattee((XXrreeff [[,, OOppttiioonnss]])) -->> {{ookk,, MMoodduulleess}} || EErrrroorr
+
+              Types:
+
+                 Error = {error, module(), Reason}
+                 Modules = [module()]
+                 Options = [Option] | Option
+                 Option = {verbose, bool()} | {warnings, bool()}
+                 Reason = {invalid_options, term()} | {module_mismatch,
+                 module(), ReadModule} | - see also add_module -
+                 Xref = xref()
+
+              Replaces the mmoodduullee ddaattaa of all aannaallyyzzeedd mmoodduulleess the BEAM files
+              of which have been modified since last read by an _a_d_d function
+              or _u_p_d_a_t_e. Application membership of the modules is retained,
+              and so is the value of the _b_u_i_l_t_i_n_s option. Returns a sorted
+              list of the names of the replaced modules.
+
+       vvaarriiaabblleess((XXrreeff [[,, OOppttiioonnss]])) -->> {{ookk,, [[VVaarriiaabblleeIInnffoo]]}}
+
+              Types:
+
+                 Options = [Option] | Option
+                 Option = predefined | user | {verbose, bool()}
+                 Reason = {invalid_options, term()}
+                 VariableInfo = {predefined, [variable()]} | {user,
+                 [variable()]}
+                 Xref = xref()
+
+              Returns a sorted lists of the names of the variables of an XXrreeff
+              sseerrvveerr. The default is to return the uusseerr vvaarriiaabblleess only.
+
+SSEEEE AALLSSOO
+       bbeeaamm__lliibb((33)), ddiiggrraapphh((33)), ddiiggrraapphh__uuttiillss((33)), rree((33)), TTOOOOLLSS UUsseerr''ss GGuuiiddee
+
+
+
+Ericsson AB                       tools 2.6.8                          xref(3)

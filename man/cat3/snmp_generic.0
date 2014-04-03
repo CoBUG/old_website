@@ -1,0 +1,309 @@
+snmp_generic(3)            Erlang Module Definition            snmp_generic(3)
+
+
+
+NNAAMMEE
+       snmp_generic - Generic Functions for Implementing SNMP Objects in a
+       Database
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p___g_e_n_e_r_i_c contains generic functions for implementing
+       tables (and variables) using the SNMP built-in database or Mnesia.
+       These default functions are used if no instrumentation function is
+       provided for a managed object in a MIB. Sometimes, it might be
+       necessary to customize the behaviour of the default functions. For
+       example, in some situations a trap should be sent if a row is deleted
+       or modified, or some hardware is to be informed, when information is
+       changed.
+
+       The overall structure is shown in the following figure:
+
+                +---------------+
+                |   SNMP Agent  |
+                +- - - - - - - -+
+                |      MIB      |
+                +---------------+
+                        |
+                Association file       (associates a MIB object with
+                        |               snmp_generic:table_funct
+                        |               snmp_generic:variable_func)
+       +--------------------------------------+
+       |           snmp_generic               |  Support for get-next,
+       |                                      |  RowStatus operations
+       +----------------------+---------------+
+       |    snmpa_local_db    |    Mnesia     |  Database
+       +--------------+-------+---------------+
+       |     dets     |  ets  |
+       | (persistent) |       |
+       +--------------+-------+
+
+       Each function takes the argument _N_a_m_e_D_b, which is a tuple _{_N_a_m_e_, _D_b_},
+       to identify which database the functions should use. _N_a_m_e is the
+       symbolic name of the managed object as defined in the MIB, and _D_b is
+       either _v_o_l_a_t_i_l_e, _p_e_r_s_i_s_t_e_n_t, or _m_n_e_s_i_a. If it is _m_n_e_s_i_a, all variables
+       are stored in the Mnesia table _s_n_m_p___v_a_r_i_a_b_l_e_s which must be a table
+       with two attributes (not a Mnesia SNMP table). The SNMP tables are
+       stored in Mnesia tables with the same names as the SNMP tables. All
+       functions assume that a Mnesia table exists with the correct name and
+       attributes. It is the programmer's responsibility to ensure this.
+       Specifically, if variables are stored in Mnesia, the table
+       _s_n_m_p___v_a_r_i_a_b_l_e_s must be created by the programmer. The record definition
+       for this table is defined in the file _s_n_m_p_/_i_n_c_l_u_d_e_/_s_n_m_p___t_y_p_e_s_._h_r_l.
+
+       If an instrumentation function in the association file for a variable
+       _m_y_V_a_r does not have a name when compiling an MIB, the compiler
+       generates an entry.
+
+       {myVar, {snmp_generic, variable_func, [{myVar, Db]}}.
+
+
+       And for a table:
+
+       {myTable, {snmp_generic, table_func, [{myTable, Db]}}.
+
+
+DDAATTAA TTYYPPEESS
+       In the functions defined below, the following types are used:
+
+       name_db() = {name(), db()}
+       name() = atom()
+       db() = volatile | persistent | mnesia
+       row_index() = [int()]
+       columns() = [column()] | [{column(), value()}]
+       column() = int()
+       value() = term()
+
+
+         _r_o_w___i_n_d_e_x_(_):
+           Denotes the last part of the OID which specifies the index of the
+           row in the table (see RFC1212, 4.1.6 for more information about
+           INDEX).
+
+         _c_o_l_u_m_n_s_(_):
+           Is a list of column numbers in the case of a _g_e_t operation, and a
+           list of column numbers and values in the case of a _s_e_t operation.
+
+EEXXPPOORRTTSS
+       ggeett__ssttaattuuss__ccooll((NNaammee,, CCoollss))
+       ggeett__ssttaattuuss__ccooll((NNaammeeDDbb,, CCoollss)) -->> {{ookk,, SSttaattuussVVaall}} || ffaallssee
+
+              Types:
+
+                 Name = name()
+                 NameDb = name_db()
+                 Cols = columns()
+                 StatusVal = term()
+
+              Gets the value of the status column from _C_o_l_s.
+
+              This function can be used in instrumentation functions for
+              _i_s___s_e_t___o_k, _u_n_d_o or _s_e_t to check if the status column of a table
+              is modified.
+
+       ggeett__iinnddeexx__ttyyppeess((NNaammee))
+
+              Types:
+
+                 Name = name()
+
+              Gets the index types of _N_a_m_e
+
+              This function can be used in instrumentation functions to
+              retrieve the index types part of the table info.
+
+       ggeett__ttaabbllee__iinnffoo((NNaammee,, IItteemm)) -->> ttaabbllee__iinnffoo__rreessuulltt(())
+
+              Types:
+
+                 Name = name()
+                 Item = table_item() | all
+                 table_item() = nbr_of_cols | defvals | status_col |
+                 not_accessible | index_types | first_accessible |
+                 first_own_index
+                 table_info_result() = Value | [{table_item(), Value}]
+                 Value = term()
+
+              Get a specific table info item or, if _I_t_e_m has the value _a_l_l, a
+              two tuple list (property list) is instead returned with all the
+              items and their respctive values of the given table.
+
+              This function can be used in instrumentation functions to
+              retrieve a given part of the table info.
+
+       ttaabbllee__ffuunncc((OOpp11,, NNaammeeDDbb))
+       ttaabbllee__ffuunncc((OOpp22,, RRoowwIInnddeexx,, CCoollss,, NNaammeeDDbb)) -->> RReett
+
+              Types:
+
+                 Op1 = new | delete
+                 Op2 = get | next | is_set_ok | set | undo
+                 NameDb = name_db()
+                 RowIndex = row_index()
+                 Cols = columns()
+                 Ret = term()
+
+              This is the default instrumentation function for tables.
+
+                * The _n_e_w function creates the table if it does not exist, but
+                  only if the database is the SNMP internal db.
+
+                * The _d_e_l_e_t_e function does not delete the table from the
+                  database since unloading an MIB does not necessarily mean
+                  that the table should be destroyed.
+
+                * The _i_s___s_e_t___o_k function checks that a row which is to be
+                  modified or deleted exists, and that a row which is to be
+                  created does not exist.
+
+                * The _u_n_d_o function does nothing.
+
+                * The _s_e_t function checks if it has enough information to make
+                  the row change its status from _n_o_t_R_e_a_d_y to _n_o_t_I_n_S_e_r_v_i_c_e
+                  (when a row has been been set to _c_r_e_a_t_e_A_n_d_W_a_i_t). If a row is
+                  set to _c_r_e_a_t_e_A_n_d_W_a_i_t, columns without a value are set to
+                  _n_o_i_n_i_t. If Mnesia is used, the set functionality is handled
+                  within a transaction.
+
+              If it is possible for a manager to create or delete rows in the
+              table, there must be a _R_o_w_S_t_a_t_u_s column for _i_s___s_e_t___o_k, _s_e_t and
+              _u_n_d_o to work properly.
+
+              The function returns according to the specification of an
+              instrumentation function.
+
+       ttaabbllee__ggeett__eelleemmeennttss((NNaammeeDDbb,, RRoowwIInnddeexx,, CCoollss)) -->> VVaalluueess
+
+              Types:
+
+                 NameDb = name_db()
+                 RowIndex = row_index()
+                 Cols = columns()
+                 Values = [value() | noinit]
+
+              Returns a list with values for all columns in _C_o_l_s. If a column
+              is undefined, its value is _n_o_i_n_i_t.
+
+       ttaabbllee__nneexxtt((NNaammeeDDbb,, RReessttOOiidd)) -->> RRoowwIInnddeexx || eennddOOffTTaabbllee
+
+              Types:
+
+                 NameDb = name_db()
+                 RestOid = [int()]
+                 RowIndex = row_index()
+
+              Finds the indices of the next row in the table. _R_e_s_t_O_i_d does not
+              have to specify an existing row.
+
+       ttaabbllee__rrooww__eexxiissttss((NNaammeeDDbb,, RRoowwIInnddeexx)) -->> bbooooll(())
+
+              Types:
+
+                 NameDb = name_db()
+                 RowIndex = row_index()
+
+              Checks if a row in a table exists.
+
+       ttaabbllee__sseett__eelleemmeennttss((NNaammeeDDbb,, RRoowwIInnddeexx,, CCoollss)) -->> bbooooll(())
+
+              Types:
+
+                 NameDb = name_db()
+                 RowIndex = row_index()
+                 Cols = columns()
+
+              Sets the elements in _C_o_l_s to the row specified by _R_o_w_I_n_d_e_x. No
+              checks are performed on the new values.
+
+              If the Mnesia database is used, this function calls _m_n_e_s_i_a_:_w_r_i_t_e
+              to store the values. This means that this function must be
+              called from within a transaction (_m_n_e_s_i_a_:_t_r_a_n_s_a_c_t_i_o_n_/_1 or
+              _m_n_e_s_i_a_:_d_i_r_t_y_/_1).
+
+       vvaarriiaabbllee__ffuunncc((OOpp11,, NNaammeeDDbb))
+       vvaarriiaabbllee__ffuunncc((OOpp22,, VVaall,, NNaammeeDDbb)) -->> RReett
+
+              Types:
+
+                 Op1 = new | delete | get
+                 Op2 = is_set_ok | set | undo
+                 NameDb = name_db()
+                 Val = value()
+                 Ret = term()
+
+              This is the default instrumentation function for variables.
+
+              The _n_e_w function creates a new variable in the database with a
+              default value as defined in the MIB, or a zero value (depending
+              on the type).
+
+              The _d_e_l_e_t_e function does not delete the variable from the
+              database.
+
+              The function returns according to the specification of an
+              instrumentation function.
+
+       vvaarriiaabbllee__ggeett((NNaammeeDDbb)) -->> {{vvaalluuee,, VVaalluuee}} || uunnddeeffiinneedd
+
+              Types:
+
+                 NameDb = name_db()
+                 Value = value()
+
+              Gets the value of a variable.
+
+       vvaarriiaabbllee__sseett((NNaammeeDDbb,, NNeewwVVaall)) -->> ttrruuee || ffaallssee
+
+              Types:
+
+                 NameDb = name_db()
+                 NewVal = value()
+
+              Sets a new value to a variable. The variable is created if it
+              does not exist. No checks are made on the type of the new value.
+
+              Returns _f_a_l_s_e if the _N_a_m_e_D_b argument is incorrectly specified,
+              otherwise _t_r_u_e.
+
+EEXXAAMMPPLLEE
+       The following example shows an implementation of a table which is
+       stored in Mnesia, but with some checks performed at set-request
+       operations.
+
+       myTable_func(new, NameDb) ->   % pass unchanged
+         snmp_generic:table_func(new, NameDb).
+
+       myTable_func(delete, NameDb) ->   % pass unchanged
+         snmp_generic:table_func(delete, NameDb).
+
+       %% change row
+       myTable_func(is_set_ok, RowIndex, Cols, NameDb) ->
+         case snmp_generic:table_func(is_set_ok, RowIndex,
+                                      Cols, NameDb) of
+           {noError, 0} ->
+             myApplication:is_set_ok(RowIndex, Cols);
+           Err ->
+             Err
+         end;
+
+       myTable_func(set, RowIndex, Cols, NameDb) ->
+         case snmp_generic:table_func(set, RowIndex, Cols,
+                                      NameDb),
+           {noError, 0} ->
+             % Now the row is updated, tell the application
+             myApplication:update(RowIndex, Cols);
+           Err ->
+             Err
+         end;
+
+       myTable_func(Op, RowIndex, Cols, NameDb) ->   % pass unchanged
+         snmp_generic:table_func(Op, RowIndex, Cols, NameDb).
+
+
+       The _._f_u_n_c_s file would look like:
+
+       {myTable, {myModule, myTable_func, [{myTable, mnesia}]}}.
+
+
+
+
+Ericsson AB                       snmp 4.22.1                  snmp_generic(3)

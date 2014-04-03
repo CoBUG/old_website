@@ -1,0 +1,41 @@
+erl_id_trans(3)            Erlang Module Definition            erl_id_trans(3)
+
+
+
+NNAAMMEE
+       erl_id_trans - An Identity Parse Transform
+
+DDEESSCCRRIIPPTTIIOONN
+       This module performs an identity parse transformation of Erlang code.
+       It is included as an example for users who may wish to write their own
+       parse transformers. If the option _{_p_a_r_s_e___t_r_a_n_s_f_o_r_m_,_M_o_d_u_l_e_} is passed to
+       the compiler, a user written function _p_a_r_s_e___t_r_a_n_s_f_o_r_m_/_2 is called by
+       the compiler before the code is checked for errors.
+
+EEXXPPOORRTTSS
+       ppaarrssee__ttrraannssffoorrmm((FFoorrmmss,, OOppttiioonnss)) -->> FFoorrmmss
+
+              Types:
+
+                 Forms = [eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())]
+                 Options = [ccoommppiillee::ooppttiioonn(())]
+
+              Performs an identity transformation on Erlang forms, as an
+              example.
+
+PPAARRSSEE TTRRAANNSSFFOORRMMAATTIIOONNSS
+       Parse transformations are used if a programmer wants to use Erlang
+       syntax, but with different semantics. The original Erlang code is then
+       transformed into other Erlang code.
+
+   NNoottee::
+       Programmers are strongly advised not to engage in parse transformations
+       and no support is offered for problems encountered.
+
+
+SSEEEE AALLSSOO
+       eerrll__ppaarrssee((33)), ccoommppiillee((33)).
+
+
+
+Ericsson AB                      stdlib 1.18.2                 erl_id_trans(3)

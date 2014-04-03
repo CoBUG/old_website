@@ -1,0 +1,42 @@
+eunit_surefire(3)          Erlang Module Definition          eunit_surefire(3)
+
+
+
+NNAAMMEE
+       eunit_surefire - Surefire reports for EUnit (Format used by Maven and
+       Atlassian Bamboo for example to integrate test results).
+
+DDEESSCCRRIIPPTTIIOONN
+       Surefire reports for EUnit (Format used by Maven and Atlassian Bamboo
+       for example to integrate test results). Based on initial code from Paul
+       Guyot.
+
+       Example: Generate XML result file in the current directory:
+
+            eunit:test([fib, eunit_examples],
+                       [{report,{eunit_surefire,[{dir,"."}]}}]).
+
+EEXXPPOORRTTSS
+       hhaannddllee__bbeeggiinn((KKiinndd,, DDaattaa,, SStt)) -->> tteerrmm(())
+
+       hhaannddllee__ccaanncceell((XX11,, DDaattaa,, SStt)) -->> tteerrmm(())
+
+       hhaannddllee__eenndd((XX11,, DDaattaa,, SStt)) -->> tteerrmm(())
+
+       iinniitt((OOppttiioonnss)) -->> tteerrmm(())
+
+       ssttaarrtt(()) -->> tteerrmm(())
+
+       ssttaarrtt((OOppttiioonnss)) -->> tteerrmm(())
+
+       tteerrmmiinnaattee((XX11,, SStt)) -->> tteerrmm(())
+
+SSEEEE AALLSSOO
+       eeuunniitt
+
+AAUUTTHHOORRSS
+       Micka~A<<l R~A(C)mond _<_m_i_c_k_a_e_l_._r_e_m_o_n_d_@_p_r_o_c_e_s_s_-_o_n_e_._n_e_t_>
+
+
+
+                                  eunit 2.2.3                eunit_surefire(3)

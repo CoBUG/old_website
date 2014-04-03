@@ -1,0 +1,711 @@
+ct_netconfc(3)             Erlang Module Definition             ct_netconfc(3)
+
+
+
+NNAAMMEE
+       ct_netconfc - Netconf client module.
+
+DDEESSCCRRIIPPTTIIOONN
+       Netconf client module.
+
+       The Netconf client is compliant with RFC4741 and RFC4742.
+
+       For each server to test against, the following entry can be added to a
+       configuration file:
+
+       _{_s_e_r_v_e_r___i_d_(_)_,_o_p_t_i_o_n_s_(_)_}_.
+
+       The _s_e_r_v_e_r___i_d_(_) or an associated _t_a_r_g_e_t___n_a_m_e_(_) (see cctt) shall then be
+       used in calls to ooppeenn//22.
+
+       If no configuration exists for a server, a session can still be opened
+       by calling ooppeenn//22 with all necessary options given in the call. The
+       first argument to ooppeenn//22 can then be any atom.
+
+       LLooggggiinngg
+
+       The netconf server uses the _e_r_r_o_r___l_o_g_g_e_r for logging of netconf
+       traffic. A special purpose error handler is implemented in
+       _c_t___c_o_n_n___l_o_g___h. To use this error handler, add the _c_t_h___c_o_n_n___l_o_g hook in
+       your test suite, e.g.
+
+         suite() ->
+            [{ct_hooks, [{cth_conn_log, [{conn_mod(),hook_options()}]}]}].
+
+       The _c_o_n_n___m_o_d_(_) is the name of the common_test module implementing the
+       connection protocol, e.g. _c_t___n_e_t_c_o_n_f_c.
+
+       The hook option _l_o_g___t_y_p_e specifies the type of logging:
+
+         _r_a_w:
+           The sent and received netconf data is logged to a separate text
+           file as is without any formatting. A link to the file is added to
+           the test case HTML log.
+
+         _p_r_e_t_t_y:
+           The sent and received netconf data is logged to a separate text
+           file with XML data nicely indented. A link to the file is added to
+           the test case HTML log.
+
+         _h_t_m_l _(_d_e_f_a_u_l_t_):
+           The sent and received netconf traffic is pretty printed directly in
+           the test case HTML log.
+
+         _s_i_l_e_n_t:
+           Netconf traffic is not logged.
+
+       By default, all netconf traffic is logged in one single log file.
+       However, it is possible to have different connections logged in
+       separate files. To do this, use the hook option _h_o_s_t_s and list the
+       names of the servers/connections that will be used in the suite. Note
+       that the connections must be named for this to work, i.e. they must be
+       opened with ooppeenn//22.
+
+       The _h_o_s_t_s option has no effect if _l_o_g___t_y_p_e is set to _h_t_m_l or _s_i_l_e_n_t.
+
+       The hook options can also be specified in a configuration file with the
+       configuration variable _c_t___c_o_n_n___l_o_g:
+
+         {ct_conn_log,[{conn_mod(),hook_options()}]}.
+
+       For example:
+
+         {ct_conn_log,[{ct_netconfc,[{log_type,pretty},
+                                     {hosts,[key_or_name()]}]}]}
+
+       _N_o_t_e that hook options specified in a configuration file will overwrite
+       the hardcoded hook options in the test suite.
+
+       LLooggggiinngg eexxaammppllee 11
+
+       The following _c_t___h_o_o_k_s statement will cause pretty printing of netconf
+       traffic to separate logs for the connections named _n_c___s_e_r_v_e_r_1 and
+       _n_c___s_e_r_v_e_r_2. Any other connections will be logged to default netconf
+       log.
+
+         suite() ->
+            [{ct_hooks, [{cth_conn_log, [{ct_netconfc,[{log_type,pretty}},
+                                                       {hosts,[nc_server1,nc_server2]}]}
+                                        ]}]}].
+
+       Connections must be opened like this:
+
+         open(nc_server1,[...]),
+         open(nc_server2,[...]).
+
+       LLooggggiinngg eexxaammppllee 22
+
+       The following configuration file will cause raw logging of all netconf
+       traffic into one single text file.
+
+         {ct_conn_log,[{ct_netconfc,[{log_type,raw}]}]}.
+
+       The _c_t___h_o_o_k_s statement must look like this:
+
+         suite() ->
+            [{ct_hooks, [{cth_conn_log, []}]}].
+
+       The same _c_t___h_o_o_k_s statement without the configuration file would cause
+       HTML logging of all netconf connections into the test case HTML log.
+
+       NNoottiiffiiccaattiioonnss
+
+       The netconf client is also compliant with RFC5277 NETCONF Event
+       Notifications, which defines a mechanism for an asynchronous message
+       notification delivery service for the netconf protocol.
+
+       Specific functions to support this are ccrreeaattee__ssuubbssccrriippttiioonn//66 and
+       ggeett__eevveenntt__ssttrreeaammss//33. (The functions also exist with other arities.)
+
+DDAATTAA TTYYPPEESS
+         _c_l_i_e_n_t_(_) _= _h_a_n_d_l_e_(_) _| _s_e_r_v_e_r___i_d_(_) _| _t_a_r_g_e_t___n_a_m_e_(_):
+
+
+         _c_o_n_n___m_o_d_(_) _= _c_t___n_e_t_c_o_n_f_c:
+
+
+         _e_r_r_o_r___r_e_a_s_o_n_(_) _= _t_e_r_m_(_):
+
+
+         _e_v_e_n_t___t_i_m_e_(_) _= _{_e_v_e_n_t_T_i_m_e_, _x_m_l___a_t_t_r_i_b_u_t_e_s_(_)_, _[_x_s___d_a_t_e_t_i_m_e_(_)_]_}:
+
+
+         _h_a_n_d_l_e_(_) _= _t_e_r_m_(_):
+
+
+           An opaque reference for a connection (netconf session). See cctt for
+           more information.
+
+         _h_o_o_k___o_p_t_i_o_n_(_) _= _{_l_o_g___t_y_p_e_, _l_o_g___t_y_p_e_(_)_} _| _{_h_o_s_t_s_, _[_k_e_y___o_r___n_a_m_e_(_)_]_}:
+
+
+         _h_o_o_k___o_p_t_i_o_n_s_(_) _= _[_h_o_o_k___o_p_t_i_o_n_(_)_]:
+
+
+           Options that can be given to _c_t_h___c_o_n_n___l_o_g in the _c_t___h_o_o_k statement.
+
+         _h_o_s_t_(_) _= _h_o_s_t___n_a_m_e_(_) _(_s_e_e _m_o_d_u_l_e _i_n_e_t_) _| _i_p___a_d_d_r_e_s_s_(_) _(_s_e_e _m_o_d_u_l_e
+         _i_n_e_t_):
+
+
+         _k_e_y___o_r___n_a_m_e_(_) _= _s_e_r_v_e_r___i_d_(_) _| _t_a_r_g_e_t___n_a_m_e_(_):
+
+
+         _l_o_g___t_y_p_e_(_) _= _r_a_w _| _p_r_e_t_t_y _| _h_t_m_l _| _s_i_l_e_n_t:
+
+
+           -type error_handler() :: module().
+
+         _n_e_t_c_o_n_f___d_b_(_) _= _r_u_n_n_i_n_g _| _s_t_a_r_t_u_p _| _c_a_n_d_i_d_a_t_e:
+
+
+         _n_o_t_i_f_i_c_a_t_i_o_n_(_) _= _{_n_o_t_i_f_i_c_a_t_i_o_n_, _x_m_l___a_t_t_r_i_b_u_t_e_s_(_)_,
+         _n_o_t_i_f_i_c_a_t_i_o_n___c_o_n_t_e_n_t_(_)_}:
+
+
+         _n_o_t_i_f_i_c_a_t_i_o_n___c_o_n_t_e_n_t_(_) _= _[_e_v_e_n_t___t_i_m_e_(_) _| _s_i_m_p_l_e___x_m_l_(_)_]:
+
+
+         _o_p_t_i_o_n_(_) _= _{_s_s_h_, _h_o_s_t_(_)_} _| _{_p_o_r_t_, _p_o_r_t___n_u_m_b_e_r_(_) _(_s_e_e _m_o_d_u_l_e _i_n_e_t_)_} _|
+         _{_u_s_e_r_, _s_t_r_i_n_g_(_)_} _| _{_p_a_s_s_w_o_r_d_, _s_t_r_i_n_g_(_)_} _| _{_u_s_e_r___d_i_r_, _s_t_r_i_n_g_(_)_} _|
+         _{_t_i_m_e_o_u_t_, _t_i_m_e_o_u_t_(_)_}:
+
+
+         _o_p_t_i_o_n_s_(_) _= _[_o_p_t_i_o_n_(_)_]:
+
+
+           Options used for setting up ssh connection to a netconf server.
+
+         _s_e_r_v_e_r___i_d_(_) _= _a_t_o_m_(_):
+
+
+           A _S_e_r_v_e_r_I_d which exists in a configuration file.
+
+         _s_i_m_p_l_e___x_m_l_(_) _= _{_x_m_l___t_a_g_(_)_, _x_m_l___a_t_t_r_i_b_u_t_e_s_(_)_, _x_m_l___c_o_n_t_e_n_t_(_)_} _|
+         _{_x_m_l___t_a_g_(_)_, _x_m_l___c_o_n_t_e_n_t_(_)_} _| _x_m_l___t_a_g_(_):
+
+
+           This type is further described in the documentation for the _X_m_e_r_l
+           application.
+
+         _s_t_r_e_a_m___d_a_t_a_(_) _= _{_d_e_s_c_r_i_p_t_i_o_n_, _s_t_r_i_n_g_(_)_} _| _{_r_e_p_l_a_y_S_u_p_p_o_r_t_, _s_t_r_i_n_g_(_)_} _|
+         _{_r_e_p_l_a_y_L_o_g_C_r_e_a_t_i_o_n_T_i_m_e_, _s_t_r_i_n_g_(_)_} _| _{_r_e_p_l_a_y_L_o_g_A_g_e_d_T_i_m_e_, _s_t_r_i_n_g_(_)_}:
+
+
+           See XML Schema for Event Notifications found in RFC5277 for further
+           detail about the data format for the string values.
+
+         _s_t_r_e_a_m___n_a_m_e_(_) _= _s_t_r_i_n_g_(_):
+
+
+         _s_t_r_e_a_m_s_(_) _= _[_{_s_t_r_e_a_m___n_a_m_e_(_)_, _[_s_t_r_e_a_m___d_a_t_a_(_)_]_}_]:
+
+
+         _t_a_r_g_e_t___n_a_m_e_(_) _= _a_t_o_m_(_):
+
+
+           A name which is associated to a _s_e_r_v_e_r___i_d_(_) via a _r_e_q_u_i_r_e statement
+           or a call to cctt::rreeqquuiirree//22 in the test suite.
+
+         _x_m_l___a_t_t_r_i_b_u_t_e___t_a_g_(_) _= _a_t_o_m_(_):
+
+
+         _x_m_l___a_t_t_r_i_b_u_t_e___v_a_l_u_e_(_) _= _s_t_r_i_n_g_(_):
+
+
+         _x_m_l___a_t_t_r_i_b_u_t_e_s_(_) _= _[_{_x_m_l___a_t_t_r_i_b_u_t_e___t_a_g_(_)_, _x_m_l___a_t_t_r_i_b_u_t_e___v_a_l_u_e_(_)_}_]:
+
+
+         _x_m_l___c_o_n_t_e_n_t_(_) _= _[_s_i_m_p_l_e___x_m_l_(_) _| _i_o_l_i_s_t_(_)_]:
+
+
+         _x_m_l___t_a_g_(_) _= _a_t_o_m_(_):
+
+
+         _x_p_a_t_h_(_) _= _{_x_p_a_t_h_, _s_t_r_i_n_g_(_)_}:
+
+
+         _x_s___d_a_t_e_t_i_m_e_(_) _= _s_t_r_i_n_g_(_):
+
+
+           This date and time identifyer has the same format as the XML type
+           dateTime and compliant to RFC3339. The format is
+
+              [-]CCYY-MM-DDThh:mm:ss[.s][Z|(+|-)hh:mm]
+
+EEXXPPOORRTTSS
+       aaccttiioonn((CClliieenntt,, AAccttiioonn)) -->> RReessuulltt
+
+              Equivalent to aaccttiioonn((CClliieenntt,, AAccttiioonn,, iinnffiinniittyy)).
+
+       aaccttiioonn((CClliieenntt,, AAccttiioonn,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Action = simple_xml()
+                 Timeout = timeout()
+                 Result = {ok, simple_xml()} | {error, error_reason()}
+
+              Execute an action.
+
+       cclloossee__sseessssiioonn((CClliieenntt)) -->> RReessuulltt
+
+              Equivalent to cclloossee__sseessssiioonn((CClliieenntt,, iinnffiinniittyy)).
+
+       cclloossee__sseessssiioonn((CClliieenntt,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Request graceful termination of the session associated with the
+              client.
+
+              When a netconf server receives a _c_l_o_s_e_-_s_e_s_s_i_o_n request, it will
+              gracefully close the session. The server will release any locks
+              and resources associated with the session and gracefully close
+              any associated connections. Any NETCONF requests received after
+              a _c_l_o_s_e_-_s_e_s_s_i_o_n request will be ignored.
+
+       ccooppyy__ccoonnffiigg((CClliieenntt,, SSoouurrccee,, TTaarrggeett)) -->> RReessuulltt
+
+              Equivalent to ccooppyy__ccoonnffiigg((CClliieenntt,, SSoouurrccee,, TTaarrggeett,, iinnffiinniittyy)).
+
+       ccooppyy__ccoonnffiigg((CClliieenntt,, TTaarrggeett,, SSoouurrccee,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Target = netconf_db()
+                 Source = netconf_db()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Copy configuration data.
+
+              Which source and target options that can be issued depends on
+              the capabilities supported by the server. I.e. _:_c_a_n_d_i_d_a_t_e and/or
+              _:_s_t_a_r_t_u_p are required.
+
+       ccrreeaattee__ssuubbssccrriippttiioonn((CClliieenntt)) -->> tteerrmm(())
+
+       ccrreeaattee__ssuubbssccrriippttiioonn((CClliieenntt,, TTiimmeeoouutt)) -->> tteerrmm(())
+
+       ccrreeaattee__ssuubbssccrriippttiioonn((CClliieenntt,, SSttrreeaamm,, TTiimmeeoouutt)) -->> tteerrmm(())
+
+       ccrreeaattee__ssuubbssccrriippttiioonn((CClliieenntt,, SSttaarrttTTiimmee,, SSttooppTTiimmee,, TTiimmeeoouutt)) -->> tteerrmm(())
+
+       ccrreeaattee__ssuubbssccrriippttiioonn((CClliieenntt,, SSttrreeaamm,, SSttaarrttTTiimmee,, SSttooppTTiimmee,, TTiimmeeoouutt)) -->>
+       tteerrmm(())
+
+       ccrreeaattee__ssuubbssccrriippttiioonn((CClliieenntt,, SSttrreeaamm,, FFiilltteerr,, SSttaarrttTTiimmee,, SSttooppTTiimmee,,
+       TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Stream = stream_name()
+                 Filter = simple_xml()
+                 StartTime = xs_datetime()
+                 StopTime = xs_datetime()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Create a subscription for event notifications.
+
+              This function sets up a subscription for netconf event
+              notifications of the given stream type, matching the given
+              filter. The calling process will receive notifications as
+              messages of type _n_o_t_i_f_i_c_a_t_i_o_n_(_).
+
+                SSttrreeaamm::::
+                  An optional parameter that indicates which stream of events
+                  is of interest. If not present, events in the default
+                  NETCONF stream will be sent.
+
+                FFiilltteerr::::
+                  An optional parameter that indicates which subset of all
+                  possible events is of interest. The format of this parameter
+                  is the same as that of the filter parameter in the NETCONF
+                  protocol operations. If not present, all events not
+                  precluded by other parameters will be sent. See section 3.6
+                  for more information on filters.
+
+                SSttaarrttTTiimmee::::
+                  An optional parameter used to trigger the replay feature and
+                  indicate that the replay should start at the time specified.
+                  If _S_t_a_r_t_T_i_m_e is not present, this is not a replay
+                  subscription. It is not valid to specify start times that
+                  are later than the current time. If the _S_t_a_r_t_T_i_m_e specified
+                  is earlier than the log can support, the replay will begin
+                  with the earliest available notification. This parameter is
+                  of type dateTime and compliant to [RFC3339]. Implementations
+                  must support time zones.
+
+                SSttooppTTiimmee::::
+                  An optional parameter used with the optional replay feature
+                  to indicate the newest notifications of interest. If
+                  _S_t_o_p_T_i_m_e is not present, the notifications will continue
+                  until the subscription is terminated. Must be used with and
+                  be later than _S_t_a_r_t_T_i_m_e. Values of _S_t_o_p_T_i_m_e in the future
+                  are valid. This parameter is of type dateTime and compliant
+                  to [RFC3339]. Implementations must support time zones.
+
+              See RFC5277 for further details about the event notification
+              mechanism.
+
+       ddeelleettee__ccoonnffiigg((CClliieenntt,, TTaarrggeett)) -->> RReessuulltt
+
+              Equivalent to ddeelleettee__ccoonnffiigg((CClliieenntt,, TTaarrggeett,, iinnffiinniittyy)).
+
+       ddeelleettee__ccoonnffiigg((CClliieenntt,, TTaarrggeett,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Target = startup | candidate
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Delete configuration data.
+
+              The running configuration cannot be deleted and _:_c_a_n_d_i_d_a_t_e or
+              _:_s_t_a_r_t_u_p must be advertised by the server.
+
+       eeddiitt__ccoonnffiigg((CClliieenntt,, TTaarrggeett,, CCoonnffiigg)) -->> RReessuulltt
+
+              Equivalent to eeddiitt__ccoonnffiigg((CClliieenntt,, TTaarrggeett,, CCoonnffiigg,, iinnffiinniittyy)).
+
+       eeddiitt__ccoonnffiigg((CClliieenntt,, TTaarrggeett,, CCoonnffiigg,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Target = netconf_db()
+                 Config = simple_xml()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Edit configuration data.
+
+              Per default only the running target is available, unless the
+              server include _:_c_a_n_d_i_d_a_t_e or _:_s_t_a_r_t_u_p in its list of
+              capabilities.
+
+       ffoorrmmaatt__ddaattaa((XX11,, DDaattaa)) -->> tteerrmm(())
+
+       ggeett((CClliieenntt,, FFiilltteerr)) -->> RReessuulltt
+
+              Equivalent to ggeett((CClliieenntt,, FFiilltteerr,, iinnffiinniittyy)).
+
+       ggeett((CClliieenntt,, FFiilltteerr,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Filter = simple_xml() | xpath()
+                 Timeout = timeout()
+                 Result = {ok, simple_xml()} | {error, error_reason()}
+
+              Get data.
+
+              This operation returns both configuration and state data from
+              the server.
+
+              Filter type _x_p_a_t_h can only be used if the server supports
+              _:_x_p_a_t_h.
+
+       ggeett__ccaappaabbiilliittiieess((CClliieenntt)) -->> RReessuulltt
+
+              Equivalent to ggeett__ccaappaabbiilliittiieess((CClliieenntt,, iinnffiinniittyy)).
+
+       ggeett__ccaappaabbiilliittiieess((CClliieenntt,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Timeout = timeout()
+                 Result = [string()] | {error, error_reason()}
+
+              Returns the server side capabilities
+
+              The following capability identifiers, defined in RFC 4741, can
+              be returned:
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_b_a_s_e_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_w_r_i_t_a_b_l_e_-_r_u_n_n_i_n_g_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_c_a_n_d_i_d_a_t_e_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_c_o_n_f_i_r_m_e_d_-_c_o_m_m_i_t_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_r_o_l_l_b_a_c_k_-_o_n_-_e_r_r_o_r_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_s_t_a_r_t_u_p_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_u_r_l_:_1_._0_"
+
+                * _"_u_r_n_:_i_e_t_f_:_p_a_r_a_m_s_:_n_e_t_c_o_n_f_:_c_a_p_a_b_i_l_i_t_y_:_x_p_a_t_h_:_1_._0_"
+
+              Note, additional identifiers may exist, e.g. server side
+              namespace.
+
+       ggeett__ccoonnffiigg((CClliieenntt,, SSoouurrccee,, FFiilltteerr)) -->> RReessuulltt
+
+              Equivalent to ggeett__ccoonnffiigg((CClliieenntt,, SSoouurrccee,, FFiilltteerr,, iinnffiinniittyy)).
+
+       ggeett__ccoonnffiigg((CClliieenntt,, SSoouurrccee,, FFiilltteerr,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Source = netconf_db()
+                 Filter = simple_xml() | xpath()
+                 Timeout = timeout()
+                 Result = {ok, simple_xml()} | {error, error_reason()}
+
+              Get configuration data.
+
+              To be able to access another source than _r_u_n_n_i_n_g, the server
+              must advertise _:_c_a_n_d_i_d_a_t_e and/or _:_s_t_a_r_t_u_p.
+
+              Filter type _x_p_a_t_h can only be used if the server supports
+              _:_x_p_a_t_h.
+
+       ggeett__eevveenntt__ssttrreeaammss((CClliieenntt,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Equivalent to ggeett__eevveenntt__ssttrreeaammss((CClliieenntt,, [[]],, TTiimmeeoouutt)).
+
+       ggeett__eevveenntt__ssttrreeaammss((CClliieenntt,, SSttrreeaammss,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Streams = [stream_name()]
+                 Timeout = timeout()
+                 Result = {ok, streams()} | {error, error_reason()}
+
+              Send a request to get the given event streams.
+
+              _S_t_r_e_a_m_s is a list of stream names. The following filter will be
+              sent to the netconf server in a _g_e_t request:
+
+                <netconf xmlns="urn:ietf:params:xml:ns:netmod:notification">
+                  <streams>
+                    <stream>
+                      <name>StreamName1</name>
+                    </stream>
+                    <stream>
+                      <name>StreamName2</name>
+                    </stream>
+                    ...
+                  </streams>
+                </netconf>
+
+              If _S_t_r_e_a_m_s is an empty list, ALL streams will be requested by
+              sending the following filter:
+
+                <netconf xmlns="urn:ietf:params:xml:ns:netmod:notification">
+                  <streams/>
+                </netconf>
+
+              If more complex filtering is needed, a use ggeett//22 or ggeett//33 and
+              specify the exact filter according to XML Schema for Event
+              Notifications found in RFC5277.
+
+       ggeett__sseessssiioonn__iidd((CClliieenntt)) -->> RReessuulltt
+
+              Equivalent to ggeett__sseessssiioonn__iidd((CClliieenntt,, iinnffiinniittyy)).
+
+       ggeett__sseessssiioonn__iidd((CClliieenntt,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Timeout = timeout()
+                 Result = pos_integer() | {error, error_reason()}
+
+              Returns the session id associated with the given client.
+
+       hhaannddllee__mmssgg((XX11,, SSttaattee)) -->> tteerrmm(())
+
+       hheelllloo((CClliieenntt)) -->> RReessuulltt
+
+              Equivalent to hheelllloo((CClliieenntt,, iinnffiinniittyy)).
+
+       hheelllloo((CClliieenntt,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = handle()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Exchange _h_e_l_l_o messages with the server.
+
+              Sends a _h_e_l_l_o message to the server and waits for the return.
+
+       kkiillll__sseessssiioonn((CClliieenntt,, SSeessssiioonnIIdd)) -->> RReessuulltt
+
+              Equivalent to kkiillll__sseessssiioonn((CClliieenntt,, SSeessssiioonnIIdd,, iinnffiinniittyy)).
+
+       kkiillll__sseessssiioonn((CClliieenntt,, SSeessssiioonnIIdd,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 SessionId = pos_integer()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Force termination of the session associated with the supplied
+              session id.
+
+              The server side shall abort any operations currently in process,
+              release any locks and resources associated with the session, and
+              close any associated connections.
+
+              Only if the server is in the confirmed commit phase, the
+              configuration will be restored to its state before entering the
+              confirmed commit phase. Otherwise, no configuration roll back
+              will be performed.
+
+              If the given _S_e_s_s_i_o_n_I_d is equal to the current session id, an
+              error will be returned.
+
+       lloocckk((CClliieenntt,, TTaarrggeett)) -->> RReessuulltt
+
+              Equivalent to lloocckk((CClliieenntt,, TTaarrggeett,, iinnffiinniittyy)).
+
+       lloocckk((CClliieenntt,, TTaarrggeett,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Target = netconf_db()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Unlock configuration target.
+
+              Which target parameters that can be used depends on if
+              _:_c_a_n_d_i_d_a_t_e and/or _:_s_t_a_r_t_u_p are supported by the server. If
+              successfull, the configuration system of the device is not
+              available to other clients (Netconf, CORBA, SNMP etc). Locks are
+              intended to be short-lived.
+
+              The operations kkiillll__sseessssiioonn//22 or kkiillll__sseessssiioonn//33 can be used to
+              force the release of a lock owned by another Netconf session.
+              How this is achieved by the server side is implementation
+              specific.
+
+       oonnllyy__ooppeenn((OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 Options = options()
+                 Result = {ok, handle()} | {error, error_reason()}
+
+              Open a netconf session, but don't send _h_e_l_l_o.
+
+              As ooppeenn//11 but does not send a _h_e_l_l_o message.
+
+       oonnllyy__ooppeenn((KKeeyyOOrrNNaammee,, EExxttrraaOOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 KeyOrName = key_or_name()
+                 ExtraOptions = options()
+                 Result = {ok, handle()} | {error, error_reason()}
+
+              Open a name netconf session, but don't send _h_e_l_l_o.
+
+              As ooppeenn//22 but does not send a _h_e_l_l_o message.
+
+       ooppeenn((OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 Options = options()
+                 Result = {ok, handle()} | {error, error_reason()}
+
+              Open a netconf session and exchange _h_e_l_l_o messages.
+
+              If the server options are specified in a configuration file, or
+              if a named client is needed for logging purposes (see LLooggggiinngg)
+              use ooppeenn//22 instead.
+
+              The opaque _h_a_n_d_l_e_r_(_) reference which is returned from this
+              function is required as client identifier when calling any other
+              function in this module.
+
+              The _t_i_m_e_o_u_t option (milli seconds) is used when setting up the
+              ssh connection and when waiting for the hello message from the
+              server. It is not used for any other purposes during the
+              lifetime of the connection.
+
+       ooppeenn((KKeeyyOOrrNNaammee,, EExxttrraaOOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 KeyOrName = key_or_name()
+                 ExtraOptions = options()
+                 Result = {ok, handle()} | {error, error_reason()}
+
+              Open a named netconf session and exchange _h_e_l_l_o messages.
+
+              If _K_e_y_O_r_N_a_m_e is a configured _s_e_r_v_e_r___i_d_(_) or a _t_a_r_g_e_t___n_a_m_e_(_)
+              associated with such an ID, then the options for this server
+              will be fetched from the configuration file.
+
+              The _E_x_t_r_a_O_p_t_i_o_n_s argument will be added to the options found in
+              the configuration file. If the same options are given, the
+              values from the configuration file will overwrite _E_x_t_r_a_O_p_t_i_o_n_s.
+
+              If the server is not specified in a configuration file, use
+              ooppeenn//11 instead.
+
+              The opaque _h_a_n_d_l_e_(_) reference which is returned from this
+              function can be used as client identifier when calling any other
+              function in this module. However, if _K_e_y_O_r_N_a_m_e is a
+              _t_a_r_g_e_t___n_a_m_e_(_), i.e. if the server is named via a call to
+              _c_t_:_r_e_q_u_i_r_e_/_2 or a _r_e_q_u_i_r_e statement in the test suite, then this
+              name may be used instead of the _h_a_n_d_l_e_(_).
+
+              The _t_i_m_e_o_u_t option (milli seconds) is used when setting up the
+              ssh connection and when waiting for the hello message from the
+              server. It is not used for any other purposes during the
+              lifetime of the connection.
+
+              _S_e_e _a_l_s_o_: cctt::rreeqquuiirree//22.
+
+       uunnlloocckk((CClliieenntt,, TTaarrggeett)) -->> RReessuulltt
+
+              Equivalent to uunnlloocckk((CClliieenntt,, TTaarrggeett,, iinnffiinniittyy)).
+
+       uunnlloocckk((CClliieenntt,, TTaarrggeett,, TTiimmeeoouutt)) -->> RReessuulltt
+
+              Types:
+
+                 Client = client()
+                 Target = netconf_db()
+                 Timeout = timeout()
+                 Result = ok | {error, error_reason()}
+
+              Unlock configuration target.
+
+              If the client earlier has aquired a lock, via lloocckk//22 or lloocckk//33,
+              this operation release the associated lock. To be able to access
+              another target than _r_u_n_n_i_n_g, the server must support _:_c_a_n_d_i_d_a_t_e
+              and/or _:_s_t_a_r_t_u_p.
+
+AAUUTTHHOORRSS
+       Support _<_>
+
+
+
+                               common_test 1.6.2                ct_netconfc(3)

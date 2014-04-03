@@ -1,0 +1,399 @@
+leex(3)                    Erlang Module Definition                    leex(3)
+
+
+
+NNAAMMEE
+       leex - Lexical analyzer generator for Erlang
+
+DDEESSCCRRIIPPTTIIOONN
+       A regular expression based lexical analyzer generator for Erlang,
+       similar to lex or flex.
+
+   NNoottee::
+       The Leex module should be considered experimental as it will be subject
+       to changes in future releases.
+
+
+DDAATTAA TTYYPPEESS
+       ErrorInfo = {ErrorLine,module(),error_descriptor()}
+       ErrorLine = integer()
+       Token = tuple()
+
+EEXXPPOORRTTSS
+       ffiillee((FFiilleeNNaammee)) -->> ookk || eerrrroorr
+       ffiillee((FFiilleeNNaammee,, OOppttiioonnss)) -->> ookk || eerrrroorr
+
+              Types:
+
+                 FileName = filename()
+                 Options = Option | [Option]
+                 Option = - see below -
+                 FileReturn = {ok, Scannerfile} | {ok, Scannerfile, Warnings}
+                 | error | {error, Warnings, Errors}
+                 Scannerfile = filename()
+                 Warnings = Errors = [{filename(), [ErrorInfo]}]
+
+              Generates a lexical analyzer from the definition in the input
+              file. The input file has the extension _._x_r_l. This is added to
+              the filename if it is not given. The resulting module is the Xrl
+              filename without the _._x_r_l extension.
+
+              The current options are:
+
+                _d_f_a___g_r_a_p_h:
+                  Generates a _._d_o_t file which contains a description of the
+                  DFA in a format which can be viewed with Graphviz,
+                  _w_w_w_._g_r_a_p_h_v_i_z_._c_o_m.
+
+                _{_i_n_c_l_u_d_e_f_i_l_e_,_I_n_c_l_u_d_e_f_i_l_e_}:
+                  Uses a specific or customised prologue file instead of
+                  default _l_i_b_/_p_a_r_s_e_t_o_o_l_s_/_i_n_c_l_u_d_e_/_l_e_e_x_i_n_c_._h_r_l which is
+                  otherwise included.
+
+                _{_r_e_p_o_r_t___e_r_r_o_r_s_, _b_o_o_l_(_)_}:
+                  Causes errors to be printed as they occur. Default is _t_r_u_e.
+
+                _{_r_e_p_o_r_t___w_a_r_n_i_n_g_s_, _b_o_o_l_(_)_}:
+                  Causes warnings to be printed as they occur. Default is
+                  _t_r_u_e.
+
+                _w_a_r_n_i_n_g_s___a_s___e_r_r_o_r_s:
+                  Causes warnings to be treated as errors.
+
+                _{_r_e_p_o_r_t_, _b_o_o_l_(_)_}:
+                  This is a short form for both _r_e_p_o_r_t___e_r_r_o_r_s and
+                  _r_e_p_o_r_t___w_a_r_n_i_n_g_s.
+
+                _{_r_e_t_u_r_n___e_r_r_o_r_s_, _b_o_o_l_(_)_}:
+                  If this flag is set, _{_e_r_r_o_r_, _E_r_r_o_r_s_, _W_a_r_n_i_n_g_s_} is returned
+                  when there are errors. Default is _f_a_l_s_e.
+
+                _{_r_e_t_u_r_n___w_a_r_n_i_n_g_s_, _b_o_o_l_(_)_}:
+                  If this flag is set, an extra field containing _W_a_r_n_i_n_g_s is
+                  added to the tuple returned upon success. Default is _f_a_l_s_e.
+
+                _{_r_e_t_u_r_n_, _b_o_o_l_(_)_}:
+                  This is a short form for both _r_e_t_u_r_n___e_r_r_o_r_s and
+                  _r_e_t_u_r_n___w_a_r_n_i_n_g_s.
+
+                _{_s_c_a_n_n_e_r_f_i_l_e_, _S_c_a_n_n_e_r_f_i_l_e_}:
+                  _S_c_a_n_n_e_r_f_i_l_e is the name of the file that will contain the
+                  Erlang scanner code that is generated. The default (_"_") is
+                  to add the extension _._e_r_l to _F_i_l_e_N_a_m_e stripped of the _._x_r_l
+                  extension.
+
+                _{_v_e_r_b_o_s_e_, _b_o_o_l_(_)_}:
+                  Outputs information from parsing the input file and
+                  generating the internal tables.
+
+              Any of the Boolean options can be set to _t_r_u_e by stating the
+              name of the option. For example, _v_e_r_b_o_s_e is equivalent to
+              _{_v_e_r_b_o_s_e_, _t_r_u_e_}.
+
+              Leex will add the extension _._h_r_l to the _I_n_c_l_u_d_e_f_i_l_e name and the
+              extension _._e_r_l to the _S_c_a_n_n_e_r_f_i_l_e name, unless the extension is
+              already there.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrIInnffoo)) -->> CChhaarrss
+
+              Types:
+
+                 Chars = [char() | Chars]
+
+              Returns a string which describes the error _E_r_r_o_r_I_n_f_o returned
+              when there is an error in a regular expression.
+
+GGEENNEERRAATTEEDD SSCCAANNNNEERR EEXXPPOORRTTSS
+       The following functions are exported by the generated scanner.
+
+EEXXPPOORRTTSS
+       ssttrriinngg((SSttrriinngg)) -->> SSttrriinnggRReett
+       ssttrriinngg((SSttrriinngg,, SSttaarrttLLiinnee)) -->> SSttrriinnggRReett
+
+              Types:
+
+                 String = string()
+                 StringRet = {ok,Tokens,EndLine} | ErrorInfo
+                 Tokens = [Token]
+                 EndLine = StartLine = integer()
+
+              Scans _S_t_r_i_n_g and returns all the tokens in it, or an error.
+
+          NNoottee::
+              It is an error if not all of the characters in _S_t_r_i_n_g are
+              consumed.
+
+
+       ttookkeenn((CCoonntt,, CChhaarrss)) -->> {{mmoorree,,CCoonntt11}} || {{ddoonnee,,TTookkeennRReett,,RReessttCChhaarrss}}
+       ttookkeenn((CCoonntt,, CChhaarrss,, SSttaarrttLLiinnee)) -->> {{mmoorree,,CCoonntt11}} ||
+       {{ddoonnee,,TTookkeennRReett,,RReessttCChhaarrss}}
+
+              Types:
+
+                 Cont = [] | Cont1
+                 Cont1 = tuple()
+                 Chars = RestChars = string() | eof
+                 TokenRet = {ok, Token, EndLine} | {eof, EndLine} | ErrorInfo
+                 StartLine = EndLine = integer()
+
+              This is a re-entrant call to try and scan one token from _C_h_a_r_s.
+              If there are enough characters in _C_h_a_r_s to either scan a token
+              or detect an error then this will be returned with _{_d_o_n_e_,_._._._}.
+              Otherwise _{_c_o_n_t_,_C_o_n_t_} will be returned where _C_o_n_t is used in the
+              next call to _t_o_k_e_n_(_) with more characters to try an scan the
+              token. This is continued until a token has been scanned. _C_o_n_t is
+              initially _[_].
+
+              It is not designed to be called directly by an application but
+              used through the i/o system where it can typically be called in
+              an application by:
+
+              io:request(InFile, {get_until,Prompt,Module,token,[Line]})
+                -> TokenRet
+
+       ttookkeennss((CCoonntt,, CChhaarrss)) -->> {{mmoorree,,CCoonntt11}} || {{ddoonnee,,TTookkeennssRReett,,RReessttCChhaarrss}}
+       ttookkeennss((CCoonntt,, CChhaarrss,, SSttaarrttLLiinnee)) -->> {{mmoorree,,CCoonntt11}} ||
+       {{ddoonnee,,TTookkeennssRReett,,RReessttCChhaarrss}}
+
+              Types:
+
+                 Cont = [] | Cont1
+                 Cont1 = tuple()
+                 Chars = RestChars = string() | eof
+                 TokensRet = {ok, Tokens, EndLine} | {eof, EndLine} |
+                 ErrorInfo
+                 Tokens = [Token]
+                 StartLine = EndLine = integer()
+
+              This is a re-entrant call to try and scan tokens from _C_h_a_r_s. If
+              there are enough characters in _C_h_a_r_s to either scan tokens or
+              detect an error then this will be returned with _{_d_o_n_e_,_._._._}.
+              Otherwise _{_c_o_n_t_,_C_o_n_t_} will be returned where _C_o_n_t is used in the
+              next call to _t_o_k_e_n_s_(_) with more characters to try an scan the
+              tokens. This is continued until all tokens have been scanned.
+              _C_o_n_t is initially _[_].
+
+              This functions differs from _t_o_k_e_n in that it will continue to
+              scan tokens upto and including an _{_e_n_d___t_o_k_e_n_,_T_o_k_e_n_} has been
+              scanned (see next section). It will then return all the tokens.
+              This is typically used for scanning grammars like Erlang where
+              there is an explicit end token, _'_._'. If no end token is found
+              then the whole file will be scanned and returned. If an error
+              occurs then all tokens upto and including the next end token
+              will be skipped.
+
+              It is not designed to be called directly by an application but
+              used through the i/o system where it can typically be called in
+              an application by:
+
+              io:request(InFile, {get_until,Prompt,Module,tokens,[Line]})
+                -> TokensRet
+
+IINNPPUUTT FFIILLEE FFOORRMMAATT
+       Erlang style comments starting with a _% are allowed in scanner files. A
+       definition file has the following format:
+
+       <Header>
+
+       Definitions.
+
+       <Macro Definitions>
+
+       Rules.
+
+       <Token Rules>
+
+       Erlang code.
+
+       <Erlang code>
+
+       The "Definitions.", "Rules." and "Erlang code." headings are mandatory
+       and must occur at the beginning of a source line. The <Header>, <Macro
+       Definitions> and <Erlang code> sections may be empty but there must be
+       at least one rule.
+
+       Macro definitions have the following format:
+
+       NAME = VALUE
+
+       and there must be spaces around _=. Macros can be used in the regular
+       expressions of rules by writing _{_N_A_M_E_}.
+
+   NNoottee::
+       When macros are expanded in expressions the macro calls are replaced by
+       the macro value without any form of quoting or enclosing in
+       parentheses.
+
+
+       Rules have the following format:
+
+       <Regexp> : <Erlang code>.
+
+       The <Regexp> must occur at the start of a line and not include any
+       blanks; use _\_t and _\_s to include TAB and SPACE characters in the
+       regular expression. If <Regexp> matches then the corresponding <Erlang
+       code> is evaluated to generate a token. With the Erlang code the
+       following predefined variables are available:
+
+         _T_o_k_e_n_C_h_a_r_s:
+           A list of the characters in the matched token.
+
+         _T_o_k_e_n_L_e_n:
+           The number of characters in the matched token.
+
+         _T_o_k_e_n_L_i_n_e:
+           The line number where the token occurred.
+
+       The code must return:
+
+         _{_t_o_k_e_n_,_T_o_k_e_n_}:
+           Return _T_o_k_e_n to the caller.
+
+         _{_e_n_d___t_o_k_e_n_,_T_o_k_e_n_}:
+           Return _T_o_k_e_n and is last token in a tokens call.
+
+         _s_k_i_p___t_o_k_e_n:
+           Skip this token completely.
+
+         _{_e_r_r_o_r_,_E_r_r_S_t_r_i_n_g_}:
+           An error in the token, _E_r_r_S_t_r_i_n_g is a string describing the error.
+
+       It is also possible to push back characters into the input characters
+       with the following returns:
+
+         * _{_t_o_k_e_n_,_T_o_k_e_n_,_P_u_s_h_B_a_c_k_L_i_s_t_}
+
+         * _{_e_n_d___t_o_k_e_n_,_T_o_k_e_n_,_P_u_s_h_B_a_c_k_L_i_s_t_}
+
+         * _{_s_k_i_p___t_o_k_e_n_,_P_u_s_h_B_a_c_k_L_i_s_t_}
+
+       These have the same meanings as the normal returns but the characters
+       in _P_u_s_h_B_a_c_k_L_i_s_t will be prepended to the input characters and scanned
+       for the next token. Note that pushing back a newline will mean the line
+       numbering will no longer be correct.
+
+   NNoottee::
+       Pushing back characters gives you unexpected possibilities to cause the
+       scanner to loop!
+
+
+       The following example would match a simple Erlang integer or float and
+       return a token which could be sent to the Erlang parser:
+
+       D = [0-9]
+
+       {D}+ :
+         {token,{integer,TokenLine,list_to_integer(TokenChars)}}.
+
+       {D}+\.{D}+((E|e)(\+|\-)?{D}+)? :
+         {token,{float,TokenLine,list_to_float(TokenChars)}}.
+
+       The Erlang code in the "Erlang code." section is written into the
+       output file directly after the module declaration and predefined
+       exports declaration so it is possible to add extra exports, define
+       imports and other attributes which are then visible in the whole file.
+
+RREEGGUULLAARR EEXXPPRREESSSSIIOONNSS
+       The regular expressions allowed here is a subset of the set found in
+       _e_g_r_e_p and in the AWK programming language, as defined in the book, The
+       AWK Programming Language, by A. V. Aho, B. W. Kernighan, P. J.
+       Weinberger. They are composed of the following characters:
+
+         _c:
+           Matches the non-metacharacter c.
+
+         _\_c:
+           Matches the escape sequence or literal character c.
+
+         _.:
+           Matches any character.
+
+         _^:
+           Matches the beginning of a string.
+
+         _$:
+           Matches the end of a string.
+
+         _[_a_b_c_._._._]:
+           Character class, which matches any of the characters _a_b_c_._._..
+           Character ranges are specified by a pair of characters separated by
+           a _-.
+
+         _[_^_a_b_c_._._._]:
+           Negated character class, which matches any character except _a_b_c_._._..
+
+         _r_1 _| _r_2:
+           Alternation. It matches either _r_1 or _r_2.
+
+         _r_1_r_2:
+           Concatenation. It matches _r_1 and then _r_2.
+
+         _r_+:
+           Matches one or more _r_s.
+
+         _r_*:
+           Matches zero or more _r_s.
+
+         _r_?:
+           Matches zero or one _r_s.
+
+         _(_r_):
+           Grouping. It matches _r.
+
+       The escape sequences allowed are the same as for Erlang strings:
+
+         _\_b:
+           Backspace.
+
+         _\_f:
+           Form feed.
+
+         _\_n:
+           Newline (line feed).
+
+         _\_r:
+           Carriage return.
+
+         _\_t:
+           Tab.
+
+         _\_e:
+           Escape.
+
+         _\_v:
+           Vertical tab.
+
+         _\_s:
+           Space.
+
+         _\_d:
+           Delete.
+
+         _\_d_d_d:
+           The octal value _d_d_d.
+
+         _\_x_h_h:
+           The hexadecimal value _h_h.
+
+         _\_x_{_h_._._._}:
+           The hexadecimal value _h_._._..
+
+         _\_c:
+           Any other character literally, for example _\_\ for backslash, _\_" for
+           _".
+
+       The following examples define Erlang data types:
+
+       Atoms [a-z][0-9a-zA-Z_]*
+
+       Variables [A-Z_][0-9a-zA-Z_]*
+
+       Floats (\+|-)?[0-9]+\.[0-9]+((E|e)(\+|-)?[0-9]+)?
+
+   NNoottee::
+       Anchoring a regular expression with _^ and _$ is not implemented in the
+       current version of Leex and just generates a parse error.
+
+
+
+Ericsson AB                    parsetools 2.0.7                        leex(3)

@@ -1,0 +1,343 @@
+filename(3)                Erlang Module Definition                filename(3)
+
+
+
+NNAAMMEE
+       filename - Filename Manipulation Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _f_i_l_e_n_a_m_e provides a number of useful functions for analyzing
+       and manipulating file names. These functions are designed so that the
+       Erlang code can work on many different platforms with different formats
+       for file names. With file name is meant all strings that can be used to
+       denote a file. They can be short relative names like _f_o_o_._e_r_l, very long
+       absolute name which include a drive designator and directory names like
+       _D_:_\_u_s_r_/_l_o_c_a_l_\_b_i_n_\_e_r_l_/_l_i_b_\_t_o_o_l_s_\_f_o_o_._e_r_l, or any variations in between.
+
+       In Windows, all functions return file names with forward slashes only,
+       even if the arguments contain back slashes. Use _j_o_i_n_/_1 to normalize a
+       file name by removing redundant directory separators.
+
+       The module supports raw file names in the way that if a binary is
+       present, or the file name cannot be interpreted according to the return
+       value of ffiillee::nnaattiivvee__nnaammee__eennccooddiinngg//00, a raw file name will also be
+       returned. For example filename:join/1 provided with a path component
+       being a binary (and also not being possible to interpret under the
+       current native file name encoding) will result in a raw file name being
+       returned (the join operation will have been performed of course). For
+       more information about raw file names, see the ffiillee module.
+
+EEXXPPOORRTTSS
+       aabbssnnaammee((FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+
+              Converts a relative _F_i_l_e_n_a_m_e and returns an absolute name. No
+              attempt is made to create the shortest absolute name, because
+              this can give incorrect results on file systems which allow
+              links.
+
+              Unix examples:
+
+              1> pwd().
+              "/usr/local"
+              2> filename:absname("foo").
+              "/usr/local/foo"
+              3> filename:absname("../x").
+              "/usr/local/../x"
+              4> filename:absname("/").
+              "/"
+
+              Windows examples:
+
+              1> pwd().
+              "D:/usr/local"
+              2> filename:absname("foo").
+              "D:/usr/local/foo"
+              3> filename:absname("../x").
+              "D:/usr/local/../x"
+              4> filename:absname("/").
+              "D:/"
+
+       aabbssnnaammee((FFiilleennaammee,, DDiirr)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Dir = ffiillee::ffiilleennaammee(())
+
+              This function works like _a_b_s_n_a_m_e_/_1, except that the directory to
+              which the file name should be made relative is given explicitly
+              in the _D_i_r argument.
+
+       aabbssnnaammee__jjooiinn((DDiirr,, FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Dir = ffiillee::ffiilleennaammee(())
+                 Filename = ffiillee::nnaammee(())
+
+              Joins an absolute directory with a relative filename. Similar to
+              _j_o_i_n_/_2, but on platforms with tight restrictions on raw filename
+              length and no support for symbolic links (read: VxWorks),
+              leading parent directory components in _F_i_l_e_n_a_m_e are matched
+              against trailing directory components in _D_i_r so they can be
+              removed from the result - minimizing its length.
+
+       bbaasseennaammee((FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+
+              Returns the last component of _F_i_l_e_n_a_m_e, or _F_i_l_e_n_a_m_e itself if it
+              does not contain any directory separators.
+
+              5> filename:basename("foo").
+              "foo"
+              6> filename:basename("/usr/foo").
+              "foo"
+              7> filename:basename("/").
+              []
+
+       bbaasseennaammee((FFiilleennaammee,, EExxtt)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = Ext = ffiillee::nnaammee(())
+
+              Returns the last component of _F_i_l_e_n_a_m_e with the extension _E_x_t
+              stripped. This function should be used to remove a specific
+              extension which might, or might not, be there. Use
+              _r_o_o_t_n_a_m_e_(_b_a_s_e_n_a_m_e_(_F_i_l_e_n_a_m_e_)_) to remove an extension that exists,
+              but you are not sure which one it is.
+
+              8> filename:basename("~/src/kalle.erl", ".erl").
+              "kalle"
+              9> filename:basename("~/src/kalle.beam", ".erl").
+              "kalle.beam"
+              10> filename:basename("~/src/kalle.old.erl", ".erl").
+              "kalle.old"
+              11> filename:rootname(filename:basename("~/src/kalle.erl")).
+              "kalle"
+              12> filename:rootname(filename:basename("~/src/kalle.beam")).
+              "kalle"
+
+       ddiirrnnaammee((FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+
+              Returns the directory part of _F_i_l_e_n_a_m_e.
+
+              13> filename:dirname("/usr/src/kalle.erl").
+              "/usr/src"
+              14> filename:dirname("kalle.erl").
+              "."
+
+              5> filename:dirname("\\usr\\src/kalle.erl"). % Windows
+              "/usr/src"
+
+       eexxtteennssiioonn((FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+
+              Returns the file extension of _F_i_l_e_n_a_m_e, including the period.
+              Returns an empty string if there is no extension.
+
+              15> filename:extension("foo.erl").
+              ".erl"
+              16> filename:extension("beam.src/kalle").
+              []
+
+       ffllaatttteenn((FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+
+              Converts a possibly deep list filename consisting of characters
+              and atoms into the corresponding flat string filename.
+
+       jjooiinn((CCoommppoonneennttss)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Components = [ffiillee::ffiilleennaammee(())]
+
+              Joins a list of file name _C_o_m_p_o_n_e_n_t_s with directory separators.
+              If one of the elements of _C_o_m_p_o_n_e_n_t_s includes an absolute path,
+              for example _"_/_x_x_x_", the preceding elements, if any, are removed
+              from the result.
+
+              The result is "normalized":
+
+                * Redundant directory separators are removed.
+
+                * In Windows, all directory separators are forward slashes and
+                  the drive letter is in lower case.
+
+              17> filename:join(["/usr", "local", "bin"]).
+              "/usr/local/bin"
+              18> filename:join(["a/b///c/"]).
+              "a/b/c"
+
+              6> filename:join(["B:a\\b///c/"]). % Windows
+              "b:a/b/c"
+
+       jjooiinn((NNaammee11,, NNaammee22)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Name1 = Name2 = ffiillee::ffiilleennaammee(())
+
+              Joins two file name components with directory separators.
+              Equivalent to _j_o_i_n_(_[_N_a_m_e_1_, _N_a_m_e_2_]_).
+
+       nnaattiivveennaammee((PPaatthh)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Path = ffiillee::ffiilleennaammee(())
+
+              Converts _P_a_t_h to a form accepted by the command shell and native
+              applications on the current platform. On Windows, forward
+              slashes is converted to backward slashes. On all platforms, the
+              name is normalized as done by _j_o_i_n_/_1.
+
+              19> filename:nativename("/usr/local/bin/"). % Unix
+              "/usr/local/bin"
+
+              7> filename:nativename("/usr/local/bin/"). % Windows
+              "\\usr\\local\\bin"
+
+       ppaatthhttyyppee((PPaatthh)) -->> aabbssoolluuttee || rreellaattiivvee || vvoolluummeerreellaattiivvee
+
+              Types:
+
+                 Path = ffiillee::nnaammee(())
+
+              Returns the type of path, one of _a_b_s_o_l_u_t_e, _r_e_l_a_t_i_v_e, or
+              _v_o_l_u_m_e_r_e_l_a_t_i_v_e.
+
+                _a_b_s_o_l_u_t_e:
+                  The path name refers to a specific file on a specific
+                  volume.
+
+                  Unix example: _/_u_s_r_/_l_o_c_a_l_/_b_i_n
+
+                  Windows example: _D_:_/_u_s_r_/_l_o_c_a_l_/_b_i_n
+
+                _r_e_l_a_t_i_v_e:
+                  The path name is relative to the current working directory
+                  on the current volume.
+
+                  Example: _f_o_o_/_b_a_r_, _._._/_s_r_c
+
+                _v_o_l_u_m_e_r_e_l_a_t_i_v_e:
+                  The path name is relative to the current working directory
+                  on a specified volume, or it is a specific file on the
+                  current working volume.
+
+                  Windows example: _D_:_b_a_r_._e_r_l_, _/_b_a_r_/_f_o_o_._e_r_l
+
+       rroooottnnaammee((FFiilleennaammee)) -->> ffiillee::ffiilleennaammee(())
+
+       rroooottnnaammee((FFiilleennaammee,, EExxtt)) -->> ffiillee::ffiilleennaammee(())
+
+              Types:
+
+                 Filename = Ext = ffiillee::nnaammee(())
+
+              Remove a filename extension. _r_o_o_t_n_a_m_e_/_2 works as _r_o_o_t_n_a_m_e_/_1,
+              except that the extension is removed only if it is _E_x_t.
+
+              20> filename:rootname("/beam.src/kalle").
+              /beam.src/kalle"
+              21> filename:rootname("/beam.src/foo.erl").
+              "/beam.src/foo"
+              22> filename:rootname("/beam.src/foo.erl", ".erl").
+              "/beam.src/foo"
+              23> filename:rootname("/beam.src/foo.beam", ".erl").
+              "/beam.src/foo.beam"
+
+       sspplliitt((FFiilleennaammee)) -->> CCoommppoonneennttss
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Components = [ffiillee::ffiilleennaammee(())]
+
+              Returns a list whose elements are the path components of
+              _F_i_l_e_n_a_m_e.
+
+              24> filename:split("/usr/local/bin").
+              ["/","usr","local","bin"]
+              25> filename:split("foo/bar").
+              ["foo","bar"]
+              26> filename:split("a:\\msdev\\include").
+              ["a:/","msdev","include"]
+
+       ffiinndd__ssrrcc((BBeeaamm)) -->>
+                   {{SSoouurrcceeFFiillee,, OOppttiioonnss}} || {{eerrrroorr,, {{EErrrroorrRReeaassoonn,, MMoodduullee}}}}
+
+       ffiinndd__ssrrcc((BBeeaamm,, RRuulleess)) -->>
+                   {{SSoouurrcceeFFiillee,, OOppttiioonnss}} || {{eerrrroorr,, {{EErrrroorrRReeaassoonn,, MMoodduullee}}}}
+
+              Types:
+
+                 Beam = Module | Filename
+                 Filename = atom() | string()
+                 Rules = [{BinSuffix :: string(), SourceSuffix :: string()}]
+                 Module = module()
+                 SourceFile = string()
+                 Options = [Option]
+                 Option = {i, Path :: string()}
+                        | {outdir, Path :: string()}
+                        | {d, atom()}
+                 ErrorReason = non_existing | preloaded | interpreted
+
+              Finds the source filename and compiler options for a module. The
+              result can be fed to _c_o_m_p_i_l_e_:_f_i_l_e_/_2 in order to compile the file
+              again.
+
+          WWaarrnniinngg::
+              We don't recommend using this function. If possible, use
+              bbeeaamm__lliibb((33)) to extract the abstract code format from the BEAM
+              file and compile that instead.
+
+
+              The _B_e_a_m argument, which can be a string or an atom, specifies
+              either the module name or the path to the source code, with or
+              without the _"_._e_r_l_" extension. In either case, the module must be
+              known by the code server, i.e. _c_o_d_e_:_w_h_i_c_h_(_M_o_d_u_l_e_) must succeed.
+
+              _R_u_l_e_s describes how the source directory can be found, when the
+              object code directory is known. It is a list of tuples
+              _{_B_i_n_S_u_f_f_i_x_, _S_o_u_r_c_e_S_u_f_f_i_x_} and is interpreted as follows: If the
+              end of the directory name where the object is located matches
+              _B_i_n_S_u_f_f_i_x, then the source code directory has the same name, but
+              with _B_i_n_S_u_f_f_i_x replaced by _S_o_u_r_c_e_S_u_f_f_i_x. _R_u_l_e_s defaults to:
+
+              [{"", ""}, {"ebin", "src"}, {"ebin", "esrc"}]
+
+              If the source file is found in the resulting directory, then the
+              function returns that location together with _O_p_t_i_o_n_s. Otherwise,
+              the next rule is tried, and so on.
+
+              The function returns _{_S_o_u_r_c_e_F_i_l_e_, _O_p_t_i_o_n_s_} if it succeeds.
+              _S_o_u_r_c_e_F_i_l_e is the absolute path to the source file without the
+              _"_._e_r_l_" extension. _O_p_t_i_o_n_s include the options which are
+              necessary to recompile the file with _c_o_m_p_i_l_e_:_f_i_l_e_/_2, but
+              excludes options such as _r_e_p_o_r_t or _v_e_r_b_o_s_e which do not change
+              the way code is generated. The paths in the _{_o_u_t_d_i_r_, _P_a_t_h_} and
+              _{_i_, _P_a_t_h_} options are guaranteed to be absolute.
+
+
+
+Ericsson AB                      stdlib 1.18.2                     filename(3)

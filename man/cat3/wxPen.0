@@ -1,0 +1,154 @@
+wxPen(3)                   Erlang Module Definition                   wxPen(3)
+
+
+
+NNAAMMEE
+       wxPen - See external documentation: wxPen.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPen.
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_e_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxPPeenn(())
+
+              See external documentation.
+
+       nneeww((CCoolloouurr)) -->> wwxxPPeenn(())
+
+              Types:
+
+                 Colour = wx_colour() (see module wx)
+
+              Equivalent to nneeww((CCoolloouurr,, [[]])).
+
+       nneeww((CCoolloouurr,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxPPeenn(())
+
+              Types:
+
+                 Colour = wx_colour() (see module wx)
+                 Option = {width, integer()} | {style, integer()}
+
+              See external documentation.
+
+       ggeettCCaapp((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPen()
+
+              See external documentation.
+
+       ggeettCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxPen()
+
+              See external documentation.
+
+       ggeettJJooiinn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPen()
+
+              See external documentation.
+
+       ggeettSSttyyllee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPen()
+
+              See external documentation.
+
+       ggeettWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPen()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPen()
+
+              See external documentation.
+
+       sseettCCaapp((TThhiiss,, CCaappSSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxPen()
+                 CapStyle = integer()
+
+              See external documentation.
+
+       sseettCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxPen()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCoolloouurr((TThhiiss,, RReedd,, GGrreeeenn,, BBlluuee)) -->> ookk
+
+              Types:
+
+                 This = wxPen()
+                 Red = integer()
+                 Green = integer()
+                 Blue = integer()
+
+              See external documentation.
+
+       sseettJJooiinn((TThhiiss,, JJooiinnSSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxPen()
+                 JoinStyle = integer()
+
+              See external documentation.
+
+       sseettSSttyyllee((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxPen()
+                 Style = integer()
+
+              See external documentation.
+
+       sseettWWiiddtthh((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxPen()
+                 Width = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPeenn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                          wxPen(3)

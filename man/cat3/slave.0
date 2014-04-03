@@ -1,0 +1,179 @@
+slave(3)                   Erlang Module Definition                   slave(3)
+
+
+
+NNAAMMEE
+       slave - Functions to Starting and Controlling Slave Nodes
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides functions for starting Erlang slave nodes. All
+       slave nodes which are started by a master will terminate automatically
+       when the master terminates. All TTY output produced at the slave will
+       be sent back to the master node. File I/O is done via the master.
+
+       Slave nodes on other hosts than the current one are started with the
+       program _r_s_h. The user must be allowed to _r_s_h to the remote hosts
+       without being prompted for a password. This can be arranged in a number
+       of ways (refer to the _r_s_h documentation for details). A slave node
+       started on the same host as the master inherits certain environment
+       values from the master, such as the current directory and the
+       environment variables. For what can be assumed about the environment
+       when a slave is started on another host, read the documentation for the
+       _r_s_h program.
+
+       An alternative to the _r_s_h program can be specified on the command line
+       to _e_r_l as follows: _-_r_s_h _P_r_o_g_r_a_m.
+
+       The slave node should use the same file system at the master. At least,
+       Erlang/OTP should be installed in the same place on both computers and
+       the same version of Erlang should be used.
+
+       Currently, a node running on Windows NT can only start slave nodes on
+       the host on which it is running.
+
+       The master node must be alive.
+
+EEXXPPOORRTTSS
+       ssttaarrtt((HHoosstt)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ssttaarrtt((HHoosstt,, NNaammee)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ssttaarrtt((HHoosstt,, NNaammee,, AArrggss)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Host = Name = atom()
+                 Args = string()
+                 Node = node()
+                 Reason = timeout | no_rsh | {already_running, Node}
+
+              Starts a slave node on the host _H_o_s_t. Host names need not
+              necessarily be specified as fully qualified names; short names
+              can also be used. This is the same condition that applies to
+              names of distributed Erlang nodes.
+
+              The name of the started node will be _N_a_m_e_@_H_o_s_t. If no name is
+              provided, the name will be the same as the node which executes
+              the call (with the exception of the host name part of the node
+              name).
+
+              The slave node resets its _u_s_e_r process so that all terminal I/O
+              which is produced at the slave is automatically relayed to the
+              master. Also, the file process will be relayed to the master.
+
+              The _A_r_g_s argument is used to set _e_r_l command line arguments. If
+              provided, it is passed to the new node and can be used for a
+              variety of purposes. See eerrll((11))
+
+              As an example, suppose that we want to start a slave node at
+              host _H with the node name _N_a_m_e_@_H, and we also want the slave
+              node to have the following properties:
+
+                * directory _D_i_r should be added to the code path;
+
+                * the Mnesia directory should be set to _M;
+
+                * the unix _D_I_S_P_L_A_Y environment variable should be set to the
+                  display of the master node.
+
+              The following code is executed to achieve this:
+
+              E = " -env DISPLAY " ++ net_adm:localhost() ++ ":0 ",
+              Arg = "-mnesia_dir " ++ M ++ " -pa " ++ Dir ++ E,
+              slave:start(H, Name, Arg).
+
+              If successful, the function returns _{_o_k_, _N_o_d_e_}, where _N_o_d_e is
+              the name of the new node. Otherwise it returns _{_e_r_r_o_r_, _R_e_a_s_o_n_},
+              where _R_e_a_s_o_n can be one of:
+
+                _t_i_m_e_o_u_t:
+                  The master node failed to get in contact with the slave
+                  node. This can happen in a number of circumstances:
+
+                  * Erlang/OTP is not installed on the remote host
+
+                  * the file system on the other host has a different
+                    structure to the the master
+
+                  * the Erlang nodes have different cookies.
+
+                _n_o___r_s_h:
+                  There is no _r_s_h program on the computer.
+
+                _{_a_l_r_e_a_d_y___r_u_n_n_i_n_g_, _N_o_d_e_}:
+                  A node with the name _N_a_m_e_@_H_o_s_t already exists.
+
+       ssttaarrtt__lliinnkk((HHoosstt)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ssttaarrtt__lliinnkk((HHoosstt,, NNaammee)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ssttaarrtt__lliinnkk((HHoosstt,, NNaammee,, AArrggss)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Host = Name = atom()
+                 Args = string()
+                 Node = node()
+                 Reason = timeout | no_rsh | {already_running, Node}
+
+              Starts a slave node in the same way as _s_t_a_r_t_/_1_,_2_,_3, except that
+              the slave node is linked to the currently executing process. If
+              that process terminates, the slave node also terminates.
+
+              See _s_t_a_r_t_/_1_,_2_,_3 for a description of arguments and return
+              values.
+
+       ssttoopp((NNooddee)) -->> ookk
+
+              Types:
+
+                 Node = node()
+
+              Stops (kills) a node.
+
+       ppsseeuuddoo(([[MMaasstteerr || SSeerrvveerrLLiisstt]])) -->> ookk
+
+              Types:
+
+                 Master = node()
+                 ServerList = [atom()]
+
+              Calls _p_s_e_u_d_o_(_M_a_s_t_e_r_, _S_e_r_v_e_r_L_i_s_t_). If we want to start a node
+              from the command line and set up a number of pseudo servers, an
+              Erlang runtime system can be started as follows:
+
+              % erl -name abc -s slave pseudo klacke@super x --
+
+       ppsseeuuddoo((MMaasstteerr,, SSeerrvveerrLLiisstt)) -->> ookk
+
+              Types:
+
+                 Master = node()
+                 ServerList = [atom()]
+
+              Starts a number of pseudo servers. A pseudo server is a server
+              with a registered name which does absolutely nothing but pass on
+              all message to the real server which executes at a master node.
+              A pseudo server is an intermediary which only has the same
+              registered name as the real server.
+
+              For example, if we have started a slave node _N and want to
+              execute _p_x_w graphics code on this node, we can start the server
+              _p_x_w___s_e_r_v_e_r as a pseudo server at the slave node. The following
+              code illustrates:
+
+              rpc:call(N, slave, pseudo, [node(), [pxw_server]]).
+
+       rreellaayy((PPiidd)) -->> nnoo__rreettuurrnn(())
+
+              Types:
+
+                 Pid = pid()
+
+              Runs a pseudo server. This function never returns any value and
+              the process which executes the function will receive messages.
+              All messages received will simply be passed on to _P_i_d.
+
+
+
+Ericsson AB                      stdlib 1.18.2                        slave(3)

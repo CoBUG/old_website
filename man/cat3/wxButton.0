@@ -1,0 +1,105 @@
+wxButton(3)                Erlang Module Definition                wxButton(3)
+
+
+
+NNAAMMEE
+       wxButton - See external documentation: wxButton.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxButton.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_B_u_t_t_o_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxBBuuttttoonn(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxBBuuttttoonn(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBuuttttoonn(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {label, chardata() (see module unicode)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxButton()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxButton()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {label, chardata() (see module unicode)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ggeettDDeeffaauullttSSiizzee(()) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              See external documentation.
+
+       sseettDDeeffaauulltt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxButton()
+
+              See external documentation.
+
+       sseettLLaabbeell((TThhiiss,, LLaabbeell)) -->> ookk
+
+              Types:
+
+                 This = wxButton()
+                 Label = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxBBuuttttoonn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                       wxButton(3)

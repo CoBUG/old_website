@@ -1,0 +1,191 @@
+erl_prim_loader(3)         Erlang Module Definition         erl_prim_loader(3)
+
+
+
+NNAAMMEE
+       erl_prim_loader - Low Level Erlang Loader
+
+DDEESSCCRRIIPPTTIIOONN
+       _e_r_l___p_r_i_m___l_o_a_d_e_r is used to load all Erlang modules into the system. The
+       start script is also fetched with this low level loader.
+
+       _e_r_l___p_r_i_m___l_o_a_d_e_r knows about the environment and how to fetch modules.
+       The loader could, for example, fetch files using the file system (with
+       absolute file names as input), or a database (where the binary format
+       of a module is stored).
+
+       The _-_l_o_a_d_e_r _L_o_a_d_e_r command line flag can be used to choose the method
+       used by the _e_r_l___p_r_i_m___l_o_a_d_e_r. Two _L_o_a_d_e_r methods are supported by the
+       Erlang runtime system: _e_f_i_l_e and _i_n_e_t. If another loader is required,
+       then it has to be implemented by the user. The _L_o_a_d_e_r provided by the
+       user must fulfill the protocol defined below, and it is started with
+       the _e_r_l___p_r_i_m___l_o_a_d_e_r by evaluating _o_p_e_n___p_o_r_t_(_{_s_p_a_w_n_,_L_o_a_d_e_r_}_,_[_b_i_n_a_r_y_]_).
+
+   WWaarrnniinngg::
+       The support for loading of code from archive files is experimental. The
+       sole purpose of releasing it before it is ready is to obtain early
+       feedback. The file format, semantics, interfaces etc. may be changed in
+       a future release. The functions _l_i_s_t___d_i_r_/_1 and _r_e_a_d___f_i_l_e___i_n_f_o_/_1 as well
+       as the flag _-_l_o_a_d_e_r___d_e_b_u_g are also experimental
+
+
+DDAATTAA TTYYPPEESS
+       hhoosstt(()) = atom()
+
+EEXXPPOORRTTSS
+       ssttaarrtt((IIdd,, LLooaaddeerr,, HHoossttss)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Id = term()
+                 Loader = atom() | string()
+                 Hosts = Host | [Host]
+                 Host = hhoosstt(())
+                 Pid = pid()
+                 What = term()
+
+              Starts the Erlang low level loader. This function is called by
+              the _i_n_i_t process (and module). The _i_n_i_t process reads the
+              command line flags _-_i_d _I_d, _-_l_o_a_d_e_r _L_o_a_d_e_r, and _-_h_o_s_t_s _H_o_s_t_s.
+              These are the arguments supplied to the _s_t_a_r_t_/_3 function.
+
+              If _-_l_o_a_d_e_r is not given, the default loader is _e_f_i_l_e which tells
+              the system to read from the file system.
+
+              If _-_l_o_a_d_e_r is _i_n_e_t, the _-_i_d _I_d, _-_h_o_s_t_s _H_o_s_t_s, and _-_s_e_t_c_o_o_k_i_e
+              _C_o_o_k_i_e flags must also be supplied. _H_o_s_t_s identifies hosts which
+              this node can contact in order to load modules. One Erlang
+              runtime system with a _e_r_l___b_o_o_t___s_e_r_v_e_r process must be started on
+              each of hosts given in _H_o_s_t_s in order to answer the requests.
+              See eerrll__bboooott__sseerrvveerr((33)).
+
+              If _-_l_o_a_d_e_r is something else, the given port program is started.
+              The port program is supposed to follow the protocol specified
+              below.
+
+       ggeett__ffiillee((FFiilleennaammee)) -->> {{ookk,, BBiinn,, FFuullllNNaammee}} || eerrrroorr
+
+              Types:
+
+                 Filename = atom() | string()
+                 Bin = binary()
+                 FullName = string()
+
+              This function fetches a file using the low level loader.
+              _F_i_l_e_n_a_m_e is either an absolute file name or just the name of the
+              file, for example _"_l_i_s_t_s_._b_e_a_m_". If an internal path is set to
+              the loader, this path is used to find the file. If a user
+              supplied loader is used, the path can be stripped off if it is
+              obsolete, and the loader does not use a path. _F_u_l_l_N_a_m_e is the
+              complete name of the fetched file. _B_i_n is the contents of the
+              file as a binary.
+
+              The _F_i_l_e_n_a_m_e can also be a file in an archive. For example
+              _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_._e_z_/_m_n_e_s_i_a_-_4_._4_._7_/_e_b_i_n_/_m_n_e_s_i_a_._b_e_a_m. See
+              ccooddee((33)) about archive files.
+
+       ggeett__ppaatthh(()) -->> {{ookk,, PPaatthh}}
+
+              Types:
+
+                 Path = [Dir :: string()]
+
+              This function gets the path set in the loader. The path is set
+              by the _i_n_i_t process according to information found in the start
+              script.
+
+       lliisstt__ddiirr((DDiirr)) -->> {{ookk,, FFiilleennaammeess}} || eerrrroorr
+
+              Types:
+
+                 Dir = string()
+                 Filenames = [Filename :: string()]
+
+              Lists all the files in a directory. Returns _{_o_k_, _F_i_l_e_n_a_m_e_s_} if
+              successful. Otherwise, it returns _e_r_r_o_r. _F_i_l_e_n_a_m_e_s is a list of
+              the names of all the files in the directory. The names are not
+              sorted.
+
+              The _D_i_r can also be a directory in an archive. For example
+              _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_._e_z_/_m_n_e_s_i_a_-_4_._4_._7_/_e_b_i_n. See ccooddee((33))
+              about archive files.
+
+       rreeaadd__ffiillee__iinnffoo((FFiilleennaammee)) -->> {{ookk,, FFiilleeIInnffoo}} || eerrrroorr
+
+              Types:
+
+                 Filename = string()
+                 FileInfo = ffiillee::ffiillee__iinnffoo(())
+
+              Retrieves information about a file. Returns _{_o_k_, _F_i_l_e_I_n_f_o_} if
+              successful, otherwise _e_r_r_o_r. _F_i_l_e_I_n_f_o is a record _f_i_l_e___i_n_f_o,
+              defined in the Kernel include file _f_i_l_e_._h_r_l. Include the
+              following directive in the module from which the function is
+              called:
+
+              -include_lib("kernel/include/file.hrl").
+
+              See ffiillee((33)) for more info about the record _f_i_l_e___i_n_f_o.
+
+              The _F_i_l_e_n_a_m_e can also be a file in an archive. For example
+              _$_O_T_P_R_O_O_T_/_l_i_b_/_m_n_e_s_i_a_-_4_._4_._7_._e_z_/_m_n_e_s_i_a_-_4_._4_._7_/_e_b_i_n_/_m_n_e_s_i_a. See
+              ccooddee((33)) about archive files.
+
+       sseett__ppaatthh((PPaatthh)) -->> ookk
+
+              Types:
+
+                 Path = [Dir :: string()]
+
+              This function sets the path of the loader if _i_n_i_t interprets a
+              _p_a_t_h command in the start script.
+
+PPRROOTTOOCCOOLL
+       The following protocol must be followed if a user provided loader port
+       program is used. The _L_o_a_d_e_r port program is started with the command
+       _o_p_e_n___p_o_r_t_(_{_s_p_a_w_n_,_L_o_a_d_e_r_}_,_[_b_i_n_a_r_y_]_). The protocol is as follows:
+
+       Function          Send               Receive
+       -------------------------------------------------------------
+       get_file          [102 | FileName]   [121 | BinaryFile] (on success)
+                                            [122]              (failure)
+
+       stop              eof                terminate
+
+CCOOMMMMAANNDD LLIINNEE FFLLAAGGSS
+       The _e_r_l___p_r_i_m___l_o_a_d_e_r module interprets the following command line flags:
+
+         _-_l_o_a_d_e_r _L_o_a_d_e_r:
+           Specifies the name of the loader used by _e_r_l___p_r_i_m___l_o_a_d_e_r. _L_o_a_d_e_r
+           can be _e_f_i_l_e (use the local file system), or _i_n_e_t (load using the
+           _b_o_o_t___s_e_r_v_e_r on another Erlang node). If _L_o_a_d_e_r is user defined, the
+           defined _L_o_a_d_e_r port program is started.
+
+           If the _-_l_o_a_d_e_r flag is omitted, it defaults to _e_f_i_l_e.
+
+         _-_l_o_a_d_e_r___d_e_b_u_g:
+           Makes the _e_f_i_l_e loader write some debug information, such as the
+           reason for failures, while it handles files.
+
+         _-_h_o_s_t_s _H_o_s_t_s:
+           Specifies which other Erlang nodes the _i_n_e_t loader can use. This
+           flag is mandatory if the _-_l_o_a_d_e_r _i_n_e_t flag is present. On each
+           host, there must be on Erlang node with the _e_r_l___b_o_o_t___s_e_r_v_e_r which
+           handles the load requests. _H_o_s_t_s is a list of IP addresses
+           (hostnames are not acceptable).
+
+         _-_i_d _I_d:
+           Specifies the identity of the Erlang runtime system. If the system
+           runs as a distributed node, _I_d must be identical to the name
+           supplied with the _-_s_n_a_m_e or _-_n_a_m_e distribution flags.
+
+         _-_s_e_t_c_o_o_k_i_e _C_o_o_k_i_e:
+           Specifies the cookie of the Erlang runtime system. This flag is
+           mandatory if the _-_l_o_a_d_e_r _i_n_e_t flag is present.
+
+SSEEEE AALLSSOO
+       iinniitt((33)), eerrll__bboooott__sseerrvveerr((33))
+
+
+
+Ericsson AB                       erts 5.9.2                erl_prim_loader(3)

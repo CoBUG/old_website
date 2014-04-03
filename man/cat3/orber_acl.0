@@ -1,0 +1,71 @@
+orber_acl(3)               Erlang Module Definition               orber_acl(3)
+
+
+
+NNAAMMEE
+       orber_acl - Orber ACL operations
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions intended for analyzing Access Control
+       List (ACL) filters. The filters uses a extended format of Classless
+       Inter Domain Routing (CIDR). For example, _"_1_2_3_._1_2_3_._1_2_3_._1_0_" limits the
+       connection to that particular host, while _"_1_2_3_._1_2_3_._1_2_3_._1_0_/_1_7_" allows
+       connections to or from any host equal to the 17 most significant bits.
+       Orber also allow the user to specify a certain port or port range, for
+       example, _"_1_2_3_._1_2_3_._1_2_3_._1_0_/_1_7_#_4_0_0_1_" and _"_1_2_3_._1_2_3_._1_2_3_._1_0_/_1_7_#_4_0_0_1_/_5_0_0_1_"
+       respectively. IPv4 or none compressed IPv6 strings are accepted.
+
+EEXXPPOORRTTSS
+       mmaattcchh((IIPP,, DDiirreeccttiioonn)) -->> bboooolleeaann(())
+       mmaattcchh((IIPP,, DDiirreeccttiioonn,, GGeettIInnffoo)) -->> RReeppllyy
+
+              Types:
+
+                 IP = tuple() | [integer()]
+                 Direction = tcp_in | ssl_in | tcp_out | ssl_out
+                 GetInfo = boolean()
+                 Reply = boolean() | {boolean(), [Interface], PortInfo}
+                 Interface = string()
+                 PortInfo = integer() | {integer(), integer()}
+
+              If _G_e_t_I_n_f_o is not supplied or set to false, this operation
+              returns a boolean which tells if the IPv4 or IPv6 address would
+              pass the ACL filter, defined by the _i_i_o_p___a_c_l configuration
+              parameter, or not. When _G_e_t_I_n_f_o is set to true, a tuple which,
+              besides the boolean that tells if access was granted, also
+              include the defined interfaces and port(s). This operation
+              requires that Orber is running and can be used on a live node to
+              determine if Orber has been properly configured.
+
+       vveerriiffyy((IIPP,, FFiilltteerr,, FFaammiillyy)) -->> RReeppllyy
+
+              Types:
+
+                 IP = string()
+                 Filter = string()
+                 Family = inet | inet6
+                 Reply = true | {false, From, To} | {error, string()}
+                 From = string()
+                 To = string()
+
+              This operation returns true if the IPv4 or IPv6 address would
+              pass the supplied ACL. If that is not the case, a tuple
+              containing the accepted range is returned. This operation should
+              only be used for test purposes.
+
+       rraannggee((FFiilltteerr,, FFaammiillyy)) -->> RReeppllyy
+
+              Types:
+
+                 Filter = string()
+                 Family = inet | inet6
+                 Reply = {ok, From, To} | {error, string()}
+                 From = string()
+                 To = string()
+
+              Returns the range of accepted IP addresses based on the supplied
+              filter. This operation should only be used for test purposes.
+
+
+
+Ericsson AB                      orber 3.6.24                     orber_acl(3)

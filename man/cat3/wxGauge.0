@@ -1,0 +1,170 @@
+wxGauge(3)                 Erlang Module Definition                 wxGauge(3)
+
+
+
+NNAAMMEE
+       wxGauge - See external documentation: wxGauge.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGauge.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_a_u_g_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxGGaauuggee(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, RRaannggee)) -->> wwxxGGaauuggee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Range = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, RRaannggee,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, RRaannggee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGaauuggee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Range = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, RRaannggee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGauge()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Range = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, RRaannggee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, RRaannggee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGauge()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Range = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ggeettBBeezzeellFFaaccee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGauge()
+
+              See external documentation.
+
+       ggeettRRaannggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGauge()
+
+              See external documentation.
+
+       ggeettSShhaaddoowwWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGauge()
+
+              See external documentation.
+
+       ggeettVVaalluuee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGauge()
+
+              See external documentation.
+
+       iissVVeerrttiiccaall((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGauge()
+
+              See external documentation.
+
+       sseettBBeezzeellFFaaccee((TThhiiss,, WW)) -->> ookk
+
+              Types:
+
+                 This = wxGauge()
+                 W = integer()
+
+              See external documentation.
+
+       sseettRRaannggee((TThhiiss,, RR)) -->> ookk
+
+              Types:
+
+                 This = wxGauge()
+                 R = integer()
+
+              See external documentation.
+
+       sseettSShhaaddoowwWWiiddtthh((TThhiiss,, WW)) -->> ookk
+
+              Types:
+
+                 This = wxGauge()
+                 W = integer()
+
+              See external documentation.
+
+       sseettVVaalluuee((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxGauge()
+                 Pos = integer()
+
+              See external documentation.
+
+       ppuullssee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGauge()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGaauuggee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxGauge(3)

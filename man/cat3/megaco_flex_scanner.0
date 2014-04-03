@@ -1,0 +1,98 @@
+megaco_flex_scanner(3)     Erlang Module Definition     megaco_flex_scanner(3)
+
+
+
+NNAAMMEE
+       megaco_flex_scanner - Interface module to the flex scanner linked in
+       driver.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains the public interface to the flex scanner linked in
+       driver. The flex scanner performs the scanning phase of text message
+       decoding.
+
+       The flex scanner is written using a tool called _f_l_e_x. In order to be
+       able to compile the flex scanner driver, this tool has to be available.
+
+       By default the flex scanner reports line-number of an error. But it can
+       be built without line-number reporting. Instead token number is used.
+       This will speed up the scanning some 5-10%. Use _-_-_d_i_s_a_b_l_e_-_m_e_g_a_c_o_-_f_l_e_x_-
+       _s_c_a_n_n_e_r_-_l_i_n_e_n_o when configuring the application.
+
+       The scanner will, by default, be built as a reentrant scanner _i_f the
+       flex utility supports this (it depends on the version of flex). It is
+       possible to explicitly disable this even when flex support this. Use
+       _-_-_d_i_s_a_b_l_e_-_m_e_g_a_c_o_-_r_e_e_n_t_r_a_n_t_-_f_l_e_x_-_s_c_a_n_n_e_r when configuring the
+       application.
+
+DDAATTAA TTYYPPEESS
+       megaco_ports() = term()
+       megaco_version() = integer() >= 1
+
+
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> {{ookk,, PPoorrttOOrrPPoorrttss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 PortOrPorts = megaco_ports()
+                 Reason = term()
+
+              This function is used to start the flex scanner. It locates the
+              library and loads the linked in driver.
+
+              On a single core system or if it's a non-reentrant scanner, a
+              single port is created. On a multi-core system with a reentrant
+              scanner, several ports will be created (one for each scheduler).
+
+              Note that the process that calls this function _m_u_s_t be
+              permanent. If it dies, the port(s) will exit and the driver
+              unload.
+
+       ssttoopp((PPoorrttOOrrPPoorrttss)) -->> ssttooppppeedd
+
+              Types:
+
+                 PortOrPorts = megaco_ports()
+
+              This function is used to stop the flex scanner. It also unloads
+              the driver.
+
+       iiss__rreeeennttrraanntt__eennaabblleedd(()) -->> BBoooolleeaann
+
+              Types:
+
+                 Boolean = boolean()
+
+              Is the flex scanner reentrant or not.
+
+       iiss__ssccaannnneerr__ppoorrtt((PPoorrtt,, PPoorrttOOrrPPoorrttss)) -->> BBoooolleeaann
+
+              Types:
+
+                 Port = port()
+                 PortOrPorts = megaco_ports()
+                 Boolean = boolean()
+
+              Checks if a port is a flex scanner port or not (useful when if a
+              port exits).
+
+       ssccaann((BBiinnaarryy,, PPoorrttOOrrPPoorrttss)) -->> {{ookk,, TTookkeennss,, VVeerrssiioonn,, LLaatteessttLLiinnee}} ||
+       {{eerrrroorr,, RReeaassoonn,, LLaatteessttLLiinnee}}
+
+              Types:
+
+                 Binary = binary()
+                 PortOrPorts = megaco_ports()
+                 Tokens = list()
+                 Version = megaco_version()
+                 LatestLine = integer()
+                 Reason = term()
+
+              Scans a megaco message and generates a token list to be passed
+              on the parser.
+
+
+
+Ericsson AB                     megaco 3.16.0.2         megaco_flex_scanner(3)

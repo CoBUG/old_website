@@ -1,0 +1,98 @@
+wxDatePickerCtrl(3)        Erlang Module Definition        wxDatePickerCtrl(3)
+
+
+
+NNAAMMEE
+       wxDatePickerCtrl - See external documentation: wxDatePickerCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxDatePickerCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxPPiicckkeerrBBaassee
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_D_a_t_e_P_i_c_k_e_r_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxDDaatteePPiicckkeerrCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxDDaatteePPiicckkeerrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxDDaatteePPiicckkeerrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {date, wx_datetime() (see module wx)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ggeettRRaannggee((TThhiiss,, DDtt11,, DDtt22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDatePickerCtrl()
+                 Dt1 = wx_datetime() (see module wx)
+                 Dt2 = wx_datetime() (see module wx)
+
+              See external documentation.
+
+       ggeettVVaalluuee((TThhiiss)) -->> wwxx__ddaatteettiimmee(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxDatePickerCtrl()
+
+              See external documentation.
+
+       sseettRRaannggee((TThhiiss,, DDtt11,, DDtt22)) -->> ookk
+
+              Types:
+
+                 This = wxDatePickerCtrl()
+                 Dt1 = wx_datetime() (see module wx)
+                 Dt2 = wx_datetime() (see module wx)
+
+              See external documentation.
+
+       sseettVVaalluuee((TThhiiss,, DDaattee)) -->> ookk
+
+              Types:
+
+                 This = wxDatePickerCtrl()
+                 Date = wx_datetime() (see module wx)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxDDaatteePPiicckkeerrCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxDatePickerCtrl(3)

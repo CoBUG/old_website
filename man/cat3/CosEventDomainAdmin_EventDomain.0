@@ -1,0 +1,573 @@
+CosEventDomainAdmin_EventDomEarilna(n3g)Module DefiCnoistEivoenntDomainAdmin_EventDomain(3)
+
+
+
+NNAAMMEE
+       CosEventDomainAdmin_EventDomain - This module implements the Event
+       Domain interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to all definitions include necessary _h_r_l files by using:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_D_o_m_a_i_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * _C_o_s_N_o_t_i_f_i_c_a_t_i_o_n___Q_o_S_A_d_m_i_n
+
+         * _C_o_s_N_o_t_i_f_i_c_a_t_i_o_n___A_d_m_i_n_P_r_o_p_e_r_t_i_e_s_A_d_m_i_n
+
+EEXXPPOORRTTSS
+       aadddd__cchhaannnneell((EEvveennttDDoommaaiinn,, CChhaannnneell)) -->> MMeemmbbeerrIIDD
+
+              Types:
+
+                 EventDomain = Channel = #objref
+                 MemberID = long()
+
+              Adds the given channel to the target domain. The channel must be
+              a _C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n_:_:_E_v_e_n_t_C_h_a_n_n_e_l.
+
+       ggeett__aallll__cchhaannnneellss((EEvveennttDDoommaaiinn)) -->> MMeemmbbeerrIIDDSSeeqq
+
+              Types:
+
+                 EventDomain = #objref
+                 MemberIDSeq = [long()]
+
+              Returns a a sequence of all channels associated with the target
+              object.
+
+       ggeett__cchhaannnneell((EEvveennttDDoommaaiinn,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 MemberID = long()
+                 Reply = Channel | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+                 Channel = #objref
+
+              If the target domain have a _C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n_:_:_E_v_e_n_t_C_h_a_n_n_e_l
+              represented by the given id this channel is returned. Otherwise,
+              an exception is raised.
+
+       rreemmoovvee__cchhaannnneell((EEvveennttDDoommaaiinn,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 MemberID = long()
+                 Reply = ok | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a _C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n_:_:_E_v_e_n_t_C_h_a_n_n_e_l with the _M_e_m_b_e_r_I_D
+              exists it will removed and all its _C_o_n_n_e_c_t_i_o_n_s terminated.
+              Otherwise an exception is raised.
+
+       aadddd__ccoonnnneeccttiioonn((EEvveennttDDoommaaiinn,, CCoonnnneeccttiioonn)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Connection =
+                 'CosEventDomainAdmin_Connection'{supplier_id=MemberID,
+                 consumer_id=MemberID, ctype=Type, notification_style=Style}
+                 MemberID = long()
+                 Type = 'ANY_EVENT' | 'STRUCTURED_EVENT' | 'SEQUENCE_EVENT'
+                 Style = 'Pull' | 'Push'
+                 Reply = ConnectionID | {'EXCEPTION', Exc}
+                 ConnectionID = long()
+                 Exc = #'CosNotifyChannelAdmin_ChannelNotFound'{} |
+                 #'CosNotifyChannelAdmin_TypeError'{} |
+                 #'CosEventDomainAdmin_AlreadyExists'{} |
+                 #'CosEventDomainAdmin_DiamondCreationForbidden'{diam=RouteSeq}
+                 |
+                 #'CosEventDomainAdmin_CycleCreationForbidden'{cyc=MemberIDSeq}
+                 RouteSeq = [MemberIDSeq]
+                 MemberIDSeq = [long()]
+
+              The Connection parameter must contain valid data to enable the
+              target domain to setup a connection between two channels. The
+              struct members _s_u_p_p_l_i_e_r___i_d and _c_o_n_s_u_m_e_r___i_d determines which
+              channel should produce and consume events. which type of events
+              and if the supplier should push or the consumer pull events is
+              determined by _c_t_y_p_e and _n_o_t_i_f_i_c_a_t_i_o_n___s_t_y_l_e respectively.
+
+              If the target domain is not able to setup the connection the
+              appropriate exception is raised.
+
+       ggeett__aallll__ccoonnnneeccttiioonnss((EEvveennttDDoommaaiinn)) -->> CCoonnnneeccttiioonnIIDDSSeeqq
+
+              Types:
+
+                 EventDomain = #objref
+                 ConnectionIDSeq = [long()]
+
+              This operation returns a sequence of all connections within the
+              target domain.
+
+       ggeett__ccoonnnneeccttiioonn((EEvveennttDDoommaaiinn,, CCoonnnneeccttiioonnIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 ConnectionID = long()
+                 Reply = Connection | {'EXCEPTION',
+                 #'CosEventDomainAdmin_ConnectionNotFound'{}}
+                 Connection =
+                 'CosEventDomainAdmin_Connection'{supplier_id=MemberID,
+                 consumer_id=MemberID, ctype=Type, notification_style=Style}
+                 MemberID = long()
+                 Type = 'ANY_EVENT' | 'STRUCTURED_EVENT' | 'SEQUENCE_EVENT'
+                 Style = 'Pull' | 'Push'
+
+              If a connection identified by the given id exists within the
+              target domain, a _#_'_C_o_s_E_v_e_n_t_D_o_m_a_i_n_A_d_m_i_n___C_o_n_n_e_c_t_i_o_n_'_{_} which
+              describe the connection is returned. Otherwise, an exception is
+              raised.
+
+       rreemmoovvee__ccoonnnneeccttiioonn((EEvveennttDDoommaaiinn,, CCoonnnneeccttiioonnIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 ConnectionID = long()
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventDomainAdmin_ConnectionNotFound'{}}
+
+              If the supplied connection id exists, the connection the id
+              represents is terminated. Otherwise, an exception is raised.
+
+       ggeett__ooffffeerr__cchhaannnneellss((EEvveennttDDoommaaiinn,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 MemberID = long()
+                 Reply = MemberIDSeq | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              This operation returns a sequence, containing the member id's of
+              all channels within the target domain which will supply events
+              to the channel identified by the given id. But, if no such id
+              exists in this domain, an exception is raised.
+
+       ggeett__ssuubbssccrriippttiioonn__cchhaannnneellss((EEvveennttDDoommaaiinn,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Reply = MemberIDSeq | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              This operations behaves like _g_e_t___s_u_b_s_c_r_i_p_t_i_o_n___c_h_a_n_n_e_l_s; the
+              difference is that the id's returned identifies channels which
+              will consume events supplied by the channel associated with the
+              given id.
+
+       ddeessttrrooyy((EEvveennttDDoommaaiinn)) -->> ookk
+
+              Types:
+
+                 EventDomain = #objref
+
+              Calling this operation will terminate all connections within the
+              target domain. The domain will terminate but all channels will
+              not be affected.
+
+       ggeett__ccyycclleess((EEvveennttDDoommaaiinn)) -->> RRoouutteeSSeeqq
+
+              Types:
+
+                 EventDomain = #objref
+                 RouteSeq = [MemberIDSeq]
+                 MemberIDSeq = [long()]
+
+              Returns a list of all cycles within the target domain.
+
+       ggeett__ddiiaammoonnddss((EEvveennttDDoommaaiinn)) -->> DDiiaammoonnddSSeeqq
+
+              Types:
+
+                 EventDomain = #objref
+                 DiamondSeq = [RouteSeq]
+                 RouteSeq = [MemberIDSeq]
+                 MemberIDSeq = [long()]
+
+              Returns a list of all diamonds within the target domain
+
+       sseett__ddeeffaauulltt__ccoonnssuummeerr__cchhaannnneell((EEvveennttDDoommaaiinn,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Reply = MemberID | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+                 MemberID = long()
+
+              If the given id represents a channel within the target domain,
+              this channel will be used when connection a supplier client
+              without specifying a certain channel. If no such channel exists
+              an exceptions is raised.
+
+       sseett__ddeeffaauulltt__ssuupppplliieerr__cchhaannnneell((EEvveennttDDoommaaiinn,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Reply = MemberID | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+                 MemberID = long()
+
+              If the given id represents a channel within the target domain,
+              this channel will be used when connection a consumer client
+              without specifying a certain channel. If no such channel exists
+              an exceptions is raised.
+
+       ccoonnnneecctt__ppuusshh__ccoonnssuummeerr((EEvveennttDDoommaaiinn,, CCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosEventComm::PushConsumer
+                 Reply = CosNotifyChannelAdmin::ProxyPushSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given PushConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuullll__ccoonnssuummeerr((EEvveennttDDoommaaiinn,, CCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosEventComm::PullConsumer
+                 Reply = CosNotifyChannelAdmin::ProxyPullSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given PullConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuusshh__ssuupppplliieerr((EEvveennttDDoommaaiinn,, SSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosEventComm::PushSupplier
+                 Reply = CosNotifyChannelAdmin::ProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given PushSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuullll__ssuupppplliieerr((EEvveennttDDoommaaiinn,, SSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosEventComm::PullSupplier
+                 Reply = CosNotifyChannelAdmin::ProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given PullSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuusshh__ccoonnssuummeerr((EEvveennttDDoommaaiinn,, CCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::StructuredPushConsumer
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPushSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given StructuredPushConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuullll__ccoonnssuummeerr((EEvveennttDDoommaaiinn,, CCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::StructuredPullConsumer
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPullSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given StructuredPullConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuusshh__ssuupppplliieerr((EEvveennttDDoommaaiinn,, SSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::StructuredPushSupplier
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given StructuredPushSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuullll__ssuupppplliieerr((EEvveennttDDoommaaiinn,, SSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::StructuredPullSupplier
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPullConsume |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given StructuredPullSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuusshh__ccoonnssuummeerr((EEvveennttDDoommaaiinn,, CCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::SequencePushConsumer
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPushSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given SequencePushConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuullll__ccoonnssuummeerr((EEvveennttDDoommaaiinn,, CCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::SequencePullConsumer
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPullSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given SequencePullConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuusshh__ssuupppplliieerr((EEvveennttDDoommaaiinn,, SSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::SequencePushSupplier
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given SequencePushSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuullll__ssuupppplliieerr((EEvveennttDDoommaaiinn,, SSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::SequencePullSupplier
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPullConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a default Channel have been set, this operation connects the
+              given SequencePullSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuusshh__ccoonnssuummeerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, CCoonnssuummeerr,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosEventComm::PushConsumer
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::ProxyPushSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              PushConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuullll__ccoonnssuummeerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, CCoonnssuummeerr,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosEventComm::PullConsumer
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::ProxyPullSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              PullConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuusshh__ssuupppplliieerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, SSuupppplliieerr,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosEventComm::PushSupplier
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::ProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              PushSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ppuullll__ssuupppplliieerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, SSuupppplliieerr,, MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosEventComm::PullSupplier
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::ProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              PullSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuusshh__ccoonnssuummeerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, CCoonnssuummeerr,,
+       MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::StructuredPushConsumer
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPushSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              StructuredPushConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuullll__ccoonnssuummeerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, CCoonnssuummeerr,,
+       MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::StructuredPullConsumer
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPullSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              StructuredPullConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuusshh__ssuupppplliieerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, SSuupppplliieerr,,
+       MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::StructuredPushSupplier
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              StructuredPushSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuullll__ssuupppplliieerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, SSuupppplliieerr,,
+       MMeemmbbeerrIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::StructuredPullSupplier
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::StructuredProxyPullConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              StructuredPullSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuusshh__ccoonnssuummeerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, CCoonnssuummeerr,, MMeemmbbeerrIIDD))
+       -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::SequencePushConsumer
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPushSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              SequencePushConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuullll__ccoonnssuummeerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, CCoonnssuummeerr,, MMeemmbbeerrIIDD))
+       -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Consumer = CosNotifyComm::SequencePullConsumer
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPullSupplier |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              SequencePullConsumer to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuusshh__ssuupppplliieerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, SSuupppplliieerr,, MMeemmbbeerrIIDD))
+       -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::SequencePushSupplier
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPushConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              SequencePushSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+       ccoonnnneecctt__sseeqquueennccee__ppuullll__ssuupppplliieerr__wwiitthh__iidd((EEvveennttDDoommaaiinn,, SSuupppplliieerr,, MMeemmbbeerrIIDD))
+       -->> RReeppllyy
+
+              Types:
+
+                 EventDomain = #objref
+                 Supplier = CosNotifyComm::SequencePullSupplier
+                 MemberID = long()
+                 Reply = CosNotifyChannelAdmin::SequenceProxyPullConsumer |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_ChannelNotFound'{}}
+
+              If a Channel associated with the given MemberID exists within
+              the target Domain, this operation connects the given
+              SequencePullSupplier to it. Otherwise, the
+              _#_'_C_o_s_N_o_t_i_f_y_C_h_a_n_n_e_l_A_d_m_i_n___C_h_a_n_n_e_l_N_o_t_F_o_u_n_d_'_{_} exception is raised.
+
+
+
+Ericsson AB                  cosEventDomain 1C.o1s.E1v2entDomainAdmin_EventDomain(3)

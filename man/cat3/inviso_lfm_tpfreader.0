@@ -1,0 +1,84 @@
+inviso_lfm_tpfreader(3)    Erlang Module Definition    inviso_lfm_tpfreader(3)
+
+
+
+NNAAMMEE
+       inviso_lfm_tpfreader - Inviso Standard Reader Process to Standard
+       Logfile Merger
+
+DDEESSCCRRIIPPTTIIOONN
+       Implements the standard reader process to the standard logfile merger
+       _i_n_v_i_s_o___l_f_m.
+
+       The reader process reads logfiles belonging to the same set (normally
+       one node) in chronological order and delivers logged trace messages one
+       by one to the output process. Before any trace messages are delivered,
+       the _i_n_v_i_s_o___l_f_m___t_p_r_e_a_d_e_r implementation reads the entire trace
+       information file (if in use) and builds a database over pid-to-alias
+       associations.
+
+       The _i_n_v_i_s_o___l_f_m___t_p_r_e_a_d_e_r implementation is capable of considering that
+       an alias may have been used for several processes during different
+       times. An alias may also be in use for several pids at the same time,
+       on purpose. If a process has generated a trace message, all
+       associations between that pid and aliases will be presented as the list
+       _P_i_d_M_a_p_p_i_n_g_s in the message sent to the output process.
+
+EEXXPPOORRTTSS
+       hhaannddllee__llooggffiillee__ssoorrtt__wwrraappsseett((LLooggFFiilleess)) -->> FFiilleeLLiisstt22
+
+              Types:
+
+                 LogFiles = [{trace_log, FileList}]
+                 FileList = FileList2 = [FileName]
+                  FileName = string()
+
+              Only one _{_t_r_a_c_e___l_o_g_, _F_i_l_e_L_i_s_t_} tuple is expected in _L_o_g_F_i_l_e_s,
+              all other tuples are ignored. _F_i_l_e_L_i_s_t must:
+
+                * contain one single file name, or
+
+                * a list of wraplog files, following the naming convention
+                  _<_P_r_e_f_i_x_>_<_N_r_>_<_S_u_f_f_i_x_>.
+
+              Sorts the files in _F_i_l_e_L_i_s_t in chronological order beginning
+              with the oldest. Sorting is only relevant if _F_i_l_e_L_i_s_t is a list
+              of wraplogs. The sorting is done on finding the modulo-counter
+              in the filename and not on filesystem timestamps.
+
+              This function is exported for convenience should an own reader
+              process be implemented.
+
+TTHHEE TTRRAACCEE IINNFFOORRMMAATTIIOONN FFIILLEE PPRROOTTOOCCOOLL
+       The format of a trace information file is dictated by the meta tracer
+       process. The _i_n_v_i_s_o___l_f_m___t_p_f_r_e_a_d_e_r implementation of a reader process
+       understands the following trace information entries. Note that the
+       _i_n_v_i_s_o___r_t___m_e_t_a trace information file is on binary format prefixing
+       every entry with a 4 byte length indicator.
+
+         _{_P_i_d_, _A_l_i_a_s_, _a_l_i_a_s_, _N_o_w_S_t_a_m_p_}:
+           _P_i_d _= _p_i_d_(_)
+           _A_l_i_a_s _= _t_e_r_m_(_)
+           _N_o_w_S_t_a_m_p _= _t_e_r_m_(_), but in current implementation as returned from
+           _e_r_l_a_n_g_:_n_o_w_/_0
+
+           This message indicates that from now on shall _P_i_d be associated
+           with _A_l_i_a_s.
+
+         _{_M_a_y_b_e_P_i_d_, _A_l_i_a_s_, _u_n_a_l_i_a_s_, _N_o_w_S_t_a_m_p_}:
+           _M_a_y_b_e_P_i_d _= _p_i_d_(_) _| _u_n_d_e_f_i_n_e_d
+           _A_l_i_a_s _= _t_e_r_m_(_)
+           _N_o_w_S_t_a_m_p _= _t_e_r_m_(_), see above
+
+           This message indicates that, if _M_a_y_b_e_P_i_d is a pid, this pid shall
+           no longer be associated with _A_l_i_a_s. If it is _u_n_d_e_f_i_n_e_d, all
+           associations with _A_l_i_a_s from now shall be considered invalid.
+
+           Also note that there are many situations where _u_n_a_l_i_a_s entries will
+           be missing. For instance if a process terminates without making
+           explicit function calls removing its associations first. This is
+           seldom a problem unless the pid is reused.
+
+
+
+Ericsson AB                      inviso 0.6.3          inviso_lfm_tpfreader(3)

@@ -1,0 +1,121 @@
+wxSpinButton(3)            Erlang Module Definition            wxSpinButton(3)
+
+
+
+NNAAMMEE
+       wxSpinButton - See external documentation: wxSpinButton.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSpinButton.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_p_i_n_B_u_t_t_o_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSppiinnBBuuttttoonn(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSppiinnBBuuttttoonn(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSppiinnBBuuttttoonn(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSpinButton()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSpinButton()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ggeettMMaaxx((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSpinButton()
+
+              See external documentation.
+
+       ggeettMMiinn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSpinButton()
+
+              See external documentation.
+
+       ggeettVVaalluuee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSpinButton()
+
+              See external documentation.
+
+       sseettRRaannggee((TThhiiss,, MMiinnVVaall,, MMaaxxVVaall)) -->> ookk
+
+              Types:
+
+                 This = wxSpinButton()
+                 MinVal = integer()
+                 MaxVal = integer()
+
+              See external documentation.
+
+       sseettVVaalluuee((TThhiiss,, VVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxSpinButton()
+                 Value = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSppiinnBBuuttttoonn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxSpinButton(3)

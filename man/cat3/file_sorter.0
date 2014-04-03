@@ -1,0 +1,396 @@
+file_sorter(3)             Erlang Module Definition             file_sorter(3)
+
+
+
+NNAAMMEE
+       file_sorter - File Sorter
+
+DDEESSCCRRIIPPTTIIOONN
+       The functions of this module sort terms on files, merge already sorted
+       files, and check files for sortedness. Chunks containing binary terms
+       are read from a sequence of files, sorted internally in memory and
+       written on temporary files, which are merged producing one sorted file
+       as output. Merging is provided as an optimization; it is faster when
+       the files are already sorted, but it always works to sort instead of
+       merge.
+
+       On a file, a term is represented by a header and a binary. Two options
+       define the format of terms on files:
+
+         * _{_h_e_a_d_e_r_, _H_e_a_d_e_r_L_e_n_g_t_h_}. HeaderLength determines the number of bytes
+           preceding each binary and containing the length of the binary in
+           bytes. Default is 4. The order of the header bytes is defined as
+           follows: if _B is a binary containing a header only, the size _S_i_z_e
+           of the binary is calculated as _<_<_S_i_z_e_:_H_e_a_d_e_r_L_e_n_g_t_h_/_u_n_i_t_:_8_>_> _= _B.
+
+         * _{_f_o_r_m_a_t_, _F_o_r_m_a_t_}. The format determines the function that is
+           applied to binaries in order to create the terms that will be
+           sorted. The default value is _b_i_n_a_r_y___t_e_r_m, which is equivalent to
+           _f_u_n _b_i_n_a_r_y___t_o___t_e_r_m_/_1. The value _b_i_n_a_r_y is equivalent to _f_u_n_(_X_) _-_> _X
+           _e_n_d, which means that the binaries will be sorted as they are. This
+           is the fastest format. If _F_o_r_m_a_t is _t_e_r_m, _i_o_:_r_e_a_d_/_2 is called to
+           read terms. In that case only the default value of the _h_e_a_d_e_r
+           option is allowed. The _f_o_r_m_a_t option also determines what is
+           written to the sorted output file: if _F_o_r_m_a_t is _t_e_r_m then
+           _i_o_:_f_o_r_m_a_t_/_3 is called to write each term, otherwise the binary
+           prefixed by a header is written. Note that the binary written is
+           the same binary that was read; the results of applying the _F_o_r_m_a_t
+           function are thrown away as soon as the terms have been sorted.
+           Reading and writing terms using the _i_o module is very much slower
+           than reading and writing binaries.
+
+       Other options are:
+
+         * _{_o_r_d_e_r_, _O_r_d_e_r_}. The default is to sort terms in ascending order,
+           but that can be changed by the value _d_e_s_c_e_n_d_i_n_g or by giving an
+           ordering function _F_u_n. An ordering function is antisymmetric,
+           transitive and total. _F_u_n_(_A_, _B_) should return _t_r_u_e if _A comes
+           before _B in the ordering, _f_a_l_s_e otherwise. An example of a typical
+           ordering function is less than or equal to, _=_<_/_2. Using an ordering
+           function will slow down the sort considerably. The _k_e_y_s_o_r_t,
+           _k_e_y_m_e_r_g_e and _k_e_y_c_h_e_c_k functions do not accept ordering functions.
+
+         * _{_u_n_i_q_u_e_, _b_o_o_l_e_a_n_(_)_}. When sorting or merging files, only the first
+           of a sequence of terms that compare equal (_=_=) is output if this
+           option is set to _t_r_u_e. The default value is _f_a_l_s_e which implies
+           that all terms that compare equal are output. When checking files
+           for sortedness, a check that no pair of consecutive terms compares
+           equal is done if this option is set to _t_r_u_e.
+
+         * _{_t_m_p_d_i_r_, _T_e_m_p_D_i_r_e_c_t_o_r_y_}. The directory where temporary files are
+           put can be chosen explicitly. The default, implied by the value _"_",
+           is to put temporary files on the same directory as the sorted
+           output file. If output is a function (see below), the directory
+           returned by _f_i_l_e_:_g_e_t___c_w_d_(_) is used instead. The names of temporary
+           files are derived from the Erlang nodename (_n_o_d_e_(_)), the process
+           identifier of the current Erlang emulator (_o_s_:_g_e_t_p_i_d_(_)), and a
+           timestamp (_e_r_l_a_n_g_:_n_o_w_(_)); a typical name would be
+           _f_s___m_y_n_o_d_e_@_m_y_h_o_s_t___1_7_6_3___1_0_4_3___3_3_7_0_0_0___2_6_6_0_0_5_._1_7, where _1_7 is a sequence
+           number. Existing files will be overwritten. Temporary files are
+           deleted unless some uncaught EXIT signal occurs.
+
+         * _{_c_o_m_p_r_e_s_s_e_d_, _b_o_o_l_e_a_n_(_)_}. Temporary files and the output file may be
+           compressed. The default value _f_a_l_s_e implies that written files are
+           not compressed. Regardless of the value of the _c_o_m_p_r_e_s_s_e_d option,
+           compressed files can always be read. Note that reading and writing
+           compressed files is significantly slower than reading and writing
+           uncompressed files.
+
+         * _{_s_i_z_e_, _S_i_z_e_}. By default approximately 512*1024 bytes read from
+           files are sorted internally. This option should rarely be needed.
+
+         * _{_n_o___f_i_l_e_s_, _N_o_F_i_l_e_s_}. By default 16 files are merged at a time. This
+           option should rarely be needed.
+
+       As an alternative to sorting files, a function of one argument can be
+       given as input. When called with the argument _r_e_a_d the function is
+       assumed to return _e_n_d___o_f___i_n_p_u_t or _{_e_n_d___o_f___i_n_p_u_t_, _V_a_l_u_e_}_} when there is
+       no more input (_V_a_l_u_e is explained below), or _{_O_b_j_e_c_t_s_, _F_u_n_}, where
+       _O_b_j_e_c_t_s is a list of binaries or terms depending on the format and _F_u_n
+       is a new input function. Any other value is immediately returned as
+       value of the current call to _s_o_r_t or _k_e_y_s_o_r_t. Each input function will
+       be called exactly once, and should an error occur, the last function is
+       called with the argument _c_l_o_s_e, the reply of which is ignored.
+
+       A function of one argument can be given as output. The results of
+       sorting or merging the input is collected in a non-empty sequence of
+       variable length lists of binaries or terms depending on the format. The
+       output function is called with one list at a time, and is assumed to
+       return a new output function. Any other return value is immediately
+       returned as value of the current call to the sort or merge function.
+       Each output function is called exactly once. When some output function
+       has been applied to all of the results or an error occurs, the last
+       function is called with the argument _c_l_o_s_e, and the reply is returned
+       as value of the current call to the sort or merge function. If a
+       function is given as input and the last input function returns
+       _{_e_n_d___o_f___i_n_p_u_t_, _V_a_l_u_e_}, the function given as output will be called with
+       the argument _{_v_a_l_u_e_, _V_a_l_u_e_}. This makes it easy to initiate the
+       sequence of output functions with a value calculated by the input
+       functions.
+
+       As an example, consider sorting the terms on a disk log file. A
+       function that reads chunks from the disk log and returns a list of
+       binaries is used as input. The results are collected in a list of
+       terms.
+
+       sort(Log) ->
+           {ok, _} = disk_log:open([{name,Log}, {mode,read_only}]),
+           Input = input(Log, start),
+           Output = output([]),
+           Reply = file_sorter:sort(Input, Output, {format,term}),
+           ok = disk_log:close(Log),
+           Reply.
+
+       input(Log, Cont) ->
+           fun(close) ->
+                   ok;
+              (read) ->
+                   case disk_log:chunk(Log, Cont) of
+                       {error, Reason} ->
+                           {error, Reason};
+                       {Cont2, Terms} ->
+                           {Terms, input(Log, Cont2)};
+                       {Cont2, Terms, _Badbytes} ->
+                           {Terms, input(Log, Cont2)};
+                       eof ->
+                           end_of_input
+                   end
+           end.
+
+       output(L) ->
+           fun(close) ->
+                   lists:append(lists:reverse(L));
+              (Terms) ->
+                   output([Terms | L])
+           end.
+
+       Further examples of functions as input and output can be found at the
+       end of the _f_i_l_e___s_o_r_t_e_r module; the _t_e_r_m format is implemented with
+       functions.
+
+       The possible values of _R_e_a_s_o_n returned when an error occurs are:
+
+         * _b_a_d___o_b_j_e_c_t, _{_b_a_d___o_b_j_e_c_t_, _F_i_l_e_N_a_m_e_}. Applying the format function
+           failed for some binary, or the key(s) could not be extracted from
+           some term.
+
+         * _{_b_a_d___t_e_r_m_, _F_i_l_e_N_a_m_e_}. _i_o_:_r_e_a_d_/_2 failed to read some term.
+
+         * _{_f_i_l_e___e_r_r_o_r_, _F_i_l_e_N_a_m_e_, _f_i_l_e_:_p_o_s_i_x_(_)_}. See _f_i_l_e_(_3_) for an
+           explanation of _f_i_l_e_:_p_o_s_i_x_(_).
+
+         * _{_p_r_e_m_a_t_u_r_e___e_o_f_, _F_i_l_e_N_a_m_e_}. End-of-file was encountered inside some
+           binary term.
+
+DDAATTAA TTYYPPEESS
+       ffiillee__nnaammee(()) = ffiillee::nnaammee(())
+
+
+       ffiillee__nnaammeess(()) = [ffiillee::nnaammee(())]
+
+
+       ii__ccoommmmaanndd(()) = read | close
+
+
+       ii__rreeppllyy(()) = end_of_input
+                 | {end_of_input, vvaalluuee(())}
+                 | {[oobbjjeecctt(())], iinnffuunn(())}
+                 | iinnppuutt__rreeppllyy(())
+
+
+       iinnffuunn(()) = fun((ii__ccoommmmaanndd(())) -> ii__rreeppllyy(()))
+
+
+       iinnppuutt(()) = ffiillee__nnaammeess(()) | iinnffuunn(())
+
+
+       iinnppuutt__rreeppllyy(()) = term()
+
+
+       oo__ccoommmmaanndd(()) = {value, vvaalluuee(())} | [oobbjjeecctt(())] | close
+
+
+       oo__rreeppllyy(()) = oouuttffuunn(()) | oouuttppuutt__rreeppllyy(())
+
+
+       oobbjjeecctt(()) = term() | binary()
+
+
+       oouuttffuunn(()) = fun((oo__ccoommmmaanndd(())) -> oo__rreeppllyy(()))
+
+
+       oouuttppuutt(()) = ffiillee__nnaammee(()) | oouuttffuunn(())
+
+
+       oouuttppuutt__rreeppllyy(()) = term()
+
+
+       vvaalluuee(()) = term()
+
+
+       ooppttiioonnss(()) = [ooppttiioonn(())] | ooppttiioonn(())
+
+
+       ooppttiioonn(()) = {compressed, boolean()}
+                | {header, hheeaaddeerr__lleennggtthh(())}
+                | {format, ffoorrmmaatt(())}
+                | {no_files, nnoo__ffiilleess(())}
+                | {order, oorrddeerr(())}
+                | {size, ssiizzee(())}
+                | {tmpdir, ttmmpp__ddiirreeccttoorryy(())}
+                | {unique, boolean()}
+
+
+       ffoorrmmaatt(()) = binary_term | term | binary | ffoorrmmaatt__ffuunn(())
+
+
+       ffoorrmmaatt__ffuunn(()) = fun((binary()) -> term())
+
+
+       hheeaaddeerr__lleennggtthh(()) = integer() >= 1
+
+
+       kkeeyy__ppooss(()) = integer() >= 1 | [integer() >= 1]
+
+
+       nnoo__ffiilleess(()) = integer() >= 1
+
+
+       oorrddeerr(()) = ascending | descending | oorrddeerr__ffuunn(())
+
+
+       oorrddeerr__ffuunn(()) = fun((term(), term()) -> boolean())
+
+
+       ssiizzee(()) = integer() >= 0
+
+
+       ttmmpp__ddiirreeccttoorryy(()) = [] | ffiillee::nnaammee(())
+
+
+       rreeaassoonn(()) = bad_object
+                | {bad_object, ffiillee__nnaammee(())}
+                | {bad_term, ffiillee__nnaammee(())}
+                | {file_error,
+                   ffiillee__nnaammee(()),
+                   ffiillee::ppoossiixx(()) | badarg | system_limit}
+                | {premature_eof, ffiillee__nnaammee(())}
+
+
+EEXXPPOORRTTSS
+       ssoorrtt((FFiilleeNNaammee)) -->> RReeppllyy
+
+              Types:
+
+                 FileName = ffiillee__nnaammee(())
+                 Reply = ok | {error, rreeaassoonn(())} | iinnppuutt__rreeppllyy(()) |
+                 oouuttppuutt__rreeppllyy(())
+
+              Sorts terms on files. _s_o_r_t_(_F_i_l_e_N_a_m_e_) is equivalent to
+              _s_o_r_t_(_[_F_i_l_e_N_a_m_e_]_, _F_i_l_e_N_a_m_e_).
+
+       ssoorrtt((IInnppuutt,, OOuuttppuutt)) -->> RReeppllyy
+
+       ssoorrtt((IInnppuutt,, OOuuttppuutt,, OOppttiioonnss)) -->> RReeppllyy
+
+              Types:
+
+                 Input = iinnppuutt(())
+                 Output = oouuttppuutt(())
+                 Options = ooppttiioonnss(())
+                 Reply = ok | {error, rreeaassoonn(())} | iinnppuutt__rreeppllyy(()) |
+                 oouuttppuutt__rreeppllyy(())
+
+              Sorts terms on files. _s_o_r_t_(_I_n_p_u_t_, _O_u_t_p_u_t_) is equivalent to
+              _s_o_r_t_(_I_n_p_u_t_, _O_u_t_p_u_t_, _[_]_).
+
+       kkeeyyssoorrtt((KKeeyyPPooss,, FFiilleeNNaammee)) -->> RReeppllyy
+
+              Types:
+
+                 KeyPos = kkeeyy__ppooss(())
+                 FileName = ffiillee__nnaammee(())
+                 Reply = ok | {error, rreeaassoonn(())} | iinnppuutt__rreeppllyy(()) |
+                 oouuttppuutt__rreeppllyy(())
+
+              Sorts tuples on files. _k_e_y_s_o_r_t_(_N_, _F_i_l_e_N_a_m_e_) is equivalent to
+              _k_e_y_s_o_r_t_(_N_, _[_F_i_l_e_N_a_m_e_]_, _F_i_l_e_N_a_m_e_).
+
+       kkeeyyssoorrtt((KKeeyyPPooss,, IInnppuutt,, OOuuttppuutt)) -->> RReeppllyy
+
+       kkeeyyssoorrtt((KKeeyyPPooss,, IInnppuutt,, OOuuttppuutt,, OOppttiioonnss)) -->> RReeppllyy
+
+              Types:
+
+                 KeyPos = kkeeyy__ppooss(())
+                 Input = iinnppuutt(())
+                 Output = oouuttppuutt(())
+                 Options = ooppttiioonnss(())
+                 Reply = ok | {error, rreeaassoonn(())} | iinnppuutt__rreeppllyy(()) |
+                 oouuttppuutt__rreeppllyy(())
+
+              Sorts tuples on files. The sort is performed on the element(s)
+              mentioned in _K_e_y_P_o_s. If two tuples compare equal (_=_=) on one
+              element, next element according to _K_e_y_P_o_s is compared. The sort
+              is stable.
+
+              _k_e_y_s_o_r_t_(_N_, _I_n_p_u_t_, _O_u_t_p_u_t_) is equivalent to _k_e_y_s_o_r_t_(_N_, _I_n_p_u_t_,
+              _O_u_t_p_u_t_, _[_]_).
+
+       mmeerrggee((FFiilleeNNaammeess,, OOuuttppuutt)) -->> RReeppllyy
+
+       mmeerrggee((FFiilleeNNaammeess,, OOuuttppuutt,, OOppttiioonnss)) -->> RReeppllyy
+
+              Types:
+
+                 FileNames = ffiillee__nnaammeess(())
+                 Output = oouuttppuutt(())
+                 Options = ooppttiioonnss(())
+                 Reply = ok | {error, rreeaassoonn(())} | oouuttppuutt__rreeppllyy(())
+
+              Merges terms on files. Each input file is assumed to be sorted.
+
+              _m_e_r_g_e_(_F_i_l_e_N_a_m_e_s_, _O_u_t_p_u_t_) is equivalent to _m_e_r_g_e_(_F_i_l_e_N_a_m_e_s_,
+              _O_u_t_p_u_t_, _[_]_).
+
+       kkeeyymmeerrggee((KKeeyyPPooss,, FFiilleeNNaammeess,, OOuuttppuutt)) -->> RReeppllyy
+
+       kkeeyymmeerrggee((KKeeyyPPooss,, FFiilleeNNaammeess,, OOuuttppuutt,, OOppttiioonnss)) -->> RReeppllyy
+
+              Types:
+
+                 KeyPos = kkeeyy__ppooss(())
+                 FileNames = ffiillee__nnaammeess(())
+                 Output = oouuttppuutt(())
+                 Options = ooppttiioonnss(())
+                 Reply = ok | {error, rreeaassoonn(())} | oouuttppuutt__rreeppllyy(())
+
+              Merges tuples on files. Each input file is assumed to be sorted
+              on key(s).
+
+              _k_e_y_m_e_r_g_e_(_K_e_y_P_o_s_, _F_i_l_e_N_a_m_e_s_, _O_u_t_p_u_t_) is equivalent to
+              _k_e_y_m_e_r_g_e_(_K_e_y_P_o_s_, _F_i_l_e_N_a_m_e_s_, _O_u_t_p_u_t_, _[_]_).
+
+       cchheecckk((FFiilleeNNaammee)) -->> RReeppllyy
+
+       cchheecckk((FFiilleeNNaammeess,, OOppttiioonnss)) -->> RReeppllyy
+
+              Types:
+
+                 FileNames = ffiillee__nnaammeess(())
+                 Options = ooppttiioonnss(())
+                 Reply = {ok, [Result]} | {error, rreeaassoonn(())}
+                 Result = {FileName, TermPosition, term()}
+                 FileName = ffiillee__nnaammee(())
+                 TermPosition = integer() >= 1
+
+              Checks files for sortedness. If a file is not sorted, the first
+              out-of-order element is returned. The first term on a file has
+              position 1.
+
+              _c_h_e_c_k_(_F_i_l_e_N_a_m_e_) is equivalent to _c_h_e_c_k_(_[_F_i_l_e_N_a_m_e_]_, _[_]_).
+
+       kkeeyycchheecckk((KKeeyyPPooss,, FFiilleeNNaammee)) -->> RReeppllyy
+
+       kkeeyycchheecckk((KKeeyyPPooss,, FFiilleeNNaammeess,, OOppttiioonnss)) -->> RReeppllyy
+
+              Types:
+
+                 KeyPos = kkeeyy__ppooss(())
+                 FileNames = ffiillee__nnaammeess(())
+                 Options = ooppttiioonnss(())
+                 Reply = {ok, [Result]} | {error, rreeaassoonn(())}
+                 Result = {FileName, TermPosition, term()}
+                 FileName = ffiillee__nnaammee(())
+                 TermPosition = integer() >= 1
+
+              Checks files for sortedness. If a file is not sorted, the first
+              out-of-order element is returned. The first term on a file has
+              position 1.
+
+              _k_e_y_c_h_e_c_k_(_K_e_y_P_o_s_, _F_i_l_e_N_a_m_e_) is equivalent to _k_e_y_c_h_e_c_k_(_K_e_y_P_o_s_,
+              _[_F_i_l_e_N_a_m_e_]_, _[_]_).
+
+
+
+Ericsson AB                      stdlib 1.18.2                  file_sorter(3)

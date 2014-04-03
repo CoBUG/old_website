@@ -1,0 +1,1731 @@
+wxWindow(3)                Erlang Module Definition                wxWindow(3)
+
+
+
+NNAAMMEE
+       wxWindow - See external documentation: wxWindow.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxWindow.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_W_i_n_d_o_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxWWiinnddooww(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow()
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow()
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccaacchheeBBeessttSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ccaappttuurreeMMoouussee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       cceenntteerr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to cceenntteerr((TThhiiss,, [[]])).
+
+       cceenntteerr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {dir, integer()}
+
+              See external documentation.
+
+       cceenntteerrOOnnPPaarreenntt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to cceenntteerrOOnnPPaarreenntt((TThhiiss,, [[]])).
+
+       cceenntteerrOOnnPPaarreenntt((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {dir, integer()}
+
+              See external documentation.
+
+       cceennttrree((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to cceennttrree((TThhiiss,, [[]])).
+
+       cceennttrree((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {dir, integer()}
+
+              See external documentation.
+
+       cceennttrreeOOnnPPaarreenntt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to cceennttrreeOOnnPPaarreenntt((TThhiiss,, [[]])).
+
+       cceennttrreeOOnnPPaarreenntt((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {dir, integer()}
+
+              See external documentation.
+
+       cclleeaarrBBaacckkggrroouunndd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       cclliieennttTTooSSccrreeeenn((TThhiiss,, PPtt)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       cclliieennttTTooSSccrreeeenn((TThhiiss,, XX,, YY)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       cclloossee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to cclloossee((TThhiiss,, [[]])).
+
+       cclloossee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {force, boolean()}
+
+              See external documentation.
+
+       ccoonnvveerrttDDiiaallooggTTooPPiixxeellss((TThhiiss,, SSzz)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+                 Sz = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ccoonnvveerrttPPiixxeellssTTooDDiiaalloogg((TThhiiss,, SSzz)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+                 Sz = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       DDeessttrrooyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ddeessttrrooyyCChhiillddrreenn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ddiissaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       eennaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to eennaabbllee((TThhiiss,, [[]])).
+
+       eennaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       ffiinnddFFooccuuss(()) -->> wwxxWWiinnddooww(())
+
+              See external documentation.
+
+       ffiinnddWWiinnddooww((TThhiiss,, WWiinniidd)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 This = wxWindow()
+                 Winid = integer()
+
+              See external documentation.
+              Also:
+              findWindow(This, Name) -> wxWindow() when
+              This::wxWindow(), Name::unicode:chardata().
+
+
+       ffiinnddWWiinnddoowwBByyIIdd((WWiinniidd)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Winid = integer()
+
+              Equivalent to ffiinnddWWiinnddoowwBByyIIdd((WWiinniidd,, [[]])).
+
+       ffiinnddWWiinnddoowwBByyIIdd((WWiinniidd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Winid = integer()
+                 Option = {parent, wxWindow()}
+
+              See external documentation.
+
+       ffiinnddWWiinnddoowwBByyNNaammee((NNaammee)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Name = chardata() (see module unicode)
+
+              Equivalent to ffiinnddWWiinnddoowwBByyNNaammee((NNaammee,, [[]])).
+
+       ffiinnddWWiinnddoowwBByyNNaammee((NNaammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Name = chardata() (see module unicode)
+                 Option = {parent, wxWindow()}
+
+              See external documentation.
+
+       ffiinnddWWiinnddoowwBByyLLaabbeell((LLaabbeell)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Label = chardata() (see module unicode)
+
+              Equivalent to ffiinnddWWiinnddoowwBByyLLaabbeell((LLaabbeell,, [[]])).
+
+       ffiinnddWWiinnddoowwBByyLLaabbeell((LLaabbeell,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 Label = chardata() (see module unicode)
+                 Option = {parent, wxWindow()}
+
+              See external documentation.
+
+       ffiitt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ffiittIInnssiiddee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ffrreeeezzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettAAcccceelleerraattoorrTTaabbllee((TThhiiss)) -->> wwxxAAcccceelleerraattoorrTTaabbllee(()) ((sseeee mmoodduullee
+       wwxxAAcccceelleerraattoorrTTaabbllee))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunnddSSttyyllee((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+              Res = ?wxBG_STYLE_SYSTEM | ?wxBG_STYLE_COLOUR |
+              ?wxBG_STYLE_CUSTOM
+
+       ggeettBBeessttSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCCaarreett((TThhiiss)) -->> wwxxCCaarreett(()) ((sseeee mmoodduullee wwxxCCaarreett))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCCaappttuurree(()) -->> wwxxWWiinnddooww(())
+
+              See external documentation.
+
+       ggeettCChhaarrHHeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCChhaarrWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCChhiillddrreenn((TThhiiss)) -->> [[wwxxWWiinnddooww(())]]
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCClliieennttSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCCoonnttaaiinniinnggSSiizzeerr((TThhiiss)) -->> wwxxSSiizzeerr(()) ((sseeee mmoodduullee wwxxSSiizzeerr))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettCCuurrssoorr((TThhiiss)) -->> wwxxCCuurrssoorr(()) ((sseeee mmoodduullee wwxxCCuurrssoorr))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettDDrrooppTTaarrggeett((TThhiiss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettEEvveennttHHaannddlleerr((TThhiiss)) -->> wwxxEEvvttHHaannddlleerr(()) ((sseeee mmoodduullee wwxxEEvvttHHaannddlleerr))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettEExxttrraaSSttyyllee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettFFoorreeggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettGGrraannddPPaarreenntt((TThhiiss)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettHHaannddllee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettHHeellppTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettIIdd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettLLaabbeell((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettMMaaxxSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettMMiinnSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettNNaammee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettPPaarreenntt((TThhiiss)) -->> wwxxWWiinnddooww(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettRReecctt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettSSccrreeeennPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettSSccrreeeennRReecctt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettSSccrroollllPPooss((TThhiiss,, OOrriieenntt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+
+              See external documentation.
+
+       ggeettSSccrroollllRRaannggee((TThhiiss,, OOrriieenntt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+
+              See external documentation.
+
+       ggeettSSccrroollllTThhuummbb((TThhiiss,, OOrriieenntt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+
+              See external documentation.
+
+       ggeettSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettSSiizzeerr((TThhiiss)) -->> wwxxSSiizzeerr(()) ((sseeee mmoodduullee wwxxSSiizzeerr))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {X::integer(), Y::integer(), Descent::integer(),
+                 ExternalLeading::integer()}
+                 This = wxWindow()
+                 String = chardata() (see module unicode)
+
+              Equivalent to ggeettTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg,, [[]])).
+
+       ggeettTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg,, OOppttiioonn::::[[OOppttiioonn]])) -->> RReessuulltt
+
+              Types:
+
+                 Result = {X::integer(), Y::integer(), Descent::integer(),
+                 ExternalLeading::integer()}
+                 This = wxWindow()
+                 String = chardata() (see module unicode)
+                 Option = {theFont, wxFont() (see module wxFont)}
+
+              See external documentation.
+
+       ggeettTToooollTTiipp((TThhiiss)) -->> wwxxTToooollTTiipp(()) ((sseeee mmoodduullee wwxxTToooollTTiipp))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettUUppddaatteeRReeggiioonn((TThhiiss)) -->> wwxxRReeggiioonn(()) ((sseeee mmoodduullee wwxxRReeggiioonn))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettVViirrttuuaallSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettWWiinnddoowwSSttyylleeFFllaagg((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ggeettWWiinnddoowwVVaarriiaanntt((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+              Res = ?wxWINDOW_VARIANT_NORMAL | ?wxWINDOW_VARIANT_SMALL |
+              ?wxWINDOW_VARIANT_MINI | ?wxWINDOW_VARIANT_LARGE |
+              ?wxWINDOW_VARIANT_MAX
+
+       hhaassCCaappttuurree((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       hhaassSSccrroollllbbaarr((TThhiiss,, OOrriieenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+
+              See external documentation.
+
+       hhaassTTrraannssppaarreennttBBaacckkggrroouunndd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       hhiiddee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iinnhheerriittAAttttrriibbuutteess((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iinniittDDiiaalloogg((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iinnvvaalliiddaatteeBBeessttSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iissEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iissEExxppoosseedd((TThhiiss,, PPtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+              Also:
+              isExposed(This, Rect) -> boolean() when
+              This::wxWindow(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+       iissEExxppoosseedd((TThhiiss,, XX,, YY)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       iissEExxppoosseedd((TThhiiss,, XX,, YY,, WW,, HH)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+
+       iissRReettaaiinneedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iissSShhoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       iissTTooppLLeevveell((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       llaayyoouutt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       lliinneeDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       lliinneeUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       lloowweerr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       mmaakkeeMMooddaall((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to mmaakkeeMMooddaall((TThhiiss,, [[]])).
+
+       mmaakkeeMMooddaall((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {modal, boolean()}
+
+              See external documentation.
+
+       mmoovvee((TThhiiss,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Pt = {X::integer(), Y::integer()}
+
+              Equivalent to mmoovvee((TThhiiss,, PPtt,, [[]])).
+
+       mmoovvee((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+              Also:
+              move(This, Pt, [Option]) -> ok when
+              This::wxWindow(), Pt::{X::integer(), Y::integer()},
+              Option :: {flags, integer()}.
+
+
+       mmoovvee((TThhiiss,, XX,, YY,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+                 Option = {flags, integer()}
+
+              See external documentation.
+
+       mmoovveeAAfftteerrIInnTTaabbOOrrddeerr((TThhiiss,, WWiinn)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Win = wxWindow()
+
+              See external documentation.
+
+       mmoovveeBBeeffoorreeIInnTTaabbOOrrddeerr((TThhiiss,, WWiinn)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Win = wxWindow()
+
+              See external documentation.
+
+       nnaavviiggaattee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to nnaavviiggaattee((TThhiiss,, [[]])).
+
+       nnaavviiggaattee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {flags, integer()}
+
+              See external documentation.
+
+       ppaaggeeDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ppaaggeeUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ppooppEEvveennttHHaannddlleerr((TThhiiss)) -->> wwxxEEvvttHHaannddlleerr(()) ((sseeee mmoodduullee wwxxEEvvttHHaannddlleerr))
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to ppooppEEvveennttHHaannddlleerr((TThhiiss,, [[]])).
+
+       ppooppEEvveennttHHaannddlleerr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxEEvvttHHaannddlleerr(()) ((sseeee mmoodduullee
+       wwxxEEvvttHHaannddlleerr))
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {deleteHandler, boolean()}
+
+              See external documentation.
+
+       ppooppuuppMMeennuu((TThhiiss,, MMeennuu)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Menu = wxMenu() (see module wxMenu)
+
+              Equivalent to ppooppuuppMMeennuu((TThhiiss,, MMeennuu,, [[]])).
+
+       ppooppuuppMMeennuu((TThhiiss,, MMeennuu,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Menu = wxMenu() (see module wxMenu)
+                 Option = {pos, {X::integer(), Y::integer()}}
+
+              See external documentation.
+
+       ppooppuuppMMeennuu((TThhiiss,, MMeennuu,, XX,, YY)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Menu = wxMenu() (see module wxMenu)
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       rraaiissee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       rreeffrreesshh((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to rreeffrreesshh((TThhiiss,, [[]])).
+
+       rreeffrreesshh((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {eraseBackground, boolean()} | {rect, {X::integer(),
+                 Y::integer(), W::integer(), H::integer()}}
+
+              See external documentation.
+
+       rreeffrreesshhRReecctt((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              Equivalent to rreeffrreesshhRReecctt((TThhiiss,, RReecctt,, [[]])).
+
+       rreeffrreesshhRReecctt((TThhiiss,, RReecctt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 Option = {eraseBackground, boolean()}
+
+              See external documentation.
+
+       rreelleeaasseeMMoouussee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       rreemmoovveeCChhiilldd((TThhiiss,, CChhiilldd)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Child = wxWindow()
+
+              See external documentation.
+
+       rreeppaarreenntt((TThhiiss,, NNeewwPPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 NewParent = wxWindow()
+
+              See external documentation.
+
+       ssccrreeeennTTooCClliieenntt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ssccrreeeennTTooCClliieenntt((TThhiiss,, PPtt)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxWindow()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ssccrroollllLLiinneess((TThhiiss,, LLiinneess)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Lines = integer()
+
+              See external documentation.
+
+       ssccrroollllPPaaggeess((TThhiiss,, PPaaggeess)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Pages = integer()
+
+              See external documentation.
+
+       ssccrroollllWWiinnddooww((TThhiiss,, DDxx,, DDyy)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Dx = integer()
+                 Dy = integer()
+
+              Equivalent to ssccrroollllWWiinnddooww((TThhiiss,, DDxx,, DDyy,, [[]])).
+
+       ssccrroollllWWiinnddooww((TThhiiss,, DDxx,, DDyy,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Dx = integer()
+                 Dy = integer()
+                 Option = {rect, {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}}
+
+              See external documentation.
+
+       sseettAAcccceelleerraattoorrTTaabbllee((TThhiiss,, AAcccceell)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Accel = wxAcceleratorTable() (see module wxAcceleratorTable)
+
+              See external documentation.
+
+       sseettAAuuttooLLaayyoouutt((TThhiiss,, AAuuttooLLaayyoouutt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 AutoLayout = boolean()
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddSSttyyllee((TThhiiss,, SSttyyllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Style = wx_enum() (see module wx)
+
+              See external documentation.
+              Style = ?wxBG_STYLE_SYSTEM | ?wxBG_STYLE_COLOUR |
+              ?wxBG_STYLE_CUSTOM
+
+       sseettCCaarreett((TThhiiss,, CCaarreett)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Caret = wxCaret() (see module wxCaret)
+
+              See external documentation.
+
+       sseettCClliieennttSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+              Also:
+              setClientSize(This, Rect) -> ok when
+              This::wxWindow(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+       sseettCClliieennttSSiizzee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettCCoonnttaaiinniinnggSSiizzeerr((TThhiiss,, SSiizzeerr)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Sizer = wxSizer() (see module wxSizer)
+
+              See external documentation.
+
+       sseettCCuurrssoorr((TThhiiss,, CCuurrssoorr)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Cursor = wxCursor() (see module wxCursor)
+
+              See external documentation.
+
+       sseettMMaaxxSSiizzee((TThhiiss,, MMaaxxSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MaxSize = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettMMiinnSSiizzee((TThhiiss,, MMiinnSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinSize = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettOOwwnnBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettOOwwnnFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettOOwwnnFFoorreeggrroouunnddCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettDDrrooppTTaarrggeett((TThhiiss,, DDrrooppTTaarrggeett)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 DropTarget = wx_object() (see module wx)
+
+              See external documentation.
+
+       sseettEExxttrraaSSttyyllee((TThhiiss,, EExxSSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 ExStyle = integer()
+
+              See external documentation.
+
+       sseettFFooccuuss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       sseettFFooccuussFFrroommKKbbdd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettFFoorreeggrroouunnddCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettHHeellppTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettIIdd((TThhiiss,, WWiinniidd)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Winid = integer()
+
+              See external documentation.
+
+       sseettLLaabbeell((TThhiiss,, LLaabbeell)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Label = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettNNaammee((TThhiiss,, NNaammee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettPPaalleettttee((TThhiiss,, PPaall)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Pal = wxPalette() (see module wxPalette)
+
+              See external documentation.
+
+       sseettSSccrroollllbbaarr((TThhiiss,, OOrriieenntt,, PPooss,, TThhuummbbVViissiibbllee,, RRaannggee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+                 Pos = integer()
+                 ThumbVisible = integer()
+                 Range = integer()
+
+              Equivalent to sseettSSccrroollllbbaarr((TThhiiss,, OOrriieenntt,, PPooss,, TThhuummbbVViissiibbllee,,
+              RRaannggee,, [[]])).
+
+       sseettSSccrroollllbbaarr((TThhiiss,, OOrriieenntt,, PPooss,, TThhuummbbVViissiibbllee,, RRaannggee,, OOppttiioonn::::[[OOppttiioonn]]))
+       -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+                 Pos = integer()
+                 ThumbVisible = integer()
+                 Range = integer()
+                 Option = {refresh, boolean()}
+
+              See external documentation.
+
+       sseettSSccrroollllPPooss((TThhiiss,, OOrriieenntt,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+                 Pos = integer()
+
+              Equivalent to sseettSSccrroollllPPooss((TThhiiss,, OOrriieenntt,, PPooss,, [[]])).
+
+       sseettSSccrroollllPPooss((TThhiiss,, OOrriieenntt,, PPooss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Orient = integer()
+                 Pos = integer()
+                 Option = {refresh, boolean()}
+
+              See external documentation.
+
+       sseettSSiizzee((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+              Also:
+              setSize(This, Size) -> ok when
+              This::wxWindow(), Size::{W::integer(), H::integer()}.
+
+
+       sseettSSiizzee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              setSize(This, Rect, [Option]) -> ok when
+              This::wxWindow(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()},
+              Option :: {sizeFlags, integer()}.
+
+
+       sseettSSiizzee((TThhiiss,, XX,, YY,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to sseettSSiizzee((TThhiiss,, XX,, YY,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       sseettSSiizzee((TThhiiss,, XX,, YY,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+                 Width = integer()
+                 Height = integer()
+                 Option = {sizeFlags, integer()}
+
+              See external documentation.
+
+       sseettSSiizzeeHHiinnttss((TThhiiss,, MMiinnSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinSize = {W::integer(), H::integer()}
+
+              Equivalent to sseettSSiizzeeHHiinnttss((TThhiiss,, MMiinnSSiizzee,, [[]])).
+
+       sseettSSiizzeeHHiinnttss((TThhiiss,, MMiinnWW,, MMiinnHH)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinW = integer()
+                 MinH = integer()
+
+              See external documentation.
+              Also:
+              setSizeHints(This, MinSize, [Option]) -> ok when
+              This::wxWindow(), MinSize::{W::integer(), H::integer()},
+              Option :: {maxSize, {W::integer(), H::integer()}}
+              | {incSize, {W::integer(), H::integer()}}.
+
+
+       sseettSSiizzeeHHiinnttss((TThhiiss,, MMiinnWW,, MMiinnHH,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinW = integer()
+                 MinH = integer()
+                 Option = {maxW, integer()} | {maxH, integer()} | {incW,
+                 integer()} | {incH, integer()}
+
+              See external documentation.
+
+       sseettSSiizzeerr((TThhiiss,, SSiizzeerr)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Sizer = wxSizer() (see module wxSizer)
+
+              Equivalent to sseettSSiizzeerr((TThhiiss,, SSiizzeerr,, [[]])).
+
+       sseettSSiizzeerr((TThhiiss,, SSiizzeerr,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Sizer = wxSizer() (see module wxSizer)
+                 Option = {deleteOld, boolean()}
+
+              See external documentation.
+
+       sseettSSiizzeerrAAnnddFFiitt((TThhiiss,, SSiizzeerr)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Sizer = wxSizer() (see module wxSizer)
+
+              Equivalent to sseettSSiizzeerrAAnnddFFiitt((TThhiiss,, SSiizzeerr,, [[]])).
+
+       sseettSSiizzeerrAAnnddFFiitt((TThhiiss,, SSiizzeerr,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Sizer = wxSizer() (see module wxSizer)
+                 Option = {deleteOld, boolean()}
+
+              See external documentation.
+
+       sseettTThheemmeeEEnnaabblleedd((TThhiiss,, EEnnaabblleeTThheemmee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 EnableTheme = boolean()
+
+              See external documentation.
+
+       sseettTToooollTTiipp((TThhiiss,, TTiipp)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Tip = chardata() (see module unicode)
+
+              See external documentation.
+              Also:
+              setToolTip(This, Tip) -> ok when
+              This::wxWindow(), Tip::wxToolTip:wxToolTip().
+
+
+       sseettVViirrttuuaallSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettVViirrttuuaallSSiizzee((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettVViirrttuuaallSSiizzeeHHiinnttss((TThhiiss,, MMiinnSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinSize = {W::integer(), H::integer()}
+
+              Equivalent to sseettVViirrttuuaallSSiizzeeHHiinnttss((TThhiiss,, MMiinnSSiizzee,, [[]])).
+
+       sseettVViirrttuuaallSSiizzeeHHiinnttss((TThhiiss,, MMiinnWW,, MMiinnHH)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinW = integer()
+                 MinH = integer()
+
+              See external documentation.
+              Also:
+              setVirtualSizeHints(This, MinSize, [Option]) -> ok when
+              This::wxWindow(), MinSize::{W::integer(), H::integer()},
+              Option :: {maxSize, {W::integer(), H::integer()}}.
+
+
+       sseettVViirrttuuaallSSiizzeeHHiinnttss((TThhiiss,, MMiinnWW,, MMiinnHH,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 MinW = integer()
+                 MinH = integer()
+                 Option = {maxW, integer()} | {maxH, integer()}
+
+              See external documentation.
+
+       sseettWWiinnddoowwSSttyyllee((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Style = integer()
+
+              See external documentation.
+
+       sseettWWiinnddoowwSSttyylleeFFllaagg((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Style = integer()
+
+              See external documentation.
+
+       sseettWWiinnddoowwVVaarriiaanntt((TThhiiss,, VVaarriiaanntt)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Variant = wx_enum() (see module wx)
+
+              See external documentation.
+              Variant = ?wxWINDOW_VARIANT_NORMAL | ?wxWINDOW_VARIANT_SMALL |
+              ?wxWINDOW_VARIANT_MINI | ?wxWINDOW_VARIANT_LARGE |
+              ?wxWINDOW_VARIANT_MAX
+
+       sshhoouullddIInnhheerriittCCoolloouurrss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       sshhooww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to sshhooww((TThhiiss,, [[]])).
+
+       sshhooww((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {show, boolean()}
+
+              See external documentation.
+
+       tthhaaww((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ttrraannssffeerrDDaattaaFFrroommWWiinnddooww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       ttrraannssffeerrDDaattaaTTooWWiinnddooww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       uuppddaattee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       uuppddaatteeWWiinnddoowwUUII((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+
+              Equivalent to uuppddaatteeWWiinnddoowwUUII((TThhiiss,, [[]])).
+
+       uuppddaatteeWWiinnddoowwUUII((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 Option = {flags, integer()}
+
+              See external documentation.
+
+       vvaalliiddaattee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxWindow()
+
+              See external documentation.
+
+       wwaarrppPPooiinntteerr((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxWWiinnddooww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                       wxWindow(3)

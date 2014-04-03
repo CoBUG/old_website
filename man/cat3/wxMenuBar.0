@@ -1,0 +1,278 @@
+wxMenuBar(3)               Erlang Module Definition               wxMenuBar(3)
+
+
+
+NNAAMMEE
+       wxMenuBar - See external documentation: wxMenuBar.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMenuBar.
+
+       This class is derived (and can use functions) from:
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_e_n_u_B_a_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMeennuuBBaarr(())
+
+              See external documentation.
+
+       nneeww((SSttyyllee)) -->> wwxxMMeennuuBBaarr(())
+
+              Types:
+
+                 Style = integer()
+
+              See external documentation.
+
+       aappppeenndd((TThhiiss,, MMeennuu,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 Menu = wxMenu() (see module wxMenu)
+                 Title = chardata() (see module unicode)
+
+              See external documentation.
+
+       cchheecckk((TThhiiss,, IItteemmiidd,, CChheecckk)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+                 Check = boolean()
+
+              See external documentation.
+
+       eennaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+
+              Equivalent to eennaabbllee((TThhiiss,, [[]])).
+
+       eennaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabbllee((TThhiiss,, IItteemmiidd,, EEnnaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+                 Enable = boolean()
+
+              See external documentation.
+
+       eennaabblleeTToopp((TThhiiss,, PPooss,, FFllaagg)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+                 Flag = boolean()
+
+              See external documentation.
+
+       ffiinnddMMeennuu((TThhiiss,, TTiittllee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 Title = chardata() (see module unicode)
+
+              See external documentation.
+
+       ffiinnddMMeennuuIItteemm((TThhiiss,, MMeennuuSSttrriinngg,, IItteemmSSttrriinngg)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 MenuString = chardata() (see module unicode)
+                 ItemString = chardata() (see module unicode)
+
+              See external documentation.
+
+       ffiinnddIItteemm((TThhiiss,, IIdd)) -->> wwxxMMeennuuIItteemm(()) ((sseeee mmoodduullee wwxxMMeennuuIItteemm))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Id = integer()
+
+              See external documentation.
+
+       ggeettHHeellppSSttrriinngg((TThhiiss,, IItteemmiidd)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+
+              See external documentation.
+
+       ggeettLLaabbeell((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuBar()
+
+              See external documentation.
+
+       ggeettLLaabbeell((TThhiiss,, IItteemmiidd)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+
+              See external documentation.
+
+       ggeettLLaabbeellTToopp((TThhiiss,, PPooss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettMMeennuu((TThhiiss,, PPooss)) -->> wwxxMMeennuu(()) ((sseeee mmoodduullee wwxxMMeennuu))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+
+              See external documentation.
+
+       ggeettMMeennuuCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMenuBar()
+
+              See external documentation.
+
+       iinnsseerrtt((TThhiiss,, PPooss,, MMeennuu,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+                 Menu = wxMenu() (see module wxMenu)
+                 Title = chardata() (see module unicode)
+
+              See external documentation.
+
+       iissCChheecckkeedd((TThhiiss,, IItteemmiidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+
+              See external documentation.
+
+       iissEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+
+              See external documentation.
+
+       iissEEnnaabblleedd((TThhiiss,, IItteemmiidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+
+              See external documentation.
+
+       rreemmoovvee((TThhiiss,, PPooss)) -->> wwxxMMeennuu(()) ((sseeee mmoodduullee wwxxMMeennuu))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+
+              See external documentation.
+
+       rreeppllaaccee((TThhiiss,, PPooss,, MMeennuu,, TTiittllee)) -->> wwxxMMeennuu(()) ((sseeee mmoodduullee wwxxMMeennuu))
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+                 Menu = wxMenu() (see module wxMenu)
+                 Title = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettHHeellppSSttrriinngg((TThhiiss,, IItteemmiidd,, HHeellppSSttrriinngg)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+                 HelpString = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettLLaabbeell((TThhiiss,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 S = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettLLaabbeell((TThhiiss,, IItteemmiidd,, LLaabbeell)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 Itemid = integer()
+                 Label = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettLLaabbeellTToopp((TThhiiss,, PPooss,, LLaabbeell)) -->> ookk
+
+              Types:
+
+                 This = wxMenuBar()
+                 Pos = integer()
+                 Label = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMeennuuBBaarr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                      wxMenuBar(3)

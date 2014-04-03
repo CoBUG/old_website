@@ -1,0 +1,270 @@
+memsup(3)                  Erlang Module Definition                  memsup(3)
+
+
+
+NNAAMMEE
+       memsup - A Memory Supervisor Process
+
+DDEESSCCRRIIPPTTIIOONN
+       _m_e_m_s_u_p is a process which supervises the memory usage for the system
+       and for individual processes. It is part of the OS_Mon application, see
+       ooss__mmoonn((66)). Available for Unix, Windows and VxWorks.
+
+       Periodically performs a memory check:
+
+         * If more than a certain amount of available system memory is
+           allocated, as reported by the underlying operating system, the
+           alarm _{_s_y_s_t_e_m___m_e_m_o_r_y___h_i_g_h___w_a_t_e_r_m_a_r_k_, _[_]_} is set.
+
+         * If any Erlang process _P_i_d in the system has allocated more than a
+           certain amount of total system memory, the alarm
+           _{_p_r_o_c_e_s_s___m_e_m_o_r_y___h_i_g_h___w_a_t_e_r_m_a_r_k_, _P_i_d_} is set.
+
+       Alarms are reported to the SASL alarm handler, see aallaarrmm__hhaannddlleerr((33)). To
+       set an alarm, _a_l_a_r_m___h_a_n_d_l_e_r_:_s_e_t___a_l_a_r_m_(_A_l_a_r_m_) is called where _A_l_a_r_m is
+       either of the alarms specified above.
+
+       The alarms are cleared automatically when the alarm cause is no longer
+       valid.
+
+       The function ggeett__mmeemmoorryy__ddaattaa(()) can be used to retrieve the result of
+       the latest periodic memory check.
+
+       There is also a interface to system dependent memory data,
+       ggeett__ssyysstteemm__mmeemmoorryy__ddaattaa(()). The result is highly dependent on the
+       underlying operating system and the interface is targeted primarily for
+       systems without virtual memory (e.g. VxWorks). The output on other
+       systems is however still valid, although sparse.
+
+       A call to _g_e_t___s_y_s_t_e_m___m_e_m_o_r_y___d_a_t_a_/_0 is more costly than a call to
+       _g_e_t___m_e_m_o_r_y___d_a_t_a_/_0 as data is collected synchronously when this function
+       is called.
+
+       The total system memory reported under UNIX is the number of physical
+       pages of memory times the page size, and the available memory is the
+       number of available physical pages times the page size. This is a
+       reasonable measure as swapping should be avoided anyway, but the task
+       of defining total memory and available memory is difficult because of
+       virtual memory and swapping.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following configuration parameters can be used to change the
+       default values for time intervals and thresholds:
+
+         _m_e_m_o_r_y___c_h_e_c_k___i_n_t_e_r_v_a_l _= _i_n_t_(_)_>_0:
+           The time interval, in minutes, for the periodic memory check. The
+           default is one minute.
+
+         _s_y_s_t_e_m___m_e_m_o_r_y___h_i_g_h___w_a_t_e_r_m_a_r_k _= _f_l_o_a_t_(_):
+           The threshold, as percentage of system memory, for how much system
+           memory can be allocated before the corresponding alarm is set. The
+           default is 0.80 (80%).
+
+         _p_r_o_c_e_s_s___m_e_m_o_r_y___h_i_g_h___w_a_t_e_r_m_a_r_k _= _f_l_o_a_t_(_):
+           The threshold, as percentage of system memory, for how much system
+           memory can be allocated by one Erlang process before the
+           corresponding alarm is set. The default is 0.05 (5%).
+
+         _m_e_m_s_u_p___h_e_l_p_e_r___t_i_m_e_o_u_t _= _i_n_t_(_)_>_0:
+           A timeout, in seconds, for how long the _m_e_m_s_u_p process should wait
+           for a result from a memory check. If the timeout expires, a warning
+           message _"_O_S___M_O_N _(_m_e_m_s_u_p_) _t_i_m_e_o_u_t_" is issued via _e_r_r_o_r___l_o_g_g_e_r and
+           any pending, synchronous client calls will return a dummy value.
+           Normally, this situation should not occur. There have been cases on
+           Linux, however, where the pseudo file from which system data is
+           read is temporarily unavailable when the system is heavily loaded.
+
+           The default is 30 seconds.
+
+         _m_e_m_s_u_p___s_y_s_t_e_m___o_n_l_y _= _b_o_o_l_(_):
+           Specifies whether the _m_e_m_s_u_p process should only check system
+           memory usage (_t_r_u_e) or not. The default is _f_a_l_s_e, meaning that
+           information regarding both system memory usage and Erlang process
+           memory usage is collected.
+
+           It is recommended to set this parameter to _f_a_l_s_e on systems with
+           many concurrent processes, as each process memory check makes a
+           traversal of the entire list of processes.
+
+       See ccoonnffiigg((44)) for information about how to change the value of
+       configuration parameters.
+
+EEXXPPOORRTTSS
+       ggeett__mmeemmoorryy__ddaattaa(()) -->> {{TToottaall,,AAllllooccaatteedd,,WWoorrsstt}}
+
+              Types:
+
+                 Total = Allocated = int()
+                 Worst = {Pid, PidAllocated} | undefined
+                  Pid = pid()
+                  PidAllocated = int()
+
+              Returns the result of the latest memory check, where _T_o_t_a_l is
+              the total memory size and _A_l_l_o_c_a_t_e_d the allocated memory size,
+              in bytes.
+
+              _W_o_r_s_t is the pid and number of allocated bytes of the largest
+              Erlang process on the node. If _m_e_m_s_u_p should not collect process
+              data, that is if the configuration parameter _m_e_m_s_u_p___s_y_s_t_e_m___o_n_l_y
+              was set to _t_r_u_e, _W_o_r_s_t is _u_n_d_e_f_i_n_e_d.
+
+              The function is normally asynchronous in the sense that it does
+              not invoke a memory check, but returns the latest available
+              value. The one exception if is the function is called before a
+              first memory check is finished, in which case it does not return
+              a value until the memory check is finished.
+
+              Returns _{_0_,_0_,_{_p_i_d_(_)_,_0_}_} or _{_0_,_0_,_u_n_d_e_f_i_n_e_d_} if _m_e_m_s_u_p is not
+              available, or if all memory checks so far have timed out.
+
+       ggeett__ssyysstteemm__mmeemmoorryy__ddaattaa(()) -->> MMeemmDDaattaaLLiisstt
+
+              Types:
+
+                 MemDataList = [{Tag, Size}]
+                  Tag = atom()
+                  Size = int()
+
+              Invokes a memory check and returns the resulting, system
+              dependent, data as a list of tagged tuples, where _T_a_g can be one
+              of the following:
+
+                _t_o_t_a_l___m_e_m_o_r_y:
+                  The total amount of memory available to the Erlang emulator,
+                  allocated and free. May or may not be equal to the amount of
+                  memory configured in the system.
+
+                _f_r_e_e___m_e_m_o_r_y:
+                  The amount of free memory available to the Erlang emulator
+                  for allocation.
+
+                _s_y_s_t_e_m___t_o_t_a_l___m_e_m_o_r_y:
+                  The amount of memory available to the whole operating
+                  system. This may well be equal to _t_o_t_a_l___m_e_m_o_r_y but not
+                  necessarily.
+
+                _l_a_r_g_e_s_t___f_r_e_e:
+                  The size of the largest contiguous free memory block
+                  available to the Erlang emulator.
+
+                _n_u_m_b_e_r___o_f___f_r_e_e:
+                  The number of free blocks available to the Erlang runtime
+                  system. This gives a fair indication of how fragmented the
+                  memory is.
+
+                _b_u_f_f_e_r_e_d___m_e_m_o_r_y:
+                   The amount of memory the system uses for temporary storing
+                  raw disk blocks.
+
+                _c_a_c_h_e_d___m_e_m_o_r_y:
+                   The amount of memory the system uses for cached files read
+                  from disk.
+
+                _t_o_t_a_l___s_w_a_p:
+                   The amount of total amount of memory the system has
+                  available for disk swap.
+
+                _f_r_e_e___s_w_a_p:
+                   The amount of memory the system has available for disk
+                  swap.
+
+              All memory sizes are presented as number of _b_y_t_e_s.
+
+              The _l_a_r_g_e_s_t___f_r_e_e and _n_u_m_b_e_r___o_f___f_r_e_e tags are currently only
+              returned on a VxWorks system.
+
+              Returns the empty list [] if _m_e_m_s_u_p is not available, or if the
+              memory check times out.
+
+          NNoottee::
+              On linux the memory available to the emulator is _c_a_c_h_e_d___m_e_m_o_r_y
+              and _b_u_f_f_e_r_e_d___m_e_m_o_r_y in addition to _f_r_e_e___m_e_m_o_r_y.
+
+
+       ggeett__ooss__wwoorrddssiizzee(()) -->> WWoorrddssiizzee
+
+              Types:
+
+                 Wordsize = 32 | 64 | unsupported_os
+
+              Returns the wordsize of the current running operating system.
+
+       ggeett__cchheecckk__iinntteerrvvaall(()) -->> MMSS
+
+              Types:
+
+                 MS = int()
+
+              Returns the time interval, in milliseconds, for the periodic
+              memory check.
+
+       sseett__cchheecckk__iinntteerrvvaall((MMiinnuutteess)) -->> ookk
+
+              Types:
+
+                 Minutes = int()>0
+
+              Changes the time interval, given in minutes, for the periodic
+              memory check.
+
+              The change will take effect after the next memory check and is
+              non-persistent. That is, in case of a process restart, this
+              value is forgotten and the default value will be used. See
+              CCoonnffiigguurraattiioonn above.
+
+       ggeett__pprrooccmmeemm__hhiigghh__wwaatteerrmmaarrkk(()) -->> iinntt(())
+
+              Returns the threshold, in percent, for process memory
+              allocation.
+
+       sseett__pprrooccmmeemm__hhiigghh__wwaatteerrmmaarrkk((FFllooaatt)) -->> ookk
+
+              Changes the threshold, given as a float, for process memory
+              allocation.
+
+              The change will take effect during the next periodic memory
+              check and is non-persistent. That is, in case of a process
+              restart, this value is forgotten and the default value will be
+              used. See CCoonnffiigguurraattiioonn above.
+
+       ggeett__ssyyssmmeemm__hhiigghh__wwaatteerrmmaarrkk(()) -->> iinntt(())
+
+              Returns the threshold, in percent, for system memory allocation.
+
+       sseett__ssyyssmmeemm__hhiigghh__wwaatteerrmmaarrkk((FFllooaatt)) -->> ookk
+
+              Changes the threshold, given as a float, for system memory
+              allocation.
+
+              The change will take effect during the next periodic memory
+              check and is non-persistent. That is, in case of a process
+              restart, this value is forgotten and the default value will be
+              used. See CCoonnffiigguurraattiioonn above.
+
+       ggeett__hheellppeerr__ttiimmeeoouutt(()) -->> SSeeccoonnddss
+
+              Types:
+
+                 Seconds = int()
+
+              Returns the timeout value, in seconds, for memory checks.
+
+       sseett__hheellppeerr__ttiimmeeoouutt((SSeeccoonnddss)) -->> ookk
+
+              Types:
+
+                 Seconds = int() (>= 1)
+
+              Changes the timeout value, given in seconds, for memory checks.
+
+              The change will take effect for the next memory check and is
+              non-persistent. That is, in the case of a process restart, this
+              value is forgotten and the default value will be used. See
+              CCoonnffiigguurraattiioonn above.
+
+SSEEEE AALLSSOO
+       aallaarrmm__hhaannddlleerr((33)), ooss__mmoonn((33))
+
+
+
+Ericsson AB                      os_mon 2.2.10                       memsup(3)

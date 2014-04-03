@@ -1,0 +1,1938 @@
+wxGrid(3)                  Erlang Module Definition                  wxGrid(3)
+
+
+
+NNAAMMEE
+       wxGrid - See external documentation: wxGrid.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGrid.
+
+       This class is derived (and can use functions) from:
+       wwxxSSccrroolllleeddWWiinnddooww
+       wwxxPPaanneell
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxGGrriidd(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxGGrriidd(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, XX,, YY)) -->> wwxxGGrriidd(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+              Also:
+              new(Parent, Id, [Option]) -> wxGrid() when
+              Parent::wxWindow:wxWindow(), Id::integer(),
+              Option :: {pos, {X::integer(), Y::integer()}}
+              | {size, {W::integer(), H::integer()}}
+              | {style, integer()}.
+
+
+       nneeww((PPaarreenntt,, XX,, YY,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrriidd(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 X = integer()
+                 Y = integer()
+                 Option = {w, integer()} | {h, integer()} | {style, integer()}
+
+              See external documentation.
+
+       aappppeennddCCoollss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to aappppeennddCCoollss((TThhiiss,, [[]])).
+
+       aappppeennddCCoollss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {numCols, integer()} | {updateLabels, boolean()}
+
+              See external documentation.
+
+       aappppeennddRRoowwss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to aappppeennddRRoowwss((TThhiiss,, [[]])).
+
+       aappppeennddRRoowwss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {numRows, integer()} | {updateLabels, boolean()}
+
+              See external documentation.
+
+       aauuttooSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       aauuttooSSiizzeeCCoolluummnn((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+
+              Equivalent to aauuttooSSiizzeeCCoolluummnn((TThhiiss,, CCooll,, [[]])).
+
+       aauuttooSSiizzeeCCoolluummnn((TThhiiss,, CCooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Option = {setAsMin, boolean()}
+
+              See external documentation.
+
+       aauuttooSSiizzeeCCoolluummnnss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to aauuttooSSiizzeeCCoolluummnnss((TThhiiss,, [[]])).
+
+       aauuttooSSiizzeeCCoolluummnnss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {setAsMin, boolean()}
+
+              See external documentation.
+
+       aauuttooSSiizzeeRRooww((TThhiiss,, RRooww)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+
+              Equivalent to aauuttooSSiizzeeRRooww((TThhiiss,, RRooww,, [[]])).
+
+       aauuttooSSiizzeeRRooww((TThhiiss,, RRooww,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Option = {setAsMin, boolean()}
+
+              See external documentation.
+
+       aauuttooSSiizzeeRRoowwss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to aauuttooSSiizzeeRRoowwss((TThhiiss,, [[]])).
+
+       aauuttooSSiizzeeRRoowwss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {setAsMin, boolean()}
+
+              See external documentation.
+
+       bbeeggiinnBBaattcchh((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       bblloocckkTTooDDeevviicceeRReecctt((TThhiiss,, TTooppLLeefftt,, BBoottttoommRRiigghhtt)) -->> {{XX::::iinntteeggeerr(()),,
+       YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+                 TopLeft = {R::integer(), C::integer()}
+                 BottomRight = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       ccaannDDrraaggCCoollSSiizzee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ccaannDDrraaggRRoowwSSiizzee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ccaannDDrraaggGGrriiddSSiizzee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ccaannEEnnaabblleeCCeellllCCoonnttrrooll((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       cceellllTTooRReecctt((TThhiiss,, CCoooorrddss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+                 Coords = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       cceellllTTooRReecctt((TThhiiss,, RRooww,, CCooll)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),,
+       WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       cclleeaarrGGrriidd((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       cclleeaarrSSeelleeccttiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ccrreeaatteeGGrriidd((TThhiiss,, NNuummRRoowwss,, NNuummCCoollss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 NumRows = integer()
+                 NumCols = integer()
+
+              Equivalent to ccrreeaatteeGGrriidd((TThhiiss,, NNuummRRoowwss,, NNuummCCoollss,, [[]])).
+
+       ccrreeaatteeGGrriidd((TThhiiss,, NNuummRRoowwss,, NNuummCCoollss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 NumRows = integer()
+                 NumCols = integer()
+                 Option = {selmode, wx_enum() (see module wx)}
+
+              See external documentation.
+              Selmode = ?wxGrid_wxGridSelectCells | ?wxGrid_wxGridSelectRows |
+              ?wxGrid_wxGridSelectColumns
+
+       ddeelleetteeCCoollss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to ddeelleetteeCCoollss((TThhiiss,, [[]])).
+
+       ddeelleetteeCCoollss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {pos, integer()} | {numCols, integer()} |
+                 {updateLabels, boolean()}
+
+              See external documentation.
+
+       ddeelleetteeRRoowwss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to ddeelleetteeRRoowwss((TThhiiss,, [[]])).
+
+       ddeelleetteeRRoowwss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {pos, integer()} | {numRows, integer()} |
+                 {updateLabels, boolean()}
+
+              See external documentation.
+
+       ddiissaabblleeCCeellllEEddiittCCoonnttrrooll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ddiissaabblleeDDrraaggCCoollSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ddiissaabblleeDDrraaggGGrriiddSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ddiissaabblleeDDrraaggRRoowwSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       eennaabblleeCCeellllEEddiittCCoonnttrrooll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to eennaabblleeCCeellllEEddiittCCoonnttrrooll((TThhiiss,, [[]])).
+
+       eennaabblleeCCeellllEEddiittCCoonnttrrooll((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabblleeDDrraaggCCoollSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to eennaabblleeDDrraaggCCoollSSiizzee((TThhiiss,, [[]])).
+
+       eennaabblleeDDrraaggCCoollSSiizzee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabblleeDDrraaggGGrriiddSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to eennaabblleeDDrraaggGGrriiddSSiizzee((TThhiiss,, [[]])).
+
+       eennaabblleeDDrraaggGGrriiddSSiizzee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabblleeDDrraaggRRoowwSSiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to eennaabblleeDDrraaggRRoowwSSiizzee((TThhiiss,, [[]])).
+
+       eennaabblleeDDrraaggRRoowwSSiizzee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabblleeEEddiittiinngg((TThhiiss,, EEddiitt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Edit = boolean()
+
+              See external documentation.
+
+       eennaabblleeGGrriiddLLiinneess((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to eennaabblleeGGrriiddLLiinneess((TThhiiss,, [[]])).
+
+       eennaabblleeGGrriiddLLiinneess((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennddBBaattcchh((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ffiitt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ffoorrcceeRReeffrreesshh((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettBBaattcchhCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettCCeellllAAlliiggnnmmeenntt((TThhiiss,, RRooww,, CCooll)) -->> {{HHoorriizz::::iinntteeggeerr(()),, VVeerrtt::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCeellllBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, RRooww,, CCooll)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCeellllEEddiittoorr((TThhiiss,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllEEddiittoorr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllEEddiittoorr))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCeellllFFoonntt((TThhiiss,, RRooww,, CCooll)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCeellllRReennddeerreerr((TThhiiss,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllRReennddeerreerr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllRReennddeerreerr))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCeellllTTeexxttCCoolloouurr((TThhiiss,, RRooww,, CCooll)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCeellllVVaalluuee((TThhiiss,, CCoooorrddss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGrid()
+                 Coords = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       ggeettCCeellllVVaalluuee((TThhiiss,, RRooww,, CCooll)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCoollLLaabbeellAAlliiggnnmmeenntt((TThhiiss)) -->> {{HHoorriizz::::iinntteeggeerr(()),, VVeerrtt::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettCCoollLLaabbeellSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettCCoollLLaabbeellVVaalluuee((TThhiiss,, CCooll)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCoollMMiinniimmaallAAcccceeppttaabblleeWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttCCeellllAAlliiggnnmmeenntt((TThhiiss)) -->> {{HHoorriizz::::iinntteeggeerr(()),, VVeerrtt::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttCCeellllBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttCCeellllFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttCCeellllTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttCCoollLLaabbeellSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttCCoollSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttEEddiittoorr((TThhiiss)) -->> wwxxGGrriiddCCeellllEEddiittoorr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllEEddiittoorr))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttEEddiittoorrFFoorrCCeellll((TThhiiss,, CC)) -->> wwxxGGrriiddCCeellllEEddiittoorr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllEEddiittoorr))
+
+              Types:
+
+                 This = wxGrid()
+                 C = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       ggeettDDeeffaauullttEEddiittoorrFFoorrCCeellll((TThhiiss,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllEEddiittoorr(()) ((sseeee
+       mmoodduullee wwxxGGrriiddCCeellllEEddiittoorr))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttEEddiittoorrFFoorrTTyyppee((TThhiiss,, TTyyppeeNNaammee)) -->> wwxxGGrriiddCCeellllEEddiittoorr(()) ((sseeee
+       mmoodduullee wwxxGGrriiddCCeellllEEddiittoorr))
+
+              Types:
+
+                 This = wxGrid()
+                 TypeName = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettDDeeffaauullttRReennddeerreerr((TThhiiss)) -->> wwxxGGrriiddCCeellllRReennddeerreerr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllRReennddeerreerr))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttRReennddeerreerrFFoorrCCeellll((TThhiiss,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllRReennddeerreerr(()) ((sseeee
+       mmoodduullee wwxxGGrriiddCCeellllRReennddeerreerr))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttRReennddeerreerrFFoorrTTyyppee((TThhiiss,, TTyyppeeNNaammee)) -->> wwxxGGrriiddCCeellllRReennddeerreerr(()) ((sseeee
+       mmoodduullee wwxxGGrriiddCCeellllRReennddeerreerr))
+
+              Types:
+
+                 This = wxGrid()
+                 TypeName = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettDDeeffaauullttRRoowwLLaabbeellSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttRRoowwSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddCCuurrssoorrCCooll((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddCCuurrssoorrRRooww((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddLLiinneeCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggrriiddLLiinneessEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettLLaabbeellBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettLLaabbeellFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettLLaabbeellTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettNNuummbbeerrCCoollss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettNNuummbbeerrRRoowwss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettOOrrCCrreeaatteeCCeellllAAttttrr((TThhiiss,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllAAttttrr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllAAttttrr))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettRRoowwMMiinniimmaallAAcccceeppttaabblleeHHeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettRRoowwLLaabbeellAAlliiggnnmmeenntt((TThhiiss)) -->> {{HHoorriizz::::iinntteeggeerr(()),, VVeerrtt::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettRRoowwLLaabbeellSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettRRoowwLLaabbeellVVaalluuee((TThhiiss,, RRooww)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+
+              See external documentation.
+
+       ggeettRRoowwSSiizzee((TThhiiss,, RRooww)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+
+              See external documentation.
+
+       ggeettSSccrroollllLLiinneeXX((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSccrroollllLLiinneeYY((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddCCeellllss((TThhiiss)) -->> [[{{RR::::iinntteeggeerr(()),, CC::::iinntteeggeerr(())}}]]
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddCCoollss((TThhiiss)) -->> [[iinntteeggeerr(())]]
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddRRoowwss((TThhiiss)) -->> [[iinntteeggeerr(())]]
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnBBaacckkggrroouunndd((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnBBlloocckkTTooppLLeefftt((TThhiiss)) -->> [[{{RR::::iinntteeggeerr(()),, CC::::iinntteeggeerr(())}}]]
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnBBlloocckkBBoottttoommRRiigghhtt((TThhiiss)) -->> [[{{RR::::iinntteeggeerr(()),, CC::::iinntteeggeerr(())}}]]
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnFFoorreeggrroouunndd((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettVViieewwWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddRRoowwLLaabbeellWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddCCoollLLaabbeellWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       ggeettGGrriiddCCoorrnneerrLLaabbeellWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       hhiiddeeCCeellllEEddiittCCoonnttrrooll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       iinnsseerrttCCoollss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to iinnsseerrttCCoollss((TThhiiss,, [[]])).
+
+       iinnsseerrttCCoollss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {pos, integer()} | {numCols, integer()} |
+                 {updateLabels, boolean()}
+
+              See external documentation.
+
+       iinnsseerrttRRoowwss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              Equivalent to iinnsseerrttRRoowwss((TThhiiss,, [[]])).
+
+       iinnsseerrttRRoowwss((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Option = {pos, integer()} | {numRows, integer()} |
+                 {updateLabels, boolean()}
+
+              See external documentation.
+
+       iissCCeellllEEddiittCCoonnttrroollEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       iissCCuurrrreennttCCeellllRReeaaddOOnnllyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       iissEEddiittaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       iissIInnSSeelleeccttiioonn((TThhiiss,, CCoooorrddss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Coords = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       iissIInnSSeelleeccttiioonn((TThhiiss,, RRooww,, CCooll)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       iissRReeaaddOOnnllyy((TThhiiss,, RRooww,, CCooll)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       iissSSeelleeccttiioonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       iissVViissiibbllee((TThhiiss,, CCoooorrddss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Coords = {R::integer(), C::integer()}
+
+              Equivalent to iissVViissiibbllee((TThhiiss,, CCoooorrddss,, [[]])).
+
+       iissVViissiibbllee((TThhiiss,, RRooww,, CCooll)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+              Also:
+              isVisible(This, Coords, [Option]) -> boolean() when
+              This::wxGrid(), Coords::{R::integer(), C::integer()},
+              Option :: {wholeCellVisible, boolean()}.
+
+
+       iissVViissiibbllee((TThhiiss,, RRooww,, CCooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Option = {wholeCellVisible, boolean()}
+
+              See external documentation.
+
+       mmaakkeeCCeellllVViissiibbllee((TThhiiss,, CCoooorrddss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Coords = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       mmaakkeeCCeellllVViissiibbllee((TThhiiss,, RRooww,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrDDoowwnn((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrLLeefftt((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrRRiigghhtt((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrUUpp((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrDDoowwnnBBlloocckk((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrLLeeffttBBlloocckk((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrRRiigghhttBBlloocckk((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveeCCuurrssoorrUUppBBlloocckk((TThhiiss,, EExxppaannddSSeelleeccttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+                 ExpandSelection = boolean()
+
+              See external documentation.
+
+       mmoovveePPaaggeeDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       mmoovveePPaaggeeUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       rreeggiisstteerrDDaattaaTTyyppee((TThhiiss,, TTyyppeeNNaammee,, RReennddeerreerr,, EEddiittoorr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 TypeName = chardata() (see module unicode)
+                 Renderer = wxGridCellRenderer() (see module
+                 wxGridCellRenderer)
+                 Editor = wxGridCellEditor() (see module wxGridCellEditor)
+
+              See external documentation.
+
+       ssaavveeEEddiittCCoonnttrroollVVaalluuee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       sseelleeccttAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       sseelleeccttBBlloocckk((TThhiiss,, TTooppLLeefftt,, BBoottttoommRRiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 TopLeft = {R::integer(), C::integer()}
+                 BottomRight = {R::integer(), C::integer()}
+
+              Equivalent to sseelleeccttBBlloocckk((TThhiiss,, TTooppLLeefftt,, BBoottttoommRRiigghhtt,, [[]])).
+
+       sseelleeccttBBlloocckk((TThhiiss,, TTooppLLeefftt,, BBoottttoommRRiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 TopLeft = {R::integer(), C::integer()}
+                 BottomRight = {R::integer(), C::integer()}
+                 Option = {addToSelected, boolean()}
+
+              See external documentation.
+
+       sseelleeccttBBlloocckk((TThhiiss,, TTooppRRooww,, LLeeffttCCooll,, BBoottttoommRRooww,, RRiigghhttCCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 TopRow = integer()
+                 LeftCol = integer()
+                 BottomRow = integer()
+                 RightCol = integer()
+
+              Equivalent to sseelleeccttBBlloocckk((TThhiiss,, TTooppRRooww,, LLeeffttCCooll,, BBoottttoommRRooww,,
+              RRiigghhttCCooll,, [[]])).
+
+       sseelleeccttBBlloocckk((TThhiiss,, TTooppRRooww,, LLeeffttCCooll,, BBoottttoommRRooww,, RRiigghhttCCooll,,
+       OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 TopRow = integer()
+                 LeftCol = integer()
+                 BottomRow = integer()
+                 RightCol = integer()
+                 Option = {addToSelected, boolean()}
+
+              See external documentation.
+
+       sseelleeccttCCooll((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+
+              Equivalent to sseelleeccttCCooll((TThhiiss,, CCooll,, [[]])).
+
+       sseelleeccttCCooll((TThhiiss,, CCooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Option = {addToSelected, boolean()}
+
+              See external documentation.
+
+       sseelleeccttRRooww((TThhiiss,, RRooww)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+
+              Equivalent to sseelleeccttRRooww((TThhiiss,, RRooww,, [[]])).
+
+       sseelleeccttRRooww((TThhiiss,, RRooww,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Option = {addToSelected, boolean()}
+
+              See external documentation.
+
+       sseettCCeellllAAlliiggnnmmeenntt((TThhiiss,, AAlliiggnn)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Align = integer()
+
+              See external documentation.
+
+       sseettCCeellllAAlliiggnnmmeenntt((TThhiiss,, AAlliiggnn,, RRooww,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Align = integer()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       sseettCCeellllAAlliiggnnmmeenntt((TThhiiss,, RRooww,, CCooll,, HHoorriizz,, VVeerrtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Horiz = integer()
+                 Vert = integer()
+
+              See external documentation.
+
+       sseettCCeellllBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCeellllBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, RRooww,, CCooll,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+              Also:
+              setCellBackgroundColour(This, Colour, Row, Col) -> ok when
+              This::wxGrid(), Colour::wx:wx_colour(), Row::integer(),
+              Col::integer().
+
+
+       sseettCCeellllEEddiittoorr((TThhiiss,, RRooww,, CCooll,, EEddiittoorr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Editor = wxGridCellEditor() (see module wxGridCellEditor)
+
+              See external documentation.
+
+       sseettCCeellllFFoonntt((TThhiiss,, RRooww,, CCooll,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Val = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettCCeellllRReennddeerreerr((TThhiiss,, RRooww,, CCooll,, RReennddeerreerr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Renderer = wxGridCellRenderer() (see module
+                 wxGridCellRenderer)
+
+              See external documentation.
+
+       sseettCCeellllTTeexxttCCoolloouurr((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCeellllTTeexxttCCoolloouurr((TThhiiss,, RRooww,, CCooll,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+              Also:
+              setCellTextColour(This, Val, Row, Col) -> ok when
+              This::wxGrid(), Val::wx:wx_colour(), Row::integer(),
+              Col::integer().
+
+
+       sseettCCeellllVVaalluuee((TThhiiss,, CCoooorrddss,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Coords = {R::integer(), C::integer()}
+                 S = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettCCeellllVVaalluuee((TThhiiss,, RRooww,, CCooll,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 S = chardata() (see module unicode)
+
+              See external documentation.
+              Also:
+              setCellValue(This, Val, Row, Col) -> ok when
+              This::wxGrid(), Val::unicode:chardata(), Row::integer(),
+              Col::integer().
+
+
+       sseettCCoollAAttttrr((TThhiiss,, CCooll,, AAttttrr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Attr = wxGridCellAttr() (see module wxGridCellAttr)
+
+              See external documentation.
+
+       sseettCCoollFFoorrmmaattBBooooll((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+
+              See external documentation.
+
+       sseettCCoollFFoorrmmaattNNuummbbeerr((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+
+              See external documentation.
+
+       sseettCCoollFFoorrmmaattFFllooaatt((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+
+              Equivalent to sseettCCoollFFoorrmmaattFFllooaatt((TThhiiss,, CCooll,, [[]])).
+
+       sseettCCoollFFoorrmmaattFFllooaatt((TThhiiss,, CCooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Option = {width, integer()} | {precision, integer()}
+
+              See external documentation.
+
+       sseettCCoollFFoorrmmaattCCuussttoomm((TThhiiss,, CCooll,, TTyyppeeNNaammee)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 TypeName = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettCCoollLLaabbeellAAlliiggnnmmeenntt((TThhiiss,, HHoorriizz,, VVeerrtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Horiz = integer()
+                 Vert = integer()
+
+              See external documentation.
+
+       sseettCCoollLLaabbeellSSiizzee((TThhiiss,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettCCoollLLaabbeellVVaalluuee((TThhiiss,, CCooll,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Val = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettCCoollMMiinniimmaallWWiiddtthh((TThhiiss,, CCooll,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettCCoollMMiinniimmaallAAcccceeppttaabblleeWWiiddtthh((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettCCoollSSiizzee((TThhiiss,, CCooll,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Col = integer()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettDDeeffaauullttCCeellllAAlliiggnnmmeenntt((TThhiiss,, HHoorriizz,, VVeerrtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Horiz = integer()
+                 Vert = integer()
+
+              See external documentation.
+
+       sseettDDeeffaauullttCCeellllBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettDDeeffaauullttCCeellllFFoonntt((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettDDeeffaauullttCCeellllTTeexxttCCoolloouurr((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettDDeeffaauullttEEddiittoorr((TThhiiss,, EEddiittoorr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Editor = wxGridCellEditor() (see module wxGridCellEditor)
+
+              See external documentation.
+
+       sseettDDeeffaauullttRReennddeerreerr((TThhiiss,, RReennddeerreerr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Renderer = wxGridCellRenderer() (see module
+                 wxGridCellRenderer)
+
+              See external documentation.
+
+       sseettDDeeffaauullttCCoollSSiizzee((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Width = integer()
+
+              Equivalent to sseettDDeeffaauullttCCoollSSiizzee((TThhiiss,, WWiiddtthh,, [[]])).
+
+       sseettDDeeffaauullttCCoollSSiizzee((TThhiiss,, WWiiddtthh,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Width = integer()
+                 Option = {resizeExistingCols, boolean()}
+
+              See external documentation.
+
+       sseettDDeeffaauullttRRoowwSSiizzee((TThhiiss,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Height = integer()
+
+              Equivalent to sseettDDeeffaauullttRRoowwSSiizzee((TThhiiss,, HHeeiigghhtt,, [[]])).
+
+       sseettDDeeffaauullttRRoowwSSiizzee((TThhiiss,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Height = integer()
+                 Option = {resizeExistingRows, boolean()}
+
+              See external documentation.
+
+       sseettGGrriiddCCuurrssoorr((TThhiiss,, RRooww,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       sseettGGrriiddLLiinneeCCoolloouurr((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettLLaabbeellBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettLLaabbeellFFoonntt((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettLLaabbeellTTeexxttCCoolloouurr((TThhiiss,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Val = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettMMaarrggiinnss((TThhiiss,, EExxttrraaWWiiddtthh,, EExxttrraaHHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 ExtraWidth = integer()
+                 ExtraHeight = integer()
+
+              See external documentation.
+
+       sseettRReeaaddOOnnllyy((TThhiiss,, RRooww,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+
+              Equivalent to sseettRReeaaddOOnnllyy((TThhiiss,, RRooww,, CCooll,, [[]])).
+
+       sseettRReeaaddOOnnllyy((TThhiiss,, RRooww,, CCooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Col = integer()
+                 Option = {isReadOnly, boolean()}
+
+              See external documentation.
+
+       sseettRRoowwAAttttrr((TThhiiss,, RRooww,, AAttttrr)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Attr = wxGridCellAttr() (see module wxGridCellAttr)
+
+              See external documentation.
+
+       sseettRRoowwLLaabbeellAAlliiggnnmmeenntt((TThhiiss,, HHoorriizz,, VVeerrtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Horiz = integer()
+                 Vert = integer()
+
+              See external documentation.
+
+       sseettRRoowwLLaabbeellSSiizzee((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettRRoowwLLaabbeellVVaalluuee((TThhiiss,, RRooww,, VVaall)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Val = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettRRoowwMMiinniimmaallHHeeiigghhtt((TThhiiss,, RRooww,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettRRoowwMMiinniimmaallAAcccceeppttaabblleeHHeeiigghhtt((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettRRoowwSSiizzee((TThhiiss,, RRooww,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Row = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettSSccrroollllLLiinneeXX((TThhiiss,, XX)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 X = integer()
+
+              See external documentation.
+
+       sseettSSccrroollllLLiinneeYY((TThhiiss,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonnBBaacckkggrroouunndd((TThhiiss,, CC)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 C = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonnFFoorreeggrroouunndd((TThhiiss,, CC)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 C = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonnMMooddee((TThhiiss,, SSeellmmooddee)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+                 Selmode = wx_enum() (see module wx)
+
+              See external documentation.
+              Selmode = ?wxGrid_wxGridSelectCells | ?wxGrid_wxGridSelectRows |
+              ?wxGrid_wxGridSelectColumns
+
+       sshhoowwCCeellllEEddiittCCoonnttrrooll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGrid()
+
+              See external documentation.
+
+       xxTTooCCooll((TThhiiss,, XX)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+                 X = integer()
+
+              Equivalent to xxTTooCCooll((TThhiiss,, XX,, [[]])).
+
+       xxTTooCCooll((TThhiiss,, XX,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+                 X = integer()
+                 Option = {clipToMinMax, boolean()}
+
+              See external documentation.
+
+       xxTTooEEddggeeOOffCCooll((TThhiiss,, XX)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+                 X = integer()
+
+              See external documentation.
+
+       yyTTooEEddggeeOOffRRooww((TThhiiss,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+                 Y = integer()
+
+              See external documentation.
+
+       yyTTooRRooww((TThhiiss,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGrid()
+                 Y = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrriidd(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                         wxGrid(3)

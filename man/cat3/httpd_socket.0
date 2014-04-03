@@ -1,0 +1,52 @@
+httpd_socket(3)            Erlang Module Definition            httpd_socket(3)
+
+
+
+NNAAMMEE
+       httpd_socket - Communication utility functions to be used by the Erlang
+           Web server API programmer.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides the Erlang Web server API module programmer with
+       utility functions for generic sockets communication. The appropriate
+       communication mechanism is transparently used, that is _i_p___c_o_m_m or _s_s_l.
+
+EEXXPPOORRTTSS
+       ddeelliivveerr((SSoocckkeettTTyyppee,, SSoocckkeett,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 SocketType = socket_type()
+                 Socket = socket()
+                 Data = io_list() | binary()
+                 Result = socket_closed | void()
+
+              _d_e_l_i_v_e_r_/_3 sends the _B_i_n_a_r_y over the _S_o_c_k_e_t using the specified
+              _S_o_c_k_e_t_T_y_p_e. Socket and SocketType should be the socket and the
+              socket_type form the mod record as defined in httpd.hrl
+
+       ppeeeerrnnaammee((SSoocckkeettTTyyppee,,SSoocckkeett)) -->> {{PPoorrtt,,IIPPAAddddrreessss}}
+
+              Types:
+
+                 SocketType = socket_type()
+                 Socket = socket()
+                 Port = integer()
+                 IPAddress = string()
+
+              _p_e_e_r_n_a_m_e_/_3 returns the _P_o_r_t and _I_P_A_d_d_r_e_s_s of the remote _S_o_c_k_e_t.
+
+       rreessoollvvee(()) -->> HHoossttNNaammee
+
+              Types:
+
+                 HostName = string()
+
+              _r_e_s_o_l_v_e_/_0 returns the official _H_o_s_t_N_a_m_e of the current host.
+
+SSEEEE AALLSSOO
+       hhttttppdd((33))
+
+
+
+Ericsson AB                       inets 5.9.1                  httpd_socket(3)

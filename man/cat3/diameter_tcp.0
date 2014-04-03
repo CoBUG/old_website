@@ -1,0 +1,79 @@
+diameter_tcp(3)            Erlang Module Definition            diameter_tcp(3)
+
+
+
+NNAAMMEE
+       diameter_tcp - Diameter transport over TCP.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements diameter transport over TCP using ggeenn__ttccpp. It
+       can be specified as the value of a _t_r_a_n_s_p_o_r_t___m_o_d_u_l_e option to
+       ddiiaammeetteerr::aadddd__ttrraannssppoorrtt//22 and implements the behaviour documented in
+       ddiiaammeetteerr__ttrraannssppoorrtt((33)). TLS security is supported, both as an upgrade
+       following capabilities exchange as specified by RFC 3588 and at
+       connection establishment as in the current draft standard.
+
+       Note that the ssl application is required for TLS and must be started
+       before configuring TLS capability on diameter transports.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(({{TTyyppee,, RReeff}},, SSvvcc,, [[OOpptt]])) -->> {{ookk,, PPiidd,, [[LLAAddddrr]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = connect | accept
+                 Ref = ddiiaammeetteerr::ttrraannssppoorrtt__rreeff(())
+                 Svc = #diameter_service{}
+                 Opt = OwnOpt | SslOpt | TcpOpt
+                 Pid = pid()
+                 LAddr = iinneett::iipp__aaddddrreessss(())
+                 Reason = term()
+                 OwnOpt = {raddr, iinneett::iipp__aaddddrreessss(())} | {rport, integer()} |
+                 {port, integer()}
+                 SslOpt = {ssl_options, true | list()}
+                 TcpOpt = term()
+
+              The start function required by ddiiaammeetteerr__ttrraannssppoorrtt((33)).
+
+              The only diameter_tcp-specific argument is the options list.
+              Options _r_a_d_d_r and _r_p_o_r_t specify the remote address and port for
+              a connecting transport and are not valid for a listening
+              transport. Option _s_s_l___o_p_t_i_o_n_s must be specified for a transport
+              that should support TLS: a value of _t_r_u_e results in a TLS
+              handshake immediately upon connection establishment while _l_i_s_t_(_)
+              specifies options to be passed to ssssll::ccoonnnneecctt//22 or
+              ssssll::ssssll__aacccceepptt//22 after capabilities exchange if TLS is
+              negotiated. Remaining options are any accepted by ssssll::ccoonnnneecctt//33
+              or ggeenn__ttccpp::ccoonnnneecctt//33 for a connecting transport, or ssssll::lliisstteenn//22
+              or ggeenn__ttccpp::lliisstteenn//22 for a listening transport, depending on
+              whether or not _{_s_s_l___o_p_t_i_o_n_s_, _t_r_u_e_} has been specified. Options
+              _b_i_n_a_r_y, _p_a_c_k_e_t and _a_c_t_i_v_e cannot be specified. Also, option _p_o_r_t
+              can be specified for a listening transport to specify the local
+              listening port, the default being the standardized 3868 if
+              unspecified. Note that the option _i_p specifies the local
+              address.
+
+              An _s_s_l___o_p_t_i_o_n_s list must be specified if and only if the
+              transport in question has set _I_n_b_a_n_d_-_S_e_c_u_r_i_t_y_-_I_d to 1 (_T_L_S), as
+              specified to either ssttaarrtt__sseerrvviiccee//22 or aadddd__ttrraannssppoorrtt//22, so that
+              the transport process will receive notification of whether or
+              not to commence with a TLS handshake following capabilities
+              exchange. Failing to specify an options list on a TLS-capable
+              transport for which TLS is negotiated will cause TLS handshake
+              to fail. Failing to specify TLS capability when _s_s_l___o_p_t_i_o_n_s has
+              been specified will cause the transport process to wait for a
+              notification that will not be forthcoming, which will eventually
+              cause the RFC 3539 watchdog to take down the connection.
+
+              If the _#_d_i_a_m_e_t_e_r___s_e_r_v_i_c_e_{_} record has more than one _H_o_s_t_-_I_P_-
+              _A_d_d_r_e_s_s and option _i_p is unspecified then the first of the these
+              addresses is used as the local address.
+
+              The returned local address list has length one.
+
+SSEEEE AALLSSOO
+       ddiiaammeetteerr((33)), ddiiaammeetteerr__ttrraannssppoorrtt((33)), ggeenn__ttccpp((33)), iinneett((33)), ssssll((33))
+
+
+
+Ericsson AB                      diameter 1.2                  diameter_tcp(3)

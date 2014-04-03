@@ -1,0 +1,1784 @@
+ets(3)                     Erlang Module Definition                     ets(3)
+
+
+
+NNAAMMEE
+       ets - Built-In Term Storage
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is an interface to the Erlang built-in term storage BIFs.
+       These provide the ability to store very large quantities of data in an
+       Erlang runtime system, and to have constant access time to the data.
+       (In the case of _o_r_d_e_r_e_d___s_e_t, see below, access time is proportional to
+       the logarithm of the number of objects stored).
+
+       Data is organized as a set of dynamic tables, which can store tuples.
+       Each table is created by a process. When the process terminates, the
+       table is automatically destroyed. Every table has access rights set at
+       creation.
+
+       Tables are divided into four different types, _s_e_t, _o_r_d_e_r_e_d___s_e_t, _b_a_g and
+       _d_u_p_l_i_c_a_t_e___b_a_g. A _s_e_t or _o_r_d_e_r_e_d___s_e_t table can only have one object
+       associated with each key. A _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g can have many objects
+       associated with each key.
+
+       The number of tables stored at one Erlang node is limited. The current
+       default limit is approximately 1400 tables. The upper limit can be
+       increased by setting the environment variable _E_R_L___M_A_X___E_T_S___T_A_B_L_E_S before
+       starting the Erlang runtime system (i.e. with the _-_e_n_v option to
+       _e_r_l/_w_e_r_l). The actual limit may be slightly higher than the one
+       specified, but never lower.
+
+       Note that there is no automatic garbage collection for tables. Even if
+       there are no references to a table from any process, it will not
+       automatically be destroyed unless the owner process terminates. It can
+       be destroyed explicitly by using _d_e_l_e_t_e_/_1. The default owner is the
+       process that created the table. Table ownership can be transferred at
+       process termination by using the hheeiirr option or explicitly by calling
+       ggiivvee__aawwaayy//33.
+
+       Some implementation details:
+
+         * In the current implementation, every object insert and look-up
+           operation results in a copy of the object.
+
+         * _'_$_e_n_d___o_f___t_a_b_l_e_' should not be used as a key since this atom is used
+           to mark the end of the table when using _f_i_r_s_t/_n_e_x_t.
+
+       Also worth noting is the subtle difference between _m_a_t_c_h_i_n_g and
+       _c_o_m_p_a_r_i_n_g _e_q_u_a_l, which is demonstrated by the different table types _s_e_t
+       and _o_r_d_e_r_e_d___s_e_t. Two Erlang terms _m_a_t_c_h if they are of the same type
+       and have the same value, so that _1 matches _1, but not _1_._0 (as _1_._0 is a
+       _f_l_o_a_t_(_) and not an _i_n_t_e_g_e_r_(_)). Two Erlang terms _c_o_m_p_a_r_e _e_q_u_a_l if they
+       either are of the same type and value, or if both are numeric types and
+       extend to the same value, so that _1 compares equal to both _1 and _1_._0.
+       The _o_r_d_e_r_e_d___s_e_t works on the _E_r_l_a_n_g _t_e_r_m _o_r_d_e_r and there is no defined
+       order between an _i_n_t_e_g_e_r_(_) and a _f_l_o_a_t_(_) that extends to the same
+       value, hence the key _1 and the key _1_._0 are regarded as equal in an
+       _o_r_d_e_r_e_d___s_e_t table.
+
+FFAAIILLUURREE
+       In general, the functions below will exit with reason _b_a_d_a_r_g if any
+       argument is of the wrong format, if the table identifier is invalid or
+       if the operation is denied due to table access rights (pprrootteecctteedd or
+       pprriivvaattee).
+
+CCOONNCCUURRRREENNCCYY
+       This module provides some limited support for concurrent access. All
+       updates to single objects are guaranteed to be both _a_t_o_m_i_c and
+       _i_s_o_l_a_t_e_d. This means that an updating operation towards a single object
+       will either succeed or fail completely without any effect at all
+       (atomicy). Nor can any intermediate results of the update be seen by
+       other processes (isolation). Some functions that update several objects
+       state that they even guarantee atomicy and isolation for the entire
+       operation. In database terms the isolation level can be seen as
+       "serializable", as if all isolated operations were carried out
+       serially, one after the other in a strict order.
+
+       No other support is available within ETS that would guarantee
+       consistency between objects. However, the _s_a_f_e___f_i_x_t_a_b_l_e_/_2 function can
+       be used to guarantee that a sequence of _f_i_r_s_t_/_1 and _n_e_x_t_/_2 calls will
+       traverse the table without errors and that each existing object in the
+       table is visited exactly once, even if another process (or the same
+       process) simultaneously deletes or inserts objects into the table.
+       Nothing more is guaranteed; in particular objects that are inserted or
+       deleted during such a traversal may be visited once or not at all.
+       Functions that internally traverse over a table, like _s_e_l_e_c_t and _m_a_t_c_h,
+       will give the same guarantee as _s_a_f_e___f_i_x_t_a_b_l_e.
+
+MMAATTCCHH SSPPEECCIIFFIICCAATTIIOONNSS
+       Some of the functions uses a _m_a_t_c_h _s_p_e_c_i_f_i_c_a_t_i_o_n, match_spec. A brief
+       explanation is given in sseelleecctt//22. For a detailed description, see the
+       chapter "Match specifications in Erlang" in _E_R_T_S _U_s_e_r_'_s _G_u_i_d_e.
+
+DDAATTAA TTYYPPEESS
+       ccoonnttiinnuuaattiioonn(())
+
+              Opaque continuation used by _s_e_l_e_c_t_/_1 and _s_e_l_e_c_t_/_3.
+
+       mmaattcchh__ssppeecc(()) = [{mmaattcchh__ppaatttteerrnn(()), [term()], [term()]}]
+
+              A match specification, see above.
+
+       mmaattcchh__ppaatttteerrnn(()) = atom() | tuple()
+
+       ttaabb(()) = atom() | ttiidd(())
+
+       ttiidd(())
+
+              A table identifier, as returned by new/2.
+
+EEXXPPOORRTTSS
+       aallll(()) -->> [[TTaabb]]
+
+              Types:
+
+                 Tab = tid() | atom()
+
+              Returns a list of all tables at the node. Named tables are given
+              by their names, unnamed tables are given by their table
+              identifiers.
+
+       ddeelleettee((TTaabb)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+
+              Deletes the entire table _T_a_b.
+
+       ddeelleettee((TTaabb,, KKeeyy)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+
+              Deletes all objects with the key _K_e_y from the table _T_a_b.
+
+       ddeelleettee__aallll__oobbjjeeccttss((TTaabb)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+
+              Delete all objects in the ETS table _T_a_b. The operation is
+              guaranteed to be aattoommiicc aanndd iissoollaatteedd.
+
+       ddeelleettee__oobbjjeecctt((TTaabb,,OObbjjeecctt)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Object = tuple()
+
+              Delete the exact object _O_b_j_e_c_t from the ETS table, leaving
+              objects with the same key but other differences (useful for type
+              _b_a_g). In a _d_u_p_l_i_c_a_t_e___b_a_g, all instances of the object will be
+              deleted.
+
+       ffiillee22ttaabb((FFiilleennaammee)) -->> {{ookk,, TTaabb}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Tab = ttaabb(())
+                 Reason = term()
+
+              Reads a file produced by ttaabb22ffiillee//22 or ttaabb22ffiillee//33 and creates
+              the corresponding table _T_a_b.
+
+              Equivalent to _f_i_l_e_2_t_a_b_(_F_i_l_e_n_a_m_e_, _[_]_).
+
+       ffiillee22ttaabb((FFiilleennaammee,, OOppttiioonnss)) -->> {{ookk,, TTaabb}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Tab = ttaabb(())
+                 Options = [Option]
+                 Option = {verify, boolean()}
+                 Reason = term()
+
+              Reads a file produced by ttaabb22ffiillee//22 or ttaabb22ffiillee//33 and creates
+              the corresponding table _T_a_b.
+
+              The currently only supported option is _{_v_e_r_i_f_y_,_b_o_o_l_e_a_n_(_)_}. If
+              verification is turned on (by means of specifying
+              _{_v_e_r_i_f_y_,_t_r_u_e_}), the function utilizes whatever information is
+              present in the file to assert that the information is not
+              damaged. How this is done depends on which _e_x_t_e_n_d_e_d___i_n_f_o was
+              written using ttaabb22ffiillee//33.
+
+              If no _e_x_t_e_n_d_e_d___i_n_f_o is present in the file and _{_v_e_r_i_f_y_,_t_r_u_e_} is
+              specified, the number of objects written is compared to the size
+              of the original table when the dump was started. This might make
+              verification fail if the table was _p_u_b_l_i_c and objects were added
+              or removed while the table was dumped to file. To avoid this
+              type of problems, either do not verify files dumped while
+              updated simultaneously or use the _{_e_x_t_e_n_d_e_d___i_n_f_o_,
+              _[_o_b_j_e_c_t___c_o_u_n_t_]_} option to ttaabb22ffiillee//33, which extends the
+              information in the file with the number of objects actually
+              written.
+
+              If verification is turned on and the file was written with the
+              option _{_e_x_t_e_n_d_e_d___i_n_f_o_, _[_m_d_5_s_u_m_]_}, reading the file is slower and
+              consumes radically more CPU time than otherwise.
+
+              _{_v_e_r_i_f_y_,_f_a_l_s_e_} is the default.
+
+       ffiirrsstt((TTaabb)) -->> KKeeyy || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+
+              Returns the first key _K_e_y in the table _T_a_b. If the table is of
+              the _o_r_d_e_r_e_d___s_e_t type, the first key in Erlang term order will be
+              returned. If the table is of any other type, the first key
+              according to the table's internal order will be returned. If the
+              table is empty, _'_$_e_n_d___o_f___t_a_b_l_e_' will be returned.
+
+              Use _n_e_x_t_/_2 to find subsequent keys in the table.
+
+       ffoollddll((FFuunnccttiioonn,, AAcccc00,, TTaabb)) -->> AAcccc11
+
+              Types:
+
+                 Function = fun((Element :: term(), AccIn) -> AccOut)
+                 Tab = ttaabb(())
+                 Acc0 = Acc1 = AccIn = AccOut = term()
+
+              _A_c_c_0 is returned if the table is empty. This function is similar
+              to _l_i_s_t_s_:_f_o_l_d_l_/_3. The order in which the elements of the table
+              are traversed is unspecified, except for tables of type
+              _o_r_d_e_r_e_d___s_e_t, for which they are traversed first to last.
+
+              If _F_u_n_c_t_i_o_n inserts objects into the table, or another process
+              inserts objects into the table, those objects _m_a_y (depending on
+              key ordering) be included in the traversal.
+
+       ffoollddrr((FFuunnccttiioonn,, AAcccc00,, TTaabb)) -->> AAcccc11
+
+              Types:
+
+                 Function = fun((Element :: term(), AccIn) -> AccOut)
+                 Tab = ttaabb(())
+                 Acc0 = Acc1 = AccIn = AccOut = term()
+
+              _A_c_c_0 is returned if the table is empty. This function is similar
+              to _l_i_s_t_s_:_f_o_l_d_r_/_3. The order in which the elements of the table
+              are traversed is unspecified, except for tables of type
+              _o_r_d_e_r_e_d___s_e_t, for which they are traversed last to first.
+
+              If _F_u_n_c_t_i_o_n inserts objects into the table, or another process
+              inserts objects into the table, those objects _m_a_y (depending on
+              key ordering) be included in the traversal.
+
+       ffrroomm__ddeettss((TTaabb,, DDeettssTTaabb)) -->> ttrruuee
+
+              Types:
+
+                 Tab = ttaabb(())
+                 DetsTab = ddeettss::ttaabb__nnaammee(())
+
+              Fills an already created ETS table with the objects in the
+              already opened Dets table named _D_e_t_s_T_a_b. The existing objects of
+              the ETS table are kept unless overwritten.
+
+              Throws a badarg error if any of the tables does not exist or the
+              dets table is not open.
+
+       ffuunn22mmss((LLiitteerraallFFuunn)) -->> MMaattcchhSSppeecc
+
+              Types:
+
+                 LiteralFun = function()
+                 MatchSpec = mmaattcchh__ssppeecc(())
+
+              Pseudo function that by means of a _p_a_r_s_e___t_r_a_n_s_f_o_r_m translates
+              _L_i_t_e_r_a_l_F_u_n typed as parameter in the function call to a
+              mmaattcchh__ssppeecc. With "literal" is meant that the fun needs to
+              textually be written as the parameter of the function, it cannot
+              be held in a variable which in turn is passed to the function).
+
+              The parse transform is implemented in the module _m_s___t_r_a_n_s_f_o_r_m
+              and the source _m_u_s_t include the file _m_s___t_r_a_n_s_f_o_r_m_._h_r_l in STDLIB
+              for this pseudo function to work. Failing to include the hrl
+              file in the source will result in a runtime error, not a compile
+              time ditto. The include file is easiest included by adding the
+              line _-_i_n_c_l_u_d_e___l_i_b_(_"_s_t_d_l_i_b_/_i_n_c_l_u_d_e_/_m_s___t_r_a_n_s_f_o_r_m_._h_r_l_"_)_. to the
+              source file.
+
+              The fun is very restricted, it can take only a single parameter
+              (the object to match): a sole variable or a tuple. It needs to
+              use the _i_s__XXX guard tests. Language constructs that have no
+              representation in a match_spec (like _i_f, _c_a_s_e, _r_e_c_e_i_v_e etc) are
+              not allowed.
+
+              The return value is the resulting match_spec.
+
+              Example:
+
+              1> ets:fun2ms(fun({M,N}) when N > 3 -> M end).
+              [{{'$1','$2'},[{'>','$2',3}],['$1']}]
+
+              Variables from the environment can be imported, so that this
+              works:
+
+              2> X=3.
+              3
+              3> ets:fun2ms(fun({M,N}) when N > X -> M end).
+              [{{'$1','$2'},[{'>','$2',{const,3}}],['$1']}]
+
+              The imported variables will be replaced by match_spec _c_o_n_s_t
+              expressions, which is consistent with the static scoping for
+              Erlang funs. Local or global function calls can not be in the
+              guard or body of the fun however. Calls to builtin match_spec
+              functions of course is allowed:
+
+              4> ets:fun2ms(fun({M,N}) when N > X, is_atomm(M) -> M end).
+              Error: fun containing local Erlang function calls
+              ('is_atomm' called in guard) cannot be translated into match_spec
+              {error,transform_error}
+              5> ets:fun2ms(fun({M,N}) when N > X, is_atom(M) -> M end).
+              [{{'$1','$2'},[{'>','$2',{const,3}},{is_atom,'$1'}],['$1']}]
+
+              As can be seen by the example, the function can be called from
+              the shell too. The fun needs to be literally in the call when
+              used from the shell as well. Other means than the
+              parse_transform are used in the shell case, but more or less the
+              same restrictions apply (the exception being records, as they
+              are not handled by the shell).
+
+          WWaarrnniinngg::
+              If the parse_transform is not applied to a module which calls
+              this pseudo function, the call will fail in runtime (with a
+              _b_a_d_a_r_g). The module _e_t_s actually exports a function with this
+              name, but it should never really be called except for when using
+              the function in the shell. If the _p_a_r_s_e___t_r_a_n_s_f_o_r_m is properly
+              applied by including the _m_s___t_r_a_n_s_f_o_r_m_._h_r_l header file, compiled
+              code will never call the function, but the function call is
+              replaced by a literal match_spec.
+
+
+              For more information, see mmss__ttrraannssffoorrmm((33)).
+
+       ggiivvee__aawwaayy((TTaabb,, PPiidd,, GGiiffttDDaattaa)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Pid = pid()
+                 GiftData = term()
+
+              Make process _P_i_d the new owner of table _T_a_b. If successful, the
+              message _{_'_E_T_S_-_T_R_A_N_S_F_E_R_'_,_T_a_b_,_F_r_o_m_P_i_d_,_G_i_f_t_D_a_t_a_} will be sent to
+              the new owner.
+
+              The process _P_i_d must be alive, local and not already the owner
+              of the table. The calling process must be the table owner.
+
+              Note that _g_i_v_e___a_w_a_y does not at all affect the hheeiirr option of
+              the table. A table owner can for example set the _h_e_i_r to itself,
+              give the table away and then get it back in case the receiver
+              terminates.
+
+       ii(()) -->> ookk
+
+              Displays information about all ETS tables on tty.
+
+       ii((TTaabb)) -->> ookk
+
+              Types:
+
+                 Tab = ttaabb(())
+
+              Browses the table _T_a_b on tty.
+
+       iinnffoo((TTaabb)) -->> [[{{IItteemm,, VVaalluuee}}]] || uunnddeeffiinneedd
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Item = atom(), see below
+                 Value = term(), see below
+
+              Returns information about the table _T_a_b as a list of _{_I_t_e_m_,
+              _V_a_l_u_e_} tuples. If _T_a_b has the correct type for a table
+              identifier, but does not refer to an existing ETS table,
+              _u_n_d_e_f_i_n_e_d is returned. If _T_a_b is not of the correct type, this
+              function fails with reason _b_a_d_a_r_g.
+
+                * _I_t_e_m_=_m_e_m_o_r_y_, _V_a_l_u_e_=_i_n_t_e_g_e_r_(_)
+                   The number of words allocated to the table.
+
+                * _I_t_e_m_=_o_w_n_e_r_, _V_a_l_u_e_=_p_i_d_(_)
+                   The pid of the owner of the table.
+
+                * _I_t_e_m_=_h_e_i_r_, _V_a_l_u_e_=_p_i_d_(_)_|_n_o_n_e
+                   The pid of the heir of the table, or _n_o_n_e if no heir is
+                  set.
+
+                * _I_t_e_m_=_n_a_m_e_, _V_a_l_u_e_=_a_t_o_m_(_)
+                   The name of the table.
+
+                * _I_t_e_m_=_s_i_z_e_, _V_a_l_u_e_=_i_n_t_e_g_e_r_(_)
+                   The number of objects inserted in the table.
+
+                * _I_t_e_m_=_n_o_d_e_, _V_a_l_u_e_=_a_t_o_m_(_)
+                   The node where the table is stored. This field is no longer
+                  meaningful as tables cannot be accessed from other nodes.
+
+                * _I_t_e_m_=_n_a_m_e_d___t_a_b_l_e_, _V_a_l_u_e_=_t_r_u_e_|_f_a_l_s_e
+                   Indicates if the table is named or not.
+
+                * _I_t_e_m_=_t_y_p_e_, _V_a_l_u_e_=_s_e_t_|_o_r_d_e_r_e_d___s_e_t_|_b_a_g_|_d_u_p_l_i_c_a_t_e___b_a_g
+                   The table type.
+
+                * _I_t_e_m_=_k_e_y_p_o_s_, _V_a_l_u_e_=_i_n_t_e_g_e_r_(_)
+                   The key position.
+
+                * _I_t_e_m_=_p_r_o_t_e_c_t_i_o_n_, _V_a_l_u_e_=_p_u_b_l_i_c_|_p_r_o_t_e_c_t_e_d_|_p_r_i_v_a_t_e
+                   The table access rights.
+
+                * _I_t_e_m_=_c_o_m_p_r_e_s_s_e_d_, _V_a_l_u_e_=_t_r_u_e_|_f_a_l_s_e
+                   Indicates if the table is compressed or not.
+
+       iinnffoo((TTaabb,, IItteemm)) -->> VVaalluuee || uunnddeeffiinneedd
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Item, Value - see below
+
+              Returns the information associated with _I_t_e_m for the table _T_a_b,
+              or returns _u_n_d_e_f_i_n_e_d if _T_a_b does not refer an existing ETS
+              table. If _T_a_b is not of the correct type, or if _I_t_e_m is not one
+              of the allowed values, this function fails with reason _b_a_d_a_r_g.
+
+          WWaarrnniinngg::
+              In R11B and earlier, this function would not fail but return
+              _u_n_d_e_f_i_n_e_d for invalid values for _I_t_e_m.
+
+
+              In addition to the _{_I_t_e_m_,_V_a_l_u_e_} pairs defined for _i_n_f_o_/_1, the
+              following items are allowed:
+
+                * _I_t_e_m_=_f_i_x_e_d_, _V_a_l_u_e_=_t_r_u_e_|_f_a_l_s_e
+                   Indicates if the table is fixed by any process or not.
+
+                * _I_t_e_m_=_s_a_f_e___f_i_x_e_d_, _V_a_l_u_e_=_{_F_i_r_s_t_F_i_x_e_d_,_I_n_f_o_}_|_f_a_l_s_e
+
+
+                  If the table has been fixed using _s_a_f_e___f_i_x_t_a_b_l_e_/_2, the call
+                  returns a tuple where _F_i_r_s_t_F_i_x_e_d is the time when the table
+                  was first fixed by a process, which may or may not be one of
+                  the processes it is fixed by right now.
+
+                  _I_n_f_o is a possibly empty lists of tuples _{_P_i_d_,_R_e_f_C_o_u_n_t_}, one
+                  tuple for every process the table is fixed by right now.
+                  _R_e_f_C_o_u_n_t is the value of the reference counter, keeping
+                  track of how many times the table has been fixed by the
+                  process.
+
+                  If the table never has been fixed, the call returns _f_a_l_s_e.
+
+                * _I_t_e_m_=_s_t_a_t_s_, _V_a_l_u_e_=_t_u_p_l_e_(_)
+                  Returns internal statistics about set, bag and duplicate_bag
+                  tables on an internal format used by OTP test suites. Not
+                  for production use.
+
+       iinniitt__ttaabbllee((TTaabb,, IInniittFFuunn)) -->> ttrruuee
+
+              Types:
+
+                 Tab = ttaabb(())
+                 InitFun = fun((Arg) -> Res)
+                 Arg = read | close
+                 Res = end_of_input | {Objects :: [term()], InitFun} | term()
+
+              Replaces the existing objects of the table _T_a_b with objects
+              created by calling the input function _I_n_i_t_F_u_n, see below. This
+              function is provided for compatibility with the _d_e_t_s module, it
+              is not more efficient than filling a table by using
+              _e_t_s_:_i_n_s_e_r_t_/_2.
+
+              When called with the argument _r_e_a_d the function _I_n_i_t_F_u_n is
+              assumed to return _e_n_d___o_f___i_n_p_u_t when there is no more input, or
+              _{_O_b_j_e_c_t_s_, _F_u_n_}, where _O_b_j_e_c_t_s is a list of objects and _F_u_n is a
+              new input function. Any other value Value is returned as an
+              error _{_e_r_r_o_r_, _{_i_n_i_t___f_u_n_, _V_a_l_u_e_}_}. Each input function will be
+              called exactly once, and should an error occur, the last
+              function is called with the argument _c_l_o_s_e, the reply of which
+              is ignored.
+
+              If the type of the table is _s_e_t and there is more than one
+              object with a given key, one of the objects is chosen. This is
+              not necessarily the last object with the given key in the
+              sequence of objects returned by the input functions. This holds
+              also for duplicated objects stored in tables of type _b_a_g.
+
+       iinnsseerrtt((TTaabb,, OObbjjeeccttOOrrOObbjjeeccttss)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 ObjectOrObjects = tuple() | [tuple()]
+
+              Inserts the object or all of the objects in the list
+              _O_b_j_e_c_t_O_r_O_b_j_e_c_t_s into the table _T_a_b. If the table is a _s_e_t and
+              the key of the inserted objects _m_a_t_c_h_e_s the key of any object in
+              the table, the old object will be replaced. If the table is an
+              _o_r_d_e_r_e_d___s_e_t and the key of the inserted object _c_o_m_p_a_r_e_s _e_q_u_a_l to
+              the key of any object in the table, the old object is also
+              replaced. If the list contains more than one object with
+              _m_a_t_c_h_i_n_g keys and the table is a _s_e_t, one will be inserted,
+              which one is not defined. The same thing holds for _o_r_d_e_r_e_d___s_e_t,
+              but will also happen if the keys _c_o_m_p_a_r_e _e_q_u_a_l.
+
+              The entire operation is guaranteed to be aattoommiicc aanndd iissoollaatteedd,
+              even when a list of objects is inserted.
+
+       iinnsseerrtt__nneeww((TTaabb,, OObbjjeeccttOOrrOObbjjeeccttss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Tab = tid() | atom()
+                 ObjectOrObjects = tuple() | [tuple()]
+
+              This function works exactly like _i_n_s_e_r_t_/_2, with the exception
+              that instead of overwriting objects with the same key (in the
+              case of _s_e_t or _o_r_d_e_r_e_d___s_e_t) or adding more objects with keys
+              already existing in the table (in the case of _b_a_g and
+              _d_u_p_l_i_c_a_t_e___b_a_g), it simply returns _f_a_l_s_e. If _O_b_j_e_c_t_O_r_O_b_j_e_c_t_s is a
+              list, the function checks _e_v_e_r_y key prior to inserting anything.
+              Nothing will be inserted if not _a_l_l keys present in the list are
+              absent from the table. Like _i_n_s_e_r_t_/_2, the entire operation is
+              guaranteed to be aattoommiicc aanndd iissoollaatteedd.
+
+       iiss__ccoommppiilleedd__mmss((TTeerrmm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Term = term()
+
+              This function is used to check if a term is a valid compiled
+              mmaattcchh__ssppeecc. The compiled match_spec is an opaque datatype which
+              can _n_o_t be sent between Erlang nodes nor be stored on disk. Any
+              attempt to create an external representation of a compiled
+              match_spec will result in an empty binary (_<_<_>_>). As an example,
+              the following expression:
+
+              ets:is_compiled_ms(ets:match_spec_compile([{'_',[],[true]}])).
+
+              will yield _t_r_u_e, while the following expressions:
+
+              MS = ets:match_spec_compile([{'_',[],[true]}]),
+              Broken = binary_to_term(term_to_binary(MS)),
+              ets:is_compiled_ms(Broken).
+
+              will yield false, as the variable _B_r_o_k_e_n will contain a compiled
+              match_spec that has passed through external representation.
+
+          NNoottee::
+              The fact that compiled match_specs has no external
+              representation is for performance reasons. It may be subject to
+              change in future releases, while this interface will still
+              remain for backward compatibility reasons.
+
+
+       llaasstt((TTaabb)) -->> KKeeyy || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+
+              Returns the last key _K_e_y according to Erlang term order in the
+              table _T_a_b of the _o_r_d_e_r_e_d___s_e_t type. If the table is of any other
+              type, the function is synonymous to _f_i_r_s_t_/_2. If the table is
+              empty, _'_$_e_n_d___o_f___t_a_b_l_e_' is returned.
+
+              Use _p_r_e_v_/_2 to find preceding keys in the table.
+
+       llooookkuupp((TTaabb,, KKeeyy)) -->> [[OObbjjeecctt]]
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+                 Object = tuple()
+
+              Returns a list of all objects with the key _K_e_y in the table _T_a_b.
+
+              In the case of _s_e_t_, _b_a_g _a_n_d _d_u_p_l_i_c_a_t_e___b_a_g, an object is returned
+              only if the given key _m_a_t_c_h_e_s the key of the object in the
+              table. If the table is an _o_r_d_e_r_e_d___s_e_t however, an object is
+              returned if the key given _c_o_m_p_a_r_e_s _e_q_u_a_l to the key of an object
+              in the table. The difference being the same as between _=_:_= and
+              _=_=. As an example, one might insert an object with the _i_n_t_e_g_e_r_(_)
+              _1 as a key in an _o_r_d_e_r_e_d___s_e_t and get the object returned as a
+              result of doing a _l_o_o_k_u_p_/_2 with the _f_l_o_a_t_(_) _1_._0 as the key to
+              search for.
+
+              If the table is of type _s_e_t or _o_r_d_e_r_e_d___s_e_t, the function returns
+              either the empty list or a list with one element, as there
+              cannot be more than one object with the same key. If the table
+              is of type _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g, the function returns a list of
+              arbitrary length.
+
+              Note that the time order of object insertions is preserved; the
+              first object inserted with the given key will be first in the
+              resulting list, and so on.
+
+              Insert and look-up times in tables of type _s_e_t, _b_a_g and
+              _d_u_p_l_i_c_a_t_e___b_a_g are constant, regardless of the size of the table.
+              For the _o_r_d_e_r_e_d___s_e_t data-type, time is proportional to the
+              (binary) logarithm of the number of objects.
+
+       llooookkuupp__eelleemmeenntt((TTaabb,, KKeeyy,, PPooss)) -->> EElleemm
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+                 Pos = integer()
+                 Elem = term() | [term()]
+
+              If the table _T_a_b is of type _s_e_t or _o_r_d_e_r_e_d___s_e_t, the function
+              returns the _P_o_s:th element of the object with the key _K_e_y.
+
+              If the table is of type _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g, the functions
+              returns a list with the _P_o_s:th element of every object with the
+              key _K_e_y.
+
+              If no object with the key _K_e_y exists, the function will exit
+              with reason _b_a_d_a_r_g.
+
+              The difference between _s_e_t, _b_a_g and _d_u_p_l_i_c_a_t_e___b_a_g on one hand,
+              and _o_r_d_e_r_e_d___s_e_t on the other, regarding the fact that
+              _o_r_d_e_r_e_d___s_e_t's view keys as equal when they _c_o_m_p_a_r_e _e_q_u_a_l whereas
+              the other table types only regard them equal when they _m_a_t_c_h,
+              naturally holds for _l_o_o_k_u_p___e_l_e_m_e_n_t as well as for _l_o_o_k_u_p.
+
+       mmaattcchh((TTaabb,, PPaatttteerrnn)) -->> [[MMaattcchh]]
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Pattern = tuple()
+                 Match = [term()]
+
+              Matches the objects in the table _T_a_b against the pattern
+              _P_a_t_t_e_r_n.
+
+              A pattern is a term that may contain:
+
+                * bound parts (Erlang terms),
+
+                * _'___' which matches any Erlang term, and
+
+                * pattern variables: _'_$_N_' where _N=0,1,...
+
+              The function returns a list with one element for each matching
+              object, where each element is an ordered list of pattern
+              variable bindings. An example:
+
+              6> ets:match(T, '$1'). % Matches every object in the table
+              [[{rufsen,dog,7}],[{brunte,horse,5}],[{ludde,dog,5}]]
+              7> ets:match(T, {'_',dog,'$1'}).
+              [[7],[5]]
+              8> ets:match(T, {'_',cow,'$1'}).
+              []
+
+              If the key is specified in the pattern, the match is very
+              efficient. If the key is not specified, i.e. if it is a variable
+              or an underscore, the entire table must be searched. The search
+              time can be substantial if the table is very large.
+
+              On tables of the _o_r_d_e_r_e_d___s_e_t type, the result is in the same
+              order as in a _f_i_r_s_t_/_n_e_x_t traversal.
+
+       mmaattcchh((TTaabb,, PPaatttteerrnn,, LLiimmiitt)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Pattern = tuple()
+                 Match = [term()]
+                 Continuation = term()
+
+              Works like _e_t_s_:_m_a_t_c_h_/_2 but only returns a limited (_L_i_m_i_t) number
+              of matching objects. The _C_o_n_t_i_n_u_a_t_i_o_n term can then be used in
+              subsequent calls to _e_t_s_:_m_a_t_c_h_/_1 to get the next chunk of
+              matching objects. This is a space efficient way to work on
+              objects in a table which is still faster than traversing the
+              table object by object using _e_t_s_:_f_i_r_s_t_/_1 and _e_t_s_:_n_e_x_t_/_1.
+
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned if the table is empty.
+
+       mmaattcchh((CCoonnttiinnuuaattiioonn)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Match = [term()]
+                 Continuation = term()
+
+              Continues a match started with _e_t_s_:_m_a_t_c_h_/_3. The next chunk of
+              the size given in the initial _e_t_s_:_m_a_t_c_h_/_3 call is returned
+              together with a new _C_o_n_t_i_n_u_a_t_i_o_n that can be used in subsequent
+              calls to this function.
+
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned when there are no more objects in
+              the table.
+
+       mmaattcchh__ddeelleettee((TTaabb,, PPaatttteerrnn)) -->> ttrruuee
+
+              Types:
+
+                 Tab = ttaabb(())
+                 Pattern = mmaattcchh__ppaatttteerrnn(())
+
+              Deletes all objects which match the pattern _P_a_t_t_e_r_n from the
+              table _T_a_b. See _m_a_t_c_h_/_2 for a description of patterns.
+
+       mmaattcchh__oobbjjeecctt((TTaabb,, PPaatttteerrnn)) -->> [[OObbjjeecctt]]
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Pattern = Object = tuple()
+
+              Matches the objects in the table _T_a_b against the pattern
+              _P_a_t_t_e_r_n. See _m_a_t_c_h_/_2 for a description of patterns. The function
+              returns a list of all objects which match the pattern.
+
+              If the key is specified in the pattern, the match is very
+              efficient. If the key is not specified, i.e. if it is a variable
+              or an underscore, the entire table must be searched. The search
+              time can be substantial if the table is very large.
+
+              On tables of the _o_r_d_e_r_e_d___s_e_t type, the result is in the same
+              order as in a _f_i_r_s_t_/_n_e_x_t traversal.
+
+       mmaattcchh__oobbjjeecctt((TTaabb,, PPaatttteerrnn,, LLiimmiitt)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} ||
+       ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Pattern = tuple()
+                 Match = [term()]
+                 Continuation = term()
+
+              Works like _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_2 but only returns a limited (_L_i_m_i_t)
+              number of matching objects. The _C_o_n_t_i_n_u_a_t_i_o_n term can then be
+              used in subsequent calls to _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_1 to get the next
+              chunk of matching objects. This is a space efficient way to work
+              on objects in a table which is still faster than traversing the
+              table object by object using _e_t_s_:_f_i_r_s_t_/_1 and _e_t_s_:_n_e_x_t_/_1.
+
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned if the table is empty.
+
+       mmaattcchh__oobbjjeecctt((CCoonnttiinnuuaattiioonn)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Match = [term()]
+                 Continuation = term()
+
+              Continues a match started with _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_3. The next
+              chunk of the size given in the initial _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_3 call
+              is returned together with a new _C_o_n_t_i_n_u_a_t_i_o_n that can be used in
+              subsequent calls to this function.
+
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned when there are no more objects in
+              the table.
+
+       mmaattcchh__ssppeecc__ccoommppiillee((MMaattcchhSSppeecc)) -->> CCoommppiilleeddMMaattcchhSSppeecc
+
+              Types:
+
+                 MatchSpec = match_spec()
+                 CompiledMatchSpec = comp_match_spec()
+
+              This function transforms a mmaattcchh__ssppeecc into an internal
+              representation that can be used in subsequent calls to
+              _e_t_s_:_m_a_t_c_h___s_p_e_c___r_u_n_/_2. The internal representation is opaque and
+              can not be converted to external term format and then back again
+              without losing its properties (meaning it can not be sent to a
+              process on another node and still remain a valid compiled
+              match_spec, nor can it be stored on disk). The validity of a
+              compiled match_spec can be checked using _e_t_s_:_i_s___c_o_m_p_i_l_e_d___m_s_/_1.
+
+              If the term _M_a_t_c_h_S_p_e_c can not be compiled (does not represent a
+              valid match_spec), a _b_a_d_a_r_g fault is thrown.
+
+          NNoottee::
+              This function has limited use in normal code, it is used by Dets
+              to perform the _d_e_t_s_:_s_e_l_e_c_t operations.
+
+
+       mmaattcchh__ssppeecc__rruunn((LLiisstt,,CCoommppiilleeddMMaattcchhSSppeecc)) -->> lliisstt(())
+
+              Types:
+
+                 List = [ tuple() ]
+                 CompiledMatchSpec = comp_match_spec()
+
+              This function executes the matching specified in a compiled
+              mmaattcchh__ssppeecc on a list of tuples. The _C_o_m_p_i_l_e_d_M_a_t_c_h_S_p_e_c term
+              should be the result of a call to _e_t_s_:_m_a_t_c_h___s_p_e_c___c_o_m_p_i_l_e_/_1 and
+              is hence the internal representation of the match_spec one wants
+              to use.
+
+              The matching will be executed on each element in _L_i_s_t and the
+              function returns a list containing all results. If an element in
+              _L_i_s_t does not match, nothing is returned for that element. The
+              length of the result list is therefore equal or less than the
+              the length of the parameter _L_i_s_t. The two calls in the following
+              example will give the same result (but certainly not the same
+              execution time...):
+
+              Table = ets:new...
+              MatchSpec = ....
+              % The following call...
+              ets:match_spec_run(ets:tab2list(Table),
+              ets:match_spec_compile(MatchSpec)),
+              % ...will give the same result as the more common (and more efficient)
+              ets:select(Table,MatchSpec),
+
+          NNoottee::
+              This function has limited use in normal code, it is used by Dets
+              to perform the _d_e_t_s_:_s_e_l_e_c_t operations and by Mnesia during
+              transactions.
+
+
+       mmeemmbbeerr((TTaabb,, KKeeyy)) -->> ttrruuee || ffaallssee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+
+              Works like _l_o_o_k_u_p_/_2, but does not return the objects. The
+              function returns _t_r_u_e if one or more elements in the table has
+              the key _K_e_y, _f_a_l_s_e otherwise.
+
+       nneeww((NNaammee,, OOppttiioonnss)) -->> ttiidd(()) || aattoomm(())
+
+              Types:
+
+                 Name = atom()
+                 Options = [Option]
+                  Option = Type | Access | named_table | {keypos,Pos} |
+                 {heir,pid(),HeirData} | {heir,none} | Tweaks
+                  Type = set | ordered_set | bag | duplicate_bag
+                  Access = public | protected | private
+                  Tweaks = {write_concurrency,boolean()} |
+                 {read_concurrency,boolean()} | compressed
+                  Pos = integer()
+                  HeirData = term()
+
+              Creates a new table and returns a table identifier which can be
+              used in subsequent operations. The table identifier can be sent
+              to other processes so that a table can be shared between
+              different processes within a node.
+
+              The parameter _O_p_t_i_o_n_s is a list of atoms which specifies table
+              type, access rights, key position and if the table is named or
+              not. If one or more options are left out, the default values are
+              used. This means that not specifying any options (_[_]) is the
+              same as specifying _[_s_e_t_, _p_r_o_t_e_c_t_e_d_, _{_k_e_y_p_o_s_,_1_}_, _{_h_e_i_r_,_n_o_n_e_}_,
+              _{_w_r_i_t_e___c_o_n_c_u_r_r_e_n_c_y_,_f_a_l_s_e_}_, _{_r_e_a_d___c_o_n_c_u_r_r_e_n_c_y_,_f_a_l_s_e_}_].
+
+                * _s_e_t The table is a _s_e_t table - one key, one object, no order
+                  among objects. This is the default table type.
+
+                * _o_r_d_e_r_e_d___s_e_t The table is a _o_r_d_e_r_e_d___s_e_t table - one key, one
+                  object, ordered in Erlang term order, which is the order
+                  implied by the < and > operators. Tables of this type have a
+                  somewhat different behavior in some situations than tables
+                  of the other types. Most notably the _o_r_d_e_r_e_d___s_e_t tables
+                  regard keys as equal when they _c_o_m_p_a_r_e _e_q_u_a_l, not only when
+                  they match. This means that to an _o_r_d_e_r_e_d___s_e_t, the _i_n_t_e_g_e_r_(_)
+                  _1 and the _f_l_o_a_t_(_) _1_._0 are regarded as equal. This also means
+                  that the key used to lookup an element not necessarily
+                  _m_a_t_c_h_e_s the key in the elements returned, if _f_l_o_a_t_(_)'s and
+                  _i_n_t_e_g_e_r_(_)'s are mixed in keys of a table.
+
+                * _b_a_g The table is a _b_a_g table which can have many objects,
+                  but only one instance of each object, per key.
+
+                * _d_u_p_l_i_c_a_t_e___b_a_g The table is a _d_u_p_l_i_c_a_t_e___b_a_g table which can
+                  have many objects, including multiple copies of the same
+                  object, per key.
+
+                * _p_u_b_l_i_c Any process may read or write to the table.
+
+                *
+
+
+                  _p_r_o_t_e_c_t_e_d The owner process can read and write to the table.
+                  Other processes can only read the table. This is the default
+                  setting for the access rights.
+
+                *
+
+
+                  _p_r_i_v_a_t_e Only the owner process can read or write to the
+                  table.
+
+                * _n_a_m_e_d___t_a_b_l_e If this option is present, the name _N_a_m_e is
+                  associated with the table identifier. The name can then be
+                  used instead of the table identifier in subsequent
+                  operations.
+
+                * _{_k_e_y_p_o_s_,_P_o_s_} Specfies which element in the stored tuples
+                  should be used as key. By default, it is the first element,
+                  i.e. _P_o_s_=_1. However, this is not always appropriate. In
+                  particular, we do not want the first element to be the key
+                  if we want to store Erlang records in a table.
+
+                  Note that any tuple stored in the table must have at least
+                  _P_o_s number of elements.
+
+                *
+
+
+                  _{_h_e_i_r_,_P_i_d_,_H_e_i_r_D_a_t_a_} _| _{_h_e_i_r_,_n_o_n_e_}
+                  Set a process as heir. The heir will inherit the table if
+                  the owner terminates. The message _{_'_E_T_S_-
+                  _T_R_A_N_S_F_E_R_'_,_t_i_d_(_)_,_F_r_o_m_P_i_d_,_H_e_i_r_D_a_t_a_} will be sent to the heir
+                  when that happens. The heir must be a local process. Default
+                  heir is _n_o_n_e, which will destroy the table when the owner
+                  terminates.
+
+                *
+
+
+                  _{_w_r_i_t_e___c_o_n_c_u_r_r_e_n_c_y_,_b_o_o_l_e_a_n_(_)_} Performance tuning. Default is
+                  _f_a_l_s_e, in which case an operation that mutates (writes to)
+                  the table will obtain exclusive access, blocking any
+                  concurrent access of the same table until finished. If set
+                  to _t_r_u_e, the table is optimized towards concurrent write
+                  access. Different objects of the same table can be mutated
+                  (and read) by concurrent processes. This is achieved to some
+                  degree at the expense of sequential access and concurrent
+                  reader performance. The _w_r_i_t_e___c_o_n_c_u_r_r_e_n_c_y option can be
+                  combined with the rreeaadd__ccoonnccuurrrreennccyy option. You typically
+                  want to combine these when large concurrent read bursts and
+                  large concurrent write bursts are common (see the
+                  documentation of the rreeaadd__ccoonnccuurrrreennccyy option for more
+                  information). Note that this option does not change any
+                  guarantees about aattoommiiccyy aanndd iissoollaattiioonn. Functions that makes
+                  such promises over several objects (like _i_n_s_e_r_t_/_2) will gain
+                  less (or nothing) from this option.
+
+                  Table type _o_r_d_e_r_e_d___s_e_t is not affected by this option in
+                  current implementation.
+
+                *
+
+
+                  _{_r_e_a_d___c_o_n_c_u_r_r_e_n_c_y_,_b_o_o_l_e_a_n_(_)_} Performance tuning. Default is
+                  _f_a_l_s_e. When set to _t_r_u_e, the table is optimized for
+                  concurrent read operations. When this option is enabled on a
+                  runtime system with SMP support, read operations become much
+                  cheaper; especially on systems with multiple physical
+                  processors. However, switching between read and write
+                  operations becomes more expensive. You typically want to
+                  enable this option when concurrent read operations are much
+                  more frequent than write operations, or when concurrent
+                  reads and writes comes in large read and write bursts (i.e.,
+                  lots of reads not interrupted by writes, and lots of writes
+                  not interrupted by reads). You typically do _n_o_t want to
+                  enable this option when the common access pattern is a few
+                  read operations interleaved with a few write operations
+                  repeatedly. In this case you will get a performance
+                  degradation by enabling this option. The _r_e_a_d___c_o_n_c_u_r_r_e_n_c_y
+                  option can be combined with the wwrriittee__ccoonnccuurrrreennccyy option.
+                  You typically want to combine these when large concurrent
+                  read bursts and large concurrent write bursts are common.
+
+                *
+
+
+                  _c_o_m_p_r_e_s_s_e_d If this option is present, the table data will be
+                  stored in a more compact format to consume less memory. The
+                  downside is that it will make table operations slower.
+                  Especially operations that need to inspect entire objects,
+                  such as _m_a_t_c_h and _s_e_l_e_c_t, will get much slower. The key
+                  element is not compressed in current implementation.
+
+       nneexxtt((TTaabb,, KKeeyy11)) -->> KKeeyy22 || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key1 = Key2 = term()
+
+              Returns the next key _K_e_y_2, following the key _K_e_y_1 in the table
+              _T_a_b. If the table is of the _o_r_d_e_r_e_d___s_e_t type, the next key in
+              Erlang term order is returned. If the table is of any other
+              type, the next key according to the table's internal order is
+              returned. If there is no next key, _'_$_e_n_d___o_f___t_a_b_l_e_' is returned.
+
+              Use _f_i_r_s_t_/_1 to find the first key in the table.
+
+              Unless a table of type _s_e_t, _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g is protected
+              using _s_a_f_e___f_i_x_t_a_b_l_e_/_2, see below, a traversal may fail if
+              concurrent updates are made to the table. If the table is of
+              type _o_r_d_e_r_e_d___s_e_t, the function returns the next key in order,
+              even if the object does no longer exist.
+
+       pprreevv((TTaabb,, KKeeyy11)) -->> KKeeyy22 || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key1 = Key2 = term()
+
+              Returns the previous key _K_e_y_2, preceding the key _K_e_y_1 according
+              the Erlang term order in the table _T_a_b of the _o_r_d_e_r_e_d___s_e_t type.
+              If the table is of any other type, the function is synonymous to
+              _n_e_x_t_/_2. If there is no previous key, _'_$_e_n_d___o_f___t_a_b_l_e_' is
+              returned.
+
+              Use _l_a_s_t_/_1 to find the last key in the table.
+
+       rreennaammee((TTaabb,, NNaammee)) -->> NNaammee
+
+              Types:
+
+                 Tab = Name = atom()
+
+              Renames the named table _T_a_b to the new name _N_a_m_e. Afterwards,
+              the old name can not be used to access the table. Renaming an
+              unnamed table has no effect.
+
+       rreeppaaiirr__ccoonnttiinnuuaattiioonn((CCoonnttiinnuuaattiioonn,, MMaattcchhSSppeecc)) -->> CCoonnttiinnuuaattiioonn
+
+              Types:
+
+                 Continuation = ccoonnttiinnuuaattiioonn(())
+                 MatchSpec = mmaattcchh__ssppeecc(())
+
+              This function can be used to restore an opaque continuation
+              returned by _e_t_s_:_s_e_l_e_c_t_/_3 or _e_t_s_:_s_e_l_e_c_t_/_1 if the continuation has
+              passed through external term format (been sent between nodes or
+              stored on disk).
+
+              The reason for this function is that continuation terms contain
+              compiled match_specs and therefore will be invalidated if
+              converted to external term format. Given that the original
+              match_spec is kept intact, the continuation can be restored,
+              meaning it can once again be used in subsequent _e_t_s_:_s_e_l_e_c_t_/_1
+              calls even though it has been stored on disk or on another node.
+
+              As an example, the following sequence of calls will fail:
+
+              T=ets:new(x,[]),
+              {_,C} = ets:select(T,ets:fun2ms(fun({N,_}=A)
+              when (N rem 10) =:= 0 ->
+              A
+              end),10),
+              Broken = binary_to_term(term_to_binary(C)),
+              ets:select(Broken).
+
+              ...while the following sequence will work:
+
+              T=ets:new(x,[]),
+              MS = ets:fun2ms(fun({N,_}=A)
+              when (N rem 10) =:= 0 ->
+              A
+              end),
+              {_,C} = ets:select(T,MS,10),
+              Broken = binary_to_term(term_to_binary(C)),
+              ets:select(ets:repair_continuation(Broken,MS)).
+
+              ...as the call to _e_t_s_:_r_e_p_a_i_r___c_o_n_t_i_n_u_a_t_i_o_n_/_2 will reestablish the
+              (deliberately) invalidated continuation _B_r_o_k_e_n.
+
+          NNoottee::
+              This function is very rarely needed in application code. It is
+              used by Mnesia to implement distributed _s_e_l_e_c_t_/_3 and _s_e_l_e_c_t_/_1
+              sequences. A normal application would either use Mnesia or keep
+              the continuation from being converted to external format.
+
+              The reason for not having an external representation of a
+              compiled match_spec is performance. It may be subject to change
+              in future releases, while this interface will remain for
+              backward compatibility.
+
+
+       ssaaffee__ffiixxttaabbllee((TTaabb,, ttrruuee||ffaallssee)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+
+              Fixes a table of the _s_e_t, _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g table type for
+              safe traversal.
+
+              A process fixes a table by calling _s_a_f_e___f_i_x_t_a_b_l_e_(_T_a_b_,_t_r_u_e_). The
+              table remains fixed until the process releases it by calling
+              _s_a_f_e___f_i_x_t_a_b_l_e_(_T_a_b_,_f_a_l_s_e_), or until the process terminates.
+
+              If several processes fix a table, the table will remain fixed
+              until all processes have released it (or terminated). A
+              reference counter is kept on a per process basis, and N
+              consecutive fixes requires N releases to actually release the
+              table.
+
+              When a table is fixed, a sequence of _f_i_r_s_t_/_1 and _n_e_x_t_/_2 calls
+              are guaranteed to succeed and each object in the table will only
+              be returned once, even if objects are removed or inserted during
+              the traversal. The keys for new objects inserted during the
+              traversal _m_a_y be returned by nneexxtt//22 (it depends on the internal
+              ordering of the keys). An example:
+
+              clean_all_with_value(Tab,X) ->
+                  safe_fixtable(Tab,true),
+                  clean_all_with_value(Tab,X,ets:first(Tab)),
+                  safe_fixtable(Tab,false).
+
+              clean_all_with_value(Tab,X,'$end_of_table') ->
+                  true;
+              clean_all_with_value(Tab,X,Key) ->
+                  case ets:lookup(Tab,Key) of
+                      [{Key,X}] ->
+                          ets:delete(Tab,Key);
+                      _ ->
+                          true
+                  end,
+                  clean_all_with_value(Tab,X,ets:next(Tab,Key)).
+
+              Note that no deleted objects are actually removed from a fixed
+              table until it has been released. If a process fixes a table but
+              never releases it, the memory used by the deleted objects will
+              never be freed. The performance of operations on the table will
+              also degrade significantly.
+
+              Use _i_n_f_o_/_2 to retrieve information about which processes have
+              fixed which tables. A system with a lot of processes fixing
+              tables may need a monitor which sends alarms when tables have
+              been fixed for too long.
+
+              Note that for tables of the _o_r_d_e_r_e_d___s_e_t type, _s_a_f_e___f_i_x_t_a_b_l_e_/_2 is
+              not necessary as calls to _f_i_r_s_t_/_1 and _n_e_x_t_/_2 will always
+              succeed.
+
+       sseelleecctt((TTaabb,, MMaattcchhSSppeecc)) -->> [[MMaattcchh]]
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Match = term()
+                 MatchSpec = match_spec()
+
+              Matches the objects in the table _T_a_b using a mmaattcchh__ssppeecc. This is
+              a more general call than the _e_t_s_:_m_a_t_c_h_/_2 and _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_2
+              calls. In its simplest forms the match_specs look like this:
+
+                * MatchSpec = [MatchFunction]
+
+                * MatchFunction = {MatchHead, [Guard], [Result]}
+
+                * MatchHead = "Pattern as in ets:match"
+
+                * Guard = {"Guardtest name", ...}
+
+                * Result = "Term construct"
+
+              This means that the match_spec is always a list of one or more
+              tuples (of arity 3). The tuples first element should be a
+              pattern as described in the documentation of _e_t_s_:_m_a_t_c_h_/_2. The
+              second element of the tuple should be a list of 0 or more guard
+              tests (described below). The third element of the tuple should
+              be a list containing a description of the value to actually
+              return. In almost all normal cases the list contains exactly one
+              term which fully describes the value to return for each object.
+
+              The return value is constructed using the "match variables"
+              bound in the MatchHead or using the special match variables _'_$___'
+              (the whole matching object) and _'_$_$_' (all match variables in a
+              list), so that the following _e_t_s_:_m_a_t_c_h_/_2 expression:
+
+              ets:match(Tab,{'$1','$2','$3'})
+
+              is exactly equivalent to:
+
+              ets:select(Tab,[{{'$1','$2','$3'},[],['$$']}])
+
+              - and the following _e_t_s_:_m_a_t_c_h___o_b_j_e_c_t_/_2 call:
+
+              ets:match_object(Tab,{'$1','$2','$1'})
+
+              is exactly equivalent to
+
+              ets:select(Tab,[{{'$1','$2','$1'},[],['$_']}])
+
+              Composite terms can be constructed in the _R_e_s_u_l_t part either by
+              simply writing a list, so that this code:
+
+              ets:select(Tab,[{{'$1','$2','$3'},[],['$$']}])
+
+              gives the same output as:
+
+              ets:select(Tab,[{{'$1','$2','$3'},[],[['$1','$2','$3']]}])
+
+              i.e. all the bound variables in the match head as a list. If
+              tuples are to be constructed, one has to write a tuple of arity
+              1 with the single element in the tuple being the tuple one wants
+              to construct (as an ordinary tuple could be mistaken for a
+              _G_u_a_r_d). Therefore the following call:
+
+              ets:select(Tab,[{{'$1','$2','$1'},[],['$_']}])
+
+              gives the same output as:
+
+              ets:select(Tab,[{{'$1','$2','$1'},[],[{{'$1','$2','$3'}}]}])
+
+              - this syntax is equivalent to the syntax used in the trace
+              patterns (see ddbbgg((33))).
+
+              The _G_u_a_r_ds are constructed as tuples where the first element is
+              the name of the test and the rest of the elements are the
+              parameters of the test. To check for a specific type (say a
+              list) of the element bound to the match variable _'_$_1_', one would
+              write the test as _{_i_s___l_i_s_t_, _'_$_1_'_}. If the test fails, the object
+              in the table will not match and the next _M_a_t_c_h_F_u_n_c_t_i_o_n (if any)
+              will be tried. Most guard tests present in Erlang can be used,
+              but only the new versions prefixed _i_s__ are allowed (like
+              _i_s___f_l_o_a_t, _i_s___a_t_o_m etc).
+
+              The _G_u_a_r_d section can also contain logic and arithmetic
+              operations, which are written with the same syntax as the guard
+              tests (prefix notation), so that a guard test written in Erlang
+              looking like this:
+
+              is_integer(X), is_integer(Y), X + Y < 4711
+
+              is expressed like this (X replaced with '$1' and Y with '$2'):
+
+              [{is_integer, '$1'}, {is_integer, '$2'}, {'<', {'+', '$1', '$2'}, 4711}]
+
+              On tables of the _o_r_d_e_r_e_d___s_e_t type, objects are visited in the
+              same order as in a _f_i_r_s_t_/_n_e_x_t traversal. This means that the
+              match specification will be executed against objects with keys
+              in the _f_i_r_s_t_/_n_e_x_t order and the corresponding result list will
+              be in the order of that execution.
+
+       sseelleecctt((TTaabb,, MMaattcchhSSppeecc,, LLiimmiitt)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} ||
+       ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Match = term()
+                 MatchSpec = match_spec()
+                 Continuation = term()
+
+              Works like _e_t_s_:_s_e_l_e_c_t_/_2 but only returns a limited (_L_i_m_i_t)
+              number of matching objects. The _C_o_n_t_i_n_u_a_t_i_o_n term can then be
+              used in subsequent calls to _e_t_s_:_s_e_l_e_c_t_/_1 to get the next chunk
+              of matching objects. This is a space efficient way to work on
+              objects in a table which is still faster than traversing the
+              table object by object using _e_t_s_:_f_i_r_s_t_/_1 and _e_t_s_:_n_e_x_t_/_1.
+
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned if the table is empty.
+
+       sseelleecctt((CCoonnttiinnuuaattiioonn)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Match = term()
+                 Continuation = term()
+
+              Continues a match started with _e_t_s_:_s_e_l_e_c_t_/_3. The next chunk of
+              the size given in the initial _e_t_s_:_s_e_l_e_c_t_/_3 call is returned
+              together with a new _C_o_n_t_i_n_u_a_t_i_o_n that can be used in subsequent
+              calls to this function.
+
+              _'_$_e_n_d___o_f___t_a_b_l_e_' is returned when there are no more objects in
+              the table.
+
+       sseelleecctt__ccoouunntt((TTaabb,, MMaattcchhSSppeecc)) -->> NNuummMMaattcchheedd
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Object = tuple()
+                 MatchSpec = match_spec()
+                 NumMatched = integer()
+
+              Matches the objects in the table _T_a_b using a mmaattcchh__ssppeecc. If the
+              match_spec returns _t_r_u_e for an object, that object considered a
+              match and is counted. For any other result from the match_spec
+              the object is not considered a match and is therefore not
+              counted.
+
+              The function could be described as a _m_a_t_c_h___d_e_l_e_t_e_/_2 that does
+              not actually delete any elements, but only counts them.
+
+              The function returns the number of objects matched.
+
+       sseelleecctt__ddeelleettee((TTaabb,, MMaattcchhSSppeecc)) -->> NNuummDDeelleetteedd
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Object = tuple()
+                 MatchSpec = match_spec()
+                 NumDeleted = integer()
+
+              Matches the objects in the table _T_a_b using a mmaattcchh__ssppeecc. If the
+              match_spec returns _t_r_u_e for an object, that object is removed
+              from the table. For any other result from the match_spec the
+              object is retained. This is a more general call than the
+              _e_t_s_:_m_a_t_c_h___d_e_l_e_t_e_/_2 call.
+
+              The function returns the number of objects actually deleted from
+              the table.
+
+          NNoottee::
+              The _m_a_t_c_h___s_p_e_c has to return the atom _t_r_u_e if the object is to
+              be deleted. No other return value will get the object deleted,
+              why one can not use the same match specification for looking up
+              elements as for deleting them.
+
+
+       sseelleecctt__rreevveerrssee((TTaabb,, MMaattcchhSSppeecc)) -->> [[MMaattcchh]]
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Match = term()
+                 MatchSpec = match_spec()
+
+              Works like _s_e_l_e_c_t_/_2, but returns the list in reverse order for
+              the _o_r_d_e_r_e_d___s_e_t table type. For all other table types, the
+              return value is identical to that of _s_e_l_e_c_t_/_2.
+
+       sseelleecctt__rreevveerrssee((TTaabb,, MMaattcchhSSppeecc,, LLiimmiitt)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} ||
+       ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Match = term()
+                 MatchSpec = match_spec()
+                 Continuation = term()
+
+              Works like _s_e_l_e_c_t_/_3, but for the _o_r_d_e_r_e_d___s_e_t table type,
+              traversing is done starting at the last object in Erlang term
+              order and moves towards the first. For all other table types,
+              the return value is identical to that of _s_e_l_e_c_t_/_3.
+
+              Note that this is _n_o_t equivalent to reversing the result list of
+              a _s_e_l_e_c_t_/_3 call, as the result list is not only reversed, but
+              also contains the last _L_i_m_i_t matching objects in the table, not
+              the first.
+
+       sseelleecctt__rreevveerrssee((CCoonnttiinnuuaattiioonn)) -->> {{[[MMaattcchh]],,CCoonnttiinnuuaattiioonn}} ||
+       ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Match = term()
+                 Continuation = term()
+
+              Continues a match started with _e_t_s_:_s_e_l_e_c_t___r_e_v_e_r_s_e_/_3. If the
+              table is an _o_r_d_e_r_e_d___s_e_t, the traversal of the table will
+              continue towards objects with keys earlier in the Erlang term
+              order. The returned list will also contain objects with keys in
+              reverse order.
+
+              For all other table types, the behaviour is exatly that of
+              _s_e_l_e_c_t_/_1.
+
+              Example:
+
+              1> T = ets:new(x,[ordered_set]).
+              2> [ ets:insert(T,{N}) || N <- lists:seq(1,10) ].
+              3> {R0,C0} = ets:select_reverse(T,[{'_',[],['$_']}],4).
+              4> R0.
+              [{10},{9},{8},{7}]
+              5> {R1,C1} = ets:select_reverse(C0).
+              6> R1.
+              [{6},{5},{4},{3}]
+              7> {R2,C2} = ets:select_reverse(C1).
+              8> R2.
+              [{2},{1}]
+              9> '$end_of_table' = ets:select_reverse(C2).
+
+
+       sseettooppttss((TTaabb,, OOppttss)) -->> ttrruuee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Opts = Opt | [Opt]
+                 Opt = {heir,pid(),HeirData} | {heir,none}
+                 HeirData = term()
+
+              Set table options. The only option that currently is allowed to
+              be set after the table has been created is hheeiirr. The calling
+              process must be the table owner.
+
+       sslloott((TTaabb,, II)) -->> [[OObbjjeecctt]] || ''$$eenndd__ooff__ttaabbllee''
+
+              Types:
+
+                 Tab = tid() | atom()
+                 I = integer()
+                 Object = tuple()
+
+              This function is mostly for debugging purposes, Normally one
+              should use _f_i_r_s_t_/_n_e_x_t or _l_a_s_t_/_p_r_e_v instead.
+
+              Returns all objects in the _I:th slot of the table _T_a_b. A table
+              can be traversed by repeatedly calling the function, starting
+              with the first slot _I_=_0 and ending when _'_$_e_n_d___o_f___t_a_b_l_e_' is
+              returned. The function will fail with reason _b_a_d_a_r_g if the _I
+              argument is out of range.
+
+              Unless a table of type _s_e_t, _b_a_g or _d_u_p_l_i_c_a_t_e___b_a_g is protected
+              using _s_a_f_e___f_i_x_t_a_b_l_e_/_2, see above, a traversal may fail if
+              concurrent updates are made to the table. If the table is of
+              type _o_r_d_e_r_e_d___s_e_t, the function returns a list containing the
+              _I:th object in Erlang term order.
+
+       ttaabb22ffiillee((TTaabb,, FFiilleennaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Tab = ttaabb(())
+                 Filename = ffiillee::nnaammee(())
+                 Reason = term()
+
+              Dumps the table _T_a_b to the file _F_i_l_e_n_a_m_e.
+
+              Equivalent to _t_a_b_2_f_i_l_e_(_T_a_b_, _F_i_l_e_n_a_m_e_,_[_]_)
+
+       ttaabb22ffiillee((TTaabb,, FFiilleennaammee,, OOppttiioonnss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Tab = ttaabb(())
+                 Filename = ffiillee::nnaammee(())
+                 Options = [Option]
+                 Option = {extended_info, [ExtInfo]}
+                 ExtInfo = md5sum | object_count
+                 Reason = term()
+
+              Dumps the table _T_a_b to the file _F_i_l_e_n_a_m_e.
+
+              When dumping the table, certain information about the table is
+              dumped to a header at the beginning of the dump. This
+              information contains data about the table type, name,
+              protection, size, version and if it's a named table. It also
+              contains notes about what extended information is added to the
+              file, which can be a count of the objects in the file or a MD5
+              sum of the header and records in the file.
+
+              The size field in the header might not correspond to the actual
+              number of records in the file if the table is public and records
+              are added or removed from the table during dumping. Public
+              tables updated during dump, and that one wants to verify when
+              reading, needs at least one field of extended information for
+              the read verification process to be reliable later.
+
+              The _e_x_t_e_n_d_e_d___i_n_f_o option specifies what extra information is
+              written to the table dump:
+
+                _o_b_j_e_c_t___c_o_u_n_t:
+                  The number of objects actually written to the file is noted
+                  in the file footer, why verification of file truncation is
+                  possible even if the file was updated during dump.
+
+                _m_d_5_s_u_m:
+                  The header and objects in the file are checksummed using the
+                  built in MD5 functions. The MD5 sum of all objects is
+                  written in the file footer, so that verification while
+                  reading will detect the slightest bitflip in the file data.
+                  Using this costs a fair amount of CPU time.
+
+              Whenever the _e_x_t_e_n_d_e_d___i_n_f_o option is used, it results in a file
+              not readable by versions of ets prior to that in stdlib-1.15.1
+
+       ttaabb22lliisstt((TTaabb)) -->> [[OObbjjeecctt]]
+
+              Types:
+
+                 Tab = ttaabb(())
+                 Object = tuple()
+
+              Returns a list of all objects in the table _T_a_b.
+
+       ttaabbffiillee__iinnffoo((FFiilleennaammee)) -->> {{ookk,, TTaabblleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 TableInfo = [InfoItem]
+                 InfoItem = {name, atom()}
+                          | {type, Type}
+                          | {protection, Protection}
+                          | {named_table, boolean()}
+                          | {keypos, integer() >= 0}
+                          | {size, integer() >= 0}
+                          | {extended_info, [ExtInfo]}
+                          | {version,
+                             {Major :: integer() >= 0,
+                              Minor :: integer() >= 0}}
+                 ExtInfo = md5sum | object_count
+                 Type = bag | duplicate_bag | ordered_set | set
+                 Protection = private | protected | public
+                 Reason = term()
+
+              Returns information about the table dumped to file by ttaabb22ffiillee//22
+              or ttaabb22ffiillee//33
+
+              The following items are returned:
+
+                nnaammee::
+                  The name of the dumped table. If the table was a named
+                  table, a table with the same name cannot exist when the
+                  table is loaded from file with ffiillee22ttaabb//22. If the table is
+                  not saved as a named table, this field has no significance
+                  at all when loading the table from file.
+
+                ttyyppee::
+                  The ets type of the dumped table (i.e. _s_e_t, _b_a_g,
+                  _d_u_p_l_i_c_a_t_e___b_a_g or _o_r_d_e_r_e_d___s_e_t). This type will be used when
+                  loading the table again.
+
+                pprrootteeccttiioonn::
+                  The protection of the dumped table (i.e. _p_r_i_v_a_t_e, _p_r_o_t_e_c_t_e_d
+                  or _p_u_b_l_i_c). A table loaded from the file will get the same
+                  protection.
+
+                nnaammeedd__ttaabbllee::
+                  _t_r_u_e if the table was a named table when dumped to file,
+                  otherwise _f_a_l_s_e. Note that when a named table is loaded from
+                  a file, there cannot exist a table in the system with the
+                  same name.
+
+                kkeeyyppooss::
+                  The _k_e_y_p_o_s of the table dumped to file, which will be used
+                  when loading the table again.
+
+                ssiizzee::
+                  The number of objects in the table when the table dump to
+                  file started, which in case of a _p_u_b_l_i_c table need not
+                  correspond to the number of objects actually saved to the
+                  file, as objects might have been added or deleted by another
+                  process during table dump.
+
+                eexxtteennddeedd__iinnffoo::
+                  The extended information written in the file footer to allow
+                  stronger verification during table loading from file, as
+                  specified to ttaabb22ffiillee//33. Note that this function only tells
+                  _w_h_i_c_h information is present, not the values in the file
+                  footer. The value is a list containing one or more of the
+                  atoms _o_b_j_e_c_t___c_o_u_n_t and _m_d_5_s_u_m.
+
+                vveerrssiioonn::
+                  A tuple _{_M_a_j_o_r_,_M_i_n_o_r_} containing the major and minor version
+                  of the file format for ets table dumps. This version field
+                  was added beginning with stdlib-1.5.1, files dumped with
+                  older versions will return _{_0_,_0_} in this field.
+
+              An error is returned if the file is inaccessible, badly damaged
+              or not an file produced with ttaabb22ffiillee//22 or ttaabb22ffiillee//33.
+
+       ttaabbllee((TTaabb)) -->> QQuueerryyHHaannddllee
+
+       ttaabbllee((TTaabb,, OOppttiioonnss)) -->> QQuueerryyHHaannddllee
+
+              Types:
+
+                 Tab = ttaabb(())
+                 QueryHandle = qqllcc::qquueerryy__hhaannddllee(())
+                 Options = [Option] | Option
+                 Option = {n_objects, NObjects} | {traverse, TraverseMethod}
+                 NObjects = default | integer() >= 1
+                 TraverseMethod = first_next
+                                | last_prev
+                                | select
+                                | {select, MatchSpec :: mmaattcchh__ssppeecc(())}
+
+              Returns a QLC (Query List Comprehension) query handle. The
+              module _q_l_c implements a query language aimed mainly at Mnesia
+              but ETS tables, Dets tables, and lists are also recognized by
+              QLC as sources of data. Calling _e_t_s_:_t_a_b_l_e_/_1_,_2 is the means to
+              make the ETS table _T_a_b usable to QLC.
+
+              When there are only simple restrictions on the key position QLC
+              uses _e_t_s_:_l_o_o_k_u_p_/_2 to look up the keys, but when that is not
+              possible the whole table is traversed. The option _t_r_a_v_e_r_s_e
+              determines how this is done:
+
+                * _f_i_r_s_t___n_e_x_t. The table is traversed one key at a time by
+                  calling _e_t_s_:_f_i_r_s_t_/_1 and _e_t_s_:_n_e_x_t_/_2.
+
+                * _l_a_s_t___p_r_e_v. The table is traversed one key at a time by
+                  calling _e_t_s_:_l_a_s_t_/_1 and _e_t_s_:_p_r_e_v_/_2.
+
+                * _s_e_l_e_c_t. The table is traversed by calling _e_t_s_:_s_e_l_e_c_t_/_3 and
+                  _e_t_s_:_s_e_l_e_c_t_/_1. The option _n___o_b_j_e_c_t_s determines the number of
+                  objects returned (the third argument of _s_e_l_e_c_t_/_3); the
+                  default is to return _1_0_0 objects at a time. The mmaattcchh__ssppeecc
+                  (the second argument of _s_e_l_e_c_t_/_3) is assembled by QLC:
+                  simple filters are translated into equivalent match_specs
+                  while more complicated filters have to be applied to all
+                  objects returned by _s_e_l_e_c_t_/_3 given a match_spec that matches
+                  all objects.
+
+                * _{_s_e_l_e_c_t_, _M_a_t_c_h_S_p_e_c_}. As for _s_e_l_e_c_t the table is traversed by
+                  calling _e_t_s_:_s_e_l_e_c_t_/_3 and _e_t_s_:_s_e_l_e_c_t_/_1. The difference is
+                  that the match_spec is explicitly given. This is how to
+                  state match_specs that cannot easily be expressed within the
+                  syntax provided by QLC.
+
+              The following example uses an explicit match_spec to traverse
+              the table:
+
+              9> true = ets:insert(Tab = ets:new(t, []), [{1,a},{2,b},{3,c},{4,d}]),
+              MS = ets:fun2ms(fun({X,Y}) when (X > 1) or (X < 5) -> {Y} end),
+              QH1 = ets:table(Tab, [{traverse, {select, MS}}]).
+
+              An example with implicit match_spec:
+
+              10> QH2 = qlc:q([{Y} || {X,Y} <- ets:table(Tab), (X > 1) or (X < 5)]).
+
+              The latter example is in fact equivalent to the former which can
+              be verified using the function _q_l_c_:_i_n_f_o_/_1:
+
+              11> qlc:info(QH1) =:= qlc:info(QH2).
+              true
+
+              _q_l_c_:_i_n_f_o_/_1 returns information about a query handle, and in this
+              case identical information is returned for the two query
+              handles.
+
+       tteesstt__mmss((TTuuppllee,, MMaattcchhSSppeecc)) -->> {{ookk,, RReessuulltt}} || {{eerrrroorr,, EErrrroorrss}}
+
+              Types:
+
+                 Tuple = tuple()
+                 MatchSpec = mmaattcchh__ssppeecc(())
+                 Result = term()
+                 Errors = [{warning | error, string()}]
+
+              This function is a utility to test a mmaattcchh__ssppeecc used in calls to
+              _e_t_s_:_s_e_l_e_c_t_/_2. The function both tests _M_a_t_c_h_S_p_e_c for "syntactic"
+              correctness and runs the match_spec against the object _T_u_p_l_e. If
+              the match_spec contains errors, the tuple _{_e_r_r_o_r_, _E_r_r_o_r_s_} is
+              returned where _E_r_r_o_r_s is a list of natural language descriptions
+              of what was wrong with the match_spec. If the match_spec is
+              syntactically OK, the function returns _{_o_k_,_R_e_s_u_l_t_} where _R_e_s_u_l_t
+              is what would have been the result in a real _e_t_s_:_s_e_l_e_c_t_/_2 call
+              or _f_a_l_s_e if the match_spec does not match the object _T_u_p_l_e.
+
+              This is a useful debugging and test tool, especially when
+              writing complicated _e_t_s_:_s_e_l_e_c_t_/_2 calls.
+
+       ttoo__ddeettss((TTaabb,, DDeettssTTaabb)) -->> DDeettssTTaabb
+
+              Types:
+
+                 Tab = ttaabb(())
+                 DetsTab = ddeettss::ttaabb__nnaammee(())
+
+              Fills an already created/opened Dets table with the objects in
+              the already opened ETS table named _T_a_b. The Dets table is
+              emptied before the objects are inserted.
+
+       uuppddaattee__ccoouunntteerr((TTaabb,, KKeeyy,, UUppddaatteeOOpp)) -->> RReessuulltt
+       uuppddaattee__ccoouunntteerr((TTaabb,, KKeeyy,, [[UUppddaatteeOOpp]])) -->> [[RReessuulltt]]
+       uuppddaattee__ccoouunntteerr((TTaabb,, KKeeyy,, IInnccrr)) -->> RReessuulltt
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = term()
+                 UpdateOp = {Pos,Incr} | {Pos,Incr,Threshold,SetValue}
+                 Pos = Incr = Threshold = SetValue = Result = integer()
+
+              This function provides an efficient way to update one or more
+              counters, without the hassle of having to look up an object,
+              update the object by incrementing an element and insert the
+              resulting object into the table again. (The update is done
+              atomically; i.e. no process can access the ets table in the
+              middle of the operation.)
+
+              It will destructively update the object with key _K_e_y in the
+              table _T_a_b by adding _I_n_c_r to the element at the _P_o_s:th position.
+              The new counter value is returned. If no position is specified,
+              the element directly following the key (_<_k_e_y_p_o_s_>_+_1) is updated.
+
+              If a _T_h_r_e_s_h_o_l_d is specified, the counter will be reset to the
+              value _S_e_t_V_a_l_u_e if the following conditions occur:
+
+                * The _I_n_c_r is not negative (_>_= _0) and the result would be
+                  greater than (_>) _T_h_r_e_s_h_o_l_d
+
+                * The _I_n_c_r is negative (_< _0) and the result would be less than
+                  (_<) _T_h_r_e_s_h_o_l_d
+
+              A list of _U_p_d_a_t_e_O_p can be supplied to do several update
+              operations within the object. The operations are carried out in
+              the order specified in the list. If the same counter position
+              occurs more than one time in the list, the corresponding counter
+              will thus be updated several times, each time based on the
+              previous result. The return value is a list of the new counter
+              values from each update operation in the same order as in the
+              operation list. If an empty list is specified, nothing is
+              updated and an empty list is returned. If the function should
+              fail, no updates will be done at all.
+
+              The given Key is used to identify the object by either _m_a_t_c_h_i_n_g
+              the key of an object in a _s_e_t table, or _c_o_m_p_a_r_e _e_q_u_a_l to the key
+              of an object in an _o_r_d_e_r_e_d___s_e_t table (see llooookkuupp//22 and nneeww//22 for
+              details on the difference).
+
+              The function will fail with reason _b_a_d_a_r_g if:
+
+                * the table is not of type _s_e_t or _o_r_d_e_r_e_d___s_e_t,
+
+                * no object with the right key exists,
+
+                * the object has the wrong arity,
+
+                * the element to update is not an integer,
+
+                * the element to update is also the key, or,
+
+                * any of _P_o_s, _I_n_c_r, _T_h_r_e_s_h_o_l_d or _S_e_t_V_a_l_u_e is not an integer
+
+       uuppddaattee__eelleemmeenntt((TTaabb,, KKeeyy,, {{PPooss,,VVaalluuee}})) -->> ttrruuee || ffaallssee
+       uuppddaattee__eelleemmeenntt((TTaabb,, KKeeyy,, [[{{PPooss,,VVaalluuee}}]])) -->> ttrruuee || ffaallssee
+
+              Types:
+
+                 Tab = tid() | atom()
+                 Key = Value = term()
+                 Pos = integer()
+
+              This function provides an efficient way to update one or more
+              elements within an object, without the hassle of having to look
+              up, update and write back the entire object.
+
+              It will destructively update the object with key _K_e_y in the
+              table _T_a_b. The element at the _P_o_s:th position will be given the
+              value _V_a_l_u_e.
+
+              A list of _{_P_o_s_,_V_a_l_u_e_} can be supplied to update several elements
+              within the same object. If the same position occurs more than
+              one in the list, the last value in the list will be written. If
+              the list is empty or the function fails, no updates will be done
+              at all. The function is also atomic in the sense that other
+              processes can never see any intermediate results.
+
+              The function returns _t_r_u_e if an object with the key _K_e_y was
+              found, _f_a_l_s_e otherwise.
+
+              The given Key is used to identify the object by either _m_a_t_c_h_i_n_g
+              the key of an object in a _s_e_t table, or _c_o_m_p_a_r_e _e_q_u_a_l to the key
+              of an object in an _o_r_d_e_r_e_d___s_e_t table (see llooookkuupp//22 and nneeww//22 for
+              details on the difference).
+
+              The function will fail with reason _b_a_d_a_r_g if:
+
+                * the table is not of type _s_e_t or _o_r_d_e_r_e_d___s_e_t,
+
+                * _P_o_s is less than 1 or greater than the object arity, or,
+
+                * the element to update is also the key
+
+Ericsson AB                      stdlib 1.18.2                          ets(3)

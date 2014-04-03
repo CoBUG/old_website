@@ -1,0 +1,203 @@
+CosNaming_NamingContext(3) Erlang Module Definition CosNaming_NamingContext(3)
+
+
+
+NNAAMMEE
+       CosNaming_NamingContext - This interface supports different bind and
+       access functions for names in a context.
+
+DDEESSCCRRIIPPTTIIOONN
+       This is the object that defines name scopes, names must be unique
+       within a naming context. Objects may have multiple names and may exist
+       in multiple naming contexts. Name context may be named in other
+       contexts and cycles are permitted.
+
+       The type _N_a_m_e_C_o_m_p_o_n_e_n_t used below is defined as:
+
+             -record('CosNaming_NameComponent', {id, kind=""}).
+
+
+       where _i_d and _k_i_n_d are strings.
+
+       The type _B_i_n_d_i_n_g used below is defined as:
+
+             -record('CosNaming_Binding', {binding_name, binding_type}).
+
+
+       where _b_i_n_d_i_n_g___n_a_m_e is a Name and _b_i_n_d_i_n_g___t_y_p_e is an enum which has the
+       values _n_o_b_j_e_c_t and _n_c_o_n_t_e_x_t.
+
+       Both these records are defined in the file _C_o_s_N_a_m_i_n_g_._h_r_l and it is
+       included with:
+
+             -include_lib("orber/COSS/CosNaming/CosNaming.hrl").
+
+
+       There are a number of exceptions that can be returned from functions in
+       this interface.
+
+         * NotFound is defined as
+
+         -record('CosNaming_NamingContext_NotFound',
+                               {rest_of_name, why}).
+
+         * CannotProceed is defined as
+
+         -record('CosNaming_NamingContext_CannotProceed',
+                               {rest_of_name, cxt}).
+
+         * InvalidName is defined as
+
+         -record('CosNaming_NamingContext_InvalidName', {}).
+
+         * NotFound is defined as
+
+         -record('CosNaming_NamingContext_NotFound', {}).
+
+         * AlreadyBound is defined as
+
+         -record('CosNaming_NamingContext_AlreadyBound', {}).
+
+         * NotEmpty is defined as
+
+         -record('CosNaming_NamingContext_NotEmpty', {).
+
+       These exceptions are defined in the file _C_o_s_N_a_m_i_n_g___N_a_m_i_n_g_C_o_n_t_e_x_t_._h_r_l
+       and it is included with:
+
+             -include_lib("orber/COSS/CosNaming/CosNaming_NamingContext.hrl").
+
+
+EEXXPPOORRTTSS
+       bbiinndd((NNaammiinnggCCoonntteexxtt,, NNaammee,, OObbjjeecctt)) -->> RReettuurrnn
+
+              Types:
+
+                 NameContext = #objref
+                 Name = [NameComponent]
+                 Object = #objref
+                 Return = ok
+
+              Creates a binding of a name and an object in the naming context.
+              Naming contexts that are bound using _b_i_n_d_(_) do not participate
+              in name resolution.
+
+       rreebbiinndd((NNaammiinnggCCoonntteexxtt,, NNaammee,, OObbjjeecctt)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 Name = [NameComponent]
+                 Object = #objref
+                 Return = ok
+
+              Creates a binding of a name and an object in the naming context
+              even if the name is already bound. Naming contexts that are
+              bound using _r_e_b_i_n_d_(_) do not participate in name resolution.
+
+       bbiinndd__ccoonntteexxtt((NNaammiinnggCCoonntteexxtt11,, NNaammee,, NNaammiinnggCCoonntteexx22)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext1 = NamingContext2 =#objref
+                 Name = [NameComponent]
+                 Return = ok
+
+              The bind_context function creates a binding of a name and a
+              naming context in the current context. Naming contexts that are
+              bound using _b_i_n_d___c_o_n_t_e_x_t_(_) participate in name resolution.
+
+       rreebbiinndd__ccoonntteexxtt((NNaammiinnggCCoonntteexxtt11,, NNaammee,, NNaammiinnggCCoonntteexx22)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext1 = NamingContext2 =#objref
+                 Name = [NameComponent]
+                 Return = ok
+
+              The rebind_context function creates a binding of a name and a
+              naming context in the current context even if the name already
+              is bound. Naming contexts that are bound using _r_e_b_i_n_d___c_o_n_t_e_x_t_(_)
+              participate in name resolution.
+
+       rreessoollvvee((NNaammiinnggCCoonntteexxtt,, NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 Name = [NameComponent]
+                 Return = Object
+                 Object = #objref
+
+              The resolve function is the way to retrieve an object bound to a
+              name in the naming context. The given name must match exactly
+              the bound name. The type of the object is not returned, clients
+              are responsible for narrowing the object to the correct type.
+
+       uunnbbiinndd((NNaammiinnggCCoonntteexxtt,, NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 Name = [NameComponent]
+                 Return = ok
+
+              The unbind operation removes a name binding from the naming
+              context.
+
+       nneeww__ccoonntteexxtt((NNaammiinnggCCoonntteexxtt)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 Return = #objref
+
+              The new_context operation creates a new naming context.
+
+       bbiinndd__nneeww__ccoonntteexxtt((NNaammiinnggCCoonntteexxtt,, NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 Name = [NameComponent]
+                 Return = #objref
+
+              The new_context operation creates a new naming context and binds
+              it to Name in the current context.
+
+       ddeessttrrooyy((NNaammiinnggCCoonntteexxtt)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 Return = ok
+
+              The destroy operation disposes the NamingContext object and
+              removes it from the name server. The context must be empty e.g.
+              not contain any bindings to be removed.
+
+       lliisstt((NNaammiinnggCCoonntteexxtt,, HHoowwMMaannyy)) -->> RReettuurrnn
+
+              Types:
+
+                 NamingContext = #objref
+                 HowMany = int()
+                 Return = {ok, BindingList, BindingIterator}
+                 BindingList = [Binding]
+                 BindingIterator = #objref
+
+              The list operation returns a BindingList with a number of
+              bindings up-to HowMany from the context. It also returns a
+              BindinIterator which can be used to step through the list. If
+              the total number of existing bindings are less than, or equal
+              to, the _H_o_w_M_a_n_y parameter a NIL object reference is returned.
+
+          NNoottee::
+              One must destroy the BindingIterator, unless it is a NIL object
+              reference, by using 'BindingIterator':destroy(). Otherwise one
+              can get dangling objects.
+
+
+
+
+Ericsson AB                      orber 3.6.24       CosNaming_NamingContext(3)

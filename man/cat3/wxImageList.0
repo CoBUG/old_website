@@ -1,0 +1,197 @@
+wxImageList(3)             Erlang Module Definition             wxImageList(3)
+
+
+
+NNAAMMEE
+       wxImageList - See external documentation: wxImageList.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxImageList.
+
+DDAATTAA TTYYPPEESS
+         _w_x_I_m_a_g_e_L_i_s_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxIImmaaggeeLLiisstt(())
+
+              See external documentation.
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt)) -->> wwxxIImmaaggeeLLiisstt(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to nneeww((WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       nneeww((WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIImmaaggeeLLiisstt(())
+
+              Types:
+
+                 Width = integer()
+                 Height = integer()
+                 Option = {mask, boolean()} | {initialCount, integer()}
+
+              See external documentation.
+
+       aadddd((TThhiiss,, BBiittmmaapp)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImageList()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       aadddd((TThhiiss,, BBiittmmaapp,, MMaasskk)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImageList()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Mask = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+              Also:
+              add(This, Bitmap, MaskColour) -> integer() when
+              This::wxImageList(), Bitmap::wxBitmap:wxBitmap(),
+              MaskColour::wx:wx_colour().
+
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Width = integer()
+                 Height = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Width = integer()
+                 Height = integer()
+                 Option = {mask, boolean()} | {initialCount, integer()}
+
+              See external documentation.
+
+       ddrraaww((TThhiiss,, IInnddeexx,, DDcc,, XX,, YY)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+                 Dc = wxDC() (see module wxDC)
+                 X = integer()
+                 Y = integer()
+
+              Equivalent to ddrraaww((TThhiiss,, IInnddeexx,, DDcc,, XX,, YY,, [[]])).
+
+       ddrraaww((TThhiiss,, IInnddeexx,, DDcc,, XX,, YY,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+                 Dc = wxDC() (see module wxDC)
+                 X = integer()
+                 Y = integer()
+                 Option = {flags, integer()} | {solidBackground, boolean()}
+
+              See external documentation.
+
+       ggeettBBiittmmaapp((TThhiiss,, IInnddeexx)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+
+              See external documentation.
+
+       ggeettIIccoonn((TThhiiss,, IInnddeexx)) -->> wwxxIIccoonn(()) ((sseeee mmoodduullee wwxxIIccoonn))
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+
+              See external documentation.
+
+       ggeettIImmaaggeeCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxImageList()
+
+              See external documentation.
+
+       ggeettSSiizzee((TThhiiss,, IInnddeexx)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Width::integer(),
+                 Height::integer()}
+                 This = wxImageList()
+                 Index = integer()
+
+              See external documentation.
+
+       rreemmoovvee((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+
+              See external documentation.
+
+       rreemmoovveeAAllll((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+
+              See external documentation.
+
+       rreeppllaaccee((TThhiiss,, IInnddeexx,, BBiittmmaapp)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       rreeppllaaccee((TThhiiss,, IInnddeexx,, BBiittmmaapp,, MMaasskk)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxImageList()
+                 Index = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Mask = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxIImmaaggeeLLiisstt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxImageList(3)

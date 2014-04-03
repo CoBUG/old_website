@@ -1,0 +1,2119 @@
+file(3)                    Erlang Module Definition                    file(3)
+
+
+
+NNAAMMEE
+       file - File Interface Module
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _f_i_l_e provides an interface to the file system.
+
+       On operating systems with thread support, it is possible to let file
+       operations be performed in threads of their own, allowing other Erlang
+       processes to continue executing in parallel with the file operations.
+       See the command line flag _+_A in eerrll((11)).
+
+       The Erlang VM supports file names in Unicode to a limited extent.
+       Depending on how the VM is started (with the parameter _+_f_n_u or _+_f_n_l),
+       file names given can contain characters > 255 and the VM system will
+       convert file names back and forth to the native file name encoding.
+
+       The default behavior for Unicode character translation depends on to
+       what extent the underlying OS/filesystem enforces consistent naming. On
+       OSes where all file names are ensured to be in one or another encoding,
+       Unicode is the default (currently this holds for Windows and MacOSX).
+       On OSes with completely transparent file naming (i.e. all Unixes except
+       MacOSX), ISO-latin-1 file naming is the default. The reason for the
+       ISO-latin-1 default is that file names are not guaranteed to be
+       possible to interpret according to the Unicode encoding expected (i.e.
+       UTF-8), and file names that cannot be decoded will only be accessible
+       by using "raw file names", in other word file names given as binaries.
+
+       As file names are traditionally not binaries in Erlang, applications
+       that need to handle raw file names need to be converted, why the
+       Unicode mode for file names is not default on systems having completely
+       transparent file naming.
+
+   NNoottee::
+       As of R14B01, the most basic file handling modules (_f_i_l_e, _p_r_i_m___f_i_l_e,
+       _f_i_l_e_l_i_b and _f_i_l_e_n_a_m_e) accept raw file names, but the rest of OTP is not
+       guaranteed to handle them, why Unicode file naming on systems where it
+       is not default is still considered experimental.
+
+
+       Raw file names is a new feature in OTP R14B01, which allows the user to
+       supply completely uninterpreted file names to the underlying
+       OS/filesystem. They are supplied as binaries, where it is up to the
+       user to supply a correct encoding for the environment. The function
+       _f_i_l_e_:_n_a_t_i_v_e___n_a_m_e___e_n_c_o_d_i_n_g_(_) can be used to check what encoding the VM
+       is working in. If the function returns _l_a_t_i_n_1 file names are not in any
+       way converted to Unicode, if it is _u_t_f_8, raw file names should be
+       encoded as UTF-8 if they are to follow the convention of the VM (and
+       usually the convention of the OS as well). Using raw file names is
+       useful if you have a filesystem with inconsistent file naming, where
+       some files are named in UTF-8 encoding while others are not. A
+       file:list_dir on such mixed file name systems when the VM is in Unicode
+       file name mode might return file names as raw binaries as they cannot
+       be interpreted as Unicode file names. Raw file names can also be used
+       to give UTF-8 encoded file names even though the VM is not started in
+       Unicode file name translation mode.
+
+       Note that on Windows, _f_i_l_e_:_n_a_t_i_v_e___n_a_m_e___e_n_c_o_d_i_n_g_(_) returns _u_t_f_8 per
+       default, which is the format for raw file names even on Windows,
+       although the underlying OS specific code works in a limited version of
+       little endian UTF16. As far as the Erlang programmer is concerned,
+       Windows native Unicode format is UTF-8...
+
+DDAATTAA TTYYPPEESS
+       ddeeeepp__lliisstt(()) = [char() | atom() | ddeeeepp__lliisstt(())]
+
+       ffdd(()) =
+           #file_descriptor{module = undefined | module(),
+                            data = undefined | term()}
+
+       ffiilleennaammee(()) = string() | binary()
+
+       iioo__ddeevviiccee(()) = pid() | ffdd(())
+
+              As returned by ffiillee::ooppeenn//22, a process handling IO protocols.
+
+       nnaammee(()) = string()
+              | atom()
+              | ddeeeepp__lliisstt(())
+              | (RawFilename :: binary())
+
+              If VM is in Unicode filename mode, _s_t_r_i_n_g_(_) and _c_h_a_r_(_) are
+              allowed to be > 255. _R_a_w_F_i_l_e_n_a_m_e is a filename not subject to
+              Unicode translation, meaning that it can contain characters not
+              conforming to the Unicode encoding expected from the filesystem
+              (i.e. non-UTF-8 characters although the VM is started in Unicode
+              filename mode).
+
+       ppoossiixx(()) = eacces
+               | eagain
+               | ebadf
+               | ebusy
+               | edquot
+               | eexist
+               | efault
+               | efbig
+               | eintr
+               | einval
+               | eio
+               | eisdir
+               | eloop
+               | emfile
+               | emlink
+               | enametoolong
+               | enfile
+               | enodev
+               | enoent
+               | enomem
+               | enospc
+               | enotblk
+               | enotdir
+               | enotsup
+               | enxio
+               | eperm
+               | epipe
+               | erofs
+               | espipe
+               | esrch
+               | estale
+               | exdev
+
+              An atom which is named from the POSIX error codes used in Unix,
+              and in the runtime libraries of most C compilers.
+
+       ddaattee__ttiimmee(()) = ccaalleennddaarr::ddaatteettiimmee(())
+
+              Must denote a valid date and time.
+
+       ffiillee__iinnffoo(()) =
+           #file_info{size = undefined | integer() >= 0,
+                      type = undefined
+                            | device
+                            | directory
+                            | other
+                            | regular
+                            | symlink,
+                      access = undefined
+                              | read
+                              | write
+                              | read_write
+                              | none,
+                      atime = undefined | ffiillee::ddaattee__ttiimmee(()) | integer(),
+                      mtime = undefined | ffiillee::ddaattee__ttiimmee(()) | integer(),
+                      ctime = undefined | ffiillee::ddaattee__ttiimmee(()) | integer(),
+                      mode = undefined | integer(),
+                      links = undefined | integer() >= 0,
+                      major_device = undefined | integer(),
+                      minor_device = undefined | integer(),
+                      inode = undefined | integer(),
+                      uid = undefined | integer(),
+                      gid = undefined | integer()}
+
+       llooccaattiioonn(()) = integer()
+                  | {bof, Offset :: integer()}
+                  | {cur, Offset :: integer()}
+                  | {eof, Offset :: integer()}
+                  | bof
+                  | cur
+                  | eof
+
+       mmooddee(()) = read
+              | write
+              | append
+              | exclusive
+              | raw
+              | binary
+              | {delayed_write,
+                 Size :: integer() >= 0,
+                 Delay :: integer() >= 0}
+              | delayed_write
+              | {read_ahead, Size :: integer() >= 1}
+              | read_ahead
+              | compressed
+              | {encoding, uunniiccooddee::eennccooddiinngg(())}
+
+       ffiillee__iinnffoo__ooppttiioonn(()) = {time, local}
+                          | {time, universal}
+                          | {time, posix}
+
+       sseennddffiillee__ooppttiioonn(()) = {chunk_size, integer() >= 0}
+
+EEXXPPOORRTTSS
+       aaddvviissee((IIooDDeevviiccee,, OOffffsseett,, LLeennggtthh,, AAddvviissee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Offset = Length = integer()
+                 Advise = ppoossiixx__ffiillee__aaddvviissee(())
+                 Reason = ppoossiixx(()) | badarg
+                 ppoossiixx__ffiillee__aaddvviissee(()) = normal
+                                     | sequential
+                                     | random
+                                     | no_reuse
+                                     | will_need
+                                     | dont_need
+
+              _a_d_v_i_s_e_/_4 can be used to announce an intention to access file
+              data in a specific pattern in the future, thus allowing the
+              operating system to perform appropriate optimizations.
+
+              On some platforms, this function might have no effect.
+
+       cchhaannggee__ggrroouupp((FFiilleennaammee,, GGiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Gid = integer()
+                 Reason = ppoossiixx(()) | badarg
+
+              Changes group of a file. See wwrriittee__ffiillee__iinnffoo//22.
+
+       cchhaannggee__mmooddee((FFiilleennaammee,, MMooddee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Mode = integer()
+                 Reason = ppoossiixx(()) | badarg
+
+              Changes permissions of a file. See wwrriittee__ffiillee__iinnffoo//22.
+
+       cchhaannggee__oowwnneerr((FFiilleennaammee,, UUiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Uid = integer()
+                 Reason = ppoossiixx(()) | badarg
+
+              Changes owner of a file. See wwrriittee__ffiillee__iinnffoo//22.
+
+       cchhaannggee__oowwnneerr((FFiilleennaammee,, UUiidd,, GGiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Uid = Gid = integer()
+                 Reason = ppoossiixx(()) | badarg
+
+              Changes owner and group of a file. See wwrriittee__ffiillee__iinnffoo//22.
+
+       cchhaannggee__ttiimmee((FFiilleennaammee,, MMttiimmee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Mtime = ddaattee__ttiimmee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Changes the modification and access times of a file. See
+              wwrriittee__ffiillee__iinnffoo//22.
+
+       cchhaannggee__ttiimmee((FFiilleennaammee,, AAttiimmee,, MMttiimmee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Atime = Mtime = ddaattee__ttiimmee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Changes the modification and last access times of a file. See
+              wwrriittee__ffiillee__iinnffoo//22.
+
+       cclloossee((IIooDDeevviiccee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Closes the file referenced by _I_o_D_e_v_i_c_e. It mostly returns _o_k,
+              expect for some severe errors such as out of memory.
+
+              Note that if the option _d_e_l_a_y_e_d___w_r_i_t_e was used when opening the
+              file, _c_l_o_s_e_/_1 might return an old write error and not even try
+              to close the file. See ooppeenn//22.
+
+       ccoonnssuulltt((FFiilleennaammee)) -->> {{ookk,, TTeerrmmss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Terms = [term()]
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Reads Erlang terms, separated by '.', from _F_i_l_e_n_a_m_e. Returns one
+              of the following:
+
+                _{_o_k_, _T_e_r_m_s_}:
+                  The file was successfully read.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  An error occurred when opening the file or reading it. See
+                  ooppeenn//22 for a list of typical error codes.
+
+                _{_e_r_r_o_r_, _{_L_i_n_e_, _M_o_d_, _T_e_r_m_}_}:
+                  An error occurred when interpreting the Erlang terms in the
+                  file. Use _f_o_r_m_a_t___e_r_r_o_r_/_1 to convert the three-element tuple
+                  to an English description of the error.
+
+              Example:
+
+              f.txt:  {person, "kalle", 25}.
+                      {person, "pelle", 30}.
+
+              1> file:consult("f.txt").
+              {ok,[{person,"kalle",25},{person,"pelle",30}]}
+
+       ccooppyy((SSoouurrccee,, DDeessttiinnaattiioonn)) -->> {{ookk,, BByytteessCCooppiieedd}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ccooppyy((SSoouurrccee,, DDeessttiinnaattiioonn,, BByytteeCCoouunntt)) -->>
+               {{ookk,, BByytteessCCooppiieedd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Source = Destination = iioo__ddeevviiccee(()) | Filename | {Filename,
+                 Modes}
+                 Filename = nnaammee(())
+                 Modes = [mmooddee(())]
+                 ByteCount = integer() >= 0 | infinity
+                 BytesCopied = integer() >= 0
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Copies _B_y_t_e_C_o_u_n_t bytes from _S_o_u_r_c_e to _D_e_s_t_i_n_a_t_i_o_n. _S_o_u_r_c_e and
+              _D_e_s_t_i_n_a_t_i_o_n refer to either filenames or IO devices from e.g.
+              _o_p_e_n_/_2. _B_y_t_e_C_o_u_n_t defaults to _i_n_f_i_n_i_t_y, denoting an infinite
+              number of bytes.
+
+              The argument _M_o_d_e_s is a list of possible modes, see ooppeenn//22, and
+              defaults to [].
+
+              If both _S_o_u_r_c_e and _D_e_s_t_i_n_a_t_i_o_n refer to filenames, the files are
+              opened with _[_r_e_a_d_, _b_i_n_a_r_y_] and _[_w_r_i_t_e_, _b_i_n_a_r_y_] prepended to
+              their mode lists, respectively, to optimize the copy.
+
+              If _S_o_u_r_c_e refers to a filename, it is opened with _r_e_a_d mode
+              prepended to the mode list before the copy, and closed when
+              done.
+
+              If _D_e_s_t_i_n_a_t_i_o_n refers to a filename, it is opened with _w_r_i_t_e
+              mode prepended to the mode list before the copy, and closed when
+              done.
+
+              Returns _{_o_k_, _B_y_t_e_s_C_o_p_i_e_d_} where _B_y_t_e_s_C_o_p_i_e_d is the number of
+              bytes that actually was copied, which may be less than _B_y_t_e_C_o_u_n_t
+              if end of file was encountered on the source. If the operation
+              fails, _{_e_r_r_o_r_, _R_e_a_s_o_n_} is returned.
+
+              Typical error reasons: As for _o_p_e_n_/_2 if a file had to be opened,
+              and as for _r_e_a_d_/_2 and _w_r_i_t_e_/_2.
+
+       ddeell__ddiirr((DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dir = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Tries to delete the directory _D_i_r. The directory must be empty
+              before it can be deleted. Returns _o_k if successful.
+
+              Typical error reasons are:
+
+                _e_a_c_c_e_s:
+                  Missing search or write permissions for the parent
+                  directories of _D_i_r.
+
+                _e_e_x_i_s_t:
+                  The directory is not empty.
+
+                _e_n_o_e_n_t:
+                  The directory does not exist.
+
+                _e_n_o_t_d_i_r:
+                  A component of _D_i_r is not a directory. On some platforms,
+                  _e_n_o_e_n_t is returned instead.
+
+                _e_i_n_v_a_l:
+                  Attempt to delete the current directory. On some platforms,
+                  _e_a_c_c_e_s is returned instead.
+
+       ddeelleettee((FFiilleennaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Tries to delete the file _F_i_l_e_n_a_m_e. Returns _o_k if successful.
+
+              Typical error reasons are:
+
+                _e_n_o_e_n_t:
+                  The file does not exist.
+
+                _e_a_c_c_e_s:
+                  Missing permission for the file or one of its parents.
+
+                _e_p_e_r_m:
+                  The file is a directory and the user is not super-user.
+
+                _e_n_o_t_d_i_r:
+                  A component of the file name is not a directory. On some
+                  platforms, _e_n_o_e_n_t is returned instead.
+
+                _e_i_n_v_a_l:
+                  _F_i_l_e_n_a_m_e had an improper type, such as tuple.
+
+          WWaarrnniinngg::
+              In a future release, a bad type for the _F_i_l_e_n_a_m_e argument will
+              probably generate an exception.
+
+
+       eevvaall((FFiilleennaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Reads and evaluates Erlang expressions, separated by '.' (or
+              ',', a sequence of expressions is also an expression), from
+              _F_i_l_e_n_a_m_e. The actual result of the evaluation is not returned;
+              any expression sequence in the file must be there for its side
+              effect. Returns one of the following:
+
+                _o_k:
+                  The file was read and evaluated.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  An error occurred when opening the file or reading it. See
+                  _o_p_e_n_/_2 for a list of typical error codes.
+
+                _{_e_r_r_o_r_, _{_L_i_n_e_, _M_o_d_, _T_e_r_m_}_}:
+                  An error occurred when interpreting the Erlang expressions
+                  in the file. Use _f_o_r_m_a_t___e_r_r_o_r_/_1 to convert the three-element
+                  tuple to an English description of the error.
+
+       eevvaall((FFiilleennaammee,, BBiinnddiinnggss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Bindings = eerrll__eevvaall::bbiinnddiinngg__ssttrruucctt(())
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              The same as _e_v_a_l_/_1 but the variable bindings _B_i_n_d_i_n_g_s are used
+              in the evaluation. See eerrll__eevvaall((33)) about variable bindings.
+
+       ffiillee__iinnffoo((FFiilleennaammee)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+              This function is obsolete. Use _r_e_a_d___f_i_l_e___i_n_f_o_/_1_,_2 instead.
+
+       ffoorrmmaatt__eerrrroorr((RReeaassoonn)) -->> CChhaarrss
+
+              Types:
+
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+                 Chars = string()
+
+              Given the error reason returned by any function in this module,
+              returns a descriptive string of the error in English.
+
+       ggeett__ccwwdd(()) -->> {{ookk,, DDiirr}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dir = ffiilleennaammee(())
+                 Reason = ppoossiixx(())
+
+              Returns _{_o_k_, _D_i_r_}, where _D_i_r is the current working directory of
+              the file server.
+
+          NNoottee::
+              In rare circumstances, this function can fail on Unix. It may
+              happen if read permission does not exist for the parent
+              directories of the current directory.
+
+
+              Typical error reasons are:
+
+                _e_a_c_c_e_s:
+                  Missing read permission for one of the parents of the
+                  current directory.
+
+       ggeett__ccwwdd((DDrriivvee)) -->> {{ookk,, DDiirr}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Drive = string()
+                 Dir = ffiilleennaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              _D_r_i_v_e should be of the form "_L_e_t_t_e_r_:", for example "c:". Returns
+              _{_o_k_, _D_i_r_} or _{_e_r_r_o_r_, _R_e_a_s_o_n_}, where _D_i_r is the current working
+              directory of the drive specified.
+
+              This function returns _{_e_r_r_o_r_, _e_n_o_t_s_u_p_} on platforms which have
+              no concept of current drive (Unix, for example).
+
+              Typical error reasons are:
+
+                _e_n_o_t_s_u_p:
+                  The operating system has no concept of drives.
+
+                _e_a_c_c_e_s:
+                  The drive does not exist.
+
+                _e_i_n_v_a_l:
+                  The format of _D_r_i_v_e is invalid.
+
+       lliisstt__ddiirr((DDiirr)) -->> {{ookk,, FFiilleennaammeess}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dir = nnaammee(())
+                 Filenames = [ffiilleennaammee(())]
+                 Reason = ppoossiixx(()) | badarg
+
+              Lists all the files in a directory. Returns _{_o_k_, _F_i_l_e_n_a_m_e_s_} if
+              successful. Otherwise, it returns _{_e_r_r_o_r_, _R_e_a_s_o_n_}. _F_i_l_e_n_a_m_e_s is
+              a list of the names of all the files in the directory. The names
+              are not sorted.
+
+              Typical error reasons are:
+
+                _e_a_c_c_e_s:
+                  Missing search or write permissions for _D_i_r or one of its
+                  parent directories.
+
+                _e_n_o_e_n_t:
+                  The directory does not exist.
+
+       mmaakkee__ddiirr((DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dir = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Tries to create the directory _D_i_r. Missing parent directories
+              are _n_o_t created. Returns _o_k if successful.
+
+              Typical error reasons are:
+
+                _e_a_c_c_e_s:
+                  Missing search or write permissions for the parent
+                  directories of _D_i_r.
+
+                _e_e_x_i_s_t:
+                  There is already a file or directory named _D_i_r.
+
+                _e_n_o_e_n_t:
+                  A component of _D_i_r does not exist.
+
+                _e_n_o_s_p_c:
+                  There is a no space left on the device.
+
+                _e_n_o_t_d_i_r:
+                  A component of _D_i_r is not a directory. On some platforms,
+                  _e_n_o_e_n_t is returned instead.
+
+       mmaakkee__lliinnkk((EExxiissttiinngg,, NNeeww)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Existing = New = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Makes a hard link from _E_x_i_s_t_i_n_g to _N_e_w, on platforms that
+              support links (Unix and Windows). This function returns _o_k if
+              the link was successfully created, or _{_e_r_r_o_r_, _R_e_a_s_o_n_}. On
+              platforms that do not support links, _{_e_r_r_o_r_,_e_n_o_t_s_u_p_} is
+              returned.
+
+              Typical error reasons:
+
+                _e_a_c_c_e_s:
+                  Missing read or write permissions for the parent directories
+                  of _E_x_i_s_t_i_n_g or _N_e_w.
+
+                _e_e_x_i_s_t:
+                  _N_e_w already exists.
+
+                _e_n_o_t_s_u_p:
+                  Hard links are not supported on this platform.
+
+       mmaakkee__ssyymmlliinnkk((EExxiissttiinngg,, NNeeww)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Existing = New = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              This function creates a symbolic link _N_e_w to the file or
+              directory _E_x_i_s_t_i_n_g, on platforms that support symbolic links
+              (most Unix systems and Windows beginning with Vista). _E_x_i_s_t_i_n_g
+              need not exist. This function returns _o_k if the link was
+              successfully created, or _{_e_r_r_o_r_, _R_e_a_s_o_n_}. On platforms that do
+              not support symbolic links, _{_e_r_r_o_r_, _e_n_o_t_s_u_p_} is returned.
+
+              Typical error reasons:
+
+                _e_a_c_c_e_s:
+                  Missing read or write permissions for the parent directories
+                  of _E_x_i_s_t_i_n_g or _N_e_w.
+
+                _e_e_x_i_s_t:
+                  _N_e_w already exists.
+
+                _e_n_o_t_s_u_p:
+                  Symbolic links are not supported on this platform.
+
+       nnaattiivvee__nnaammee__eennccooddiinngg(()) -->> llaattiinn11 || uuttff88
+
+              This function returns the configured default file name encoding
+              to use for raw file names. Generally an application supplying
+              file names raw (as binaries), should obey the character encoding
+              returned by this function.
+
+              By default, the VM uses ISO-latin-1 file name encoding on
+              filesystems and/or OSes that use completely transparent file
+              naming. This includes all Unix versions except MacOSX, where the
+              vfs layer enforces UTF-8 file naming. By giving the experimental
+              option _+_f_n_u when starting Erlang, UTF-8 translation of file
+              names can be turned on even for those systems. If Unicode file
+              name translation is in effect, the system behaves as usual as
+              long as file names conform to the encoding, but will return file
+              names that are not properly encoded in UTF-8 as raw file names
+              (i.e. binaries).
+
+              On Windows, this function also returns _u_t_f_8 by default. The OS
+              uses a pure Unicode naming scheme and file names are always
+              possible to interpret as valid Unicode. The fact that the
+              underlying Windows OS actually encodes file names using little
+              endian UTF-16 can be ignored by the Erlang programmer. Windows
+              and MacOSX are the only operating systems where the VM operates
+              in Unicode file name mode by default.
+
+       ooppeenn((FFiilleennaammee,, MMooddeess)) -->> {{ookk,, IIooDDeevviiccee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Modes = [mmooddee(())]
+                 IoDevice = iioo__ddeevviiccee(())
+                 Reason = ppoossiixx(()) | badarg | system_limit
+
+              Opens the file _F_i_l_e_n_a_m_e in the mode determined by _M_o_d_e_s, which
+              may contain one or more of the following items:
+
+                _r_e_a_d:
+                  The file, which must exist, is opened for reading.
+
+                _w_r_i_t_e:
+                  The file is opened for writing. It is created if it does not
+                  exist. If the file exists, and if _w_r_i_t_e is not combined with
+                  _r_e_a_d, the file will be truncated.
+
+                _a_p_p_e_n_d:
+                  The file will be opened for writing, and it will be created
+                  if it does not exist. Every write operation to a file opened
+                  with _a_p_p_e_n_d will take place at the end of the file.
+
+                _e_x_c_l_u_s_i_v_e:
+                  The file, when opened for writing, is created if it does not
+                  exist. If the file exists, open will return _{_e_r_r_o_r_, _e_e_x_i_s_t_}.
+
+            WWaarrnniinngg::
+                This option does not guarantee exclusiveness on file systems
+                that do not support O_EXCL properly, such as NFS. Do not
+                depend on this option unless you know that the file system
+                supports it (in general, local file systems should be safe).
+
+
+                _r_a_w:
+                  The _r_a_w option allows faster access to a file, because no
+                  Erlang process is needed to handle the file. However, a file
+                  opened in this way has the following limitations:
+
+                  * The functions in the _i_o module cannot be used, because
+                    they can only talk to an Erlang process. Instead, use the
+                    _r_e_a_d_/_2, _r_e_a_d___l_i_n_e_/_1 and _w_r_i_t_e_/_2 functions.
+
+                  * Especially if _r_e_a_d___l_i_n_e_/_1 is to be used on a _r_a_w file, it
+                    is recommended to combine this option with the
+                    _{_r_e_a_d___a_h_e_a_d_, _S_i_z_e_} option as line oriented I/O is
+                    inefficient without buffering.
+
+                  * Only the Erlang process which opened the file can use it.
+
+                  * A remote Erlang file server cannot be used; the computer
+                    on which the Erlang node is running must have access to
+                    the file system (directly or through NFS).
+
+                _b_i_n_a_r_y:
+                  When this option has been given, read operations on the file
+                  will return binaries rather than lists.
+
+                _{_d_e_l_a_y_e_d___w_r_i_t_e_, _S_i_z_e_, _D_e_l_a_y_}:
+                  If this option is used, the data in subsequent _w_r_i_t_e_/_2 calls
+                  is buffered until there are at least _S_i_z_e bytes buffered, or
+                  until the oldest buffered data is _D_e_l_a_y milliseconds old.
+                  Then all buffered data is written in one operating system
+                  call. The buffered data is also flushed before some other
+                  file operation than _w_r_i_t_e_/_2 is executed.
+
+                  The purpose of this option is to increase performance by
+                  reducing the number of operating system calls, so the
+                  _w_r_i_t_e_/_2 calls should be for sizes significantly less than
+                  _S_i_z_e, and not interspersed by to many other file operations,
+                  for this to happen.
+
+                  When this option is used, the result of _w_r_i_t_e_/_2 calls may
+                  prematurely be reported as successful, and if a write error
+                  should actually occur the error is reported as the result of
+                  the next file operation, which is not executed.
+
+                  For example, when _d_e_l_a_y_e_d___w_r_i_t_e is used, after a number of
+                  _w_r_i_t_e_/_2 calls, _c_l_o_s_e_/_1 might return _{_e_r_r_o_r_, _e_n_o_s_p_c_} because
+                  there was not enough space on the disc for previously
+                  written data, and _c_l_o_s_e_/_1 should probably be called again
+                  since the file is still open.
+
+                _d_e_l_a_y_e_d___w_r_i_t_e:
+                  The same as _{_d_e_l_a_y_e_d___w_r_i_t_e_, _S_i_z_e_, _D_e_l_a_y_} with reasonable
+                  default values for _S_i_z_e and _D_e_l_a_y. (Roughly some 64 KBytes,
+                  2 seconds)
+
+                _{_r_e_a_d___a_h_e_a_d_, _S_i_z_e_}:
+                  This option activates read data buffering. If _r_e_a_d_/_2 calls
+                  are for significantly less than _S_i_z_e bytes, read operations
+                  towards the operating system are still performed for blocks
+                  of _S_i_z_e bytes. The extra data is buffered and returned in
+                  subsequent _r_e_a_d_/_2 calls, giving a performance gain since the
+                  number of operating system calls is reduced.
+
+                  The _r_e_a_d___a_h_e_a_d buffer is also highly utilized by the
+                  _r_e_a_d___l_i_n_e_/_1 function in _r_a_w mode, why this option is
+                  recommended (for performance reasons) when accessing raw
+                  files using that function.
+
+                  If _r_e_a_d_/_2 calls are for sizes not significantly less than,
+                  or even greater than _S_i_z_e bytes, no performance gain can be
+                  expected.
+
+                _r_e_a_d___a_h_e_a_d:
+                  The same as _{_r_e_a_d___a_h_e_a_d_, _S_i_z_e_} with a reasonable default
+                  value for _S_i_z_e. (Roughly some 64 KBytes)
+
+                _c_o_m_p_r_e_s_s_e_d:
+                  Makes it possible to read or write gzip compressed files.
+                  The _c_o_m_p_r_e_s_s_e_d option must be combined with either _r_e_a_d or
+                  _w_r_i_t_e, but not both. Note that the file size obtained with
+                  _r_e_a_d___f_i_l_e___i_n_f_o_/_1 will most probably not match the number of
+                  bytes that can be read from a compressed file.
+
+                _{_e_n_c_o_d_i_n_g_, _E_n_c_o_d_i_n_g_}:
+                  Makes the file perform automatic translation of characters
+                  to and from a specific (Unicode) encoding. Note that the
+                  data supplied to file:write or returned by file:read still
+                  is byte oriented, this option only denotes how data is
+                  actually stored in the disk file.
+
+                  Depending on the encoding, different methods of reading and
+                  writing data is preferred. The default encoding of _l_a_t_i_n_1
+                  implies using this (the file) module for reading and writing
+                  data, as the interfaces provided here work with byte-
+                  oriented data, while using other (Unicode) encodings makes
+                  the iioo((33)) module's _g_e_t___c_h_a_r_s, _g_e_t___l_i_n_e and _p_u_t___c_h_a_r_s
+                  functions more suitable, as they can work with the full
+                  Unicode range.
+
+                  If data is sent to an _i_o___d_e_v_i_c_e_(_) in a format that cannot be
+                  converted to the specified encoding, or if data is read by a
+                  function that returns data in a format that cannot cope with
+                  the character range of the data, an error occurs and the
+                  file will be closed.
+
+                  The allowed values for _E_n_c_o_d_i_n_g are:
+
+                  _l_a_t_i_n_1:
+                    The default encoding. Bytes supplied to i.e. file:write
+                    are written as is on the file, likewise bytes read from
+                    the file are returned to i.e. file:read as is. If the
+                    iioo((33)) module is used for writing, the file can only cope
+                    with Unicode characters up to codepoint 255 (the ISO-
+                    latin-1 range).
+
+                  _u_n_i_c_o_d_e or _u_t_f_8:
+                    Characters are translated to and from the UTF-8 encoding
+                    before being written to or read from the file. A file
+                    opened in this way might be readable using the file:read
+                    function, as long as no data stored on the file lies
+                    beyond the ISO-latin-1 range (0..255), but failure will
+                    occur if the data contains Unicode codepoints beyond that
+                    range. The file is best read with the functions in the
+                    Unicode aware iioo((33)) module.
+
+                    Bytes written to the file by any means are translated to
+                    UTF-8 encoding before actually being stored on the disk
+                    file.
+
+                  _u_t_f_1_6 or _{_u_t_f_1_6_,_b_i_g_}:
+                    Works like _u_n_i_c_o_d_e, but translation is done to and from
+                    big endian UTF-16 instead of UTF-8.
+
+                  _{_u_t_f_1_6_,_l_i_t_t_l_e_}:
+                    Works like _u_n_i_c_o_d_e, but translation is done to and from
+                    little endian UTF-16 instead of UTF-8.
+
+                  _u_t_f_3_2 or _{_u_t_f_3_2_,_b_i_g_}:
+                    Works like _u_n_i_c_o_d_e, but translation is done to and from
+                    big endian UTF-32 instead of UTF-8.
+
+                  _{_u_t_f_3_2_,_l_i_t_t_l_e_}:
+                    Works like _u_n_i_c_o_d_e, but translation is done to and from
+                    little endian UTF-32 instead of UTF-8.
+
+                  The Encoding can be changed for a file "on the fly" by using
+                  the iioo::sseettooppttss//22 function, why a file can be analyzed in
+                  latin1 encoding for i.e. a BOM, positioned beyond the BOM
+                  and then be set for the right encoding before further
+                  reading.See the uunniiccooddee((33)) module for functions identifying
+                  BOM's.
+
+                  This option is not allowed on _r_a_w files.
+
+              Returns:
+
+                _{_o_k_, _I_o_D_e_v_i_c_e_}:
+                  The file has been opened in the requested mode. _I_o_D_e_v_i_c_e is
+                  a reference to the file.
+
+                _{_e_r_r_o_r_, _R_e_a_s_o_n_}:
+                  The file could not be opened.
+
+              _I_o_D_e_v_i_c_e is really the pid of the process which handles the
+              file. This process is linked to the process which originally
+              opened the file. If any process to which the _I_o_D_e_v_i_c_e is linked
+              terminates, the file will be closed and the process itself will
+              be terminated. An _I_o_D_e_v_i_c_e returned from this call can be used
+              as an argument to the IO functions (see iioo((33))).
+
+          NNoottee::
+              In previous versions of _f_i_l_e, modes were given as one of the
+              atoms _r_e_a_d, _w_r_i_t_e, or _r_e_a_d___w_r_i_t_e instead of a list. This is
+              still allowed for reasons of backwards compatibility, but should
+              not be used for new code. Also note that _r_e_a_d___w_r_i_t_e is not
+              allowed in a mode list.
+
+
+              Typical error reasons:
+
+                _e_n_o_e_n_t:
+                  The file does not exist.
+
+                _e_a_c_c_e_s:
+                  Missing permission for reading the file or searching one of
+                  the parent directories.
+
+                _e_i_s_d_i_r:
+                  The named file is not a regular file. It may be a directory,
+                  a fifo, or a device.
+
+                _e_n_o_t_d_i_r:
+                  A component of the file name is not a directory. On some
+                  platforms, _e_n_o_e_n_t is returned instead.
+
+                _e_n_o_s_p_c:
+                  There is a no space left on the device (if _w_r_i_t_e access was
+                  specified).
+
+       ppaatthh__ccoonnssuulltt((PPaatthh,, FFiilleennaammee)) -->>
+                       {{ookk,, TTeerrmmss,, FFuullllNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Path = [Dir]
+                 Dir = Filename = nnaammee(())
+                 Terms = [term()]
+                 FullName = ffiilleennaammee(())
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Searches the path _P_a_t_h (a list of directory names) until the
+              file _F_i_l_e_n_a_m_e is found. If _F_i_l_e_n_a_m_e is an absolute filename,
+              _P_a_t_h is ignored. Then reads Erlang terms, separated by '.', from
+              the file. Returns one of the following:
+
+                _{_o_k_, _T_e_r_m_s_, _F_u_l_l_N_a_m_e_}:
+                  The file was successfully read. _F_u_l_l_N_a_m_e is the full name of
+                  the file.
+
+                _{_e_r_r_o_r_, _e_n_o_e_n_t_}:
+                  The file could not be found in any of the directories in
+                  _P_a_t_h.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  An error occurred when opening the file or reading it. See
+                  ooppeenn//22 for a list of typical error codes.
+
+                _{_e_r_r_o_r_, _{_L_i_n_e_, _M_o_d_, _T_e_r_m_}_}:
+                  An error occurred when interpreting the Erlang terms in the
+                  file. Use _f_o_r_m_a_t___e_r_r_o_r_/_1 to convert the three-element tuple
+                  to an English description of the error.
+
+       ppaatthh__eevvaall((PPaatthh,, FFiilleennaammee)) -->> {{ookk,, FFuullllNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Path = [Dir :: nnaammee(())]
+                 Filename = nnaammee(())
+                 FullName = ffiilleennaammee(())
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Searches the path _P_a_t_h (a list of directory names) until the
+              file _F_i_l_e_n_a_m_e is found. If _F_i_l_e_n_a_m_e is an absolute file name,
+              _P_a_t_h is ignored. Then reads and evaluates Erlang expressions,
+              separated by '.' (or ',', a sequence of expressions is also an
+              expression), from the file. The actual result of evaluation is
+              not returned; any expression sequence in the file must be there
+              for its side effect. Returns one of the following:
+
+                _{_o_k_, _F_u_l_l_N_a_m_e_}:
+                  The file was read and evaluated. _F_u_l_l_N_a_m_e is the full name
+                  of the file.
+
+                _{_e_r_r_o_r_, _e_n_o_e_n_t_}:
+                  The file could not be found in any of the directories in
+                  _P_a_t_h.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  An error occurred when opening the file or reading it. See
+                  ooppeenn//22 for a list of typical error codes.
+
+                _{_e_r_r_o_r_, _{_L_i_n_e_, _M_o_d_, _T_e_r_m_}_}:
+                  An error occurred when interpreting the Erlang expressions
+                  in the file. Use _f_o_r_m_a_t___e_r_r_o_r_/_1 to convert the three-element
+                  tuple to an English description of the error.
+
+       ppaatthh__ooppeenn((PPaatthh,, FFiilleennaammee,, MMooddeess)) -->>
+                    {{ookk,, IIooDDeevviiccee,, FFuullllNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Path = [Dir :: nnaammee(())]
+                 Filename = nnaammee(())
+                 Modes = [mmooddee(())]
+                 IoDevice = iioo__ddeevviiccee(())
+                 FullName = ffiilleennaammee(())
+                 Reason = ppoossiixx(()) | badarg | system_limit
+
+              Searches the path _P_a_t_h (a list of directory names) until the
+              file _F_i_l_e_n_a_m_e is found. If _F_i_l_e_n_a_m_e is an absolute file name,
+              _P_a_t_h is ignored. Then opens the file in the mode determined by
+              _M_o_d_e_s. Returns one of the following:
+
+                _{_o_k_, _I_o_D_e_v_i_c_e_, _F_u_l_l_N_a_m_e_}:
+                  The file has been opened in the requested mode. _I_o_D_e_v_i_c_e is
+                  a reference to the file and _F_u_l_l_N_a_m_e is the full name of the
+                  file.
+
+                _{_e_r_r_o_r_, _e_n_o_e_n_t_}:
+                  The file could not be found in any of the directories in
+                  _P_a_t_h.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  The file could not be opened.
+
+       ppaatthh__ssccrriipptt((PPaatthh,, FFiilleennaammee)) -->>
+                      {{ookk,, VVaalluuee,, FFuullllNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Path = [Dir :: nnaammee(())]
+                 Filename = nnaammee(())
+                 Value = term()
+                 FullName = ffiilleennaammee(())
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Searches the path _P_a_t_h (a list of directory names) until the
+              file _F_i_l_e_n_a_m_e is found. If _F_i_l_e_n_a_m_e is an absolute file name,
+              _P_a_t_h is ignored. Then reads and evaluates Erlang expressions,
+              separated by '.' (or ',', a sequence of expressions is also an
+              expression), from the file. Returns one of the following:
+
+                _{_o_k_, _V_a_l_u_e_, _F_u_l_l_N_a_m_e_}:
+                  The file was read and evaluated. _F_u_l_l_N_a_m_e is the full name
+                  of the file and _V_a_l_u_e the value of the last expression.
+
+                _{_e_r_r_o_r_, _e_n_o_e_n_t_}:
+                  The file could not be found in any of the directories in
+                  _P_a_t_h.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  An error occurred when opening the file or reading it. See
+                  ooppeenn//22 for a list of typical error codes.
+
+                _{_e_r_r_o_r_, _{_L_i_n_e_, _M_o_d_, _T_e_r_m_}_}:
+                  An error occurred when interpreting the Erlang expressions
+                  in the file. Use _f_o_r_m_a_t___e_r_r_o_r_/_1 to convert the three-element
+                  tuple to an English description of the error.
+
+       ppaatthh__ssccrriipptt((PPaatthh,, FFiilleennaammee,, BBiinnddiinnggss)) -->>
+                      {{ookk,, VVaalluuee,, FFuullllNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Path = [Dir :: nnaammee(())]
+                 Filename = nnaammee(())
+                 Bindings = eerrll__eevvaall::bbiinnddiinngg__ssttrruucctt(())
+                 Value = term()
+                 FullName = ffiilleennaammee(())
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              The same as _p_a_t_h___s_c_r_i_p_t_/_2 but the variable bindings _B_i_n_d_i_n_g_s are
+              used in the evaluation. See eerrll__eevvaall((33)) about variable bindings.
+
+       ppiidd22nnaammee((PPiidd)) -->> {{ookk,, FFiilleennaammee}} || uunnddeeffiinneedd
+
+              Types:
+
+                 Filename = ffiilleennaammee(())
+                 Pid = pid()
+
+              If _P_i_d is an IO device, that is, a pid returned from _o_p_e_n_/_2,
+              this function returns the filename, or rather:
+
+                _{_o_k_, _F_i_l_e_n_a_m_e_}:
+                  If this node's file server is not a slave, the file was
+                  opened by this node's file server, (this implies that _P_i_d
+                  must be a local pid) and the file is not closed. _F_i_l_e_n_a_m_e is
+                  the filename in flat string format.
+
+                _u_n_d_e_f_i_n_e_d:
+                  In all other cases.
+
+          WWaarrnniinngg::
+              This function is intended for debugging only.
+
+
+       ppoossiittiioonn((IIooDDeevviiccee,, LLooccaattiioonn)) -->>
+                   {{ookk,, NNeewwPPoossiittiioonn}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Location = llooccaattiioonn(())
+                 NewPosition = integer()
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Sets the position of the file referenced by _I_o_D_e_v_i_c_e to
+              _L_o_c_a_t_i_o_n. Returns _{_o_k_, _N_e_w_P_o_s_i_t_i_o_n_} (as absolute offset) if
+              successful, otherwise _{_e_r_r_o_r_, _R_e_a_s_o_n_}. _L_o_c_a_t_i_o_n is one of the
+              following:
+
+                _O_f_f_s_e_t:
+                  The same as _{_b_o_f_, _O_f_f_s_e_t_}.
+
+                _{_b_o_f_, _O_f_f_s_e_t_}:
+                  Absolute offset.
+
+                _{_c_u_r_, _O_f_f_s_e_t_}:
+                  Offset from the current position.
+
+                _{_e_o_f_, _O_f_f_s_e_t_}:
+                  Offset from the end of file.
+
+                _b_o_f _| _c_u_r _| _e_o_f:
+                  The same as above with _O_f_f_s_e_t 0.
+
+              Note that offsets are counted in bytes, not in characters. If
+              the file is opened using some other _e_n_c_o_d_i_n_g than _l_a_t_i_n_1, one
+              byte does not correspond to one character. Positioning in such a
+              file can only be done to known character boundaries, i.e. to a
+              position earlier retrieved by getting a current position, to the
+              beginning/end of the file or to some other position _k_n_o_w_n to be
+              on a correct character boundary by some other means (typically
+              beyond a byte order mark in the file, which has a known byte-
+              size).
+
+              Typical error reasons are:
+
+                _e_i_n_v_a_l:
+                  Either _L_o_c_a_t_i_o_n was illegal, or it evaluated to a negative
+                  offset in the file. Note that if the resulting position is a
+                  negative value, the result is an error, and after the call
+                  the file position is undefined.
+
+       pprreeaadd((IIooDDeevviiccee,, LLooccNNuummss)) -->> {{ookk,, DDaattaaLL}} || eeooff || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 LocNums =
+                     [{Location :: llooccaattiioonn(()), Number :: integer() >= 0}]
+                 DataL = [Data]
+                 Data = string() | binary() | eof
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Performs a sequence of _p_r_e_a_d_/_3 in one operation, which is more
+              efficient than calling them one at a time. Returns _{_o_k_, _[_D_a_t_a_,
+              _._._._]_} or _{_e_r_r_o_r_, _R_e_a_s_o_n_}, where each _D_a_t_a, the result of the
+              corresponding _p_r_e_a_d, is either a list or a binary depending on
+              the mode of the file, or _e_o_f if the requested position was
+              beyond end of file.
+
+              As the position is given as a byte-offset, special caution has
+              to be taken when working with files where _e_n_c_o_d_i_n_g is set to
+              something else than _l_a_t_i_n_1, as not every byte position will be a
+              valid character boundary on such a file.
+
+       pprreeaadd((IIooDDeevviiccee,, LLooccaattiioonn,, NNuummbbeerr)) -->>
+                {{ookk,, DDaattaa}} || eeooff || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Location = llooccaattiioonn(())
+                 Number = integer() >= 0
+                 Data = string() | binary()
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Combines _p_o_s_i_t_i_o_n_/_2 and _r_e_a_d_/_2 in one operation, which is more
+              efficient than calling them one at a time. If _I_o_D_e_v_i_c_e has been
+              opened in raw mode, some restrictions apply: _L_o_c_a_t_i_o_n is only
+              allowed to be an integer; and the current position of the file
+              is undefined after the operation.
+
+              As the position is given as a byte-offset, special caution has
+              to be taken when working with files where _e_n_c_o_d_i_n_g is set to
+              something else than _l_a_t_i_n_1, as not every byte position will be a
+              valid character boundary on such a file.
+
+       ppwwrriittee((IIooDDeevviiccee,, LLooccBByytteess)) -->> ookk || {{eerrrroorr,, {{NN,, RReeaassoonn}}}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 LocBytes = [{Location :: llooccaattiioonn(()), Bytes :: iodata()}]
+                 N = integer() >= 0
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Performs a sequence of _p_w_r_i_t_e_/_3 in one operation, which is more
+              efficient than calling them one at a time. Returns _o_k or _{_e_r_r_o_r_,
+              _{_N_, _R_e_a_s_o_n_}_}, where _N is the number of successful writes that
+              was done before the failure.
+
+              When positioning in a file with other _e_n_c_o_d_i_n_g than _l_a_t_i_n_1,
+              caution must be taken to set the position on a correct character
+              boundary, see ppoossiittiioonn//22 for details.
+
+       ppwwrriittee((IIooDDeevviiccee,, LLooccaattiioonn,, BByytteess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Location = llooccaattiioonn(())
+                 Bytes = iodata()
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Combines _p_o_s_i_t_i_o_n_/_2 and _w_r_i_t_e_/_2 in one operation, which is more
+              efficient than calling them one at a time. If _I_o_D_e_v_i_c_e has been
+              opened in raw mode, some restrictions apply: _L_o_c_a_t_i_o_n is only
+              allowed to be an integer; and the current position of the file
+              is undefined after the operation.
+
+              When positioning in a file with other _e_n_c_o_d_i_n_g than _l_a_t_i_n_1,
+              caution must be taken to set the position on a correct character
+              boundary, see ppoossiittiioonn//22 for details.
+
+       rreeaadd((IIooDDeevviiccee,, NNuummbbeerr)) -->> {{ookk,, DDaattaa}} || eeooff || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(()) | atom()
+                 Number = integer() >= 0
+                 Data = string() | binary()
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Reads _N_u_m_b_e_r bytes/characters from the file referenced by
+              _I_o_D_e_v_i_c_e. The functions _r_e_a_d_/_2, _p_r_e_a_d_/_3 and _r_e_a_d___l_i_n_e_/_1 are the
+              only ways to read from a file opened in raw mode (although they
+              work for normally opened files, too).
+
+              For files where _e_n_c_o_d_i_n_g is set to something else than _l_a_t_i_n_1,
+              one character might be represented by more than one byte on the
+              file. The parameter _N_u_m_b_e_r always denotes the number of
+              _c_h_a_r_a_c_t_e_r_s read from the file, why the position in the file
+              might be moved a lot more than this number when reading a
+              Unicode file.
+
+              Also if _e_n_c_o_d_i_n_g is set to something else than _l_a_t_i_n_1, the
+              _r_e_a_d_/_3 call will fail if the data contains characters larger
+              than 255, why the iioo((33)) module is to be preferred when reading
+              such a file.
+
+              The function returns:
+
+                _{_o_k_, _D_a_t_a_}:
+                  If the file was opened in binary mode, the read bytes are
+                  returned in a binary, otherwise in a list. The list or
+                  binary will be shorter than the number of bytes requested if
+                  end of file was reached.
+
+                _e_o_f:
+                  Returned if _N_u_m_b_e_r_>_0 and end of file was reached before
+                  anything at all could be read.
+
+                _{_e_r_r_o_r_, _R_e_a_s_o_n_}:
+                  An error occurred.
+
+              Typical error reasons:
+
+                _e_b_a_d_f:
+                  The file is not opened for reading.
+
+                _{_n_o___t_r_a_n_s_l_a_t_i_o_n_, _u_n_i_c_o_d_e_, _l_a_t_i_n_1_}:
+                  The file was opened with another _e_n_c_o_d_i_n_g than _l_a_t_i_n_1 and
+                  the data in the file can not be translated to the byte-
+                  oriented data that this function returns.
+
+       rreeaadd__ffiillee((FFiilleennaammee)) -->> {{ookk,, BBiinnaarryy}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Binary = binary()
+                 Reason = ppoossiixx(()) | badarg | terminated | system_limit
+
+              Returns _{_o_k_, _B_i_n_a_r_y_}, where _B_i_n_a_r_y is a binary data object that
+              contains the contents of _F_i_l_e_n_a_m_e, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an
+              error occurs.
+
+              Typical error reasons:
+
+                _e_n_o_e_n_t:
+                  The file does not exist.
+
+                _e_a_c_c_e_s:
+                  Missing permission for reading the file, or for searching
+                  one of the parent directories.
+
+                _e_i_s_d_i_r:
+                  The named file is a directory.
+
+                _e_n_o_t_d_i_r:
+                  A component of the file name is not a directory. On some
+                  platforms, _e_n_o_e_n_t is returned instead.
+
+                _e_n_o_m_e_m:
+                  There is not enough memory for the contents of the file.
+
+       rreeaadd__ffiillee__iinnffoo((FFiilleennaammee)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+       rreeaadd__ffiillee__iinnffoo((FFiilleennaammee,, OOppttss)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Opts = [ffiillee__iinnffoo__ooppttiioonn(())]
+                 FileInfo = ffiillee__iinnffoo(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Retrieves information about a file. Returns _{_o_k_, _F_i_l_e_I_n_f_o_} if
+              successful, otherwise _{_e_r_r_o_r_, _R_e_a_s_o_n_}. _F_i_l_e_I_n_f_o is a record
+              _f_i_l_e___i_n_f_o, defined in the Kernel include file _f_i_l_e_._h_r_l. Include
+              the following directive in the module from which the function is
+              called:
+
+              -include_lib("kernel/include/file.hrl").
+
+              The time type returned in _a_t_i_m_e, _m_t_i_m_e and _c_t_i_m_e is dependent on
+              the time type set in _O_p_t_s _:_: _{_t_i_m_e_, _T_y_p_e_}. Type _l_o_c_a_l will
+              return local time, _u_n_i_v_e_r_s_a_l will return universal time and
+              _p_o_s_i_x will return seconds since or before unix time epoch which
+              is 1970-01-01 00:00 UTC. Default is _{_t_i_m_e_, _l_o_c_a_l_}.
+
+          NNoottee::
+              Since file times is stored in posix time on most OS it is faster
+              to query file information with the _p_o_s_i_x option.
+
+
+              The record _f_i_l_e___i_n_f_o contains the following fields.
+
+                _s_i_z_e _= _i_n_t_e_g_e_r_(_):
+                  Size of file in bytes.
+
+                _t_y_p_e _= _d_e_v_i_c_e _| _d_i_r_e_c_t_o_r_y _| _r_e_g_u_l_a_r _| _o_t_h_e_r:
+                  The type of the file.
+
+                _a_c_c_e_s_s _= _r_e_a_d _| _w_r_i_t_e _| _r_e_a_d___w_r_i_t_e _| _n_o_n_e:
+                  The current system access to the file.
+
+                _a_t_i_m_e _= ddaattee__ttiimmee(()) | integer() :
+                  The last time the file was read.
+
+                _m_t_i_m_e _= ddaattee__ttiimmee(()) | integer() :
+                  The last time the file was written.
+
+                _c_t_i_m_e _= ddaattee__ttiimmee(()) | integer() :
+                  The interpretation of this time field depends on the
+                  operating system. On Unix, it is the last time the file or
+                  the inode was changed. In Windows, it is the create time.
+
+                _m_o_d_e _= _i_n_t_e_g_e_r_(_):
+                  The file permissions as the sum of the following bit values:
+
+                  88##0000440000::
+                    read permission: owner
+
+                  88##0000220000::
+                    write permission: owner
+
+                  88##0000110000::
+                    execute permission: owner
+
+                  88##0000004400::
+                    read permission: group
+
+                  88##0000002200::
+                    write permission: group
+
+                  88##0000001100::
+                    execute permission: group
+
+                  88##0000000044::
+                    read permission: other
+
+                  88##0000000022::
+                    write permission: other
+
+                  88##0000000011::
+                    execute permission: other
+
+                  1166##880000::
+                    set user id on execution
+
+                  1166##440000::
+                    set group id on execution
+
+                  On Unix platforms, other bits than those listed above may be
+                  set.
+
+                _l_i_n_k_s _= _i_n_t_e_g_e_r_(_):
+                  Number of links to the file (this will always be 1 for file
+                  systems which have no concept of links).
+
+                _m_a_j_o_r___d_e_v_i_c_e _= _i_n_t_e_g_e_r_(_):
+                  Identifies the file system where the file is located. In
+                  Windows, the number indicates a drive as follows: 0 means
+                  A:, 1 means B:, and so on.
+
+                _m_i_n_o_r___d_e_v_i_c_e _= _i_n_t_e_g_e_r_(_):
+                  Only valid for character devices on Unix. In all other
+                  cases, this field is zero.
+
+                _i_n_o_d_e _= _i_n_t_e_g_e_r_(_):
+                  Gives the _i_n_o_d_e number. On non-Unix file systems, this field
+                  will be zero.
+
+                _u_i_d _= _i_n_t_e_g_e_r_(_):
+                  Indicates the owner of the file. Will be zero for non-Unix
+                  file systems.
+
+                _g_i_d _= _i_n_t_e_g_e_r_(_):
+                  Gives the group that the owner of the file belongs to. Will
+                  be zero for non-Unix file systems.
+
+              Typical error reasons:
+
+                _e_a_c_c_e_s:
+                  Missing search permission for one of the parent directories
+                  of the file.
+
+                _e_n_o_e_n_t:
+                  The file does not exist.
+
+                _e_n_o_t_d_i_r:
+                  A component of the file name is not a directory. On some
+                  platforms, _e_n_o_e_n_t is returned instead.
+
+       rreeaadd__lliinnee((IIooDDeevviiccee)) -->> {{ookk,, DDaattaa}} || eeooff || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(()) | atom()
+                 Data = string() | binary()
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Reads a line of bytes/characters from the file referenced by
+              _I_o_D_e_v_i_c_e. Lines are defined to be delimited by the linefeed (LF,
+              _\_n) character, but any carriage return (CR, _\_r) followed by a
+              newline is also treated as a single LF character (the carriage
+              return is silently ignored). The line is returned _i_n_c_l_u_d_i_n_g the
+              LF, but excluding any CR immediately followed by a LF. This
+              behaviour is consistent with the behaviour of iioo::ggeett__lliinnee//22. If
+              end of file is reached without any LF ending the last line, a
+              line with no trailing LF is returned.
+
+              The function can be used on files opened in _r_a_w mode. It is
+              however inefficient to use it on _r_a_w files if the file is not
+              opened with the option _{_r_e_a_d___a_h_e_a_d_, _S_i_z_e_} specified, why
+              combining _r_a_w and _{_r_e_a_d___a_h_e_a_d_, _S_i_z_e_} is highly recommended when
+              opening a text file for raw line oriented reading.
+
+              If _e_n_c_o_d_i_n_g is set to something else than _l_a_t_i_n_1, the
+              _r_e_a_d___l_i_n_e_/_1 call will fail if the data contains characters
+              larger than 255, why the iioo((33)) module is to be preferred when
+              reading such a file.
+
+              The function returns:
+
+                _{_o_k_, _D_a_t_a_}:
+                  One line from the file is returned, including the trailing
+                  LF, but with CRLF sequences replaced by a single LF (see
+                  above).
+
+                  If the file was opened in binary mode, the read bytes are
+                  returned in a binary, otherwise in a list.
+
+                _e_o_f:
+                  Returned if end of file was reached before anything at all
+                  could be read.
+
+                _{_e_r_r_o_r_, _R_e_a_s_o_n_}:
+                  An error occurred.
+
+              Typical error reasons:
+
+                _e_b_a_d_f:
+                  The file is not opened for reading.
+
+                _{_n_o___t_r_a_n_s_l_a_t_i_o_n_, _u_n_i_c_o_d_e_, _l_a_t_i_n_1_}:
+                  The file is was opened with another _e_n_c_o_d_i_n_g than _l_a_t_i_n_1 and
+                  the data on the file can not be translated to the byte-
+                  oriented data that this function returns.
+
+       rreeaadd__lliinnkk((NNaammee)) -->> {{ookk,, FFiilleennaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Filename = ffiilleennaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              This function returns _{_o_k_, _F_i_l_e_n_a_m_e_} if _N_a_m_e refers to a
+              symbolic link or _{_e_r_r_o_r_, _R_e_a_s_o_n_} otherwise. On platforms that do
+              not support symbolic links, the return value will be
+              _{_e_r_r_o_r_,_e_n_o_t_s_u_p_}.
+
+              Typical error reasons:
+
+                _e_i_n_v_a_l:
+                  _N_a_m_e does not refer to a symbolic link.
+
+                _e_n_o_e_n_t:
+                  The file does not exist.
+
+                _e_n_o_t_s_u_p:
+                  Symbolic links are not supported on this platform.
+
+       rreeaadd__lliinnkk__iinnffoo((NNaammee)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+       rreeaadd__lliinnkk__iinnffoo((NNaammee,, OOppttss)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Opts = [ffiillee__iinnffoo__ooppttiioonn(())]
+                 FileInfo = ffiillee__iinnffoo(())
+                 Reason = ppoossiixx(()) | badarg
+
+              This function works like rreeaadd__ffiillee__iinnffoo//11,,22 except that if _N_a_m_e
+              is a symbolic link, information about the link will be returned
+              in the _f_i_l_e___i_n_f_o record and the _t_y_p_e field of the record will be
+              set to _s_y_m_l_i_n_k.
+
+              If _N_a_m_e is not a symbolic link, this function returns exactly
+              the same result as _r_e_a_d___f_i_l_e___i_n_f_o_/_1. On platforms that do not
+              support symbolic links, this function is always equivalent to
+              _r_e_a_d___f_i_l_e___i_n_f_o_/_1.
+
+       rreennaammee((SSoouurrccee,, DDeessttiinnaattiioonn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Source = Destination = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Tries to rename the file _S_o_u_r_c_e to _D_e_s_t_i_n_a_t_i_o_n. It can be used
+              to move files (and directories) between directories, but it is
+              not sufficient to specify the destination only. The destination
+              file name must also be specified. For example, if _b_a_r is a
+              normal file and _f_o_o and _b_a_z are directories, _r_e_n_a_m_e_(_"_f_o_o_/_b_a_r_"_,
+              _"_b_a_z_"_) returns an error, but _r_e_n_a_m_e_(_"_f_o_o_/_b_a_r_"_, _"_b_a_z_/_b_a_r_"_)
+              succeeds. Returns _o_k if it is successful.
+
+          NNoottee::
+              Renaming of open files is not allowed on most platforms (see
+              _e_a_c_c_e_s below).
+
+
+              Typical error reasons:
+
+                _e_a_c_c_e_s:
+                  Missing read or write permissions for the parent directories
+                  of _S_o_u_r_c_e or _D_e_s_t_i_n_a_t_i_o_n. On some platforms, this error is
+                  given if either _S_o_u_r_c_e or _D_e_s_t_i_n_a_t_i_o_n is open.
+
+                _e_e_x_i_s_t:
+                  _D_e_s_t_i_n_a_t_i_o_n is not an empty directory. On some platforms,
+                  also given when _S_o_u_r_c_e and _D_e_s_t_i_n_a_t_i_o_n are not of the same
+                  type.
+
+                _e_i_n_v_a_l:
+                  _S_o_u_r_c_e is a root directory, or _D_e_s_t_i_n_a_t_i_o_n is a sub-
+                  directory of _S_o_u_r_c_e.
+
+                _e_i_s_d_i_r:
+                  _D_e_s_t_i_n_a_t_i_o_n is a directory, but _S_o_u_r_c_e is not.
+
+                _e_n_o_e_n_t:
+                  _S_o_u_r_c_e does not exist.
+
+                _e_n_o_t_d_i_r:
+                  _S_o_u_r_c_e is a directory, but _D_e_s_t_i_n_a_t_i_o_n is not.
+
+                _e_x_d_e_v:
+                  _S_o_u_r_c_e and _D_e_s_t_i_n_a_t_i_o_n are on different file systems.
+
+       ssccrriipptt((FFiilleennaammee)) -->> {{ookk,, VVaalluuee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Value = term()
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Reads and evaluates Erlang expressions, separated by '.' (or
+              ',', a sequence of expressions is also an expression), from the
+              file. Returns one of the following:
+
+                _{_o_k_, _V_a_l_u_e_}:
+                  The file was read and evaluated. _V_a_l_u_e is the value of the
+                  last expression.
+
+                _{_e_r_r_o_r_, _a_t_o_m_(_)_}:
+                  An error occurred when opening the file or reading it. See
+                  ooppeenn//22 for a list of typical error codes.
+
+                _{_e_r_r_o_r_, _{_L_i_n_e_, _M_o_d_, _T_e_r_m_}_}:
+                  An error occurred when interpreting the Erlang expressions
+                  in the file. Use _f_o_r_m_a_t___e_r_r_o_r_/_1 to convert the three-element
+                  tuple to an English description of the error.
+
+       ssccrriipptt((FFiilleennaammee,, BBiinnddiinnggss)) -->> {{ookk,, VVaalluuee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Bindings = eerrll__eevvaall::bbiinnddiinngg__ssttrruucctt(())
+                 Value = term()
+                 Reason = ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              The same as _s_c_r_i_p_t_/_1 but the variable bindings _B_i_n_d_i_n_g_s are used
+              in the evaluation. See eerrll__eevvaall((33)) about variable bindings.
+
+       sseett__ccwwdd((DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dir = nnaammee(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Sets the current working directory of the file server to _D_i_r.
+              Returns _o_k if successful.
+
+              Typical error reasons are:
+
+                _e_n_o_e_n_t:
+                  The directory does not exist.
+
+                _e_n_o_t_d_i_r:
+                  A component of _D_i_r is not a directory. On some platforms,
+                  _e_n_o_e_n_t is returned.
+
+                _e_a_c_c_e_s:
+                  Missing permission for the directory or one of its parents.
+
+                _b_a_d_a_r_g:
+                  _D_i_r had an improper type, such as tuple.
+
+          WWaarrnniinngg::
+              In a future release, a bad type for the _D_i_r argument will
+              probably generate an exception.
+
+
+       ssyynncc((IIooDDeevviiccee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Makes sure that any buffers kept by the operating system (not by
+              the Erlang runtime system) are written to disk. On some
+              platforms, this function might have no effect.
+
+              Typical error reasons are:
+
+                _e_n_o_s_p_c:
+                  Not enough space left to write the file.
+
+       ddaattaassyynncc((IIooDDeevviiccee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Makes sure that any buffers kept by the operating system (not by
+              the Erlang runtime system) are written to disk. In many ways
+              it's resembles fsync but it not requires to update some of
+              file's metadata such as the access time. On some platforms, this
+              function might have no effect.
+
+              Applications that access databases or log files often write a
+              tiny data fragment (e.g., one line in a log file) and then call
+              fsync() immediately in order to ensure that the written data is
+              physically stored on the harddisk. Unfortunately, fsync() will
+              always initiate two write operations: one for the newly written
+              data and another one in order to update the modification time
+              stored in the inode. If the modification time is not a part of
+              the transaction concept fdatasync() can be used to avoid
+              unnecessary inode disk write operations.
+
+              Available only in some POSIX systems. This call results in a
+              call to fsync(), or has no effect, in systems not implementing
+              the fdatasync syscall.
+
+       ttrruunnccaattee((IIooDDeevviiccee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(())
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Truncates the file referenced by _I_o_D_e_v_i_c_e at the current
+              position. Returns _o_k if successful, otherwise _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+       sseennddffiillee((FFiilleennaammee,, SSoocckkeett)) -->>
+                   {{ookk,, iinntteeggeerr(()) >>== 00}} ||
+                   {{eerrrroorr,, iinneett::ppoossiixx(()) || cclloosseedd || bbaaddaarrgg || nnoott__oowwnneerr}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 Socket = iinneett::ssoocckkeett(())
+
+              Sends the file _F_i_l_e_n_a_m_e to _S_o_c_k_e_t. Returns _{_o_k_, _B_y_t_e_s_S_e_n_t_} if
+              successful, otherwise _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+       sseennddffiillee((RRaawwFFiillee,, SSoocckkeett,, OOffffsseett,, BByytteess,, OOppttss)) -->>
+                   {{ookk,, iinntteeggeerr(()) >>== 00}} ||
+                   {{eerrrroorr,, iinneett::ppoossiixx(()) || cclloosseedd || bbaaddaarrgg || nnoott__oowwnneerr}}
+
+              Types:
+
+                 RawFile = ffiillee::ffdd(())
+                 Socket = iinneett::ssoocckkeett(())
+                 Offset = Bytes = integer() >= 0
+                 Opts = [sseennddffiillee__ooppttiioonn(())]
+
+              Sends _B_y_t_e_s from the file referenced by _R_a_w_F_i_l_e beginning at
+              _O_f_f_s_e_t to _S_o_c_k_e_t. Returns _{_o_k_, _B_y_t_e_s_S_e_n_t_} if successful,
+              otherwise _{_e_r_r_o_r_, _R_e_a_s_o_n_}. If _B_y_t_e_s is set to 0 all data after
+              the given _O_f_f_s_e_t is sent.
+
+              The file used must be opened using the raw flag, and the process
+              calling sendfile must be the controlling process of the socket.
+              See ggeenn__ttccpp::ccoonnttrroolllliinngg__pprroocceessss//22
+
+              If the OS used does not support sendfile, an Erlang fallback
+              using file:read and gen_tcp:send is used.
+
+              The option list can contain the following options:
+
+                _c_h_u_n_k___s_i_z_e:
+                  The chunk size used by the erlang fallback to send data. If
+                  using the fallback, this should be set to a value which
+                  comfortably fits in the systems memory. Default is 20 MB.
+
+              On operating systems with thread support, it is recommended to
+              use async threads. See the command line flag _+_A in eerrll((11)). If it
+              is not possible to use async threads for sendfile, it is
+              recommended to use a relatively small value for the send buffer
+              on the socket. Otherwise the Erlang VM might loose some of its
+              soft realtime guarantees. Which size to use depends on the
+              OS/hardware and the requirements of the application.
+
+       wwrriittee((IIooDDeevviiccee,, BByytteess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 IoDevice = iioo__ddeevviiccee(()) | atom()
+                 Bytes = iodata()
+                 Reason = ppoossiixx(()) | badarg | terminated
+
+              Writes _B_y_t_e_s to the file referenced by _I_o_D_e_v_i_c_e. This function
+              is the only way to write to a file opened in raw mode (although
+              it works for normally opened files, too). Returns _o_k if
+              successful, and _{_e_r_r_o_r_, _R_e_a_s_o_n_} otherwise.
+
+              If the file is opened with _e_n_c_o_d_i_n_g set to something else than
+              _l_a_t_i_n_1, each byte written might result in several bytes actually
+              being written to the file, as the byte range 0..255 might
+              represent anything between one and four bytes depending on value
+              and UTF encoding type.
+
+              Typical error reasons are:
+
+                _e_b_a_d_f:
+                  The file is not opened for writing.
+
+                _e_n_o_s_p_c:
+                  There is a no space left on the device.
+
+       wwrriittee__ffiillee((FFiilleennaammee,, BByytteess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Bytes = iodata()
+                 Reason = ppoossiixx(()) | badarg | terminated | system_limit
+
+              Writes the contents of the iodata term _B_y_t_e_s to the file
+              _F_i_l_e_n_a_m_e. The file is created if it does not exist. If it
+              exists, the previous contents are overwritten. Returns _o_k, or
+              _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+              Typical error reasons are:
+
+                _e_n_o_e_n_t:
+                  A component of the file name does not exist.
+
+                _e_n_o_t_d_i_r:
+                  A component of the file name is not a directory. On some
+                  platforms, _e_n_o_e_n_t is returned instead.
+
+                _e_n_o_s_p_c:
+                  There is a no space left on the device.
+
+                _e_a_c_c_e_s:
+                  Missing permission for writing the file or searching one of
+                  the parent directories.
+
+                _e_i_s_d_i_r:
+                  The named file is a directory.
+
+       wwrriittee__ffiillee((FFiilleennaammee,, BByytteess,, MMooddeess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Bytes = iodata()
+                 Modes = [mmooddee(())]
+                 Reason = ppoossiixx(()) | badarg | terminated | system_limit
+
+              Same as _w_r_i_t_e___f_i_l_e_/_2, but takes a third argument _M_o_d_e_s, a list
+              of possible modes, see ooppeenn//22. The mode flags _b_i_n_a_r_y and _w_r_i_t_e
+              are implicit, so they should not be used.
+
+       wwrriittee__ffiillee__iinnffoo((FFiilleennaammee,, FFiilleeIInnffoo)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       wwrriittee__ffiillee__iinnffoo((FFiilleennaammee,, FFiilleeIInnffoo,, OOppttss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Filename = nnaammee(())
+                 Opts = [ffiillee__iinnffoo__ooppttiioonn(())]
+                 FileInfo = ffiillee__iinnffoo(())
+                 Reason = ppoossiixx(()) | badarg
+
+              Change file information. Returns _o_k if successful, otherwise
+              _{_e_r_r_o_r_, _R_e_a_s_o_n_}. _F_i_l_e_I_n_f_o is a record _f_i_l_e___i_n_f_o, defined in the
+              Kernel include file _f_i_l_e_._h_r_l. Include the following directive in
+              the module from which the function is called:
+
+              -include_lib("kernel/include/file.hrl").
+
+              The time type set in _a_t_i_m_e, _m_t_i_m_e and _c_t_i_m_e is dependent on the
+              time type set in _O_p_t_s _:_: _{_t_i_m_e_, _T_y_p_e_}. Type _l_o_c_a_l will interpret
+              the time set as local, _u_n_i_v_e_r_s_a_l will interpret it as universal
+              time and _p_o_s_i_x must be seconds since or before unix time epoch
+              which is 1970-01-01 00:00 UTC. Default is _{_t_i_m_e_, _l_o_c_a_l_}.
+
+              The following fields are used from the record, if they are
+              given.
+
+                _a_t_i_m_e _= ddaattee__ttiimmee(()) | integer():
+                  The last time the file was read.
+
+                _m_t_i_m_e _= ddaattee__ttiimmee(()) | integer():
+                  The last time the file was written.
+
+                _c_t_i_m_e _= ddaattee__ttiimmee(()) | integer():
+                  On Unix, any value give for this field will be ignored (the
+                  "ctime" for the file will be set to the current time). On
+                  Windows, this field is the new creation time to set for the
+                  file.
+
+                _m_o_d_e _= _i_n_t_e_g_e_r_(_):
+                  The file permissions as the sum of the following bit values:
+
+                  88##0000440000::
+                    read permission: owner
+
+                  88##0000220000::
+                    write permission: owner
+
+                  88##0000110000::
+                    execute permission: owner
+
+                  88##0000004400::
+                    read permission: group
+
+                  88##0000002200::
+                    write permission: group
+
+                  88##0000001100::
+                    execute permission: group
+
+                  88##0000000044::
+                    read permission: other
+
+                  88##0000000022::
+                    write permission: other
+
+                  88##0000000011::
+                    execute permission: other
+
+                  1166##880000::
+                    set user id on execution
+
+                  1166##440000::
+                    set group id on execution
+
+                  On Unix platforms, other bits than those listed above may be
+                  set.
+
+                _u_i_d _= _i_n_t_e_g_e_r_(_):
+                  Indicates the owner of the file. Ignored for non-Unix file
+                  systems.
+
+                _g_i_d _= _i_n_t_e_g_e_r_(_):
+                  Gives the group that the owner of the file belongs to.
+                  Ignored non-Unix file systems.
+
+              Typical error reasons:
+
+                _e_a_c_c_e_s:
+                  Missing search permission for one of the parent directories
+                  of the file.
+
+                _e_n_o_e_n_t:
+                  The file does not exist.
+
+                _e_n_o_t_d_i_r:
+                  A component of the file name is not a directory. On some
+                  platforms, _e_n_o_e_n_t is returned instead.
+
+PPOOSSIIXX EERRRROORR CCOODDEESS
+         * _e_a_c_c_e_s - permission denied
+
+         * _e_a_g_a_i_n - resource temporarily unavailable
+
+         * _e_b_a_d_f - bad file number
+
+         * _e_b_u_s_y - file busy
+
+         * _e_d_q_u_o_t - disk quota exceeded
+
+         * _e_e_x_i_s_t - file already exists
+
+         * _e_f_a_u_l_t - bad address in system call argument
+
+         * _e_f_b_i_g - file too large
+
+         * _e_i_n_t_r - interrupted system call
+
+         * _e_i_n_v_a_l - invalid argument
+
+         * _e_i_o - IO error
+
+         * _e_i_s_d_i_r - illegal operation on a directory
+
+         * _e_l_o_o_p - too many levels of symbolic links
+
+         * _e_m_f_i_l_e - too many open files
+
+         * _e_m_l_i_n_k - too many links
+
+         * _e_n_a_m_e_t_o_o_l_o_n_g - file name too long
+
+         * _e_n_f_i_l_e - file table overflow
+
+         * _e_n_o_d_e_v - no such device
+
+         * _e_n_o_e_n_t - no such file or directory
+
+         * _e_n_o_m_e_m - not enough memory
+
+         * _e_n_o_s_p_c - no space left on device
+
+         * _e_n_o_t_b_l_k - block device required
+
+         * _e_n_o_t_d_i_r - not a directory
+
+         * _e_n_o_t_s_u_p - operation not supported
+
+         * _e_n_x_i_o - no such device or address
+
+         * _e_p_e_r_m - not owner
+
+         * _e_p_i_p_e - broken pipe
+
+         * _e_r_o_f_s - read-only file system
+
+         * _e_s_p_i_p_e - invalid seek
+
+         * _e_s_r_c_h - no such process
+
+         * _e_s_t_a_l_e - stale remote file handle
+
+         * _e_x_d_e_v - cross-domain link
+
+PPEERRFFOORRMMAANNCCEE
+       Some operating system file operations, for example a _s_y_n_c_/_1 or _c_l_o_s_e_/_1
+       on a huge file, may block their calling thread for seconds. If this
+       befalls the emulator main thread, the response time is no longer in the
+       order of milliseconds, depending on the definition of "soft" in soft
+       real-time system.
+
+       If the device driver thread pool is active, file operations are done
+       through those threads instead, so the emulator can go on executing
+       Erlang processes. Unfortunately, the time for serving a file operation
+       increases due to the extra scheduling required from the operating
+       system.
+
+       If the device driver thread pool is disabled or of size 0, large file
+       reads and writes are segmented into several smaller, which enables the
+       emulator so server other processes during the file operation. This
+       gives the same effect as when using the thread pool, but with larger
+       overhead. Other file operations, for example _s_y_n_c_/_1 or _c_l_o_s_e_/_1 on a
+       huge file, still are a problem.
+
+       For increased performance, raw files are recommended. Raw files uses
+       the file system of the node's host machine. For normal files (non-raw),
+       the file server is used to find the files, and if the node is running
+       its file server as slave to another node's, and the other node runs on
+       some other host machine, they may have different file systems. This is
+       seldom a problem, but you have now been warned.
+
+       A normal file is really a process so it can be used as an IO device
+       (see _i_o). Therefore when data is written to a normal file, the sending
+       of the data to the file process, copies all data that are not binaries.
+       Opening the file in binary mode and writing binaries is therefore
+       recommended. If the file is opened on another node, or if the file
+       server runs as slave to another node's, also binaries are copied.
+
+       Caching data to reduce the number of file operations, or rather the
+       number of calls to the file driver, will generally increase
+       performance. The following function writes 4 MBytes in 23 seconds when
+       tested:
+
+       create_file_slow(Name, N) when integer(N), N >= 0 ->
+           {ok, FD} = file:open(Name, [raw, write, delayed_write, binary]),
+           ok = create_file_slow(FD, 0, N),
+           ok = ?FILE_MODULE:close(FD),
+           ok.
+
+       create_file_slow(FD, M, M) ->
+           ok;
+       create_file_slow(FD, M, N) ->
+           ok = file:write(FD, <<M:32/unsigned>>),
+           create_file_slow(FD, M+1, N).
+
+       The following, functionally equivalent, function collects 1024 entries
+       into a list of 128 32-byte binaries before each call to _f_i_l_e_:_w_r_i_t_e_/_2
+       and so does the same work in 0.52 seconds, which is 44 times faster.
+
+       create_file(Name, N) when integer(N), N >= 0 ->
+           {ok, FD} = file:open(Name, [raw, write, delayed_write, binary]),
+           ok = create_file(FD, 0, N),
+           ok = ?FILE_MODULE:close(FD),
+           ok.
+
+       create_file(FD, M, M) ->
+           ok;
+       create_file(FD, M, N) when M + 1024 =&lt; N ->
+           create_file(FD, M, M + 1024, []),
+           create_file(FD, M + 1024, N);
+       create_file(FD, M, N) ->
+           create_file(FD, M, N, []).
+
+       create_file(FD, M, M, R) ->
+           ok = file:write(FD, R);
+       create_file(FD, M, N0, R) when M + 8 =&lt; N0 ->
+           N1  = N0-1,  N2  = N0-2,  N3  = N0-3,  N4  = N0-4,
+           N5  = N0-5,  N6  = N0-6,  N7  = N0-7,  N8  = N0-8,
+           create_file(FD, M, N8,
+                       [<<N8:32/unsigned,  N7:32/unsigned,
+                          N6:32/unsigned,  N5:32/unsigned,
+                          N4:32/unsigned,  N3:32/unsigned,
+                          N2:32/unsigned,  N1:32/unsigned>> | R]);
+       create_file(FD, M, N0, R) ->
+           N1 = N0-1,
+           create_file(FD, M, N1, [<<N1:32/unsigned>> | R]).
+
+   NNoottee::
+       Trust only your own benchmarks. If the list length in _c_r_e_a_t_e___f_i_l_e_/_2
+       above is increased, it will run slightly faster, but consume more
+       memory and cause more memory fragmentation. How much this affects your
+       application is something that this simple benchmark can not predict.
+
+       If the size of each binary is increased to 64 bytes, it will also run
+       slightly faster, but the code will be twice as clumsy. In the current
+       implementation are binaries larger than 64 bytes stored in memory
+       common to all processes and not copied when sent between processes,
+       while these smaller binaries are stored on the process heap and copied
+       when sent like any other term.
+
+       So, with a binary size of 68 bytes _c_r_e_a_t_e___f_i_l_e_/_2 runs 30 percent slower
+       then with 64 bytes, and will cause much more memory fragmentation. Note
+       that if the binaries were to be sent between processes (for example a
+       non-raw file) the results would probably be completely different.
+
+
+       A raw file is really a port. When writing data to a port, it is
+       efficient to write a list of binaries. There is no need to flatten a
+       deep list before writing. On Unix hosts, scatter output, which writes a
+       set of buffers in one operation, is used when possible. In this way
+       _f_i_l_e_:_w_r_i_t_e_(_F_D_, _[_B_i_n_1_, _B_i_n_2 _| _B_i_n_3_]_) will write the contents of the
+       binaries without copying the data at all except for perhaps deep down
+       in the operating system kernel.
+
+       For raw files, _p_w_r_i_t_e_/_2 and _p_r_e_a_d_/_2 are efficiently implemented. The
+       file driver is called only once for the whole operation, and the list
+       iteration is done in the file driver.
+
+       The options _d_e_l_a_y_e_d___w_r_i_t_e and _r_e_a_d___a_h_e_a_d to _f_i_l_e_:_o_p_e_n_/_2 makes the file
+       driver cache data to reduce the number of operating system calls. The
+       function _c_r_e_a_t_e___f_i_l_e_/_2 in the example above takes 60 seconds seconds
+       without the _d_e_l_a_y_e_d___w_r_i_t_e option, which is 2.6 times slower.
+
+       And, as a really bad example, _c_r_e_a_t_e___f_i_l_e___s_l_o_w_/_2 above without the _r_a_w,
+       _b_i_n_a_r_y and _d_e_l_a_y_e_d___w_r_i_t_e options, that is it calls _f_i_l_e_:_o_p_e_n_(_N_a_m_e_,
+       _[_w_r_i_t_e_]_), needs 1 min 20 seconds for the job, which is 3.5 times slower
+       than the first example, and 150 times slower than the optimized
+       _c_r_e_a_t_e___f_i_l_e_/_2.
+
+WWAARRNNIINNGGSS
+       If an error occurs when accessing an open file with the _i_o module, the
+       process which handles the file will exit. The dead file process might
+       hang if a process tries to access it later. This will be fixed in a
+       future release.
+
+SSEEEE AALLSSOO
+       ffiilleennaammee((33))
+
+
+
+Ericsson AB                      kernel 2.15.2                         file(3)

@@ -1,0 +1,59 @@
+edoc_layout(3)             Erlang Module Definition             edoc_layout(3)
+
+
+
+NNAAMMEE
+       edoc_layout - The standard HTML layout module for EDoc.
+
+DDEESSCCRRIIPPTTIIOONN
+       The standard HTML layout module for EDoc. See the eeddoocc module for
+       details on usage.
+
+EEXXPPOORRTTSS
+       mmoodduullee((EElleemmeenntt,, OOppttiioonnss)) -->> tteerrmm(())
+
+              The layout function.
+
+              Options to the standard layout:
+
+                _{_i_n_d_e_x___c_o_l_u_m_n_s_, _i_n_t_e_g_e_r_(_)_}:
+                  Specifies the number of column pairs used for the function
+                  index tables. The default value is 1.
+
+                _{_p_r_e_t_t_y___p_r_i_n_t_e_r_, _a_t_o_m_(_)_}:
+                  Specifies how types and specifications are pretty printed.
+                  If the value _e_r_l___p_p is specified the Erlang pretty printer
+                  (the module _e_r_l___p_p) will be used. The default is to do no
+                  pretty printing which implies that lines can be very long.
+
+                _{_s_t_y_l_e_s_h_e_e_t_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the URI used for referencing the stylesheet. The
+                  default value is _"_s_t_y_l_e_s_h_e_e_t_._c_s_s_". If an empty string is
+                  specified, no stylesheet reference will be generated.
+
+                _{_s_o_r_t___f_u_n_c_t_i_o_n_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If _t_r_u_e, the detailed function descriptions are listed by
+                  name, otherwise they are listed in the order of occurrence
+                  in the source file. The default value is _t_r_u_e.
+
+                _{_x_m_l___e_x_p_o_r_t_, _M_o_d_u_l_e_:_:_a_t_o_m_(_)_}:
+                  Specifies an xxmmeerrll callback module to be used for exporting
+                  the documentation. See xxmmeerrll::eexxppoorrtt__ssiimmppllee//33 for details.
+
+              _S_e_e _a_l_s_o_: eeddoocc::llaayyoouutt//22.
+
+       oovveerrvviieeww((EE,, OOppttiioonnss)) -->> tteerrmm(())
+
+       ppaacckkaaggee((EE,, OOppttiioonnss)) -->> tteerrmm(())
+
+       ttyyppee((EE)) -->> tteerrmm(())
+
+SSEEEE AALLSSOO
+       eeddoocc
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  edoc 0.7.10                   edoc_layout(3)

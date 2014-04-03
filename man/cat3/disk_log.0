@@ -1,0 +1,1104 @@
+disk_log(3)                Erlang Module Definition                disk_log(3)
+
+
+
+NNAAMMEE
+       disk_log - A disk based term logging facility
+
+DDEESSCCRRIIPPTTIIOONN
+       _d_i_s_k___l_o_g is a disk based term logger which makes it possible to
+       efficiently log items on files. Two types of logs are supported, _h_a_l_t
+       _l_o_g_s and _w_r_a_p _l_o_g_s. A halt log appends items to a single file, the size
+       of which may or may not be limited by the disk log module, whereas a
+       wrap log utilizes a sequence of wrap log files of limited size. As a
+       wrap log file has been filled up, further items are logged onto to the
+       next file in the sequence, starting all over with the first file when
+       the last file has been filled up. For the sake of efficiency, items are
+       always written to files as binaries.
+
+       Two formats of the log files are supported, the _i_n_t_e_r_n_a_l _f_o_r_m_a_t and the
+       _e_x_t_e_r_n_a_l _f_o_r_m_a_t. The internal format supports automatic repair of log
+       files that have not been properly closed, and makes it possible to
+       efficiently read logged items in _c_h_u_n_k_s using a set of functions
+       defined in this module. In fact, this is the only way to read
+       internally formatted logs. The external format leaves it up to the user
+       to read the logged deep byte lists. The disk log module cannot repair
+       externally formatted logs. An item logged to an internally formatted
+       log must not occupy more than 4 GB of disk space (the size must fit in
+       4 bytes).
+
+       For each open disk log there is one process that handles requests made
+       to the disk log; the disk log process is created when _o_p_e_n_/_1 is called,
+       provided there exists no process handling the disk log. A process that
+       opens a disk log can either be an _o_w_n_e_r or an anonymous _u_s_e_r of the
+       disk log. Each owner is linked to the disk log process, and the disk
+       log is closed by the owner should the owner terminate. Owners can
+       subscribe to _n_o_t_i_f_i_c_a_t_i_o_n_s, messages of the form _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_,
+       _I_n_f_o_} that are sent from the disk log process when certain events
+       occur, see the commands below and in particular the _o_p_e_n_/_1 option
+       nnoottiiffyy. There can be several owners of a log, but a process cannot own
+       a log more than once. One and the same process may, however, open the
+       log as a user more than once. For a disk log process to properly close
+       its file and terminate, it must be closed by its owners and once by
+       some non-owner process for each time the log was used anonymously; the
+       users are counted, and there must not be any users left when the disk
+       log process terminates.
+
+       Items can be logged _s_y_n_c_h_r_o_n_o_u_s_l_y by using the functions _l_o_g_/_2, _b_l_o_g_/_2,
+       _l_o_g___t_e_r_m_s_/_2 and _b_l_o_g___t_e_r_m_s_/_2. For each of these functions, the caller
+       is put on hold until the items have been logged (but not necessarily
+       written, use _s_y_n_c_/_1 to ensure that). By adding an _a to each of the
+       mentioned function names we get functions that log items
+       _a_s_y_n_c_h_r_o_n_o_u_s_l_y. Asynchronous functions do not wait for the disk log
+       process to actually write the items to the file, but return the control
+       to the caller more or less immediately.
+
+       When using the internal format for logs, the functions _l_o_g_/_2,
+       _l_o_g___t_e_r_m_s_/_2, _a_l_o_g_/_2, and _a_l_o_g___t_e_r_m_s_/_2 should be used. These functions
+       log one or more Erlang terms. By prefixing each of the functions with a
+       _b (for "binary") we get the corresponding _b_l_o_g functions for the
+       external format. These functions log one or more deep lists of bytes
+       or, alternatively, binaries of deep lists of bytes. For example, to log
+       the string _"_h_e_l_l_o_" in ASCII format, we can use _d_i_s_k___l_o_g_:_b_l_o_g_(_L_o_g_,
+       _"_h_e_l_l_o_"_), or _d_i_s_k___l_o_g_:_b_l_o_g_(_L_o_g_, _l_i_s_t___t_o___b_i_n_a_r_y_(_"_h_e_l_l_o_"_)_). The two
+       alternatives are equally efficient. The _b_l_o_g functions can be used for
+       internally formatted logs as well, but in this case they must be called
+       with binaries constructed with calls to _t_e_r_m___t_o___b_i_n_a_r_y_/_1. There is no
+       check to ensure this, it is entirely the responsibility of the caller.
+       If these functions are called with binaries that do not correspond to
+       Erlang terms, the _c_h_u_n_k_/_2_,_3 and automatic repair functions will fail.
+       The corresponding terms (not the binaries) will be returned when
+       _c_h_u_n_k_/_2_,_3 is called.
+
+       A collection of open disk logs with the same name running on different
+       nodes is said to be a _a _d_i_s_t_r_i_b_u_t_e_d _d_i_s_k _l_o_g if requests made to any
+       one of the logs are automatically made to the other logs as well. The
+       members of such a collection will be called individual distributed disk
+       logs, or just distributed disk logs if there is no risk of confusion.
+       There is no order between the members of such a collection. For
+       instance, logged terms are not necessarily written onto the node where
+       the request was made before written onto the other nodes. One could
+       note here that there are a few functions that do not make requests to
+       all members of distributed disk logs, namely _i_n_f_o, _c_h_u_n_k, _b_c_h_u_n_k,
+       _c_h_u_n_k___s_t_e_p and _l_c_l_o_s_e. An open disk log that is not a distributed disk
+       log is said to be a _l_o_c_a_l _d_i_s_k _l_o_g. A local disk log is accessible only
+       from the node where the disk log process runs, whereas a distributed
+       disk log is accessible from all nodes in the Erlang system, with
+       exception for those nodes where a local disk log with the same name as
+       the distributed disk log exists. All processes on nodes that have
+       access to a local or distributed disk log can log items or otherwise
+       change, inspect or close the log.
+
+       It is not guaranteed that all log files of a distributed disk log
+       contain the same log items; there is no attempt made to synchronize the
+       contents of the files. However, as long as at least one of the involved
+       nodes is alive at each time, all items will be logged. When logging
+       items to a distributed log, or otherwise trying to change the log, the
+       replies from individual logs are ignored. If all nodes are down, the
+       disk log functions reply with a _n_o_n_o_d_e error.
+
+   NNoottee::
+       In some applications it may not be acceptable that replies from
+       individual logs are ignored. An alternative in such situations is to
+       use several local disk logs instead of one distributed disk log, and
+       implement the distribution without use of the disk log module.
+
+
+       Errors are reported differently for asynchronous log attempts and other
+       uses of the disk log module. When used synchronously the disk log
+       module replies with an error message, but when called asynchronously,
+       the disk log module does not know where to send the error message.
+       Instead owners subscribing to notifications will receive an
+       _e_r_r_o_r___s_t_a_t_u_s message.
+
+       The disk log module itself does not report errors to the _e_r_r_o_r___l_o_g_g_e_r
+       module; it is up to the caller to decide whether the error logger
+       should be employed or not. The function _f_o_r_m_a_t___e_r_r_o_r_/_1 can be used to
+       produce readable messages from error replies. Information events are
+       however sent to the error logger in two situations, namely when a log
+       is repaired, or when a file is missing while reading chunks.
+
+       The error message _n_o___s_u_c_h___l_o_g means that the given disk log is not
+       currently open. Nothing is said about whether the disk log files exist
+       or not.
+
+   NNoottee::
+       If an attempt to reopen or truncate a log fails (see _r_e_o_p_e_n and
+       _t_r_u_n_c_a_t_e) the disk log process immediately terminates. Before the
+       process terminates links to to owners and blocking processes (see
+       _b_l_o_c_k) are removed. The effect is that the links work in one direction
+       only; any process using a disk log has to check for the error message
+       _n_o___s_u_c_h___l_o_g if some other process might truncate or reopen the log
+       simultaneously.
+
+
+DDAATTAA TTYYPPEESS
+       lloogg(()) = term()
+
+       ddlloogg__ssiizzee(()) = infinity
+                   | integer() >= 1
+                   | {MaxNoBytes :: integer() >= 1,
+                      MaxNoFiles :: integer() >= 1}
+
+       ddlloogg__ffoorrmmaatt(()) = external | internal
+
+       ddlloogg__hheeaadd__oopptt(()) = none | term() | binary() | [ddlloogg__bbyyttee(())]
+
+       ddlloogg__bbyyttee(()) = [ddlloogg__bbyyttee(())] | byte()
+
+       ddlloogg__mmooddee(()) = read_only | read_write
+
+       ddlloogg__ttyyppee(()) = halt | wrap
+
+       ccoonnttiinnuuaattiioonn(())
+
+              Chunk continuation returned by _c_h_u_n_k_/_2_,_3, _b_c_h_u_n_k_/_2_,_3, or
+              _c_h_u_n_k___s_t_e_p_/_3.
+
+       bbyytteess(()) = binary() | [byte()]
+
+       iinnvvaalliidd__hheeaaddeerr(()) = term()
+
+       ffiillee__eerrrroorr(()) = term()
+
+EEXXPPOORRTTSS
+       aacccceessssiibbllee__llooggss(()) -->> {{[[LLooccaallLLoogg]],, [[DDiissttrriibbuutteeddLLoogg]]}}
+
+              Types:
+
+                 LocalLog = DistributedLog = lloogg(())
+
+              The _a_c_c_e_s_s_i_b_l_e___l_o_g_s_/_0 function returns the names of the disk
+              logs accessible on the current node. The first list contains
+              local disk logs, and the second list contains distributed disk
+              logs.
+
+       aalloogg((LLoogg,, TTeerrmm)) -->> nnoottiiffyy__rreett(())
+
+       bbaalloogg((LLoogg,, BByytteess)) -->> nnoottiiffyy__rreett(())
+
+              Types:
+
+                 Log = lloogg(())
+                 Term = term()
+                 Bytes = bbyytteess(())
+                 nnoottiiffyy__rreett(()) = ok | {error, no_such_log}
+
+              The _a_l_o_g_/_2 and _b_a_l_o_g_/_2 functions asynchronously append an item
+              to a disk log. The function _a_l_o_g_/_2 is used for internally
+              formatted logs, and the function _b_a_l_o_g_/_2 for externally
+              formatted logs. _b_a_l_o_g_/_2 can be used for internally formatted
+              logs as well provided the binary was constructed with a call to
+              _t_e_r_m___t_o___b_i_n_a_r_y_/_1.
+
+              The owners that subscribe to notifications will receive the
+              message _r_e_a_d___o_n_l_y, _b_l_o_c_k_e_d___l_o_g or _f_o_r_m_a_t___e_x_t_e_r_n_a_l in case the
+              item cannot be written on the log, and possibly one of the
+              messages _w_r_a_p, _f_u_l_l and _e_r_r_o_r___s_t_a_t_u_s if an item was written on
+              the log. The message _e_r_r_o_r___s_t_a_t_u_s is sent if there is something
+              wrong with the header function or a file error occurred.
+
+       aalloogg__tteerrmmss((LLoogg,, TTeerrmmLLiisstt)) -->> nnoottiiffyy__rreett(())
+
+       bbaalloogg__tteerrmmss((LLoogg,, BByytteeLLiisstt)) -->> nnoottiiffyy__rreett(())
+
+              Types:
+
+                 Log = lloogg(())
+                 TermList = [term()]
+                 ByteList = [bbyytteess(())]
+                 nnoottiiffyy__rreett(()) = ok | {error, no_such_log}
+
+              The _a_l_o_g___t_e_r_m_s_/_2 and _b_a_l_o_g___t_e_r_m_s_/_2 functions asynchronously
+              append a list of items to a disk log. The function _a_l_o_g___t_e_r_m_s_/_2
+              is used for internally formatted logs, and the function
+              _b_a_l_o_g___t_e_r_m_s_/_2 for externally formatted logs. _b_a_l_o_g___t_e_r_m_s_/_2 can
+              be used for internally formatted logs as well provided the
+              binaries were constructed with calls to _t_e_r_m___t_o___b_i_n_a_r_y_/_1.
+
+              The owners that subscribe to notifications will receive the
+              message _r_e_a_d___o_n_l_y, _b_l_o_c_k_e_d___l_o_g or _f_o_r_m_a_t___e_x_t_e_r_n_a_l in case the
+              items cannot be written on the log, and possibly one or more of
+              the messages _w_r_a_p, _f_u_l_l and _e_r_r_o_r___s_t_a_t_u_s if items were written
+              on the log. The message _e_r_r_o_r___s_t_a_t_u_s is sent if there is
+              something wrong with the header function or a file error
+              occurred.
+
+       bblloocckk((LLoogg)) -->> ookk || {{eerrrroorr,, bblloocckk__eerrrroorr__rrssnn(())}}
+
+       bblloocckk((LLoogg,, QQuueeuueeLLooggRReeccoorrddss)) -->> ookk || {{eerrrroorr,, bblloocckk__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 QueueLogRecords = boolean()
+                 bblloocckk__eerrrroorr__rrssnn(()) = no_such_log | nonode | {blocked_log, lloogg(())}
+
+              With a call to _b_l_o_c_k_/_1_,_2 a process can block a log. If the
+              blocking process is not an owner of the log, a temporary link is
+              created between the disk log process and the blocking process.
+              The link is used to ensure that the disk log is unblocked should
+              the blocking process terminate without first closing or
+              unblocking the log.
+
+              Any process can probe a blocked log with _i_n_f_o_/_1 or close it with
+              _c_l_o_s_e_/_1. The blocking process can also use the functions
+              _c_h_u_n_k_/_2_,_3, _b_c_h_u_n_k_/_2_,_3, _c_h_u_n_k___s_t_e_p_/_3, and _u_n_b_l_o_c_k_/_1 without being
+              affected by the block. Any other attempt than those hitherto
+              mentioned to update or read a blocked log suspends the calling
+              process until the log is unblocked or returns an error message
+              _{_b_l_o_c_k_e_d___l_o_g_, _L_o_g_}, depending on whether the value of
+              _Q_u_e_u_e_L_o_g_R_e_c_o_r_d_s is _t_r_u_e or _f_a_l_s_e. The default value of
+              _Q_u_e_u_e_L_o_g_R_e_c_o_r_d_s is _t_r_u_e, which is used by _b_l_o_c_k_/_1.
+
+       cchhaannggee__hheeaaddeerr((LLoogg,, HHeeaaddeerr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Header = {head, ddlloogg__hheeaadd__oopptt(())}
+                        | {head_func, MFA :: {atom(), atom(), list()}}
+                 Reason = no_such_log
+                        | nonode
+                        | {read_only_mode, Log}
+                        | {blocked_log, Log}
+                        | {badarg, head}
+
+              The _c_h_a_n_g_e___h_e_a_d_e_r_/_2 function changes the value of the _h_e_a_d or
+              _h_e_a_d___f_u_n_c option of a disk log.
+
+       cchhaannggee__nnoottiiffyy((LLoogg,, OOwwnneerr,, NNoottiiffyy)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Owner = pid()
+                 Notify = boolean()
+                 Reason = no_such_log
+                        | nonode
+                        | {blocked_log, Log}
+                        | {badarg, notify}
+                        | {not_owner, Owner}
+
+              The _c_h_a_n_g_e___n_o_t_i_f_y_/_3 function changes the value of the _n_o_t_i_f_y
+              option for an owner of a disk log.
+
+       cchhaannggee__ssiizzee((LLoogg,, SSiizzee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Size = ddlloogg__ssiizzee(())
+                 Reason = no_such_log
+                        | nonode
+                        | {read_only_mode, Log}
+                        | {blocked_log, Log}
+                        | {new_size_too_small, CurrentSize :: integer() >= 1}
+                        | {badarg, size}
+                        | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The _c_h_a_n_g_e___s_i_z_e_/_2 function changes the size of an open log. For
+              a halt log it is always possible to increase the size, but it is
+              not possible to decrease the size to something less than the
+              current size of the file.
+
+              For a wrap log it is always possible to increase both the size
+              and number of files, as long as the number of files does not
+              exceed 65000. If the maximum number of files is decreased, the
+              change will not be valid until the current file is full and the
+              log wraps to the next file. The redundant files will be removed
+              next time the log wraps around, i.e. starts to log to file
+              number 1.
+
+              As an example, assume that the old maximum number of files is 10
+              and that the new maximum number of files is 6. If the current
+              file number is not greater than the new maximum number of files,
+              the files 7 to 10 will be removed when file number 6 is full and
+              the log starts to write to file number 1 again. Otherwise the
+              files greater than the current file will be removed when the
+              current file is full (e.g. if the current file is 8, the files 9
+              and 10); the files between new maximum number of files and the
+              current file (i.e. files 7 and 8) will be removed next time file
+              number 6 is full.
+
+              If the size of the files is decreased the change will
+              immediately affect the current log. It will not of course change
+              the size of log files already full until next time they are
+              used.
+
+              If the log size is decreased for instance to save space, the
+              function _i_n_c___w_r_a_p___f_i_l_e_/_1 can be used to force the log to wrap.
+
+       cchhuunnkk((LLoogg,, CCoonnttiinnuuaattiioonn)) -->> cchhuunnkk__rreett(())
+
+       cchhuunnkk((LLoogg,, CCoonnttiinnuuaattiioonn,, NN)) -->> cchhuunnkk__rreett(())
+
+       bbcchhuunnkk((LLoogg,, CCoonnttiinnuuaattiioonn)) -->> bbcchhuunnkk__rreett(())
+
+       bbcchhuunnkk((LLoogg,, CCoonnttiinnuuaattiioonn,, NN)) -->> bbcchhuunnkk__rreett(())
+
+              Types:
+
+                 Log = lloogg(())
+                 Continuation = start | ccoonnttiinnuuaattiioonn(())
+                 N = integer() >= 1 | infinity
+                 cchhuunnkk__rreett(()) = {Continuation2 :: ccoonnttiinnuuaattiioonn(()),
+                                Terms :: [term()]}
+                             | {Continuation2 :: ccoonnttiinnuuaattiioonn(()),
+                                Terms :: [term()],
+                                Badbytes :: integer() >= 0}
+                             | eof
+                             | {error, Reason :: cchhuunnkk__eerrrroorr__rrssnn(())}
+                 bbcchhuunnkk__rreett(()) = {Continuation2 :: ccoonnttiinnuuaattiioonn(()),
+                                 Binaries :: [binary()]}
+                              | {Continuation2 :: ccoonnttiinnuuaattiioonn(()),
+                                 Binaries :: [binary()],
+                                 Badbytes :: integer() >= 0}
+                              | eof
+                              | {error, Reason :: cchhuunnkk__eerrrroorr__rrssnn(())}
+                 cchhuunnkk__eerrrroorr__rrssnn(()) = no_such_log
+                                   | {format_external, lloogg(())}
+                                   | {blocked_log, lloogg(())}
+                                   | {badarg, continuation}
+                                   | {not_internal_wrap, lloogg(())}
+                                   | {corrupt_log_file,
+                                      FileName :: ffiillee::ffiilleennaammee(())}
+                                   | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The _c_h_u_n_k_/_2_,_3 and _b_c_h_u_n_k_/_2_,_3 functions make it possible to
+              efficiently read the terms which have been appended to an
+              internally formatted log. It minimizes disk I/O by reading 64
+              kilobyte chunks from the file. The _b_c_h_u_n_k_/_2_,_3 functions return
+              the binaries read from the file; they do not call
+              _b_i_n_a_r_y___t_o___t_e_r_m. Otherwise the work just like _c_h_u_n_k_/_2_,_3.
+
+              The first time _c_h_u_n_k (or _b_c_h_u_n_k) is called, an initial
+              continuation, the atom _s_t_a_r_t, must be provided. If there is a
+              disk log process running on the current node, terms are read
+              from that log, otherwise an individual distributed log on some
+              other node is chosen, if such a log exists.
+
+              When _c_h_u_n_k_/_3 is called, _N controls the maximum number of terms
+              that are read from the log in each chunk. Default is _i_n_f_i_n_i_t_y,
+              which means that all the terms contained in the 64 kilobyte
+              chunk are read. If less than _N terms are returned, this does not
+              necessarily mean that the end of the file has been reached.
+
+              The _c_h_u_n_k function returns a tuple _{_C_o_n_t_i_n_u_a_t_i_o_n_2_, _T_e_r_m_s_}, where
+              _T_e_r_m_s is a list of terms found in the log. _C_o_n_t_i_n_u_a_t_i_o_n_2 is yet
+              another continuation which must be passed on to any subsequent
+              calls to _c_h_u_n_k. With a series of calls to _c_h_u_n_k it is possible
+              to extract all terms from a log.
+
+              The _c_h_u_n_k function returns a tuple _{_C_o_n_t_i_n_u_a_t_i_o_n_2_, _T_e_r_m_s_,
+              _B_a_d_b_y_t_e_s_} if the log is opened in read-only mode and the read
+              chunk is corrupt. _B_a_d_b_y_t_e_s is the number of bytes in the file
+              which were found not to be Erlang terms in the chunk. Note also
+              that the log is not repaired. When trying to read chunks from a
+              log opened in read-write mode, the tuple _{_c_o_r_r_u_p_t___l_o_g___f_i_l_e_,
+              _F_i_l_e_N_a_m_e_} is returned if the read chunk is corrupt.
+
+              _c_h_u_n_k returns _e_o_f when the end of the log is reached, or _{_e_r_r_o_r_,
+              _R_e_a_s_o_n_} if an error occurs. Should a wrap log file be missing, a
+              message is output on the error log.
+
+              When _c_h_u_n_k_/_2_,_3 is used with wrap logs, the returned continuation
+              may or may not be valid in the next call to _c_h_u_n_k. This is
+              because the log may wrap and delete the file into which the
+              continuation points. To make sure this does not happen, the log
+              can be blocked during the search.
+
+       cchhuunnkk__iinnffoo((CCoonnttiinnuuaattiioonn)) -->> IInnffooLLiisstt || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Continuation = ccoonnttiinnuuaattiioonn(())
+                 InfoList = [{node, Node :: node()}, ...]
+                 Reason = {no_continuation, Continuation}
+
+              The _c_h_u_n_k___i_n_f_o_/_1 function returns the following pair describing
+              the chunk continuation returned by _c_h_u_n_k_/_2_,_3, _b_c_h_u_n_k_/_2_,_3, or
+              _c_h_u_n_k___s_t_e_p_/_3:
+
+                * _{_n_o_d_e_, _N_o_d_e_}. Terms are read from the disk log running on
+                  _N_o_d_e.
+
+       cchhuunnkk__sstteepp((LLoogg,, CCoonnttiinnuuaattiioonn,, SStteepp)) -->>
+                     {{ookk,, aannyy(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Continuation = start | ccoonnttiinnuuaattiioonn(())
+                 Step = integer()
+                 Reason = no_such_log
+                        | end_of_log
+                        | {format_external, Log}
+                        | {blocked_log, Log}
+                        | {badarg, continuation}
+                        | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The function _c_h_u_n_k___s_t_e_p can be used in conjunction with
+              _c_h_u_n_k_/_2_,_3 and _b_c_h_u_n_k_/_2_,_3 to search through an internally
+              formatted wrap log. It takes as argument a continuation as
+              returned by _c_h_u_n_k_/_2_,_3, _b_c_h_u_n_k_/_2_,_3, or _c_h_u_n_k___s_t_e_p_/_3, and steps
+              forward (or backward) _S_t_e_p files in the wrap log. The
+              continuation returned points to the first log item in the new
+              current file.
+
+              If the atom _s_t_a_r_t is given as continuation, a disk log to read
+              terms from is chosen. A local or distributed disk log on the
+              current node is preferred to an individual distributed log on
+              some other node.
+
+              If the wrap log is not full because all files have not been used
+              yet, _{_e_r_r_o_r_, _e_n_d___o_f___l_o_g_} is returned if trying to step outside
+              the log.
+
+       cclloossee((LLoogg)) -->> ookk || {{eerrrroorr,, cclloossee__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 cclloossee__eerrrroorr__rrssnn(()) = no_such_log
+                                   | nonode
+                                   | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The function _c_l_o_s_e_/_1 closes a local or distributed disk log
+              properly. An internally formatted log must be closed before the
+              Erlang system is stopped, otherwise the log is regarded as
+              unclosed and the automatic repair procedure will be activated
+              next time the log is opened.
+
+              The disk log process in not terminated as long as there are
+              owners or users of the log. It should be stressed that each and
+              every owner must close the log, possibly by terminating, and
+              that any other process - not only the processes that have opened
+              the log anonymously - can decrement the _u_s_e_r_s counter by closing
+              the log. Attempts to close a log by a process that is not an
+              owner are simply ignored if there are no users.
+
+              If the log is blocked by the closing process, the log is also
+              unblocked.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorr)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Error = term()
+
+              Given the error returned by any function in this module, the
+              function _f_o_r_m_a_t___e_r_r_o_r returns a descriptive string of the error
+              in English. For file errors, the function _f_o_r_m_a_t___e_r_r_o_r_/_1 in the
+              _f_i_l_e module is called.
+
+       iinncc__wwrraapp__ffiillee((LLoogg)) -->> ookk || {{eerrrroorr,, iinncc__wwrraapp__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 iinncc__wwrraapp__eerrrroorr__rrssnn(()) = no_such_log
+                                      | nonode
+                                      | {read_only_mode, lloogg(())}
+                                      | {blocked_log, lloogg(())}
+                                      | {halt_log, lloogg(())}
+                                      | {invalid_header, iinnvvaalliidd__hheeaaddeerr(())}
+                                      | {file_error,
+                                         ffiillee::ffiilleennaammee(()),
+                                         ffiillee__eerrrroorr(())}
+                 iinnvvaalliidd__hheeaaddeerr(()) = term()
+
+              The _i_n_c___w_r_a_p___f_i_l_e_/_1 function forces the internally formatted
+              disk log to start logging to the next log file. It can be used,
+              for instance, in conjunction with _c_h_a_n_g_e___s_i_z_e_/_2 to reduce the
+              amount of disk space allocated by the disk log.
+
+              The owners that subscribe to notifications will normally receive
+              a _w_r_a_p message, but in case of an error with a reason tag of
+              _i_n_v_a_l_i_d___h_e_a_d_e_r or _f_i_l_e___e_r_r_o_r an _e_r_r_o_r___s_t_a_t_u_s message will be
+              sent.
+
+       iinnffoo((LLoogg)) -->> IInnffooLLiisstt || {{eerrrroorr,, nnoo__ssuucchh__lloogg}}
+
+              Types:
+
+                 Log = lloogg(())
+                 InfoList = [ddlloogg__iinnffoo(())]
+                 ddlloogg__iinnffoo(()) = {name, Log :: lloogg(())}
+                             | {file, File :: ffiillee::ffiilleennaammee(())}
+                             | {type, Type :: ddlloogg__ttyyppee(())}
+                             | {format, Format :: ddlloogg__ffoorrmmaatt(())}
+                             | {size, Size :: ddlloogg__ssiizzee(())}
+                             | {mode, Mode :: ddlloogg__mmooddee(())}
+                             | {owners, [{pid(), Notify :: boolean()}]}
+                             | {users, Users :: integer() >= 0}
+                             | {status,
+                                Status :: ok
+                                        | {blocked,
+                                           QueueLogRecords :: boolean()}}
+                             | {node, Node :: node()}
+                             | {distributed, Dist :: local | [node()]}
+                             | {head,
+                                Head :: none
+                                      | {head, term()}
+                                      | (MFA :: {atom(), atom(), list()})}
+                             | {no_written_items,
+                                NoWrittenItems :: integer() >= 0}
+                             | {full, Full :: boolean}
+                             | {no_current_bytes, integer() >= 0}
+                             | {no_current_items, integer() >= 0}
+                             | {no_items, integer() >= 0}
+                             | {current_file, integer() >= 1}
+                             | {no_overflows,
+                                {SinceLogWasOpened :: integer() >= 0,
+                                 SinceLastInfo :: integer() >= 0}}
+
+              The _i_n_f_o_/_1 function returns a list of _{_T_a_g_, _V_a_l_u_e_} pairs
+              describing the log. If there is a disk log process running on
+              the current node, that log is used as source of information,
+              otherwise an individual distributed log on some other node is
+              chosen, if such a log exists.
+
+              The following pairs are returned for all logs:
+
+                * _{_n_a_m_e_, _L_o_g_}, where _L_o_g is the name of the log as given by
+                  the _o_p_e_n_/_1 option _n_a_m_e.
+
+                * _{_f_i_l_e_, _F_i_l_e_}. For halt logs _F_i_l_e is the filename, and for
+                  wrap logs _F_i_l_e is the base name.
+
+                * _{_t_y_p_e_, _T_y_p_e_}, where _T_y_p_e is the type of the log as given by
+                  the _o_p_e_n_/_1 option _t_y_p_e.
+
+                * _{_f_o_r_m_a_t_, _F_o_r_m_a_t_}, where _F_o_r_m_a_t is the format of the log as
+                  given by the _o_p_e_n_/_1 option _f_o_r_m_a_t.
+
+                * _{_s_i_z_e_, _S_i_z_e_}, where _S_i_z_e is the size of the log as given by
+                  the _o_p_e_n_/_1 option _s_i_z_e, or the size set by _c_h_a_n_g_e___s_i_z_e_/_2.
+                  The value set by _c_h_a_n_g_e___s_i_z_e_/_2 is reflected immediately.
+
+                * _{_m_o_d_e_, _M_o_d_e_}, where _M_o_d_e is the mode of the log as given by
+                  the _o_p_e_n_/_1 option _m_o_d_e.
+
+                * _{_o_w_n_e_r_s_, _[_{_p_i_d_(_)_, _N_o_t_i_f_y_}_]_} where _N_o_t_i_f_y is the value set by
+                  the _o_p_e_n_/_1 option _n_o_t_i_f_y or the function _c_h_a_n_g_e___n_o_t_i_f_y_/_3 for
+                  the owners of the log.
+
+                * _{_u_s_e_r_s_, _U_s_e_r_s_} where _U_s_e_r_s is the number of anonymous users
+                  of the log, see the _o_p_e_n_/_1 option lliinnkkttoo.
+
+                * _{_s_t_a_t_u_s_, _S_t_a_t_u_s_}, where _S_t_a_t_u_s is _o_k or _{_b_l_o_c_k_e_d_,
+                  _Q_u_e_u_e_L_o_g_R_e_c_o_r_d_s_} as set by the functions _b_l_o_c_k_/_1_,_2 and
+                  _u_n_b_l_o_c_k_/_1.
+
+                * _{_n_o_d_e_, _N_o_d_e_}. The information returned by the current
+                  invocation of the _i_n_f_o_/_1 function has been gathered from the
+                  disk log process running on _N_o_d_e.
+
+                * _{_d_i_s_t_r_i_b_u_t_e_d_, _D_i_s_t_}. If the log is local on the current
+                  node, then _D_i_s_t has the value _l_o_c_a_l, otherwise all nodes
+                  where the log is distributed are returned as a list.
+
+              The following pairs are returned for all logs opened in
+              _r_e_a_d___w_r_i_t_e mode:
+
+                * _{_h_e_a_d_, _H_e_a_d_}. Depending of the value of the _o_p_e_n_/_1 options
+                  _h_e_a_d and _h_e_a_d___f_u_n_c or set by the function _c_h_a_n_g_e___h_e_a_d_e_r_/_2,
+                  the value of _H_e_a_d is _n_o_n_e (default), _{_h_e_a_d_, _H_} (_h_e_a_d option)
+                  or _{_M_,_F_,_A_} (_h_e_a_d___f_u_n_c option).
+
+                * _{_n_o___w_r_i_t_t_e_n___i_t_e_m_s_, _N_o_W_r_i_t_t_e_n_I_t_e_m_s_}, where _N_o_W_r_i_t_t_e_n_I_t_e_m_s is
+                  the number of items written to the log since the disk log
+                  process was created.
+
+              The following pair is returned for halt logs opened in
+              _r_e_a_d___w_r_i_t_e mode:
+
+                * _{_f_u_l_l_, _F_u_l_l_}, where _F_u_l_l is _t_r_u_e or _f_a_l_s_e depending on
+                  whether the halt log is full or not.
+
+              The following pairs are returned for wrap logs opened in
+              _r_e_a_d___w_r_i_t_e mode:
+
+                * _{_n_o___c_u_r_r_e_n_t___b_y_t_e_s_, _i_n_t_e_g_e_r_(_) _>_= _0_} is the number of bytes
+                  written to the current wrap log file.
+
+                * _{_n_o___c_u_r_r_e_n_t___i_t_e_m_s_, _i_n_t_e_g_e_r_(_) _>_= _0_} is the number of items
+                  written to the current wrap log file, header inclusive.
+
+                * _{_n_o___i_t_e_m_s_, _i_n_t_e_g_e_r_(_) _>_= _0_} is the total number of items in
+                  all wrap log files.
+
+                * _{_c_u_r_r_e_n_t___f_i_l_e_, _i_n_t_e_g_e_r_(_)_} is the ordinal for the current
+                  wrap log file in the range _1_._._M_a_x_N_o_F_i_l_e_s, where _M_a_x_N_o_F_i_l_e_s
+                  is given by the _o_p_e_n_/_1 option _s_i_z_e or set by _c_h_a_n_g_e___s_i_z_e_/_2.
+
+                * _{_n_o___o_v_e_r_f_l_o_w_s_, _{_S_i_n_c_e_L_o_g_W_a_s_O_p_e_n_e_d_, _S_i_n_c_e_L_a_s_t_I_n_f_o_}_}, where
+                  _S_i_n_c_e_L_o_g_W_a_s_O_p_e_n_e_d (_S_i_n_c_e_L_a_s_t_I_n_f_o) is the number of times a
+                  wrap log file has been filled up and a new one opened or
+                  _i_n_c___w_r_a_p___f_i_l_e_/_1 has been called since the disk log was last
+                  opened (_i_n_f_o_/_1 was last called). The first time _i_n_f_o_/_2 is
+                  called after a log was (re)opened or truncated, the two
+                  values are equal.
+
+              Note that the _c_h_u_n_k_/_2_,_3, _b_c_h_u_n_k_/_2_,_3, and _c_h_u_n_k___s_t_e_p_/_3 functions
+              do not affect any value returned by _i_n_f_o_/_1.
+
+       llcclloossee((LLoogg)) -->> ookk || {{eerrrroorr,, llcclloossee__eerrrroorr__rrssnn(())}}
+
+       llcclloossee((LLoogg,, NNooddee)) -->> ookk || {{eerrrroorr,, llcclloossee__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Node = node()
+                 llcclloossee__eerrrroorr__rrssnn(()) = no_such_log
+                                    | {file_error,
+                                       ffiillee::ffiilleennaammee(()),
+                                       ffiillee__eerrrroorr(())}
+
+              The function _l_c_l_o_s_e_/_1 closes a local log or an individual
+              distributed log on the current node. The function _l_c_l_o_s_e_/_2
+              closes an individual distributed log on the specified node if
+              the node is not the current one. _l_c_l_o_s_e_(_L_o_g_) is equivalent to
+              _l_c_l_o_s_e_(_L_o_g_, _n_o_d_e_(_)_). See also cclloossee//11.
+
+              If there is no log with the given name on the specified node,
+              _n_o___s_u_c_h___l_o_g is returned.
+
+       lloogg((LLoogg,, TTeerrmm)) -->> ookk || {{eerrrroorr,, RReeaassoonn :::: lloogg__eerrrroorr__rrssnn(())}}
+
+       bblloogg((LLoogg,, BByytteess)) -->> ookk || {{eerrrroorr,, RReeaassoonn :::: lloogg__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Term = term()
+                 Bytes = bbyytteess(())
+                 lloogg__eerrrroorr__rrssnn(()) = no_such_log
+                                 | nonode
+                                 | {read_only_mode, lloogg(())}
+                                 | {format_external, lloogg(())}
+                                 | {blocked_log, lloogg(())}
+                                 | {full, lloogg(())}
+                                 | {invalid_header, iinnvvaalliidd__hheeaaddeerr(())}
+                                 | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The _l_o_g_/_2 and _b_l_o_g_/_2 functions synchronously append a term to a
+              disk log. They return _o_k or _{_e_r_r_o_r_, _R_e_a_s_o_n_} when the term has
+              been written to disk. If the log is distributed, _o_k is always
+              returned, unless all nodes are down. Terms are written by means
+              of the ordinary _w_r_i_t_e_(_) function of the operating system. Hence,
+              there is no guarantee that the term has actually been written to
+              the disk, it might linger in the operating system kernel for a
+              while. To make sure the item is actually written to disk, the
+              _s_y_n_c_/_1 function must be called.
+
+              The _l_o_g_/_2 function is used for internally formatted logs, and
+              _b_l_o_g_/_2 for externally formatted logs. _b_l_o_g_/_2 can be used for
+              internally formatted logs as well provided the binary was
+              constructed with a call to _t_e_r_m___t_o___b_i_n_a_r_y_/_1.
+
+              The owners that subscribe to notifications will be notified of
+              an error with an _e_r_r_o_r___s_t_a_t_u_s message if the error reason tag is
+              _i_n_v_a_l_i_d___h_e_a_d_e_r or _f_i_l_e___e_r_r_o_r.
+
+       lloogg__tteerrmmss((LLoogg,, TTeerrmmLLiisstt)) -->>
+                    ookk || {{eerrrroorr,, RReessaaoonn :::: lloogg__eerrrroorr__rrssnn(())}}
+
+       bblloogg__tteerrmmss((LLoogg,, BByytteessLLiisstt)) -->>
+                     ookk || {{eerrrroorr,, RReeaassoonn :::: lloogg__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 TermList = [term()]
+                 BytesList = [bbyytteess(())]
+                 lloogg__eerrrroorr__rrssnn(()) = no_such_log
+                                 | nonode
+                                 | {read_only_mode, lloogg(())}
+                                 | {format_external, lloogg(())}
+                                 | {blocked_log, lloogg(())}
+                                 | {full, lloogg(())}
+                                 | {invalid_header, iinnvvaalliidd__hheeaaddeerr(())}
+                                 | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The _l_o_g___t_e_r_m_s_/_2 and _b_l_o_g___t_e_r_m_s_/_2 functions synchronously append
+              a list of items to the log. The benefit of using these functions
+              rather than the _l_o_g_/_2 and _b_l_o_g_/_2 functions is that of
+              efficiency: the given list is split into as large sublists as
+              possible (limited by the size of wrap log files), and each
+              sublist is logged as one single item, which reduces the
+              overhead.
+
+              The _l_o_g___t_e_r_m_s_/_2 function is used for internally formatted logs,
+              and _b_l_o_g___t_e_r_m_s_/_2 for externally formatted logs. _b_l_o_g___t_e_r_m_s_/_2 can
+              be used for internally formatted logs as well provided the
+              binaries were constructed with calls to _t_e_r_m___t_o___b_i_n_a_r_y_/_1.
+
+              The owners that subscribe to notifications will be notified of
+              an error with an _e_r_r_o_r___s_t_a_t_u_s message if the error reason tag is
+              _i_n_v_a_l_i_d___h_e_a_d_e_r or _f_i_l_e___e_r_r_o_r.
+
+       ooppeenn((AArrggLL)) -->> ooppeenn__rreett(()) || ddiisstt__ooppeenn__rreett(())
+
+              Types:
+
+                 ArgL = ddlloogg__ooppttiioonnss(())
+                 ddlloogg__ooppttiioonnss(()) = [ddlloogg__ooppttiioonn(())]
+                 ddlloogg__ooppttiioonn(()) = {name, Log :: lloogg(())}
+                               | {file, FileName :: ffiillee::ffiilleennaammee(())}
+                               | {linkto, LinkTo :: none | pid()}
+                               | {repair, Repair :: true | false | truncate}
+                               | {type, Type :: dlog_type}
+                               | {format, Format :: ddlloogg__ffoorrmmaatt(())}
+                               | {size, Size :: ddlloogg__ssiizzee(())}
+                               | {distributed, Nodes :: [node()]}
+                               | {notify, boolean()}
+                               | {head, Head :: ddlloogg__hheeaadd__oopptt(())}
+                               | {head_func, MFA :: {atom(), atom(), list()}}
+                               | {mode, Mode :: ddlloogg__mmooddee(())}
+                 ooppeenn__rreett(()) = rreett(()) | {error, ooppeenn__eerrrroorr__rrssnn(())}
+                 rreett(()) = {ok, Log :: lloogg(())}
+                       | {repaired,
+                          Log :: lloogg(()),
+                          {recovered, Rec :: integer() >= 0},
+                          {badbytes, Bad :: integer() >= 0}}
+                 ddiisstt__ooppeenn__rreett(()) =
+                     {[{node(), rreett(())}], [{node(), {error, ddiisstt__eerrrroorr__rrssnn(())}}]}
+                 ddiisstt__eerrrroorr__rrssnn(()) = nodedown | ooppeenn__eerrrroorr__rrssnn(())
+                 ooppeenn__eerrrroorr__rrssnn(()) = no_such_log
+                                  | {badarg, term()}
+                                  | {size_mismatch,
+                                     CurrentSize :: ddlloogg__ssiizzee(()),
+                                     NewSize :: ddlloogg__ssiizzee(())}
+                                  | {arg_mismatch,
+                                     OptionName :: ddlloogg__ooppttaattttrr(()),
+                                     CurrentValue :: term(),
+                                     Value :: term()}
+                                  | {name_already_open, Log :: lloogg(())}
+                                  | {open_read_write, Log :: lloogg(())}
+                                  | {open_read_only, Log :: lloogg(())}
+                                  | {need_repair, Log :: lloogg(())}
+                                  | {not_a_log_file,
+                                     FileName :: ffiillee::ffiilleennaammee(())}
+                                  | {invalid_index_file,
+                                     FileName :: ffiillee::ffiilleennaammee(())}
+                                  | {invalid_header, iinnvvaalliidd__hheeaaddeerr(())}
+                                  | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+                                  | {node_already_open, Log :: lloogg(())}
+                 ddlloogg__ooppttaattttrr(()) = name
+                                | file
+                                | linkto
+                                | repair
+                                | type
+                                | format
+                                | size
+                                | distributed
+                                | notify
+                                | head
+                                | head_func
+                                | mode
+                 ddlloogg__ssiizzee(()) = infinity
+                             | integer() >= 1
+                             | {MaxNoBytes :: integer() >= 1,
+                                MaxNoFiles :: integer() >= 1}
+
+              The _A_r_g_L parameter is a list of options which have the following
+              meanings:
+
+                * _{_n_a_m_e_, _L_o_g_} specifies the name of the log. This is the name
+                  which must be passed on as a parameter in all subsequent
+                  logging operations. A name must always be supplied.
+
+                * _{_f_i_l_e_, _F_i_l_e_N_a_m_e_} specifies the name of the file which will
+                  be used for logged terms. If this value is omitted and the
+                  name of the log is either an atom or a string, the file name
+                  will default to _l_i_s_t_s_:_c_o_n_c_a_t_(_[_L_o_g_, _"_._L_O_G_"_]_) for halt logs.
+                  For wrap logs, this will be the base name of the files. Each
+                  file in a wrap log will be called _<_b_a_s_e___n_a_m_e_>_._N, where _N is
+                  an integer. Each wrap log will also have two files called
+                  _<_b_a_s_e___n_a_m_e_>_._i_d_x and _<_b_a_s_e___n_a_m_e_>_._s_i_z.
+
+                * _{_l_i_n_k_t_o_, _L_i_n_k_T_o_}. If _L_i_n_k_T_o is a pid, that pid becomes an
+                  owner of the log. If _L_i_n_k_T_o is _n_o_n_e the log records that it
+                  is used anonymously by some process by incrementing the
+                  _u_s_e_r_s counter. By default, the process which calls _o_p_e_n_/_1
+                  owns the log.
+
+                * _{_r_e_p_a_i_r_, _R_e_p_a_i_r_}. If _R_e_p_a_i_r is _t_r_u_e, the current log file
+                  will be repaired, if needed. As the restoration is
+                  initiated, a message is output on the error log. If _f_a_l_s_e is
+                  given, no automatic repair will be attempted. Instead, the
+                  tuple _{_e_r_r_o_r_, _{_n_e_e_d___r_e_p_a_i_r_, _L_o_g_}_} is returned if an attempt
+                  is made to open a corrupt log file. If _t_r_u_n_c_a_t_e is given,
+                  the log file will be truncated, creating an empty log.
+                  Default is _t_r_u_e, which has no effect on logs opened in read-
+                  only mode.
+
+                * _{_t_y_p_e_, _T_y_p_e_} is the type of the log. Default is _h_a_l_t.
+
+                * _{_f_o_r_m_a_t_, _F_o_r_m_a_t_} specifies the format of the disk log.
+                  Default is _i_n_t_e_r_n_a_l.
+
+                * _{_s_i_z_e_, _S_i_z_e_} specifies the size of the log. When a halt log
+                  has reached its maximum size, all attempts to log more items
+                  are rejected. The default size is _i_n_f_i_n_i_t_y, which for halt
+                  implies that there is no maximum size. For wrap logs, the
+                  _S_i_z_e parameter may be either a pair _{_M_a_x_N_o_B_y_t_e_s_, _M_a_x_N_o_F_i_l_e_s_}
+                  or _i_n_f_i_n_i_t_y. In the latter case, if the files of an already
+                  existing wrap log with the same name can be found, the size
+                  is read from the existing wrap log, otherwise an error is
+                  returned. Wrap logs write at most _M_a_x_N_o_B_y_t_e_s bytes on each
+                  file and use _M_a_x_N_o_F_i_l_e_s files before starting all over with
+                  the first wrap log file. Regardless of _M_a_x_N_o_B_y_t_e_s, at least
+                  the header (if there is one) and one item is written on each
+                  wrap log file before wrapping to the next file. When opening
+                  an existing wrap log, it is not necessary to supply a value
+                  for the option _S_i_z_e, but any supplied value must equal the
+                  current size of the log, otherwise the tuple _{_e_r_r_o_r_,
+                  _{_s_i_z_e___m_i_s_m_a_t_c_h_, _C_u_r_r_e_n_t_S_i_z_e_, _N_e_w_S_i_z_e_}_} is returned.
+
+                * _{_d_i_s_t_r_i_b_u_t_e_d_, _N_o_d_e_s_}. This option can be used for adding
+                  members to a distributed disk log. The default value is _[_],
+                  which means that the log is local on the current node.
+
+                *
+
+
+                  _{_n_o_t_i_f_y_, _b_o_o_l_(_)_}. If _t_r_u_e, the owners of the log are
+                  notified when certain events occur in the log. Default is
+                  _f_a_l_s_e. The owners are sent one of the following messages
+                  when an event occurs:
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _{_w_r_a_p_, _N_o_L_o_s_t_I_t_e_m_s_}_} is sent when a
+                    wrap log has filled up one of its files and a new file is
+                    opened. _N_o_L_o_s_t_I_t_e_m_s is the number of previously logged
+                    items that have been lost when truncating existing files.
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _{_t_r_u_n_c_a_t_e_d_, _N_o_L_o_s_t_I_t_e_m_s_}_} is sent
+                    when a log has been truncated or reopened. For halt logs
+                    _N_o_L_o_s_t_I_t_e_m_s is the number of items written on the log
+                    since the disk log process was created. For wrap logs
+                    _N_o_L_o_s_t_I_t_e_m_s is the number of items on all wrap log files.
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _{_r_e_a_d___o_n_l_y_, _I_t_e_m_s_}_} is sent when an
+                    asynchronous log attempt is made to a log file opened in
+                    read-only mode. _I_t_e_m_s is the items from the log attempt.
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _{_b_l_o_c_k_e_d___l_o_g_, _I_t_e_m_s_}_} is sent when
+                    an asynchronous log attempt is made to a blocked log that
+                    does not queue log attempts. _I_t_e_m_s is the items from the
+                    log attempt.
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _{_f_o_r_m_a_t___e_x_t_e_r_n_a_l_, _I_t_e_m_s_}_} is sent
+                    when _a_l_o_g_/_2 or _a_l_o_g___t_e_r_m_s_/_2 is used for internally
+                    formatted logs. _I_t_e_m_s is the items from the log attempt.
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _f_u_l_l_} is sent when an attempt to log
+                    items to a wrap log would write more bytes than the limit
+                    set by the _s_i_z_e option.
+
+                  * _{_d_i_s_k___l_o_g_, _N_o_d_e_, _L_o_g_, _{_e_r_r_o_r___s_t_a_t_u_s_, _S_t_a_t_u_s_}_} is sent when
+                    the error status changes. The error status is defined by
+                    the outcome of the last attempt to log items to a the log
+                    or to truncate the log or the last use of _s_y_n_c_/_1,
+                    _i_n_c___w_r_a_p___f_i_l_e_/_1 or _c_h_a_n_g_e___s_i_z_e_/_2. _S_t_a_t_u_s is one of _o_k and
+                    _{_e_r_r_o_r_, _E_r_r_o_r_}, the former being the initial value.
+
+                * _{_h_e_a_d_, _H_e_a_d_} specifies a header to be written first on the
+                  log file. If the log is a wrap log, the item _H_e_a_d is written
+                  first in each new file. _H_e_a_d should be a term if the format
+                  is _i_n_t_e_r_n_a_l, and a deep list of bytes (or a binary)
+                  otherwise. Default is _n_o_n_e, which means that no header is
+                  written first on the file.
+
+                * _{_h_e_a_d___f_u_n_c_, _{_M_,_F_,_A_}_} specifies a function to be called each
+                  time a new log file is opened. The call _M_:_F_(_A_) is assumed to
+                  return _{_o_k_, _H_e_a_d_}. The item _H_e_a_d is written first in each
+                  file. _H_e_a_d should be a term if the format is _i_n_t_e_r_n_a_l, and a
+                  deep list of bytes (or a binary) otherwise.
+
+                * _{_m_o_d_e_, _M_o_d_e_} specifies if the log is to be opened in read-
+                  only or read-write mode. It defaults to _r_e_a_d___w_r_i_t_e.
+
+              The _o_p_e_n_/_1 function returns _{_o_k_, _L_o_g_} if the log file was
+              successfully opened. If the file was successfully repaired, the
+              tuple _{_r_e_p_a_i_r_e_d_, _L_o_g_, _{_r_e_c_o_v_e_r_e_d_, _R_e_c_}_, _{_b_a_d_b_y_t_e_s_, _B_a_d_}_} is
+              returned, where _R_e_c is the number of whole Erlang terms found in
+              the file and _B_a_d is the number of bytes in the file which were
+              non-Erlang terms. If the _d_i_s_t_r_i_b_u_t_e_d parameter was given, _o_p_e_n_/_1
+              returns a list of successful replies and a list of erroneous
+              replies. Each reply is tagged with the node name.
+
+              When a disk log is opened in read-write mode, any existing log
+              file is checked for. If there is none a new empty log is
+              created, otherwise the existing file is opened at the position
+              after the last logged item, and the logging of items will
+              commence from there. If the format is _i_n_t_e_r_n_a_l and the existing
+              file is not recognized as an internally formatted log, a tuple
+              _{_e_r_r_o_r_, _{_n_o_t___a___l_o_g___f_i_l_e_, _F_i_l_e_N_a_m_e_}_} is returned.
+
+              The _o_p_e_n_/_1 function cannot be used for changing the values of
+              options of an already open log; when there are prior owners or
+              users of a log, all option values except _n_a_m_e, _l_i_n_k_t_o and _n_o_t_i_f_y
+              are just checked against the values that have been supplied
+              before as option values to _o_p_e_n_/_1, _c_h_a_n_g_e___h_e_a_d_e_r_/_2,
+              _c_h_a_n_g_e___n_o_t_i_f_y_/_3 or _c_h_a_n_g_e___s_i_z_e_/_2. As a consequence, none of the
+              options except _n_a_m_e is mandatory. If some given value differs
+              from the current value, a tuple _{_e_r_r_o_r_, _{_a_r_g___m_i_s_m_a_t_c_h_,
+              _O_p_t_i_o_n_N_a_m_e_, _C_u_r_r_e_n_t_V_a_l_u_e_, _V_a_l_u_e_}_} is returned. Caution: an
+              owner's attempt to open a log as owner once again is
+              acknowledged with the return value _{_o_k_, _L_o_g_}, but the state of
+              the disk log is not affected in any way.
+
+              If a log with a given name is local on some node, and one tries
+              to open the log distributed on the same node, then the tuple
+              _{_e_r_r_o_r_, _{_n_o_d_e___a_l_r_e_a_d_y___o_p_e_n_, _L_o_g_}_} is returned. The same tuple is
+              returned if the log is distributed on some node, and one tries
+              to open the log locally on the same node. Opening individual
+              distributed disk logs for the first time adds those logs to a
+              (possibly empty) distributed disk log. The option values
+              supplied are used on all nodes mentioned by the _d_i_s_t_r_i_b_u_t_e_d
+              option. Individual distributed logs know nothing about each
+              other's option values, so each node can be given unique option
+              values by creating a distributed log with several calls to
+              _o_p_e_n_/_1.
+
+              It is possible to open a log file more than once by giving
+              different values to the option _n_a_m_e or by using the same file
+              when distributing a log on different nodes. It is up to the user
+              of the _d_i_s_k___l_o_g module to ensure that no more than one disk log
+              process has write access to any file, or the the file may be
+              corrupted.
+
+              If an attempt to open a log file for the first time fails, the
+              disk log process terminates with the EXIT message
+              _{_{_f_a_i_l_e_d_,_R_e_a_s_o_n_}_,_[_{_d_i_s_k___l_o_g_,_o_p_e_n_,_1_}_]_}. The function returns
+              _{_e_r_r_o_r_, _R_e_a_s_o_n_} for all other errors.
+
+       ppiidd22nnaammee((PPiidd)) -->> {{ookk,, LLoogg}} || uunnddeeffiinneedd
+
+              Types:
+
+                 Pid = pid()
+                 Log = lloogg(())
+
+              The _p_i_d_2_n_a_m_e_/_1 function returns the name of the log given the
+              pid of a disk log process on the current node, or _u_n_d_e_f_i_n_e_d if
+              the given pid is not a disk log process.
+
+              This function is meant to be used for debugging only.
+
+       rreeooppeenn((LLoogg,, FFiillee)) -->> ookk || {{eerrrroorr,, rreeooppeenn__eerrrroorr__rrssnn(())}}
+
+       rreeooppeenn((LLoogg,, FFiillee,, HHeeaadd)) -->> ookk || {{eerrrroorr,, rreeooppeenn__eerrrroorr__rrssnn(())}}
+
+       bbrreeooppeenn((LLoogg,, FFiillee,, BBHHeeaadd)) -->> ookk || {{eerrrroorr,, rreeooppeenn__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 File = ffiillee::ffiilleennaammee(())
+                 Head = term()
+                 BHead = bbyytteess(())
+                 rreeooppeenn__eerrrroorr__rrssnn(()) = no_such_log
+                                    | nonode
+                                    | {read_only_mode, lloogg(())}
+                                    | {blocked_log, lloogg(())}
+                                    | {same_file_name, lloogg(())}
+                                    | {invalid_index_file, ffiillee::ffiilleennaammee(())}
+                                    | {invalid_header, iinnvvaalliidd__hheeaaddeerr(())}
+                                    | {file_error,
+                                       ffiillee::ffiilleennaammee(()),
+                                       ffiillee__eerrrroorr(())}
+
+              The _r_e_o_p_e_n functions first rename the log file to _F_i_l_e and then
+              re-create a new log file. In case of a wrap log, _F_i_l_e is used as
+              the base name of the renamed files. By default the header given
+              to _o_p_e_n_/_1 is written first in the newly opened log file, but if
+              the _H_e_a_d or the _B_H_e_a_d argument is given, this item is used
+              instead. The header argument is used once only; next time a wrap
+              log file is opened, the header given to _o_p_e_n_/_1 is used.
+
+              The _r_e_o_p_e_n_/_2_,_3 functions are used for internally formatted logs,
+              and _b_r_e_o_p_e_n_/_3 for externally formatted logs.
+
+              The owners that subscribe to notifications will receive a
+              _t_r_u_n_c_a_t_e message.
+
+              Upon failure to reopen the log, the disk log process terminates
+              with the EXIT message _{_{_f_a_i_l_e_d_,_E_r_r_o_r_}_,_[_{_d_i_s_k___l_o_g_,_F_u_n_,_A_r_i_t_y_}_]_},
+              and other processes that have requests queued receive the
+              message _{_d_i_s_k___l_o_g_, _N_o_d_e_, _{_e_r_r_o_r_, _d_i_s_k___l_o_g___s_t_o_p_p_e_d_}_}.
+
+       ssyynncc((LLoogg)) -->> ookk || {{eerrrroorr,, ssyynncc__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 ssyynncc__eerrrroorr__rrssnn(()) = no_such_log
+                                  | nonode
+                                  | {read_only_mode, lloogg(())}
+                                  | {blocked_log, lloogg(())}
+                                  | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The _s_y_n_c_/_1 function ensures that the contents of the log are
+              actually written to the disk. This is usually a rather expensive
+              operation.
+
+       ttrruunnccaattee((LLoogg)) -->> ookk || {{eerrrroorr,, ttrruunncc__eerrrroorr__rrssnn(())}}
+
+       ttrruunnccaattee((LLoogg,, HHeeaadd)) -->> ookk || {{eerrrroorr,, ttrruunncc__eerrrroorr__rrssnn(())}}
+
+       bbttrruunnccaattee((LLoogg,, BBHHeeaadd)) -->> ookk || {{eerrrroorr,, ttrruunncc__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 Head = term()
+                 BHead = bbyytteess(())
+                 ttrruunncc__eerrrroorr__rrssnn(()) = no_such_log
+                                   | nonode
+                                   | {read_only_mode, lloogg(())}
+                                   | {blocked_log, lloogg(())}
+                                   | {invalid_header, iinnvvaalliidd__hheeaaddeerr(())}
+                                   | {file_error, ffiillee::ffiilleennaammee(()), ffiillee__eerrrroorr(())}
+
+              The _t_r_u_n_c_a_t_e functions remove all items from a disk log. If the
+              _H_e_a_d or the _B_H_e_a_d argument is given, this item is written first
+              in the newly truncated log, otherwise the header given to _o_p_e_n_/_1
+              is used. The header argument is only used once; next time a wrap
+              log file is opened, the header given to _o_p_e_n_/_1 is used.
+
+              The _t_r_u_n_c_a_t_e_/_1_,_2 functions are used for internally formatted
+              logs, and _b_t_r_u_n_c_a_t_e_/_2 for externally formatted logs.
+
+              The owners that subscribe to notifications will receive a
+              _t_r_u_n_c_a_t_e message.
+
+              If the attempt to truncate the log fails, the disk log process
+              terminates with the EXIT message
+              _{_{_f_a_i_l_e_d_,_R_e_a_s_o_n_}_,_[_{_d_i_s_k___l_o_g_,_F_u_n_,_A_r_i_t_y_}_]_}, and other processes
+              that have requests queued receive the message _{_d_i_s_k___l_o_g_, _N_o_d_e_,
+              _{_e_r_r_o_r_, _d_i_s_k___l_o_g___s_t_o_p_p_e_d_}_}.
+
+       uunnbblloocckk((LLoogg)) -->> ookk || {{eerrrroorr,, uunnbblloocckk__eerrrroorr__rrssnn(())}}
+
+              Types:
+
+                 Log = lloogg(())
+                 uunnbblloocckk__eerrrroorr__rrssnn(()) = no_such_log
+                                     | nonode
+                                     | {not_blocked, lloogg(())}
+                                     | {not_blocked_by_pid, lloogg(())}
+
+              The _u_n_b_l_o_c_k_/_1 function unblocks a log. A log can only be
+              unblocked by the blocking process.
+
+SSEEEE AALLSSOO
+       ffiillee((33)), ppgg22((33)), wwrraapp__lloogg__rreeaaddeerr((33))
+
+
+
+Ericsson AB                      kernel 2.15.2                     disk_log(3)

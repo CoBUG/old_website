@@ -1,0 +1,374 @@
+edoc(3)                    Erlang Module Definition                    edoc(3)
+
+
+
+NNAAMMEE
+       edoc - EDoc - the Erlang program documentation generator.
+
+DDEESSCCRRIIPPTTIIOONN
+       EDoc - the Erlang program documentation generator.
+
+       This module provides the main user interface to EDoc.
+
+         * EEDDoocc UUsseerr MMaannuuaall
+
+         * RRuunnnniinngg EEDDoocc
+
+DDAATTAA TTYYPPEESS
+         _c_o_m_m_e_n_t_(_) _= _{_L_i_n_e_, _C_o_l_u_m_n_, _I_n_d_e_n_t_a_t_i_o_n_, _T_e_x_t_}:
+
+
+           * _L_i_n_e _= _i_n_t_e_g_e_r_(_)
+
+           * _C_o_l_u_m_n _= _i_n_t_e_g_e_r_(_)
+
+           * _I_n_d_e_n_t_a_t_i_o_n _= _i_n_t_e_g_e_r_(_)
+
+           * _T_e_x_t _= _[_s_t_r_i_n_g_(_)_]
+
+         _e_d_o_c___m_o_d_u_l_e_(_):
+
+
+           The EDoc documentation data for a module, expressed as an XML
+           document in XXMMeerrLL format. See the file edoc.dtd for details.
+
+         _f_i_l_e_n_a_m_e_(_) _= _f_i_l_e_n_a_m_e_(_) _(_s_e_e _m_o_d_u_l_e _/_/_k_e_r_n_e_l_/_f_i_l_e_):
+
+
+         _p_a_c_k_a_g_e_(_) _= _a_t_o_m_(_) _| _s_t_r_i_n_g_(_):
+
+
+         _p_r_o_p_l_i_s_t_(_) _= _[_t_e_r_m_(_)_]:
+
+
+         _s_y_n_t_a_x_T_r_e_e_(_) _= _s_y_n_t_a_x_T_r_e_e_(_) _(_s_e_e _m_o_d_u_l_e _/_/_s_y_n_t_a_x___t_o_o_l_s_/_e_r_l___s_y_n_t_a_x_):
+
+
+EEXXPPOORRTTSS
+       aapppplliiccaattiioonn((AApppplliiccaattiioonn::::aattoomm(()))) -->> ookk
+
+              Equivalent to aapppplliiccaattiioonn((AApppplliiccaattiioonn,, [[]])).
+
+       aapppplliiccaattiioonn((AApppplliiccaattiioonn::::aattoomm(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> ookk
+
+              Run EDoc on an application in its default app-directory. See
+              aapppplliiccaattiioonn//33 for details.
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//11.
+
+       aapppplliiccaattiioonn((AApppplliiccaattiioonn::::aattoomm(()),, DDiirr::::ffiilleennaammee(()),, OOppttiioonnss::::pprroopplliisstt(())))
+       -->> ookk
+
+              Run EDoc on an application located in the specified directory.
+              Tries to automatically set up good defaults. Unless the user
+              specifies otherwise:
+
+                * The _d_o_c subdirectory will be used as the target directory,
+                  if it exists; otherwise the application directory is used.
+
+                * The source code is assumed to be located in the _s_r_c
+                  subdirectory, if it exists, or otherwise in the application
+                  directory itself.
+
+                * The ssuubbppaacckkaaggeess option is turned on. All found source files
+                  will be processed.
+
+                * The _i_n_c_l_u_d_e subdirectory is automatically added to the
+                  include path. (Only important if  pprreepprroocceessssiinngg is turned
+                  on.)
+
+              See rruunn//33 for details, including options.
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//22.
+
+       ffiillee((NNaammee::::ffiilleennaammee(()))) -->> ookk
+
+              _T_h_i_s _f_u_n_c_t_i_o_n _i_s _d_e_p_r_e_c_a_t_e_d_: See ffiillee//22 for details.
+
+              Equivalent to ffiillee((NNaammee,, [[]])).
+
+       ffiillee((NNaammee::::ffiilleennaammee(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> ookk
+
+              _T_h_i_s _f_u_n_c_t_i_o_n _i_s _d_e_p_r_e_c_a_t_e_d_: This is part of the old interface
+              to EDoc and is mainly kept for backwards compatibility. The
+              preferred way of generating documentation is through one of the
+              functions aapppplliiccaattiioonn//22, ppaacckkaaggeess//22 and ffiilleess//22.
+
+              Reads a source code file and outputs formatted documentation to
+              a corresponding file.
+
+              Options:
+
+                _{_d_i_r_, _f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the output directory for the created file. (By
+                  default, the output is written to the directory of the
+                  source file.)
+
+                _{_s_o_u_r_c_e___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the expected suffix of the input file. The default
+                  value is _"_._e_r_l_".
+
+                _{_f_i_l_e___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the suffix for the created file. The default value
+                  is _"_._h_t_m_l_".
+
+              See ggeett__ddoocc//22 and llaayyoouutt//22 for further options.
+
+              For running EDoc from a Makefile or similar, see
+              eeddoocc__rruunn::ffiillee//11.
+
+              _S_e_e _a_l_s_o_: rreeaadd//22.
+
+       ffiilleess((FFiilleess::::[[ffiilleennaammee(()) || {{ppaacckkaaggee(()),, [[ffiilleennaammee(())]]}}]])) -->> ookk
+
+              Equivalent to ppaacckkaaggeess((PPaacckkaaggeess,, [[]])).
+
+       ffiilleess((FFiilleess::::[[ffiilleennaammee(()) || {{ppaacckkaaggee(()),, [[ffiilleennaammee(())]]}}]],,
+       OOppttiioonnss::::pprroopplliisstt(()))) -->> ookk
+
+              Runs EDoc on a given set of source files. See rruunn//33 for details,
+              including options.
+
+       ggeett__ddoocc((FFiillee::::ffiilleennaammee(()))) -->> {{MMoodduulleeNNaammee,, eeddoocc__mmoodduullee(())}}
+
+              Equivalent to ggeett__ddoocc((FFiillee,, [[]])).
+
+       ggeett__ddoocc((FFiillee::::ffiilleennaammee(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> {{MMoodduulleeNNaammee,,
+       eeddoocc__mmoodduullee(())}}
+
+              Types:
+
+                 ModuleName = atom()
+
+              Reads a source code file and extracts EDoc documentation data.
+              Note that without an environment parameter (see ggeett__ddoocc//33),
+              hypertext links may not be correct.
+
+              Options:
+
+                _{_d_e_f_, _M_a_c_r_o_s_}:
+
+
+                  * _M_a_c_r_o_s = _M_a_c_r_o _| _[_M_a_c_r_o_]
+
+                  * _M_a_c_r_o = _{_N_a_m_e_:_:_a_t_o_m_(_)_, _T_e_x_t_:_:_s_t_r_i_n_g_(_)_}
+
+                  Specifies a set of EDoc macro definitions. See IInnlliinnee mmaaccrroo
+                  eexxppaannssiioonn for details.
+
+                _{_h_i_d_d_e_n_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, documentation of hidden functions will
+                  also be included. The default value is _f_a_l_s_e.
+
+                _{_p_r_i_v_a_t_e_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, documentation of private functions
+                  will also be included. The default value is _f_a_l_s_e.
+
+                _{_t_o_d_o_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, To-Do notes written using _@_t_o_d_o or
+                  _@_T_O_D_O tags will be included in the documentation. The
+                  default value is _f_a_l_s_e.
+
+              See rreeaadd__ssoouurrccee//22, rreeaadd__ccoommmmeennttss//22 and eeddoocc__lliibb::ggeett__ddoocc__eennvv//44
+              for further options.
+
+              _S_e_e _a_l_s_o_: ggeett__ddoocc//33, llaayyoouutt//22, rreeaadd//22, rruunn//33,
+              eeddoocc__eexxttrraacctt::ssoouurrccee//55.
+
+       ggeett__ddoocc((FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()) ((sseeee mmoodduullee eeddoocc__lliibb)),,
+       OOppttiioonnss::::pprroopplliisstt(()))) -->> {{MMoodduulleeNNaammee,, eeddoocc__mmoodduullee(())}}
+
+              Types:
+
+                 ModuleName = atom()
+
+              Like ggeett__ddoocc//22, but for a given environment parameter. _E_n_v is an
+              environment created by eeddoocc__lliibb::ggeett__ddoocc__eennvv//44.
+
+       llaayyoouutt((DDoocc::::eeddoocc__mmoodduullee(()))) -->> ssttrriinngg(())
+
+              Equivalent to llaayyoouutt((DDoocc,, [[]])).
+
+       llaayyoouutt((DDoocc::::eeddoocc__mmoodduullee(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> ssttrriinngg(())
+
+              Transforms EDoc module documentation data to text. The default
+              layout creates an HTML document.
+
+              Options:
+
+                _{_l_a_y_o_u_t_, _M_o_d_u_l_e_:_:_a_t_o_m_(_)_}:
+                  Specifies a callback module to be used for formatting. The
+                  module must export a function _m_o_d_u_l_e_(_D_o_c_, _O_p_t_i_o_n_s_). The
+                  default callback module is eeddoocc__llaayyoouutt; see
+                  eeddoocc__llaayyoouutt::mmoodduullee//22 for layout-specific options.
+
+              _S_e_e _a_l_s_o_: ffiillee//22, llaayyoouutt//11, rreeaadd//22, rruunn//33.
+
+       ppaacckkaaggeess((PPaacckkaaggeess::::[[ppaacckkaaggee(())]])) -->> ookk
+
+              Equivalent to ppaacckkaaggeess((PPaacckkaaggeess,, [[]])).
+
+       ppaacckkaaggeess((PPaacckkaaggeess::::[[ppaacckkaaggee(())]],, OOppttiioonnss::::pprroopplliisstt(()))) -->> ookk
+
+              Runs EDoc on a set of packages. The _s_o_u_r_c_e___p_a_t_h option is used
+              to locate the files; see rruunn//33 for details, including options.
+              This function automatically appends the current directory to the
+              source path.
+
+       rreeaadd((FFiillee::::ffiilleennaammee(()))) -->> ssttrriinngg(())
+
+              Equivalent to rreeaadd((FFiillee,, [[]])).
+
+       rreeaadd((FFiillee::::ffiilleennaammee(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> ssttrriinngg(())
+
+              Reads and processes a source file and returns the resulting
+              EDoc-text as a string. See ggeett__ddoocc//22 and llaayyoouutt//22 for options.
+
+              _S_e_e _a_l_s_o_: ffiillee//22.
+
+       rreeaadd__ccoommmmeennttss((FFiillee)) -->> [[ccoommmmeenntt(())]]
+
+              Equivalent to rreeaadd__ccoommmmeennttss((FFiillee,, [[]])).
+
+       rreeaadd__ccoommmmeennttss((FFiillee::::ffiilleennaammee(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> [[ccoommmmeenntt(())]]
+
+              Extracts comments from an Erlang source code file. See the
+              module eerrll__ccoommmmeenntt__ssccaann((33)) for details on the representation of
+              comments. Currently, no options are avaliable.
+
+       rreeaadd__ssoouurrccee((NNaammee::::FFiillee)) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Equivalent to rreeaadd__ssoouurrccee((FFiillee,, [[]])).
+
+       rreeaadd__ssoouurrccee((FFiillee::::ffiilleennaammee(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> [[ssyynnttaaxxTTrreeee(())]]
+
+              Reads an Erlang source file and returns the list of "source code
+              form" syntax trees.
+
+              Options:
+
+                _{_p_r_e_p_r_o_c_e_s_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, the source file will be read via the
+                  Erlang preprocessor (_e_p_p). The default value is _f_a_l_s_e.
+                  _n_o___p_r_e_p_r_o_c_e_s_s is an alias for _{_p_r_e_p_r_o_c_e_s_s_, _f_a_l_s_e_}.
+
+                  Normally, preprocessing is not necessary for EDoc to work,
+                  but if a file contains too exotic definitions or uses of
+                  macros, it will not be possible to read it without
+                  preprocessing. _N_o_t_e_: _c_o_m_m_e_n_t_s _i_n _i_n_c_l_u_d_e_d _f_i_l_e_s _w_i_l_l _n_o_t _b_e
+                  _a_v_a_i_l_a_b_l_e _t_o _E_D_o_c_, _e_v_e_n _w_i_t_h _t_h_i_s _o_p_t_i_o_n _e_n_a_b_l_e_d_.
+
+                _{_i_n_c_l_u_d_e_s_, _P_a_t_h_:_:_[_s_t_r_i_n_g_(_)_]_}:
+                  Specifies a list of directory names to be searched for
+                  include files, if the _p_r_e_p_r_o_c_e_s_s option is turned on. Also
+                  used with the _@_h_e_a_d_e_r_f_i_l_e tag. The default value is the
+                  empty list. The directory of the source file is always
+                  automatically appended to the search path.
+
+                _{_m_a_c_r_o_s_, _[_{_a_t_o_m_(_)_, _t_e_r_m_(_)_}_]_}:
+                  Specifies a list of pre-defined Erlang preprocessor (_e_p_p)
+                  macro definitions, used if the _p_r_e_p_r_o_c_e_s_s option is turned
+                  on. The default value is the empty list.
+
+              _{_r_e_p_o_r_t___m_i_s_s_i_n_g___t_y_p_e_s_, _b_o_o_l_e_a_n_(_)_} If the value is _t_r_u_e, warnings
+              are issued for missing types. The default value is _f_a_l_s_e.
+              _n_o___r_e_p_o_r_t___m_i_s_s_i_n_g___t_y_p_e_s is an alias for _{_r_e_p_o_r_t___m_i_s_s_i_n_g___t_y_p_e_s_,
+              _f_a_l_s_e_}.
+
+              _S_e_e _a_l_s_o_: eerrll__ssyynnttaaxx((33)), ggeett__ddoocc//22.
+
+       rruunn((PPaacckkaaggeess::::[[ppaacckkaaggee(())]],, FFiilleess::::[[ffiilleennaammee(()) || {{ppaacckkaaggee(()),,
+       [[ffiilleennaammee(())]]}}]],, OOppttiioonnss::::pprroopplliisstt(()))) -->> ookk
+
+              Runs EDoc on a given set of source files and/or packages. Note
+              that the doclet plugin module has its own particular options;
+              see the _d_o_c_l_e_t option below.
+
+              Also see llaayyoouutt//22 for layout-related options, and ggeett__ddoocc//22 for
+              options related to reading source files.
+
+              Options:
+
+                _{_a_p_p___d_e_f_a_u_l_t_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the default base URI for unknown applications.
+
+                _{_a_p_p_l_i_c_a_t_i_o_n_, _A_p_p_:_:_a_t_o_m_(_)_}:
+                  Specifies that the generated documentation describes the
+                  application _A_p_p. This mainly affects generated references.
+
+                _{_d_i_r_, _f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the target directory for the generated
+                  documentation.
+
+                _{_d_o_c___p_a_t_h_, _[_s_t_r_i_n_g_(_)_]_}:
+                  Specifies a list of URI:s pointing to directories that
+                  contain EDoc-generated documentation. URI without a
+                  _s_c_h_e_m_e_:_/_/ part are taken as relative to _f_i_l_e_:_/_/. (Note that
+                  such paths must use _/ as separator, regardless of the host
+                  operating system.)
+
+                _{_d_o_c_l_e_t_, _M_o_d_u_l_e_:_:_a_t_o_m_(_)_}:
+                  Specifies a callback module to be used for creating the
+                  documentation. The module must export a function _r_u_n_(_C_m_d_,
+                  _C_t_x_t_). The default doclet module is eeddoocc__ddoocclleett; see
+                  eeddoocc__ddoocclleett::rruunn//22 for doclet-specific options.
+
+                _{_e_x_c_l_u_d_e___p_a_c_k_a_g_e_s_, _[_p_a_c_k_a_g_e_(_)_]_}:
+                  Lists packages to be excluded from the documentation.
+                  Typically used in conjunction with the _s_u_b_p_a_c_k_a_g_e_s option.
+
+                _{_f_i_l_e___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the suffix used for output files. The default
+                  value is _"_._h_t_m_l_". Note that this also affects generated
+                  references.
+
+                _{_n_e_w_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, any existing _e_d_o_c_-_i_n_f_o file in the
+                  target directory will be ignored and overwritten. The
+                  default value is _f_a_l_s_e.
+
+                _{_p_a_c_k_a_g_e_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, it it assumed that packages (module
+                  namespaces) are being used, and that the source code
+                  directory structure reflects this. The default value is
+                  _t_r_u_e. (Usually, this does the right thing even if all the
+                  modules belong to the top-level "empty" package.)
+                  _n_o___p_a_c_k_a_g_e_s is an alias for _{_p_a_c_k_a_g_e_s_, _f_a_l_s_e_}. See the
+                  _s_u_b_p_a_c_k_a_g_e_s option below for further details.
+
+                  If the source code is organized in a hierarchy of
+                  subdirectories although it does not use packages, use
+                  _n_o___p_a_c_k_a_g_e_s together with the recursive-search _s_u_b_p_a_c_k_a_g_e_s
+                  option (on by default) to automatically generate
+                  documentation for all the modules.
+
+                _{_s_o_u_r_c_e___p_a_t_h_, _[_f_i_l_e_n_a_m_e_(_)_]_}:
+                  Specifies a list of file system paths used to locate the
+                  source code for packages.
+
+                _{_s_o_u_r_c_e___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the expected suffix of input files. The default
+                  value is _"_._e_r_l_".
+
+                _{_s_u_b_p_a_c_k_a_g_e_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, all subpackages of specified packages
+                  will also be included in the documentation. The default
+                  value is _f_a_l_s_e. _n_o___s_u_b_p_a_c_k_a_g_e_s is an alias for _{_s_u_b_p_a_c_k_a_g_e_s_,
+                  _f_a_l_s_e_}. See also the _e_x_c_l_u_d_e___p_a_c_k_a_g_e_s option.
+
+                  Subpackage source files are found by recursively searching
+                  for source code files in subdirectories of the known source
+                  code root directories. (Also see the _s_o_u_r_c_e___p_a_t_h option.)
+                  Directory names must begin with a lowercase letter and
+                  contain only alphanumeric characters and underscore, or they
+                  will be ignored. (For example, a subdirectory named _t_e_s_t_-
+                  _f_i_l_e_s will not be searched.)
+
+              _S_e_e _a_l_s_o_: aapppplliiccaattiioonn//22, ffiilleess//22, ppaacckkaaggeess//22.
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  edoc 0.7.10                          edoc(3)

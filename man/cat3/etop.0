@@ -1,0 +1,119 @@
+etop(3)                    Erlang Module Definition                    etop(3)
+
+
+
+NNAAMMEE
+       etop - Erlang Top is a tool for presenting information about erlang
+       processes similar to the information presented by "top" in UNIX.
+
+DDEESSCCRRIIPPTTIIOONN
+       _e_t_o_p should be started with the provided scripts _e_t_o_p and _g_e_t_o_p for
+       text based and graphical presentation respectively. This will start a
+       hidden erlang node which connects to the node to be measured. The
+       measured node is given with the _-_n_o_d_e option. If the measured node has
+       a different cookie than the default cookie for the user who invokes the
+       script, the cookie must be explicitly given witht the _-_s_e_t_c_o_o_k_i_e
+       option.
+
+       Under Windows the batch files _e_t_o_p_._b_a_t and _g_e_t_o_p_._b_a_t can be used.
+
+       The following configuration parameters exist for the _e_t_o_p tool. When
+       executing the _e_t_o_p or _g_e_t_o_p scripts, these parameters can be given as
+       command line options, e.g. _g_e_t_o_p _-_n_o_d_e _t_e_s_t_n_o_d_e_@_m_y_h_o_s_t _-_s_e_t_c_o_o_k_i_e
+       _M_y_C_o_o_k_i_e.
+
+         nnooddee::
+           The measured node.
+            Value: atom()
+            Mandatory
+
+         sseettccooookkiiee::
+           Cookie to use for the etop node - must be the same as the cookie on
+           the measured node.
+            Value: atom()
+
+         lliinneess::
+           Number of lines (processes) to display.
+            Value: integer()
+            Default: 10
+
+         iinntteerrvvaall::
+           The time interval (in seconds) between each update of the display.
+            Value: integer()
+            Default: 5
+
+         aaccccuummuullaattee::
+           If _t_r_u_e the execution time and reductions are accumulated.
+            Value: boolean()
+            Default: _f_a_l_s_e
+
+         ssoorrtt::
+           Identifies what information to sort by.
+            Value: _r_u_n_t_i_m_e _| _r_e_d_u_c_t_i_o_n_s _| _m_e_m_o_r_y _| _m_s_g___q
+            Default: _r_u_n_t_i_m_e (_r_e_d_u_c_t_i_o_n_s if _t_r_a_c_i_n_g_=_o_f_f)
+
+         ttrraacciinngg::
+           _e_t_o_p uses the erlang trace facility, and thus no other tracing is
+           possible on the measured node while _e_t_o_p is running, unless this
+           option is set to _o_f_f. Also helpful if the _e_t_o_p tracing causes too
+           high load on the measured node. With tracing off, runtime is not
+           measured.
+            Value: _o_n _| _o_f_f
+            Default: _o_n
+
+       All interaction with _e_t_o_p when running the graphical presentation
+       should happen via the menus. For the text based presentation the
+       functions described below can be used.
+
+       See the uusseerr''ss gguuiiddee for more information about the _e_t_o_p tool.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> ookk
+
+              This function starts _e_t_o_p. Note that etop is preferably started
+              with the etop and getop scripts
+
+       ssttaarrtt((OOppttiioonnss)) -->> ookk
+
+              Types:
+
+                 Options = [Option]
+                 Option = {Key, Value}
+                 Key = atom()
+                 Value = term()
+
+              This function starts _e_t_o_p. Use hheellpp//00 to see a description of
+              the possible options.
+
+       hheellpp(()) -->> ookk
+
+              This function prints the help of _e_t_o_p and its options.
+
+       ccoonnffiigg((KKeeyy,,VVaalluuee)) -->> RReessuulltt
+
+              Types:
+
+                 Result = ok | {error,Reason}
+                 Key = lines | interval | accumulate | sort
+                 Value = term()
+
+              This function is used to change the tool's configuration
+              parameters during runtime. The table above indicates the allowed
+              values for each parameter.
+
+       dduummpp((FFiillee)) -->> RReessuulltt
+
+              Types:
+
+                 Result = ok | {error,Reason}
+                 File = string()
+
+              This function dumps the current display to a text file.
+
+       ssttoopp(()) -->> ssttoopp
+
+              This function terminates _e_t_o_p.
+
+
+
+Ericsson AB                      observer 1.2                          etop(3)

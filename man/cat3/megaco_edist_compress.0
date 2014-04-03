@@ -1,0 +1,38 @@
+megaco_edist_compress(3)   Erlang Module Definition   megaco_edist_compress(3)
+
+
+
+NNAAMMEE
+       megaco_edist_compress - Megaco erlang dist compress behaviour.
+
+DDEESSCCRRIIPPTTIIOONN
+       The following functions should be exported from a _m_e_g_a_c_o___e_d_i_s_t___c_o_m_p_r_e_s_s
+       callback module:
+
+EEXXPPOORRTTSS
+       MMoodduullee::eennccooddee((RR,, VVeerrssiioonn)) -->> TT
+
+              Types:
+
+                 R = megaco_message() | transaction() | action_reply() |
+                 action_request() | command_request()
+                 Version = integer()
+                 T = term()
+
+              Compress a megaco component. The erlang dist encoder makes no
+              assumption on the how or even if the component is compressed.
+
+       MMoodduullee::ddeeccooddee((TT,, VVeerrssiioonn)) -->> RR
+
+              Types:
+
+                 T = term()
+                 Version = integer()
+                 R = megaco_message() | transaction() | action_reply() |
+                 action_request() | command_request()
+
+              Decompress a megaco component.
+
+
+
+Ericsson AB                     megaco 3.16.0.2       megaco_edist_compress(3)

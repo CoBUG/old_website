@@ -1,0 +1,124 @@
+net_adm(3)                 Erlang Module Definition                 net_adm(3)
+
+
+
+NNAAMMEE
+       net_adm - Various Erlang Net Administration Routines
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains various network utility functions.
+
+EEXXPPOORRTTSS
+       ddnnss__hhoossttnnaammee((HHoosstt)) -->> {{ookk,, NNaammee}} || {{eerrrroorr,, HHoosstt}}
+
+              Types:
+
+                 Host = atom() | string()
+                 Name = string()
+
+              Returns the official name of _H_o_s_t, or _{_e_r_r_o_r_, _H_o_s_t_} if no such
+              name is found. See also _i_n_e_t_(_3_).
+
+       hhoosstt__ffiillee(()) -->> HHoossttss || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Hosts = [Host :: atom()]
+                 Reason = ffiillee::ppoossiixx(())
+                        | badarg
+                        | terminated
+                        | system_limit
+                        | {Line :: integer(), Mod :: module(), Term :: term()}
+
+              Reads the _._h_o_s_t_s_._e_r_l_a_n_g file, see the section _F_i_l_e_s below.
+              Returns the hosts in this file as a list, or returns _{_e_r_r_o_r_,
+              _R_e_a_s_o_n_} if the file could not be read or the Erlang terms on the
+              file could not be interpreted.
+
+       llooccaallhhoosstt(()) -->> NNaammee
+
+              Types:
+
+                 Name = string()
+
+              Returns the name of the local host. If Erlang was started with
+              the _-_n_a_m_e command line flag, _N_a_m_e is the fully qualified name.
+
+       nnaammeess(()) -->> {{ookk,, [[{{NNaammee,, PPoorrtt}}]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+       nnaammeess((HHoosstt)) -->> {{ookk,, [[{{NNaammee,, PPoorrtt}}]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Host = atom() | string()
+                 Name = string()
+                 Port = integer() >= 0
+                 Reason = address | ffiillee::ppoossiixx(())
+
+              Similar to _e_p_m_d _-_n_a_m_e_s, see _e_p_m_d_(_1_). _H_o_s_t defaults to the local
+              host. Returns the names and associated port numbers of the
+              Erlang nodes that _e_p_m_d at the specified host has registered.
+
+              Returns _{_e_r_r_o_r_, _a_d_d_r_e_s_s_} if _e_p_m_d is not running.
+
+              (arne@dunn)1> net_adm:names().
+              {ok,[{"arne",40262}]}
+
+       ppiinngg((NNooddee)) -->> ppoonngg || ppaanngg
+
+              Types:
+
+                 Node = atom()
+
+              Tries to set up a connection to _N_o_d_e. Returns _p_a_n_g if it fails,
+              or _p_o_n_g if it is successful.
+
+       wwoorrlldd(()) -->> [[nnooddee(())]]
+
+       wwoorrlldd((AArrgg)) -->> [[nnooddee(())]]
+
+              Types:
+
+                 Arg = vveerrbboossiittyy(())
+                 vveerrbboossiittyy(()) = silent | verbose
+
+              This function calls _n_a_m_e_s_(_H_o_s_t_) for all hosts which are
+              specified in the Erlang host file _._h_o_s_t_s_._e_r_l_a_n_g, collects the
+              replies and then evaluates _p_i_n_g_(_N_o_d_e_) on all those nodes.
+              Returns the list of all nodes that were, successfully pinged.
+
+              _A_r_g defaults to _s_i_l_e_n_t. If _A_r_g _=_= _v_e_r_b_o_s_e, the function writes
+              information about which nodes it is pinging to stdout.
+
+              This function can be useful when a node is started, and the
+              names of the other nodes in the network are not initially known.
+
+              Failure: _{_e_r_r_o_r_, _R_e_a_s_o_n_} if _h_o_s_t___f_i_l_e_(_) returns _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+       wwoorrlldd__lliisstt((HHoossttss)) -->> [[nnooddee(())]]
+
+       wwoorrlldd__lliisstt((HHoossttss,, AArrgg)) -->> [[nnooddee(())]]
+
+              Types:
+
+                 Hosts = [atom()]
+                 Arg = vveerrbboossiittyy(())
+                 vveerrbboossiittyy(()) = silent | verbose
+
+              As _w_o_r_l_d_/_0_,_1, but the hosts are given as argument instead of
+              being read from _._h_o_s_t_s_._e_r_l_a_n_g.
+
+FFIILLEESS
+       The _._h_o_s_t_s_._e_r_l_a_n_g file consists of a number of host names written as
+       Erlang terms. It is looked for in the current work directory, the
+       user's home directory, and _$_O_T_P___R_O_O_T (the root directory of
+       Erlang/OTP), in that order.
+
+       The format of the _._h_o_s_t_s_._e_r_l_a_n_g file must be one host name per line.
+       The host names must be within quotes as shown in the following example:
+
+       ^ (new line)
+
+
+
+Ericsson AB                      kernel 2.15.2                      net_adm(3)

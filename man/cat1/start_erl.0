@@ -1,0 +1,100 @@
+start_erl(1)                     User Commands                    start_erl(1)
+
+
+
+NNAAMMEE
+       start_erl - Start Erlang for embedded systems on Windows NT(R)
+
+DDEESSCCRRIIPPTTIIOONN
+       This describes the _s_t_a_r_t___e_r_l program specific to Windows NT. Although
+       there exists programs with the same name on other platforms, their
+       functionality is not the same.
+
+       The _s_t_a_r_t___e_r_l program is distributed both in compiled form (under
+       <Erlang root>\\erts-<version>\\bin) and in source form (under <Erlang
+       root>\\erts-<version>\\src). The purpose of the source code is to make
+       it possible to easily customize the program for local needs, such as
+       cyclic restart detection etc. There is also a "make"-file, written for
+       the _n_m_a_k_e program distributed with Microsoft(R) Visual C++(R). The
+       program can however be compiled with any Win32 C compiler (possibly
+       with slight modifications).
+
+       The purpose of the program is to aid release handling on Windows NT(R).
+       The program should be called by the _e_r_l_s_r_v program, read up the release
+       data file start_erl.data and start Erlang. Certain options to start_erl
+       are added and removed by the release handler during upgrade with
+       emulator restart (more specifically the _-_d_a_t_a option).
+
+EEXXPPOORRTTSS
+       ssttaarrtt__eerrll [[<<eerrll ooppttiioonnss>>]] ++++ [[<<ssttaarrtt__eerrll ooppttiioonnss>>]]
+
+              The _s_t_a_r_t___e_r_l program in its original form recognizes the
+              following options:
+
+                ++++::
+                  Mandatory, delimits start_erl options from normal Erlang
+                  options. Everything on the command line _b_e_f_o_r_e the _+_+ is
+                  interpreted as options to be sent to the _e_r_l program.
+                  Everything _a_f_t_e_r_+_+ is interpreted as options to _s_t_a_r_t___e_r_l
+                  itself.
+
+                --rreellddiirr <<rreelleeaassee rroooott>>::
+                  Mandatory if the environment variable _R_E_L_D_I_R is not
+                  specified and no _-_r_o_o_t_d_i_r option is given. Tells start_erl
+                  where the root of the release tree is placed in the file-
+                  system (typically <Erlang root>\\releases). The
+                  _s_t_a_r_t___e_r_l_._d_a_t_a file is expected to be placed in this
+                  directory (if not otherwise specified). If only the _-_r_o_o_t_d_i_r
+                  option is given, the directory is assumed to be <Erlang
+                  root>\\releases.
+
+                --rroooottddiirr <<EErrllaanngg rroooott ddiirreeccttoorryy>>::
+                  Mandatory if _-_r_e_l_d_i_r is not given and there is no _R_E_L_D_I_R in
+                  the environment. This specifies the Erlang installation root
+                  directory (under which the _l_i_b, _r_e_l_e_a_s_e_s and _e_r_t_s_-_<_V_e_r_s_i_o_n_>
+                  directories are placed). If only _-_r_e_l_d_i_r (or the environment
+                  variable _R_E_L_D_I_R) is given, the Erlang root is assumed to be
+                  the directory exactly one level above the release directory.
+
+                --ddaattaa <<ddaattaa ffiillee nnaammee>>::
+                  Optional, specifies another data file than start_erl.data in
+                  the <release root>. It is specified relative to the <release
+                  root> or absolute (including drive letter etc.). This option
+                  is used by the release handler during upgrade and should not
+                  be used during normal operation. The release data file
+                  should not normally be named differently.
+
+                --bboooottffllaaggss <<bboooott ffllaaggss ffiillee nnaammee>>::
+                  Optional, specifies a file name relative to actual release
+                  directory (that is the subdirectory of <release root> where
+                  the _._b_o_o_t file etc. are placed). The contents of this file
+                  is appended to the command line when Erlang is started. This
+                  makes it easy to start the emulator with different options
+                  for different releases.
+
+NNOOTTEESS
+       As the source code is distributed, it can easily be modified to accept
+       other options. The program must still accept the _-_d_a_t_a option with the
+       semantics described above for the release handler to work correctly.
+
+       The Erlang emulator is found by examining the registry keys for the
+       emulator version specified in the release data file. The new emulator
+       needs to be properly installed before the upgrade for this to work.
+
+       Although the program is located together with files specific to
+       emulator version, it is not expected to be specific to the emulator
+       version. The release handler does _n_o_t change the _-_m_a_c_h_i_n_e option to
+       _e_r_l_s_r_v during emulator restart. Place the (possibly customized)
+       _s_t_a_r_t___e_r_l program so that it is not overwritten during upgrade.
+
+       The _e_r_l_s_r_v program's default options are not sufficient for release
+       handling. The machine _e_r_l_s_r_v starts should be specified as the
+       _s_t_a_r_t___e_r_l program and the arguments should contain the _+_+ followed by
+       desired options.
+
+SSEEEE AALLSSOO
+       erlsrv(1), release_handler(3)
+
+
+
+Ericsson AB                       erts 5.9.2                      start_erl(1)

@@ -1,0 +1,916 @@
+wxDC(3)                    Erlang Module Definition                    wxDC(3)
+
+
+
+NNAAMMEE
+       wxDC - See external documentation: wxDC.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxDC.
+
+DDAATTAA TTYYPPEESS
+         _w_x_D_C_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       bblliitt((TThhiiss,, DDeessttPPtt,, SSzz,, SSoouurrccee,, SSrrccPPtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDC()
+                 DestPt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+                 Source = wxDC()
+                 SrcPt = {X::integer(), Y::integer()}
+
+              Equivalent to bblliitt((TThhiiss,, DDeessttPPtt,, SSzz,, SSoouurrccee,, SSrrccPPtt,, [[]])).
+
+       bblliitt((TThhiiss,, DDeessttPPtt,, SSzz,, SSoouurrccee,, SSrrccPPtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDC()
+                 DestPt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+                 Source = wxDC()
+                 SrcPt = {X::integer(), Y::integer()}
+                 Option = {rop, integer()} | {useMask, boolean()} |
+                 {srcPtMask, {X::integer(), Y::integer()}}
+
+              See external documentation.
+
+       ccaallccBBoouunnddiinnggBBooxx((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ccoommppuutteeSSccaalleeAAnnddOOrriiggiinn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ccrroossssHHaaiirr((TThhiiss,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ddeessttrrooyyCClliippppiinnggRReeggiioonn((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ddeevviicceeTTooLLooggiiccaallXX((TThhiiss,, XX)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 X = integer()
+
+              See external documentation.
+
+       ddeevviicceeTTooLLooggiiccaallXXRReell((TThhiiss,, XX)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 X = integer()
+
+              See external documentation.
+
+       ddeevviicceeTTooLLooggiiccaallYY((TThhiiss,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 Y = integer()
+
+              See external documentation.
+
+       ddeevviicceeTTooLLooggiiccaallYYRReell((TThhiiss,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 Y = integer()
+
+              See external documentation.
+
+       ddrraawwAArrcc((TThhiiss,, PPtt11,, PPtt22,, CCeennttrree)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt1 = {X::integer(), Y::integer()}
+                 Pt2 = {X::integer(), Y::integer()}
+                 Centre = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ddrraawwBBiittmmaapp((TThhiiss,, BBmmpp,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Bmp = wxBitmap() (see module wxBitmap)
+                 Pt = {X::integer(), Y::integer()}
+
+              Equivalent to ddrraawwBBiittmmaapp((TThhiiss,, BBmmpp,, PPtt,, [[]])).
+
+       ddrraawwBBiittmmaapp((TThhiiss,, BBmmpp,, PPtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Bmp = wxBitmap() (see module wxBitmap)
+                 Pt = {X::integer(), Y::integer()}
+                 Option = {useMask, boolean()}
+
+              See external documentation.
+
+       ddrraawwCChheecckkMMaarrkk((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       ddrraawwCCiirrccllee((TThhiiss,, PPtt,, RRaaddiiuuss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Radius = integer()
+
+              See external documentation.
+
+       ddrraawwEElllliippssee((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       ddrraawwEElllliippssee((TThhiiss,, PPtt,, SSzz)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ddrraawwEElllliippttiiccAArrcc((TThhiiss,, PPtt,, SSzz,, SSaa,, EEaa)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+                 Sa = number()
+                 Ea = number()
+
+              See external documentation.
+
+       ddrraawwIIccoonn((TThhiiss,, IIccoonn,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Icon = wxIcon() (see module wxIcon)
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ddrraawwLLaabbeell((TThhiiss,, TTeexxtt,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Text = chardata() (see module unicode)
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              Equivalent to ddrraawwLLaabbeell((TThhiiss,, TTeexxtt,, RReecctt,, [[]])).
+
+       ddrraawwLLaabbeell((TThhiiss,, TTeexxtt,, RReecctt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Text = chardata() (see module unicode)
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 Option = {alignment, integer()} | {indexAccel, integer()}
+
+              See external documentation.
+
+       ddrraawwLLiinnee((TThhiiss,, PPtt11,, PPtt22)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt1 = {X::integer(), Y::integer()}
+                 Pt2 = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ddrraawwLLiinneess((TThhiiss,, PPooiinnttss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Points = [{X::integer(), Y::integer()}]
+
+              Equivalent to ddrraawwLLiinneess((TThhiiss,, PPooiinnttss,, [[]])).
+
+       ddrraawwLLiinneess((TThhiiss,, PPooiinnttss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Points = [{X::integer(), Y::integer()}]
+                 Option = {xoffset, integer()} | {yoffset, integer()}
+
+              See external documentation.
+
+       ddrraawwPPoollyyggoonn((TThhiiss,, PPooiinnttss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Points = [{X::integer(), Y::integer()}]
+
+              Equivalent to ddrraawwPPoollyyggoonn((TThhiiss,, PPooiinnttss,, [[]])).
+
+       ddrraawwPPoollyyggoonn((TThhiiss,, PPooiinnttss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Points = [{X::integer(), Y::integer()}]
+                 Option = {xoffset, integer()} | {yoffset, integer()} |
+                 {fillStyle, integer()}
+
+              See external documentation.
+
+       ddrraawwPPooiinntt((TThhiiss,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ddrraawwRReeccttaannggllee((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       ddrraawwRReeccttaannggllee((TThhiiss,, PPtt,, SSzz)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ddrraawwRRoottaatteeddTTeexxtt((TThhiiss,, TTeexxtt,, PPtt,, AAnnggllee)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Text = chardata() (see module unicode)
+                 Pt = {X::integer(), Y::integer()}
+                 Angle = number()
+
+              See external documentation.
+
+       ddrraawwRRoouunnddeeddRReeccttaannggllee((TThhiiss,, RR,, RRaaddiiuuss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 R = {X::integer(), Y::integer(), W::integer(), H::integer()}
+                 Radius = number()
+
+              See external documentation.
+
+       ddrraawwRRoouunnddeeddRReeccttaannggllee((TThhiiss,, PPtt,, SSzz,, RRaaddiiuuss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+                 Radius = number()
+
+              See external documentation.
+
+       ddrraawwTTeexxtt((TThhiiss,, TTeexxtt,, PPtt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Text = chardata() (see module unicode)
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       eennddDDoocc((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       eennddPPaaggee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ffllooooddFFiillll((TThhiiss,, PPtt,, CCooll)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Col = wx_colour() (see module wx)
+
+              Equivalent to ffllooooddFFiillll((TThhiiss,, PPtt,, CCooll,, [[]])).
+
+       ffllooooddFFiillll((TThhiiss,, PPtt,, CCooll,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Col = wx_colour() (see module wx)
+                 Option = {style, integer()}
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunndd((TThhiiss)) -->> wwxxBBrruusshh(()) ((sseeee mmoodduullee wwxxBBrruusshh))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunnddMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettBBrruusshh((TThhiiss)) -->> wwxxBBrruusshh(()) ((sseeee mmoodduullee wwxxBBrruusshh))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettCChhaarrHHeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettCChhaarrWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettCClliippppiinnggBBooxx((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettLLaayyoouuttDDiirreeccttiioonn((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+              Res = ?wxLayout_Default | ?wxLayout_LeftToRight |
+              ?wxLayout_RightToLeft
+
+       ggeettLLooggiiccaallFFuunnccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettMMaappMMooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettMMuullttiiLLiinneeTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+                 String = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettMMuullttiiLLiinneeTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       {{WWiiddtthh::::iinntteeggeerr(()),, HHeeiigghhtt::::iinntteeggeerr(()),, HHeeiigghhttLLiinnee::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+                 String = chardata() (see module unicode)
+                 Option = {font, wxFont() (see module wxFont)}
+
+              See external documentation.
+
+       ggeettPPaarrttiiaallTTeexxttEExxtteennttss((TThhiiss,, TTeexxtt)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Widths::[integer()]}
+                 This = wxDC()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettPPeenn((TThhiiss)) -->> wwxxPPeenn(()) ((sseeee mmoodduullee wwxxPPeenn))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettPPiixxeell((TThhiiss,, PPtt)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Col::wx_colour4() (see module wx)}
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ggeettPPPPII((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettSSiizzeeMMMM((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettTTeexxttBBaacckkggrroouunndd((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+                 String = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettTTeexxttEExxtteenntt((TThhiiss,, SSttrriinngg,, OOppttiioonn::::[[OOppttiioonn]])) -->> RReessuulltt
+
+              Types:
+
+                 Result = {X::integer(), Y::integer(), Descent::integer(),
+                 ExternalLeading::integer()}
+                 This = wxDC()
+                 String = chardata() (see module unicode)
+                 Option = {theFont, wxFont() (see module wxFont)}
+
+              See external documentation.
+
+       ggeettTTeexxttFFoorreeggrroouunndd((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggeettUUsseerrSSccaallee((TThhiiss)) -->> {{XX::::nnuummbbeerr(()),, YY::::nnuummbbeerr(())}}
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       ggrraaddiieennttFFiillllCCoonncceennttrriicc((TThhiiss,, RReecctt,, IInniittiiaallCCoolloouurr,, DDeessttCCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 InitialColour = wx_colour() (see module wx)
+                 DestColour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ggrraaddiieennttFFiillllCCoonncceennttrriicc((TThhiiss,, RReecctt,, IInniittiiaallCCoolloouurr,, DDeessttCCoolloouurr,,
+       CCiirrcclleeCCeenntteerr)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 InitialColour = wx_colour() (see module wx)
+                 DestColour = wx_colour() (see module wx)
+                 CircleCenter = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ggrraaddiieennttFFiillllLLiinneeaarr((TThhiiss,, RReecctt,, IInniittiiaallCCoolloouurr,, DDeessttCCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 InitialColour = wx_colour() (see module wx)
+                 DestColour = wx_colour() (see module wx)
+
+              Equivalent to ggrraaddiieennttFFiillllLLiinneeaarr((TThhiiss,, RReecctt,, IInniittiiaallCCoolloouurr,,
+              DDeessttCCoolloouurr,, [[]])).
+
+       ggrraaddiieennttFFiillllLLiinneeaarr((TThhiiss,, RReecctt,, IInniittiiaallCCoolloouurr,, DDeessttCCoolloouurr,,
+       OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 InitialColour = wx_colour() (see module wx)
+                 DestColour = wx_colour() (see module wx)
+                 Option = {nDirection, wx_enum() (see module wx)}
+
+              See external documentation.
+              NDirection = ?wxLEFT | ?wxRIGHT | ?wxUP | ?wxDOWN | ?wxTOP |
+              ?wxBOTTOM | ?wxNORTH | ?wxSOUTH | ?wxWEST | ?wxEAST | ?wxALL
+
+       llooggiiccaallTTooDDeevviicceeXX((TThhiiss,, XX)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 X = integer()
+
+              See external documentation.
+
+       llooggiiccaallTTooDDeevviicceeXXRReell((TThhiiss,, XX)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 X = integer()
+
+              See external documentation.
+
+       llooggiiccaallTTooDDeevviicceeYY((TThhiiss,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 Y = integer()
+
+              See external documentation.
+
+       llooggiiccaallTTooDDeevviicceeYYRReell((TThhiiss,, YY)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+                 Y = integer()
+
+              See external documentation.
+
+       mmaaxxXX((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       mmaaxxYY((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       mmiinnXX((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       mmiinnYY((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       rreesseettBBoouunnddiinnggBBooxx((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+       sseettAAxxiissOOrriieennttaattiioonn((TThhiiss,, XXLLeeffttRRiigghhtt,, YYBBoottttoommUUpp)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 XLeftRight = boolean()
+                 YBottomUp = boolean()
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunndd((TThhiiss,, BBrruusshh)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Brush = wxBrush() (see module wxBrush)
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Mode = integer()
+
+              See external documentation.
+
+       sseettBBrruusshh((TThhiiss,, BBrruusshh)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Brush = wxBrush() (see module wxBrush)
+
+              See external documentation.
+
+       sseettCClliippppiinnggRReeggiioonn((TThhiiss,, RReeggiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Region = wxRegion() (see module wxRegion)
+
+              See external documentation.
+              Also:
+              setClippingRegion(This, Rect) -> ok when
+              This::wxDC(), Rect::{X::integer(), Y::integer(), W::integer(),
+              H::integer()}.
+
+
+       sseettCClliippppiinnggRReeggiioonn((TThhiiss,, PPtt,, SSzz)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pt = {X::integer(), Y::integer()}
+                 Sz = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettDDeevviicceeOOrriiggiinn((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettLLaayyoouuttDDiirreeccttiioonn((TThhiiss,, DDiirr)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Dir = wx_enum() (see module wx)
+
+              See external documentation.
+              Dir = ?wxLayout_Default | ?wxLayout_LeftToRight |
+              ?wxLayout_RightToLeft
+
+       sseettLLooggiiccaallFFuunnccttiioonn((TThhiiss,, FFuunnccttiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Function = integer()
+
+              See external documentation.
+
+       sseettMMaappMMooddee((TThhiiss,, MMooddee)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Mode = integer()
+
+              See external documentation.
+
+       sseettPPaalleettttee((TThhiiss,, PPaalleettttee)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Palette = wxPalette() (see module wxPalette)
+
+              See external documentation.
+
+       sseettPPeenn((TThhiiss,, PPeenn)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Pen = wxPen() (see module wxPen)
+
+              See external documentation.
+
+       sseettTTeexxttBBaacckkggrroouunndd((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettTTeexxttFFoorreeggrroouunndd((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettUUsseerrSSccaallee((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+                 X = number()
+                 Y = number()
+
+              See external documentation.
+
+       ssttaarrttDDoocc((TThhiiss,, MMeessssaaggee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxDC()
+                 Message = chardata() (see module unicode)
+
+              See external documentation.
+
+       ssttaarrttPPaaggee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxDC()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                           wxDC(3)

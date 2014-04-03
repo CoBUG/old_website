@@ -1,0 +1,64 @@
+wxStaticBoxSizer(3)        Erlang Module Definition        wxStaticBoxSizer(3)
+
+
+
+NNAAMMEE
+       wxStaticBoxSizer - See external documentation: wxStaticBoxSizer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxStaticBoxSizer.
+
+       This class is derived (and can use functions) from:
+       wwxxBBooxxSSiizzeerr
+       wwxxSSiizzeerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_t_a_t_i_c_B_o_x_S_i_z_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((OOrriieenntt,, WWiinn)) -->> wwxxSSttaattiiccBBooxxSSiizzeerr(())
+
+              Types:
+
+                 Orient = integer()
+                 Win = wxWindow() (see module wxWindow)
+
+              See external documentation.
+              Also:
+              new(Box, Orient) -> wxStaticBoxSizer() when
+              Box::wxStaticBox:wxStaticBox(), Orient::integer().
+
+
+       nneeww((OOrriieenntt,, WWiinn,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSttaattiiccBBooxxSSiizzeerr(())
+
+              Types:
+
+                 Orient = integer()
+                 Win = wxWindow() (see module wxWindow)
+                 Option = {label, chardata() (see module unicode)}
+
+              See external documentation.
+
+       ggeettSSttaattiiccBBooxx((TThhiiss)) -->> wwxxSSttaattiiccBBooxx(()) ((sseeee mmoodduullee wwxxSSttaattiiccBBooxx))
+
+              Types:
+
+                 This = wxStaticBoxSizer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSttaattiiccBBooxxSSiizzeerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxStaticBoxSizer(3)

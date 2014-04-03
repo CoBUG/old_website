@@ -1,0 +1,152 @@
+wxMDIParentFrame(3)        Erlang Module Definition        wxMDIParentFrame(3)
+
+
+
+NNAAMMEE
+       wxMDIParentFrame - See external documentation: wxMDIParentFrame.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMDIParentFrame.
+
+       This class is derived (and can use functions) from:
+       wwxxFFrraammee
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_D_I_P_a_r_e_n_t_F_r_a_m_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMDDIIPPaarreennttFFrraammee(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee)) -->> wwxxMMDDIIPPaarreennttFFrraammee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMDDIIPPaarreennttFFrraammee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       aaccttiivvaatteeNNeexxtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              See external documentation.
+
+       aaccttiivvaatteePPrreevviioouuss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              See external documentation.
+
+       aarrrraannggeeIIccoonnss((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              See external documentation.
+
+       ccaassccaaddee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMDIParentFrame()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMDIParentFrame()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ggeettAAccttiivveeCChhiilldd((TThhiiss)) -->> wwxxMMDDIICChhiillddFFrraammee(()) ((sseeee mmoodduullee wwxxMMDDIICChhiillddFFrraammee))
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              See external documentation.
+
+       ggeettCClliieennttWWiinnddooww((TThhiiss)) -->> wwxxMMDDIICClliieennttWWiinnddooww(()) ((sseeee mmoodduullee
+       wwxxMMDDIICClliieennttWWiinnddooww))
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              See external documentation.
+
+       ttiillee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIParentFrame()
+
+              Equivalent to ttiillee((TThhiiss,, [[]])).
+
+       ttiillee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxMDIParentFrame()
+                 Option = {orient, wx_enum() (see module wx)}
+
+              See external documentation.
+              Orient = ?wxHORIZONTAL | ?wxVERTICAL | ?wxBOTH
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMDDIIPPaarreennttFFrraammee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxMDIParentFrame(3)

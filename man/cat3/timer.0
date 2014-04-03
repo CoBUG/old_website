@@ -1,0 +1,265 @@
+timer(3)                   Erlang Module Definition                   timer(3)
+
+
+
+NNAAMMEE
+       timer - Timer Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides useful functions related to time. Unless otherwise
+       stated, time is always measured in _m_i_l_l_i_s_e_c_o_n_d_s. All timer functions
+       return immediately, regardless of work carried out by another process.
+
+       Successful evaluations of the timer functions yield return values
+       containing a timer reference, denoted _T_R_e_f below. By using _c_a_n_c_e_l_/_1,
+       the returned reference can be used to cancel any requested action. A
+       _T_R_e_f is an Erlang term, the contents of which must not be altered.
+
+       The timeouts are not exact, but should be _a_t _l_e_a_s_t as long as
+       requested.
+
+DDAATTAA TTYYPPEESS
+       ttiimmee(()) = integer() >= 0
+
+              Time in milliseconds.
+
+       ttrreeff(())
+
+              A timer reference.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> ookk
+
+              Starts the timer server. Normally, the server does not need to
+              be started explicitly. It is started dynamically if it is
+              needed. This is useful during development, but in a target
+              system the server should be started explicitly. Use
+              configuration parameters for _k_e_r_n_e_l for this.
+
+       aappppllyy__aafftteerr((TTiimmee,, MMoodduullee,, FFuunnccttiioonn,, AArrgguummeennttss)) -->>
+                      {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Time = ttiimmee(())
+                 Module = module()
+                 Function = atom()
+                 Arguments = [term()]
+                 TRef = ttrreeff(())
+                 Reason = term()
+
+              Evaluates _a_p_p_l_y_(_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _A_r_g_u_m_e_n_t_s_) after _T_i_m_e amount
+              of time has elapsed. Returns _{_o_k_, _T_R_e_f_}, or _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+       sseenndd__aafftteerr((TTiimmee,, MMeessssaaggee)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+       sseenndd__aafftteerr((TTiimmee,, PPiidd,, MMeessssaaggee)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Time = ttiimmee(())
+                 Pid = pid() | (RegName :: atom())
+                 Message = term()
+                 TRef = ttrreeff(())
+                 Reason = term()
+
+                _s_e_n_d___a_f_t_e_r_/_3:
+                  Evaluates _P_i_d _! _M_e_s_s_a_g_e after _T_i_m_e amount of time has
+                  elapsed. (_P_i_d can also be an atom of a registered name.)
+                  Returns _{_o_k_, _T_R_e_f_}, or _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+                _s_e_n_d___a_f_t_e_r_/_2:
+                  Same as _s_e_n_d___a_f_t_e_r_(_T_i_m_e_, _s_e_l_f_(_)_, _M_e_s_s_a_g_e_).
+
+       kkiillll__aafftteerr((TTiimmee)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn22}}
+
+       kkiillll__aafftteerr((TTiimmee,, PPiidd)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn22}}
+
+       eexxiitt__aafftteerr((TTiimmee,, RReeaassoonn11)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn22}}
+
+       eexxiitt__aafftteerr((TTiimmee,, PPiidd,, RReeaassoonn11)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn22}}
+
+              Types:
+
+                 Time = ttiimmee(())
+                 Pid = pid() | (RegName :: atom())
+                 TRef = ttrreeff(())
+                 Reason1 = Reason2 = term()
+
+                _e_x_i_t___a_f_t_e_r_/_3:
+                  Send an exit signal with reason _R_e_a_s_o_n_1 to Pid _P_i_d. Returns
+                  _{_o_k_, _T_R_e_f_}, or _{_e_r_r_o_r_, _R_e_a_s_o_n_2_}.
+
+                _e_x_i_t___a_f_t_e_r_/_2:
+                  Same as _e_x_i_t___a_f_t_e_r_(_T_i_m_e_, _s_e_l_f_(_)_, _R_e_a_s_o_n_1_).
+
+                _k_i_l_l___a_f_t_e_r_/_2:
+                  Same as _e_x_i_t___a_f_t_e_r_(_T_i_m_e_, _P_i_d_, _k_i_l_l_).
+
+                _k_i_l_l___a_f_t_e_r_/_1:
+                  Same as _e_x_i_t___a_f_t_e_r_(_T_i_m_e_, _s_e_l_f_(_)_, _k_i_l_l_).
+
+       aappppllyy__iinntteerrvvaall((TTiimmee,, MMoodduullee,, FFuunnccttiioonn,, AArrgguummeennttss)) -->>
+                         {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Time = ttiimmee(())
+                 Module = module()
+                 Function = atom()
+                 Arguments = [term()]
+                 TRef = ttrreeff(())
+                 Reason = term()
+
+              Evaluates _a_p_p_l_y_(_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _A_r_g_u_m_e_n_t_s_) repeatedly at
+              intervals of _T_i_m_e. Returns _{_o_k_, _T_R_e_f_}, or _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+       sseenndd__iinntteerrvvaall((TTiimmee,, MMeessssaaggee)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+       sseenndd__iinntteerrvvaall((TTiimmee,, PPiidd,, MMeessssaaggee)) -->> {{ookk,, TTRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Time = ttiimmee(())
+                 Pid = pid() | (RegName :: atom())
+                 Message = term()
+                 TRef = ttrreeff(())
+                 Reason = term()
+
+                _s_e_n_d___i_n_t_e_r_v_a_l_/_3:
+                  Evaluates _P_i_d _! _M_e_s_s_a_g_e repeatedly after _T_i_m_e amount of time
+                  has elapsed. (_P_i_d can also be an atom of a registered name.)
+                  Returns _{_o_k_, _T_R_e_f_} or _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+                _s_e_n_d___i_n_t_e_r_v_a_l_/_2:
+                  Same as _s_e_n_d___i_n_t_e_r_v_a_l_(_T_i_m_e_, _s_e_l_f_(_)_, _M_e_s_s_a_g_e_).
+
+       ccaanncceell((TTRReeff)) -->> {{ookk,, ccaanncceell}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TRef = ttrreeff(())
+                 Reason = term()
+
+              Cancels a previously requested timeout. _T_R_e_f is a unique timer
+              reference returned by the timer function in question. Returns
+              _{_o_k_, _c_a_n_c_e_l_}, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} when _T_R_e_f is not a timer
+              reference.
+
+       sslleeeepp((TTiimmee)) -->> ookk
+
+              Types:
+
+                 Time = timeout()
+
+              Suspends the process calling this function for _T_i_m_e amount of
+              milliseconds and then returns _o_k, or suspend the process forever
+              if _T_i_m_e is the atom _i_n_f_i_n_i_t_y. Naturally, this function does _n_o_t
+              return immediately.
+
+       ttcc((FFuunn)) -->> {{TTiimmee,, VVaalluuee}}
+
+       ttcc((FFuunn,, AArrgguummeennttss)) -->> {{TTiimmee,, VVaalluuee}}
+
+       ttcc((MMoodduullee,, FFuunnccttiioonn,, AArrgguummeennttss)) -->> {{TTiimmee,, VVaalluuee}}
+
+              Types:
+
+                 Module = module()
+                 Function = atom()
+                 Arguments = [term()]
+                 Time = integer()
+                   In microseconds
+                 Value = term()
+
+                _t_c_/_3:
+                  Evaluates _a_p_p_l_y_(_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _A_r_g_u_m_e_n_t_s_) and measures
+                  the elapsed real time as reported by _o_s_:_t_i_m_e_s_t_a_m_p_/_0. Returns
+                  _{_T_i_m_e_, _V_a_l_u_e_}, where _T_i_m_e is the elapsed real time in
+                  _m_i_c_r_o_s_e_c_o_n_d_s, and _V_a_l_u_e is what is returned from the apply.
+
+                _t_c_/_2:
+                  Evaluates _a_p_p_l_y_(_F_u_n_, _A_r_g_u_m_e_n_t_s_). Otherwise works like _t_c_/_3.
+
+                _t_c_/_1:
+                  Evaluates _F_u_n_(_). Otherwise works like _t_c_/_2.
+
+       nnooww__ddiiffff((TT22,, TT11)) -->> TTddiiffff
+
+              Types:
+
+                 T1 = T2 = eerrllaanngg::ttiimmeessttaammpp(())
+                 Tdiff = integer()
+                   In microseconds
+
+              Calculates the time difference _T_d_i_f_f _= _T_2 _- _T_1 in _m_i_c_r_o_s_e_c_o_n_d_s,
+              where _T_1 and _T_2 probably are timestamp tuples returned from
+              _e_r_l_a_n_g_:_n_o_w_/_0.
+
+       sseeccoonnddss((SSeeccoonnddss)) -->> MMiilllliiSSeeccoonnddss
+
+              Types:
+
+                 Seconds = MilliSeconds = integer() >= 0
+
+              Returns the number of milliseconds in _S_e_c_o_n_d_s.
+
+       mmiinnuutteess((MMiinnuutteess)) -->> MMiilllliiSSeeccoonnddss
+
+              Types:
+
+                 Minutes = MilliSeconds = integer() >= 0
+
+              Return the number of milliseconds in _M_i_n_u_t_e_s.
+
+       hhoouurrss((HHoouurrss)) -->> MMiilllliiSSeeccoonnddss
+
+              Types:
+
+                 Hours = MilliSeconds = integer() >= 0
+
+              Returns the number of milliseconds in _H_o_u_r_s.
+
+       hhmmss((HHoouurrss,, MMiinnuutteess,, SSeeccoonnddss)) -->> MMiilllliiSSeeccoonnddss
+
+              Types:
+
+                 Hours = Minutes = Seconds = MilliSeconds = integer() >= 0
+
+              Returns the number of milliseconds in _H_o_u_r_s _+ _M_i_n_u_t_e_s _+ _S_e_c_o_n_d_s.
+
+EEXXAAMMPPLLEESS
+       This example illustrates how to print out "Hello World!" in 5 seconds:
+
+             1> timer:apply_after(5000, io, format, ["~nHello World!~n", []]).
+             {ok,TRef}
+             Hello World!
+
+       The following coding example illustrates a process which performs a
+       certain action and if this action is not completed within a certain
+       limit, then the process is killed.
+
+             Pid = spawn(mod, fun, [foo, bar]),
+             %% If pid is not finished in 10 seconds, kill him
+             {ok, R} = timer:kill_after(timer:seconds(10), Pid),
+             ...
+             %% We change our mind...
+             timer:cancel(R),
+             ...
+
+WWAARRNNIINNGG
+       A timer can always be removed by calling _c_a_n_c_e_l_/_1.
+
+       An interval timer, i.e. a timer created by evaluating any of the
+       functions _a_p_p_l_y___i_n_t_e_r_v_a_l_/_4, _s_e_n_d___i_n_t_e_r_v_a_l_/_3, and _s_e_n_d___i_n_t_e_r_v_a_l_/_2, is
+       linked to the process towards which the timer performs its task.
+
+       A one-shot timer, i.e. a timer created by evaluating any of the
+       functions _a_p_p_l_y___a_f_t_e_r_/_4, _s_e_n_d___a_f_t_e_r_/_3, _s_e_n_d___a_f_t_e_r_/_2, _e_x_i_t___a_f_t_e_r_/_3,
+       _e_x_i_t___a_f_t_e_r_/_2, _k_i_l_l___a_f_t_e_r_/_2, and _k_i_l_l___a_f_t_e_r_/_1 is not linked to any
+       process. Hence, such a timer is removed only when it reaches its
+       timeout, or if it is explicitly removed by a call to _c_a_n_c_e_l_/_1.
+
+
+
+Ericsson AB                      stdlib 1.18.2                        timer(3)

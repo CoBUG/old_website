@@ -1,0 +1,36 @@
+CosFileTransfer_Directory(3)Erlang Module DefinitionCosFileTransfer_Directory(3)
+
+
+
+NNAAMMEE
+       CosFileTransfer_Directory - This module implements the OMG
+       CosFileTransfer::Directory interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_F_i_l_e_T_r_a_n_s_f_e_r_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossFFiilleeTTrraannssffeerr__FFiillee
+
+         * CosPropertyService_PropertySetDef in the cosProperty application.
+
+EEXXPPOORRTTSS
+       lliisstt((DDiirreeccttoorryy,, MMaaxx)) -->> RReettuurrnn
+
+              Types:
+
+                 Directory = #objref
+                 Return = {ok, FileList, FileIterator}
+                 FileList = [File]
+                 File = FileIterator = #objref
+
+              This operation returns a list, of length _M_a_x or less, containing
+              Object References representing files or directories contained
+              within the target Directory. If the amount of objects found is
+              less than _M_a_x the returned Iterator will be a _N_I_L object.
+
+
+
+Ericsson AB                 cosFileTransfer 1.1.13CosFileTransfer_Directory(3)

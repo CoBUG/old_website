@@ -1,0 +1,183 @@
+os_sup(3)                  Erlang Module Definition                  os_sup(3)
+
+
+
+NNAAMMEE
+       os_sup - Interface to OS System Messages
+
+DDEESSCCRRIIPPTTIIOONN
+       _o_s___s_u_p is a process providing a message passing service from the
+       operating system to the error logger in the Erlang runtime system. It
+       is part of the OS_Mon application, see ooss__mmoonn((66)). Available for Solaris
+       and Windows.
+
+       Messages received from the operating system results in an user defined
+       callback function being called. This function can do whatever filtering
+       and formatting is necessary and then deploy any type of logging
+       suitable for the user's application.
+
+SSOOLLAARRIISS OOPPEERRAATTIIOONN
+       The Solaris (SunOS 5.x) messages are retrieved from the syslog-daemon,
+       _s_y_s_l_o_g_d.
+
+       Enabling the service includes actions which require root privileges,
+       such as change of ownership and file privileges of an executable binary
+       file, and creating a modified copy of the configuration file for
+       _s_y_s_l_o_g_d. When _o_s___s_u_p is terminated, the service must be disabled,
+       meaning the original configuration must be restored. Enabling/disabling
+       can be done either outside or inside _o_s___s_u_p, see CCoonnffiigguurraattiioonn below.
+
+   WWaarrnniinngg::
+       This process cannot run in multiple instances on the same hardware.
+       OS_Mon must be configured to start _o_s___s_u_p on one node only if two or
+       more Erlang nodes execute on the same machine.
+
+
+       The format of received events is not defined.
+
+WWIINNDDOOWWSS OOPPEERRAATTIIOONN
+       The Windows messages are retrieved from the eventlog file.
+
+       The _n_t_e_v_e_n_t_l_o_g module is used to implement _o_s___s_u_p. See nntteevveennttlloogg((33)).
+       Note that the start functions of _n_t_e_v_e_n_t_l_o_g does not need to be used,
+       in this case the process is started automatically as part of the OS_Mon
+       supervision tree.
+
+       OS messages are formatted as a tuple _{_T_i_m_e_, _C_a_t_e_g_o_r_y_, _F_a_c_i_l_i_t_y_,
+       _S_e_v_e_r_i_t_y_, _M_e_s_s_a_g_e_}:
+
+         _T_i_m_e _= _{_M_e_g_a_S_e_c_s_, _S_e_c_s_, _M_i_c_r_o_S_e_c_s_}:
+           A time stamp as returned by the BIF _n_o_w_(_).
+
+         _C_a_t_e_g_o_r_y _= _s_t_r_i_n_g_(_):
+           Usually one of _"_S_y_s_t_e_m_", _"_A_p_p_l_i_c_a_t_i_o_n_" or _"_S_e_c_u_r_i_t_y_". Note that the
+           NT eventlog viewer has another notion of category, which in most
+           cases is totally meaningless and therefore not imported into
+           Erlang. What is called a category here is one of the main three
+           types of events occurring in a normal NT system.
+
+         _F_a_c_i_l_i_t_y _= _s_t_r_i_n_g_(_):
+           The source of the message, usually the name of the application that
+           generated it. This could be almost any string. When matching
+           messages from certain applications, the version number of the
+           application may have to be accounted for. This is what the NT event
+           viewer calls "source".
+
+         _S_e_v_e_r_i_t_y _= _s_t_r_i_n_g_(_):
+           One of _"_E_r_r_o_r_", _"_W_a_r_n_i_n_g_", _"_I_n_f_o_r_m_a_t_i_o_n_a_l_", _"_A_u_d_i_t___S_u_c_c_e_s_s_",
+           _"_A_u_d_i_t___F_a_u_l_u_r_e_" or, in case of a currently unknown Windows NT
+           version _"_S_e_v_e_r_i_t_y___U_n_k_n_o_w_n_".
+
+         _M_e_s_s_a_g_e _= _s_t_r_i_n_g_(_):
+           Formatted exactly as it would be in the NT eventlog viewer. Binary
+           data is not imported into Erlang.
+
+CCOONNFFIIGGUURRAATTIIOONN
+         _o_s___s_u_p___m_f_a _= _{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _A_r_g_s_}:
+           The callback function to use. _M_o_d_u_l_e and _F_u_n_c_t_i_o_n are atoms and
+           _A_r_g_s is a list of terms. When an OS message _M_s_g is received, this
+           function is called as _a_p_p_l_y_(_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _[_M_s_g _| _A_r_g_s_]_).
+
+           Default is _{_o_s___s_u_p_, _e_r_r_o_r___r_e_p_o_r_t_, _[_T_a_g_]_} which will send the event
+           to the error logger using eerrrroorr__llooggggeerr::eerrrroorr__rreeppoorrtt((TTaagg,, MMssgg)). _T_a_g
+           is the value of _o_s___s_u_p___e_r_r_o_r_t_a_g, see below.
+
+         _o_s___s_u_p___e_r_r_o_r_t_a_g _= _a_t_o_m_(_):
+           This parameter defines the error report type used when messages are
+           sent to error logger using the default callback function. Default
+           is _s_t_d___e_r_r_o_r, which means the events are handled by the standard
+           event handler.
+
+         _o_s___s_u_p___e_n_a_b_l_e _= _b_o_o_l_(_):
+           Solaris only. Defines if the service should be enabled (and
+           disabled) inside (_t_r_u_e) or outside (_f_a_l_s_e) _o_s___s_u_p. For backwards
+           compatibility reasons, the default is _t_r_u_e. The recommended value
+           is _f_a_l_s_e, as the Erlang emulator should normally not be run with
+           _r_o_o_t privileges, as is required for enabling the service.
+
+         _o_s___s_u_p___o_w_n _= _s_t_r_i_n_g_(_):
+           Solaris only. Defines the directory which contains the backup copy
+           and the Erlang specific configuration files for _s_y_s_l_o_g_d, and a
+           named pipe to receive the messages from _s_y_s_l_o_g_d. Default is _"_/_e_t_c_".
+
+         _o_s___s_u_p___s_y_s_l_o_g_c_o_n_f _= _s_t_r_i_n_g_(_):
+           Solaris only. Defines the full name of the configuration file for
+           _s_y_s_l_o_g_d. Default is _"_/_e_t_c_/_s_y_s_l_o_g_._c_o_n_f_".
+
+EEXXPPOORRTTSS
+       eennaabbllee(()) -->> ookk || {{eerrrroorr,, RReess}}
+       eennaabbllee((DDiirr,, CCoonnff)) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Dir = Conf = Res = string()
+
+              Enables the _o_s___s_u_p service. Needed on Solaris only.
+
+              If the configuration parameter _o_s___s_u_p___e_n_a_b_l_e is _f_a_l_s_e, this
+              function is called automatically by _o_s___s_u_p, using the values of
+              _o_s___s_u_p___o_w_n and _o_s___s_u_p___s_y_s_l_o_g_c_o_n_f as arguments.
+
+              If _o_s___s_u_p___e_n_a_b_l_e is _t_r_u_e, this function must be called _b_e_f_o_r_e
+              OS_Mon/_o_s___s_u_p is started. _D_i_r defines the directory which
+              contains the backup copy and the Erlang specific configuration
+              files for _s_y_s_l_o_g_d, and a named pipe to receive the messages from
+              _s_y_s_l_o_g_d. Defaults to _"_/_e_t_c_". _C_o_n_f defines the full name of the
+              configuration file for _s_y_s_l_o_g_d. Default is _"_/_e_t_c_/_s_y_s_l_o_g_._c_o_n_f_".
+
+              Results in a OS call to:
+
+              <PRIVDIR>/bin/mod_syslog otp Dir Conf
+
+
+              where _<_P_R_I_V_D_I_R_> is the _p_r_i_v directory of OS_Mon,
+              _c_o_d_e_:_p_r_i_v___d_i_r_(_o_s___m_o_n_).
+
+              Returns _o_k if this yields the expected result _"_0_", and _{_e_r_r_o_r_,
+              _R_e_s_} if it yields anything else.
+
+          NNoottee::
+              This function requires root privileges to succeed.
+
+
+       ddiissaabbllee(()) -->> ookk || {{eerrrroorr,, RReess}}
+       ddiissaabbllee((DDiirr,, CCoonnff)) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Dir = Conf = Res = string()
+
+              Disables the _o_s___s_u_p service. Needed on Solaris only.
+
+              If the configuration parameter _o_s___s_u_p___e_n_a_b_l_e is _f_a_l_s_e, this
+              function is called automatically by _o_s___s_u_p, using the same
+              arguments as when _e_n_a_b_l_e_/_2 was called.
+
+              If _o_s___s_u_p___e_n_a_b_l_e is _t_r_u_e, this function must be called _a_f_t_e_r
+              OS_Mon/_o_s___s_u_p is stopped. _D_i_r defines the directory which
+              contains the backup copy and the Erlang specific configuration
+              files for _s_y_s_l_o_g_d, and a named pipe to receive the messages from
+              _s_y_s_l_o_g_d. Defaults to _"_/_e_t_c_". _C_o_n_f defines the full name of the
+              configuration file for _s_y_s_l_o_g_d. Default is _"_/_e_t_c_/_s_y_s_l_o_g_._c_o_n_f_".
+
+              Results in a OS call to:
+
+              <PRIVDIR>/bin/mod_syslog nootp Dir Conf
+
+
+              where _<_P_R_I_V_D_I_R_> is the _p_r_i_v directory of OS_Mon,
+              _c_o_d_e_:_p_r_i_v___d_i_r_(_o_s___m_o_n_).
+
+              Returns _o_k if this yields the expected result _"_0_", and _{_e_r_r_o_r_,
+              _R_e_s_} if it yields anything else.
+
+          NNoottee::
+              This function requires root privileges to succeed.
+
+
+SSEEEE AALLSSOO
+       eerrrroorr__llooggggeerr((33)), ooss__mmoonn((33))
+
+       _s_y_s_l_o_g_d_(_1_M_), _s_y_s_l_o_g_._c_o_n_f_(_4_) in the Solaris documentation.
+
+Ericsson AB                      os_mon 2.2.10                       os_sup(3)

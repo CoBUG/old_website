@@ -1,0 +1,329 @@
+public_key(3)              Erlang Module Definition              public_key(3)
+
+
+
+NNAAMMEE
+       public_key -  API module for public key infrastructure.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides functions to handle public key infrastructure from
+       RFC 5280 - X.509 certificates and some parts of the PKCS-standard.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+   NNoottee::
+       All records used in this manual are generated from ASN.1 specifications
+       and are documented in the User's Guide. See PPuubblliicc kkeeyy rreeccoorrddss and
+       XX..550099 CCeerrttiiffiiccaattee rreeccoorrddss.
+
+
+       Use the following include directive to get access to the records and
+       constant macros described here and in the User's Guide.
+
+        -include_lib("public_key/include/public_key.hrl").
+
+       _D_a_t_a _T_y_p_e_s
+
+       boolean() = true | false
+
+       string = [bytes()]
+
+       pki_asn1_type() = 'Certificate' | 'RSAPrivateKey'| 'RSAPublicKey'
+           'DSAPrivateKey' | 'DSAPublicKey' | 'DHParameter' | 'SubjectPublicKeyInfo'| 'PrivateKeyInfo'
+
+       pem_entry () = {pki_asn1_type(), binary(), %% DER or encrypted DER
+                 not_encrypted | cipher_info()}
+
+       cipher_info()  =  {"RC2-CBC | "DES-CBC" | "DES-EDE3-CBC", crypto:rand_bytes(8)} |
+           'PBES2-params'}
+
+       rsa_public_key()  = #'RSAPublicKey'{}
+
+       rsa_private_key() = #'RSAPrivateKey'{}
+
+       dsa_public_key() = {integer(),  #'Dss-Parms'{}}
+
+       dsa_private_key() = #'DSAPrivateKey'{}
+
+        public_crypt_options() = [{rsa_pad, rsa_padding()}].
+
+        rsa_padding() =  'rsa_pkcs1_padding' | 'rsa_pkcs1_oaep_padding'
+           | 'rsa_no_padding'
+
+        rsa_digest_type()  = 'md5' | 'sha' | 'sha224' | 'sha256' | 'sha384' | 'sha512'
+
+        dss_digest_type()  = 'sha'
+
+        ssh_file()  = openssh_public_key | rfc4716_public_key |
+           known_hosts | auth_keys
+
+EEXXPPOORRTTSS
+       ddeeccrryypptt__pprriivvaattee((CCiipphheerrTTeexxtt,, KKeeyy)) -->> bbiinnaarryy(())
+       ddeeccrryypptt__pprriivvaattee((CCiipphheerrTTeexxtt,, KKeeyy,, OOppttiioonnss)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 CipherText = binary()
+                 Key = rsa_private_key()
+                 Options = public_crypt_options()
+
+              Public key decryption using the private key.
+
+       ddeeccrryypptt__ppuubblliicc((CCiipphheerrTTeexxtt,, KKeeyy)) -- >> bbiinnaarryy(())
+       ddeeccrryypptt__ppuubblliicc((CCiipphheerrTTeexxtt,, KKeeyy,, OOppttiioonnss)) -- >> bbiinnaarryy(())
+
+              Types:
+
+                 CipherText = binary()
+                 Key = rsa_public_key()
+                 Options = public_crypt_options()
+
+              Public key decryption using the public key.
+
+       ddeerr__ddeeccooddee((AAssnn11ttyyppee,, DDeerr)) -->> tteerrmm(())
+
+              Types:
+
+                 Asn1Type = atom()
+                    ASN.1 type present in the public_key applications asn1
+                   specifications.
+                 Der = der_encoded()
+
+              Decodes a public key ASN.1 der encoded entity.
+
+       ddeerr__eennccooddee((AAssnn11TTyyppee,, EEnnttiittyy)) -->> ddeerr__eennccooddeedd(())
+
+              Types:
+
+                 Asn1Type = atom()
+                    Asn1 type present in the public_key applications ASN.1
+                   specifications.
+                 Entity = term()
+                   The erlang representation of _A_s_n_1_T_y_p_e
+
+              Encodes a public key entity with ASN.1 DER encoding.
+
+       ppeemm__ddeeccooddee((PPeemmBBiinn)) -->> [[ppeemm__eennttrryy(())]]
+
+              Types:
+
+                 PemBin = binary()
+                   Example {ok, PemBin} = file:read_file("cert.pem").
+
+              Decode PEM binary data and return entries as ASN.1 der encoded
+              entities.
+
+       ppeemm__eennccooddee((PPeemmEEnnttrriieess)) -->> bbiinnaarryy(())
+
+              Types:
+
+                  PemEntries = [pem_entry()]
+
+              Creates a PEM binary
+
+       ppeemm__eennttrryy__ddeeccooddee((PPeemmEEnnttrryy)) -->> tteerrmm(())
+       ppeemm__eennttrryy__ddeeccooddee((PPeemmEEnnttrryy,, PPaasssswwoorrdd)) -->> tteerrmm(())
+
+              Types:
+
+                  PemEntry = pem_entry()
+                  Password = string()
+
+              Decodes a pem entry. pem_decode/1 returns a list of pem entries.
+              Note that if the pem entry is of type 'SubjectPublickeyInfo' it
+              will be further decoded to an rsa_public_key() or
+              dsa_public_key().
+
+       ppeemm__eennttrryy__eennccooddee((AAssnn11TTyyppee,, EEnnttiittyy)) -->> ppeemm__eennttrryy(())
+       ppeemm__eennttrryy__eennccooddee((AAssnn11TTyyppee,, EEnnttiittyy,, {{CCiipphheerrIInnffoo,, PPaasssswwoorrdd}})) -->>
+       ppeemm__eennttrryy(())
+
+              Types:
+
+                 Asn1Type = pki_asn1_type()
+                 Entity = term()
+                   The Erlang representation of _A_s_n_1_T_y_p_e. If _A_s_n_1_T_y_p_e is
+                   'SubjectPublicKeyInfo' then _E_n_t_i_t_y must be either an
+                   rsa_public_key() or a dsa_public_key() and this function
+                   will create the appropriate 'SubjectPublicKeyInfo' entry.
+                 CipherInfo = cipher_info()
+                 Password = string()
+
+              Creates a pem entry that can be feed to pem_encode/1.
+
+       eennccrryypptt__pprriivvaattee((PPllaaiinnTTeexxtt,, KKeeyy)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 PlainText = binary()
+                 Key = rsa_private_key()
+
+              Public key encryption using the private key.
+
+       eennccrryypptt__ppuubblliicc((PPllaaiinnTTeexxtt,, KKeeyy)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 PlainText = binary()
+                 Key = rsa_public_key()
+
+              Public key encryption using the public key.
+
+       ppkkiixx__ddeeccooddee__cceerrtt((CCeerrtt,, oottpp||ppllaaiinn)) -->> ##''CCeerrttiiffiiccaattee''{{}} ||
+       ##''OOTTPPCCeerrttiiffiiccaattee''{{}}
+
+              Types:
+
+                 Cert = der_encoded()
+
+              Decodes an ASN.1 der encoded pkix certificate. The otp option
+              will use the customized ASN.1 specification OTP-PKIX.asn1 for
+              decoding and also recursively decode most of the standard parts.
+
+       ppkkiixx__eennccooddee((AAssnn11TTyyppee,, EEnnttiittyy,, oottpp || ppllaaiinn)) -->> ddeerr__eennccooddeedd(())
+
+              Types:
+
+                 Asn1Type = atom()
+                   The ASN.1 type can be 'Certificate', 'OTPCertificate' or a
+                   subtype of either .
+
+              Der encodes a pkix x509 certificate or part of such a
+              certificate. This function must be used for encoding
+              certificates or parts of certificates that are decoded/created
+              in the otp format, whereas for the plain format this function
+              will directly call der_encode/2.
+
+       ppkkiixx__iiss__iissssuueerr((CCeerrtt,, IIssssuueerrCCeerrtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Cert = der_encode() | #'OTPCertificate'{}
+                 IssuerCert = der_encode() | #'OTPCertificate'{}
+
+              Checks if _I_s_s_u_e_r_C_e_r_t issued _C_e_r_t
+
+       ppkkiixx__iiss__ffiixxeedd__ddhh__cceerrtt((CCeerrtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Cert = der_encode() | #'OTPCertificate'{}
+
+              Checks if a Certificate is a fixed Diffie-Hellman Cert.
+
+       ppkkiixx__iiss__sseellff__ssiiggnneedd((CCeerrtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Cert = der_encode() | #'OTPCertificate'{}
+
+              Checks if a Certificate is self signed.
+
+       ppkkiixx__iissssuueerr__iidd((CCeerrtt,, IIssssuueeddBByy)) -->> {{ookk,, IIssssuueerrIIDD}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Cert = der_encode() | #'OTPCertificate'{}
+                 IssuedBy = self | other
+                 IssuerID = {integer(), {rdnSequence,
+                 [#'AttributeTypeAndValue'{}]}}
+                   The issuer id consists of the serial number and the issuers
+                   name.
+                 Reason = term()
+
+              Returns the issuer id.
+
+       ppkkiixx__nnoorrmmaalliizzee__nnaammee((IIssssuueerr)) -->> NNoorrmmaalliizzeedd
+
+              Types:
+
+                 Issuer = {rdnSequence,[#'AttributeTypeAndValue'{}]}
+                 Normalized = {rdnSequence, [#'AttributeTypeAndValue'{}]}
+
+              Normalizes a issuer name so that it can be easily compared to
+              another issuer name.
+
+       ppkkiixx__ssiiggnn((##''OOTTPPTTBBSSCCeerrttiiffiiccaattee''{{}},, KKeeyy)) -->> ddeerr__eennccooddee(())
+
+              Types:
+
+                 Key = rsa_public_key() | dsa_public_key()
+
+              Signs a 'OTPTBSCertificate'. Returns the corresponding der
+              encoded certificate.
+
+       ppkkiixx__vveerriiffyy((CCeerrtt,, KKeeyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Cert = der_encode()
+                 Key = rsa_public_key() | dsa_public_key()
+
+              Verify pkix x.509 certificate signature.
+
+       ssiiggnn((MMssgg,, DDiiggeessttTTyyppee,, KKeeyy)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Msg = binary() | {digest,binary()}
+                   The msg is either the binary "plain text" data to be signed
+                   or it is the hashed value of "plain text" i.e. the digest.
+                 DigestType = rsa_digest_type() | dss_digest_type()
+                 Key = rsa_private_key() | dsa_private_key()
+
+              Creates a digital signature.
+
+       sssshh__ddeeccooddee((SSsshhBBiinn,, TTyyppee)) -->> [[{{ppuubblliicc__kkeeyy(()),, AAttttrriibbuutteess::::lliisstt(())}}]]
+
+              Types:
+
+                 SshBin = binary()
+                   Example {ok, SshBin} = file:read_file("known_hosts").
+                  Type = public_key | ssh_file()
+                   If _T_y_p_e is _p_u_b_l_i_c___k_e_y the binary may be either a rfc4716
+                   public key or a openssh public key.
+
+              Decodes a ssh file-binary. In the case of know_hosts or
+              auth_keys the binary may include one or more lines of the file.
+              Returns a list of public keys and their attributes, possible
+              attribute values depends on the file type represented by the
+              binary.
+
+                rrffcc44771166 aattttrriibbuutteess -- sseeee RRFFCC 44771166::
+                  {headers, [{string(), utf8_string()}]}
+
+                aauutthh__kkeeyy aattttrriibbuutteess -- sseeee mmaann sssshhdd ::
+                  {comment, string()}{options, [string()]}{bits, integer()} -
+                  In ssh version 1 files
+
+                kknnoowwnn__hhoosstt aattttrriibbuutteess -- sseeee mmaann sssshhdd::
+                  {hostnames, [string()]}{comment, string()}{bits, integer()}
+                  - In ssh version 1 files
+
+       sssshh__eennccooddee(([[{{KKeeyy,, AAttttrriibbuutteess}}]],, TTyyppee)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 Key = public_key()
+                 Attributes = list()
+                 Type = ssh_file()
+
+              Encodes a list of ssh file entries (public keys and attributes)
+              to a binary. Possible attributes depends on the file type, see
+              sssshh__ddeeccooddee//22
+
+       vveerriiffyy((MMssgg,, DDiiggeessttTTyyppee,, SSiiggnnaattuurree,, KKeeyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Msg = binary() | {digest,binary()}
+                   The msg is either the binary "plain text" data or it is the
+                   hashed value of "plain text" i.e. the digest.
+                 DigestType = rsa_digest_type() | dss_digest_type()
+                 Signature = binary()
+                 Key = rsa_public_key() | dsa_public_key()
+
+              Verifies a digital signature
+
+
+
+Ericsson AB                     public_key 0.16                  public_key(3)

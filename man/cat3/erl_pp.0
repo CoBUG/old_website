@@ -1,0 +1,126 @@
+erl_pp(3)                  Erlang Module Definition                  erl_pp(3)
+
+
+
+NNAAMMEE
+       erl_pp - The Erlang Pretty Printer
+
+DDEESSCCRRIIPPTTIIOONN
+       The functions in this module are used to generate aesthetically
+       attractive representations of abstract forms, which are suitable for
+       printing. All functions return (possibly deep) lists of characters and
+       generate an error if the form is wrong.
+
+       All functions can have an optional argument which specifies a hook that
+       is called if an attempt is made to print an unknown form.
+
+DDAATTAA TTYYPPEESS
+       hhooookk__ffuunnccttiioonn(()) = none
+                       | fun((Expr :: eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(()),
+                              CurrentIndentation :: integer(),
+                              CurrentPrecedence :: integer() >= 0,
+                              HookFunction :: hhooookk__ffuunnccttiioonn(())) ->
+                                 iioo__lliibb::cchhaarrss(()))
+
+              The optional argument _H_o_o_k_F_u_n_c_t_i_o_n, shown in the functions
+              described below, defines a function which is called when an
+              unknown form occurs where there should be a valid expression.
+
+              If _H_o_o_k_F_u_n_c_t_i_o_n is equal to _n_o_n_e there is no hook function.
+
+              The called hook function should return a (possibly deep) list of
+              characters. _e_x_p_r_/_4 is useful in a hook.
+
+              If _C_u_r_r_e_n_t_I_n_d_e_n_t_a_t_i_o_n is negative, there will be no line breaks
+              and only a space is used as a separator.
+
+EEXXPPOORRTTSS
+       ffoorrmm((FFoorrmm)) -->> iioo__lliibb::cchhaarrss(())
+
+       ffoorrmm((FFoorrmm,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Form = eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())
+                 HookFunction = hhooookk__ffuunnccttiioonn(())
+
+              Pretty prints a _F_o_r_m which is an abstract form of a type which
+              is returned by _e_r_l___p_a_r_s_e_:_p_a_r_s_e___f_o_r_m_/_1.
+
+       aattttrriibbuuttee((AAttttrriibbuuttee)) -->> iioo__lliibb::cchhaarrss(())
+
+       aattttrriibbuuttee((AAttttrriibbuuttee,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Attribute = eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())
+                 HookFunction = hhooookk__ffuunnccttiioonn(())
+
+              The same as _f_o_r_m, but only for the attribute _A_t_t_r_i_b_u_t_e.
+
+       ffuunnccttiioonn((FFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+       ffuunnccttiioonn((FFuunnccttiioonn,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Function = eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())
+                 HookFunction = hhooookk__ffuunnccttiioonn(())
+
+              The same as _f_o_r_m, but only for the function _F_u_n_c_t_i_o_n.
+
+       gguuaarrdd((GGuuaarrdd)) -->> iioo__lliibb::cchhaarrss(())
+
+       gguuaarrdd((GGuuaarrdd,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Guard = [eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())]
+                 HookFunction = hhooookk__ffuunnccttiioonn(())
+
+              The same as _f_o_r_m, but only for the guard test _G_u_a_r_d.
+
+       eexxpprrss((EExxpprreessssiioonnss)) -->> iioo__lliibb::cchhaarrss(())
+
+       eexxpprrss((EExxpprreessssiioonnss,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+       eexxpprrss((EExxpprreessssiioonnss,, IInnddeenntt,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Expressions = [eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())]
+                 Indent = integer()
+                 HookFunction = hhooookk__ffuunnccttiioonn(())
+
+              The same as _f_o_r_m, but only for the sequence of expressions in
+              _E_x_p_r_e_s_s_i_o_n_s.
+
+       eexxpprr((EExxpprreessssiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+       eexxpprr((EExxpprreessssiioonn,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+       eexxpprr((EExxpprreessssiioonn,, IInnddeenntt,, HHooookkFFuunnccttiioonn)) -->> iioo__lliibb::cchhaarrss(())
+
+       eexxpprr((EExxpprreessssiioonn,, IInnddeenntt,, PPrreecceeddeennccee,, HHooookkFFuunnccttiioonn)) -->>
+               iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Expression = eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())
+                 Indent = integer()
+                 Precedence = integer() >= 0
+                 HookFunction = hhooookk__ffuunnccttiioonn(())
+
+              This function prints one expression. It is useful for
+              implementing hooks (see below).
+
+BBUUGGSS
+       It should be possible to have hook functions for unknown forms at
+       places other than expressions.
+
+SSEEEE AALLSSOO
+       iioo((33)), eerrll__ppaarrssee((33)), eerrll__eevvaall((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                       erl_pp(3)

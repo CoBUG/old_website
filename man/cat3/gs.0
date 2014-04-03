@@ -1,0 +1,116 @@
+gs(3)                      Erlang Module Definition                      gs(3)
+
+
+
+NNAAMMEE
+       gs - The Graphics System for Erlang.
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       GS is not recommended for use in new applications. Instead we recommend
+       WX for applications that need a graphical user interface.
+
+       GS is deprecated and will be removed in the R16 release.
+
+
+       The Graphics System, GS, is easy to learn and designed to be portable
+       to many different platforms.
+
+       In the description below, the type _g_s_o_b_j_(_) denotes a reference to a
+       graphical object created with GS. Such a reference is either a GS
+       object identifier or the name of the object (an atom), if such a name
+       exists. The functions all return the specified values or _{_e_r_r_o_r_,_R_e_a_s_o_n_}
+       if an error occurs.
+
+       Please refer to the GS User's Guide for a description of the different
+       object types and possible options.
+
+EEXXPPOORRTTSS
+       ccoonnffiigg((GGSSOObbjj,, OOppttiioonnss)) -->> ookk
+
+              Types:
+
+                 GSOBj = gsobj()
+                 Options = [Option] | Option
+                  Option = {Key,Value}
+
+              Configures a graphical object according to the specified
+              options.
+
+       ccrreeaattee((OObbjjTTyyppee,, PPaarreenntt)) -->> OObbjjIIdd
+       ccrreeaattee((OObbjjTTyyppee,, PPaarreenntt,, OOppttiioonnss)) -->> OObbjjIIdd
+       ccrreeaattee((OObbjjTTyyppee,, NNaammee,, PPaarreenntt,, OOppttiioonnss)) -->> OObbjjIIdd
+
+              Types:
+
+                 ObjType = atom()
+                 Parent = gsobj()
+                 Name = atom()
+                 Options = [Option] | Option
+                  Option = {Key,Value}
+
+              Creates a new graphical object of the specified type as a child
+              to the specified parent object. The object is configured
+              according to the options and its identifier is returned. If no
+              options are provided, default option values are used.
+
+              If a name is provided, this name can be used to reference the
+              object instead of the object identifier. The name is local to
+              the process which creates the object.
+
+              The following object types exist: _w_i_n_d_o_w _| _b_u_t_t_o_n _| _r_a_d_i_o_b_u_t_t_o_n
+              _| _c_h_e_c_k_b_u_t_t_o_n _| _l_a_b_e_l _| _f_r_a_m_e _| _e_n_t_r_y _| _l_i_s_t_b_o_x _| _c_a_n_v_a_s _| _a_r_c _|
+              _i_m_a_g_e _| _l_i_n_e _| _o_v_a_l _| _p_o_l_y_g_o_n _| _r_e_c_t_a_n_g_l_e _| _t_e_x_t _| _m_e_n_u_b_a_r _|
+              _m_e_n_u_b_u_t_t_o_n _| _m_e_n_u _| _m_e_n_u_i_t_e_m _| _g_r_i_d _| _g_r_i_d_l_i_n_e _| _e_d_i_t_o_r _| _s_c_a_l_e
+
+       ccrreeaattee__ttrreeee((PPaarreenntt,, TTrreeee)) -->> ookk
+
+              Types:
+
+                 Parent = gsobj()
+                 Tree = [Object]
+                  Object = {ObjType,Options} | {ObjType,Options,Tree} |
+                 {ObjType,Name,Options,Tree}
+
+              Creates a hierarchy of graphical objects.
+
+       ddeessttrrooyy((GGSSOObbjj)) -->> vvooiidd(())
+
+              Types:
+
+                 GSObj = gsobj()
+
+              Destroys a graphical object and all its children.
+
+       OObbjjTTyyppee((PPaarreenntt))
+       OObbjjTTyyppee((PPaarreenntt,, OOppttiioonnss))
+       OObbjjTTyyppee((NNaammee,, PPaarreenntt,, OOppttiioonnss))
+
+              These functions are shorthand equivalents of _c_r_e_a_t_e_/_2, _c_r_e_a_t_e_/_3,
+              and _c_r_e_a_t_e_/_4, respectively.
+
+       rreeaadd((GGSSOObbjj,, KKeeyy)) -->> VVaalluuee
+
+              Types:
+
+                 GSObj = gsobj()
+                 Key = atom()
+                 Value = term()
+
+              Returns the value of an option key for the specified graphical
+              object.
+
+       ssttaarrtt(()) -->> OObbjjIIdd
+
+              Starts GS, unless it is already started, and returns its object
+              identifier.
+
+       ssttoopp(()) -->> vvooiidd(())
+
+              Stops GS and closes all windows. This function is not the
+              opposite of _s_t_a_r_t_/_0 as it will cause _a_l_l applications to lose
+              their GS objects.
+
+
+
+Ericsson AB                       gs 1.5.15.1                            gs(3)

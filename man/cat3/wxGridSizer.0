@@ -1,0 +1,128 @@
+wxGridSizer(3)             Erlang Module Definition             wxGridSizer(3)
+
+
+
+NNAAMMEE
+       wxGridSizer - See external documentation: wxGridSizer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridSizer.
+
+       This class is derived (and can use functions) from:
+       wwxxSSiizzeerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_S_i_z_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((CCoollss)) -->> wwxxGGrriiddSSiizzeerr(())
+
+              Types:
+
+                 Cols = integer()
+
+              Equivalent to nneeww((CCoollss,, [[]])).
+
+       nneeww((CCoollss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrriiddSSiizzeerr(())
+
+              Types:
+
+                 Cols = integer()
+                 Option = {vgap, integer()} | {hgap, integer()}
+
+              See external documentation.
+
+       nneeww((RRoowwss,, CCoollss,, VVggaapp,, HHggaapp)) -->> wwxxGGrriiddSSiizzeerr(())
+
+              Types:
+
+                 Rows = integer()
+                 Cols = integer()
+                 Vgap = integer()
+                 Hgap = integer()
+
+              See external documentation.
+
+       ggeettCCoollss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridSizer()
+
+              See external documentation.
+
+       ggeettHHGGaapp((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridSizer()
+
+              See external documentation.
+
+       ggeettRRoowwss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridSizer()
+
+              See external documentation.
+
+       ggeettVVGGaapp((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridSizer()
+
+              See external documentation.
+
+       sseettCCoollss((TThhiiss,, CCoollss)) -->> ookk
+
+              Types:
+
+                 This = wxGridSizer()
+                 Cols = integer()
+
+              See external documentation.
+
+       sseettHHGGaapp((TThhiiss,, GGaapp)) -->> ookk
+
+              Types:
+
+                 This = wxGridSizer()
+                 Gap = integer()
+
+              See external documentation.
+
+       sseettRRoowwss((TThhiiss,, RRoowwss)) -->> ookk
+
+              Types:
+
+                 This = wxGridSizer()
+                 Rows = integer()
+
+              See external documentation.
+
+       sseettVVGGaapp((TThhiiss,, GGaapp)) -->> ookk
+
+              Types:
+
+                 This = wxGridSizer()
+                 Gap = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrriiddSSiizzeerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxGridSizer(3)

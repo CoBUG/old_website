@@ -1,0 +1,66 @@
+CosTransactions_RecoveryCoorEdrilnaantgorM(o3d)uleCDoesfTirnaintsiaocntions_RecoveryCoordinator(3)
+
+
+
+NNAAMMEE
+       CosTransactions_RecoveryCoordinator - This module implements the OMG
+       CosTransactions::RecoveryCoordinator interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       rreeppllaayy__ccoommpplleettiioonn((RReeccoovveerryyCCoooorrddiinnaattoorr,, TTiimmeeoouutt,, RReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 RecoveryCoordinator = #objref
+                 Timeout = integer(), milliseconds | 'infinity'
+                 Resource = #objref
+                 Return = Status | {'EXCEPTION', E}
+                 E = #'CosTransactions_NotPrepared'{}
+                 Status = atom()
+
+              The _R_e_c_o_v_e_r_y_C_o_o_r_d_i_n_a_t_o_r object is returned by the operation
+              _C_o_s_T_r_a_n_s_a_c_t_i_o_n_s___C_o_o_r_d_i_n_a_t_o_r_:_r_e_g_i_s_t_e_r___r_e_s_o_u_r_c_e_/_3. The
+              _r_e_p_l_a_y___c_o_m_p_l_e_t_i_o_n_/_2 may only be used by the registered Resource
+              and returns the current status of the transaction. The operation
+              is used when recovering after a failure.
+
+              Possible Status replies:
+
+                * 'StatusCommitted'
+
+                * 'StatusCommitting'
+
+                * 'StatusMarkedRollback'
+
+                * 'StatusRollingBack'
+
+                * 'StatusRolledBack'
+
+                * 'StatusActive'
+
+                * 'StatusPrepared'
+
+                * 'StatusUnknown'
+
+                * 'StatusNoTransaction'
+
+                * 'StatusPreparing'
+
+          WWaarrnniinngg::
+              _r_e_p_l_a_y___c_o_m_p_l_e_t_i_o_n_/_3 is blocking and may cause dead-lock if a
+              child calls this function at the same time as its parent invokes
+              an operation on the child. Dead-lock will not occur if the
+              timeout has any value except 'infinity'.
+
+              If the call is external incoming (intra-ORB) the timeout will
+              not be activated. Hence, similar action must be taken if the
+              Resource resides on another vendors ORB.
+
+
+
+
+Ericsson AB                 cosTransactioCnossT1r.a2n.s1a2ctions_RecoveryCoordinator(3)

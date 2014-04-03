@@ -1,0 +1,81 @@
+lname_component(3)         Erlang Module Definition         lname_component(3)
+
+
+
+NNAAMMEE
+       lname_component - Interface that supports the name pseudo-objects.
+
+DDEESSCCRRIIPPTTIIOONN
+       This interface is a part of the name library, which is used to hide the
+       representation of names. In Orbers Erlang mapping the pseudo-object
+       names and the real IDL names have the same representation but it is
+       desirable that the clients uses the names library so they will not be
+       dependent of the representation. The lname_component interface supports
+       handling of name components e.g. set and get of the struct members.
+
+       Note that the lname_component interface in orber does not contain a
+       destroy function because the NameComponents are represented as Erlang
+       records and therefor will be removed by the garbage collector when not
+       in use.
+
+       The type _N_a_m_e_C_o_m_p_o_n_e_n_t used below is defined as:
+
+             -record('CosNaming_NameComponent', {id, kind=""}).
+
+
+       _i_d and _k_i_n_d are strings.
+
+       The record is defined in the file _C_o_s_N_a_m_i_n_g_._h_r_l and it is included
+       with:
+
+             -include_lib("orber/COSS/CosNaming/CosNaming.hrl").
+
+
+EEXXPPOORRTTSS
+       ccrreeaattee(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = NameComponent
+
+              This function returns a new name component.
+
+       ggeett__iidd((NNaammeeCCoommppoonneenntt)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = string()
+
+              This function returns the id string of a name component.
+
+       sseett__iidd((NNaammeeCCoommppoonneenntt,, IIdd)) -->> RReettuurrnn
+
+              Types:
+
+                 Id = string()
+                 Return = NameComponent
+
+              This function sets the id string of a name component and returns
+              the component.
+
+       ggeett__kkiinndd((NNaammeeCCoommppoonneenntt)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = string()
+
+              This function returns the id string of a name component.
+
+       sseett__kkiinndd((NNaammeeCCoommppoonneenntt,, KKiinndd)) -->> RReettuurrnn
+
+              Types:
+
+                 Kind = string()
+                 Return = NameComponent
+
+              This function sets the kind string of a name component and
+              returns the component.
+
+
+
+Ericsson AB                      orber 3.6.24               lname_component(3)

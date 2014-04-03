@@ -1,0 +1,92 @@
+pg(3)                      Erlang Module Definition                      pg(3)
+
+
+
+NNAAMMEE
+       pg - Distributed, Named Process Groups
+
+DDEESSCCRRIIPPTTIIOONN
+       This (experimental) module implements process groups. A process group
+       is a group of processes that can be accessed by a common name. For
+       example, a group named _f_o_o_b_a_r can include a set of processes as members
+       of this group and they can be located on different nodes.
+
+       When messages are sent to the named group, all members of the group
+       receive the message. The messages are serialized. If the process _P_1
+       sends the message _M_1 to the group, and process _P_2 simultaneously sends
+       message _M_2, then all members of the group receive the two messages in
+       the same order. If members of a group terminate, they are automatically
+       removed from the group.
+
+       This module is not complete. The module is inspired by the ISIS system
+       and the causal order protocol of the ISIS system should also be
+       implemented. At the moment, all messages are serialized by sending them
+       through a group master process.
+
+EEXXPPOORRTTSS
+       ccrreeaattee((PPggNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 PgName = term()
+                 Reason = already_created | term()
+
+              Creates an empty group named _P_g_N_a_m_e on the current node.
+
+       ccrreeaattee((PPggNNaammee,, NNooddee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 PgName = term()
+                 Node = node()
+                 Reason = already_created | term()
+
+              Creates an empty group named _P_g_N_a_m_e on the node _N_o_d_e.
+
+       jjooiinn((PPggNNaammee,, PPiidd)) -->> MMeemmbbeerrss
+
+              Types:
+
+                 PgName = term()
+                 Pid = pid()
+                 Members = [pid()]
+
+              Joins the pid _P_i_d to the process group _P_g_N_a_m_e. Returns a list of
+              all old members of the group.
+
+       sseenndd((PPggNNaammee,, MMssgg)) -->> ookk
+
+              Types:
+
+                 PgName = Msg = term()
+
+              Sends the tuple _{_p_g___m_e_s_s_a_g_e_, _F_r_o_m_, _P_g_N_a_m_e_, _M_s_g_} to all members
+              of the process group _P_g_N_a_m_e.
+
+              Failure: _{_b_a_d_a_r_g_, _{_P_g_N_a_m_e_, _M_s_g_}_} if _P_g_N_a_m_e is not a process
+              group (a globally registered name).
+
+       eesseenndd((PPggNNaammee,, MMssgg)) -->> ookk
+
+              Types:
+
+                 PgName = Msg = term()
+
+              Sends the tuple _{_p_g___m_e_s_s_a_g_e_, _F_r_o_m_, _P_g_N_a_m_e_, _M_s_g_} to all members
+              of the process group _P_g_N_a_m_e, except ourselves.
+
+              Failure: _{_b_a_d_a_r_g_, _{_P_g_N_a_m_e_, _M_s_g_}_} if _P_g_N_a_m_e is not a process
+              group (a globally registered name).
+
+       mmeemmbbeerrss((PPggNNaammee)) -->> MMeemmbbeerrss
+
+              Types:
+
+                 PgName = term()
+                 Members = [pid()]
+
+              Returns a list of all members of the process group _P_g_N_a_m_e.
+
+
+
+Ericsson AB                      stdlib 1.18.2                           pg(3)

@@ -1,0 +1,42 @@
+CosTransactions_Control(3) Erlang Module Definition CosTransactions_Control(3)
+
+
+
+NNAAMMEE
+       CosTransactions_Control - This module implements the OMG
+       CosTransactions::Control interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ggeett__ccoooorrddiinnaattoorr((CCoonnttrrooll)) -->> RReettuurrnn
+
+              Types:
+
+                 Control = #objref
+                 Return = Coordinator | {'EXCEPTION', E}
+                 Coordinator = #objref
+                 E = #'CosTransactions_Unavailable' {}
+
+              This operation returns the Coordinator object associated with
+              the target object. The Coordinator supports operations for
+              termination of a transaction.
+
+       ggeett__tteerrmmiinnaattoorr((CCoonnttrrooll)) -->> RReettuurrnn
+
+              Types:
+
+                 Control = #objref
+                 Return = Terminator | {'EXCEPTION', E}
+                 Terminator = #objref
+                 E = #'CosTransactions_Unavailable' {}
+
+              This operation returns the Terminator object associated with the
+              target object. The Terminator supports operations for
+              termination of a transaction.
+
+
+
+Ericsson AB                 cosTransactions 1.2.12  CosTransactions_Control(3)

@@ -1,0 +1,49 @@
+CosNotification_AdminPropertEirelsaAndgmiMno(d3u)leCoDseNfoitniiftiicoantion_AdminPropertiesAdmin(3)
+
+
+
+NNAAMMEE
+       CosNotification_AdminPropertiesAdmin - This module implements the OMG
+       CosNotification::AdminPropertiesAdmin interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       All objects, which inherit this interface, export functions described
+       in this module.
+
+EEXXPPOORRTTSS
+       ggeett__aaddmmiinn((OObbjjeecctt)) -->> AAddmmiinnPPrrooppeerrttiieess
+
+              Types:
+
+                 Object = #objref
+                 AdminProperties = [AdminProperty]
+                 AdminProperty = #'CosNotification_Property'{name, value}
+                 name = string()
+                 value = #any
+
+              This operation returns sequence of name-value pairs which
+              encapsulates the current administrative properties of the target
+              object.
+
+       sseett__aaddmmiinn((OObbjjeecctt,, AAddmmiinnPPrrooppeerrttiieess)) -->> RReeppllyy
+
+              Types:
+
+                 Object = #objref
+                 AdminProperties = [AdminProperty]
+                 AdminProperty = #'CosNotification_Property'{name, value}
+                 name = string()
+                 value = #any
+                 Reply = ok | {'EXCEPTION', CosNotification_UnsupportedAdmin}
+
+              As input, this operation accepts a sequence of name-value pairs
+              encapsulating the desired administrative settings for the target
+              object. If it is not possible to set the given properties the
+              exception _U_n_s_u_p_p_o_r_t_e_d_A_d_m_i_n will be raised.
+
+
+
+Ericsson AB                 cosNotificatCioosnNo1t.i1f.i1c8ation_AdminPropertiesAdmin(3)

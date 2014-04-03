@@ -1,0 +1,63 @@
+TAGS(3)                    ERLANG MODULE DEFINITION                    TAGS(3)
+
+
+
+MMOODDUULLEE
+       tags - Generate Emacs TAGS file from Erlang source files.
+
+DDEESSCCRRIIPPTTIIOONN
+       A TAGS file is used by Emacs to find function and variable definitions
+       in any source file in a big project.  This module can generate a TAGS
+       file from Erlang source files.  It recognises functions, records, and
+       defines.
+
+EEXXPPOORRTTSS
+       rroooott(([[OOppttiioonnss]]))
+               Create a TAGS file covering all files in the Erlang
+               distribution.
+
+       ffiillee((FFiillee [[,, OOppttiioonnss]]))
+               Create a TAGS file for the file `File'.
+
+       ffiilleess((FFiilleeLLiisstt [[,, OOppttiioonnss]]))
+               Create a TAGS file for the files in the list `FileList'.
+
+       ddiirr((DDiirr [[,, OOppttiioonnss]]))
+               Create a TAGS file for all files in directory `Dir'.
+
+       ddiirrss((DDiirrLLiisstt [[,, OOppttiioonnss]]))
+               Create a TAGS file for all files in any directory in `DirList'.
+
+       ssuubbddiirr((DDiirr [[,, OOppttiioonnss]]))
+               Descend recursively down the directory `Dir' and create a TAGS
+               file based on all files found.
+
+       ssuubbddiirrss((DDiirrLLiisstt [[,, OOppttiioonnss]]))
+               Descend recursively down all the directories in `DirList' and
+               create a TAGS file based on all files found.
+
+OOPPTTIIOONNSS
+       The functions above have an optional argument, OOppttiioonnss.  It is a list
+       which can contain the following elements:
+
+       {{oouuttffiillee,, NNaammeeOOffTTAAGGSSFFiillee}}
+               Create a TAGS file named `NameOfTAGSFile'.
+
+       {{oouuttddiirr,, NNaammeeOOffDDiirreeccttoorryy}}
+               Create a file named TAGS in the directory `NameOfDirectory'.
+
+       The default behaviour is to create a file named "TAGS" in the current
+       directory.
+
+SSEEEE AALLSSOO
+       GNU Emacs Manual, chapter "Editing Programs", section "Tag Tables".
+
+       Erlang mode V2.0 for Emacs.
+
+AAUUTTHHOORR
+       Anders Lindgren
+
+
+
+
+Ericsson Software Technology      1996-05-30                           TAGS(3)

@@ -1,0 +1,59 @@
+xmerl_eventp(3)            Erlang Module Definition            xmerl_eventp(3)
+
+
+
+NNAAMMEE
+       xmerl_eventp - Simple event-based front-ends to xmerl_scan for
+       processing
+         of XML documents in streams and for parsing in SAX style.
+
+DDEESSCCRRIIPPTTIIOONN
+       Simple event-based front-ends to xmerl_scan for processing of XML
+       documents in streams and for parsing in SAX style. Each contain more
+       elaborate settings of xmerl_scan that makes usage of the customization
+       functions.
+
+EEXXPPOORRTTSS
+       ffiillee__ssaaxx((FFnnaammee::::ssttrriinngg(()),, CCaallllBBaacckkMMoodduullee::::aattoomm(()),, UUsseerrSSttaattee,,
+       OOppttiioonnss::::ooppttiioonn__lliisstt(()))) -->> NNeewwUUsseerrSSttaattee
+
+              Parse file containing an XML document, SAX style. Wrapper for a
+              call to the XML parser _x_m_e_r_l___s_c_a_n with a _h_o_o_k___f_u_n for using
+              xmerl export functionality directly after an entity is parsed.
+
+       ssttrreeaamm((FFnnaammee::::ssttrriinngg(()),, OOppttiioonnss::::ooppttiioonn__lliisstt(()))) -->> xxmmllEElleemmeenntt(())
+
+              Parse file containing an XML document as a stream, DOM style.
+              Wrapper for a call to the XML parser _x_m_e_r_l___s_c_a_n with a
+              _c_o_n_t_i_n_u_a_t_i_o_n___f_u_n for handling streams of XML data. Note that the
+              _c_o_n_t_i_n_u_a_t_i_o_n___f_u_n, _a_c_c___f_u_n, _f_e_t_c_h___f_u_n, _r_u_l_e_s and _c_l_o_s_e___f_u_n
+              options cannot be user defined using this parser.
+
+       ssttrreeaamm__ssaaxx((FFnnaammee,, CCaallllBBaacckk::::CCaallllBBaacckkMMoodduullee,, UUsseerrSSttaattee,, OOppttiioonnss)) -->>
+       xxmmllEElleemmeenntt(())
+
+              Types:
+
+                 Fname = string()
+                 CallBackModule = atom()
+                 Options = option_list()
+
+              Parse file containing an XML document as a stream, SAX style.
+              Wrapper for a call to the XML parser _x_m_e_r_l___s_c_a_n with a
+              _c_o_n_t_i_n_u_a_t_i_o_n___f_u_n for handling streams of XML data. Note that the
+              _c_o_n_t_i_n_u_a_t_i_o_n___f_u_n, _a_c_c___f_u_n, _f_e_t_c_h___f_u_n, _r_u_l_e_s, _h_o_o_k___f_u_n, _c_l_o_s_e___f_u_n
+              and _u_s_e_r___s_t_a_t_e options cannot be user defined using this parser.
+
+       ssttrriinngg__ssaaxx((SSttrriinngg::::lliisstt(()),, CCaallllBBaacckkMMoodduullee::::aattoomm(()),, UUsseerrSSttaattee,,
+       OOppttiioonnss::::ooppttiioonn__lliisstt(()))) -->> xxmmllEElleemmeenntt(())
+
+              Parse file containing an XML document, SAX style. Wrapper for a
+              call to the XML parser _x_m_e_r_l___s_c_a_n with a _h_o_o_k___f_u_n for using
+              xmerl export functionality directly after an entity is parsed.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                  xmerl 1.3.2                  xmerl_eventp(3)

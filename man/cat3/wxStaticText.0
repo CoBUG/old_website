@@ -1,0 +1,110 @@
+wxStaticText(3)            Erlang Module Definition            wxStaticText(3)
+
+
+
+NNAAMMEE
+       wxStaticText - See external documentation: wxStaticText.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxStaticText.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_t_a_t_i_c_T_e_x_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSttaattiiccTTeexxtt(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, LLaabbeell)) -->> wwxxSSttaattiiccTTeexxtt(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, LLaabbeell,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, LLaabbeell,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSttaattiiccTTeexxtt(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, LLaabbeell)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStaticText()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, LLaabbeell,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, LLaabbeell,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStaticText()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ggeettLLaabbeell((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStaticText()
+
+              See external documentation.
+
+       sseettLLaabbeell((TThhiiss,, LLaabbeell)) -->> ookk
+
+              Types:
+
+                 This = wxStaticText()
+                 Label = chardata() (see module unicode)
+
+              See external documentation.
+
+       wwrraapp((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxStaticText()
+                 Width = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSttaattiiccTTeexxtt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxStaticText(3)

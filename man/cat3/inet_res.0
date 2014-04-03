@@ -1,0 +1,392 @@
+inet_res(3)                Erlang Module Definition                inet_res(3)
+
+
+
+NNAAMMEE
+       inet_res - A Rudimentary DNS Client
+
+DDEESSCCRRIIPPTTIIOONN
+       Performs DNS name resolving towards recursive name servers
+
+       See also  EERRTTSS UUsseerr''ss GGuuiiddee:: IInneett ccoonnffiigguurraattiioonn  for more information
+       on how to configure an Erlang runtime system for IP communication and
+       how to enable this DNS client by defining _'_d_n_s_' as a lookup method. It
+       then acts as a backend for the resolving functions in iinneett.
+
+       This DNS client can resolve DNS records even if it is not used for
+       normal name resolving in the node.
+
+       This is not a full-fledged resolver. It is just a DNS client that
+       relies on asking trusted recursive nameservers.
+
+NNAAMMEE RREESSOOLLVVIINNGG
+       UDP queries are used unless resolver option _u_s_e_v_c is _t_r_u_e, which forces
+       TCP queries. If the query is to large for UDP, TCP is used instead. For
+       regular DNS queries 512 bytes is the size limit. When EDNS is enabled
+       (resolver option _e_d_n_s is set to the EDNS version i.e _0 instead of
+       _f_a_l_s_e), resolver option _u_d_p___p_a_y_l_o_a_d___s_i_z_e sets the limit. If a
+       nameserver replies with the TC bit set (truncation), indicating the
+       answer is incomplete, the query is retried to that nameserver using
+       TCP. The resolver option _u_d_p___p_a_y_l_o_a_d___s_i_z_e also sets the advertised size
+       for the max allowed reply size, if EDNS is enabled, otherwise the
+       nameserver uses the limit 512 byte. If the reply is larger it gets
+       truncated, forcing a TCP re-query.
+
+       For UDP queries, the resolver options _t_i_m_e_o_u_t and _r_e_t_r_y control
+       retransmission. Each nameserver in the _n_a_m_e_s_e_r_v_e_r_s list is tried with a
+       timeout of _t_i_m_e_o_u_t / _r_e_t_r_y. Then all nameservers are tried again
+       doubling the timeout, for a total of _r_e_t_r_y times.
+
+       For queries that not use the _s_e_a_r_c_h list, if the query to all
+       _n_a_m_e_s_e_r_v_e_r_s results in _{_e_r_r_o_r_,_n_x_d_o_m_a_i_n_}or an empty answer, the same
+       query is tried for the _a_l_t___n_a_m_e_s_e_r_v_e_r_s.
+
+DDAATTAA TTYYPPEESS
+       Resolver types:
+
+       rreess__ooppttiioonn(()) = {alt_nameservers, [nnaammeesseerrvveerr(())]}
+                    | {edns, 0 | false}
+                    | {inet6, boolean()}
+                    | {nameservers, [nnaammeesseerrvveerr(())]}
+                    | {recurse, boolean()}
+                    | {retry, integer()}
+                    | {timeout, integer()}
+                    | {udp_payload_size, integer()}
+                    | {usevc, boolean()}
+
+       nnaammeesseerrvveerr(()) = {iinneett::iipp__aaddddrreessss(()), Port :: 1..65535}
+
+       rreess__eerrrroorr(()) = formerr
+                   | qfmterror
+                   | servfail
+                   | nxdomain
+                   | notimp
+                   | refused
+                   | badvers
+                   | timeout
+
+       DNS types:
+
+       ddnnss__nnaammee(()) = string()
+
+              A string with no adjacent dots.
+
+       rrrr__ttyyppee(()) = a
+                 | aaaa
+                 | cname
+                 | gid
+                 | hinfo
+                 | ns
+                 | mb
+                 | md
+                 | mg
+                 | mf
+                 | minfo
+                 | mx
+                 | naptr
+                 | null
+                 | ptr
+                 | soa
+                 | spf
+                 | srv
+                 | txt
+                 | uid
+                 | uinfo
+                 | unspec
+                 | wks
+
+       ddnnss__ccllaassss(()) = in | chaos | hs | any
+
+       ddnnss__mmssgg(()) = term()
+
+              This is the start of a hiearchy of opaque data structures that
+              can be examined with access functions in inet_dns that return
+              lists of {Field,Value} tuples. The arity 2 functions just return
+              the value for a given field.
+
+              dns_msg() = DnsMsg
+                  inet_dns:msg(DnsMsg) ->
+                      [ {header, dns_header()}
+                      | {qdlist, dns_query()}
+                      | {anlist, dns_rr()}
+                      | {nslist, dns_rr()}
+                      | {arlist, dns_rr()} ]
+                  inet_dns:msg(DnsMsg, header) -> dns_header() % for example
+                  inet_dns:msg(DnsMsg, Field) -> Value
+
+              dns_header() = DnsHeader
+                  inet_dns:header(DnsHeader) ->
+                      [ {id, integer()}
+                      | {qr, boolean()}
+                      | {opcode, 'query' | iquery | status | integer()}
+                      | {aa, boolean()}
+                      | {tc, boolean()}
+                      | {rd, boolean()}
+                      | {ra, boolean()}
+                      | {pr, boolean()}
+                      | {rcode, integer(0..16)} ]
+                  inet_dns:header(DnsHeader, Field) -> Value
+
+              query_type() = axfr | mailb | maila | any | rr_type()
+
+              dns_query() = DnsQuery
+                  inet_dns:dns_query(DnsQuery) ->
+                      [ {domain, dns_name()}
+                      | {type, query_type()}
+                      | {class, dns_class()} ]
+                  inet_dns:dns_query(DnsQuery, Field) -> Value
+
+              dns_rr() = DnsRr
+                  inet_dns:rr(DnsRr) -> DnsRrFields | DnsRrOptFields
+                  DnsRrFields = [ {domain, dns_name()}
+                                | {type, rr_type()}
+                                | {class, dns_class()}
+                                | {ttl, integer()}
+                                | {data, dns_data()} ]
+                  DnsRrOptFields = [ {domain, dns_name()}
+                                   | {type, opt}
+                                   | {udp_payload_size, integer()}
+                                   | {ext_rcode, integer()}
+                                   | {version, integer()}
+                                   | {z, integer()}
+                                   | {data, dns_data()} ]
+                  inet_dns:rr(DnsRr, Field) -> Value
+
+              There is an info function for the types above:
+
+              inet_dns:record_type(dns_msg()) -> msg;
+              inet_dns:record_type(dns_header()) -> header;
+              inet_dns:record_type(dns_query()) -> dns_query;
+              inet_dns:record_type(dns_rr()) -> rr;
+              inet_dns:record_type(_) -> undefined.
+
+              So; inet_dns:(inet_dns:record_type(X))(X) will convert
+              any of these data structures into a {Field,Value} list.
+
+       ddnnss__ddaattaa(()) = ddnnss__nnaammee(())
+                  | iinneett::iipp44__aaddddrreessss(())
+                  | iinneett::iipp66__aaddddrreessss(())
+                  | {MName :: ddnnss__nnaammee(()),
+                     RName :: ddnnss__nnaammee(()),
+                     Serial :: integer(),
+                     Refresh :: integer(),
+                     Retry :: integer(),
+                     Expiry :: integer(),
+                     Minimum :: integer()}
+                  | {iinneett::iipp44__aaddddrreessss(()),
+                     Proto :: integer(),
+                     BitMap :: binary()}
+                  | {CpuString :: string(), OsString :: string()}
+                  | {RM :: ddnnss__nnaammee(()), EM :: ddnnss__nnaammee(())}
+                  | {Prio :: integer(), ddnnss__nnaammee(())}
+                  | {Prio :: integer(),
+                     Weight :: integer(),
+                     Port :: integer(),
+                     ddnnss__nnaammee(())}
+                  | {Order :: integer(),
+                     Preference :: integer(),
+                     Flags :: string(),
+                     Services :: string(),
+                     Regexp :: string(),
+                     ddnnss__nnaammee(())}
+                  | [string()]
+                  | binary()
+
+              _R_e_g_e_x_p is a string with characters encoded in the UTF-8 coding
+              standard.
+
+EEXXPPOORRTTSS
+       ggeettbbyynnaammee((NNaammee,, TTyyppee)) -->> {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ggeettbbyynnaammee((NNaammee,, TTyyppee,, TTiimmeeoouutt)) -->> {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ddnnss__nnaammee(())
+                 Type = rrrr__ttyyppee(())
+                 Timeout = timeout()
+                 Hostent = iinneett::hhoosstteenntt(())
+                 Reason = iinneett::ppoossiixx(()) | rreess__eerrrroorr(())
+
+              Resolve a DNS record of the given type for the given host, of
+              class _i_n. On success returns a _h_o_s_t_e_n_t_(_) record with _d_n_s___d_a_t_a_(_)
+              elements in the address list field.
+
+              This function uses the resolver option _s_e_a_r_c_h that is a list of
+              domain names. If the name to resolve contains no dots, it is
+              prepended to each domain name in the search list, and they are
+              tried in order. If the name contains dots, it is first tried as
+              an absolute name and if that fails the search list is used. If
+              the name has a trailing dot it is simply supposed to be an
+              absolute name and the search list is not used.
+
+       ggeetthhoossttbbyyaaddddrr((AAddddrreessss)) -->> {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ggeetthhoossttbbyyaaddddrr((AAddddrreessss,, TTiimmeeoouutt)) -->> {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Address = iinneett::iipp__aaddddrreessss(())
+                 Timeout = timeout()
+                 Hostent = iinneett::hhoosstteenntt(())
+                 Reason = iinneett::ppoossiixx(()) | rreess__eerrrroorr(())
+
+              Backend functions used by  iinneett::ggeetthhoossttbbyyaaddddrr//11 .
+
+       ggeetthhoossttbbyynnaammee((NNaammee)) -->> {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ggeetthhoossttbbyynnaammee((NNaammee,, FFaammiillyy)) -->> {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ggeetthhoossttbbyynnaammee((NNaammee,, FFaammiillyy,, TTiimmeeoouutt)) -->>
+                        {{ookk,, HHoosstteenntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ddnnss__nnaammee(())
+                 Hostent = iinneett::hhoosstteenntt(())
+                 Timeout = timeout()
+                 Family = iinneett::aaddddrreessss__ffaammiillyy(())
+                 Reason = iinneett::ppoossiixx(()) | rreess__eerrrroorr(())
+
+              Backend functions used by  iinneett::ggeetthhoossttbbyynnaammee//11,,22 .
+
+              This function uses the resolver option _s_e_a_r_c_h just like
+              ggeettbbyynnaammee//22,,33.
+
+              If the resolver option _i_n_e_t_6 is _t_r_u_e, an IPv6 address is looked
+              up, and if that fails the IPv4 address is looked up and returned
+              on IPv6 mapped IPv4 format.
+
+       llooookkuupp((NNaammee,, CCllaassss,, TTyyppee)) -->> [[ddnnss__ddaattaa(())]]
+
+       llooookkuupp((NNaammee,, CCllaassss,, TTyyppee,, OOppttss)) -->> [[ddnnss__ddaattaa(())]]
+
+       llooookkuupp((NNaammee,, CCllaassss,, TTyyppee,, OOppttss,, TTiimmeeoouutt)) -->> [[ddnnss__ddaattaa(())]]
+
+              Types:
+
+                 Name = ddnnss__nnaammee(()) | iinneett::iipp__aaddddrreessss(())
+                 Class = ddnnss__ccllaassss(())
+                 Type = rrrr__ttyyppee(())
+                 Opts = [rreess__ooppttiioonn(()) | verbose]
+                 Timeout = timeout()
+
+              Resolve the DNS data for the record of the given type and class
+              for the given name. On success filters out the answer records
+              with the correct _C_l_a_s_s and _T_y_p_e and returns a list of their data
+              fields. So a lookup for type _a_n_y will give an empty answer since
+              the answer records have specific types that are not _a_n_y. An
+              empty answer as well as a failed lookup returns an empty list.
+
+              Calls rreessoollvvee//22....44 with the same arguments and filters the
+              result, so _O_p_t_s is explained there.
+
+       rreessoollvvee((NNaammee,, CCllaassss,, TTyyppee)) -->> {{ookk,, ddnnss__mmssgg(())}} || EErrrroorr
+
+       rreessoollvvee((NNaammee,, CCllaassss,, TTyyppee,, OOppttss)) -->> {{ookk,, ddnnss__mmssgg(())}} || EErrrroorr
+
+       rreessoollvvee((NNaammee,, CCllaassss,, TTyyppee,, OOppttss,, TTiimmeeoouutt)) -->>
+                  {{ookk,, ddnnss__mmssgg(())}} || EErrrroorr
+
+              Types:
+
+                 Name = ddnnss__nnaammee(()) | iinneett::iipp__aaddddrreessss(())
+                 Class = ddnnss__ccllaassss(())
+                 Type = rrrr__ttyyppee(())
+                 Opts = [Opt]
+                 Opt = rreess__ooppttiioonn(()) | verbose | atom()
+                 Timeout = timeout()
+                 Error = {error, Reason} | {error, {Reason, ddnnss__mmssgg(())}}
+                 Reason = iinneett::ppoossiixx(()) | rreess__eerrrroorr(())
+
+              Resolve a DNS record of the given type and class for the given
+              name. The returned _d_n_s___m_s_g_(_) can be examined using access
+              functions in _i_n_e_t___d_b as described in DDNNSS ttyyppeess.
+
+              If _N_a_m_e is an _i_p___a_d_d_r_e_s_s_(_), the domain name to query for is
+              generated as the standard reverse ".IN-ADDR.ARPA." name for an
+              IPv4 address, or the ".IP6.ARPA." name for an IPv6 address. In
+              this case you most probably want to use _C_l_a_s_s _= _i_n and _T_y_p_e _=
+              _p_t_r but it is not done automatically.
+
+              _O_p_t_s override the corresponding resolver options. If the option
+              _n_a_m_e_s_e_r_v_e_r_s is given, it is also assumed that it is the complete
+              list of nameserves, so the resolver option _a_l_t___n_a_m_e_s_e_r_v_e_s is
+              ignored. Of course, if that option is also given to this
+              function, it is used.
+
+              The _v_e_r_b_o_s_e option (or rather _{_v_e_r_b_o_s_e_,_t_r_u_e_}), causes
+              diagnostics printout through iioo::ffoorrmmaatt//22 of queries, replies
+              retransmissions, etc, similar to from utilities like _d_i_g,
+              _n_s_l_o_o_k_u_p et.al.
+
+              If _O_p_t is an arbitrary atom it is interpreted as _{_O_p_t_,_t_r_u_e_}
+              unless the atom string starts with _"_n_o_" making the
+              interpretation _{_O_p_t_,_f_a_l_s_e_}. For example: _u_s_e_v_c is an alias for
+              _{_u_s_e_v_c_,_t_r_u_e_}, and _n_o_u_s_e_v_c an alias for _{_u_s_e_v_c_,_f_a_l_s_e_}.
+
+              The _i_n_e_t_6 option currently has no effect on this function. You
+              probably want to use _T_y_p_e _= _a _| _a_a_a_a instead.
+
+EEXXAAMMPPLLEESS
+       Access functions example: how llooookkuupp//33 could have been implemented
+       using rreessoollvvee//33 from outside the module.
+
+           example_lookup(Name, Class, Type) ->
+               case inet_res:resolve(Name, Class, Type) of
+                   {ok,Msg} ->
+                       [inet_dns:rr(RR, data)
+                        || RR <- inet_dns:msg(Msg, anlist),
+                           inet_dns:rr(RR, type) =:= Type,
+                           inet_dns:rr(RR, class) =:= Class];
+                   {error,_} ->
+                       []
+               end.
+
+LLEEGGAACCYY FFUUNNCCTTIIOONNSS
+       These have been deprecated due to the annoying double meaning of the
+       nameservers/timeout argument, and because they had no decent place for
+       a resolver options list.
+
+EEXXPPOORRTTSS
+       nnssllooookkuupp((NNaammee,, CCllaassss,, TTyyppee)) -->> {{ookk,, ddnnss__mmssgg(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+       nnssllooookkuupp((NNaammee,, CCllaassss,, TTyyppee,, TTiimmeeoouutt)) -->>
+                   {{ookk,, ddnnss__mmssgg(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+       nnssllooookkuupp((NNaammee,, CCllaassss,, TTyyppee,, NNaammeesseerrvveerrss)) -->>
+                   {{ookk,, ddnnss__mmssgg(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ddnnss__nnaammee(()) | iinneett::iipp__aaddddrreessss(())
+                 Class = ddnnss__ccllaassss(())
+                 Type = rrrr__ttyyppee(())
+                 Timeout = timeout()
+                 Nameservers = [nnaammeesseerrvveerr(())]
+                 Reason = iinneett::ppoossiixx(()) | rreess__eerrrroorr(())
+
+              Resolve a DNS record of the given type and class for the given
+              name.
+
+       nnnnssllooookkuupp((NNaammee,, CCllaassss,, TTyyppee,, NNaammeesseerrvveerrss)) -->>
+                    {{ookk,, ddnnss__mmssgg(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+       nnnnssllooookkuupp((NNaammee,, CCllaassss,, TTyyppee,, NNaammeesseerrvveerrss,, TTiimmeeoouutt)) -->>
+                    {{ookk,, ddnnss__mmssgg(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ddnnss__nnaammee(()) | iinneett::iipp__aaddddrreessss(())
+                 Class = ddnnss__ccllaassss(())
+                 Type = rrrr__ttyyppee(())
+                 Timeout = timeout()
+                 Nameservers = [nnaammeesseerrvveerr(())]
+                 Reason = iinneett::ppoossiixx(())
+
+              Resolve a DNS record of the given type and class for the given
+              name.
+
+
+
+Ericsson AB                      kernel 2.15.2                     inet_res(3)

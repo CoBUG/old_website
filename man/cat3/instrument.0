@@ -1,0 +1,358 @@
+instrument(3)              Erlang Module Definition              instrument(3)
+
+
+
+NNAAMMEE
+       instrument - Analysis and Utility Functions for Instrumentation
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _i_n_s_t_r_u_m_e_n_t contains support for studying the resource usage
+       in an Erlang runtime system. Currently, only the allocation of memory
+       can be studied.
+
+   NNoottee::
+       Note that this whole module is experimental, and the representations
+       used as well as the functionality is likely to change in the future.
+
+       The _i_n_s_t_r_u_m_e_n_t module interface was slightly changed in Erlang/OTP R9C.
+
+
+       To start an Erlang runtime system with instrumentation, use the _+_M_i_*
+       set of command-line arguments to the _e_r_l command (see the erts_alloc(3)
+       and erl(1) man pages).
+
+       The basic object of study in the case of memory allocation is a memory
+       allocation map. A memory allocation map contains a list of descriptors
+       for each allocated memory block. Currently, a descriptor is a 4-tuple
+
+               {TypeNo, Address, Size, PidDesc}
+
+       where _T_y_p_e_N_o is the memory block type number, _A_d_d_r_e_s_s is its place in
+       memory, and _S_i_z_e is its size, in bytes. _P_i_d_D_e_s_c is either a tuple
+       _{_X_,_Y_,_Z_} identifying the process which was executing when the block was
+       allocated, or _u_n_d_e_f_i_n_e_d if no process was executing. The pid tuple
+       _{_X_,_Y_,_Z_} can be transformed into a real pid by usage of the _c_:_p_i_d_/_3
+       function.
+
+       Various details about memory allocation:
+
+       Memory blocks are allocated both on the heap segment and on other
+       memory segments. This can cause the instrumentation functionality to
+       report very large holes. Currently the instrumentation functionality
+       doesn't provide any support for distinguishing between holes between
+       memory segments, and holes between allocated blocks inside memory
+       segments. The current size of the process cannot be obtained from
+       within Erlang, but can be seen with one of the system statistics tools,
+       e.g., _p_s or _t_o_p. The Solaris utility _p_m_a_p can be useful. It reports
+       currently mapped memory segments.
+
+       Overhead for instrumentation: When the emulator has been started with
+       the ""++MMiimm ttrruuee"" flag, each block is preceded by a 24 bytes large header
+       on a 32-bit machine and a 48 bytes large header on a 64-bit machine.
+       When the emulator has been started with the ""++MMiiss ttrruuee"" flag, each
+       block is preceded by an 8 bytes large header. These are the header
+       sizes used by the Erlang 5.3/OTP R9C emulator. Other versions of the
+       emulator may use other header sizes. The function bblloocckk__hheeaaddeerr__ssiizzee//11
+       can be used for retrieving the header size used for a specific memory
+       allocation map. The time overhead for managing the instrumentation data
+       is small.
+
+       Sizes presented by the instrumentation functionality are (by the
+       emulator) requested sizes, i.e. neither instrumentation headers nor
+       headers used by allocators are included.
+
+EEXXPPOORRTTSS
+       aallllooccaattoorr__ddeessccrr((MMeemmoorryyDDaattaa,, TTyyppeeNNoo)) -->> AAllllooccDDeessccrr || iinnvvaalliidd__ttyyppee ||
+       ""uunnkknnoowwnn""
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+                 TypeNo = int()
+                 AllocDescr = atom() | string()
+
+              Returns the allocator description of the allocator that manages
+              memory blocks of type number _T_y_p_e_N_o used in _M_e_m_o_r_y_D_a_t_a. Valid
+              _T_y_p_e_N_os are in the range returned by ttyyppee__nnoo__rraannggee//11 on this
+              specific memory allocation map. If _T_y_p_e_N_o is an invalid integer,
+              _i_n_v_a_l_i_d___t_y_p_e is returned.
+
+       bblloocckk__hheeaaddeerr__ssiizzee((MMeemmoorryyDDaattaa)) -->> iinntt(())
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+
+              Returns the memory block header size used by the emulator that
+              generated the memory allocation map. The block header size may
+              differ between different emulators.
+
+       ccllaassss__ddeessccrr((MMeemmoorryyDDaattaa,, TTyyppeeNNoo)) -->> CCllaassssDDeessccrr || iinnvvaalliidd__ttyyppee ||
+       ""uunnkknnoowwnn""
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+                 TypeNo = int()
+                 ClassDescr = atom() | string()
+
+              Returns the class description of the class that the type number
+              _T_y_p_e_N_o used in _M_e_m_o_r_y_D_a_t_a belongs to. Valid _T_y_p_e_N_os are in the
+              range returned by ttyyppee__nnoo__rraannggee//11 on this specific memory
+              allocation map. If _T_y_p_e_N_o is an invalid integer, _i_n_v_a_l_i_d___t_y_p_e is
+              returned.
+
+       ddeessccrr((MMeemmoorryyDDaattaa)) -->> DDeessccrrMMeemmoorryyDDaattaa
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+                 DescrMemoryData = {term(), DescrAllocList}
+                 DescrAllocList = [DescrDesc]
+                 DescrDesc = {TypeDescr, int(), int(), DescrPidDesc}
+                 TypeDescr = atom() | string()
+                 DescrPidDesc = pid() | undefined
+
+              Returns a memory allocation map where the type numbers (first
+              element of _D_e_s_c) have been replaced by type descriptions, and
+              pid tuples (fourth element of _D_e_s_c) have been replaced by real
+              pids.
+
+       hhoolleess((MMeemmoorryyDDaattaa)) -->> ookk
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+
+              Prints out the size of each hole (i.e., the space between
+              allocated blocks) on the terminal. _N_O_T_E_: Really large holes are
+              probably holes between memory segments. The memory allocation
+              map has to be sorted (see ssoorrtt//11).
+
+       mmeemm__lliimmiittss((MMeemmoorryyDDaattaa)) -->> {{LLooww,, HHiigghh}}
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+                 Low = High = int()
+
+              Returns a tuple _{_L_o_w_, _H_i_g_h_} indicating the lowest and highest
+              address used. The memory allocation map has to be sorted (see
+              ssoorrtt//11).
+
+       mmeemmoorryy__ddaattaa(()) -->> MMeemmoorryyDDaattaa || ffaallssee
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+
+              Returns _M_e_m_o_r_y_D_a_t_a (a the memory allocation map) if the emulator
+              has been started with the "_+_M_i_m _t_r_u_e" command-line argument;
+              otherwise, _f_a_l_s_e. _N_O_T_E_:_m_e_m_o_r_y___d_a_t_a_/_0 blocks execution of other
+              processes while the data is collected. The time it takes to
+              collect the data can be substantial.
+
+       mmeemmoorryy__ssttaattuuss((SSttaattuussTTyyppee)) -->> [[SSttaattuussIInnffoo]] || ffaallssee
+
+              Types:
+
+                 StatusType = total | allocators | classes | types
+                 StatusInfo = {About, [Info]}
+                 About = atom()
+                 Info = {InfoName, Current, MaxSinceLast, MaxEver}
+                 InfoName = sizes|blocks
+                 Current = int()
+                 MaxSinceLast = int()
+                 MaxEver = int()
+
+              Returns a list of _S_t_a_t_u_s_I_n_f_o if the emulator has been started
+              with the "_+_M_i_s _t_r_u_e" or "_+_M_i_m _t_r_u_e" command-line argument;
+              otherwise, _f_a_l_s_e.
+
+              See the rreeaadd__mmeemmoorryy__ssttaattuuss//11 function for a description of the
+              _S_t_a_t_u_s_I_n_f_o term.
+
+       rreeaadd__mmeemmoorryy__ddaattaa((FFiillee)) -->> MMeemmoorryyDDaattaa || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 File = string()
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+
+              Reads a memory allocation map from the file _F_i_l_e and returns it.
+              The file is assumed to have been created by _s_t_o_r_e___m_e_m_o_r_y___d_a_t_a_/_1.
+              The error codes are the same as for _f_i_l_e_:_c_o_n_s_u_l_t_/_1.
+
+       rreeaadd__mmeemmoorryy__ssttaattuuss((FFiillee)) -->> MMeemmoorryySSttaattuuss || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 File = string()
+                 MemoryStatus = [{StatusType, [StatusInfo]}]
+                 StatusType = total | allocators | classes | types
+                 StatusInfo = {About, [Info]}
+                 About = atom()
+                 Info = {InfoName, Current, MaxSinceLast, MaxEver}
+                 InfoName = sizes|blocks
+                 Current = int()
+                 MaxSinceLast = int()
+                 MaxEver = int()
+
+              Reads memory allocation status from the file _F_i_l_e and returns
+              it. The file is assumed to have been created by
+              _s_t_o_r_e___m_e_m_o_r_y___s_t_a_t_u_s_/_1. The error codes are the same as for
+              _f_i_l_e_:_c_o_n_s_u_l_t_/_1.
+
+              When _S_t_a_t_u_s_T_y_p_e is _a_l_l_o_c_a_t_o_r_s, _A_b_o_u_t is the allocator that the
+              information is about. When _S_t_a_t_u_s_T_y_p_e is _t_y_p_e_s, _A_b_o_u_t is the
+              memory block type that the information is about. Memory block
+              types are not described other than by their name and may vary
+              between emulators. When _S_t_a_t_u_s_T_y_p_e is _c_l_a_s_s_e_s, _A_b_o_u_t is the
+              memory block type class that information is presented about.
+              Memory block types are classified after their use. Currently the
+              following classes exist:
+
+                _p_r_o_c_e_s_s___d_a_t_a:
+                  Erlang process specific data.
+
+                _b_i_n_a_r_y___d_a_t_a:
+                  Erlang binaries.
+
+                _a_t_o_m___d_a_t_a:
+                  Erlang atoms.
+
+                _c_o_d_e___d_a_t_a:
+                  Erlang code.
+
+                _s_y_s_t_e_m___d_a_t_a:
+                  Other data used by the system
+
+              When _I_n_f_o_N_a_m_e is _s_i_z_e_s, _C_u_r_r_e_n_t, _M_a_x_S_i_n_c_e_L_a_s_t, and _M_a_x_E_v_e_r are,
+              respectively, current size, maximum size since last call to
+              _s_t_o_r_e___m_e_m_o_r_y___s_t_a_t_u_s_/_1 or _m_e_m_o_r_y___s_t_a_t_u_s_/_1 with the specific
+              _S_t_a_t_u_s_T_y_p_e, and maximum size since the emulator was started.
+              When _I_n_f_o_N_a_m_e is _b_l_o_c_k_s, _C_u_r_r_e_n_t, _M_a_x_S_i_n_c_e_L_a_s_t, and _M_a_x_E_v_e_r are,
+              respectively, current number of blocks, maximum number of blocks
+              since last call to _s_t_o_r_e___m_e_m_o_r_y___s_t_a_t_u_s_/_1 or _m_e_m_o_r_y___s_t_a_t_u_s_/_1 with
+              the specific _S_t_a_t_u_s_T_y_p_e, and maximum number of blocks since the
+              emulator was started.
+
+              _N_O_T_E_:A memory block is accounted for at "the first level"
+              allocator. E.g. _f_i_x___a_l_l_o_c allocates its memory pools via
+              _l_l___a_l_l_o_c. When a _f_i_x___a_l_l_o_c block is allocated, neither the block
+              nor the pool in which it resides are accounted for as memory
+              allocated via _l_l___a_l_l_o_c even though it is.
+
+       ssoorrtt((MMeemmoorryyDDaattaa)) -->> MMeemmoorryyDDaattaa
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+
+              Sorts a memory allocation map so that the addresses are in
+              ascending order.
+
+       ssttoorree__mmeemmoorryy__ddaattaa((FFiillee)) -->> ttrruuee||ffaallssee
+
+              Types:
+
+                 File = string()
+
+              Stores the current memory allocation map on the file _F_i_l_e.
+              Returns _t_r_u_e if the emulator has been started with the "_+_M_i_m
+              _t_r_u_e" command-line argument, and the map was successfully
+              stored; otherwise, _f_a_l_s_e. The contents of the file can later be
+              read using rreeaadd__mmeemmoorryy__ddaattaa//11. _N_O_T_E_:_s_t_o_r_e___m_e_m_o_r_y___d_a_t_a_/_0 blocks
+              execution of other processes while the data is collected. The
+              time it takes to collect the data can be substantial.
+
+       ssttoorree__mmeemmoorryy__ssttaattuuss((FFiillee)) -->> ttrruuee||ffaallssee
+
+              Types:
+
+                 File = string()
+
+              Stores the current memory status on the file _F_i_l_e. Returns _t_r_u_e
+              if the emulator has been started with the "_+_M_i_s _t_r_u_e", or "_+_M_i_m
+              _t_r_u_e" command-line arguments, and the data was successfully
+              stored; otherwise, _f_a_l_s_e. The contents of the file can later be
+              read using rreeaadd__mmeemmoorryy__ssttaattuuss//11.
+
+       ssuumm__bblloocckkss((MMeemmoorryyDDaattaa)) -->> iinntt(())
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+
+              Returns the total size of the memory blocks in the list.
+
+       ttyyppee__ddeessccrr((MMeemmoorryyDDaattaa,, TTyyppeeNNoo)) -->> TTyyppeeDDeessccrr || iinnvvaalliidd__ttyyppee
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+                 TypeNo = int()
+                 TypeDescr = atom() | string()
+
+              Returns the type description of a type number used in
+              _M_e_m_o_r_y_D_a_t_a. Valid _T_y_p_e_N_os are in the range returned by
+              ttyyppee__nnoo__rraannggee//11 on this specific memory allocation map. If
+              _T_y_p_e_N_o is an invalid integer, _i_n_v_a_l_i_d___t_y_p_e is returned.
+
+       ttyyppee__nnoo__rraannggee((MMeemmoorryyDDaattaa)) -->> {{MMiinn,, MMaaxx}}
+
+              Types:
+
+                 MemoryData = {term(), AllocList}
+                 AllocList = [Desc]
+                 Desc = {int(), int(), int(), PidDesc}
+                 PidDesc = {int(), int(), int()} | undefined
+                 Min = int()
+                 Max = int()
+
+              Returns the memory block type number range used in _M_e_m_o_r_y_D_a_t_a.
+              When the memory allocation map was generated by an Erlang
+              5.3/OTP R9C or newer emulator, all integers _T that satisfy _M_i_n
+              <= _T <= _M_a_x are valid type numbers. When the memory allocation
+              map was generated by a pre Erlang 5.3/OTP R9C emulator, all
+              integers in the range are _n_o_t valid type numbers.
+
+SSEEEE AALLSSOO
+       eerrttss__aalllloocc((33)), eerrll((11))
+
+
+
+Ericsson AB                       tools 2.6.8                    instrument(3)

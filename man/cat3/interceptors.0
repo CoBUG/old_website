@@ -1,0 +1,243 @@
+interceptors(3)            Erlang Module Definition            interceptors(3)
+
+
+
+NNAAMMEE
+       interceptors - Describe the functions which must be exported by any
+       supplied Orber native interceptor.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains the mandatory functions for user supplied native
+       interceptors and their intended behavior. See also the User's Guide.
+
+   WWaarrnniinngg::
+       Using _I_n_t_e_r_c_e_p_t_o_r_s may reduce the through-put significantly if the
+       supplied interceptors invoke expensive operations. Hence, one should
+       always supply interceptors which cause as little overhead as possible.
+
+
+   WWaarrnniinngg::
+       It is possible to alter the _D_a_t_a, _B_i_n and _A_r_g_s parameter for the
+       _i_n___r_e_p_l_y and _o_u_t___r_e_p_l_y, _i_n___r_e_p_l_y___e_n_c_o_d_e_d, _i_n___r_e_q_u_e_s_t___e_n_c_o_d_e_d,
+       _o_u_t___r_e_p_l_y___e_n_c_o_d_e_d and _o_u_t___r_e_q_u_e_s_t___e_n_c_o_d_e_d, _i_n___r_e_q_u_e_s_t and _o_u_t___r_e_q_u_e_s_t
+       respectively. But, if it is done incorrectly, the consequences can be
+       serious.
+
+
+   NNoottee::
+       The _E_x_t_r_a parameter is set to 'undefined' by Orber when calling the
+       first interceptor and may be set to any Erlang term. If an interceptor
+       change this parameter it will be passed on to the next interceptor in
+       the list uninterpreted.
+
+
+   NNoottee::
+       The _R_e_f parameter is set to 'undefined' by Orber when calling
+       _n_e_w___i_n___c_o_n_n_e_c_t_i_o_n or _n_e_w___o_u_t___c_o_n_n_e_c_t_i_o_n using the first interceptor.
+       The user supplied interceptor may set _N_e_w_R_e_f to any Erlang term. If an
+       interceptor change this parameter it will be passed on to the next
+       interceptor in the list uninterpreted.
+
+
+EEXXPPOORRTTSS
+       nneeww__iinn__ccoonnnneeccttiioonn((RReeff,, PPeeeerrHHoosstt,, PPeeeerrPPoorrtt)) -->> NNeewwRReeff
+       nneeww__iinn__ccoonnnneeccttiioonn((RReeff,, PPeeeerrHHoosstt,, PPeeeerrPPoorrtt,, SSoocckkeettHHoosstt,, SSoocckkeettPPoorrtt)) -->>
+       NNeewwRReeff
+
+              Types:
+
+                 Ref = term() | undefined
+                 PeerHost = SocketHost = string(), e.g., "myHost@myServer" or
+                 "192.0.0.10"
+                 PeerPort = SocketPort = integer()
+                 NewRef = term() | {'EXIT', Reason}
+
+              When a new connection is requested by a client side ORB this
+              operation is invoked. If more than one interceptor is supplied,
+              e.g., _{_n_a_t_i_v_e_, _[_'_m_y_I_n_t_e_r_c_e_p_t_o_r_1_'_, _'_m_y_I_n_t_e_r_c_e_p_t_o_r_2_'_]_}, the return
+              value from 'myInterceptor1' is passed to 'myInterceptor2' as
+              _R_e_f. Initially, Orber uses the atom 'undefined' as _R_e_f parameter
+              when calling the first interceptor. The return value from the
+              last interceptor, in the example above 'myInterceptor2', is
+              passed to all other functions exported by the interceptors.
+              Hence, the _R_e_f parameter can, for example, be used as a unique
+              identifier to mnesia or ets where information/restrictions for
+              this connection is stored.
+
+              The PeerHost and PeerPort variables supplied data of the client
+              ORB which requested a new connection. SocketHost and SocketPort
+              are the local interface and port the client connected to.
+
+              If, for some reason, we do not allow the client ORB to connect
+              simply invoke _e_x_i_t_(_R_e_a_s_o_n_).
+
+       nneeww__oouutt__ccoonnnneeccttiioonn((RReeff,, PPeeeerrHHoosstt,, PPeeeerrPPoorrtt)) -->> NNeewwRReeff
+       nneeww__oouutt__ccoonnnneeccttiioonn((RReeff,, PPeeeerrHHoosstt,, PPeeeerrPPoorrtt,, SSoocckkeettHHoosstt,, SSoocckkeettPPoorrtt)) -->>
+       NNeewwRReeff
+
+              Types:
+
+                 Ref = term() | undefined
+                 PeerHost = SocketHost = string(), e.g., "myHost@myServer" or
+                 "192.0.0.10"
+                 PeerPort = SocketPort = integer()
+                 NewRef = term() | {'EXIT', Reason}
+
+              When a new connection is set up this function is invoked.
+              Behaves just like _n_e_w___i_n___c_o_n_n_e_c_t_i_o_n; the only difference is that
+              the PeerHost and PeerPort variables identifies the target ORB's
+              bootstrap data and SocketHost and SocketPort are the local
+              interface and port the client ORB connected via.
+
+       cclloosseedd__iinn__ccoonnnneeccttiioonn((RReeff)) -->> NNeewwRReeff
+
+              Types:
+
+                 Ref = term()
+                 NewRef = term()
+
+              When an existing connection is terminated this operation is
+              invoked. The main purpose of this function is to make it
+              possible for a user to clean up all data associated with the
+              associated connection.
+
+              The input parameter _R_e_f is the return value from
+              _n_e_w___i_n___c_o_n_n_e_c_t_i_o_n_/_3.
+
+       cclloosseedd__oouutt__ccoonnnneeccttiioonn((RReeff)) -->> NNeewwRReeff
+
+              Types:
+
+                 Ref = term()
+                 NewRef = term()
+
+              When an existing connection is terminated this operation is
+              invoked. The main purpose of this function is to make it
+              possible for a user to clean up all data associated with the
+              associated connection.
+
+              The input parameter _R_e_f is the return value from
+              _n_e_w___o_u_t___c_o_n_n_e_c_t_i_o_n_/_3.
+
+       iinn__rreeppllyy((RReeff,, OObbjj,, CCttxx,, OOpp,, DDaattaa,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Data = [Result, OutParameter1, ..., OutPramaterN]
+                 Reply = {NewData, NewExtra}
+
+              When replies are delivered from the server side ORB to the
+              client side ORB this operation is invoked. The _D_a_t_a parameter is
+              a list in which the first element is the return value value from
+              the target object and the rest is a all parameters defined as
+              _o_u_t or _i_n_o_u_t in the IDL-specification.
+
+       iinn__rreeppllyy__eennccooddeedd((RReeff,, OObbjj,, CCttxx,, OOpp,, BBiinn,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Bin = #binary
+                 Reply = {NewBin, NewExtra}
+
+              When replies are delivered from the server side ORB to the
+              client side ORB this operation is invoked. The _B_i_n parameter is
+              the reply body still uncoded.
+
+       iinn__rreeqquueesstt((RReeff,, OObbjj,, CCttxx,, OOpp,, AArrggss,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Args = [Argument] - defined in the IDL-specification
+                 Reply = {NewArgs, NewExtra}
+
+              When a new request arrives at the server side ORB this operation
+              is invoked.
+
+       iinn__rreeqquueesstt__eennccooddeedd((RReeff,, OObbjj,, CCttxx,, OOpp,, BBiinn,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Bin = #binary
+                 Reply = {NewBin, NewExtra}
+
+              When a new request arrives at the server side ORB this operation
+              is invoked before decoding the request body.
+
+       oouutt__rreeppllyy((RReeff,, OObbjj,, CCttxx,, OOpp,, DDaattaa,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Data = [Result, OutParameter1, ..., OutPramaterN]
+                 Reply = {NewData, NewExtra}
+
+              After the target object have been invoked this operation is
+              invoked with the result. The _D_a_t_a parameter is a list in which
+              the first element is the return value value from the target
+              object and the rest is a all parameters defined as _o_u_t or _i_n_o_u_t
+              in the IDL-specification.
+
+       oouutt__rreeppllyy__eennccooddeedd((RReeff,, OObbjj,, CCttxx,, OOpp,, BBiinn,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Bin = #binary
+                 Reply = {NewBin, NewExtra}
+
+              This operation is similar to _o_u_t___r_e_p_l_y; the only difference is
+              that the reply body have been encoded.
+
+       oouutt__rreeqquueesstt((RReeff,, OObbjj,, CCttxx,, OOpp,, AArrggss,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Args = [Argument] - defined in the IDL-specification
+                 Reply = {NewArgs, NewExtra}
+
+              Before a request is sent to the server side ORB, _o_u_t___r_e_q_u_e_s_t is
+              invoked.
+
+       oouutt__rreeqquueesstt__eennccooddeedd((RReeff,, OObbjj,, CCttxx,, OOpp,, BBiinn,, EExxttrraa)) -->> RReeppllyy
+
+              Types:
+
+                 Ref = term()
+                 Obj = #objref
+                 Ctx = [#'IOP_ServiceContext'{}]
+                 Op = atom()
+                 Bin = #binary
+                 Reply = {NewBin, NewExtra}
+
+              This operation is similar to _o_u_t___r_e_q_u_e_s_t; the only difference is
+              that the request body have been encoded.
+
+
+
+Ericsson AB                      orber 3.6.24                  interceptors(3)

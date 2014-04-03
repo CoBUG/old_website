@@ -1,0 +1,421 @@
+corba(3)                   Erlang Module Definition                   corba(3)
+
+
+
+NNAAMMEE
+       corba - The functions on CORBA module level
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions that are specified on the CORBA module
+       level. It also contains some functions for creating and disposing
+       objects.
+
+EEXXPPOORRTTSS
+       ccrreeaattee((MMoodduullee,, TTyyppeeIIDD)) -->> OObbjjeecctt
+       ccrreeaattee((MMoodduullee,, TTyyppeeIIDD,, EEnnvv)) -->> OObbjjeecctt
+       ccrreeaattee((MMoodduullee,, TTyyppeeIIDD,, EEnnvv,, OOppttoonnss11)) -->> OObbjjeecctt
+       ccrreeaattee__lliinnkk((MMoodduullee,, TTyyppeeIIDD)) -->> OObbjjeecctt
+       ccrreeaattee__lliinnkk((MMoodduullee,, TTyyppeeIIDD,, EEnnvv)) -->> OObbjjeecctt
+       ccrreeaattee__lliinnkk((MMoodduullee,, TTyyppeeIIDD,, EEnnvv,, OOppttiioonnss22)) -->> RReeppllyy
+
+              Types:
+
+                 Module = atom()
+                 TypeID = string()
+                 Env = term()
+                 Options1 = [{persistent, Bool} | {regname, RegName} |
+                 {local_typecheck, Bool}]
+                 Options2 = [{sup_child, Bool} | {persistent, Bool} |
+                 {regname, RegName} | {pseudo, Bool} | {local_typecheck,
+                 Bool}]
+                 RegName = {local, atom()} | {global, term()}
+                 Reply = #objref | {ok, Pid, #objref}
+                 Bool = true | false
+                 Object = #objref
+
+              These functions start a new server object. If you start it
+              without _R_e_g_N_a_m_e it can only be accessed through the returned
+              object key. Started with a _R_e_g_N_a_m_e the name is registered
+              locally or globally.
+
+              _T_y_p_e_I_D is the repository ID of the server object type and could
+              for example look like "IDL:StackModule/Stack:1.0".
+
+              _M_o_d_u_l_e is the name of the interface API module.
+
+              _E_n_v is the arguments passed which will be passed to the
+              implementations _i_n_i_t call-back function.
+
+              A server started with create/2, create/3 or create/4 does not
+              care about the parent, which means that the parent is not
+              handled explicitly in the generic process part.
+
+              A server started with create_link2, create_link/3 or
+              create_link/4 is initially linked to the caller, the parent, and
+              it will terminate whenever the parent process terminates, and
+              with the same reason as the parent. If the server traps exits,
+              the terminate/2 call-back function is called in order to clean
+              up before the termination. These functions should be used if the
+              server is a worker in a supervision tree.
+
+              If you use the option _{_s_u_p___c_h_i_l_d_, _t_r_u_e_} create_link/4 will
+              return _{_o_k_, _P_i_d_, _#_o_b_j_r_e_f_}, otherwise _#_o_b_j_r_e_f, and make it
+              possible to start a server as a supervisor child (stdlib-1.7 or
+              later).
+
+              If you use the option _{_p_e_r_s_i_s_t_e_n_t_, _t_r_u_e_} you also must use the
+              option _{_r_e_g_n_a_m_e_, _{_g_l_o_b_a_l_, _N_a_m_e_}_}. This combination makes it
+              possible to tell the difference between a server permanently
+              terminated or in the process of restarting.
+
+              The option _{_p_s_e_u_d_o_, _t_r_u_e_}, allow us to create an object which is
+              not a server. Using _{_p_s_e_u_d_o_, _t_r_u_e_} overrides all other start
+              options. For more information see section _M_o_d_u_l_e___I_n_t_e_r_f_a_c_e.
+
+              If a server is started using the option _{_p_e_r_s_i_s_t_e_n_t_, _t_r_u_e_} the
+              object key will not be removed unless it terminates with reason
+              _n_o_r_m_a_l or _s_h_u_t_d_o_w_n. Hence, if persistent servers is used as
+              supervisor children they should be _t_r_a_n_s_i_e_n_t and the
+              _o_b_j_e_c_t_k_e_y_s___g_c___t_i_m_e should be modified (default equals _i_n_f_i_n_i_t_y).
+
+              The option _{_l_o_c_a_l___t_y_p_e_c_h_e_c_k_, _b_o_o_l_e_a_n_(_)_}, which overrides the
+              LLooccaall TTyyppeecchheecckkiinngg environment flag, turns on or off
+              typechecking. If activated, parameters, replies and raised
+              exceptions will be checked to ensure that the data is correct,
+              when invoking operations on CORBA Objects within the same Orber
+              domain. Due to the extra overhead, this option _M_A_Y _O_N_L_Y be used
+              during testing and development.
+
+              Example:
+
+                corba:create('StackModule_Stack', "IDL:StackModule/Stack:1.0", {10, test})
+
+
+       ddiissppoossee((OObbjjeecctt)) -->> ookk
+
+              Types:
+
+                 Object = #objref
+
+              This function is used for terminating the execution of a server
+              object. Invoking this operation on a NIL object reference, e.g.,
+              the return value of _c_o_r_b_a_:_c_r_e_a_t_e___n_i_l___o_b_j_r_e_f_/_0, always return ok.
+              For valid object references, invoking this operation more than
+              once, will result in a system exception.
+
+       ccrreeaattee__nniill__oobbjjrreeff(()) -->> OObbjjeecctt
+
+              Types:
+
+                 Object = #objref representing NIL.
+
+              Creates an object reference that represents the NIL value.
+              Attempts to invoke operations using the returned object
+              reference will return a system exception.
+
+       ccrreeaattee__ssuubboobbjjeecctt__kkeeyy((OObbjjeecctt,, KKeeyy)) -->> RReessuulltt
+
+              Types:
+
+                 Object = #objref
+                 Key = term()
+                 Result = #objref
+
+              This function is used to create a subobject in a server object.
+              It can for example be useful when one wants unique access to
+              separate rows in a mnesia or an ETS table. The _R_e_s_u_l_t is an
+              object reference that will be seen as a unique reference to the
+              outside world but will access the same server object where one
+              can use the _g_e_t___s_u_b_o_b_j_e_c_t___k_e_y_/_1 function to get the private key
+              value.
+
+              _K_e_y is stored in the object reference _O_b_j_e_c_t. If it is a binary
+              it will be stored as is and otherwise it is converted to a
+              binary before storage.
+
+       ggeett__ssuubboobbjjeecctt__kkeeyy((OObbjjeecctt)) -->> RReessuulltt
+
+              Types:
+
+                 Object = #objref
+                 Result = #binary
+
+              This function is used to fetch a subobject key from the object
+              reference _O_b_j_e_c_t. The result is a always a binary, if it was an
+              Erlang term that was stored with _c_r_e_a_t_e___s_u_b_o_b_j_e_c_t___k_e_y_/_2 one can
+              to do _b_i_n_a_r_y___t_o___t_e_r_m_/_1 to get the real value.
+
+       ggeett__ppiidd((OObbjjeecctt)) -->> RReessuulltt
+
+              Types:
+
+                 Object = #objref
+                 Result = #pid | {error, Reason} | {'EXCEPTION',E}
+
+              This function is to get the process id from an object, which is
+              a must when CORBA objects is started/handled in a supervisor
+              tree. The function will throw exceptions if the key is not found
+              or some other error occurs.
+
+       rraaiissee((EExxcceeppttiioonn))
+
+              Types:
+
+                 Exception = record()
+
+              This function is used for raising corba exceptions as an Erlang
+              user generated exit signal. It will throw the tuple
+              _{_'_E_X_C_E_P_T_I_O_N_'_, _E_x_c_e_p_t_i_o_n_}.
+
+       rreeppllyy((TToo,, RReeppllyy)) -->> ttrruuee
+
+              Types:
+
+                 To = client reference
+                 Reply = IDL type
+
+              This function can be used by a CORBA object to explicitly send a
+              reply to a client that invoked a two-way operation. If this
+              operation is used, it is _n_o_t possible to return a reply in the
+              call-back module.
+              _T_o must be the _F_r_o_m argument provided to the callback function,
+              which requires that the IC option _f_r_o_m was used when compiling
+              the IDL-file.
+
+       rreessoollvvee__iinniittiiaall__rreeffeerreenncceess((OObbjjeeccttIIdd)) -->> OObbjjeecctt
+       rreessoollvvee__iinniittiiaall__rreeffeerreenncceess((OObbjjeeccttIIdd,, CCoonntteexxttss)) -->> OObbjjeecctt
+
+              Types:
+
+                 ObjectId = string()
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 Object = #objref
+
+              This function returns the object reference associated with the
+              given object id. Initially, only _"_N_a_m_e_S_e_r_v_i_c_e_" is available. To
+              add or remove services use _a_d_d___i_n_i_t_i_a_l___s_e_r_v_i_c_e_/_2 or
+              _r_e_m_o_v_e___i_n_i_t_i_a_l___s_e_r_v_i_c_e_/_1.
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+       aadddd__iinniittiiaall__sseerrvviiccee((OObbjjeeccttIIdd,, OObbjjeecctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 ObjectId = string()
+                 Object = #objref
+
+              This operation allows us to add initial services, which can be
+              accessed by using _r_e_s_o_l_v_e___i_n_i_t_i_a_l___r_e_f_e_r_e_n_c_e_s_/_1 or the _c_o_r_b_a_l_o_c
+              schema. If using an Id defined by the OMG, the given object must
+              be of the correct type; for more information see the
+              IInntteerrooppeerraabbllee NNaammiinngg SSeerrvviiccee. Returns _f_a_l_s_e if the given id
+              already exists.
+
+       rreemmoovvee__iinniittiiaall__sseerrvviiccee((OObbjjeeccttIIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 ObjectId = string()
+
+              If we don not want a certain service to be accessible, invoking
+              this function will remove the association. Returns _t_r_u_e if able
+              to terminate the binding. If no such binding existed _f_a_l_s_e is
+              returned.
+
+       lliisstt__iinniittiiaall__sseerrvviicceess(()) -->> [[OObbjjeeccttIIdd]]
+
+              Types:
+
+                 ObjectId = string()
+
+              This function returns a list of allowed object id's.
+
+       rreessoollvvee__iinniittiiaall__rreeffeerreenncceess__rreemmoottee((OObbjjeeccttIIdd,, AAddddrreessss)) -->> OObbjjeecctt
+       rreessoollvvee__iinniittiiaall__rreeffeerreenncceess__rreemmoottee((OObbjjeeccttIIdd,, AAddddrreessss,, CCoonntteexxttss)) -->>
+       OObbjjeecctt
+
+              Types:
+
+                 ObjectId = string()
+                 Address = [RemoteModifier]
+                 RemoteModifier = string()
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 Object = #objref
+
+              This function returns the object reference for the object id
+              asked for. The remote modifier string has the following format:
+              _"_i_i_o_p_:_/_/_h_o_s_t_:_p_o_r_t_".
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+          WWaarrnniinngg::
+              This operation is not supported by most ORB's. Hence, use
+              _c_o_r_b_a_:_s_t_r_i_n_g___t_o___o_b_j_e_c_t_/_1 instead.
+
+
+       lliisstt__iinniittiiaall__sseerrvviicceess__rreemmoottee((AAddddrreessss)) -->> [[OObbjjeeccttIIdd]]
+       lliisstt__iinniittiiaall__sseerrvviicceess__rreemmoottee((AAddddrreessss,, CCoonntteexxttss)) -->> [[OObbjjeeccttIIdd]]
+
+              Types:
+
+                 Address = [RemoteModifier]
+                 RemoteModifier = string()
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 ObjectId = string()
+
+              This function returns a list of allowed object id's. The remote
+              modifier string has the following format: _"_i_i_o_p_:_/_/_h_o_s_t_:_p_o_r_t_".
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+          WWaarrnniinngg::
+              This operation is not supported by most ORB's. Hence, avoid
+              using it.
+
+
+       oobbjjeecctt__ttoo__ssttrriinngg((OObbjjeecctt)) -->> IIOORR__ssttrriinngg
+
+              Types:
+
+                 Object = #objref
+                 IOR_string = string()
+
+              This function returns the object reference as the external
+              string representation of an IOR.
+
+       ssttrriinngg__ttoo__oobbjjeecctt((IIOORR__ssttrriinngg)) -->> OObbjjeecctt
+       ssttrriinngg__ttoo__oobbjjeecctt((IIOORR__ssttrriinngg,, CCoonntteexxttss)) -->> OObbjjeecctt
+
+              Types:
+
+                 IOR_string = string()
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 Object = #objref
+
+              This function takes a _c_o_r_b_a_n_a_m_e, _c_o_r_b_a_l_o_c or an IOR on the
+              external string representation and returns the object reference.
+
+              To lookup the NameService reference, simply use
+              _"_c_o_r_b_a_l_o_c_:_i_i_o_p_:_1_._2_@_1_2_3_._0_._0_._0_1_2_:_4_0_0_1_/_N_a_m_e_S_e_r_v_i_c_e_"
+
+              We can also resolve an object from the NameService by using
+              _"_c_o_r_b_a_n_a_m_e_:_i_i_o_p_:_1_._2_@_1_2_3_._0_._0_._0_1_2_:_4_0_0_1_/_N_a_m_e_S_e_r_v_i_c_e_#_o_r_g_/_E_r_l_a_n_g_/_M_y_O_b_j_"
+
+              For more information about _c_o_r_b_a_n_a_m_e and _c_o_r_b_a_l_o_c, see the
+              User's Guide (Interoperable Naming Service).
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+              How to handle the interface context is further described in the
+              User's Guide.
+
+       pprriinntt__oobbjjeecctt((DDaattaa [[,, TTyyppee]])) -->> ookk || {{''EEXXCCEEPPTTIIOONN'',, EE}} || {{''EEXXIITT'',, RR}} ||
+       ssttrriinngg(())
+
+              Types:
+
+                 Data = IOR_string | #objref (local or external) |
+                 corbaloc/corbaname string
+                 Type = IoDevice | error_report | {error_report, Reason} |
+                 info_msg | {info_msg, Comment} | string
+                 IoDevice = see the io-module
+                 Reason = Comment = string()
+
+              The object represented by the supplied data is dissected and
+              presented in a more readable form. The Type parameter is
+              optional; if not supplied standard output is used. For
+              _e_r_r_o_r___r_e_p_o_r_t and _i_n_f_o___m_s_g the _e_r_r_o_r___l_o_g_g_e_r module is used, with
+              or without Reason or Comment. If the atom _s_t_r_i_n_g is supplied
+              this function will return a flat list. The _I_o_D_e_v_i_c_e is passed to
+              the operation _i_o_:_f_o_r_m_a_t_/_2.
+
+              If the supplied object is a local reference, the output is
+              equivalent to an object exported from the node this function is
+              invoked on.
+
+       aadddd__aalltteerrnnaattee__iiiioopp__aaddddrreessss((OObbjjeecctt,, HHoosstt,, PPoorrtt)) -->> NNeewwOObbjjeecctt ||
+       {{''EEXXCCEEPPTTIIOONN'',, EE}}
+
+              Types:
+
+                 Object = NewObject = local #objref
+                 Host = string()
+                 Port = integer()
+
+              This operation creates a new instance of the supplied object
+              containing an ALTERNATE_IIOP_ADDRESS component. Only the new
+              instance contains the new component. When this object is passed
+              to another ORB, which supports the ALTERNATE_IIOP_ADDRESS,
+              requests will be routed to the alternate address if it is not
+              possible to communicate with the main address.
+
+              The ALTERNATE_IIOP_ADDRESS component requires that IIOP-1.2 is
+              used. Hence, make sure both Orber and the other ORB is correctly
+              configured.
+
+          NNoottee::
+              Make sure that the given _O_b_j_e_c_t is accessible via the alternate
+              Host/port. For example, if the object is correctly started as
+              _l_o_c_a_l or _p_s_e_u_d_o, the object should be available on all nodes
+              within a multi-node Orber installation. Since only one instance
+              exists for other object types, it will not be possible to access
+              it if the node it was started on terminates.
+
+
+       oorrbb__iinniitt((KKeeyyVVaalluueeLLiisstt)) -->> ookk || {{''EEXXIITT'',, RReeaassoonn}}
+
+              Types:
+
+                 KeyValueList = [{Key, Value}]
+                 Key = any key listed in the configuration chapter
+                 Value = allowed value associated with the given key
+
+              This function allows the user to configure Orber in, for
+              example, an Erlang shell. Orber may _N_O_T be started prior to
+              invoking this operation. For more information, see ccoonnffiigguurraattiioonn
+              sseettttiinnggss in the User's Guide.
+
+
+
+Ericsson AB                      orber 3.6.24                         corba(3)

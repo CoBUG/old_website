@@ -1,0 +1,126 @@
+lname(3)                   Erlang Module Definition                   lname(3)
+
+
+
+NNAAMMEE
+       lname - Interface that supports the name pseudo-objects.
+
+DDEESSCCRRIIPPTTIIOONN
+       This interface is a part of the names library which is used to hide the
+       representation of names. In Orbers Erlang mapping the pseudo-object
+       names and the real IDL names have the same representation but it is
+       desirable that the clients uses the names library so they will not be
+       dependent of the representation. The lname interface supports handling
+       of names e.g. adding and removing name components.
+
+       Note that the lname interface in orber does not contain a destroy
+       function because the Names are represented as standard Erlang lists and
+       therefor will be removed by the garbage collector when not in use.
+
+       The type _N_a_m_e_C_o_m_p_o_n_e_n_t used below is defined as:
+
+             -record('CosNaming_NameComponent', {id, kind=""}).
+
+
+       _i_d and _k_i_n_d are strings.
+
+       The record is defined in the file _C_o_s_N_a_m_i_n_g_._h_r_l and it is included
+       with:
+
+             -include_lib("orber/COSS/CosNaming/CosNaming.hrl").
+
+
+EEXXPPOORRTTSS
+       ccrreeaattee(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = [NameComponent]
+
+              This function returns a new name.
+
+       iinnsseerrtt__ccoommppoonneenntt((NNaammee,, NN,, NNaammeeCCoommppoonneenntt)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = [NameComponent]
+                 N = int()
+                 Return = Name
+
+              This function returns a name where the new name component has
+              been inserted as component _N in Name.
+
+       ggeett__ccoommppoonneenntt((NNaammee,, NN)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = [NameComponent]
+                 N = int()
+                 Return = NameComponent
+
+              This function returns the _N_:_t_h name component in Name.
+
+       ddeelleettee__ccoommppoonneenntt((NNaammee,, NN)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = [NameComponent]
+                 N = int()
+                 Return = Name
+
+              This function deletes the _N_:_t_h name component from Name and
+              returns the new name.
+
+       nnuumm__ccoommppoonneenntt((NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = [NameComponent]
+                 Return = int()
+
+              This function returns a the number of name components in Name.
+
+       eeqquuaall((NNaammee11,, NNaammee22)) -->> RReettuurrnn
+
+              Types:
+
+                 Name1 = Name2 = [NameComponent]
+                 Return = bool()
+
+              This function returns true if the two names are equal and false
+              otherwise.
+
+       lleessss__tthhaann((NNaammee11,, NNaammee22)) -->> RReettuurrnn
+
+              Types:
+
+                 Name1 = Name2 = [NameComponent]
+                 Return = bool()
+
+              This function returns true if Name1 are lesser than Name2 and
+              false otherwise.
+
+       ttoo__iiddll__ffoorrmm((NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = [NameComponent]
+                 Return = Name
+
+              This function just checks if Name is a correct IDL name before
+              returning it because the name representation is the same for
+              pseudo and IDL names in orber.
+
+       ffrroomm__iiddll__ffoorrmm((NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 Name = [NameComponent]
+                 Return = Name
+
+              This function just returns the Name because the name
+              representation is the same for pseudo and IDL names in orber.
+
+
+
+Ericsson AB                      orber 3.6.24                         lname(3)

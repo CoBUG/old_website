@@ -1,0 +1,489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- Release Notes</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/diameter-1.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Diameter</strong><br><strong>Release Notes</strong><br><small>Version 1.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Chapters</strong></small></p>
+<ul class="flipMenu" imagepath="../../../../doc/js/flipmenu"><li id="loadscrollpos" title="Release Notes" expanded="true">Release Notes<ul>
+<li><a href="notes.html">
+              Top of chapter
+            </a></li>
+<li title="Diameter 1.2"><a href="notes.html#id60371">Diameter 1.2</a></li>
+<li title="Diameter 1.0"><a href="notes.html#id64954">Diameter 1.0</a></li>
+<li title="Diameter 0.10"><a href="notes.html#id62790">Diameter 0.10</a></li>
+<li title="diameter 0.9"><a href="notes.html#id60791">diameter 0.9</a></li>
+</ul>
+</li></ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<h1>1 Release Notes</h1>
+
+
+
+<p>
+Releases are listed in reverse chronological order, most recent
+first.</p>
+
+
+
+<h3><a name="id60371">1.1 
+        Diameter 1.2</a></h3>
+
+    <h4>Fixed Bugs and Malfunctions</h4>
+      <ul>
+        <li>
+          <p>
+	    Fix broken Result-Code setting and Destination-Host/Realm
+	    extraction.</p>
+          <p>
+	    Result-Code was assumed to have arity 1 when setting this
+	    value in an answer to a request containing AVP decode
+	    errors. Destination-Host/Realm were only correctly
+	    extracted from messages in the common application.</p>
+          <p>
+	    Own Id: OTP-10202</p>
+        </li>
+        <li>
+          <p>
+	    Handle insufficient capabilities configuration more
+	    gracefully.</p>
+          <p>
+	    A transport that does not have sufficient capabilities
+	    configuration in order to encode CER/CEA will now emit an
+	    error report noting the configuration error and exit
+	    instead of failing. The error is not detected at
+	    diameter:add_transport/2 since there is no requirement
+	    that a service be configured before its transports.</p>
+          <p>
+	    Own Id: OTP-10203</p>
+        </li>
+        <li>
+          <p>
+	    Ensure a failing peer_up/down callback does not affect
+	    transport connections to other peers.</p>
+          <p>
+	    Such a failure would previously have taken down all of a
+	    service's connections.</p>
+          <p>
+	    Own Id: OTP-10215</p>
+        </li>
+      </ul>
+    
+
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+          <p>
+	    Statistics related to Diameter messages can be retrieved
+	    using diameter:service_info/2.</p>
+          <p>
+	    Both Diameter and socket-level statistics are available,
+	    for both incoming and outgoing messages.</p>
+          <p>
+	    Own Id: OTP-9608</p>
+        </li>
+        <li>
+          <p>
+	    Allow multiple transport_module/config to
+	    diameter:add_transport/2.</p>
+          <p>
+	    Multiple values are attempted in sequence until one
+	    results in an established connection. This provides a way
+	    for a connecting transport to specify configuration in
+	    order of preference. (For example, SCTP before TCP.)</p>
+          <p>
+	    Own Id: OTP-9885</p>
+        </li>
+        <li>
+          <p>
+	    Add events for state transitions in the RFC 3539 watchdog
+	    state machine.</p>
+          <p>
+	    The watchdog state is also available through
+	    diameter:service_info/2.</p>
+          <p>
+	    Own Id: OTP-10212</p>
+        </li>
+        <li>
+          <p>
+	    Add diameter:service_info(SvcName, connections).</p>
+          <p>
+	    This provides an alternative to
+	    diameter:service_info(SvcName, transport) that presents
+	    information per established connection instead of per
+	    transport reference.</p>
+          <p>
+	    Own Id: OTP-10213</p>
+        </li>
+        <li>
+          <p>
+	    Assorted documentation corrections/improvements.</p>
+          <p>
+	    Own Id: OTP-10216</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id64954">1.2 
+        Diameter 1.0</a></h3>
+
+    <h4>Fixed Bugs and Malfunctions</h4>
+      <ul>
+        <li>
+          <p>
+	    Fix faulty cleanup after diameter:remove_transport/2.</p>
+          <p>
+	    Removing a transport removed the configuration but did
+	    not prevent the transport process from being restarted.</p>
+          <p>
+	    Own Id: OTP-9756</p>
+        </li>
+      </ul>
+    
+
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+          <p>
+	    Add support for TLS over TCP.</p>
+          <p>
+	    RFC 3588 requires that a Diameter server support TLS. In
+	    practice this seems to mean TLS over SCTP since there are
+	    limitations with running over SCTP: see RFC 6083 (DTLS
+	    over SCTP), which is a response to RFC 3436 (TLS over
+	    SCTP). The current RFC 3588 draft acknowledges this by
+	    equating TLS with TLS/TCP and DTLS/SCTP.</p>
+          <p>
+	    TLS handshaking can take place either following a CER/CEA
+	    that negotiates TLS using the Inband-Security-Id AVP (the
+	    method documented in RFC 3588) or immediately following
+	    connection establishment (the method added to the current
+	    draft).</p>
+          <p>
+	    Own Id: OTP-9605</p>
+        </li>
+        <li>
+          <p>
+	    Improvements to the dictionary parser.</p>
+          <p>
+	    The dictionary parser now emits useful error messages in
+	    case of faults in the input file, also identifying the
+	    line number at which the fault was detected. There are
+	    semantic checks that were missing in the previous parser,
+	    a fault in the interpretation of vendor id's in
+	    combination with @inherits has been fixed and @end can be
+	    used to terminate parsing explicitly instead of always
+	    parsing to end of file.</p>
+          <p>
+	    Own Id: OTP-9639</p>
+        </li>
+        <li>
+          <p>
+	    Improve dictionary reusability.</p>
+          <p>
+	    Reusing a dictionary just to get a different generated
+	    module name or prefix previously required taking a copy
+	    of the source, which may consist of several files if
+	    inheritance is used, just to edit a couple of lines which
+	    don't affect the semantics of the Diameter application
+	    being defined. Options --name, --prefix and --inherits
+	    have been added to diameterc to allow corresponding
+	    values to be set at compile time.</p>
+          <p>
+	    Own Id: OTP-9641</p>
+        </li>
+        <li>
+          <p>
+	    Add capabilities_cb transport option.</p>
+          <p>
+	    Its value is a function that's applied to the transport
+	    reference and capabilities record after capabilities
+	    exchange. If a callback returns anything but 'ok' then
+	    the connection is closed. In the case of an incoming CER,
+	    the callback can return a result code with which to
+	    answer. Multiple callbacks can be specified and are
+	    applied until either all return 'ok' or one doesn't.</p>
+          <p>
+	    This provides a way to reject a peer connection.</p>
+          <p>
+	    Own Id: OTP-9654</p>
+        </li>
+        <li>
+          <p>
+	    Add @codecs to dictionary format.</p>
+          <p>
+	    The semantics are similar to @custom_types but results in
+	    codec functions of the form TypeName(encode|decode,
+	    AvpName, Data) rather than AvpName(encode|decode,
+	    TypeName, Data). That is, the role of the AVP name and
+	    Diameter type name are reversed. This eliminates the need
+	    for exporting one function for each AVP sharing a common
+	    specialized encode/decode.</p>
+          <p>
+	    Own Id: OTP-9708 Aux Id: OTP-9639 </p>
+        </li>
+        <li>
+          <p>
+	    Add #diameter_callback{} for more flexible callback
+	    configuration.</p>
+          <p>
+	    The record allows individual functions to be configured
+	    for each of the diameter_app(3) callbacks, as well as a
+	    default callback.</p>
+          <p>
+	    Own Id: OTP-9777</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id62790">1.3 
+        Diameter 0.10</a></h3>
+
+    <h4>Fixed Bugs and Malfunctions</h4>
+      <ul>
+        <li>
+          <p>
+	    Handle #sctp_paddr_change and #sctp_pdapi_event from
+	    gen_sctp.</p>
+          <p>
+	    The events are enabled by default but diameter_sctp
+	    neither disabled nor dealt with them. Reception of such
+	    an event caused a transport process to crash.</p>
+          <p>
+	    Own Id: OTP-9538</p>
+        </li>
+        <li>
+          <p>
+	    Fix header folding bug.</p>
+          <p>
+	    A prepare_request callback from diameter can return a
+	    diameter_header record in order to set values in the
+	    header of an outgoing request. A fault in
+	    diameter_lib:fold_tuple/3 caused the subsequent encode of
+	    the outgoing request to fail.</p>
+          <p>
+	    Own Id: OTP-9577</p>
+        </li>
+        <li>
+          <p>
+	    Fix bugs in sending of answer-message replies.</p>
+          <p>
+	    3001 (DIAMETER_COMMAND_UNSUPPORTED) was not sent since
+	    the decode placed the AVP list in the wrong field of the
+	    diameter_packet, causing the subsequent encode to fail.
+	    Session-Id was also set improperly, causing encode to
+	    fail even in this case.</p>
+          <p>
+	    Own Id: OTP-9578</p>
+        </li>
+        <li>
+          <p>
+	    Fix improper use of error_logger:info_report/2.</p>
+          <p>
+	    Function doesn't take a format string and arguments as it
+	    was called. Instead use error_logger:info_report/1 and
+	    use the same report format as used for warning and error
+	    reports.</p>
+          <p>
+	    Own Id: OTP-9579</p>
+        </li>
+        <li>
+          <p>
+	    Fix and clarify semantics of peer filters.</p>
+          <p>
+	    An eval filter returning a non-true value caused the call
+	    process to fail and the doc was vague on how an exception
+	    was treated. Clarify that the non-tuple host/realm
+	    filters assume messages of a certain form.</p>
+          <p>
+	    Own Id: OTP-9580</p>
+        </li>
+        <li>
+          <p>
+	    Fix and clarify relay behaviour.</p>
+          <p>
+	    Implicit filtering of the sending peer in relaying a
+	    request could cause loop detection to be preempted in a
+	    manner not specified by RFC3588. Reply with 3002
+	    (DIAMETER_UNABLE_TO_DELIVER) on anything but an answer to
+	    a relayed request.</p>
+          <p>
+	    Own Id: OTP-9583</p>
+        </li>
+      </ul>
+    
+
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+          <p>
+	    @id required in dictionary files only when @messages is
+	    specified.</p>
+          <p>
+	    @id defines an application identifier and this is used
+	    only when sending or receiving messages. A dictionary can
+	    define only AVP's however, to be included by other
+	    dictionaries using @inherits, in which case it makes no
+	    sense to require @id.</p>
+          <p>
+	    Note that message definitions are not inherited with
+	    @inherits, only AVP's</p>
+          <p>
+	    Own Id: OTP-9467</p>
+        </li>
+        <li>
+          <p>
+	    Allow @enum when AVP is defined in an inherited
+	    dictionary.</p>
+          <p>
+	    3GPP standards (for one) extend the values allowed for
+	    RFC 3588 AVP's of type Enumerated. Previously, extending
+	    an AVP was only possible by completely redefining the
+	    AVP.</p>
+          <p>
+	    Own Id: OTP-9469</p>
+        </li>
+        <li>
+          <p>
+	    Migrate testsuites to pure common test and add both
+	    suites and testcases.</p>
+          <p>
+	    Own Id: OTP-9553</p>
+        </li>
+        <li>
+          <p>
+	    Requests of arbitrary form.</p>
+          <p>
+	    diameter:call/4 can be passed anything, as long as the
+	    subsequent prepare_request callback returns a term that
+	    can be encoded.</p>
+          <p>
+	    Own Id: OTP-9581</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id60791">1.4 
+        diameter 0.9</a></h3>
+
+
+<p>
+Initial release of the diameter application.</p>
+
+<p>
+Known issues or limitations:</p>
+
+<ul>
+
+<li>
+<p>
+Some agent-related functionality is not entirely complete.
+In particular, support for proxy agents, that advertise specific
+Diameter applications but otherwise relay messages in much the same
+way as relay agents (for which a <span class="bold_code"><a href="diameter_app.html#handle_request">handle_request/3</a></span>
+callback can return a <span class="code">relay</span> tuple), will be completed in an
+upcoming release.
+There may also be more explicit support for redirect agents, although
+redirect behaviour can be implemented with the current
+functionality.</p>
+
+</li>
+
+<li>
+<p>
+There is some asymmetry in the treatment of messages sent as
+<span class="code">diameter_header/avp</span> records and those sent in the "normal"
+fashion, and not all of this is documented.
+This is related to the previous point since this form of sending a
+message was introduced specifically to handle relay agent behaviour
+using the same callback interface as for client/server behaviour.</p>
+</li>
+
+<li>
+<p>
+The User's Guide is currently quite thin.
+The introductory chapter followed by the examples (in the application
+<span class="code">examples</span> subdirectory) may be sufficient
+for those having some familiarity with the Diameter protocol but the
+intention is to provide more introductory text.
+The reference documentation is quite complete, although some points
+could likely be expanded upon.</p>
+</li>
+
+<li>
+<p>
+The function <span class="bold_code"><a href="diameter.html#service_info">diameter:service_info/2</a></span>
+can be used to retrieve information about a started service
+(statistics, information about connected peers, etc) but
+this is not yet documented and both the input and output may change
+in the next release.</p>
+</li>
+
+
+</ul>
+
+<p>
+See <span class="bold_code"><a href="diameter_soc.html">Standards Compliance</a></span> for
+standards-related issues.</p>
+
+
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 2011-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

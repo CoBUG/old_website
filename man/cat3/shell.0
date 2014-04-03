@@ -1,0 +1,701 @@
+shell(3)                   Erlang Module Definition                   shell(3)
+
+
+
+NNAAMMEE
+       shell - The Erlang Shell
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_h_e_l_l implements an Erlang shell.
+
+       The shell is a user interface program for entering expression
+       sequences. The expressions are evaluated and a value is returned. A
+       history mechanism saves previous commands and their values, which can
+       then be incorporated in later commands. How many commands and results
+       to save can be determined by the user, either interactively, by calling
+       _s_h_e_l_l_:_h_i_s_t_o_r_y_/_1 and _s_h_e_l_l_:_r_e_s_u_l_t_s_/_1, or by setting the application
+       configuration parameters _s_h_e_l_l___h_i_s_t_o_r_y___l_e_n_g_t_h and _s_h_e_l_l___s_a_v_e_d___r_e_s_u_l_t_s
+       for the application STDLIB.
+
+       The shell uses a helper process for evaluating commands in order to
+       protect the history mechanism from exceptions. By default the evaluator
+       process is killed when an exception occurs, but by calling
+       _s_h_e_l_l_:_c_a_t_c_h___e_x_c_e_p_t_i_o_n_/_1 or by setting the application configuration
+       parameter _s_h_e_l_l___c_a_t_c_h___e_x_c_e_p_t_i_o_n for the application STDLIB this
+       behavior can be changed. See also the example below.
+
+       Variable bindings, and local process dictionary changes which are
+       generated in user expressions are preserved, and the variables can be
+       used in later commands to access their values. The bindings can also be
+       forgotten so the variables can be re-used.
+
+       The special shell commands all have the syntax of (local) function
+       calls. They are evaluated as normal function calls and many commands
+       can be used in one expression sequence.
+
+       If a command (local function call) is not recognized by the shell, an
+       attempt is first made to find the function in the module _u_s_e_r___d_e_f_a_u_l_t,
+       where customized local commands can be placed. If found, then the
+       function is evaluated. Otherwise, an attempt is made to evaluate the
+       function in the module _s_h_e_l_l___d_e_f_a_u_l_t. The module _u_s_e_r___d_e_f_a_u_l_t must be
+       explicitly loaded.
+
+       The shell also permits the user to start multiple concurrent jobs. A
+       job can be regarded as a set of processes which can communicate with
+       the shell.
+
+       There is some support for reading and printing records in the shell.
+       During compilation record expressions are translated to tuple
+       expressions. In runtime it is not known whether a tuple actually
+       represents a record. Nor are the record definitions used by compiler
+       available at runtime. So in order to read the record syntax and print
+       tuples as records when possible, record definitions have to be
+       maintained by the shell itself. The shell commands for reading,
+       defining, forgetting, listing, and printing records are described
+       below. Note that each job has its own set of record definitions. To
+       facilitate matters record definitions in the modules _s_h_e_l_l___d_e_f_a_u_l_t and
+       _u_s_e_r___d_e_f_a_u_l_t (if loaded) are read each time a new job is started. For
+       instance, adding the line
+
+                 -include_lib("kernel/include/file.hrl").
+
+       to _u_s_e_r___d_e_f_a_u_l_t makes the definition of _f_i_l_e___i_n_f_o readily available in
+       the shell.
+
+       The shell runs in two modes:
+
+         * _N_o_r_m_a_l _(_p_o_s_s_i_b_l_y _r_e_s_t_r_i_c_t_e_d_) mode, in which commands can be edited
+           and expressions evaluated.
+
+         * Job Control Mode _J_C_L, in which jobs can be started, killed,
+           detached and connected.
+
+       Only the currently connected job can 'talk' to the shell.
+
+SSHHEELLLL CCOOMMMMAANNDDSS
+         _b_(_):
+           Prints the current variable bindings.
+
+         _f_(_):
+           Removes all variable bindings.
+
+         _f_(_X_):
+           Removes the binding of variable _X.
+
+         _h_(_):
+           Prints the history list.
+
+         _h_i_s_t_o_r_y_(_N_):
+           Sets the number of previous commands to keep in the history list to
+           _N. The previous number is returned. The default number is 20.
+
+         _r_e_s_u_l_t_s_(_N_):
+           Sets the number of results from previous commands to keep in the
+           history list to _N. The previous number is returned. The default
+           number is 20.
+
+         _e_(_N_):
+           Repeats the command _N, if _N is positive. If it is negative, the _Nth
+           previous command is repeated (i.e., _e_(_-_1_) repeats the previous
+           command).
+
+         _v_(_N_):
+           Uses the return value of the command _N in the current command, if _N
+           is positive. If it is negative, the return value of the _Nth
+           previous command is used (i.e., _v_(_-_1_) uses the value of the
+           previous command).
+
+         _h_e_l_p_(_):
+           Evaluates _s_h_e_l_l___d_e_f_a_u_l_t_:_h_e_l_p_(_).
+
+         _c_(_F_i_l_e_):
+           Evaluates _s_h_e_l_l___d_e_f_a_u_l_t_:_c_(_F_i_l_e_). This compiles and loads code in
+           _F_i_l_e and purges old versions of code, if necessary. Assumes that
+           the file and module names are the same.
+
+         _c_a_t_c_h___e_x_c_e_p_t_i_o_n_(_B_o_o_l_):
+           Sets the exception handling of the evaluator process. The previous
+           exception handling is returned. The default (_f_a_l_s_e) is to kill the
+           evaluator process when an exception occurs, which causes the shell
+           to create a new evaluator process. When the exception handling is
+           set to _t_r_u_e the evaluator process lives on which means that for
+           instance ports and ETS tables as well as processes linked to the
+           evaluator process survive the exception.
+
+         _r_d_(_R_e_c_o_r_d_N_a_m_e_, _R_e_c_o_r_d_D_e_f_i_n_i_t_i_o_n_):
+           Defines a record in the shell. _R_e_c_o_r_d_N_a_m_e is an atom and
+           _R_e_c_o_r_d_D_e_f_i_n_i_t_i_o_n lists the field names and the default values.
+           Usually record definitions are made known to the shell by use of
+           the _r_r commands described below, but sometimes it is handy to
+           define records on the fly.
+
+         _r_f_(_):
+           Removes all record definitions, then reads record definitions from
+           the modules _s_h_e_l_l___d_e_f_a_u_l_t and _u_s_e_r___d_e_f_a_u_l_t (if loaded). Returns the
+           names of the records defined.
+
+         _r_f_(_R_e_c_o_r_d_N_a_m_e_s_):
+           Removes selected record definitions. _R_e_c_o_r_d_N_a_m_e_s is a record name
+           or a list of record names. Use _'___' to remove all record
+           definitions.
+
+         _r_l_(_):
+           Prints all record definitions.
+
+         _r_l_(_R_e_c_o_r_d_N_a_m_e_s_):
+           Prints selected record definitions. _R_e_c_o_r_d_N_a_m_e_s is a record name or
+           a list of record names.
+
+         _r_p_(_T_e_r_m_):
+           Prints a term using the record definitions known to the shell. All
+           of _T_e_r_m is printed; the depth is not limited as is the case when a
+           return value is printed.
+
+         _r_r_(_M_o_d_u_l_e_):
+           Reads record definitions from a module's BEAM file. If there are no
+           record definitions in the BEAM file, the source file is located and
+           read instead. Returns the names of the record definitions read.
+           _M_o_d_u_l_e is an atom.
+
+         _r_r_(_W_i_l_d_c_a_r_d_):
+           Reads record definitions from files. Existing definitions of any of
+           the record names read are replaced. _W_i_l_d_c_a_r_d is a wildcard string
+           as defined in _f_i_l_e_l_i_b_(_3_) but not an atom.
+
+         _r_r_(_W_i_l_d_c_a_r_d_O_r_M_o_d_u_l_e_, _R_e_c_o_r_d_N_a_m_e_s_):
+           Reads record definitions from files but discards record names not
+           mentioned in _R_e_c_o_r_d_N_a_m_e_s (a record name or a list of record names).
+
+         _r_r_(_W_i_l_d_c_a_r_d_O_r_M_o_d_u_l_e_, _R_e_c_o_r_d_N_a_m_e_s_, _O_p_t_i_o_n_s_):
+           Reads record definitions from files. The compiler options _{_i_, _D_i_r_},
+           _{_d_, _M_a_c_r_o_}, and _{_d_, _M_a_c_r_o_, _V_a_l_u_e_} are recognized and used for
+           setting up the include path and macro definitions. Use _'___' as value
+           of _R_e_c_o_r_d_N_a_m_e_s to read all record definitions.
+
+EEXXAAMMPPLLEE
+       The following example is a long dialogue with the shell. Commands
+       starting with _> are inputs to the shell. All other lines are output
+       from the shell. All commands in this example are explained at the end
+       of the dialogue. .
+
+       strider 1> erl
+       Erlang (BEAM) emulator version 5.3 [hipe] [threads:0]
+
+       Eshell V5.3  (abort with ^G)
+       1>Str = "abcd".
+       "abcd"
+       2> L = length(Str).
+       4
+       3> Descriptor = {L, list_to_atom(Str)}.
+       {4,abcd}
+       4> L.
+       4
+       5> b().
+       Descriptor = {4,abcd}
+       L = 4
+       Str = "abcd"
+       ok
+       6> f(L).
+       ok
+       7> b().
+       Descriptor = {4,abcd}
+       Str = "abcd"
+       ok
+       8> f(L).
+       ok
+       9> {L, _} = Descriptor.
+       {4,abcd}
+       10> L.
+       4
+       11> {P, Q, R} = Descriptor.
+       ** exception error: no match of right hand side value {4,abcd}
+       12> P.
+       * 1: variable 'P' is unbound **
+       13> Descriptor.
+       {4,abcd}
+       14>{P, Q} = Descriptor.
+       {4,abcd}
+       15> P.
+       4
+       16> f().
+       ok
+       17> put(aa, hello).
+       undefined
+       18> get(aa).
+       hello
+       19> Y = test1:demo(1).
+       11
+       20> get().
+       [{aa,worked}]
+       21> put(aa, hello).
+       worked
+       22> Z = test1:demo(2).
+       ** exception error: no match of right hand side value 1
+            in function  test1:demo/1
+       23> Z.
+       * 1: variable 'Z' is unbound **
+       24> get(aa).
+       hello
+       25> erase(), put(aa, hello).
+       undefined
+       26> spawn(test1, demo, [1]).
+       <0.57.0>
+       27> get(aa).
+       hello
+       28> io:format("hello hello\n").
+       hello hello
+       ok
+       29> e(28).
+       hello hello
+       ok
+       30> v(28).
+       ok
+       31> c(ex).
+       {ok,ex}
+       32> rr(ex).
+       [rec]
+       33> rl(rec).
+       -record(rec,{a,b = val()}).
+       ok
+       34> #rec{}.
+       ** exception error: undefined shell command val/0
+       35> #rec{b = 3}.
+       #rec{a = undefined,b = 3}
+       36> rp(v(-1)).
+       #rec{a = undefined,b = 3}
+       ok
+       37> rd(rec, {f = orddict:new()}).
+       rec
+       38> #rec{}.
+       #rec{f = []}
+       ok
+       39> rd(rec, {c}), A.
+       * 1: variable 'A' is unbound **
+       40> #rec{}.
+       #rec{c = undefined}
+       ok
+       41> test1:loop(0).
+       Hello Number: 0
+       Hello Number: 1
+       Hello Number: 2
+       Hello Number: 3
+
+       User switch command
+        --> i
+        --> c
+       Hello Number: 3374
+       Hello Number: 3375
+       Hello Number: 3376
+       Hello Number: 3377
+       Hello Number: 3378
+       ** exception exit: killed
+       42> E = ets:new(t, []).
+       17
+       43> ets:insert({d,1,2}).
+       ** exception error: undefined function ets:insert/1
+       44> ets:insert(E, {d,1,2}).
+       ** exception error: argument is of wrong type
+            in function  ets:insert/2
+               called as ets:insert(16,{d,1,2})
+       45> f(E).
+       ok
+       46> catch_exception(true).
+       false
+       47> E = ets:new(t, []).
+       18
+       48> ets:insert({d,1,2}).
+       * exception error: undefined function ets:insert/1
+       49> ets:insert(E, {d,1,2}).
+       true
+       50> halt().
+       strider 2>
+
+CCOOMMMMEENNTTSS
+       Command 1 sets the variable _S_t_r to the string _"_a_b_c_d_".
+
+       Command 2 sets _L to the length of the string evaluating the BIF
+       _a_t_o_m___t_o___l_i_s_t.
+
+       Command 3 builds the tuple _D_e_s_c_r_i_p_t_o_r.
+
+       Command 4 prints the value of the variable _L.
+
+       Command 5 evaluates the internal shell command _b_(_), which is an
+       abbreviation of "bindings". This prints the current shell variables and
+       their bindings. The _o_k at the end is the return value of the _b_(_)
+       function.
+
+       Command 6 _f_(_L_) evaluates the internal shell command _f_(_L_) (abbreviation
+       of "forget"). The value of the variable _L is removed.
+
+       Command 7 prints the new bindings.
+
+       Command 8 has no effect since _L has no value.
+
+       Command 9 performs a pattern matching operation on _D_e_s_c_r_i_p_t_o_r, binding
+       a new value to _L.
+
+       Command 10 prints the current value of _L.
+
+       Command 11 tries to match _{_P_, _Q_, _R_} against _D_e_s_c_r_i_p_t_o_r which is _{_4_,
+       _a_b_c_}. The match fails and none of the new variables become bound. The
+       printout starting with "_*_* _e_x_c_e_p_t_i_o_n _e_r_r_o_r_:" is not the value of the
+       expression (the expression had no value because its evaluation failed),
+       but rather a warning printed by the system to inform the user that an
+       error has occurred. The values of the other variables (_L, _S_t_r, etc.)
+       are unchanged.
+
+       Commands 12 and 13 show that _P is unbound because the previous command
+       failed, and that _D_e_s_c_r_i_p_t_o_r has not changed.
+
+       Commands 14 and 15 show a correct match where _P and _Q are bound.
+
+       Command 16 clears all bindings.
+
+       The next few commands assume that _t_e_s_t_1_:_d_e_m_o_(_X_) is defined in the
+       following way:
+
+       demo(X) ->
+           put(aa, worked),
+           X = 1,
+           X + 10.
+
+       Commands 17 and 18 set and inspect the value of the item _a_a in the
+       process dictionary.
+
+       Command 19 evaluates _t_e_s_t_1_:_d_e_m_o_(_1_). The evaluation succeeds and the
+       changes made in the process dictionary become visible to the shell. The
+       new value of the dictionary item _a_a can be seen in command 20.
+
+       Commands 21 and 22 change the value of the dictionary item _a_a to _h_e_l_l_o
+       and call _t_e_s_t_1_:_d_e_m_o_(_2_). Evaluation fails and the changes made to the
+       dictionary in _t_e_s_t_1_:_d_e_m_o_(_2_), before the error occurred, are discarded.
+
+       Commands 23 and 24 show that _Z was not bound and that the dictionary
+       item _a_a has retained its original value.
+
+       Commands 25, 26 and 27 show the effect of evaluating _t_e_s_t_1_:_d_e_m_o_(_1_) in
+       the background. In this case, the expression is evaluated in a newly
+       spawned process. Any changes made in the process dictionary are local
+       to the newly spawned process and therefore not visible to the shell.
+
+       Commands 28, 29 and 30 use the history facilities of the shell.
+
+       Command 29 is _e_(_2_8_). This re-evaluates command 28. Command 30 is _v_(_2_8_).
+       This uses the value (result) of command 28. In the cases of a pure
+       function (a function with no side effects), the result is the same. For
+       a function with side effects, the result can be different.
+
+       The next few commands show some record manipulation. It is assumed that
+       _e_x_._e_r_l defines a record like this:
+
+       -record(rec, {a, b = val()}).
+
+       val() ->
+           3.
+
+       Commands 31 and 32 compiles the file _e_x_._e_r_l and reads the record
+       definitions in _e_x_._b_e_a_m. If the compiler did not output any record
+       definitions on the BEAM file, _r_r_(_e_x_) tries to read record definitions
+       from the source file instead.
+
+       Command 33 prints the definition of the record named _r_e_c.
+
+       Command 34 tries to create a _r_e_c record, but fails since the function
+       _v_a_l_/_0 is undefined. Command 35 shows the workaround: explicitly assign
+       values to record fields that cannot otherwise be initialized.
+
+       Command 36 prints the newly created record using record definitions
+       maintained by the shell.
+
+       Command 37 defines a record directly in the shell. The definition
+       replaces the one read from the file _e_x_._b_e_a_m.
+
+       Command 38 creates a record using the new definition, and prints the
+       result.
+
+       Command 39 and 40 show that record definitions are updated as side
+       effects. The evaluation of the command fails but the definition of _r_e_c
+       has been carried out.
+
+       For the next command, it is assumed that _t_e_s_t_1_:_l_o_o_p_(_N_) is defined in
+       the following way:
+
+       loop(N) ->
+           io:format("Hello Number: ~w~n", [N]),
+           loop(N+1).
+
+       Command 41 evaluates _t_e_s_t_1_:_l_o_o_p_(_0_), which puts the system into an
+       infinite loop. At this point the user types _C_o_n_t_r_o_l _G, which suspends
+       output from the current process, which is stuck in a loop, and
+       activates _J_C_L mode. In _J_C_L mode the user can start and stop jobs.
+
+       In this particular case, the _i command ("interrupt") is used to
+       terminate the looping program, and the _c command is used to connect to
+       the shell again. Since the process was running in the background before
+       we killed it, there will be more printouts before the "_*_* _e_x_c_e_p_t_i_o_n
+       _e_x_i_t_: _k_i_l_l_e_d" message is shown.
+
+       Command 42 creates an ETS table.
+
+       Command 43 tries to insert a tuple into the ETS table but the first
+       argument (the table) is missing. The exception kills the evaluator
+       process.
+
+       Command 44 corrects the mistake, but the ETS table has been destroyed
+       since it was owned by the killed evaluator process.
+
+       Command 46 sets the exception handling of the evaluator process to
+       _t_r_u_e. The exception handling can also be set when starting Erlang, like
+       this: _e_r_l _-_s_t_d_l_i_b _s_h_e_l_l___c_a_t_c_h___e_x_c_e_p_t_i_o_n _t_r_u_e.
+
+       Command 48 makes the same mistake as in command 43, but this time the
+       evaluator process lives on. The single star at the beginning of the
+       printout signals that the exception has been caught.
+
+       Command 49 successfully inserts the tuple into the ETS table.
+
+       The _h_a_l_t_(_) command exits the Erlang runtime system.
+
+JJCCLL MMOODDEE
+       When the shell starts, it starts a single evaluator process. This
+       process, together with any local processes which it spawns, is referred
+       to as a _j_o_b. Only the current job, which is said to be _c_o_n_n_e_c_t_e_d, can
+       perform operations with standard IO. All other jobs, which are said to
+       be _d_e_t_a_c_h_e_d, are _b_l_o_c_k_e_d if they attempt to use standard IO.
+
+       All jobs which do not use standard IO run in the normal way.
+
+       The shell escape key _^_G (Control G) detaches the current job and
+       activates _J_C_L mode. The _J_C_L mode prompt is _"_-_-_>_". If _"_?_" is entered at
+       the prompt, the following help message is displayed:
+
+                 --> ?
+                 c [nn]            - connect to job
+                 i [nn]            - interrupt job
+                 k [nn]            - kill job
+                 j                 - list all jobs
+                 s [shell]         - start local shell
+                 r [node [shell]]  - start remote shell
+                 q        - quit erlang
+                 ? | h             - this message
+
+       The _J_C_L commands have the following meaning:
+
+         _c _[_n_n_]:
+           Connects to job number _<_n_n_> or the current job. The standard shell
+           is resumed. Operations which use standard IO by the current job
+           will be interleaved with user inputs to the shell.
+
+         _i _[_n_n_]:
+           Stops the current evaluator process for job number _n_n or the
+           current job, but does not kill the shell process. Accordingly, any
+           variable bindings and the process dictionary will be preserved and
+           the job can be connected again. This command can be used to
+           interrupt an endless loop.
+
+         _k _[_n_n_]:
+           Kills job number _n_n or the current job. All spawned processes in
+           the job are killed, provided they have not evaluated the
+           _g_r_o_u_p___l_e_a_d_e_r_/_1 BIF and are located on the local machine. Processes
+           spawned on remote nodes will not be killed.
+
+         _j:
+           Lists all jobs. A list of all known jobs is printed. The current
+           job name is prefixed with '*'.
+
+         _s:
+           Starts a new job. This will be assigned the new index _[_n_n_] which
+           can be used in references.
+
+         _s _[_s_h_e_l_l_]:
+           Starts a new job. This will be assigned the new index _[_n_n_] which
+           can be used in references. If the optional argument _s_h_e_l_l is given,
+           it is assumed to be a module that implements an alternative shell.
+
+         _r _[_n_o_d_e_]:
+           Starts a remote job on _n_o_d_e. This is used in distributed Erlang to
+           allow a shell running on one node to control a number of
+           applications running on a network of nodes. If the optional
+           argument _s_h_e_l_l is given, it is assumed to be a module that
+           implements an alternative shell.
+
+         _q:
+           Quits Erlang. Note that this option is disabled if Erlang is
+           started with the ignore break, _+_B_i, system flag (which may be
+           useful e.g. when running a restricted shell, see below).
+
+         _?:
+           Displays this message.
+
+       It is possible to alter the behavior of shell escape by means of the
+       STDLIB application variable _s_h_e_l_l___e_s_c. The value of the variable can be
+       either _j_c_l (_e_r_l _-_s_t_d_l_i_b _s_h_e_l_l___e_s_c _j_c_l) or _a_b_o_r_t (_e_r_l _-_s_t_d_l_i_b _s_h_e_l_l___e_s_c
+       _a_b_o_r_t). The first option sets ^G to activate _J_C_L mode (which is also
+       default behavior). The latter sets ^G to terminate the current shell
+       and start a new one. _J_C_L mode cannot be invoked when _s_h_e_l_l___e_s_c is set
+       to _a_b_o_r_t.
+
+       If you want an Erlang node to have a remote job active from the start
+       (rather than the default local job), you start Erlang with the _-_r_e_m_s_h
+       flag. Example: _e_r_l _-_s_n_a_m_e _t_h_i_s___n_o_d_e _-_r_e_m_s_h _o_t_h_e_r___n_o_d_e_@_o_t_h_e_r___h_o_s_t
+
+RREESSTTRRIICCTTEEDD SSHHEELLLL
+       The shell may be started in a restricted mode. In this mode, the shell
+       evaluates a function call only if allowed. This feature makes it
+       possible to, for example, prevent a user from accidentally calling a
+       function from the prompt that could harm a running system (useful in
+       combination with the the system flag _+_B_i).
+
+       When the restricted shell evaluates an expression and encounters a
+       function call or an operator application, it calls a callback function
+       (with information about the function call in question). This callback
+       function returns _t_r_u_e to let the shell go ahead with the evaluation, or
+       _f_a_l_s_e to abort it. There are two possible callback functions for the
+       user to implement:
+
+       _l_o_c_a_l___a_l_l_o_w_e_d_(_F_u_n_c_, _A_r_g_L_i_s_t_, _S_t_a_t_e_) _-_> _{_t_r_u_e_,_N_e_w_S_t_a_t_e_} _|
+       _{_f_a_l_s_e_,_N_e_w_S_t_a_t_e_}
+
+       to determine if the call to the local function _F_u_n_c with arguments
+       _A_r_g_L_i_s_t should be allowed.
+
+       _n_o_n___l_o_c_a_l___a_l_l_o_w_e_d_(_F_u_n_c_S_p_e_c_, _A_r_g_L_i_s_t_, _S_t_a_t_e_) _-_> _{_t_r_u_e_,_N_e_w_S_t_a_t_e_} _|
+       _{_f_a_l_s_e_,_N_e_w_S_t_a_t_e_} _| _{_{_r_e_d_i_r_e_c_t_,_N_e_w_F_u_n_c_S_p_e_c_,_N_e_w_A_r_g_L_i_s_t_}_,_N_e_w_S_t_a_t_e_}
+
+       to determine if the call to non-local function _F_u_n_c_S_p_e_c (_{_M_o_d_u_l_e_,_F_u_n_c_}
+       or a fun) with arguments _A_r_g_L_i_s_t should be allowed. The return value
+       _{_r_e_d_i_r_e_c_t_,_N_e_w_F_u_n_c_S_p_e_c_,_N_e_w_A_r_g_L_i_s_t_} can be used to let the shell evaluate
+       some other function than the one specified by _F_u_n_c_S_p_e_c and _A_r_g_L_i_s_t.
+
+       These callback functions are in fact called from local and non-local
+       evaluation function handlers, described in the eerrll__eevvaall manual page.
+       (Arguments in _A_r_g_L_i_s_t are evaluated before the callback functions are
+       called.)
+
+       The _S_t_a_t_e argument is a tuple _{_S_h_e_l_l_S_t_a_t_e_,_E_x_p_r_S_t_a_t_e_}. The return value
+       _N_e_w_S_t_a_t_e has the same form. This may be used to carry a state between
+       calls to the callback functions. Data saved in _S_h_e_l_l_S_t_a_t_e lives through
+       an entire shell session. Data saved in _E_x_p_r_S_t_a_t_e lives only through the
+       evaluation of the current expression.
+
+       There are two ways to start a restricted shell session:
+
+         * Use the STDLIB application variable _r_e_s_t_r_i_c_t_e_d___s_h_e_l_l and specify,
+           as its value, the name of the callback module. Example (with
+           callback functions implemented in callback_mod.erl): _$ _e_r_l _-_s_t_d_l_i_b
+           _r_e_s_t_r_i_c_t_e_d___s_h_e_l_l _c_a_l_l_b_a_c_k___m_o_d
+
+         * From a normal shell session, call function
+           _s_h_e_l_l_:_s_t_a_r_t___r_e_s_t_r_i_c_t_e_d_/_1. This exits the current evaluator and
+           starts a new one in restricted mode.
+
+       _N_o_t_e_s_:
+
+         * When restricted shell mode is activated or deactivated, new jobs
+           started on the node will run in restricted or normal mode
+           respectively.
+
+         * If restricted mode has been enabled on a particular node, remote
+           shells connecting to this node will also run in restricted mode.
+
+         * The callback functions cannot be used to allow or disallow
+           execution of functions called from compiled code (only functions
+           called from expressions entered at the shell prompt).
+
+       Errors when loading the callback module is handled in different ways
+       depending on how the restricted shell is activated:
+
+         * If the restricted shell is activated by setting the kernel variable
+           during emulator startup and the callback module cannot be loaded, a
+           default restricted shell allowing only the commands _q_(_) and
+           _i_n_i_t_:_s_t_o_p_(_) is used as fallback.
+
+         * If the restricted shell is activated using _s_h_e_l_l_:_s_t_a_r_t___r_e_s_t_r_i_c_t_e_d_/_1
+           and the callback module cannot be loaded, an error report is sent
+           to the error logger and the call returns _{_e_r_r_o_r_,_R_e_a_s_o_n_}.
+
+PPRROOMMPPTTIINNGG
+       The default shell prompt function displays the name of the node (if the
+       node can be part of a distributed system) and the current command
+       number. The user can customize the prompt function by calling
+       _s_h_e_l_l_:_p_r_o_m_p_t___f_u_n_c_/_1 or by setting the application configuration
+       parameter _s_h_e_l_l___p_r_o_m_p_t___f_u_n_c for the application STDLIB.
+
+       A customized prompt function is stated as a tuple _{_M_o_d_, _F_u_n_c_}. The
+       function is called as _M_o_d_:_F_u_n_c_(_L_), where _L is a list of key-value pairs
+       created by the shell. Currently there is only one pair: _{_h_i_s_t_o_r_y_, _N_},
+       where N is the current command number. The function should return a
+       list of characters or an atom. This constraint is due to the Erlang
+       I/O-protocol. Unicode characters beyond codepoint 255 are allowed in
+       the list. Note that in restricted mode the call _M_o_d_:_F_u_n_c_(_L_) must be
+       allowed or the default shell prompt function will be called.
+
+EEXXPPOORRTTSS
+       hhiissttoorryy((NN)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 N = integer() >= 0
+
+              Sets the number of previous commands to keep in the history list
+              to _N. The previous number is returned. The default number is 20.
+
+       rreessuullttss((NN)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 N = integer() >= 0
+
+              Sets the number of results from previous commands to keep in the
+              history list to _N. The previous number is returned. The default
+              number is 20.
+
+       ccaattcchh__eexxcceeppttiioonn((BBooooll)) -->> BBooooll
+
+              Types:
+
+                 Bool = boolean()
+
+              Sets the exception handling of the evaluator process. The
+              previous exception handling is returned. The default (_f_a_l_s_e) is
+              to kill the evaluator process when an exception occurs, which
+              causes the shell to create a new evaluator process. When the
+              exception handling is set to _t_r_u_e the evaluator process lives on
+              which means that for instance ports and ETS tables as well as
+              processes linked to the evaluator process survive the exception.
+
+       pprroommpptt__ffuunncc((PPrroommppttFFuunncc)) -->> PPrroommppttFFuunncc
+
+              Types:
+
+                 PromptFunc = default | {module(), atom()}
+
+              Sets the shell prompt function to _P_r_o_m_p_t_F_u_n_c. The previous
+              prompt function is returned.
+
+       ssttaarrtt__rreessttrriicctteedd((MMoodduullee)) -->> {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Module = module()
+                 Reason = ccooddee::llooaadd__eerrrroorr__rrssnn(())
+
+              Exits a normal shell and starts a restricted shell. _M_o_d_u_l_e
+              specifies the callback module for the functions _l_o_c_a_l___a_l_l_o_w_e_d_/_3
+              and _n_o_n___l_o_c_a_l___a_l_l_o_w_e_d_/_3. The function is meant to be called from
+              the shell.
+
+              If the callback module cannot be loaded, an error tuple is
+              returned. The _R_e_a_s_o_n in the error tuple is the one returned by
+              the code loader when trying to load the code of the callback
+              module.
+
+       ssttoopp__rreessttrriicctteedd(()) -->> nnoo__rreettuurrnn(())
+
+              Exits a restricted shell and starts a normal shell. The function
+              is meant to be called from the shell.
+
+
+
+Ericsson AB                      stdlib 1.18.2                        shell(3)

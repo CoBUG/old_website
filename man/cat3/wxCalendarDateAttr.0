@@ -1,0 +1,214 @@
+wxCalendarDateAttr(3)      Erlang Module Definition      wxCalendarDateAttr(3)
+
+
+
+NNAAMMEE
+       wxCalendarDateAttr - See external documentation: wxCalendarDateAttr.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCalendarDateAttr.
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_a_l_e_n_d_a_r_D_a_t_e_A_t_t_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCCaalleennddaarrDDaatteeAAttttrr(())
+
+              See external documentation.
+
+       nneeww((BBoorrddeerr)) -->> wwxxCCaalleennddaarrDDaatteeAAttttrr(())
+
+              Types:
+
+                 Border = wx_enum() (see module wx)
+
+              See external documentation.
+              Also:
+              new(ColText) -> wxCalendarDateAttr() when
+              ColText::wx:wx_colour().
+
+
+              Border = ?wxCAL_BORDER_NONE | ?wxCAL_BORDER_SQUARE |
+              ?wxCAL_BORDER_ROUND
+
+       nneeww((BBoorrddeerr,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxCCaalleennddaarrDDaatteeAAttttrr(())
+
+              Types:
+
+                 Border = wx_enum() (see module wx)
+                 Option = {colBorder, wx_colour() (see module wx)}
+
+              See external documentation.
+              Also:
+              new(ColText, [Option]) -> wxCalendarDateAttr() when
+              ColText::wx:wx_colour(),
+              Option :: {colBack, wx:wx_colour()}
+              | {colBorder, wx:wx_colour()}
+              | {font, wxFont:wxFont()}
+              | {border, wx:wx_enum()}.
+
+
+              Border = ?wxCAL_BORDER_NONE | ?wxCAL_BORDER_SQUARE |
+              ?wxCAL_BORDER_ROUND
+
+       sseettTTeexxttCCoolloouurr((TThhiiss,, CCoollTTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+                 ColText = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoollBBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+                 ColBack = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettBBoorrddeerrCCoolloouurr((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettBBoorrddeerr((TThhiiss,, BBoorrddeerr)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+                 Border = wx_enum() (see module wx)
+
+              See external documentation.
+              Border = ?wxCAL_BORDER_NONE | ?wxCAL_BORDER_SQUARE |
+              ?wxCAL_BORDER_ROUND
+
+       sseettHHoolliiddaayy((TThhiiss,, HHoolliiddaayy)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+                 Holiday = boolean()
+
+              See external documentation.
+
+       hhaassTTeexxttCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       hhaassBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       hhaassBBoorrddeerrCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       hhaassFFoonntt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       hhaassBBoorrddeerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       iissHHoolliiddaayy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       ggeettTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       ggeettBBoorrddeerrCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+
+       ggeettBBoorrddeerr((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarDateAttr()
+
+              See external documentation.
+              Res = ?wxCAL_BORDER_NONE | ?wxCAL_BORDER_SQUARE |
+              ?wxCAL_BORDER_ROUND
+
+       ddeessttrrooyy((TThhiiss::::wwxxCCaalleennddaarrDDaatteeAAttttrr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxCalendarDateAttr(3)

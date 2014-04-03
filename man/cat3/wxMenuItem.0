@@ -1,0 +1,239 @@
+wxMenuItem(3)              Erlang Module Definition              wxMenuItem(3)
+
+
+
+NNAAMMEE
+       wxMenuItem - See external documentation: wxMenuItem.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMenuItem.
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_e_n_u_I_t_e_m_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMeennuuIItteemm(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMeennuuIItteemm(())
+
+              Types:
+
+                 Option = {parentMenu, wxMenu() (see module wxMenu)} | {id,
+                 integer()} | {text, chardata() (see module unicode)} | {help,
+                 chardata() (see module unicode)} | {kind, wx_enum() (see
+                 module wx)} | {subMenu, wxMenu() (see module wxMenu)}
+
+              See external documentation.
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       cchheecckk((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+
+              Equivalent to cchheecckk((TThhiiss,, [[]])).
+
+       cchheecckk((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Option = {check, boolean()}
+
+              See external documentation.
+
+       eennaabbllee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+
+              Equivalent to eennaabbllee((TThhiiss,, [[]])).
+
+       eennaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       ggeettBBiittmmaapp((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       ggeettHHeellpp((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       ggeettIIdd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       ggeettKKiinndd((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+              Res = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       ggeettLLaabbeell((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       ggeettLLaabbeellFFrroommTTeexxtt((TTeexxtt)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettMMeennuu((TThhiiss)) -->> wwxxMMeennuu(()) ((sseeee mmoodduullee wwxxMMeennuu))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       ggeettSSuubbMMeennuu((TThhiiss)) -->> wwxxMMeennuu(()) ((sseeee mmoodduullee wwxxMMeennuu))
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       iissCChheecckkaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       iissCChheecckkeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       iissEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       iissSSeeppaarraattoorr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       iissSSuubbMMeennuu((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMenuItem()
+
+              See external documentation.
+
+       sseettBBiittmmaapp((TThhiiss,, BBiittmmaapp)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       sseettHHeellpp((TThhiiss,, SSttrr)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Str = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettMMeennuu((TThhiiss,, MMeennuu)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Menu = wxMenu() (see module wxMenu)
+
+              See external documentation.
+
+       sseettSSuubbMMeennuu((TThhiiss,, MMeennuu)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Menu = wxMenu() (see module wxMenu)
+
+              See external documentation.
+
+       sseettTTeexxtt((TThhiiss,, SSttrr)) -->> ookk
+
+              Types:
+
+                 This = wxMenuItem()
+                 Str = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMeennuuIItteemm(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxMenuItem(3)

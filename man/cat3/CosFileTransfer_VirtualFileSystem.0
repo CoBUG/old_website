@@ -1,0 +1,49 @@
+CosFileTransfer_VirtualFileSEyrsltaenmg(3M)odule DeCfoisnFiitlieoTnransfer_VirtualFileSystem(3)
+
+
+
+NNAAMMEE
+       CosFileTransfer_VirtualFileSystem - This module implements the OMG
+       CosFileTransfer::VirtualFileSystem interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_F_i_l_e_T_r_a_n_s_f_e_r_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ''__ggeett__ffiillee__ssyysstteemm__ttyyppee''((VVFFSS)) -->> RReettuurrnn
+
+              Types:
+
+                 VFS = #objref
+                 Return = 'FTP' | 'NATIVE'
+
+              This read only attribute represents the target object's
+              associated file system.
+
+       ''__ggeett__ssuuppppoorrtteedd__ccoonntteenntt__ttyyppeess''((VVFFSS)) -->> RReettuurrnn
+
+              Types:
+
+                 VFS = #objref
+                 Return =
+
+              This read only attribute represents the target object's
+              supported content types.
+
+       llooggiinn((VVFFSS,, UUsseerr,, PPaasssswwoorrdd,, AAccccoouunntt)) -->> RReettuurrnn
+
+              Types:
+
+                 VFS = #objref
+                 User = Password = Account = string()
+                 Return = {FileTransferSession, Directory} | {'EXCEPTION', E}
+                 FileTransferSession = Directory = #objref
+
+              This operation creates a new instance of a _F_i_l_e_T_r_a_n_s_f_e_r_S_e_s_s_i_o_n
+              and a _D_i_r_e_c_t_o_r_y. The later represents the current working
+              directory of the returned _F_i_l_e_T_r_a_n_s_f_e_r_S_e_s_s_i_o_n.
+
+
+
+Ericsson AB                 cosFileTransferCo1s.F1i.l1e3Transfer_VirtualFileSystem(3)

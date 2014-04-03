@@ -1,0 +1,89 @@
+wxGridCellFloatRenderer(3) Erlang Module Definition wxGridCellFloatRenderer(3)
+
+
+
+NNAAMMEE
+       wxGridCellFloatRenderer - See external documentation:
+       wxGridCellFloatRenderer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridCellFloatRenderer.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrriiddCCeellllSSttrriinnggRReennddeerreerr
+       wwxxGGrriiddCCeellllRReennddeerreerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_C_e_l_l_F_l_o_a_t_R_e_n_d_e_r_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxGGrriiddCCeellllFFllooaattRReennddeerreerr(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrriiddCCeellllFFllooaattRReennddeerreerr(())
+
+              Types:
+
+                 Option = {width, integer()} | {precision, integer()}
+
+              See external documentation.
+
+       ggeettPPrreecciissiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridCellFloatRenderer()
+
+              See external documentation.
+
+       ggeettWWiiddtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGridCellFloatRenderer()
+
+              See external documentation.
+
+       sseettPPaarraammeetteerrss((TThhiiss,, PPaarraammss)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellFloatRenderer()
+                 Params = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettPPrreecciissiioonn((TThhiiss,, PPrreecciissiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellFloatRenderer()
+                 Precision = integer()
+
+              See external documentation.
+
+       sseettWWiiddtthh((TThhiiss,, WWiiddtthh)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellFloatRenderer()
+                 Width = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrriiddCCeellllFFllooaattRReennddeerreerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2        wxGridCellFloatRenderer(3)

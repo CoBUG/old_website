@@ -1,0 +1,73 @@
+lib(3)                     Erlang Module Definition                     lib(3)
+
+
+
+NNAAMMEE
+       lib - A number of useful library functions
+
+DDEESSCCRRIIPPTTIIOONN
+   WWaarrnniinngg::
+       This module is retained for compatibility. It may disappear without
+       warning in a future release.
+
+
+EEXXPPOORRTTSS
+       fflluusshh__rreecceeiivvee(()) -->> ookk
+
+              Flushes the message buffer of the current process.
+
+       eerrrroorr__mmeessssaaggee((FFoorrmmaatt,, AArrggss)) -->> ookk
+
+              Types:
+
+                 Format = iioo::ffoorrmmaatt(())
+                 Args = [term()]
+
+              Prints error message _A_r_g_s in accordance with _F_o_r_m_a_t. Similar to
+              _i_o_:_f_o_r_m_a_t_/_2, see iioo((33)).
+
+       pprrooggnnaammee(()) -->> aattoomm(())
+
+              Returns the name of the script that started the current Erlang
+              session.
+
+       nnoonnll((SSttrriinngg11)) -->> SSttrriinngg22
+
+              Types:
+
+                 String1 = String2 = string()
+
+              Removes the last newline character, if any, in _S_t_r_i_n_g_1.
+
+       sseenndd((TToo,, MMssgg)) -->> MMssgg
+
+              Types:
+
+                 To = pid() | atom() | {atom(), node()}
+                 Msg = term()
+
+              This function to makes it possible to send a message using the
+              _a_p_p_l_y_/_3 BIF.
+
+       sseennddww((TToo,, MMssgg)) -->> MMssgg
+
+              Types:
+
+                 To = pid() | atom() | {atom(), node()}
+                 Msg = term()
+
+              As _s_e_n_d_/_2, but waits for an answer. It is implemented as
+              follows:
+
+              sendw(To, Msg) ->
+                  To ! {self(),Msg},
+                  receive
+                      Reply -> Reply
+                  end.
+
+              The message returned is not necessarily a reply to the message
+              sent.
+
+
+
+Ericsson AB                      stdlib 1.18.2                          lib(3)

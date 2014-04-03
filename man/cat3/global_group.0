@@ -1,0 +1,233 @@
+global_group(3)            Erlang Module Definition            global_group(3)
+
+
+
+NNAAMMEE
+       global_group - Grouping Nodes to Global Name Registration Groups
+
+DDEESSCCRRIIPPTTIIOONN
+       The global group function makes it possible to group the nodes in a
+       system into partitions, each partition having its own global name
+       space, refer to _g_l_o_b_a_l_(_3_). These partitions are called global groups.
+
+       The main advantage of dividing systems to global groups is that the
+       background load decreases while the number of nodes to be updated is
+       reduced when manipulating globally registered names.
+
+       The Kernel configuration parameter _g_l_o_b_a_l___g_r_o_u_p_s defines the global
+       groups (see also kkeerrnneell((66)), ccoonnffiigg((44)):
+
+       {global_groups, [GroupTuple :: group_tuple()]}
+
+       For the processes and nodes to run smoothly using the global group
+       functionality, the following criteria must be met:
+
+         * An instance of the global group server, _g_l_o_b_a_l___g_r_o_u_p, must be
+           running on each node. The processes are automatically started and
+           synchronized when a node is started.
+
+         * All involved nodes must agree on the global group definition, or
+           the behavior of the system is undefined.
+
+         * _A_l_l nodes in the system should belong to exactly one global group.
+
+       In the following description, a _g_r_o_u_p _n_o_d_e is a node belonging to the
+       same global group as the local node.
+
+DDAATTAA TTYYPPEESS
+       ggrroouupp__ttuuppllee(()) = {GroupName :: ggrroouupp__nnaammee(()), [node()]}
+                     | {GroupName :: ggrroouupp__nnaammee(()),
+                        PublishType :: ppuubblliisshh__ttyyppee(()),
+                        [node()]}
+
+              A _G_r_o_u_p_T_u_p_l_e without _P_u_b_l_i_s_h_T_y_p_e is the same as a _G_r_o_u_p_T_u_p_l_e
+              with _P_u_b_l_i_s_h_T_y_p_e _=_= _n_o_r_m_a_l.
+
+       ggrroouupp__nnaammee(()) = atom()
+
+       ppuubblliisshh__ttyyppee(()) = hidden | normal
+
+              A node started with the command line flag _-_h_i_d_d_e_n, see eerrll((11)),
+              is said to be a _h_i_d_d_e_n node. A hidden node will establish hidden
+              connections to nodes not part of the same global group, but
+              normal (visible) connections to nodes part of the same global
+              group.
+
+              A global group defined with _P_u_b_l_i_s_h_T_y_p_e _=_= _h_i_d_d_e_n, is said to be
+              a hidden global group. All nodes in a hidden global group are
+              hidden nodes, regardless if they are started with the _-_h_i_d_d_e_n
+              command line flag or not.
+
+       nnaammee(()) = atom()
+
+              A registered name.
+
+       wwhheerree(()) = {node, node()} | {group, ggrroouupp__nnaammee(())}
+
+EEXXPPOORRTTSS
+       gglloobbaall__ggrroouuppss(()) -->> {{GGrroouuppNNaammee,, GGrroouuppNNaammeess}} || uunnddeeffiinneedd
+
+              Types:
+
+                 GroupName = ggrroouupp__nnaammee(())
+                 GroupNames = [GroupName]
+
+              Returns a tuple containing the name of the global group the
+              local node belongs to, and the list of all other known group
+              names. Returns _u_n_d_e_f_i_n_e_d if no global groups are defined.
+
+       iinnffoo(()) -->> [[iinnffoo__iitteemm(())]]
+
+              Types:
+
+                 iinnffoo__iitteemm(()) = {state, State :: ssyynncc__ssttaattee(())}
+                             | {own_group_name, GroupName :: ggrroouupp__nnaammee(())}
+                             | {own_group_nodes, Nodes :: [node()]}
+                             | {synched_nodes, Nodes :: [node()]}
+                             | {sync_error, Nodes :: [node()]}
+                             | {no_contact, Nodes :: [node()]}
+                             | {other_groups, Groups :: [ggrroouupp__ttuuppllee(())]}
+                             | {monitoring, Pids :: [pid()]}
+                 ssyynncc__ssttaattee(()) = no_conf | synced
+
+              Returns a list containing information about the global groups.
+              Each element of the list is a tuple. The order of the tuples is
+              not defined.
+
+                _{_s_t_a_t_e_, _S_t_a_t_e_}:
+                  If the local node is part of a global group, _S_t_a_t_e _=_=
+                  _s_y_n_c_e_d. If no global groups are defined, _S_t_a_t_e _=_= _n_o___c_o_n_f.
+
+                _{_o_w_n___g_r_o_u_p___n_a_m_e_, _G_r_o_u_p_N_a_m_e_}:
+                  The name (atom) of the group that the local node belongs to.
+
+                _{_o_w_n___g_r_o_u_p___n_o_d_e_s_, _N_o_d_e_s_}:
+                  A list of node names (atoms), the group nodes.
+
+                _{_s_y_n_c_e_d___n_o_d_e_s_, _N_o_d_e_s_}:
+                  A list of node names, the group nodes currently synchronized
+                  with the local node.
+
+                _{_s_y_n_c___e_r_r_o_r_, _N_o_d_e_s_}:
+                  A list of node names, the group nodes with which the local
+                  node has failed to synchronize.
+
+                _{_n_o___c_o_n_t_a_c_t_, _N_o_d_e_s_}:
+                  A list of node names, the group nodes to which there are
+                  currently no connections.
+
+                _{_o_t_h_e_r___g_r_o_u_p_s_, _G_r_o_u_p_s_}:
+                  _G_r_o_u_p_s is a list of tuples _{_G_r_o_u_p_N_a_m_e_, _N_o_d_e_s_}, specifying
+                  the name and nodes of the other global groups.
+
+                _{_m_o_n_i_t_o_r_i_n_g_, _P_i_d_s_}:
+                  A list of pids, specifying the processes which have
+                  subscribed to _n_o_d_e_u_p and _n_o_d_e_d_o_w_n messages.
+
+       mmoonniittoorr__nnooddeess((FFllaagg)) -->> ookk
+
+              Types:
+
+                 Flag = boolean()
+
+              Depending on _F_l_a_g, the calling process starts subscribing (_F_l_a_g
+              _=_= _t_r_u_e) or stops subscribing (_F_l_a_g _=_= _f_a_l_s_e) to node status
+              change messages.
+
+              A process which has subscribed will receive the messages
+              _{_n_o_d_e_u_p_, _N_o_d_e_} and _{_n_o_d_e_d_o_w_n_, _N_o_d_e_} when a group node connects
+              or disconnects, respectively.
+
+       oowwnn__nnooddeess(()) -->> NNooddeess
+
+              Types:
+
+                 Nodes = [Node :: node()]
+
+              Returns the names of all group nodes, regardless of their
+              current status.
+
+       rreeggiisstteerreedd__nnaammeess((WWhheerree)) -->> NNaammeess
+
+              Types:
+
+                 Where = wwhheerree(())
+                 Names = [Name :: nnaammee(())]
+
+              Returns a list of all names which are globally registered on the
+              specified node or in the specified global group.
+
+       sseenndd((NNaammee,, MMssgg)) -->> ppiidd(()) || {{bbaaddaarrgg,, {{NNaammee,, MMssgg}}}}
+
+       sseenndd((WWhheerree,, NNaammee,, MMssgg)) -->> ppiidd(()) || {{bbaaddaarrgg,, {{NNaammee,, MMssgg}}}}
+
+              Types:
+
+                 Where = wwhheerree(())
+                 Name = nnaammee(())
+                 Msg = term()
+
+              Searches for _N_a_m_e, globally registered on the specified node or
+              in the specified global group, or -- if the _W_h_e_r_e argument is
+              not provided -- in any global group. The global groups are
+              searched in the order in which they appear in the value of the
+              _g_l_o_b_a_l___g_r_o_u_p_s configuration parameter.
+
+              If _N_a_m_e is found, the message _M_s_g is sent to the corresponding
+              pid. The pid is also the return value of the function. If the
+              name is not found, the function returns _{_b_a_d_a_r_g_, _{_N_a_m_e_, _M_s_g_}_}.
+
+       ssyynncc(()) -->> ookk
+
+              Synchronizes the group nodes, that is, the global name servers
+              on the group nodes. Also check the names globally registered in
+              the current global group and unregisters them on any known node
+              not part of the group.
+
+              If synchronization is not possible, an error report is sent to
+              the error logger (see also _e_r_r_o_r___l_o_g_g_e_r_(_3_)).
+
+              Failure: _{_e_r_r_o_r_, _{_'_i_n_v_a_l_i_d _g_l_o_b_a_l___g_r_o_u_p_s _d_e_f_i_n_i_t_i_o_n_'_, _B_a_d_}_} if
+              the _g_l_o_b_a_l___g_r_o_u_p_s configuration parameter has an invalid value
+              _B_a_d.
+
+       wwhheerreeiiss__nnaammee((NNaammee)) -->> ppiidd(()) || uunnddeeffiinneedd
+
+       wwhheerreeiiss__nnaammee((WWhheerree,, NNaammee)) -->> ppiidd(()) || uunnddeeffiinneedd
+
+              Types:
+
+                 Where = wwhheerree(())
+                 Name = nnaammee(())
+
+              Searches for _N_a_m_e, globally registered on the specified node or
+              in the specified global group, or -- if the _W_h_e_r_e argument is
+              not provided -- in any global group. The global groups are
+              searched in the order in which they appear in the value of the
+              _g_l_o_b_a_l___g_r_o_u_p_s configuration parameter.
+
+              If _N_a_m_e is found, the corresponding pid is returned. If the name
+              is not found, the function returns _u_n_d_e_f_i_n_e_d.
+
+NNOOTTEE
+       In the situation where a node has lost its connections to other nodes
+       in its global group, but has connections to nodes in other global
+       groups, a request from another global group may produce an incorrect or
+       misleading result. For example, the isolated node may not have accurate
+       information about registered names in its global group.
+
+       Note also that the _s_e_n_d_/_2_,_3 function is not secure.
+
+       Distribution of applications is highly dependent of the global group
+       definitions. It is not recommended that an application is distributed
+       over several global groups of the obvious reason that the registered
+       names may be moved to another global group at failover/takeover. There
+       is nothing preventing doing this, but the application code must in such
+       case handle the situation.
+
+SSEEEE AALLSSOO
+       eerrll((11)), gglloobbaall((33))
+
+
+
+Ericsson AB                      kernel 2.15.2                 global_group(3)

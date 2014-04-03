@@ -1,0 +1,113 @@
+webtool(3)                 Erlang Module Definition                 webtool(3)
+
+
+
+NNAAMMEE
+       webtool - WebTool is a tool used to simplify the implementation of web
+       based tools with Erlang/OTP.
+
+DDEESSCCRRIIPPTTIIOONN
+       WebTool makes it easy to use web based tools with Erlang/OTP. WebTool
+       configures and starts the webserver httpd.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(())-->> {{ookk,,PPiidd}}|| {{ssttoopp,,RReeaassoonn}}
+
+              Start WebTool with default data, i.e. port 8888, ip-number
+              127.0.0.1, and server-name _l_o_c_a_l_h_o_s_t. If port 8888 is in use,
+              port 8889 is tried instead. If 8889 is also in use, 8890 is
+              tried and so on. Max number of ports tried is 256.
+
+              The _m_i_m_e_._t_y_p_e_s file and WebTool's own HTML files are assumed to
+              be in the directory _w_e_b_t_o_o_l_-_<_v_s_n_>_/_p_r_i_v_/_r_o_o_t_/_c_o_n_f.
+
+       ssttaarrtt((PPaatthh,,DDaattaa))-->>{{ookk,,PPiidd}}||{{ssttoopp,,RReeaassoonn}}
+
+              Types:
+
+                 Path = string() | standard_path
+                 Data = [Port,Address,Name] | PortNumber | standard_data
+                 Port = {port,PortNumber}
+                 Address = {bind_address,IpNumber}
+                 Name = {server_name,ServerName}
+                 PortNumber = integer()
+                 IpNumber = tuple(), e.g. {127,0,0,1}
+                 ServerName = string()
+                 Pid = pid()
+
+              Use this function to start WebTool if the default port, ip-
+              number,servername or path can not be used.
+
+              _P_a_t_h is the directory where the _m_i_m_e_._t_y_p_e_s file and WebTool's
+              own HTML files are located. By default this is
+              _w_e_b_t_o_o_l_-_<_v_s_n_>_/_p_r_i_v, and in most cases there is no need to change
+              this. If _P_a_t_h is set to _s_t_a_n_d_a_r_d___p_a_t_h the default will be used.
+
+              If _D_a_t_a is set to _P_o_r_t_N_u_m_b_e_r, the default data will be used for
+              ip-number (_1_2_7_._0_._0_._1) and server name (_l_o_c_a_l_h_o_s_t).
+
+       ssttoopp(())-->>vvooiidd
+
+              Stop WebTool and the tools started by WebTool.
+
+       ddeebbuugg__aapppp((MMoodduullee))-->>vvooiidd
+
+              Types:
+
+                 Module = atom()
+
+              Debug a WebTool application by tracing all functions in the
+              given module which are called from WebTool.
+
+       ssttoopp__ddeebbuugg(())-->>vvooiidd
+
+              Stop the tracing started by _d_e_b_u_g___a_p_p_/_1, and format the trace
+              log.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following callback function must be implemented by each web based
+       tool that will be used via WebTool. When started, WebTool searches the
+       Erlang code path for *.tool files to locate all web based tools and
+       their callback functions. See the WWeebbTTooooll UUsseerr''ss GGuuiiddee for more
+       information about the *.tool files.
+
+EEXXPPOORRTTSS
+       MMoodduullee::FFuunncc((DDaattaa))-->> {{NNaammee,,WWeebbDDaattaa}}||eerrrroorr
+
+              Types:
+
+                 Data = term()
+                 Name = atom()
+                 WebData = [WebOptions]
+                 WebOptions = LinkData | Alias | Start
+                 LinkData = {web_data,{ToolName,Url}}
+                 Alias = {alias,{VirtualPath,RealPath}} |
+                 {alias,{erl_alias,Path,[Modules]}
+                 Start = {start,StartData}
+                 ToolName = Url = VirtualPath = RealPath = Path = string()
+                 Modules = atom()
+                 StartData = AppData | ChildSpec | Func
+                 AppData = {app,AppName}
+                 ChildSpec = {child,child_spec()}
+                   See the Reference Manual for the module supervisor in the
+                   STDLIB application for details about child_spec().
+                 Func = {func,{StartMod,StartFunc,StartArg},
+                 {StopMod,StopFunc,StopArg}}
+                 AppName = StartMod = StartFunc = StopMod = StopFunc =atom()
+                 StartArg = StopArg = [term()]
+
+              This is the configuration function (_c_o_n_f_i_g___f_u_n_c) which must be
+              stated in the _*_._t_o_o_l file.
+
+              The function is called by WebTool at startup to retrieve the
+              data needed to start and configure the tool. _L_i_n_k_D_a_t_a is used by
+              WebTool to create the link to the tool. _A_l_i_a_s is used to create
+              the aliases needed by the webserver. _S_t_a_r_t is used to start and
+              stop the tool.
+
+SSEEEE AALLSSOO
+       ssttaarrtt__wweebbttooooll((11)), WWeebbTTooooll UUsseerr''ss GGuuiiddee
+
+
+
+Ericsson AB                     webtool 0.8.9.1                     webtool(3)

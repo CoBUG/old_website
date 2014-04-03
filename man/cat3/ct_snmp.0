@@ -1,0 +1,354 @@
+ct_snmp(3)                 Erlang Module Definition                 ct_snmp(3)
+
+
+
+NNAAMMEE
+       ct_snmp - Common Test user interface module for the OTP snmp
+       application.
+
+DDEESSCCRRIIPPTTIIOONN
+       Common Test user interface module for the OTP snmp application
+
+       The purpose of this module is to make snmp configuration easier for the
+       test case writer. Many test cases can use default values for common
+       operations and then no snmp configuration files need to be supplied.
+       When it is necessary to change particular configuration parameters, a
+       subset of the relevant snmp configuration files may be passed to
+       _c_t___s_n_m_p by means of Common Test configuration files. For more
+       specialized configuration parameters, it is possible to place a "simple
+       snmp configuration file" in the test suite data directory. To simplify
+       the test suite, Common Test keeps track of some of the snmp manager
+       information. This way the test suite doesn't have to handle as many
+       input parameters as it would if it had to interface the OTP snmp
+       manager directly.
+
+       The following snmp manager and agent parameters are configurable:
+
+          {snmp,
+                 %%% Manager config
+                 [{start_manager, boolean()}    % Optional - default is true
+                 {users, [{user_name(), [call_back_module(), user_data()]}]}, %% Optional
+                 {usm_users, [{usm_user_name(), usm_config()}]},%% Optional - snmp v3 only
+                 % managed_agents is optional
+                 {managed_agents,[{agent_name(), [user_name(), agent_ip(), agent_port(), [agent_config()]]}]},
+                 {max_msg_size, integer()},     % Optional - default is 484
+                 {mgr_port, integer()},         % Optional - default is 5000
+                 {engine _id, string()},        % Optional - default is "mgrEngine"
+
+                 %%% Agent config
+                 {start_agent, boolean()},      % Optional - default is false
+                 {agent_sysname, string()},     % Optional - default is "ct_test"
+                 {agent_manager_ip, manager_ip()}, % Optional - default is localhost
+                 {agent_vsns, list()},          % Optional - default is [v2]
+                 {agent_trap_udp, integer()},   % Optional - default is 5000
+                 {agent_udp, integer()},        % Optional - default is 4000
+                 {agent_notify_type, atom()},   % Optional - default is trap
+                 {agent_sec_type, sec_type()},  % Optional - default is none
+                 {agent_passwd, string()},      % Optional - default is ""
+                 {agent_engine_id, string()},   % Optional - default is "agentEngine"
+                 {agent_max_msg_size, string()},% Optional - default is 484
+
+                 %% The following parameters represents the snmp configuration files
+                 %% context.conf, standard.conf, community.conf, vacm.conf,
+                 %% usm.conf, notify.conf, target_addr.conf and target_params.conf.
+                 %% Note all values in agent.conf can be altered by the parametes
+                 %% above. All these configuration files have default values set
+                 %% up by the snmp application. These values can be overridden by
+                 %% suppling a list of valid configuration values or a file located
+                 %% in the test suites data dir that can produce a list
+                 %% of valid configuration values if you apply file:consult/1 to the
+                 %% file.
+                 {agent_contexts, [term()] | {data_dir_file, rel_path()}}, % Optional
+                 {agent_community, [term()] | {data_dir_file, rel_path()}},% Optional
+                 {agent_sysinfo,  [term()] | {data_dir_file, rel_path()}}, % Optional
+                 {agent_vacm, [term()] | {data_dir_file, rel_path()}},     % Optional
+                 {agent_usm, [term()] | {data_dir_file, rel_path()}},      % Optional
+                 {agent_notify_def, [term()] | {data_dir_file, rel_path()}},% Optional
+                 {agent_target_address_def, [term()] | {data_dir_file, rel_path()}},% Optional
+                 {agent_target_param_def, [term()] | {data_dir_file, rel_path()}},% Optional
+                ]}.
+
+
+       The _M_g_r_A_g_e_n_t_C_o_n_f_N_a_m_e parameter in the functions should be a name you
+       allocate in your test suite using a _r_e_q_u_i_r_e statement. Example (where
+       _M_g_r_A_g_e_n_t_C_o_n_f_N_a_m_e _= _s_n_m_p___m_g_r___a_g_e_n_t):
+
+        suite() -> [{require, snmp_mgr_agent, snmp}].
+
+       or
+
+         ct:require(snmp_mgr_agent, snmp).
+
+       Note that Usm users are needed for snmp v3 configuration and are not to
+       be confused with users.
+
+       Snmp traps, inform and report messages are handled by the user callback
+       module. For more information about this see the snmp application.
+
+       Note: It is recommended to use the .hrl-files created by the Erlang/OTP
+       mib-compiler to define the oids. Example for the getting the erlang
+       node name from the erlNodeTable in the OTP-MIB:
+
+       Oid = ?erlNodeEntry ++ [?erlNodeName, 1]
+
+       It is also possible to set values for snmp application configuration
+       parameters, such as _c_o_n_f_i_g, _s_e_r_v_e_r, _n_e_t___i_f, etc (see the "Configuring
+       the application" chapter in the OTP snmp User's Guide for a list of
+       valid parameters and types). This is done by defining a configuration
+       data variable on the following form:
+
+          {snmp_app, [{manager, [snmp_app_manager_params()]},
+                      {agent, [snmp_app_agent_params()]}]}.
+
+       A name for the data needs to be allocated in the suite using _r_e_q_u_i_r_e
+       (see example above), and this name passed as the _S_n_m_p_A_p_p_C_o_n_f_N_a_m_e
+       argument to _s_t_a_r_t_/_3. _c_t___s_n_m_p specifies default values for some snmp
+       application configuration parameters (such as _{_v_e_r_b_o_s_i_t_y_,_t_r_a_c_e_} for the
+       _c_o_n_f_i_g parameter). This set of defaults will be merged with the
+       parameters specified by the user, and user values override _c_t___s_n_m_p
+       defaults.
+
+DDAATTAA TTYYPPEESS
+         _a_g_e_n_t___c_o_n_f_i_g_(_) _= _{_I_t_e_m_, _V_a_l_u_e_}:
+
+
+         _a_g_e_n_t___i_p_(_) _= _i_p_(_):
+
+
+         _a_g_e_n_t___n_a_m_e_(_) _= _a_t_o_m_(_):
+
+
+         _a_g_e_n_t___p_o_r_t_(_) _= _i_n_t_e_g_e_r_(_):
+
+
+         _c_a_l_l___b_a_c_k___m_o_d_u_l_e_(_) _= _a_t_o_m_(_):
+
+
+         _e_r_r_o_r___i_n_d_e_x_(_) _= _i_n_t_e_g_e_r_(_):
+
+
+         _e_r_r_o_r___s_t_a_t_u_s_(_) _= _n_o_E_r_r_o_r _| _a_t_o_m_(_):
+
+
+         _i_p_(_) _= _s_t_r_i_n_g_(_) _| _{_i_n_t_e_g_e_r_(_)_, _i_n_t_e_g_e_r_(_)_, _i_n_t_e_g_e_r_(_)_, _i_n_t_e_g_e_r_(_)_}:
+
+
+         _m_a_n_a_g_e_r___i_p_(_) _= _i_p_(_):
+
+
+         _o_i_d_(_) _= _[_b_y_t_e_(_)_]:
+
+
+         _o_i_d_s_(_) _= _[_o_i_d_(_)_]:
+
+
+         _r_e_l___p_a_t_h_(_) _= _s_t_r_i_n_g_(_):
+
+
+         _s_e_c___t_y_p_e_(_) _= _n_o_n_e _| _m_i_n_i_m_u_m _| _s_e_m_i:
+
+
+         _s_n_m_p___a_p_p___a_g_e_n_t___p_a_r_a_m_s_(_) _= _t_e_r_m_(_):
+
+
+         _s_n_m_p___a_p_p___m_a_n_a_g_e_r___p_a_r_a_m_s_(_) _= _t_e_r_m_(_):
+
+
+         _s_n_m_p_r_e_p_l_y_(_) _= _{_e_r_r_o_r___s_t_a_t_u_s_(_)_, _e_r_r_o_r___i_n_d_e_x_(_)_, _v_a_r_b_i_n_d_s_(_)_}:
+
+
+         _u_s_e_r___d_a_t_a_(_) _= _t_e_r_m_(_):
+
+
+         _u_s_e_r___n_a_m_e_(_) _= _a_t_o_m_(_):
+
+
+         _u_s_m___c_o_n_f_i_g_(_) _= _s_t_r_i_n_g_(_):
+
+
+         _u_s_m___u_s_e_r___n_a_m_e_(_) _= _s_t_r_i_n_g_(_):
+
+
+         _v_a_l_u_e___t_y_p_e_(_) _= _o_(_'_O_B_J_E_C_T _I_D_E_N_T_I_F_I_E_R_'_) _| _i_(_'_I_N_T_E_G_E_R_'_) _|
+         _u_(_'_U_n_s_i_g_n_e_d_3_2_'_) _| _g_(_'_U_n_s_i_g_n_e_d_3_2_'_) _| _s_(_'_O_C_T_E_T _S_T_R_I_N_G_'_):
+
+
+         _v_a_r___a_n_d___v_a_l_(_) _= _{_o_i_d_(_)_, _v_a_l_u_e___t_y_p_e_(_)_, _v_a_l_u_e_(_)_}:
+
+
+         _v_a_r_b_i_n_d_(_) _= _t_e_r_m_(_):
+
+
+         _v_a_r_b_i_n_d_s_(_) _= _[_v_a_r_b_i_n_d_(_)_]:
+
+
+         _v_a_r_s_a_n_d_v_a_l_s_(_) _= _[_v_a_r___a_n_d___v_a_l_(_)_]:
+
+
+EEXXPPOORRTTSS
+       ggeett__nneexxtt__vvaalluueess((AAggeenntt,, OOiiddss,, MMggrrAAggeennttCCoonnffNNaammee)) -->> SSnnmmppRReeppllyy
+
+              Types:
+
+                 Agent = agent_name()
+                 Oids = oids()
+                 MgrAgentConfName = atom()
+                 SnmpReply = snmpreply()
+
+              Issues a synchronous snmp get next request.
+
+       ggeett__vvaalluueess((AAggeenntt,, OOiiddss,, MMggrrAAggeennttCCoonnffNNaammee)) -->> SSnnmmppRReeppllyy
+
+              Types:
+
+                 Agent = agent_name()
+                 Oids = oids()
+                 MgrAgentConfName = atom()
+                 SnmpReply = snmpreply()
+
+              Issues a synchronous snmp get request.
+
+       llooaadd__mmiibbss((MMiibbss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Mibs = [MibName]
+                 MibName = string()
+                 Reason = term()
+
+              Load the mibs into the agent 'snmp_master_agent'.
+
+       rreeggiisstteerr__aaggeennttss((MMggrrAAggeennttCCoonnffNNaammee,, MMaannaaggeeddAAggeennttss)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 MgrAgentConfName = atom()
+                 ManagedAgents = [agent()]
+                 Reason = term()
+
+              Explicitly instruct the manager to handle this agent.
+              Corresponds to making an entry in agents.conf
+
+       rreeggiisstteerr__uusseerrss((MMggrrAAggeennttCCoonnffNNaammee,, UUsseerrss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 MgrAgentConfName = atom()
+                 Users = [user()]
+                 Reason = term()
+
+              Register the manager entity (=user) responsible for specific
+              agent(s). Corresponds to making an entry in users.conf
+
+       rreeggiisstteerr__uussmm__uusseerrss((MMggrrAAggeennttCCoonnffNNaammee,, UUssmmUUsseerrss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 MgrAgentConfName = atom()
+                 UsmUsers = [usm_user()]
+                 Reason = term()
+
+              Explicitly instruct the manager to handle this USM user.
+              Corresponds to making an entry in usm.conf
+
+       sseett__iinnffoo((CCoonnffiigg)) -->> [[{{AAggeenntt,, OOllddVVaarrssAAnnddVVaallss,, NNeewwVVaarrssAAnnddVVaallss}}]]
+
+              Types:
+
+                 Config = [{Key, Value}]
+                 Agent = agent_name()
+                 OldVarsAndVals = varsandvals()
+                 NewVarsAndVals = varsandvals()
+
+              Returns a list of all successful set requests performed in the
+              test case in reverse order. The list contains the involved user
+              and agent, the value prior to the set and the new value. This is
+              intended to facilitate the clean up in the end_per_testcase
+              function i.e. the undoing of the set requests and its possible
+              side-effects.
+
+       sseett__vvaalluueess((AAggeenntt,, VVaarrssAAnnddVVaallss,, MMggrrAAggeennttCCoonnffNNaammee,, CCoonnffiigg)) -->> SSnnmmppRReeppllyy
+
+              Types:
+
+                 Agent = agent_name()
+                 Oids = oids()
+                 MgrAgentConfName = atom()
+                 Config = [{Key, Value}]
+                 SnmpReply = snmpreply()
+
+              Issues a synchronous snmp set request.
+
+       ssttaarrtt((CCoonnffiigg,, MMggrrAAggeennttCCoonnffNNaammee)) -->> ookk
+
+              Equivalent to ssttaarrtt((CCoonnffiigg,, MMggrrAAggeennttCCoonnffNNaammee,, uunnddeeffiinneedd)).
+
+       ssttaarrtt((CCoonnffiigg,, MMggrrAAggeennttCCoonnffNNaammee,, SSnnmmppAAppppCCoonnffNNaammee)) -->> ookk
+
+              Types:
+
+                 Config = [{Key, Value}]
+                 Key = atom()
+                 Value = term()
+                 MgrAgentConfName = atom()
+                 SnmpConfName = atom()
+
+              Starts an snmp manager and/or agent. In the manager case,
+              registrations of users and agents as specified by the
+              configuration _M_g_r_A_g_e_n_t_C_o_n_f_N_a_m_e will be performed. When using
+              snmp v3 also so called usm users will be registered. Note that
+              users, usm_users and managed agents may also be registered at a
+              later time using ct_snmp:register_users/2,
+              ct_snmp:register_agents/2, and ct_snmp:register_usm_users/2. The
+              agent started will be called _s_n_m_p___m_a_s_t_e_r___a_g_e_n_t. Use
+              ct_snmp:load_mibs/1 to load mibs into the agent. With
+              _S_n_m_p_A_p_p_C_o_n_f_N_a_m_e it's possible to configure the snmp application
+              with parameters such as _c_o_n_f_i_g, _m_i_b_s, _n_e_t___i_f, etc. The values
+              will be merged with (and possibly override) default values set
+              by _c_t___s_n_m_p.
+
+       ssttoopp((CCoonnffiigg)) -->> ookk
+
+              Types:
+
+                 Config = [{Key, Value}]
+                 Key = atom()
+                 Value = term()
+
+              Stops the snmp manager and/or agent removes all files created.
+
+       uunnrreeggiisstteerr__aaggeennttss((MMggrrAAggeennttCCoonnffNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 MgrAgentConfName = atom()
+                 Reason = term()
+
+              Removes information added when calling register_agents/2.
+
+       uunnrreeggiisstteerr__uusseerrss((MMggrrAAggeennttCCoonnffNNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 MgrAgentConfName = atom()
+                 Reason = term()
+
+              Removes information added when calling register_users/2.
+
+       uuppddaattee__uussmm__uusseerrss((MMggrrAAggeennttCCoonnffNNaammee,, UUssmmUUsseerrss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 MgrAgentConfName = atom()
+                 UsmUsers = usm_users()
+                 Reason = term()
+
+              Alters information added when calling register_usm_users/2.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                    ct_snmp(3)

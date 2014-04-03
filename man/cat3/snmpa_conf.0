@@ -1,0 +1,662 @@
+snmpa_conf(3)              Erlang Module Definition              snmpa_conf(3)
+
+
+
+NNAAMMEE
+       snmpa_conf - Utility functions for handling the agent config files.
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_a___c_o_n_f contains various utility functions to used for
+       manipulating (write/append/read) the config files of the SNMP agent.
+
+DDAATTAA TTYYPPEESS
+       transportDomain() = transportDomainUdpIpv4 | transportDomainUdpIpv6
+       transportAddressIPv4() = [integer()], length 4
+       transportAddressIPv6() = [integer()], length 8
+       transportAddressMask() = [integer()], length 0 (default), 6 (IPv4) or 10 (IPv6)
+
+
+EEXXPPOORRTTSS
+       aaggeenntt__eennttrryy((TTaagg,, VVaall)) -->> aaggeenntt__eennttrryy(())
+
+              Types:
+
+                 Tag = intAgentIpAddress | intAgentUDPPort |
+                 intAgentMaxPacketSize | snmpEngineMaxMessageSize |
+                 snmpEngineID
+                 Val = term()
+                 agent_entry() = term()
+
+              Create an entry for the agent config file, _a_g_e_n_t_._c_o_n_f.
+
+              The type of _V_a_l depends on the value of _T_a_g, see AAggeenntt
+              IInnffoorrmmaattiioonn for more info.
+
+       wwrriittee__aaggeenntt__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__aaggeenntt__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [agent_entry()]
+
+              Write the agent config to the agent config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See AAggeenntt IInnffoorrmmaattiioonn for more info.
+
+       aappppeenndd__aaggeenntt__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [agent_entry()]
+
+              Append the config to the current agent config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See AAggeenntt IInnffoorrmmaattiioonn for more info.
+
+       rreeaadd__aaggeenntt__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [agent_entry()]
+
+              Read the current agent config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See AAggeenntt IInnffoorrmmaattiioonn for more info.
+
+       ssttaannddaarrdd__eennttrryy((TTaagg,, VVaall)) -->> ssttaannddaarrdd__eennttrryy(())
+
+              Types:
+
+                 Tag = sysDescr | sysObjectID | sysContact | sysName |
+                 sysLocation | sysServices | snmpEnableAuthenTraps
+                 Val = term()
+                 standard_entry() = term()
+
+              Create an entry for the agent standard config file,
+              _s_t_a_n_d_a_r_d_._c_o_n_f.
+
+              The type of _V_a_l depends on the value of _T_a_g, see SSyysstteemm
+              IInnffoorrmmaattiioonn for more info.
+
+       wwrriittee__ssttaannddaarrdd__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__ssttaannddaarrdd__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [standard_entry()]
+
+              Write the agent standard config to the agent standard config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See SSyysstteemm IInnffoorrmmaattiioonn for more info.
+
+       aappppeenndd__ssttaannddaarrdd__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [standard_entry()]
+
+              Append the standard config to the current agent standard config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See SSyysstteemm IInnffoorrmmaattiioonn for more info.
+
+       rreeaadd__ssttaannddaarrdd__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [standard_entry()]
+
+              Read the current agent standard config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See SSyysstteemm IInnffoorrmmaattiioonn for more info.
+
+       ccoonntteexxtt__eennttrryy((CCoonntteexxtt)) -->> ccoonntteexxtt__eennttrryy(())
+
+              Types:
+
+                 Context = string()
+                 context_entry() = term()
+
+              Create an entry for the agent context config file, _c_o_n_t_e_x_t_._c_o_n_f.
+
+              See CCoonntteexxttss for more info.
+
+       wwrriittee__ccoonntteexxtt__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__ccoonntteexxtt__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [context_entry()]
+
+              Write the agent context config to the agent context config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See CCoonntteexxttss for more info.
+
+       aappppeenndd__ccoonntteexxtt__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [context_entry()]
+
+              Append the context config to the current agent context config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See CCoonntteexxttss for more info.
+
+       rreeaadd__ccoonntteexxtt__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [context_entry()]
+
+              Read the current agent context config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See CCoonntteexxttss for more info.
+
+       ccoommmmuunniittyy__eennttrryy((CCoommmmuunniittyyIInnddeexx)) -->> ccoommmmuunniittyy__eennttrryy(())
+       ccoommmmuunniittyy__eennttrryy((CCoommmmuunniittyyIInnddeexx,, CCoommmmuunniittyyNNaammee,, SSeeccNNaammee,, CCoonntteexxttNNaammee,,
+       TTrraannssppoorrttTTaagg)) -->> ccoommmmuunniittyy__eennttrryy(())
+
+              Types:
+
+                 CommunityIndex = string()
+                 CommunityName = string()
+                 SecName = string()
+                 CtxName = string()
+                 TransportTag = string()
+                 community_entry() = term()
+
+              Create an entry for the agent community config file,
+              _c_o_m_m_u_n_i_t_y_._c_o_n_f.
+
+              _C_o_m_m_u_n_i_t_y_I_n_d_e_x must be a _n_o_n_-_e_m_p_t_y string.
+
+              _c_o_m_m_u_n_i_t_y___e_n_t_r_y_(_"_p_u_b_l_i_c_"_) translates to the following call:
+              _c_o_m_m_u_n_i_t_y___e_n_t_r_y_(_C_o_m_m_u_n_i_t_y_I_n_d_e_x_, _C_o_m_m_u_n_i_t_y_I_n_d_e_x_, _"_i_n_i_t_i_a_l_"_, _"_"_,
+              _"_"_).
+
+              _c_o_m_m_u_n_i_t_y___e_n_t_r_y_(_"_a_l_l_-_r_i_g_h_t_s_"_) translates to the following call:
+              _c_o_m_m_u_n_i_t_y___e_n_t_r_y_(_C_o_m_m_u_n_i_t_y_I_n_d_e_x_, _C_o_m_m_u_n_i_t_y_I_n_d_e_x_, _C_o_m_m_u_n_i_t_y_I_n_d_e_x_,
+              _"_"_, _"_"_).
+
+              See CCoommmmuunniittyy for more info.
+
+       wwrriittee__ccoommmmuunniittyy__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__ccoommmmuunniittyy__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [community_entry()]
+
+              Write the agent community config to the agent community config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See CCoommmmuunniittyy for more info.
+
+       aappppeenndd__ccoommmmuunniittyy__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [community_entry()]
+
+              Append the community config to the current agent community
+              config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See CCoommmmuunniittyy for more info.
+
+       rreeaadd__ccoommmmuunniittyy__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [community_entry()]
+
+              Read the current agent community config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See CCoommmmuunniittiieess for more info.
+
+       ttaarrggeett__aaddddrr__eennttrryy((NNaammee,, IIpp,, TTaaggLLiisstt,, PPaarraammssNNaammee,, EEnnggiinneeIIdd)) -->>
+       ttaarrggeett__aaddddrr__eennttrryy(())
+       ttaarrggeett__aaddddrr__eennttrryy((NNaammee,, IIpp,, TTaaggLLiisstt,, PPaarraammssNNaammee,, EEnnggiinneeIIdd,, TTMMaasskk)) -->>
+       ttaarrggeett__aaddddrr__eennttrryy(())
+       ttaarrggeett__aaddddrr__eennttrryy((NNaammee,, IIpp,, UUddpp,, TTaaggLLiisstt,, PPaarraammssNNaammee,, EEnnggiinneeIIdd,, TTMMaasskk,,
+       MMaaxxMMeessssaaggeeSSiizzee)) -->> ttaarrggeett__aaddddrr__eennttrryy(())
+       ttaarrggeett__aaddddrr__eennttrryy((NNaammee,, IIpp,, UUddpp,, TTiimmeeoouutt,, RReettrryyCCoouunntt,, TTaaggLLiisstt,,
+       PPaarraammssNNaammee,, EEnnggiinneeIIdd,, TTMMaasskk,, MMaaxxMMeessssaaggeeSSiizzee)) -->> ttaarrggeett__aaddddrr__eennttrryy(())
+       ttaarrggeett__aaddddrr__eennttrryy((NNaammee,, DDoommaaiinn,, IIpp,, UUddpp,, TTiimmeeoouutt,, RReettrryyCCoouunntt,, TTaaggLLiisstt,,
+       PPaarraammssNNaammee,, EEnnggiinneeIIdd,, TTMMaasskk,, MMaaxxMMeessssaaggeeSSiizzee)) -->> ttaarrggeett__aaddddrr__eennttrryy(())
+
+              Types:
+
+                 Name = string()
+                 Domain = transportDomain()
+                 Ip = transportAddressIPv4() | transportAddressIPv6() (depends
+                 on Domain)
+                 Udp = integer()
+                 Timeout = integer()
+                 RetryCount = integer()
+                 TagList = string()
+                 ParamsName = string()
+                 EngineId = string()
+                 TMask = transportAddressMask() (depends on Domain)
+                 MaxMessageSize = integer()
+                 target_addr_entry() = term()
+
+              Create an entry for the agent target_addr config file,
+              _t_a_r_g_e_t___a_d_d_r_._c_o_n_f.
+
+              _N_a_m_e must be a _n_o_n_-_e_m_p_t_y string.
+
+              _t_a_r_g_e_t___a_d_d_r___e_n_t_r_y_/_5 translates to the following call:
+              _t_a_r_g_e_t___a_d_d_r___e_n_t_r_y_(_N_a_m_e_, _I_p_, _T_a_g_L_i_s_t_, _P_a_r_a_m_s_N_a_m_e_, _E_n_g_i_n_e_I_d_).
+
+              _t_a_r_g_e_t___a_d_d_r___e_n_t_r_y_/_6 translates to the following call:
+              _t_a_r_g_e_t___a_d_d_r___e_n_t_r_y_(_N_a_m_e_, _I_p_, _1_6_2_, _T_a_g_L_i_s_t_, _P_a_r_a_m_s_N_a_m_e_, _E_n_g_i_n_e_I_d_,
+              _T_M_a_s_k_, _2_0_4_8_).
+
+              _t_a_r_g_e_t___a_d_d_r___e_n_t_r_y_/_8 translates to the following call:
+              _t_a_r_g_e_t___a_d_d_r___e_n_t_r_y_(_N_a_m_e_, _I_p_, _U_d_p_, _1_5_0_0_, _3_, _T_a_g_L_i_s_t_, _P_a_r_a_m_s_N_a_m_e_,
+              _E_n_g_i_n_e_I_d_, _T_M_a_s_k_, _M_a_x_M_e_s_s_a_g_e_S_i_z_e_).
+
+              See TTaarrggeett AAddddrreessss DDeeffiinniittiioonnss for more info.
+
+       wwrriittee__ttaarrggeett__aaddddrr__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__ttaarrggeett__aaddddrr__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [target_addr_entry()]
+
+              Write the agent target_addr config to the agent target_addr
+              config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See TTaarrggeett AAddddrreessss DDeeffiinniittiioonnss for more info.
+
+       aappppeenndd__ttaarrggeett__aaddddrr__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [target_addr_entry()]
+
+              Append the target_addr config to the current agent target_addr
+              config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See TTaarrggeett AAddddrreessss DDeeffiinniittiioonnss for more info.
+
+       rreeaadd__ttaarrggeett__aaddddrr__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [target_addr_entry()]
+
+              Read the current agent target_addr config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See TTaarrggeett AAddddrreessss DDeeffiinniittiioonnss for more info.
+
+       ttaarrggeett__ppaarraammss__eennttrryy((NNaammee,, VVssnn)) -->> ttaarrggeett__ppaarraammss__eennttrryy(())
+       ttaarrggeett__ppaarraammss__eennttrryy((NNaammee,, VVssnn,, SSeeccNNaammee,, SSeeccLLeevveell)) -->>
+       ttaarrggeett__ppaarraammss__eennttrryy(())
+       ttaarrggeett__ppaarraammss__eennttrryy((NNaammee,, MMPPMMooddeell,, SSeeccMMooddeell,, SSeeccNNaammee,, SSeeccLLeevveell)) -->>
+       ttaarrggeett__ppaarraammss__eennttrryy(())
+
+              Types:
+
+                 Name = string()
+                 Vsn = v1 | v2 | v3
+                 MPModel = v1 | v2c | v3
+                 SecModel = v1 | v2c | usm
+                 SecName = string()
+                 SecLevel = noAuthNoPriv | authNoPriv | authPriv
+                 target_params_entry() = term()
+
+              Create an entry for the agent target_params config file,
+              _t_a_r_g_e_t___p_a_r_a_m_s_._c_o_n_f.
+
+              _N_a_m_e must be a _n_o_n_-_e_m_p_t_y string.
+
+              _V_s_n translates into _M_P_M_o_d_e_l and _S_e_c_M_o_d_e_l as follows:
+
+              \011  Vsn = v1 => MPModel = v1,  SecModel = v1
+              \011  Vsn = v2 => MPModel = v2c, SecModel = v2c
+              \011  Vsn = v3 => MPModel = v3,  SecModel = usm
+
+
+              _t_a_r_g_e_t___p_a_r_a_m_s___e_n_t_r_y_/_2 translates to the following call:
+              _t_a_r_g_e_t___p_a_r_a_m_s___e_n_t_r_y_(_N_a_m_e_, _V_s_n_, _"_i_n_i_t_i_a_l_"_, _n_o_A_u_t_h_N_o_P_r_i_v_).
+
+              _t_a_r_g_e_t___p_a_r_a_m_s___e_n_t_r_y_/_4 translates to the following call:
+              _t_a_r_g_e_t___p_a_r_a_m_s___e_n_t_r_y_(_N_a_m_e_, _M_P_M_o_d_e_l_, _S_e_c_M_o_d_e_l_, _S_e_c_N_a_m_e_, _S_e_c_L_e_v_e_l_)
+              where _M_P_M_o_d_e_l and _S_e_c_M_o_d_e_l is mapped from _V_s_n, see above.
+
+              See TTaarrggeett PPaarraammeetteerrss DDeeffiinniittiioonnss for more info.
+
+       wwrriittee__ttaarrggeett__ppaarraammss__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__ttaarrggeett__ppaarraammss__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [target_params_entry()]
+
+              Write the agent target_params config to the agent target_params
+              config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See TTaarrggeett PPaarraammeetteerrss DDeeffiinniittiioonnss for more info.
+
+       aappppeenndd__ttaarrggeett__ppaarraammss__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [target_params_entry()]
+
+              Append the target_params config to the current agent
+              target_params config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See TTaarrggeett PPaarraammeetteerrss DDeeffiinniittiioonnss for more info.
+
+       rreeaadd__ttaarrggeett__ppaarraammss__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [target_params_entry()]
+
+              Read the current agent target_params config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See TTaarrggeett PPaarraammeetteerrss DDeeffiinniittiioonnss for more info.
+
+       vvaaccmm__ss22gg__eennttrryy((SSeeccMMooddeell,, SSeeccNNaammee,, GGrroouuppNNaammee)) -->> vvaaccmm__ss22gg__eennttrryy(())
+       vvaaccmm__aacccc__eennttrryy((GGrroouuppNNaammee,, PPrreeffiixx,, SSeeccMMooddeell,, SSeeccLLeevveell,, MMaattcchh,, RReeaaddVViieeww,,
+       WWrriitteeVViieeww,, NNoottiiffyyVViieeww)) -->> vvaaccmm__aacccc__eennttrryy(())
+       vvaaccmm__vvttff__eennttrryy((VViieewwIInnddeexx,, VViieewwSSuubbttrreeee)) -->> vvaaccmm__vvttff__eennttrryy(())
+       vvaaccmm__vvttff__eennttrryy((VViieewwIInnddeexx,, VViieewwSSuubbttrreeee,, VViieewwSSttaattuuss,, VViieewwMMaasskk)) -->>
+       vvaaccmm__vvttff__eennttrryy(())
+
+              Types:
+
+                 SecModel = v1 | v2c | usm
+                 SecName = string()
+                 GroupName = string()
+                 Prefix = string()
+                 SecLevel = noAuthNoPriv | authNoPriv | authPriv
+                 Match = prefix | exact
+                 ReadView = string()
+                 WriteView = string()
+                 NotifyView = string()
+                 ViewIndex = integer()
+                 ViewSubtree = [integer()]
+                 ViewStatus = included | excluded
+                 ViewMask = null | [zero_or_one()]
+                 zero_or_one() = 0 | 1
+                 vacm_s2g_entry() = term()
+                 vacm_acc_entry() = term()
+                 vacm_vtf_entry() = term()
+
+              Create an entry for the agent vacm config file, _v_a_c_m_._c_o_n_f.
+
+              _v_a_c_m___v_t_f___e_n_t_r_y_/_2 translates to the following call:
+              _v_a_c_m___v_t_f___e_n_t_r_y_(_V_i_e_w_I_n_d_e_x_, _V_i_e_w_S_u_b_t_r_e_e_, _i_n_c_l_u_d_e_d_, _n_u_l_l_).
+
+              See MMIIBB VViieewwss ffoorr VVAACCMM for more info.
+
+       wwrriittee__vvaaccmm__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__vvaaccmm__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [vacm_entry()]
+                 vacm_entry() = vacm_sg2_entry() | vacm_acc_entry() |
+                 vacm_vtf_entry()
+
+              Write the agent vacm config to the agent vacm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See MMIIBB VViieewwss ffoorr VVAACCMM for more info.
+
+       aappppeenndd__vvaaccmm__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [vacm_entry()]
+
+              Append the vacm config to the current agent vacm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See MMIIBB VViieewwss ffoorr VVAACCMM for more info.
+
+       rreeaadd__vvaaccmm__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [vacm_entry()]
+
+              Read the current agent vacm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See MMIIBB VViieewwss ffoorr VVAACCMM for more info.
+
+       uussmm__eennttrryy((EEnnggiinneeIIdd)) -->> uussmm__eennttrryy(())
+       uussmm__eennttrryy((EEnnggiinneeIIDD,, UUsseerrNNaammee,, SSeeccNNaammee,, CClloonnee,, AAuutthhPP,, AAuutthhKKeeyyCC,,
+       OOwwnnAAuutthhKKeeyyCC,, PPrriivvPP,, PPrriivvKKeeyyCC,, OOwwnnPPrriivvKKeeyyCC,, PPuubblliicc,, AAuutthhKKeeyy,, PPrriivvKKeeyy)) -->>
+       uussmm__eennttrryy(())
+
+              Types:
+
+                 EngineId = string()
+                 UserName = string()
+                 SecName = string()
+                 Clone = zeroDotZero | [integer()]
+                 AuthP = usmNoAuthProtocol | usmHMACMD5AuthProtocol, |
+                 usmHMACSHAAuthProtocol
+                 AuthKeyC = string()
+                 OwnAuthKeyC = string()
+                 PrivP = usmNoPrivProtocol | usmDESPrivProtocol |
+                 usmAesCfb128Protocol
+                 PrivKeyC = string()
+                 OwnPrivKeyC = string()
+                 Public = string()
+                 AuthKey = [integer()]
+                 PrivKey = [integer()]
+                 usm_entry() = term()
+
+              Create an entry for the agent vacm config file, _v_a_c_m_._c_o_n_f.
+
+              _u_s_m___e_n_t_r_y_/_1 translates to the following call:
+              _u_s_m___e_n_t_r_y_(_"_i_n_i_t_i_a_l_"_, _"_i_n_i_t_i_a_l_"_, _z_e_r_o_D_o_t_Z_e_r_o_, _u_s_m_N_o_A_u_t_h_P_r_o_t_o_c_o_l_,
+              _"_"_, _"_"_, _u_s_m_N_o_P_r_i_v_P_r_o_t_o_c_o_l_, _"_"_, _"_"_, _"_"_, _"_"_, _"_"_).
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       wwrriittee__uussmm__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__uussmm__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [usm_entry()]
+
+              Write the agent usm config to the agent usm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       aappppeenndd__uussmm__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [usm_entry()]
+
+              Append the usm config to the current agent vacm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       rreeaadd__uussmm__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [usm_entry()]
+
+              Read the current agent usm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       nnoottiiffyy__eennttrryy((NNaammee,, TTaagg,, TTyyppee)) -->> nnoottiiffyy__eennttrryy(())
+
+              Types:
+
+                 Name = string()
+                 Tag = string()
+                 Type = trap | inform
+                 community_entry() = term()
+
+              Create an entry for the agent notify config file, _n_o_t_i_f_y_._c_o_n_f.
+
+              _N_a_m_e must be a _n_o_n_-_e_m_p_t_y string.
+
+              See NNoottiiffyy DDeeffiinniittiioonnss for more info.
+
+       wwrriittee__nnoottiiffyy__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__nnoottiiffyy__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [notify_entry()]
+
+              Write the agent notify config to the agent notify config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See NNoottiiffyy DDeeffiinniittiioonnss for more info.
+
+       aappppeenndd__nnoottiiffyy__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [notify_entry()]
+
+              Append the notify config to the current agent notify config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See NNoottiiffyy DDeeffiinniittiioonnss for more info.
+
+       rreeaadd__nnoottiiffyy__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [community_entry()]
+
+              Read the current agent notify config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See NNoottiiffyy DDeeffiinniittiioonnss for more info.
+
+
+
+Ericsson AB                       snmp 4.22.1                    snmpa_conf(3)

@@ -1,0 +1,215 @@
+epmd(1)                          User Commands                         epmd(1)
+
+
+
+NNAAMMEE
+       epmd - Erlang Port Mapper Daemonepmd [-d|-debug] [DbgExtra...] [-port
+       No] [-daemon] [-relaxed_command_check]Starts the port mapper daemonepmd
+       [-d|-debug] [-port No] [-names|-kill|-stop Name]Communicates with a
+       running port mapper daemon
+
+DDEESSCCRRIIPPTTIIOONN
+       This daemon acts as a name server on all hosts involved in distributed
+       Erlang computations. When an Erlang node starts, the node has a name
+       and it obtains an address from the host OS kernel. The name and the
+       address are sent to the _e_p_m_d daemon running on the local host. In a
+       TCP/IP environment, the address consists of the IP address and a port
+       number. The name of the node is an atom on the form of _N_a_m_e_@_N_o_d_e. The
+       job of the _e_p_m_d daemon is to keep track of which node name listens on
+       which address. Hence, _e_p_m_d map symbolic node names to machine
+       addresses.
+
+       The TCP/IP _e_p_m_d daemon actually only keeps track of the _N_a_m_e (first)
+       part of an Erlang node name, the _H_o_s_t part (whatever is after the _@ is
+       implicit in the node name where the _e_p_m_d daemon was actually contacted,
+       as is the IP address where the Erlang node can be reached. Consistent
+       and correct TCP naming services are therefore required for an Erlang
+       network to function correctly.
+
+         SSttaarrttiinngg tthhee ppoorrtt mmaappppeerr ddaaeemmoonn::
+           The daemon is started automatically by the _e_r_l command if the node
+           is to be distributed and there is no running instance present. If
+           automatically launched, environment variables has to be used to
+           alter the behavior of the daemon. See the EEnnvviirroonnmmeenntt vvaarriiaabblleess
+           section below.
+
+           If the -daemon argument is not given, the _e_p_m_d runs as a normal
+           program with the controlling terminal of the shell in which it is
+           started. Normally, it should run as a daemon.
+
+           Regular start-up options are described in the RReegguullaarr ooppttiioonnss
+           section below.
+
+           The _D_b_g_E_x_t_r_a options are described in the DDbbggEExxttrraa ooppttiioonnss section
+           below.
+
+         CCoommmmuunniiccaattiinngg wwiitthh aa rruunnnniinngg ppoorrtt mmaappppeerr ddaaeemmoonn::
+           Communicating with the running epmd daemon by means of the _e_p_m_d
+           program is done primarily for debugging purposes.
+
+           The different queries are described in the IInntteerraaccttiivvee ooppttiioonnss
+           section below.
+
+RREEGGUULLAARR OOPPTTIIOONNSS
+       These options are available when starting the actual name server. The
+       name server is normally started automatically by the _e_r_l command (if
+       not already available), but it can also be started at i.e. system
+       start-up.
+
+         _-_a_d_d_r_e_s_s _L_i_s_t:
+           Let this instance of _e_p_m_d listen only on the comma-separated list
+           of IP addresses and on the loopback address (which is implicitly
+           added to the list if it has not been specified). This can also be
+           set using the _E_R_L___E_P_M_D___A_D_D_R_E_S_S environment variable, see the
+           section EEnnvviirroonnmmeenntt vvaarriiaabblleess below.
+
+         _-_p_o_r_t _N_o:
+           Let this instance of epmd listen to another TCP port than default
+           4369. This can also be set using the _E_R_L___E_P_M_D___P_O_R_T environment
+           variable, see the section EEnnvviirroonnmmeenntt vvaarriiaabblleess below
+
+         _-_d _| _-_d_e_b_u_g:
+           Enable debug output. The more _-_d flags given, the more debug output
+           you will get (to a certain limit). This option is most useful when
+           the epmd daemon is not started as a daemon.
+
+         _-_d_a_e_m_o_n:
+           Start epmd detached from the controlling terminal. Logging will end
+           up in syslog when available and correctly configured. If the epmd
+           daemon is started at boot, this option should definitely be used.
+           It is also used when the _e_r_l command automatically starts _e_p_m_d.
+
+         _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k:
+           Start the epmd program with relaxed command checking (mostly for
+           backward compatibility). This affects the following:
+
+           * With relaxed command checking, the _e_p_m_d daemon can be killed from
+             the localhost with i.e. _e_p_m_d _-_k_i_l_l even if there are active nodes
+             registered. Normally only daemons with an empty node database can
+             be killed with the _e_p_m_d _-_k_i_l_l command.
+
+           * The _e_p_m_d _-_s_t_o_p command (and the corresponding messages to epmd,
+             as can be given using _e_r_l___i_n_t_e_r_f_a_c_e_/_e_i) is normally always
+             ignored, as it opens up for strange situation when two nodes of
+             the same name can be alive at the same time. A node unregisters
+             itself by just closing the connection to epmd, why the _s_t_o_p
+             command was only intended for use in debugging situations.
+
+             With relaxed command checking enabled, you can forcibly
+             unregister live nodes.
+
+           Relaxed command checking can also be enabled by setting the
+           environment variable _E_R_L___E_P_M_D___R_E_L_A_X_E_D___C_O_M_M_A_N_D___C_H_E_C_K prior to
+           starting _e_p_m_d.
+
+           Only use relaxed command checking on systems with very limited
+           interactive usage.
+
+DDBBGGEEXXTTRRAA OOPPTTIIOONNSS
+       These options are purely for debugging and testing epmd clients, they
+       should not be used in normal operation.
+
+         _-_p_a_c_k_e_t___t_i_m_e_o_u_t _S_e_c_o_n_d_s:
+           Set the number of seconds a connection can be inactive before epmd
+           times out and closes the connection (default 60).
+
+         _-_d_e_l_a_y___a_c_c_e_p_t _S_e_c_o_n_d_s:
+           To simulate a busy server you can insert a delay between epmd gets
+           notified about that a new connection is requested and when the
+           connections gets accepted.
+
+         _-_d_e_l_a_y___w_r_i_t_e _S_e_c_o_n_d_s:
+           Also a simulation of a busy server. Inserts a delay before a reply
+           is sent.
+
+IINNTTEERRAACCTTIIVVEE OOPPTTIIOONNSS
+       These options make _e_p_m_d run as an interactive command displaying the
+       results of sending queries ta an already running instance of _e_p_m_d. The
+       epmd contacted is always on the local node, but the _-_p_o_r_t option can be
+       used to select between instances if several are running using different
+       port on the host.
+
+         _-_p_o_r_t _N_o:
+           Contacts the _e_p_m_d listening on the given TCP port number (default
+           4369). This can also be set using the _E_R_L___E_P_M_D___P_O_R_T environment
+           variable, see the section EEnnvviirroonnmmeenntt vvaarriiaabblleess below
+
+         _-_n_a_m_e_s:
+           List names registered with the currently running epmd
+
+         _-_k_i_l_l:
+           Kill the currently running _e_p_m_d.
+
+           Killing the running _e_p_m_d is only allowed if _e_p_m_d _-_n_a_m_e_s show an
+           empty database or _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k was given when the running
+           instance of _e_p_m_d was started. Note that _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k is
+           given when starting the daemon that is to accept killing when it
+           has live nodes registered. When running epmd interactively,
+           _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k has no effect. A daemon that is started
+           without relaxed command checking has to be killed using i.e.
+           signals or some other OS specific method if it has active clients
+           registered.
+
+         _-_s_t_o_p _N_a_m_e:
+           Forcibly unregister a live node from _e_p_m_d's database
+
+           This command can only be used when contacting _e_p_m_d instances
+           started with the _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k flag. Note that relaxed
+           command checking has to be enabled for the _e_p_m_d daemon contacted,
+           When running epmd interactively, _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k has no
+           effect.
+
+EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
+         _E_R_L___E_P_M_D___A_D_D_R_E_S_S:
+           This environment variable may be set to a comma-separated list of
+           IP addresses, in which case the _e_p_m_d daemon will listen only on the
+           specified address(es) and on the loopback address (which is
+           implicitly added to the list if it has not been specified). The
+           default behaviour is to listen on all available IP addresses.
+
+         _E_R_L___E_P_M_D___P_O_R_T:
+           This environment variable can contain the port number epmd will
+           use. The default port will work fine in most cases. A different
+           port can be specified to allow several instances of epmd,
+           representing independent clusters of nodes, to co-exist on the same
+           host. All nodes in a cluster must use the same epmd port number.
+
+         _E_R_L___E_P_M_D___R_E_L_A_X_E_D___C_O_M_M_A_N_D___C_H_E_C_K:
+           If set prior to start, the _e_p_m_d daemon will behave as if the
+           _-_r_e_l_a_x_e_d___c_o_m_m_a_n_d___c_h_e_c_k option was given at start-up. If
+           consequently setting this option before starting the Erlang virtual
+           machine, the automatically started _e_p_m_d will accept the _-_k_i_l_l and
+           _-_s_t_o_p commands without restrictions.
+
+LLOOGGGGIINNGG
+       On some operating systems _s_y_s_l_o_g will be used for error reporting when
+       epmd runs as an daemon. To enable the error logging you have to edit
+       /etc/syslog.conf file and add an entry
+
+             !epmd
+             *.*<TABs>/var/log/epmd.log
+
+
+       where <TABs> are at least one real tab character. Spaces will silently
+       be ignored.
+
+AACCCCEESSSS RREESSTTRRIICCTTIIOONNSS
+       The _e_p_m_d daemon accepts messages from both localhost and remote hosts.
+       However, only the query commands are answered (and acted upon) if the
+       query comes from a remote host. It is always an error to try to
+       register a nodename if the client is not a process located on the same
+       host as the _e_p_m_d instance is running on, why such requests are
+       considered hostile and the connection is immediately closed.
+
+       The queries accepted from remote nodes are:
+
+         * Port queries - i.e. on which port does the node with a given name
+           listen
+
+         * Name listing - i.e. give a list of all names registered on the host
+
+       To restrict access further, firewall software has to be used.
+
+
+
+Ericsson AB                       erts 5.9.2                           epmd(1)

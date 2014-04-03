@@ -1,0 +1,172 @@
+wxUpdateUIEvent(3)         Erlang Module Definition         wxUpdateUIEvent(3)
+
+
+
+NNAAMMEE
+       wxUpdateUIEvent - See external documentation: wxUpdateUIEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxUpdateUIEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _u_p_d_a_t_e___u_i
+
+       See also the message variant ##wwxxUUppddaatteeUUII{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_U_p_d_a_t_e_U_I_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ccaannUUppddaattee((WWiinn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Win = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       cchheecckk((TThhiiss,, CChheecckk)) -->> ookk
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+                 Check = boolean()
+
+              See external documentation.
+
+       eennaabbllee((TThhiiss,, EEnnaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+                 Enable = boolean()
+
+              See external documentation.
+
+       sshhooww((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+                 Show = boolean()
+
+              See external documentation.
+
+       ggeettCChheecckkeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettSShhoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettSSeettCChheecckkeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettSSeettEEnnaabblleedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettSSeettSShhoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettSSeettTTeexxtt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+
+              See external documentation.
+
+       ggeettMMooddee(()) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              See external documentation.
+              Res = ?wxUPDATE_UI_PROCESS_ALL | ?wxUPDATE_UI_PROCESS_SPECIFIED
+
+       ggeettUUppddaatteeIInntteerrvvaall(()) -->> iinntteeggeerr(())
+
+              See external documentation.
+
+       rreesseettUUppddaatteeTTiimmee(()) -->> ookk
+
+              See external documentation.
+
+       sseettMMooddee((MMooddee)) -->> ookk
+
+              Types:
+
+                 Mode = wx_enum() (see module wx)
+
+              See external documentation.
+              Mode = ?wxUPDATE_UI_PROCESS_ALL | ?wxUPDATE_UI_PROCESS_SPECIFIED
+
+       sseettTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxUpdateUIEvent()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettUUppddaatteeIInntteerrvvaall((UUppddaatteeIInntteerrvvaall)) -->> ookk
+
+              Types:
+
+                 UpdateInterval = integer()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxUpdateUIEvent(3)

@@ -1,0 +1,582 @@
+orber(3)                   Erlang Module Definition                   orber(3)
+
+
+
+NNAAMMEE
+       orber - The main module of the Orber application
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains the functions for starting and stopping the
+       application. It also has some utility functions to get some of the
+       configuration information from running application.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> ookk
+       ssttaarrtt((TTyyppee)) -->> ookk
+
+              Types:
+
+                 Type = temporary | permanent
+
+              Starts the Orber application (it also starts mnesia if it is not
+              running). Which _T_y_p_e parameter is supplied determines the
+              behavior. If not supplied Orber is started as _t_e_m_p_o_r_a_r_y. See the
+              Reference Manual _a_p_p_l_i_c_a_t_i_o_n_(_3_) for further information.
+
+       jjuummpp__ssttaarrtt((AAttttrriibbuutteess)) -->> ookk || {{''EEXXIITT'',, RReeaassoonn}}
+
+              Types:
+
+                 Attributes = Port | Options
+                 Port = integer()
+                 Options = [{Key, Value}]
+                 Key = any key listed in the configuration chapter
+                 Value = allowed value associated with the given key
+
+              Installs and starts the Orber and the Mnesia applications with
+              the configuration parameters _d_o_m_a_i_n and _i_i_o_p___p_o_r_t set to _"_I_P_-
+              _n_u_m_b_e_r_:_P_o_r_t_" and the supplied Port respectively. Theses settings
+              are in most cases sufficient to ensure that no clash with any
+              other Orber instance occur. If this operation fails, check if
+              the listen port (iiop_port) is already in use. This function _M_A_Y
+              _O_N_L_Y be used during development and tests; how Orber is
+              configured when using this operation may change at any time
+              without warning.
+
+       ssttoopp(()) -->> ookk
+
+              Stops the Orber application.
+
+       iinnffoo(()) -->> ookk
+       iinnffoo((IIooTTyyppee)) -->> ookk || {{''EEXXIITT'',, RReeaassoonn}} || ssttrriinngg(())
+
+              Types:
+
+                 IoType = info_msg | string | io | {io, IoDevice}
+
+              Generates an Info Report, which contain Orber's configuration
+              settings. If no _I_o_T_y_p_e is supplied, _i_n_f_o___m_s_g is used (see the
+              error_logger documentation). When the atom string is supplied
+              this function will return a flat list. For _i_o and _{_i_o_,
+              _I_o_D_e_v_i_c_e_}, _i_o_:_f_o_r_m_a_t_/_1 and _i_o_:_f_o_r_m_a_t_/_3 is used respectively.
+
+       eexxcceeppttiioonn__iinnffoo((EExxcceeppttiioonn)) -->> {{ookk,, ssttrriinngg(())}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Returns a printable string, which describes the supplied
+              exception in greater detail. Note, this function is mainly
+              intended for system exceptions.
+
+       iiss__ssyysstteemm__eexxcceeppttiioonn((EExxcceeppttiioonn)) -->> ttrruuee || ffaallssee
+
+              Returns true if the supplied exception is a system defined
+              exception, otherwise false.
+
+       ggeett__ttaabblleess(()) -->> [[TTaabblleess]]
+
+              Returns a list of the Orber specific Mnesia tables. This list is
+              required to restore Mnesia if it has been partitioned.
+
+       ggeett__OORRBBIInniittRReeff(()) -->> ssttrriinngg(()) || uunnddeeffiinneedd
+
+              This function returns undefined if we will resolve references
+              locally, otherwise a string describing which host we will
+              contact if the Key given to _c_o_r_b_a_:_r_e_s_o_l_v_e___i_n_i_t_i_a_l___r_e_f_e_r_e_n_c_e_s_/_1
+              matches the Key set in this configuration variable. For more
+              information see the user's guide.
+
+       ggeett__OORRBBDDeeffaauullttIInniittRReeff(()) -->> ssttrriinngg(()) || uunnddeeffiinneedd
+
+              This function returns undefined if we will resolve references
+              locally, otherwise a string describing which host, or hosts,
+              from which we will try to resolve the Key given to
+              _c_o_r_b_a_:_r_e_s_o_l_v_e___i_n_i_t_i_a_l___r_e_f_e_r_e_n_c_e_s_/_1. For more information see the
+              user's guide.
+
+       ddoommaaiinn(()) -->> ssttrriinngg(())
+
+              This function returns the domain name of the current Orber
+              domain as a string.
+
+       iiiioopp__ppoorrtt(()) -->> iinntt(())
+
+              This function returns the port-number, which is used by the IIOP
+              protocol. It can be configured by setting the application
+              variable _i_i_o_p___p_o_r_t, if it is not set it will have the default
+              number 4001.
+
+       iiiioopp__oouutt__ppoorrttss(()) -->> 00 || {{MMiinn,, MMaaxx}}
+
+              The return value of this operation is what the configuration
+              parameter iiiioopp__oouutt__ppoorrttss has been set to.
+
+       iiiioopp__oouutt__ppoorrttss__rraannddoomm(()) -->> ttrruuee || ffaallssee
+
+              Return the value of the configuration parameter
+              iiiioopp__oouutt__ppoorrttss__rraannddoomm.
+
+       iiiioopp__oouutt__ppoorrttss__aatttteemmppttss(()) -->> iinntt(())
+
+              Return the value of the configuration parameter
+              iiiioopp__oouutt__ppoorrttss__aatttteemmppttss.
+
+       iiiioopp__ssssll__ppoorrtt(()) -->> iinntt(())
+
+              This function returns the port-number, which is used by the
+              secure IIOP protocol. It can be configured by setting the
+              application variable _i_i_o_p___s_s_l___p_o_r_t, if it is not set it will
+              have the default number 4002 if Orber is to configured to run in
+              secure mode. Otherwise it returns -1.
+
+       iiiioopp__ttiimmeeoouutt(()) -->> iinntt(()) ((mmiilllliisseeccoonnddss))
+
+              This function returns the timeout value after which outgoing
+              IIOP requests terminate. It can be configured by setting the
+              application variable _i_i_o_p___t_i_m_e_o_u_t _T_i_m_e_V_a_l _(_s_e_c_o_n_d_s_), if it is
+              not set it will have the default value _i_n_f_i_n_i_t_y. If a request
+              times out a system exception, e.g. _T_I_M_E_O_U_T, is raised.
+
+              Note: the iiop_timeout configuration parameter (TimeVal) may
+              only range between 0 and 1000000 seconds. Otherwise, the default
+              value is used.
+
+              Note: Earlier IC versions required that the compile option
+              _{_t_i_m_e_o_u_t_,_"_m_o_d_u_l_e_:_:_i_n_t_e_r_f_a_c_e_"_}, was used, which allow the user to
+              add an extra timeout parameter, e.g.,
+              _m_o_d_u_l_e___i_n_t_e_r_f_a_c_e_:_f_u_n_c_t_i_o_n_(_O_b_j_R_e_f_, _T_i_m_e_o_u_t_, _._._. _A_r_g_u_m_e_n_t_s _._._._) or
+              _m_o_d_u_l_e___i_n_t_e_r_f_a_c_e_:_f_u_n_c_t_i_o_n_(_O_b_j_R_e_f_, _[_{_t_i_m_e_o_u_t_, _T_i_m_e_o_u_t_}_]_, _._._.
+              _A_r_g_u_m_e_n_t_s _._._._), instead of _m_o_d_u_l_e___i_n_t_e_r_f_a_c_e_:_f_u_n_c_t_i_o_n_(_O_b_j_R_e_f_, _._._.
+              _A_r_g_u_m_e_n_t_s _._._._). This is no longer the case and if the extra
+              Timeout is used, argument will override the configuration
+              parameter _i_i_o_p___t_i_m_e_o_u_t. It is, however, not possible to use
+              _i_n_f_i_n_i_t_y to override the Timeout parameter. The Timeout option
+              is also valid for objects which resides within the same Orber
+              domain.
+
+       iiiioopp__ccoonnnneeccttiioonn__ttiimmeeoouutt(()) -->> iinntt(()) ((mmiilllliisseeccoonnddss))
+
+              This function returns the timeout value after which outgoing
+              IIOP connections terminate. It can be configured by setting the
+              application variable _i_i_o_p___c_o_n_n_e_c_t_i_o_n___t_i_m_e_o_u_t _T_i_m_e_V_a_l _(_s_e_c_o_n_d_s_),
+              if it is not set it will have the default value _i_n_f_i_n_i_t_y. The
+              connection will not be terminated if there are pending requests.
+
+              Note: the iiop_connection_timeout configuration parameter
+              (TimeVal) may only range between 0 and 1000000 seconds.
+              Otherwise, the default value is used.
+
+       iiiioopp__ccoonnnneeccttiioonnss(()) -->> RReessuulltt
+       iiiioopp__ccoonnnneeccttiioonnss((DDiirreeccttiioonn)) -->> RReessuulltt
+
+              Types:
+
+                 Direction = in | out | inout
+                 Result = [{Host, Port}] | [{Host, Port, Interface}] |
+                 {'EXIT',Reason}
+                 Host = string()
+                 Port = integer()
+                 Interface = string()
+                 Reason = term()
+
+              The list returned by this operation contain tuples of remote
+              hosts/ports Orber is currently connected to. If no Direction is
+              not supplied, both incoming and outgoing connections are
+              included.
+
+              If a specific local interface has been defined for the
+              connection, this will be added to the returned tuple.
+
+       iiiioopp__ccoonnnneeccttiioonnss__ppeennddiinngg(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = [{Host, Port}] | [{Host, Port, Interface}] |
+                 {'EXIT',Reason}
+                 Host = string()
+                 Port = integer()
+                 Interface = string()
+                 Reason = term()
+
+              In some cases a connection attempt (i.e. trying to communicate
+              with another ORB) may block due to a number of reasons. This
+              operation allows the user to check if this is the case. The
+              returned list contain tuples of remote hosts/ports. Normally,
+              the list is empty.
+
+              If a specific local interface has been defined for the
+              connection, this will be added to the returned tuple.
+
+       iiiioopp__iinn__ccoonnnneeccttiioonn__ttiimmeeoouutt(()) -->> iinntt(()) ((mmiilllliisseeccoonnddss))
+
+              This function returns the timeout value after which incoming
+              IIOP connections terminate. It can be configured by setting the
+              application variable _i_i_o_p___i_n___c_o_n_n_e_c_t_i_o_n___t_i_m_e_o_u_t _T_i_m_e_V_a_l
+              _(_s_e_c_o_n_d_s_), if it is not set it will have the default value
+              _i_n_f_i_n_i_t_y. The connection will not be terminated if there are
+              pending requests.
+
+              Note: the iiop_in_connection_timeout configuration parameter
+              (TimeVal) may only range between 0 and 1000000 seconds.
+              Otherwise, the default value is used.
+
+       iiiioopp__aaccll(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = [{Direction, Filter}] | [{Direction, Filter,
+                 [Interface]}]
+                 Direction = tcp_in | ssl_in | tcp_out | ssl_out
+                 Filter = string()
+                 Interface = string()
+
+              Returns the ACL configuration. The _F_i_l_t_e_r uses a extended format
+              of Classless Inter Domain Routing (CIDR). For example,
+              _"_1_2_3_._1_2_3_._1_2_3_._1_0_" limits the connection to that particular host,
+              while _"_1_2_3_._1_2_3_._1_2_3_._1_0_/_1_7_" allows connections to or from any host
+              equal to the 17 most significant bits. Orber also allow the user
+              to specify a certain port or port range, for example,
+              _"_1_2_3_._1_2_3_._1_2_3_._1_0_/_1_7_#_4_0_0_1_" and _"_1_2_3_._1_2_3_._1_2_3_._1_0_/_1_7_#_4_0_0_1_/_5_0_0_1_"
+              respectively. IPv4 or none compressed IPv6 strings are accepted.
+              The list of _I_n_t_e_r_f_a_c_e_s, IPv4 or IPv6 strings, are currently only
+              used for outgoing connections and may only contain _o_n_e address.
+              If set and access is granted, Orber will use that local
+              interface when connecting to the other ORB. The module oorrbbeerr__aaccll
+              provides operations for evaluating the access control for
+              filters and addresses.
+
+       aaccttiivvaattee__aauuddiitt__ttrraaiill(()) -->> RReessuulltt
+       aaccttiivvaattee__aauuddiitt__ttrraaiill((VVeerrbboossiittyy)) -->> RReessuulltt
+
+              Types:
+
+                 Verbosity = stealth | normal | verbose
+                 Result = ok | {error, Reason}
+                 Reason = string()
+
+              Activates audit/trail for all existing incoming and outgoing
+              IIOP connections. The _V_e_r_b_o_s_i_t_y parameter, _s_t_e_a_l_t_h, _n_o_r_m_a_l or
+              _v_e_r_b_o_s_e, determines which of the built in interceptors is used
+              (_o_r_b_e_r___i_i_o_p___t_r_a_c_e_r___s_t_e_a_l_t_h, _o_r_b_e_r___i_i_o_p___t_r_a_c_e_r___s_i_l_e_n_t or
+              _o_r_b_e_r___i_i_o_p___t_r_a_c_e_r respectively). If no verbosity level is
+              supplied, then the _n_o_r_m_a_l will be used.
+
+              In case Orber is configured to use other interceptors, the
+              audit/trail interceptors will simply be added to that list.
+
+       ddeeaaccttiivvaattee__aauuddiitt__ttrraaiill(()) -->> RReessuulltt
+
+              Types:
+
+                 Result = ok | {error, Reason}
+                 Reason = string()
+
+              Deactivates audit/trail for all existing incoming and outgoing
+              IIOP connections. In case Orber is configured to use other
+              interceptors, those will still be used.
+
+       aadddd__lliisstteenn__iinntteerrffaaccee((IIPP,, TTyyppee)) -->> RReessuulltt
+       aadddd__lliisstteenn__iinntteerrffaaccee((IIPP,, TTyyppee,, PPoorrtt)) -->> RReessuulltt
+       aadddd__lliisstteenn__iinntteerrffaaccee((IIPP,, TTyyppee,, CCoonnffiigguurraattiioonnPPaarraammeetteerrss)) -->> RReessuulltt
+
+              Types:
+
+                 IP = string
+                 Type = normal | ssl
+                 Port = integer() > 0
+                 ConfigurationParameters = [{Key, Value}]
+                 Key = flags | iiop_in_connection_timeout | iiop_max_fragments
+                 | iiop_max_in_requests | interceptors | iiop_port |
+                 iiop_ssl_port | ssl_server_options
+                 Value = as described in the User's Guide
+                 Result = {ok, Ref} | {error, Reason} | {'EXCEPTION',
+                 #'BAD_PARAM'{}}
+                 Ref = #Ref
+                 Reason = string()
+
+              Create a new process that handle requests for creating a new
+              incoming IIOP connection via the given interface and port. If
+              the latter is excluded, Orber will use the value of the
+              _i_i_o_p___p_o_r_t or _i_i_o_p___s_s_l___p_o_r_t configuration parameters. The _T_y_p_e
+              parameter determines if it is supposed to be IIOP or IIOP via
+              SSL. If successful, the returned _#_R_e_f shall be passed to
+              _o_r_b_e_r_:_r_e_m_o_v_e___l_i_s_t_e_n___i_n_t_e_r_f_a_c_e_/_1 when the connection shall be
+              terminated.
+
+              It is also possible to supply configuration parameters that
+              override the global configuration. The
+              _i_i_o_p___i_n___c_o_n_n_e_c_t_i_o_n___t_i_m_e_o_u_t, _i_i_o_p___m_a_x___f_r_a_g_m_e_n_t_s,
+              _i_i_o_p___m_a_x___i_n___r_e_q_u_e_s_t_s and _i_n_t_e_r_c_e_p_t_o_r_s parameters simply
+              overrides the global counterparts (See the CCoonnffiigguurraattiioonn chapter
+              in the User's Guide). But for the following parameters there are
+              a few restrictions:
+
+                * _f_l_a_g_s - currently it is only possible to override the global
+                  setting for the _U_s_e _C_u_r_r_e_n_t _I_n_t_e_r_f_a_c_e _i_n _I_O_R and _E_x_c_l_u_d_e
+                  _C_o_d_e_S_e_t _C_o_m_p_o_n_e_n_t flags.
+
+                * _i_i_o_p___p_o_r_t - requires that _U_s_e _C_u_r_r_e_n_t _I_n_t_e_r_f_a_c_e _i_n _I_O_R is
+                  activated and the supplied _T_y_p_e is _n_o_r_m_a_l. If so, exported
+                  IOR:s will contain the IIOP port defined by this
+                  configuration parameter. Otherwise, the global setting will
+                  be used.
+
+                * _i_i_o_p___s_s_l___p_o_r_t - almost equivalent to _i_i_o_p___p_o_r_t. The
+                  difference is that _T_y_p_e shall be _s_s_l and that exported IOR:s
+                  will contain the IIOP via SSL port defined by this
+                  configuration parameter.
+
+              If it is not possible to add a listener based on the supplied
+              interface and port, the error message is one of the ones
+              described in _i_n_e_t and/or _s_s_l documentation.
+
+       rreemmoovvee__lliisstteenn__iinntteerrffaaccee((RReeff)) -->> ookk
+
+              Types:
+
+                 Ref = #Ref
+
+              Terminates the listen process, associated with the supplied
+              _#_R_e_f, for incoming a connection. The Ref parameter is the return
+              value from the _o_r_b_e_r_:_a_d_d___l_i_s_t_e_n___i_n_t_e_r_f_a_c_e_/_2_/_3 operation. When
+              terminating the connection, all associated requests will not
+              deliver a reply to the clients.
+
+       cclloossee__ccoonnnneeccttiioonn((CCoonnnneeccttiioonn)) -->> RReessuulltt
+       cclloossee__ccoonnnneeccttiioonn((CCoonnnneeccttiioonn,, IInntteerrffaaccee)) -->> RReessuulltt
+
+              Types:
+
+                 Connection = Object | [{Host, Port}]
+                 Object = #objref (external)
+                 Host = string()
+                 Port = string()
+                 Interface = string()
+                 Result = ok | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Will try to close all outgoing connections to the host/port
+              combinations found in the supplied object reference or the given
+              list of hosts/ports. If a _#_'_I_O_P___S_e_r_v_i_c_e_C_o_n_t_e_x_t_'_{_} containing a
+              local interface has been used when communicating with the remote
+              object (see also MMoodduullee__IInntteerrffaaccee), that interface shall be
+              passed as the second argument. Otherwise, connections via the
+              default local interface, will be terminated.
+
+          NNoottee::
+              Since several clients maybe communicates via the same
+              connection, they will be affected when invoking this operation.
+              Other clients may re-create the connection by invoking an
+              operation on the target object.
+
+
+       sseeccuurree(()) -->> nnoo || ssssll
+
+              This function returns the security mode Orber is running in,
+              which is either no if it is an insecure domain or the type of
+              security mechanism used. For the moment the only security
+              mechanism is ssl. This is configured by setting the application
+              variable _s_e_c_u_r_e.
+
+       ssssll__sseerrvveerr__ooppttiioonnss(()) -->> lliisstt(())
+
+              This function returns the list of SSL options set for the Orber
+              domain as server. This is configured by setting the application
+              variable _s_s_l___s_e_r_v_e_r___o_p_t_i_o_n_s.
+
+       ssssll__cclliieenntt__ooppttiioonnss(()) -->> lliisstt(())
+
+              This function returns the list of SSL options used in outgoing
+              calls in the current process. The default value is configured by
+              setting the application variable _s_s_l___c_l_i_e_n_t___o_p_t_i_o_n_s.
+
+       sseett__ssssll__cclliieenntt__ooppttiioonnss((OOppttiioonnss)) -->> ookk
+
+              Types:
+
+                 Options = list()
+
+              This function takes a list of SSL options as parameter and sets
+              it for the current process.
+
+       oobbjjeeccttkkeeyyss__ggcc__ttiimmee(()) -->> iinntt(()) ((sseeccoonnddss))
+
+              This function returns the timeout value after which after which
+              terminated object keys, related to servers started with the
+              configuration parameter _{_p_e_r_s_i_s_t_e_n_t_, _t_r_u_e_}, will be removed. It
+              can be configured by setting the application variable
+              _o_b_j_e_c_t_k_e_y_s___g_c___t_i_m_e _T_i_m_e_V_a_l _(_s_e_c_o_n_d_s_), if it is not set it will
+              have the default value _i_n_f_i_n_i_t_y.
+
+              Objects terminating with reason _n_o_r_m_a_l or _s_h_u_t_d_o_w_n are removed
+              automatically.
+
+              Note: the objectkeys_gc_time configuration parameter (TimeVal)
+              may only range between 0 and 1000000 seconds. Otherwise, the
+              default value is used.
+
+       oorrbbeerr__nnooddeess(()) -->> RReettVVaall
+
+              Types:
+
+                 RetVal = [node()]
+
+              This function returns the list of node names that this orber
+              domain consists of.
+
+       iinnssttaallll((NNooddeeLLiisstt)) -->> ookk
+       iinnssttaallll((NNooddeeLLiisstt,, OOppttiioonnss)) -->> ookk
+
+              Types:
+
+                 NodeList = [node()]
+                 Options = [Option]
+                 Option = {install_timeout, Timeout} | {ifr_storage_type,
+                 TableType} | {nameservice_storage_type, TableType} |
+                 {initialreferences_storage_type, TableType} | {load_order,
+                 Priority}
+                 Timeout = infinity | integer()
+                 TableType = disc_copies | ram_copies
+                 Priority = integer()
+
+              This function installs all the necessary mnesia tables and load
+              default data in some of them. If one or more Orber tables
+              already exists the installation fails. The function _u_n_i_n_s_t_a_l_l
+              may be used, if it is safe, i.e., no other application is
+              running Orber.
+
+              Preconditions:
+
+                * a mnesia schema must exist before the installation
+
+                * mnesia is running on the other nodes if the new installation
+                  shall be a multi node domain
+
+              Mnesia will be started by the function if it is not already
+              running on the installation node and if it was started it will
+              be stopped afterwards.
+
+              The options that can be sent to the installation program is:
+
+                * _{_i_n_s_t_a_l_l___t_i_m_e_o_u_t_, _T_i_m_e_o_u_t_} - this timeout is how long we
+                  will wait for the tables to be created. The Timeout value
+                  can be _i_n_f_i_n_i_t_y or an integer number in milliseconds.
+                  Default is infinity.
+
+                * _{_i_f_r___s_t_o_r_a_g_e___t_y_p_e_, _T_a_b_l_e_T_y_p_e_} - this option sets the type of
+                  tables used for the interface repository. The TableType can
+                  be disc_copies or ram_copies. Default is disc_copies.
+
+                * _{_i_n_i_t_i_a_l_r_e_f_e_r_e_n_c_e_s___s_t_o_r_a_g_e___t_y_p_e_, _T_a_b_l_e_T_y_p_e_} - this option
+                  sets the type of table used for storing initial references.
+                  The TableType can be disc_copies or ram_copies. Default is
+                  ram_copies.
+
+                * _{_n_a_m_e_s_e_r_v_i_c_e___s_t_o_r_a_g_e___t_y_p_e_, _T_a_b_l_e_T_y_p_e_} - the default behavior
+                  of Orber is to install the NameService as ram_copies. This
+                  option makes it possible to change this to disc_copies. But
+                  the user should be aware of that if a node is restarted, all
+                  local object references stored in the NameService is not
+                  valid. Hence, you cannot switch to disc_copies and expect
+                  exactly the same behavior as before.
+
+                * _{_l_o_a_d___o_r_d_e_r_, _P_r_i_o_r_i_t_y_} - per default the priority is set to
+                  0. Using this option it will change the priority of in which
+                  order Mnesia will load Orber internal tables. For more
+                  information, consult the Mnesia documentation.
+
+       uunniinnssttaallll(()) -->> ookk
+
+              This function stops the Orber application, terminates all server
+              objects and removes all Orber related mnesia tables.
+
+              Note: Since other applications may be running on the same node
+              using mnesia _u_n_i_n_s_t_a_l_l will not stop the mnesia application.
+
+       aadddd__nnooddee((NNooddee,, OOppttiioonnss)) -->> RReettVVaall
+
+              Types:
+
+                 Node = node()
+                 Options = IFRStorageType | [KeyValue]
+                 IFRStorageType = StorageType
+                 StorageType = disc_copies | ram_copies
+                 KeyValue = {ifr_storage_type, StorageType} |
+                 {initialreferences_storage_type, StorageType} |
+                 {nameservice_storage_type, StorageType} | {type, Type}
+                 Type = temporary | permanent
+                 RetVal = ok | exit()
+
+              This function add given node to a existing Orber node group and
+              starts Orber on the new node. _o_r_b_e_r_:_a_d_d___n_o_d_e is called from a
+              member in the Orber node group.
+
+              Preconditions for new node:
+
+                * Erlang started on the new node using the option _-_m_n_e_s_i_a
+                  _e_x_t_r_a___d_b___n_o_d_e_s, e.g., _e_r_l _-_s_n_a_m_e _n_e_w___n_o_d_e___n_a_m_e _-_m_n_e_s_i_a
+                  _e_x_t_r_a___d_b___n_o_d_e_s _C_o_n_n_e_c_t_T_o_N_o_d_e_s___L_i_s_t
+
+                * The new node's _d_o_m_a_i_n name is the same for the nodes we want
+                  to connect to.
+
+                * Mnesia is running on the new node (no new schema created).
+
+                * If the new node will use _d_i_s_c___c_o_p_i_e_s the schema type must be
+                  changed using: _m_n_e_s_i_a_:_c_h_a_n_g_e___t_a_b_l_e___c_o_p_y___t_y_p_e_(_s_c_h_e_m_a_, _n_o_d_e_(_)_,
+                  _d_i_s_c___c_o_p_i_e_s_)_.
+
+              Orber will be started by the function on the new node.
+
+              Fails if:
+
+                * Orber already installed on given node.
+
+                * Mnesia not started as described above on the new node.
+
+                * Impossible to copy data in Mnesia tables to the new node.
+
+                * Not able to start Orber on the new node, due to, for
+                  example, the _i_i_o_p___p_o_r_t is already in use.
+
+              The function do not remove already copied tables after a
+              failure. Use _o_r_b_e_r_:_r_e_m_o_v_e___n_o_d_e to remove these tables.
+
+       rreemmoovvee__nnooddee((NNooddee)) -->> RReettVVaall
+
+              Types:
+
+                 Node = node()
+                 RetVal = ok | exit()
+
+              This function removes given node from a Orber node group. The
+              Mnesia application is not stopped.
+
+       ccoonnffiigguurree((KKeeyy,, VVaalluuee)) -->> ookk || {{''EEXXIITT'',, RReeaassoonn}}
+
+              Types:
+
+                 Key = orbDefaultInitRef | orbInitRef | giop_version |
+                 iiop_timeout | iiop_connection_timeout |
+                 iiop_setup_connection_timeout | iiop_in_connection_timeout |
+                 objectkeys_gc_time | orber_debug_level
+                 Value = allowed value associated with the given key
+
+              This function allows the user to configure Orber in, for
+              example, an Erlang shell. It is possible to invoke _c_o_n_f_i_g_u_r_e at
+              any time the keys specified above.
+
+              Any other key must be set before installing and starting Orber.
+
+              Trying to change the configuration in any other way is _N_O_T
+              allowed since it may affect the behavior of Orber.
+
+              For more information regarding allowed values, see ccoonnffiigguurraattiioonn
+              sseettttiinnggss in the User's Guide.
+
+          NNoottee::
+              Configuring the IIOP timeout values will not affect already
+              existing connections. If you want a guaranteed uniform behavior,
+              you must set these parameters from the start.
+
+
+
+
+Ericsson AB                      orber 3.6.24                         orber(3)

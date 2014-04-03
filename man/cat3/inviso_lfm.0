@@ -1,0 +1,125 @@
+inviso_lfm(3)              Erlang Module Definition              inviso_lfm(3)
+
+
+
+NNAAMMEE
+       inviso_lfm - An Inviso Off-Line Logfile Merger
+
+DDEESSCCRRIIPPTTIIOONN
+       Implements an off-line logfile merger, merging binary trace-log files
+       from several nodes together in chronological order. The logfile merger
+       can also do pid-to-alias translations.
+
+       The logfile merger is supposed to be called from the Erlang shell or a
+       higher layer trace tool. For it to work, all logfiles and trace
+       information files (containing the pid-alias associations) must be
+       located in the file system accessible from this node and organized
+       according to the API description.
+
+       The logfile merger starts a process, the output process, which in its
+       turn starts one reader process for every node it shall merge logfiles
+       from. Note that the reason for a process for each node is not remote
+       communication, the logfile merger is an off-line utility, it is to sort
+       the logfile entries in chronological order.
+
+       The logfile merger can be customized both when it comes to the
+       implementation of the reader processes and the output the output
+       process shall generate for every logfile entry.
+
+EEXXPPOORRTTSS
+       mmeerrggee((FFiilleess,, OOuuttFFiillee)) -->>
+       mmeerrggee((FFiilleess,, WWoorrkkHHFFuunn,, IInniittHHaannddlleerrDDaattaa)) -->>
+       mmeerrggee((FFiilleess,, BBeeggiinnHHFFuunn,, WWoorrkkHHFFuunn,, EEnnddHHFFuunn,, IInniittHHaannddlleerrDDaattaa)) -->> {{ookk,,
+       CCoouunntt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Files = [FileDescription]
+                  FileDescription = FileSet | {reader,RMod,RFunc,FileSet}
+                  FileSet = {Node,LogFiles} | {Node,[LogFiles]}
+                  Node = atom()
+                  LogFiles = [{trace_log,[FileName]}] |
+                 [{trace_log,[FileName]},{ti_log,TiFileSpec}]
+                  TiFileSpec = [string()] - a list of one string.
+                  FileName = string()
+                  RMod = RFunc = atom()
+                 OutFile = string()
+                 BeginHFun = fun(InitHandlerData) -> {ok, NewHandlerData} |
+                 {error, Reason}
+                 WorkHFun = fun(Node, LogEntry, PidMappings, HandlerData) ->
+                 {ok, NewHandlerData}
+                  LogEntry = tuple()
+                  PidMappings = term()
+                 EndHFun = fun(HandlerData) -> ok | {error, Reason}
+                 Count = int()
+                 Reason = term()
+
+              Merges the logfiles in _F_i_l_e_s together into one file in
+              chronological order. The logfile merger consists of an output
+              process and one or several reader processes.
+
+              Returns _{_o_k_, _C_o_u_n_t_} where _C_o_u_n_t is the total number of log
+              entries processed, if successful.
+
+              When specifying _L_o_g_F_i_l_e_s, currently the standard reader-process
+              only supports:
+
+                * one single file
+
+                * a list of wraplog files, following the naming convention
+                  _<_P_r_e_f_i_x_>_<_N_r_>_<_S_u_f_f_i_x_>.
+
+              Note that (when using the standard reader process) it is
+              possible to give a list of _L_o_g_F_i_l_e_s. The list must be sorted
+              starting with the oldest. This will cause several trace-logs
+              (from the same node) to be merged together in the same _O_u_t_F_i_l_e.
+              The reader process will simply start reading the next file (or
+              wrapset) when the previous is done.
+
+              _F_i_l_e_D_e_s_c_r_i_p_t_i_o_n _=_= _{_r_e_a_d_e_r_,_R_M_o_d_,_R_F_u_n_c_,_F_i_l_e_S_e_t_} indicates that
+              _s_p_a_w_n_(_R_M_o_d_, _R_F_u_n_c_, _[_O_u_t_p_u_t_P_i_d_,_L_o_g_F_i_l_e_s_]_) shall create a reader
+              process.
+
+              The output process is customized with _B_e_g_i_n_H_F_u_n, _W_o_r_k_H_F_u_n and
+              _E_n_d_H_F_u_n. If using _m_e_r_g_e_/_2 a default output process configuration
+              is used, basically creating a text file and writing the output
+              line by line. _B_e_g_i_n_H_F_u_n is called once before requesting log
+              entries from the reader processes. _W_o_r_k_H_F_u_n is called for every
+              log entry (trace message) _L_o_g_E_n_t_r_y. Here the log entry typically
+              gets written to the output. _P_i_d_M_a_p_p_i_n_g_s is the translations
+              produced by the reader process. _E_n_d_H_F_u_n is called when all
+              reader processes have terminated.
+
+              Currently the standard reader can only handle one ti-file (per
+              _L_o_g_F_i_l_e_s). The current inviso meta tracer is further not capable
+              of wrapping ti-files. (This also because a wrapped ti-log will
+              most likely be worthless since alias associations done in the
+              beginning are erased but still used in the trace-log).
+
+              The standard reader process is implemented in the module
+              _i_n_v_i_s_o___l_f_m___t_p_r_e_a_d_e_r (trace port reader). It understands Erlang
+              linked in trace-port driver generated trace-logs and
+              _i_n_v_i_s_o___r_t___m_e_t_a generated trace information files.
+
+WWRRIITTIINNGG YYOOUURR OOWWNN RREEAADDEERR PPRROOCCEESSSS
+       Writing a reader process is not that difficult. It must:
+
+         * Export an init-like function accepting two arguments, pid of the
+           output process and the _L_o_g_F_i_l_e_s component. _L_o_g_F_i_l_e_s is actually
+           only used by the reader processes, making it possible to redefine
+           _L_o_g_F_i_l_e_s if implementing an own reader process.
+
+         * Respond to _{_g_e_t___n_e_x_t___e_n_t_r_y_, _O_u_t_p_u_t_P_i_d_} messages with _{_n_e_x_t___e_n_t_r_y_,
+           _s_e_l_f_(_)_, _P_i_d_M_a_p_p_i_n_g_s_, _N_o_w_T_i_m_e_S_t_a_m_p_, _T_e_r_m_} or _{_n_e_x_t___e_n_t_r_y_, _s_e_l_f_(_)_,
+           _{_e_r_r_o_r_,_R_e_a_s_o_n_}_}.
+
+         * Terminate normally when no more log entries are available.
+
+         * Terminate on an incoming EXIT-signal from _O_u_t_p_u_t_P_i_d.
+
+       The reader process must of course understand the format of a logfile
+       written by the runtime component.
+
+
+
+Ericsson AB                      inviso 0.6.3                    inviso_lfm(3)

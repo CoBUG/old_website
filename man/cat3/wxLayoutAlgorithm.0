@@ -1,0 +1,91 @@
+wxLayoutAlgorithm(3)       Erlang Module Definition       wxLayoutAlgorithm(3)
+
+
+
+NNAAMMEE
+       wxLayoutAlgorithm - See external documentation: wxLayoutAlgorithm.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxLayoutAlgorithm.
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_a_y_o_u_t_A_l_g_o_r_i_t_h_m_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxLLaayyoouuttAAllggoorriitthhmm(())
+
+              See external documentation.
+
+       llaayyoouuttFFrraammee((TThhiiss,, FFrraammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxLayoutAlgorithm()
+                 Frame = wxFrame() (see module wxFrame)
+
+              Equivalent to llaayyoouuttFFrraammee((TThhiiss,, FFrraammee,, [[]])).
+
+       llaayyoouuttFFrraammee((TThhiiss,, FFrraammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxLayoutAlgorithm()
+                 Frame = wxFrame() (see module wxFrame)
+                 Option = {mainWindow, wxWindow() (see module wxWindow)}
+
+              See external documentation.
+
+       llaayyoouuttMMDDIIFFrraammee((TThhiiss,, FFrraammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxLayoutAlgorithm()
+                 Frame = wxMDIParentFrame() (see module wxMDIParentFrame)
+
+              Equivalent to llaayyoouuttMMDDIIFFrraammee((TThhiiss,, FFrraammee,, [[]])).
+
+       llaayyoouuttMMDDIIFFrraammee((TThhiiss,, FFrraammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxLayoutAlgorithm()
+                 Frame = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Option = {rect, {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}}
+
+              See external documentation.
+
+       llaayyoouuttWWiinnddooww((TThhiiss,, FFrraammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxLayoutAlgorithm()
+                 Frame = wxWindow() (see module wxWindow)
+
+              Equivalent to llaayyoouuttWWiinnddooww((TThhiiss,, FFrraammee,, [[]])).
+
+       llaayyoouuttWWiinnddooww((TThhiiss,, FFrraammee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxLayoutAlgorithm()
+                 Frame = wxWindow() (see module wxWindow)
+                 Option = {mainWindow, wxWindow() (see module wxWindow)}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxLLaayyoouuttAAllggoorriitthhmm(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2              wxLayoutAlgorithm(3)

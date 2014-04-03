@@ -1,0 +1,848 @@
+httpd(3)                   Erlang Module Definition                   httpd(3)
+
+
+
+NNAAMMEE
+       httpd - An implementation of an HTTP
+           1.1 compliant Web server, as defined in RFC 2616.
+
+
+DDEESSCCRRIIPPTTIIOONN
+       Documents the HTTP server start options, some administrative functions
+       and also specifies the Erlang Web server callback API
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module:
+
+       _b_o_o_l_e_a_n_(_) _= _t_r_u_e _| _f_a_l_s_e
+
+       _s_t_r_i_n_g_(_) _= _l_i_s_t _o_f _A_S_C_I_I _c_h_a_r_a_c_t_e_r_s
+
+       _p_a_t_h_(_) _= _s_t_r_i_n_g_(_) _- _r_e_p_r_e_s_e_n_t_i_n_g _a _f_i_l_e _o_r _d_i_r_e_c_t_o_r_y _p_a_t_h_.
+
+        _i_p___a_d_d_r_e_s_s_(_) _= _{_N_1_,_N_2_,_N_3_,_N_4_} _% _I_P_v_4 _| _{_K_1_,_K_2_,_K_3_,_K_4_,_K_5_,_K_6_,_K_7_,_K_8_} _% _I_P_v_6
+
+       _h_o_s_t_n_a_m_e_(_) _= _s_t_r_i_n_g_(_) _- _r_e_p_r_e_s_e_n_t_i_n_g _a _h_o_s_t _e_x _"_f_o_o_._b_a_r_._c_o_m_"
+
+       _p_r_o_p_e_r_t_y_(_) _= _a_t_o_m_(_)
+
+EERRLLAANNGG HHTTTTPP SSEERRVVEERR SSEERRVVIICCEE SSTTAARRTT//SSTTOOPP
+       A web server can be configured to start when starting the inets
+       application or started dynamically in runtime by calling the Inets
+       application API _i_n_e_t_s_:_s_t_a_r_t_(_h_t_t_p_d_, _S_e_r_v_i_c_e_C_o_n_f_i_g_), or
+       _i_n_e_t_s_:_s_t_a_r_t_(_h_t_t_p_d_, _S_e_r_v_i_c_e_C_o_n_f_i_g_, _H_o_w_), see iinneettss((33)) Below follows a
+       description of the available configuration options, also called
+       properties.
+
+       _F_i_l_e _p_r_o_p_e_r_t_i_e_s
+
+       When the web server is started at application start time the properties
+       should be fetched from a configuration file that could consist of a
+       regular erlang property list, e.i. _[_{_O_p_t_i_o_n_, _V_a_l_u_e_}_]  where  _O_p_t_i_o_n _=
+       _p_r_o_p_e_r_t_y_(_)  and _V_a_l_u_e _= _t_e_r_m_(_), followed by a full stop, or for
+       backwards compatibility an Apache like configuration file. If the web
+       server is started dynamically at runtime you may still specify a file
+       but you could also just specify the complete property list.
+
+         {{pprroopplliisstt__ffiillee,, ppaatthh(())}}::
+           If this property is defined inets will expect to find all other
+           properties defined in this file. Note that the file must include
+           all properties listed under mandatory properties.
+
+         {{ffiillee,, ppaatthh(())}}::
+           If this property is defined inets will expect to find all other
+           properties defined in this file, that uses Apache like syntax. Note
+           that the file must include all properties listed under mandatory
+           properties. The Apache like syntax is the property, written as one
+           word where each new word begins with a capital, followed by a
+           white-space followed by the value followed by a new line. Ex:
+
+         {server_root, "/urs/local/www"} -> ServerRoot /usr/local/www
+
+
+           With a few exceptions, that are documented for each property that
+           behaves differently, and the special case {directory, {path(),
+           PropertyList}} and {security_directory, {Dir, PropertyList}} that
+           are represented as:
+
+
+         <Directory Dir>
+          <Properties handled as described above>
+         </Directory>
+
+
+
+   NNoottee::
+       The properties proplist_file and file are mutually exclusive.
+
+
+       _M_a_n_d_a_t_o_r_y _p_r_o_p_e_r_t_i_e_s
+
+         {{ppoorrtt,, iinntteeggeerr(())}} ::
+           The port that the HTTP server shall listen on. If zero is specified
+           as port, an arbitrary available port will be picked and you can use
+           the httpd:info/2 function to find out which port was picked.
+
+         {{sseerrvveerr__nnaammee,, ssttrriinngg(())}} ::
+           The name of your server, normally a fully qualified domain name.
+
+         {{sseerrvveerr__rroooott,, ppaatthh(())}} ::
+           Defines the servers home directory where log files etc can be
+           stored. Relative paths specified in other properties refer to this
+           directory.
+
+         {{ddooccuummeenntt__rroooott,, ppaatthh(())}}::
+            Defines the top directory for the documents that are available on
+           the HTTP server.
+
+       _C_o_m_m_u_n_i_c_a_t_i_o_n _p_r_o_p_e_r_t_i_e_s
+
+         {{bbiinndd__aaddddrreessss,, iipp__aaddddrreessss(()) || hhoossttnnaammee(()) || aannyy}} ::
+           Defaults to _a_n_y. Note that _a_n_y is denoted _* in the apache like
+           configuration file.
+
+         {{ssoocckkeett__ttyyppee,, iipp__ccoommmm || ssssll || eessssll}}::
+           When using ssl, there are currently only one alternative. _e_s_s_l
+           specifically uses the Erlang based SSL. _s_s_l defaults to _e_s_s_l.
+
+           Defaults to _i_p___c_o_m_m.
+
+         {{iippffaammiillyy,, iinneett || iinneett66 || iinneett66ffbb44}}::
+           Defaults to _i_n_e_t_6_f_b_4_.
+
+           Note that this option is only used when the option _s_o_c_k_e_t___t_y_p_e has
+           the value _i_p___c_o_m_m.
+
+       _E_r_l_a_n_g _W_e_b _s_e_r_v_e_r _A_P_I _m_o_d_u_l_e_s
+
+         {{mmoodduulleess,, [[aattoomm(())]]}} ::
+           Defines which modules the HTTP server will use to handle requests.
+           Defaults to: _[_m_o_d___a_l_i_a_s_, _m_o_d___a_u_t_h_, _m_o_d___e_s_i_, _m_o_d___a_c_t_i_o_n_s_, _m_o_d___c_g_i_,
+           _m_o_d___d_i_r_, _m_o_d___g_e_t_, _m_o_d___h_e_a_d_, _m_o_d___l_o_g_, _m_o_d___d_i_s_k___l_o_g_]  Note that some
+           mod-modules are dependent on others, so the order can not be
+           entirely arbitrary. See the  IInneettss WWeebb sseerrvveerr MMoodduulleess iinn tthhee UUsseerrss
+           gguuiiddee for more information.
+
+       _L_i_m_i_t _p_r_o_p_e_r_t_i_e_s
+
+         {{ddiissaabbllee__cchhuunnkkeedd__ttrraannssffeerr__eennccooddiinngg__sseenndd,, bboooolleeaann(())}}::
+           This property allows you to disable chunked transfer-encoding when
+           sending a response to a HTTP/1.1 client, by default this is false.
+
+         {{kkeeeepp__aalliivvee,, bboooolleeaann(())}}::
+           Instructs the server whether or not to use persistent connections
+           when the client claims to be HTTP/1.1 compliant, default is true.
+
+         {{kkeeeepp__aalliivvee__ttiimmeeoouutt,, iinntteeggeerr(())}}::
+           The number of seconds the server will wait for a subsequent request
+           from the client before closing the connection. Default is 150.
+
+         {{mmaaxx__bbooddyy__ssiizzee,, iinntteeggeerr(())}}::
+           Limits the size of the message body of HTTP request. By the default
+           there is no limit.
+
+         {{mmaaxx__cclliieennttss,, iinntteeggeerr(())}}::
+           Limits the number of simultaneous requests that can be supported.
+           Defaults to 150.
+
+         {{mmaaxx__hheeaaddeerr__ssiizzee,, iinntteeggeerr(())}}::
+           Limits the size of the message header of HTTP request. Defaults to
+           10240.
+
+         {{mmaaxx__uurrii,, iinntteeggeerr(())}}::
+           Limits the size of the HTTP request URI. By default there is no
+           limit.
+
+         {{mmaaxx__kkeeeepp__aalliivvee__rreeqquueessttss,, iinntteeggeerr(())}}::
+           The number of request that a client can do on one connection. When
+           the server has responded to the number of requests defined by
+           max_keep_alive_requests the server close the connection. The server
+           will close it even if there are queued request. Defaults to no
+           limit.
+
+       _A_d_m_i_n_i_s_t_r_a_t_i_v_e _p_r_o_p_e_r_t_i_e_s
+
+         {{mmiimmee__ttyyppeess,, [[{{MMiimmeeTTyyppee,, EExxtteennssiioonn}}]] || ppaatthh(())}}::
+           Where MimeType = string() and Extension = string(). Files delivered
+           to the client are MIME typed according to RFC 1590. File suffixes
+           are mapped to MIME types before file delivery. The mapping between
+           file suffixes and MIME types can be specified as an Apache like
+           file as well as directly in the property list. Such a file may look
+           like:
+
+         # MIME type    Extension
+         text/html html htm
+         text/plain     asc txt
+
+
+           Defaults to [{"html","text/html"},{"htm","text/html"}]
+
+         {{mmiimmee__ttyyppee,, ssttrriinngg(())}}::
+           When the server is asked to provide a document type which cannot be
+           determined by the MIME Type Settings, the server will use this
+           default type.
+
+         {{sseerrvveerr__aaddmmiinn,, ssttrriinngg(())}}::
+           ServerAdmin defines the email-address of the server administrator,
+           to be included in any error messages returned by the server.
+
+         {{sseerrvveerr__ttookkeennss,, pprroodd||mmaajjoorr||mmiinnoorr||mmiinniimmaall||ooss||ffuullll||{{pprriivvaattee,,
+         ssttrriinngg(())}}}}::
+           ServerTokens defines how the value of the server header should
+           look.
+
+           Example: Assuming the version of inets is 5.8.1, here is what the
+           server header string could look like for the different values of
+           server-tokens:
+
+         prod                  "inets"
+         major                 "inets/5"
+         minor                 "inets/5.8"
+         minimal               "inets/5.8.1"
+         os                    "inets/5.8.1 (unix)"
+         full                  "inets/5.8.1 (unix/linux) OTP/R15B"
+         {private, "foo/bar"}  "foo/bar"
+
+
+           By default, the value is as before, which is _m_i_n_i_m_a_l.
+
+         {{lloogg__ffoorrmmaatt,, ccoommmmoonn || ccoommbbiinneedd}}::
+           Defines if access logs should be written according to the common
+           log format or to the extended common log format. The _c_o_m_m_o_n format
+           is one line that looks like this: _r_e_m_o_t_e_h_o_s_t _r_f_c_9_3_1 _a_u_t_h_u_s_e_r _[_d_a_t_e_]
+           _"_r_e_q_u_e_s_t_" _s_t_a_t_u_s _b_y_t_e_s
+
+         remotehost
+              Remote
+         rfc931
+              The client's remote username (RFC 931).
+         authuser
+              The username with which the user authenticated
+                 himself.
+         [date]
+              Date and time of the request (RFC 1123).
+         "request"
+              The request line exactly as it came from the client
+                 (RFC 1945).
+         status
+              The HTTP status code returned to the client
+                 (RFC 1945).
+         bytes
+              The content-length of the document transferred.
+
+
+           The _c_o_m_b_i_n_e_d format is on line that look like this: _r_e_m_o_t_e_h_o_s_t
+           _r_f_c_9_3_1 _a_u_t_h_u_s_e_r _[_d_a_t_e_] _"_r_e_q_u_e_s_t_" _s_t_a_t_u_s _b_y_t_e_s _"_r_e_f_e_r_e_r_"
+           _"_u_s_e_r___a_g_e_n_t_"
+
+         "referer"
+              The url the client was on before
+              requesting your url. (If it could not be determined
+              a minus sign will be placed in this field)
+         "user_agent"
+              The software the client claims to be using. (If it
+              could not be determined a minus sign will be placed in
+              this field)
+
+
+           This affects the access logs written by mod_log and mod_disk_log.
+
+         {{eerrrroorr__lloogg__ffoorrmmaatt,, pprreettttyy || ccoommppaacctt}}::
+           Defaults to pretty. If the error log is meant to be read directly
+           by a human _p_r_e_t_t_y will be the best option. _p_r_e_t_t_y has the format
+           corresponding to:
+
+         io:format("[~s] ~s, reason: ~n ~p ~n~n", [Date, Msg, Reason]).
+
+
+           _c_o_m_p_a_c_t has the format corresponding to:
+
+         io:format("[~s] ~s, reason: ~w ~n", [Date, Msg, Reason]).
+
+
+           This affects the error logs written by mod_log and mod_disk_log.
+
+       _s_s_l _p_r_o_p_e_r_t_i_e_s
+
+         {{ssssll__ccaa__cceerrttiiffiiccaattee__ffiillee,, ppaatthh(())}}::
+           Used as cacertfile option in ssl:listen/2 see ssssll((33)).
+
+         {{ssssll__cceerrttiiffiiccaattee__ffiillee,, ppaatthh(())}}::
+           Used as certfile option in ssl:listen/2 see ssssll((33)).
+
+         {{ssssll__cciipphheerrss,, lliisstt(())}}::
+           Used as ciphers option in ssl:listen/2 see ssssll((33)).
+
+         {{ssssll__vveerriiffyy__cclliieenntt,, iinntteeggeerr(())}}::
+           Used as verify option in ssl:listen/2 see ssssll((33)).
+
+         {{ssssll__vveerriiffyy__ddeepptthh,, iinntteeggeerr(())}}::
+           Used as depth option in ssl:listen/2 see ssssll((33)).
+
+         {{ssssll__ppaasssswwoorrdd__ccaallllbbaacckk__ffuunnccttiioonn,, aattoomm(())}}::
+           Used together with ssl_password_callback_module to retrieve a value
+           to use as password option to ssl:listen/2 see ssssll((33)).
+
+         {{ssssll__ppaasssswwoorrdd__ccaallllbbaacckk__aarrgguummeennttss,, lliisstt(())}}::
+           Used together with ssl_password_callback_function to supply a list
+           of arguments to the callback function. If not specified the
+           callback function will be assumed to have arity 0.
+
+         {{ssssll__ppaasssswwoorrdd__ccaallllbbaacckk__mmoodduullee,, aattoomm(())}}::
+           Used together with ssl_password_callback_function to retrieve a
+           value to use as password option to ssl:listen/2 see ssssll((33)).
+
+       _U_R_L _a_l_i_a_s_i_n_g _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___a_l_i_a_s
+
+         {{aalliiaass,, {{AAlliiaass,, RReeaallNNaammee}}}}::
+           Where Alias = string() and RealName = string(). The Alias property
+           allows documents to be stored in the local file system instead of
+           the document_root location. URLs with a path that begins with url-
+           path is mapped to local files that begins with directory-filename,
+           for example:
+
+         {alias, {"/image", "/ftp/pub/image"}
+
+         {{rree__wwrriittee,, {{RRee,, RReeppllaacceemmeenntt}}}}::
+           Where Re = string() and Replacement = string(). The ReWrite
+           property allows documents to be stored in the local file system
+           instead of the document_root location. URLs are rewritten by
+           re:replace/3 to produce a path in the local filesystem. For
+           example:
+
+         {re_write, {"^/[~]([^/]+)(.*)$", "/home/\\1/public\\2"}
+
+         ReWrite ^/[~]([^/]+)(.*)$ /home/\1/public\2
+
+         \040
+
+         {{ddiirreeccttoorryy__iinnddeexx,, [[ssttrriinngg(())]]}}::
+           DirectoryIndex specifies a list of resources to look for if a
+           client requests a directory using a / at the end of the directory
+           name. file depicts the name of a file in the directory. Several
+           files may be given, in which case the server will return the first
+           it finds, for example:
+
+         {directory_index, ["index.hml", "welcome.html"]}
+
+       _C_G_I _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___c_g_i
+
+         {{ssccrriipptt__aalliiaass,, {{AAlliiaass,, RReeaallNNaammee}}}}::
+           Where Alias = string() and RealName = string(). Has the same
+           behavior as the Alias property, except that it also marks the
+           target directory as containing CGI scripts. URLs with a path
+           beginning with url-path are mapped to scripts beginning with
+           directory-filename, for example:
+
+         {script_alias, {"/cgi-bin/", "/web/cgi-bin/"}
+
+         {{ssccrriipptt__rree__wwrriittee,, {{RRee,, RReeppllaacceemmeenntt}}}}::
+           Where Re = string() and Replacement = string(). Has the same
+           behavior as the ReWrite property, except that it also marks the
+           target directory as containing CGI scripts. URLs with a path
+           beginning with url-path are mapped to scripts beginning with
+           directory-filename, for example:
+
+         {script_re_write, {"^/cgi-bin/(\\d+)/", "/web/\\1/cgi-bin/"}
+
+         {{ssccrriipptt__nnooccaacchhee,, bboooolleeaann(())}}::
+           If ScriptNoCache is set to true the HTTP server will by default add
+           the header fields necessary to prevent proxies from caching the
+           page. Generally this is something you want. Defaults to false.
+
+         {{ssccrriipptt__ttiimmeeoouutt,, iinntteeggeerr(())}}::
+           The time in seconds the web server will wait between each chunk of
+           data from the script. If the CGI-script not delivers any data
+           before the timeout the connection to the client will be closed.
+           Defaults to 15.
+
+         {{aaccttiioonn,, {{MMiimmeeTTyyppee,, CCggiiSSccrriipptt}}}} -- rreeqquuiirreess mmoodd__aaccttiioonn::
+           Where MimeType = string() and CgiScript = string(). Action adds an
+           action, which will activate a cgi-script whenever a file of a
+           certain mime-type is requested. It propagates the URL and file path
+           of the requested document using the standard CGI PATH_INFO and
+           PATH_TRANSLATED environment variables.
+
+         {action, {"text/plain", "/cgi-bin/log_and_deliver_text"}
+
+         {{ssccrriipptt,, {{MMeetthhoodd,, CCggiiSSccrriipptt}}}} -- rreeqquuiirreess mmoodd__aaccttiioonn::
+           Where Method = string() and CgiScript = string(). Script adds an
+           action, which will activate a cgi-script whenever a file is
+           requested using a certain HTTP method. The method is either GET or
+           POST as defined in RFC 1945. It propagates the URL and file path of
+           the requested document using the standard CGI PATH_INFO and
+           PATH_TRANSLATED environment variables.
+
+         {script, {"PUT", "/cgi-bin/put"}
+
+       _E_S_I _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___e_s_i
+
+         {{eerrll__ssccrriipptt__aalliiaass,, {{UURRLLPPaatthh,, [[AAlllloowweeddMMoodduullee]]}}}}::
+           Where URLPath = string() and AllowedModule = atom().
+           erl_script_alias marks all URLs matching url-path as erl scheme
+           scripts. A matching URL is mapped into a specific module and
+           function. For example:
+
+         {erl_script_alias, {"/cgi-bin/example", [httpd_example]}
+
+
+         {{eerrll__ssccrriipptt__nnooccaacchhee,, bboooolleeaann(())}}::
+           If erl_script_nocache is set to true the server will add http
+           header fields that prevents proxies from caching the page. This is
+           generally a good idea for dynamic content, since the content often
+           vary between each request. Defaults to false.
+
+         {{eerrll__ssccrriipptt__ttiimmeeoouutt,, iinntteeggeerr(())}}::
+           If erl_script_timeout sets the time in seconds the server will wait
+           between each chunk of data to be delivered through
+           mod_esi:deliver/2. Defaults to 15. This is only relevant for
+           scripts that uses the erl scheme.
+
+         {{eevvaall__ssccrriipptt__aalliiaass,, {{UURRLLPPaatthh,, [[AAlllloowweeddMMoodduullee]]}}}}::
+           Where URLPath = string() and AllowedModule = atom(). Same as
+           erl_script_alias but for scripts using the eval scheme. Note that
+           this is only supported for backwards compatibility. The eval scheme
+           is deprecated.
+
+       _L_o_g _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___l_o_g
+
+         {{eerrrroorr__lloogg,, ppaatthh(())}}::
+           Defines the filename of the error log file to be used to log server
+           errors. If the filename does not begin with a slash (/) it is
+           assumed to be relative to the server_root.
+
+         {{sseeccuurriittyy__lloogg,, ppaatthh(())}}::
+           Defines the filename of the access log file to be used to log
+           security events. If the filename does not begin with a slash (/) it
+           is assumed to be relative to the server_root.
+
+         {{ttrraannssffeerr__lloogg,, ppaatthh(())}}::
+           Defines the filename of the access log file to be used to log
+           incoming requests. If the filename does not begin with a slash (/)
+           it is assumed to be relative to the server_root.
+
+       _D_i_s_k _L_o_g _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___d_i_s_k___l_o_g
+
+         {{ddiisskk__lloogg__ffoorrmmaatt,, iinntteerrnnaall || eexxtteerrnnaall}}::
+           Defines the file-format of the log files see disk_log for more
+           information. If the internal file-format is used, the logfile will
+           be repaired after a crash. When a log file is repaired data might
+           get lost. When the external file-format is used httpd will not
+           start if the log file is broken. Defaults to external.
+
+         {{eerrrroorr__ddiisskk__lloogg,, iinntteerrnnaall || eexxtteerrnnaall}}::
+           Defines the filename of the (disk_log(3)) error log file to be used
+           to log server errors. If the filename does not begin with a slash
+           (/) it is assumed to be relative to the server_root.
+
+         {{eerrrroorr__ddiisskk__lloogg__ssiizzee,, {{MMaaxxBByytteess,, MMaaxxFFiilleess}}}}::
+           Where MaxBytes = integer() and MaxFiles = integer(). Defines the
+           properties of the (disk_log(3)) error log file. The disk_log(3)
+           error log file is of type wrap log and max-bytes will be written to
+           each file and max-files will be used before the first file is
+           truncated and reused.
+
+         {{sseeccuurriittyy__ddiisskk__lloogg,, ppaatthh(())}}::
+           Defines the filename of the (disk_log(3)) access log file which
+           logs incoming security events i.e authenticated requests. If the
+           filename does not begin with a slash (/) it is assumed to be
+           relative to the server_root.
+
+         {{sseeccuurriittyy__ddiisskk__lloogg__ssiizzee,, {{MMaaxxBByytteess,, MMaaxxFFiilleess}}}}::
+           Where MaxBytes = integer() and MaxFiles = integer(). Defines the
+           properties of the disk_log(3) access log file. The disk_log(3)
+           access log file is of type wrap log and max-bytes will be written
+           to each file and max-files will be used before the first file is
+           truncated and reused.
+
+         {{ttrraannssffeerr__ddiisskk__lloogg,, ppaatthh(())}}::
+           Defines the filename of the (disk_log(3)) access log file which
+           logs incoming requests. If the filename does not begin with a slash
+           (/) it is assumed to be relative to the server_root.
+
+         {{ttrraannssffeerr__ddiisskk__lloogg__ssiizzee,, {{MMaaxxBByytteess,, MMaaxxFFiilleess}}}}::
+           Where MaxBytes = integer() and MaxFiles = integer(). Defines the
+           properties of the disk_log(3) access log file. The disk_log(3)
+           access log file is of type wrap log and max-bytes will be written
+           to each file and max-files will be used before the first file is
+           truncated and reused.
+
+       _A_u_t_h_e_n_t_i_c_a_t_i_o_n _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___a_u_t_h
+
+       _{_d_i_r_e_c_t_o_r_y_, _{_p_a_t_h_(_)_, _[_{_p_r_o_p_e_r_t_y_(_)_, _t_e_r_m_(_)_}_]_}_}
+
+       Here follows the valid properties for directories
+
+         {{aallllooww__ffrroomm,, aallll || [[RReeggxxppHHoossttSSttrriinngg]]}}::
+           Defines a set of hosts which should be granted access to a given
+           directory. For example:
+
+         {allow_from, ["123.34.56.11", "150.100.23"]
+
+         {{ddeennyy__ffrroomm,, aallll || [[RReeggxxppHHoossttSSttrriinngg]]}}::
+           Defines a set of hosts which should be denied access to a given
+           directory. For example:
+
+         {deny_from, ["123.34.56.11", "150.100.23"]
+
+         {{aauutthh__ttyyppee,, ppllaaiinn || ddeettss || mmnneessiiaa}}::
+           Sets the type of authentication database that is used for the
+           directory.The key difference between the different methods is that
+           dynamic data can be saved when Mnesia and Dets is used. This
+           property is called AuthDbType in the Apache like configuration
+           files.
+
+         {{aauutthh__uusseerr__ffiillee,, ppaatthh(())}}::
+           Sets the name of a file which contains the list of users and
+           passwords for user authentication. filename can be either absolute
+           or relative to the _s_e_r_v_e_r___r_o_o_t. If using the plain storage method,
+           this file is a plain text file, where each line contains a user
+           name followed by a colon, followed by the non-encrypted password.
+           If user names are duplicated, the behavior is undefined. For
+           example:
+
+          ragnar:s7Xxv7
+          edward:wwjau8
+
+         {{aauutthh__ggrroouupp__ffiillee,, ppaatthh(())}}::
+           Sets the name of a file which contains the list of user groups for
+           user authentication. Filename can be either absolute or relative to
+           the _s_e_r_v_e_r___r_o_o_t. If you use the plain storage method, the group
+           file is a plain text file, where each line contains a group name
+           followed by a colon, followed by the member user names separated by
+           spaces. For example:
+
+         group1: bob joe ante
+
+         {{aauutthh__nnaammee,, ssttrriinngg(())}}::
+           Sets the name of the authorization realm (auth-domain) for a
+           directory. This string informs the client about which user name and
+           password to use.
+
+         {{aauutthh__aacccceessss__ppaasssswwoorrdd,, ssttrriinngg(())}}::
+           If set to other than "NoPassword" the password is required for all
+           API calls. If the password is set to "DummyPassword" the password
+           must be changed before any other API calls. To secure the
+           authenticating data the password must be changed after the web
+           server is started since it otherwise is written in clear text in
+           the configuration file.
+
+         {{rreeqquuiirree__uusseerr,, [[ssttrriinngg(())]]}}::
+           Defines users which should be granted access to a given directory
+           using a secret password.
+
+         {{rreeqquuiirree__ggrroouupp,, [[ssttrriinngg(())]]}}::
+           Defines users which should be granted access to a given directory
+           using a secret password.
+
+       _H_t_a_c_c_e_s_s _a_u_t_h_e_n_t_i_c_a_t_i_o_n _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___h_t_a_c_c_e_s_s
+
+         {{aacccceessss__ffiilleess,, [[ppaatthh(())]]}}::
+           Specify which filenames that are used for access-files. When a
+           request comes every directory in the path to the requested asset
+           will be searched after files with the names specified by this
+           parameter. If such a file is found the file will be parsed and the
+           restrictions specified in it will be applied to the request.
+
+       _S_e_c_u_r_i_t_y _p_r_o_p_e_r_t_i_e_s _- _r_e_q_u_i_r_e_s _m_o_d___s_e_c_u_r_i_t_y
+
+       _{_s_e_c_u_r_i_t_y___d_i_r_e_c_t_o_r_y_, _{_p_a_t_h_(_)_, _[_{_p_r_o_p_e_r_t_y_(_)_, _t_e_r_m_(_)_}_]_}
+
+       Here follows the valid properties for security directories
+
+         {{ddaattaa__ffiillee,, ppaatthh(())}}::
+           Name of the security data file. The filename can either absolute or
+           relative to the server_root. This file is used to store persistent
+           data for the mod_security module.
+
+         {{mmaaxx__rreettrriieess,, iinntteeggeerr(())}}::
+           Specifies the maximum number of tries to authenticate a user has
+           before the user is blocked out. If a user successfully
+           authenticates when the user has been blocked, the user will receive
+           a 403 (Forbidden) response from the server. If the user makes a
+           failed attempt while blocked the server will return 401
+           (Unauthorized), for security reasons. Defaults to 3 may also be set
+           to infinity.
+
+         {{bblloocckk__ttiimmee,, iinntteeggeerr(())}}::
+           Specifies the number of minutes a user is blocked. After this
+           amount of time, he automatically regains access. Defaults to 60.
+
+         {{ffaaiill__eexxppiirree__ttiimmee,, iinntteeggeerr(())}}::
+           Specifies the number of minutes a failed user authentication is
+           remembered. If a user authenticates after this amount of time, his
+           previous failed authentications are forgotten. Defaults to 30.
+
+         {{aauutthh__ttiimmeeoouutt,, iinntteeggeerr(())}}::
+            Specifies the number of seconds a successful user authentication
+           is remembered. After this time has passed, the authentication will
+           no longer be reported. Defaults to 30.
+
+EEXXPPOORRTTSS
+       iinnffoo((PPiidd)) -->>
+       iinnffoo((PPiidd,, PPrrooppeerrttiieess)) -->> [[{{OOppttiioonn,, VVaalluuee}}]]
+
+              Types:
+
+                 Properties = [property()]
+                 Option = property()
+                 Value = term()
+
+              Fetches information about the HTTP server. When called with only
+              the pid all properties are fetched, when called with a list of
+              specific properties they are fetched. Available properties are
+              the same as the servers start options.
+
+          NNoottee::
+              Pid is the pid returned from inets:start/[2,3]. Can also be
+              retrieved form inets:services/0, inets:services_info/0 see
+              iinneettss((33))
+
+
+       iinnffoo((AAddddrreessss,, PPoorrtt)) -->>
+       iinnffoo((AAddddrreessss,, PPoorrtt,, PPrrooppeerrttiieess)) -->> [[{{OOppttiioonn,, VVaalluuee}}]]
+
+              Types:
+
+                 Address = ip_address()
+                 Port = integer()
+                 Properties = [property()]
+                 Option = property()
+                 Value = term()
+
+              Fetches information about the HTTP server. When called with only
+              the Address and Port all properties are fetched, when called
+              with a list of specific properties they are fetched. Available
+              properties are the same as the servers start options.
+
+          NNoottee::
+              Address has to be the ip-address and can not be the hostname.
+
+
+       rreellooaadd__ccoonnffiigg((CCoonnffiigg,, MMooddee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Config = path() | [{Option, Value}]
+                 Option = property()
+                 Value = term()
+                 Mode = non_disturbing | disturbing
+
+              Reloads the HTTP server configuration without restarting the
+              server. Incoming requests will be answered with a temporary down
+              message during the time the it takes to reload.
+
+          NNoottee::
+              Available properties are the same as the servers start options,
+              although the properties bind_address and port can not be
+              changed.
+
+
+              If mode is disturbing, the server is blocked forcefully and all
+              ongoing requests are terminated and the reload will start
+              immediately. If mode is non-disturbing, no new connections are
+              accepted, but the ongoing requests are allowed to complete
+              before the reload is done.
+
+EERRLLAANNGG WWEEBB SSEERRVVEERR AAPPII DDAATTAA TTYYPPEESS
+             ModData = #mod{}
+
+             -record(mod, {
+                 data = [],
+                 socket_type = ip_comm,
+                 socket,
+                 config_db,
+                 method,
+                 absolute_uri,
+                 request_uri,
+                 http_version,
+                 request_line,
+                 parsed_header = [],
+                 entity_body,
+                 connection
+            }).
+
+
+       To acess the record in your callback-module use
+
+        -include_lib("inets/include/httpd.hrl").
+
+       The fields of the _m_o_d record has the following meaning:
+
+         _d_a_t_a:
+           Type _[_{_I_n_t_e_r_a_c_t_i_o_n_K_e_y_,_I_n_t_e_r_a_c_t_i_o_n_V_a_l_u_e_}_] is used to propagate data
+           between modules. Depicted _i_n_t_e_r_a_c_t_i_o_n___d_a_t_a_(_) in function type
+           declarations.
+
+         _s_o_c_k_e_t___t_y_p_e:
+           _s_o_c_k_e_t___t_y_p_e_(_), Indicates whether it is an ip socket or a ssl
+           socket.
+
+         _s_o_c_k_e_t:
+           The actual socket in _i_p___c_o_m_m or _s_s_l format depending on the
+           _s_o_c_k_e_t___t_y_p_e.
+
+         _c_o_n_f_i_g___d_b:
+           The config file directives stored as key-value tuples in an ETS-
+           table. Depicted _c_o_n_f_i_g___d_b_(_) in function type declarations.
+
+         _m_e_t_h_o_d:
+           Type _"_G_E_T_" _| _"_P_O_S_T_" _| _"_H_E_A_D_" _| _"_T_R_A_C_E_", that is the HTTP method.
+
+         _a_b_s_o_l_u_t_e___u_r_i:
+           If the request is a HTTP/1.1 request the URI might be in the
+           absolute URI format. In that case httpd will save the absolute URI
+           in this field. An Example of an absolute URI could
+           be_"_h_t_t_p_:_/_/_S_e_r_v_e_r_N_a_m_e_:_P_a_r_t_/_c_g_i_-_b_i_n_/_f_i_n_d_._p_l_?_p_e_r_s_o_n_=_j_o_c_k_e_"
+
+         _r_e_q_u_e_s_t___u_r_i:
+           The _R_e_q_u_e_s_t_-_U_R_I as defined in RFC 1945, for example _"_/_c_g_i_-
+           _b_i_n_/_f_i_n_d_._p_l_?_p_e_r_s_o_n_=_j_o_c_k_e_"
+
+         _h_t_t_p___v_e_r_s_i_o_n:
+           The _H_T_T_P version of the request, that is "HTTP/0.9", "HTTP/1.0", or
+           "HTTP/1.1".
+
+         _r_e_q_u_e_s_t___l_i_n_e:
+           The _R_e_q_u_e_s_t_-_L_i_n_e as defined in RFC 1945, for example _"_G_E_T _/_c_g_i_-
+           _b_i_n_/_f_i_n_d_._p_l_?_p_e_r_s_o_n_=_j_o_c_k_e _H_T_T_P_/_1_._0_".
+
+         _p_a_r_s_e_d___h_e_a_d_e_r:
+           Type _[_{_H_e_a_d_e_r_K_e_y_,_H_e_a_d_e_r_V_a_l_u_e_}_], _p_a_r_s_e_d___h_e_a_d_e_r contains all HTTP
+           header fields from the HTTP-request stored in a list as key-value
+           tuples. See RFC 2616 for a listing of all header fields. For
+           example the date field would be stored as: _{_"_d_a_t_e_"_,_"_W_e_d_, _1_5 _O_c_t
+           _1_9_9_7 _1_4_:_3_5_:_1_7 _G_M_T_"_} . RFC 2616 defines that HTTP is a case
+           insensitive protocol and the header fields may be in lower case or
+           upper case. Httpd will ensure that all header field names are in
+           lower case.
+
+         _e_n_t_i_t_y___b_o_d_y:
+           The _E_n_t_i_t_y_-_B_o_d_y as defined in RFC 2616, for example data sent from
+           a CGI-script using the POST method.
+
+         _c_o_n_n_e_c_t_i_o_n:
+           _t_r_u_e _| _f_a_l_s_e If set to true the connection to the client is a
+           persistent connection and will not be closed when the request is
+           served.
+
+EERRLLAANNGG WWEEBB SSEERRVVEERR AAPPII CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+EEXXPPOORRTTSS
+       MMoodduullee::ddoo((MMooddDDaattaa))-->> {{pprroocceeeedd,, OOllddDDaattaa}} || {{pprroocceeeedd,, NNeewwDDaattaa}} || {{bbrreeaakk,,
+       NNeewwDDaattaa}} || ddoonnee
+
+              Types:
+
+                 OldData = list()
+                 NewData = [{response,{StatusCode,Body}}] |
+                 [{response,{response,Head,Body}}] |
+                 [{response,{already_sent,Statuscode,Size}]
+                 StausCode = integer()
+                 Body = io_list() | nobody | {Fun, Arg}
+                 Head = [HeaderOption]
+                 HeaderOption = {Option, Value} | {code, StatusCode}
+                 Option = accept_ranges | allow | cache_control | content_MD5
+                 | content_encoding | content_language | content_length |
+                 content_location | content_range | content_type | date | etag
+                 | expires | last_modified | location | pragma | retry_after |
+                 server | trailer | transfer_encoding
+                 Value = string()
+                 Fun = fun( Arg ) -> sent| close | Body
+                 Arg = [term()]
+
+              When a valid request reaches httpd it calls _d_o_/_1 in each module
+              defined by the Modules configuration option. The function may
+              generate data for other modules or a response that can be sent
+              back to the client.
+
+              The field _d_a_t_a in ModData is a list. This list will be the list
+              returned from the last call to _d_o_/_1.
+
+              _B_o_d_y is the body of the http-response that will be sent back to
+              the client an appropriate header will be appended to the
+              message. _S_t_a_t_u_s_C_o_d_e will be the status code of the response see
+              RFC2616 for the appropriate values.
+
+              _H_e_a_d is a key value list of HTTP header fields. The server will
+              construct a HTTP header from this data. See RFC 2616 for the
+              appropriate value for each header field. If the client is a
+              HTTP/1.0 client then the server will filter the list so that
+              only HTTP/1.0 header fields will be sent back to the client.
+
+              If _B_o_d_y is returned and equal to _{_F_u_n_,_A_r_g_}, the Web server will
+              try _a_p_p_l_y_/_2 on _F_u_n with _A_r_g as argument and expect that the fun
+              either returns a list _(_B_o_d_y_) that is a HTTP-repsonse or the atom
+              sent if the HTTP-response is sent back to the client. If close
+              is returned from the fun something has gone wrong and the server
+              will signal this to the client by closing the connection.
+
+       MMoodduullee::llooaadd((LLiinnee,, AAccccIInn))-->> eeooff || ookk || {{ookk,, AAccccOOuutt}} || {{ookk,, AAccccOOuutt,,
+       {{OOppttiioonn,, VVaalluuee}}}} || {{ookk,, AAccccOOuutt,, [[{{OOppttiioonn,, VVaalluuee}}]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Line = string()
+                 AccIn = [{Option, Value}]
+                 AccOut = [{Option, Value}]
+                 Option = property()
+                 Value = term()
+                 Reason = term()
+
+              Load is used to convert a line in a Apache like configuration
+              file to a _{_O_p_t_i_o_n_, _V_a_l_u_e_} tuple. Some more complex configuration
+              options such as _d_i_r_e_c_t_o_r_y and _s_e_c_u_r_i_t_y___d_i_r_e_c_t_o_r_y will create an
+              accumulator.This function does only need clauses for the options
+              implemented by this particular callback module.
+
+       MMoodduullee::ssttoorree(({{OOppttiioonn,, VVaalluuee}},, CCoonnffiigg))-->> {{ookk,, {{OOppttiioonn,, NNeewwVVaalluuee}}}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Line = string()
+                 Option = property()
+                 Config = [{Option, Value}]
+                 Value = term()
+                 Reason = term()
+
+              This function is used to check the validity of the configuration
+              options before saving them in the internal database. This
+              function may also have a side effect e.i. setup necessary extra
+              resources implied by the configuration option. It can also
+              resolve possible dependencies among configuration options by
+              changing the value of the option. This function does only need
+              clauses for the options implemented by this particular callback
+              module.
+
+       MMoodduullee::rreemmoovvee((CCoonnffiiggDDBB)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ConfigDB = ets_table()
+                 Reason = term()
+
+              When httpd is shutdown it will try to execute _r_e_m_o_v_e_/_1 in each
+              Erlang web server callback module. The programmer may use this
+              function to clean up resources that may have been created in the
+              store function.
+
+EERRLLAANNGG WWEEBB SSEERRVVEERR AAPPII HHEELLPP FFUUNNCCTTIIOONNSS
+EEXXPPOORRTTSS
+       ppaarrssee__qquueerryy((QQuueerryySSttrriinngg)) -->> [[{{KKeeyy,,VVaalluuee}}]]
+
+              Types:
+
+                 QueryString = string()
+                 Key = string()
+                 Value = string()
+
+              _p_a_r_s_e___q_u_e_r_y_/_1 parses incoming data to _e_r_l and _e_v_a_l scripts (See
+              mmoodd__eessii((33))) as defined in the standard URL format, that is '+'
+              becomes 'space' and decoding of hexadecimal characters (_%_x_x).
+
+SSEEEE AALLSSOO
+       RFC 2616, iinneettss((33)), ssssll((33))
+
+
+
+Ericsson AB                       inets 5.9.1                         httpd(3)

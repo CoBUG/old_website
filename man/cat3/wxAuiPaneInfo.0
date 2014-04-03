@@ -1,0 +1,797 @@
+wxAuiPaneInfo(3)           Erlang Module Definition           wxAuiPaneInfo(3)
+
+
+
+NNAAMMEE
+       wxAuiPaneInfo - See external documentation: wxAuiPaneInfo.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxAuiPaneInfo.
+
+DDAATTAA TTYYPPEESS
+         _w_x_A_u_i_P_a_n_e_I_n_f_o_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              See external documentation.
+
+       nneeww((CC)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 C = wxAuiPaneInfo()
+
+              See external documentation.
+
+       bbeessttSSiizzee((TThhiiss,, SSiizzee)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       bbeessttSSiizzee((TThhiiss,, XX,, YY)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       bboottttoomm((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       bboottttoommDDoocckkaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to bboottttoommDDoocckkaabbllee((TThhiiss,, [[]])).
+
+       bboottttoommDDoocckkaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       ccaappttiioonn((TThhiiss,, CC)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 C = chardata() (see module unicode)
+
+              See external documentation.
+
+       ccaappttiioonnVViissiibbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ccaappttiioonnVViissiibbllee((TThhiiss,, [[]])).
+
+       ccaappttiioonnVViissiibbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       cceennttrree((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       cceennttrreePPaannee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       cclloosseeBBuuttttoonn((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to cclloosseeBBuuttttoonn((TThhiiss,, [[]])).
+
+       cclloosseeBBuuttttoonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       ddeeffaauullttPPaannee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       ddeessttrrooyyOOnnCClloossee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ddeessttrrooyyOOnnCClloossee((TThhiiss,, [[]])).
+
+       ddeessttrrooyyOOnnCClloossee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       ddiirreeccttiioonn((TThhiiss,, DDiirreeccttiioonn)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Direction = integer()
+
+              See external documentation.
+
+       ddoocckk((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       ddoocckkaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ddoocckkaabbllee((TThhiiss,, [[]])).
+
+       ddoocckkaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       ffiixxeedd((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       ffllooaatt((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       ffllooaattaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ffllooaattaabbllee((TThhiiss,, [[]])).
+
+       ffllooaattaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       ffllooaattiinnggPPoossiittiioonn((TThhiiss,, PPooss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ffllooaattiinnggPPoossiittiioonn((TThhiiss,, XX,, YY)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ffllooaattiinnggSSiizzee((TThhiiss,, SSiizzee)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ffllooaattiinnggSSiizzee((TThhiiss,, XX,, YY)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggrriippppeerr((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ggrriippppeerr((TThhiiss,, [[]])).
+
+       ggrriippppeerr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       ggrriippppeerrTToopp((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ggrriippppeerrTToopp((TThhiiss,, [[]])).
+
+       ggrriippppeerrTToopp((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {attop, boolean()}
+
+              See external documentation.
+
+       hhaassBBoorrddeerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassCCaappttiioonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassCClloosseeBBuuttttoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassFFllaagg((TThhiiss,, FFllaagg)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Flag = integer()
+
+              See external documentation.
+
+       hhaassGGrriippppeerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassGGrriippppeerrTToopp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassMMaaxxiimmiizzeeBBuuttttoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassMMiinniimmiizzeeBBuuttttoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhaassPPiinnBBuuttttoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       hhiiddee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissBBoottttoommDDoocckkaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissDDoocckkeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissFFiixxeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissFFllooaattaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissFFllooaattiinngg((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissLLeeffttDDoocckkaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissMMoovvaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissRReessiizzaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissRRiigghhttDDoocckkaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissSShhoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissTToooollbbaarr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       iissTTooppDDoocckkaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       llaayyeerr((TThhiiss,, LLaayyeerr)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Layer = integer()
+
+              See external documentation.
+
+       lleefftt((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       lleeffttDDoocckkaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to lleeffttDDoocckkaabbllee((TThhiiss,, [[]])).
+
+       lleeffttDDoocckkaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       mmaaxxSSiizzee((TThhiiss,, SSiizzee)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       mmaaxxSSiizzee((TThhiiss,, XX,, YY)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       mmaaxxiimmiizzeeBBuuttttoonn((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to mmaaxxiimmiizzeeBBuuttttoonn((TThhiiss,, [[]])).
+
+       mmaaxxiimmiizzeeBBuuttttoonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       mmiinnSSiizzee((TThhiiss,, SSiizzee)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       mmiinnSSiizzee((TThhiiss,, XX,, YY)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       mmiinniimmiizzeeBBuuttttoonn((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to mmiinniimmiizzeeBBuuttttoonn((TThhiiss,, [[]])).
+
+       mmiinniimmiizzeeBBuuttttoonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       mmoovvaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to mmoovvaabbllee((TThhiiss,, [[]])).
+
+       mmoovvaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       nnaammee((TThhiiss,, NN)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 N = chardata() (see module unicode)
+
+              See external documentation.
+
+       ppaanneeBBoorrddeerr((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ppaanneeBBoorrddeerr((TThhiiss,, [[]])).
+
+       ppaanneeBBoorrddeerr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       ppiinnBBuuttttoonn((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ppiinnBBuuttttoonn((TThhiiss,, [[]])).
+
+       ppiinnBBuuttttoonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {visible, boolean()}
+
+              See external documentation.
+
+       ppoossiittiioonn((TThhiiss,, PPooss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Pos = integer()
+
+              See external documentation.
+
+       rreessiizzaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to rreessiizzaabbllee((TThhiiss,, [[]])).
+
+       rreessiizzaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {resizable, boolean()}
+
+              See external documentation.
+
+       rriigghhtt((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       rriigghhttDDoocckkaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to rriigghhttDDoocckkaabbllee((TThhiiss,, [[]])).
+
+       rriigghhttDDoocckkaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       rrooww((TThhiiss,, RRooww)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Row = integer()
+
+              See external documentation.
+
+       ssaaffeeSSeett((TThhiiss,, SSoouurrccee)) -->> ookk
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Source = wxAuiPaneInfo()
+
+              See external documentation.
+
+       sseettFFllaagg((TThhiiss,, FFllaagg,, OOppttiioonn__ssttaattee)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Flag = integer()
+                 Option_state = boolean()
+
+              See external documentation.
+
+       sshhooww((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to sshhooww((TThhiiss,, [[]])).
+
+       sshhooww((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {show, boolean()}
+
+              See external documentation.
+
+       ttoooollbbaarrPPaannee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       ttoopp((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              See external documentation.
+
+       ttooppDDoocckkaabbllee((TThhiiss)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+
+              Equivalent to ttooppDDoocckkaabbllee((TThhiiss,, [[]])).
+
+       ttooppDDoocckkaabbllee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 Option = {b, boolean()}
+
+              See external documentation.
+
+       wwiinnddooww((TThhiiss,, WW)) -->> wwxxAAuuiiPPaanneeIInnffoo(())
+
+              Types:
+
+                 This = wxAuiPaneInfo()
+                 W = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxAAuuiiPPaanneeIInnffoo(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                  wxAuiPaneInfo(3)

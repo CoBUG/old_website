@@ -1,0 +1,1072 @@
+gen_sctp(3)                Erlang Module Definition                gen_sctp(3)
+
+
+
+NNAAMMEE
+       gen_sctp - The gen_sctp module provides functions for communicating
+       with sockets using the SCTP protocol.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _g_e_n___s_c_t_p module provides functions for communicating with sockets
+       using the SCTP protocol. The implementation assumes that the OS kernel
+       supports SCTP (RFC2960) through the user-level Sockets API Extensions.
+       During development this implementation was tested on Linux Fedora Core
+       5.0 (kernel 2.6.15-2054 or later is needed), and on Solaris 10, 11.
+       During OTP adaptation it was tested on SUSE Linux Enterprise Server 10
+       (x86_64) kernel 2.6.16.27-0.6-smp, with lksctp-tools-1.0.6, briefly on
+       Solaris 10, and later on SUSE Linux Enterprise Server 10 Service Pack 1
+       (x86_64) kernel 2.6.16.54-0.2.3-smp with lksctp-tools-1.0.7, and later
+       also on FreeBSD 8.2.
+
+       This module was written for one-to-many style sockets (type _s_e_q_p_a_c_k_e_t).
+       With the addition of ppeeeellooffff//22, one-to-one style sockets (type _s_t_r_e_a_m)
+       were introduced.
+
+       Record definitions for the _g_e_n___s_c_t_p module can be found using:
+
+         -include_lib("kernel/include/inet_sctp.hrl").
+
+       These record definitions use the "new" spelling 'adaptation', not the
+       deprecated 'adaption', regardless of which spelling the underlying C
+       API uses.
+
+CCOONNTTEENNTTSS
+         * DDAATTAA TTYYPPEESS
+
+         * EEXXPPOORRTTSS
+
+         * SSCCTTPP SSOOCCKKEETT OOPPTTIIOONNSS
+
+         * SSCCTTPP EEXXAAMMPPLLEESS
+
+         * SSEEEE AALLSSOO
+
+DDAATTAA TTYYPPEESS
+       aassssoocc__iidd(())
+
+              An opaque term returned in for example #sctp_paddr_change{} that
+              identifies an association for an SCTP socket. The term is opaque
+              except for the special value _0 that has a meaning such as "the
+              whole endpoint" or "all future associations".
+
+       ooppttiioonn(()) = {active, true | false | once}
+                | {buffer, integer() >= 0}
+                | {dontroute, boolean()}
+                | {linger, {boolean(), integer() >= 0}}
+                | {mode, list | binary}
+                | list
+                | binary
+                | {priority, integer() >= 0}
+                | {recbuf, integer() >= 0}
+                | {reuseaddr, boolean()}
+                | {sctp_adaptation_layer, #sctp_setadaptation{}}
+                | {sctp_associnfo, #sctp_assocparams{}}
+                | {sctp_autoclose, integer() >= 0}
+                | {sctp_default_send_param, #sctp_sndrcvinfo{}}
+                | {sctp_delayed_ack_time, #sctp_assoc_value{}}
+                | {sctp_disable_fragments, boolean()}
+                | {sctp_events, #sctp_event_subscribe{}}
+                | {sctp_get_peer_addr_info, #sctp_paddrinfo{}}
+                | {sctp_i_want_mapped_v4_addr, boolean()}
+                | {sctp_initmsg, #sctp_initmsg{}}
+                | {sctp_maxseg, integer() >= 0}
+                | {sctp_nodelay, boolean()}
+                | {sctp_peer_addr_params, #sctp_paddrparams{}}
+                | {sctp_primary_addr, #sctp_prim{}}
+                | {sctp_rtoinfo, #sctp_rtoinfo{}}
+                | {sctp_set_peer_primary_addr, #sctp_setpeerprim{}}
+                | {sctp_status, #sctp_status{}}
+                | {sndbuf, integer() >= 0}
+                | {tos, integer() >= 0}
+
+              One of the SSCCTTPP SSoocckkeett OOppttiioonnss..
+
+       ooppttiioonn__nnaammee(()) = active
+                     | buffer
+                     | dontroute
+                     | linger
+                     | mode
+                     | priority
+                     | recbuf
+                     | reuseaddr
+                     | sctp_adaptation_layer
+                     | sctp_associnfo
+                     | sctp_autoclose
+                     | sctp_default_send_param
+                     | sctp_delayed_ack_time
+                     | sctp_disable_fragments
+                     | sctp_events
+                     | sctp_get_peer_addr_info
+                     | sctp_i_want_mapped_v4_addr
+                     | sctp_initmsg
+                     | sctp_maxseg
+                     | sctp_nodelay
+                     | sctp_peer_addr_params
+                     | sctp_primary_addr
+                     | sctp_rtoinfo
+                     | sctp_set_peer_primary_addr
+                     | sctp_status
+                     | sndbuf
+                     | tos
+
+       ssccttpp__ssoocckkeett(())
+
+              Socket identifier returned from _o_p_e_n_/_*.
+
+EEXXPPOORRTTSS
+       aabboorrtt((SSoocckkeett,, AAssssoocc)) -->> ookk || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Assoc = #sctp_assoc_change{}
+
+              Abnormally terminates the association given by _A_s_s_o_c, without
+              flushing of unsent data. The socket itself remains open. Other
+              associations opened on this socket are still valid, and it can
+              be used in new associations.
+
+       cclloossee((SSoocckkeett)) -->> ookk || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+
+              Completely closes the socket and all associations on it. The
+              unsent data is flushed as in _e_o_f_/_2. The _c_l_o_s_e_/_1 call is blocking
+              or otherwise depending of the value of the lliinnggeerr socket ooppttiioonn.
+              If _c_l_o_s_e does not linger or linger timeout expires, the call
+              returns and the data is flushed in the background.
+
+       ccoonnnneecctt((SSoocckkeett,, AAddddrr,, PPoorrtt,, OOppttss)) -->>
+                  {{ookk,, AAssssoocc}} || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Addr = iinneett::iipp__aaddddrreessss(()) | iinneett::hhoossttnnaammee(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Opts = [Opt :: ooppttiioonn(())]
+                 Assoc = #sctp_assoc_change{}
+
+              Same as _c_o_n_n_e_c_t_(_S_o_c_k_e_t_, _A_d_d_r_, _P_o_r_t_, _O_p_t_s_, _i_n_f_i_n_i_t_y_).
+
+       ccoonnnneecctt((SSoocckkeett,, AAddddrr,, PPoorrtt,, OOppttss,, TTiimmeeoouutt)) -->>
+                  {{ookk,, AAssssoocc}} || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Addr = iinneett::iipp__aaddddrreessss(()) | iinneett::hhoossttnnaammee(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Opts = [Opt :: ooppttiioonn(())]
+                 Timeout = timeout()
+                 Assoc = #sctp_assoc_change{}
+
+              Establishes a new association for the socket _S_o_c_k_e_t, with the
+              peer (SCTP server socket) given by _A_d_d_r and _P_o_r_t. The _T_i_m_e_o_u_t,
+              is expressed in milliseconds. A socket can be associated with
+              multiple peers.
+
+              WWAARRNNIINNGG:: Using a value of _T_i_m_e_o_u_t less than the maximum time
+              taken by the OS to establish an association (around 4.5 minutes
+              if the default values from RFC 4960 are used) can result in
+              inconsistent or incorrect return values. This is especially
+              relevant for associations sharing the same _S_o_c_k_e_t (i.e. source
+              address and port) since the controlling process blocks until
+              _c_o_n_n_e_c_t_/_* returns. ccoonnnneecctt__iinniitt//** provides an alternative not
+              subject to this limitation.
+
+              The result of _c_o_n_n_e_c_t_/_* is an _#_s_c_t_p___a_s_s_o_c___c_h_a_n_g_e_{_} event which
+              contains, in particular, the new AAssssoocciiaattiioonn IIDD.
+
+                 #sctp_assoc_change{
+                      state             = atom(),
+                      error             = atom(),
+                      outbound_streams  = integer(),
+                      inbound_streams   = integer(),
+                      assoc_id          = assoc_id()
+                }
+
+              The number of outbound and inbound streams can be set by giving
+              an _s_c_t_p___i_n_i_t_m_s_g option to _c_o_n_n_e_c_t as in:
+
+                connect(Socket, Ip, Port,
+                      [{sctp_initmsg,#sctp_initmsg{num_ostreams=OutStreams,
+                                                   max_instreams=MaxInStreams}}])
+
+              All options _O_p_t are set on the socket before the association is
+              attempted. If an option record has got undefined field values,
+              the options record is first read from the socket for those
+              values. In effect, _O_p_t option records only define field values
+              to change before connecting.
+
+              The returned _o_u_t_b_o_u_n_d___s_t_r_e_a_m_s and _i_n_b_o_u_n_d___s_t_r_e_a_m_s are the actual
+              stream numbers on the socket, which may be different from the
+              requested values (_O_u_t_S_t_r_e_a_m_s and _M_a_x_I_n_S_t_r_e_a_m_s respectively) if
+              the peer requires lower values.
+
+              The following values of _s_t_a_t_e are possible:
+
+                * _c_o_m_m___u_p: association successfully established. This
+                  indicates a successful completion of _c_o_n_n_e_c_t.
+
+                * _c_a_n_t___a_s_s_o_c: association cannot be established (_c_o_n_n_e_c_t_/_*
+                  failure).
+
+              All other states do not normally occur in the output from
+              _c_o_n_n_e_c_t_/_*. Rather, they may occur in _#_s_c_t_p___a_s_s_o_c___c_h_a_n_g_e_{_} events
+              received instead of data in rreeccvv//** calls. All of them indicate
+              losing the association due to various error conditions, and are
+              listed here for the sake of completeness. The _e_r_r_o_r field may
+              provide more detailed diagnostics.
+
+                * _c_o_m_m___l_o_s_t;
+
+                * _r_e_s_t_a_r_t;
+
+                * _s_h_u_t_d_o_w_n___c_o_m_p.
+
+       ccoonnnneecctt__iinniitt((SSoocckkeett,, AAddddrr,, PPoorrtt,, OOppttss)) -->>
+                       ookk || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Addr = iinneett::iipp__aaddddrreessss(()) | iinneett::hhoossttnnaammee(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Opts = [ooppttiioonn(())]
+
+              Same as _c_o_n_n_e_c_t___i_n_i_t_(_S_o_c_k_e_t_, _A_d_d_r_, _P_o_r_t_, _O_p_t_s_, _i_n_f_i_n_i_t_y_).
+
+       ccoonnnneecctt__iinniitt((SSoocckkeett,, AAddddrr,, PPoorrtt,, OOppttss,, TTiimmeeoouutt)) -->>
+                       ookk || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Addr = iinneett::iipp__aaddddrreessss(()) | iinneett::hhoossttnnaammee(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Opts = [ooppttiioonn(())]
+                 Timeout = timeout()
+
+              Initiates a new association for the socket _S_o_c_k_e_t, with the peer
+              (SCTP server socket) given by _A_d_d_r and _P_o_r_t.
+
+              The fundamental difference between this API and _c_o_n_n_e_c_t_/_* is
+              that the return value is that of the underlying OS connect(2)
+              system call. If _o_k is returned then the result of the
+              association establishement is received by the calling process as
+              an  ##ssccttpp__aassssoocc__cchhaannggee{{}} event. The calling process must be
+              prepared to receive this, or poll for it using _r_e_c_v_/_* depending
+              on the value of the active option.
+
+              The parameters are as described in ccoonnnneecctt//**, with the exception
+              of the _T_i_m_e_o_u_t value.
+
+              The timer associated with _T_i_m_e_o_u_t only supervises IP resolution
+              of _A_d_d_r
+
+       ccoonnttrroolllliinngg__pprroocceessss((SSoocckkeett,, PPiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Pid = pid()
+                 Reason = closed | not_owner | iinneett::ppoossiixx(())
+
+              Assigns a new controlling process _P_i_d to _S_o_c_k_e_t. Same
+              implementation as _g_e_n___u_d_p_:_c_o_n_t_r_o_l_l_i_n_g___p_r_o_c_e_s_s_/_2.
+
+       eeooff((SSoocckkeett,, AAssssoocc)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Assoc = #sctp_assoc_change{}
+                 Reason = term()
+
+              Gracefully terminates the association given by _A_s_s_o_c, with
+              flushing of all unsent data. The socket itself remains open.
+              Other associations opened on this socket are still valid, and it
+              can be used in new associations.
+
+       lliisstteenn((SSoocckkeett,, IIssSSeerrvveerr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+       lliisstteenn((SSoocckkeett,, BBaacckklloogg)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Backlog = integer()
+                 Reason = term()
+
+              Sets up a socket to listen on the IP address and port number it
+              is bound to.
+
+              For type _s_e_q_p_a_c_k_e_t sockets (the default) _I_s_S_e_r_v_e_r must be _t_r_u_e
+              or _f_a_l_s_e. In contrast to TCP, in SCTP there is no listening
+              queue length. If _I_s_S_e_r_v_e_r is _t_r_u_e the socket accepts new
+              associations, i.e. it will become an SCTP server socket.
+
+              For type _s_t_r_e_a_m sockets Backlog defines the backlog queue length
+              just like in TCP.
+
+       ooppeenn(()) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+       ooppeenn((PPoorrtt)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+       ooppeenn((OOppttss)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+       ooppeenn((PPoorrtt,, OOppttss)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, iinneett::ppoossiixx(())}}
+
+              Types:
+
+                 Opts = [Opt]
+                 Opt = {ip, IP}
+                     | {ifaddr, IP}
+                     | iinneett::aaddddrreessss__ffaammiillyy(())
+                     | {port, Port}
+                     | {type, SockType}
+                     | ooppttiioonn(())
+                 IP = iinneett::iipp__aaddddrreessss(()) | any | loopback
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 SockType = seqpacket | stream
+                 Socket = ssccttpp__ssoocckkeett(())
+
+              Creates an SCTP socket and binds it to the local addresses
+              specified by all _{_i_p_,_I_P_} (or synonymously _{_i_f_a_d_d_r_,_I_P_}) options
+              (this feature is called SCTP multi-homing). The default _I_P and
+              _P_o_r_t are _a_n_y and _0, meaning bind to all local addresses on any
+              one free port.
+
+              Other options are:
+
+                _i_n_e_t_6:
+                  Set up the socket for IPv6.
+
+                _i_n_e_t:
+                  Set up the socket for IPv4. This is the default.
+
+              A default set of socket ooppttiioonnss is used. In particular, the
+              socket is opened in bbiinnaarryy and ppaassssiivvee mode, with SockType
+              _s_e_q_p_a_c_k_e_t, and with reasonably large kkeerrnneell and driver bbuuffffeerrss..
+
+       ppeeeellooffff((SSoocckkeett,, AAssssoocc)) -->> {{ookk,, NNeewwSSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Assoc = #sctp_assoc_change{} | aassssoocc__iidd(())
+                 NewSocket = ssccttpp__ssoocckkeett(())
+                 Reason = term()
+
+              Branch off an existing association Assoc in a socket Socket of
+              type _s_e_q_p_a_c_k_e_t (one-to-may style) into a new socket NewSocket of
+              type _s_t_r_e_a_m (one-to-one style).
+
+              The existing association argument Assoc can be either a
+              ##ssccttpp__aassssoocc__cchhaannggee{{}}  record as returned from e.g rreeccvv//**,
+              ccoonnnneecctt//** or from a listening socket in active mode. Or it can
+              be just the field _a_s_s_o_c___i_d integer from such a record.
+
+       rreeccvv((SSoocckkeett)) -->>
+               {{ookk,, {{FFrroommIIPP,, FFrroommPPoorrtt,, AAnnccDDaattaa,, DDaattaa}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+       rreeccvv((SSoocckkeett,, TTiimmeeoouutt)) -->>
+               {{ookk,, {{FFrroommIIPP,, FFrroommPPoorrtt,, AAnnccDDaattaa,, DDaattaa}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Timeout = timeout()
+                 FromIP = iinneett::iipp__aaddddrreessss(())
+                 FromPort = iinneett::ppoorrtt__nnuummbbeerr(())
+                 AncData = [#sctp_sndrcvinfo{}]
+                 Data = binary()
+                      | string()
+                      | #sctp_sndrcvinfo{}
+                      | #sctp_assoc_change{}
+                      | #sctp_paddr_change{}
+                      | #sctp_adaptation_event{}
+                 Reason = iinneett::ppoossiixx(())
+                        | #sctp_send_failed{}
+                        | #sctp_paddr_change{}
+                        | #sctp_pdapi_event{}
+                        | #sctp_remote_error{}
+                        | #sctp_shutdown_event{}
+
+              Receives the _D_a_t_a message from any association of the socket. If
+              the receive times out _{_e_r_r_o_r_,_t_i_m_e_o_u_t is returned. The default
+              timeout is _i_n_f_i_n_i_t_y. _F_r_o_m_I_P and _F_r_o_m_P_o_r_t indicate the sender's
+              address.
+
+              _A_n_c_D_a_t_a is a list of Ancillary Data items which may be received
+              along with the main _D_a_t_a. This list can be empty, or contain a
+              single ##ssccttpp__ssnnddrrccvviinnffoo{{}} record, if receiving of such ancillary
+              data is enabled (see option ssccttpp__eevveennttss). It is enabled by
+              default, since such ancillary data provide an easy way of
+              determining the association and stream over which the message
+              has been received. (An alternative way would be to get the
+              Association ID from the _F_r_o_m_I_P and _F_r_o_m_P_o_r_t using the
+              ssccttpp__ggeett__ppeeeerr__aaddddrr__iinnffoo socket option, but this would still not
+              produce the Stream number).
+
+              The actual _D_a_t_a received may be a _b_i_n_a_r_y_(_), or _l_i_s_t_(_) of bytes
+              (integers in the range 0 through 255) depending on the socket
+              mode, or an SCTP Event. The following SCTP Events are possible:
+
+                * ##ssccttpp__ssnnddrrccvviinnffoo{{}}
+
+                * ##ssccttpp__aassssoocc__cchhaannggee{{}};
+
+                *
+
+
+                  #sctp_paddr_change{
+                        addr      = {ip_address(),port()},
+                        state     = atom(),
+                        error     = integer(),
+                        assoc_id  = assoc_id()
+                  }
+
+                  Indicates change of the status of the peer's IP address
+                  given by _a_d_d_r within the association _a_s_s_o_c___i_d. Possible
+                  values of _s_t_a_t_e (mostly self-explanatory) include:
+
+                  * _a_d_d_r___u_n_r_e_a_c_h_a_b_l_e;
+
+                  * _a_d_d_r___a_v_a_i_l_a_b_l_e;
+
+                  * _a_d_d_r___r_e_m_o_v_e_d;
+
+                  * _a_d_d_r___a_d_d_e_d;
+
+                  * _a_d_d_r___m_a_d_e___p_r_i_m.
+
+                  * _a_d_d_r___c_o_n_f_i_r_m_e_d.
+
+                  In case of an error (e.g. _a_d_d_r___u_n_r_e_a_c_h_a_b_l_e), the _e_r_r_o_r field
+                  provides additional diagnostics. In such cases, the
+                  _#_s_c_t_p___p_a_d_d_r___c_h_a_n_g_e_{_} Event is automatically converted into
+                  an _e_r_r_o_r term returned by _g_e_n___s_c_t_p_:_r_e_c_v. The _e_r_r_o_r field
+                  value can be converted into a string using _e_r_r_o_r___s_t_r_i_n_g_/_1.
+
+                *
+
+
+                  #sctp_send_failed{
+                        flags     = true | false,
+                        error     = integer(),
+                        info      = #sctp_sndrcvinfo{},
+                        assoc_id  = assoc_id()
+                        data      = binary()
+                  }
+
+                  The sender may receive this event if a send operation fails.
+                  The _f_l_a_g_s is a Boolean specifying whether the data have
+                  actually been transmitted over the wire; _e_r_r_o_r provides
+                  extended diagnostics, use _e_r_r_o_r___s_t_r_i_n_g_/_1; _i_n_f_o is the
+                  original ##ssccttpp__ssnnddrrccvviinnffoo{{}} record used in the failed
+                  sseenndd//**,, and _d_a_t_a is the whole original data chunk attempted
+                  to be sent.
+
+                  In the current implementation of the Erlang/SCTP binding,
+                  this Event is internally converted into an _e_r_r_o_r term
+                  returned by _r_e_c_v_/_*.
+
+                *
+
+
+                  #sctp_adaptation_event{
+                        adaptation_ind = integer(),
+                        assoc_id       = assoc_id()
+                  }
+
+                  Delivered when a peer sends an Adaptation Layer Indication
+                  parameter (configured through the option
+                  ssccttpp__aaddaappttaattiioonn__llaayyeerr). Note that with the current
+                  implementation of the Erlang/SCTP binding, this event is
+                  disabled by default.
+
+                *
+
+
+                  #sctp_pdapi_event{
+                        indication = sctp_partial_delivery_aborted,
+                        assoc_id   = assoc_id()
+                  }
+
+                  A partial delivery failure. In the current implementation of
+                  the Erlang/SCTP binding, this Event is internally converted
+                  into an _e_r_r_o_r term returned by _r_e_c_v_/_*.
+
+       sseenndd((SSoocckkeett,, SSnnddRRccvvIInnffoo,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 SndRcvInfo = #sctp_sndrcvinfo{}
+                 Data = binary() | iolist()
+                 Reason = term()
+
+              Sends the _D_a_t_a message with all sending parameters from a
+              ##ssccttpp__ssnnddrrccvviinnffoo{{}} record. This way, the user can specify the
+              PPID (passed to the remote end) and Context (passed to the local
+              SCTP layer) which can be used for example for error
+              identification. However, such a fine level of user control is
+              rarely required. The send/4 function is sufficient for most
+              applications.
+
+       sseenndd((SSoocckkeett,, AAssssoocc,, SSttrreeaamm,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssccttpp__ssoocckkeett(())
+                 Assoc = #sctp_assoc_change{} | aassssoocc__iidd(())
+                 Stream = integer()
+                 Data = binary() | iolist()
+                 Reason = term()
+
+              Sends _D_a_t_a message over an existing association and given
+              stream.
+
+       eerrrroorr__ssttrriinngg((EErrrroorrNNuummbbeerr)) -->> ookk || ssttrriinngg(()) || uunnkknnoowwnn__eerrrroorr
+
+              Types:
+
+                 ErrorNumber = integer()
+
+              Translates an SCTP error number from for example
+              _#_s_c_t_p___r_e_m_o_t_e___e_r_r_o_r_{_} or _#_s_c_t_p___s_e_n_d___f_a_i_l_e_d_{_} into an explanatory
+              string, or one of the atoms _o_k for no error and _u_n_d_e_f_i_n_e_d for an
+              unrecognized error.
+
+SSCCTTPP SSOOCCKKEETT OOPPTTIIOONNSS
+       The set of admissible SCTP socket options is by construction orthogonal
+       to the sets of TCP, UDP and generic INET options: only those options
+       which are explicitly listed below are allowed for SCTP sockets. Options
+       can be set on the socket using _g_e_n___s_c_t_p_:_o_p_e_n_/_1_,_2 or _i_n_e_t_:_s_e_t_o_p_t_s_/_2,
+       retrieved using _i_n_e_t_:_g_e_t_o_p_t_s_/_2, and when calling _g_e_n___s_c_t_p_:_c_o_n_n_e_c_t_/_4_,_5
+       options can be changed.
+
+         _{_m_o_d_e_, _l_i_s_t_|_b_i_n_a_r_y_} or just _l_i_s_t or _b_i_n_a_r_y:
+           Determines the type of data returned from _g_e_n___s_c_t_p_:_r_e_c_v_/_1_,_2.
+
+         _{_a_c_t_i_v_e_, _t_r_u_e_|_f_a_l_s_e_|_o_n_c_e_}:
+
+
+           * If _f_a_l_s_e (passive mode, the default), the caller needs to do an
+             explicit _g_e_n___s_c_t_p_:_r_e_c_v call in order to retrieve the available
+             data from the socket.
+
+           * If _t_r_u_e (full active mode), the pending data or events are sent
+             to the owning process.
+
+             _N_B_: This can cause the message queue to overflow, as there is no
+             way to throttle the sender in this case (no flow control!).
+
+           * If _o_n_c_e, only one message is automatically placed in the message
+             queue, after that the mode is automatically re-set to passive.
+             This provides flow control as well as the possibility for the
+             receiver to listen for its incoming SCTP data interleaved with
+             other inter-process messages.
+
+         _{_t_o_s_, _i_n_t_e_g_e_r_(_)_}:
+           Sets the Type-Of-Service field on the IP datagrams being sent, to
+           the given value, which effectively determines a prioritization
+           policy for the outbound packets. The acceptable values are system-
+           dependent. TODO: we do not provide symbolic names for these values
+           yet.
+
+         _{_p_r_i_o_r_i_t_y_, _i_n_t_e_g_e_r_(_)_}:
+           A protocol-independent equivalent of _t_o_s above. Setting priority
+           implies setting tos as well.
+
+         _{_d_o_n_t_r_o_u_t_e_, _t_r_u_e_|_f_a_l_s_e_}:
+           By default _f_a_l_s_e. If _t_r_u_e, the kernel does not send packets via any
+           gateway, only sends them to directly connected hosts.
+
+         _{_r_e_u_s_e_a_d_d_r_, _t_r_u_e_|_f_a_l_s_e_}:
+           By default _f_a_l_s_e. If true, the local binding address _{_I_P_,_P_o_r_t_} of
+           the socket can be re-used immediately: no waiting in the CLOSE_WAIT
+           state is performed (may be required for high-throughput servers).
+
+         _{_s_n_d_b_u_f_, _i_n_t_e_g_e_r_(_)_}:
+           The size, in bytes, of the *kernel* send buffer for this socket.
+           Sending errors would occur for datagrams larger than _v_a_l_(_s_n_d_b_u_f_).
+           Setting this option also adjusts the size of the driver buffer (see
+           _b_u_f_f_e_r above).
+
+         _{_r_e_c_b_u_f_, _i_n_t_e_g_e_r_(_)_}:
+           The size, in bytes, of the *kernel* recv buffer for this socket.
+           Sending errors would occur for datagrams larger than _v_a_l_(_s_n_d_b_u_f_).
+           Setting this option also adjusts the size of the driver buffer (see
+           _b_u_f_f_e_r above).
+
+         _{_s_c_t_p___m_o_d_u_l_e_, _m_o_d_u_l_e_(_)_}:
+           Override which callback module is used. Defaults to _i_n_e_t___s_c_t_p for
+           IPv4 and _i_n_e_t_6___s_c_t_p for IPv6.
+
+         _{_s_c_t_p___r_t_o_i_n_f_o_, _#_s_c_t_p___r_t_o_i_n_f_o_{_}_}:
+
+
+           #sctp_rtoinfo{
+                 assoc_id = assoc_id(),
+                 initial  = integer(),
+                 max      = integer(),
+                 min      = integer()
+           }
+
+           Determines re-transmission time-out parameters, in milliseconds,
+           for the association(s) given by _a_s_s_o_c___i_d. If _a_s_s_o_c___i_d _= _0 (default)
+           indicates the whole endpoint. See RFC2960 and Sockets API
+           Extensions for SCTP for the exact semantics of the fields values.
+
+         _{_s_c_t_p___a_s_s_o_c_i_n_f_o_, _#_s_c_t_p___a_s_s_o_c_p_a_r_a_m_s_{_}_}:
+
+
+           #sctp_assocparams{
+                 assoc_id                 = assoc_id(),
+                 asocmaxrxt               = integer(),
+                 number_peer_destinations = integer(),
+                 peer_rwnd                = integer(),
+                 local_rwnd               = integer(),
+                 cookie_life              = integer()
+           }
+
+           Determines association parameters for the association(s) given by
+           _a_s_s_o_c___i_d. _a_s_s_o_c___i_d _= _0 (default) indicates the whole endpoint. See
+           Sockets API Extensions for SCTP for the discussion of their
+           semantics. Rarely used.
+
+         _{_s_c_t_p___i_n_i_t_m_s_g_, _#_s_c_t_p___i_n_i_t_m_s_g_{_}_}:
+
+
+           #sctp_initmsg{
+                num_ostreams   = integer(),
+                max_instreams  = integer(),
+                max_attempts   = integer(),
+                max_init_timeo = integer()
+           }
+
+           Determines the default parameters which this socket attempts to
+           negotiate with its peer while establishing an association with it.
+           Should be set after _o_p_e_n_/_* but before the first _c_o_n_n_e_c_t_/_*.
+           _#_s_c_t_p___i_n_i_t_m_s_g_{_} can also be used as ancillary data with the first
+           call of _s_e_n_d_/_* to a new peer (when a new association is created).
+
+           * _n_u_m___o_s_t_r_e_a_m_s: number of outbound streams;
+
+           * _m_a_x___i_n_s_t_r_e_a_m_s: max number of in-bound streams;
+
+           * _m_a_x___a_t_t_e_m_p_t_s: max re-transmissions while establishing an
+             association;
+
+           * _m_a_x___i_n_i_t___t_i_m_e_o: time-out in milliseconds for establishing an
+             association.
+
+         _{_s_c_t_p___a_u_t_o_c_l_o_s_e_, _i_n_t_e_g_e_r_(_) _>_= _0_}:
+           Determines the time (in seconds) after which an idle association is
+           automatically closed. _0 means that the association is never
+           automatically closed.
+
+         _{_s_c_t_p___n_o_d_e_l_a_y_, _t_r_u_e_|_f_a_l_s_e_}:
+           Turns on|off the Nagle algorithm for merging small packets into
+           larger ones (which improves throughput at the expense of latency).
+
+         _{_s_c_t_p___d_i_s_a_b_l_e___f_r_a_g_m_e_n_t_s_, _t_r_u_e_|_f_a_l_s_e_}:
+           If _t_r_u_e, induces an error on an attempt to send a message which is
+           larger than the current PMTU size (which would require
+           fragmentation/re-assembling). Note that message fragmentation does
+           not affect the logical atomicity of its delivery; this option is
+           provided for performance reasons only.
+
+         _{_s_c_t_p___i___w_a_n_t___m_a_p_p_e_d___v_4___a_d_d_r_, _t_r_u_e_|_f_a_l_s_e_}:
+           Turns on|off automatic mapping of IPv4 addresses into IPv6 ones (if
+           the socket address family is AF_INET6).
+
+         _{_s_c_t_p___m_a_x_s_e_g_, _i_n_t_e_g_e_r_(_)_}:
+           Determines the maximum chunk size if message fragmentation is used.
+           If _0, the chunk size is limited by the Path MTU only.
+
+         _{_s_c_t_p___p_r_i_m_a_r_y___a_d_d_r_, _#_s_c_t_p___p_r_i_m_{_}_}:
+
+
+           #sctp_prim{
+                 assoc_id = assoc_id(),
+                 addr     = {IP, Port}
+           }
+           IP = ip_address()
+           Port = port_number()
+
+           For the association given by _a_s_s_o_c___i_d, _{_I_P_,_P_o_r_t_} must be one of the
+           peer's addresses. This option determines that the given address is
+           treated by the local SCTP stack as the peer's primary address.
+
+         _{_s_c_t_p___s_e_t___p_e_e_r___p_r_i_m_a_r_y___a_d_d_r_, _#_s_c_t_p___s_e_t_p_e_e_r_p_r_i_m_{_}_}:
+
+
+           #sctp_setpeerprim{
+                 assoc_id = assoc_id(),
+                 addr     = {IP, Port}
+           }
+           IP = ip_address()
+           Port = port_number()
+
+           When set, informs the peer that it should use _{_I_P_, _P_o_r_t_} as the
+           primary address of the local endpoint for the association given by
+           _a_s_s_o_c___i_d.
+
+         _{_s_c_t_p___a_d_a_p_t_a_t_i_o_n___l_a_y_e_r_, _#_s_c_t_p___s_e_t_a_d_a_p_t_a_t_i_o_n_{_}_}:
+
+
+           #sctp_setadaptation{
+                 adaptation_ind = integer()
+           }
+
+           When set, requests that the local endpoint uses the value given by
+           _a_d_a_p_t_a_t_i_o_n___i_n_d as the Adaptation Indication parameter for
+           establishing new associations. See RFC2960 and Sockets API
+           Extenstions for SCTP for more details.
+
+         _{_s_c_t_p___p_e_e_r___a_d_d_r___p_a_r_a_m_s_, _#_s_c_t_p___p_a_d_d_r_p_a_r_a_m_s_{_}_}:
+
+
+           #sctp_paddrparams{
+                 assoc_id   = assoc_id(),
+                 address    = {IP, Port},
+                 hbinterval = integer(),
+                 pathmaxrxt = integer(),
+                 pathmtu    = integer(),
+                 sackdelay  = integer(),
+                 flags      = list()
+           }
+           IP = ip_address()
+           Port = port_number()
+
+           This option determines various per-address parameters for the
+           association given by _a_s_s_o_c___i_d and the peer address _a_d_d_r_e_s_s (the
+           SCTP protocol supports multi-homing, so more than 1 address can
+           correspond to a given association).
+
+           * _h_b_i_n_t_e_r_v_a_l: heartbeat interval, in milliseconds;
+
+           * _p_a_t_h_m_a_x_r_x_t: max number of retransmissions before this address is
+             considered unreachable (and an alternative address is selected);
+
+           * _p_a_t_h_m_t_u: fixed Path MTU, if automatic discovery is disabled (see
+             _f_l_a_g_s below);
+
+           * _s_a_c_k_d_e_l_a_y: delay in milliseconds for SAC messages (if the delay
+             is enabled, see _f_l_a_g_s below);
+
+           * _f_l_a_g_s: the following flags are available:
+
+             * _h_b___e_n_a_b_l_e: enable heartbeat;
+
+             * _h_b___d_i_s_a_b_l_e: disable heartbeat;
+
+             * _h_b___d_e_m_a_n_d: initiate heartbeat immediately;
+
+             * _p_m_t_u_d___e_n_a_b_l_e: enable automatic Path MTU discovery;
+
+             * _p_m_t_u_d___d_i_s_a_b_l_e: disable automatic Path MTU discovery;
+
+             * _s_a_c_k_d_e_l_a_y___e_n_a_b_l_e: enable SAC delay;
+
+             * _s_a_c_k_d_e_l_a_y___d_i_s_a_b_l_e: disable SAC delay.
+
+         _{_s_c_t_p___d_e_f_a_u_l_t___s_e_n_d___p_a_r_a_m_, _#_s_c_t_p___s_n_d_r_c_v_i_n_f_o_{_}_}:
+
+
+           #sctp_sndrcvinfo{
+                 stream     = integer(),
+                 ssn        = integer(),
+                 flags      = list(),
+                 ppid       = integer(),
+                 context    = integer(),
+                 timetolive = integer(),
+                 tsn        = integer(),
+                 cumtsn     = integer(),
+                 assoc_id   = assoc_id()
+           }
+
+           _#_s_c_t_p___s_n_d_r_c_v_i_n_f_o_{_} is used both in this socket option, and as
+           ancillary data while sending or receiving SCTP messages. When set
+           as an option, it provides a default values for subsequent
+           _g_e_n___s_c_t_p_:_s_e_n_dcalls on the association given by _a_s_s_o_c___i_d. _a_s_s_o_c___i_d _=
+           _0 (default) indicates the whole endpoint. The following fields
+           typically need to be specified by the sender:
+
+           * _s_i_n_f_o___s_t_r_e_a_m: stream number (0-base) within the association to
+             send the messages through;
+
+           * _s_i_n_f_o___f_l_a_g_s: the following flags are recognised:
+
+             * _u_n_o_r_d_e_r_e_d: the message is to be sent unordered;
+
+             * _a_d_d_r___o_v_e_r: the address specified in _g_e_n___s_c_t_p_:_s_e_n_d overwrites
+               the primary peer address;
+
+             * _a_b_o_r_t: abort the current association without flushing any
+               unsent data;
+
+             * _e_o_f: gracefully shut down the current association, with
+               flushing of unsent data.
+
+             Other fields are rarely used. See RFC2960 and Sockets API
+             Extensions for SCTP for full information.
+
+         _{_s_c_t_p___e_v_e_n_t_s_, _#_s_c_t_p___e_v_e_n_t___s_u_b_s_c_r_i_b_e_{_}_}:
+
+
+           #sctp_event_subscribe{
+                   data_io_event          = true | false,
+                   association_event      = true | false,
+                   address_event          = true | false,
+                   send_failure_event     = true | false,
+                   peer_error_event       = true | false,
+                   shutdown_event         = true | false,
+                   partial_delivery_event = true | false,
+                   adaptation_layer_event = true | false
+             }
+
+           This option determines which SSCCTTPP EEvveennttss are to be received (via
+           rreeccvv//**) along with the data. The only exception is _d_a_t_a___i_o___e_v_e_n_t
+           which enables or disables receiving of ##ssccttpp__ssnnddrrccvviinnffoo{{}} ancillary
+           data, not events. By default, all flags except
+           _a_d_a_p_t_a_t_i_o_n___l_a_y_e_r___e_v_e_n_t are enabled, although _s_c_t_p___d_a_t_a___i_o___e_v_e_n_t and
+           _a_s_s_o_c_i_a_t_i_o_n___e_v_e_n_t are used by the driver itself and not exported to
+           the user level.
+
+         _{_s_c_t_p___d_e_l_a_y_e_d___a_c_k___t_i_m_e_, _#_s_c_t_p___a_s_s_o_c___v_a_l_u_e_{_}_}:
+
+
+           #sctp_assoc_value{
+                 assoc_id    = assoc_id(),
+                 assoc_value = integer()
+           }
+
+           Rarely used. Determines the ACK time (given by _a_s_s_o_c___v_a_l_u_e in
+           milliseconds) for the given association or the whole endpoint if
+           _a_s_s_o_c___v_a_l_u_e _= _0 (default).
+
+         _{_s_c_t_p___s_t_a_t_u_s_, _#_s_c_t_p___s_t_a_t_u_s_{_}_}:
+
+
+           #sctp_status{
+                 assoc_id            = assoc_id(),
+                 state               = atom(),
+                 rwnd                = integer(),
+                 unackdata           = integer(),
+                 penddata            = integer(),
+                 instrms             = integer(),
+                 outstrms            = integer(),
+                 fragmentation_point = integer(),
+                 primary             = #sctp_paddrinfo{}
+           }
+
+           This option is read-only. It determines the status of the SCTP
+           association given by _a_s_s_o_c___i_d. Possible values of _s_t_a_t_e follows.
+           The state designations are mostly self-explanatory. _s_t_a_t_e___e_m_p_t_y is
+           the default which means that no other state is active:
+
+           * _s_c_t_p___s_t_a_t_e___e_m_p_t_y
+
+           * _s_c_t_p___s_t_a_t_e___c_l_o_s_e_d
+
+           * _s_c_t_p___s_t_a_t_e___c_o_o_k_i_e___w_a_i_t
+
+           * _s_c_t_p___s_t_a_t_e___c_o_o_k_i_e___e_c_h_o_e_d
+
+           * _s_c_t_p___s_t_a_t_e___e_s_t_a_b_l_i_s_h_e_d
+
+           * _s_c_t_p___s_t_a_t_e___s_h_u_t_d_o_w_n___p_e_n_d_i_n_g
+
+           * _s_c_t_p___s_t_a_t_e___s_h_u_t_d_o_w_n___s_e_n_t
+
+           * _s_c_t_p___s_t_a_t_e___s_h_u_t_d_o_w_n___r_e_c_e_i_v_e_d
+
+           * _s_c_t_p___s_t_a_t_e___s_h_u_t_d_o_w_n___a_c_k___s_e_n_t
+
+           The semantics of other fields is the following:
+
+           * _s_s_t_a_t___r_w_n_d: the association peer's current receiver window size;
+
+           * _s_s_t_a_t___u_n_a_c_k_d_a_t_a: number of unacked data chunks;
+
+           * _s_s_t_a_t___p_e_n_d_d_a_t_a: number of data chunks pending receipt;
+
+           * _s_s_t_a_t___i_n_s_t_r_m_s: number of inbound streams;
+
+           * _s_s_t_a_t___o_u_t_s_t_r_m_s: number of outbound streams;
+
+           * _s_s_t_a_t___f_r_a_g_m_e_n_t_a_t_i_o_n___p_o_i_n_t: message size at which SCTP
+             fragmentation will occur;
+
+           * _s_s_t_a_t___p_r_i_m_a_r_y: information on the current primary peer address
+             (see below for the format of _#_s_c_t_p___p_a_d_d_r_i_n_f_o_{_}).
+
+         _{_s_c_t_p___g_e_t___p_e_e_r___a_d_d_r___i_n_f_o_, _#_s_c_t_p___p_a_d_d_r_i_n_f_o_{_}_}:
+
+
+           #sctp_paddrinfo{
+                 assoc_id  = assoc_id(),
+                 address   = {IP, Port},
+                 state     = inactive | active,
+                 cwnd      = integer(),
+                 srtt      = integer(),
+                 rto       = integer(),
+                 mtu       = integer()
+           }
+           IP = ip_address()
+           Port = port_number()
+
+           This option is read-only. It determines the parameters specific to
+           the peer's address given by _a_d_d_r_e_s_s within the association given by
+           _a_s_s_o_c___i_d. The _a_d_d_r_e_s_s field must be set by the caller; all other
+           fields are filled in on return. If _a_s_s_o_c___i_d _= _0 (default), the
+           _a_d_d_r_e_s_s is automatically translated into the corresponding
+           association ID. This option is rarely used; see RFC2960 and Sockets
+           API Extensions for SCTP for the semantics of all fields.
+
+SSCCTTPP EEXXAAMMPPLLEESS
+         * Example of an Erlang SCTP Server which receives SCTP messages and
+           prints them on the standard output:
+
+           -module(sctp_server).
+
+           -export([server/0,server/1,server/2]).
+           -include_lib("kernel/include/inet.hrl").
+           -include_lib("kernel/include/inet_sctp.hrl").
+
+           server() ->
+               server(any, 2006).
+
+           server([Host,Port]) when is_list(Host), is_list(Port) ->
+               {ok, #hostent{h_addr_list = [IP|_]}} = inet:gethostbyname(Host),
+               io:format("~w -> ~w~n", [Host, IP]),
+               server([IP, list_to_integer(Port)]).
+
+           server(IP, Port) when is_tuple(IP) orelse IP == any orelse IP == loopback,
+                                 is_integer(Port) ->
+               {ok,S} = gen_sctp:open(Port, [{recbuf,65536}, {ip,IP}]),
+               io:format("Listening on ~w:~w. ~w~n", [IP,Port,S]),
+               ok     = gen_sctp:listen(S, true),
+               server_loop(S).
+
+           server_loop(S) ->
+               case gen_sctp:recv(S) of
+               {error, Error} ->
+                   io:format("SCTP RECV ERROR: ~p~n", [Error]);
+               Data ->
+                   io:format("Received: ~p~n", [Data])
+               end,
+               server_loop(S).
+
+         * Example of an Erlang SCTP Client which interacts with the above
+           Server. Note that in this example, the Client creates an
+           association with the Server with 5 outbound streams. For this
+           reason, sending of "Test 0" over Stream 0 succeeds, but sending of
+           "Test 5" over Stream 5 fails. The client then _a_b_o_r_ts the
+           association, which results in the corresponding Event being
+           received on the Server side.
+
+           -module(sctp_client).
+
+           -export([client/0, client/1, client/2]).
+           -include_lib("kernel/include/inet.hrl").
+           -include_lib("kernel/include/inet_sctp.hrl").
+
+           client() ->
+               client([localhost]).
+
+           client([Host]) ->
+               client(Host, 2006);
+
+           client([Host, Port]) when is_list(Host), is_list(Port) ->
+               client(Host,list_to_integer(Port)),
+               init:stop().
+
+           client(Host, Port) when is_integer(Port) ->
+               {ok,S}     = gen_sctp:open(),
+               {ok,Assoc} = gen_sctp:connect
+                   (S, Host, Port, [{sctp_initmsg,#sctp_initmsg{num_ostreams=5}}]),
+               io:format("Connection Successful, Assoc=~p~n", [Assoc]),
+
+               io:write(gen_sctp:send(S, Assoc, 0, <<"Test 0">>)),
+               io:nl(),
+               timer:sleep(10000),
+               io:write(gen_sctp:send(S, Assoc, 5, <<"Test 5">>)),
+               io:nl(),
+               timer:sleep(10000),
+               io:write(gen_sctp:abort(S, Assoc)),
+               io:nl(),
+
+               timer:sleep(1000),
+               gen_sctp:close(S).
+
+         * A very simple Erlang SCTP Client which uses the connect_init API.
+
+         -module(ex3).
+
+         -export([client/4]).
+         -include_lib("kernel/include/inet.hrl").
+         -include_lib("kernel/include/inet_sctp.hrl").
+
+         client(Peer1, Port1, Peer2, Port2)
+           when is_tuple(Peer1), is_integer(Port1), is_tuple(Peer2), is_integer(Port2) ->
+             {ok,S}     = gen_sctp:open(),
+             SctpInitMsgOpt = {sctp_initmsg,#sctp_initmsg{num_ostreams=5}},
+             ActiveOpt = {active, true},
+             Opts = [SctpInitMsgOpt, ActiveOpt],
+             ok = gen_sctp:connect(S, Peer1, Port1, Opts),
+             ok = gen_sctp:connect(S, Peer2, Port2, Opts),
+             io:format("Connections initiated~n", []),
+             client_loop(S, Peer1, Port1, undefined, Peer2, Port2, undefined).
+
+         client_loop(S, Peer1, Port1, AssocId1, Peer2, Port2, AssocId2) ->
+             receive
+                 {sctp, S, Peer1, Port1, {_Anc, SAC}}
+                   when is_record(SAC, sctp_assoc_change), AssocId1 == undefined ->
+                     io:format("Association 1 connect result: ~p. AssocId: ~p~n",
+                               [SAC#sctp_assoc_change.state,
+                                SAC#sctp_assoc_change.assoc_id]),
+                     client_loop(S, Peer1, Port1, SAC#sctp_assoc_change.assoc_id,
+                                 Peer2, Port2, AssocId2);
+
+                 {sctp, S, Peer2, Port2, {_Anc, SAC}}
+                   when is_record(SAC, sctp_assoc_change), AssocId2 == undefined ->
+                     io:format("Association 2 connect result: ~p. AssocId: ~p~n",
+                               [SAC#sctp_assoc_change.state, SAC#sctp_assoc_change.assoc_id]),
+                     client_loop(S, Peer1, Port1, AssocId1, Peer2, Port2,
+                                 SAC#sctp_assoc_change.assoc_id);
+
+                 {sctp, S, Peer1, Port1, Data} ->
+                     io:format("Association 1: received ~p~n", [Data]),
+                     client_loop(S, Peer1, Port1, AssocId1,
+                                 Peer2, Port2, AssocId2);
+
+                 {sctp, S, Peer2, Port2, Data} ->
+                     io:format("Association 2: received ~p~n", [Data]),
+                     client_loop(S, Peer1, Port1, AssocId1,
+                                 Peer2, Port2, AssocId2);
+
+                 Other ->
+                     io:format("Other ~p~n", [Other]),
+                     client_loop(S, Peer1, Port1, AssocId1,
+                                 Peer2, Port2, AssocId2)
+
+             after 5000 ->
+                     ok
+             end.
+
+
+SSEEEE AALLSSOO
+       iinneett((33)), ggeenn__ttccpp((33)), ggeenn__uuddpp((33)), RFC2960 (Stream Control Transmission
+       Protocol), Sockets API Extensions for SCTP.
+
+
+
+Ericsson AB                      kernel 2.15.2                     gen_sctp(3)

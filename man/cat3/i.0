@@ -1,0 +1,270 @@
+i(3)                       Erlang Module Definition                       i(3)
+
+
+
+NNAAMMEE
+       i - Debugger/Interpreter Interface
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _i provides short forms for some of the functions used by the
+       graphical Debugger and some of the functions in the _i_n_t module, the
+       Erlang interpreter.
+
+       This module also provides facilities for displaying status information
+       about interpreted processes and break points.
+
+       It is possible to attach to interpreted processes by giving the
+       corresponding process identity only. By default, an attachment window
+       pops up. Processes at other Erlang nodes can be attached manually or
+       automatically.
+
+       By preference, these functions can be included in the module
+       _s_h_e_l_l___d_e_f_a_u_l_t. By default, they are.
+
+EEXXPPOORRTTSS
+       iimm(()) -->> ppiidd(())
+
+              Starts a new graphical monitor. This is the Monitor window, the
+              main window of the Debugger. All of the Debugger and interpreter
+              functionality is accessed from the Monitor window. The Monitor
+              window displays the status of all processes that have been/are
+              executing interpreted modules.
+
+       iiii((AAbbssMMoodduulleess)) -->> ookk
+       iiii((AAbbssMMoodduullee)) -->> {{mmoodduullee,, MMoodduullee}} || eerrrroorr
+       iinnii((AAbbssMMoodduulleess)) -->> ookk
+       iinnii((AAbbssMMoodduullee)) -->> {{mmoodduullee,, MMoodduullee}} || eerrrroorr
+
+              Types:
+
+                 AbsModules = [AbsModule]
+                 AbsModule = Module | File
+                  Module = atom()
+                  File = string()
+
+              Interprets the specified module(s). _i_i_/_1 interprets the
+              module(s) only at the current node, see iinntt::ii//11. _i_n_i_/_1
+              interprets the module(s) at all known nodes, see iinntt::nnii//11.
+
+       iiqq((AAbbssMMoodduullee)) -->> ookk
+       iinnqq((AAbbssMMoodduullee)) -->> ookk
+
+              Types:
+
+                 AbsModule = Module | File
+                  Module = atom()
+                  File = string()
+
+              Stops interpreting the specified module. _i_q_/_1 stops interpreting
+              the module only at the current node. _i_n_q_/_1 stops interpreting
+              the module at all known nodes.
+
+       iill(()) -->> ookk
+
+              Makes a printout of all interpreted modules. Modules are printed
+              together with the full path name of the corresponding source
+              code file.
+
+       iipp(()) -->> ookk
+
+              Makes a printout of the current status of all interpreted
+              processes.
+
+       iicc(()) -->> ookk
+
+              Clears information about processes executing interpreted code
+              byt removing all information about terminated processes.
+
+       iiaaaa((FFllaaggss)) -->> ttrruuee
+       iiaaaa((FFllaaggss,, FFuunnccttiioonn)) -->> ttrruuee
+
+              Types:
+
+                 Flags = [init | break | exit]
+                 Function = {Module,Name,Args}
+                  Module = Name = atom()
+                  Args = [term()]
+
+              Sets when and how to automatically attach to a debugged process,
+              see iinntt::aauuttoo__aattttaacchh//22. _F_u_n_c_t_i_o_n defaults to the standard
+              function used by the Debugger.
+
+       iisstt((FFllaagg)) -->> ttrruuee
+
+              Types:
+
+                 Flag = all | no_tail | false
+
+              Sets how to save call frames in the stack, see
+              iinntt::ssttaacckk__ttrraaccee//11.
+
+       iiaa((PPiidd)) -->> ookk || nnoo__pprroocc
+
+              Types:
+
+                 Pid = pid()
+
+              Attaches to the debugged process _P_i_d. A Debugger Attach Process
+              window is opened for the process.
+
+       iiaa((XX,,YY,,ZZ)) -->> ookk || nnoo__pprroocc
+
+              Types:
+
+                 X = Y = Z = int()
+
+              Same as _i_a_(_P_i_d_), where _P_i_d is the result of calling the shell
+              function _p_i_d_(_X_,_Y_,_Z_).
+
+       iiaa((PPiidd,, FFuunnccttiioonn)) -->> ookk || nnoo__pprroocc
+
+              Types:
+
+                 Pid = pid()
+                 Function = {Module,Name}
+                  Module = Name = atom()
+
+              Attaches to the debugged process _P_i_d. The interpreter will call
+              _s_p_a_w_n_(_M_o_d_u_l_e_, _N_a_m_e_, _[_P_i_d_]_) (and ignore the result).
+
+       iiaa((XX,,YY,,ZZ,, FFuunnccttiioonn)) -->> ookk || nnoo__pprroocc
+
+              Types:
+
+                 X = Y = Z = int()
+                 Function = {Module,Name}
+                  Module = Name = atom()
+
+              Same as _i_a_(_P_i_d_, _F_u_n_c_t_i_o_n_), where _P_i_d is the result of calling
+              the shell function _p_i_d_(_X_,_Y_,_Z_). An attached process is expected
+              to call the unofficial _i_n_t_:_a_t_t_a_c_h_e_d_(_P_i_d_) function and to be able
+              to handle messages from the interpreter, see _d_b_g___u_i___t_r_a_c_e_._e_r_l
+              for an example.
+
+       iibb((MMoodduullee,, LLiinnee)) -->> ookk || {{eerrrroorr,, bbrreeaakk__eexxiissttss}}
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Creates a breakpoint at _L_i_n_e in _M_o_d_u_l_e.
+
+       iibb((MMoodduullee,, NNaammee,, AArriittyy)) -->> ookk || {{eerrrroorr,, ffuunnccttiioonn__nnoott__ffoouunndd}}
+
+              Types:
+
+                 Module = Name = atom()
+                 Arity = int()
+
+              Creates breakpoints at the first line of every clause of the
+              _M_o_d_u_l_e_:_N_a_m_e_/_A_r_i_t_y function.
+
+       iirr(()) -->> ookk
+
+              Deletes all breakpoints.
+
+       iirr((MMoodduullee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+
+              Deletes all breakpoints in _M_o_d_u_l_e.
+
+       iirr((MMoodduullee,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Deletes the breakpoint located at _L_i_n_e in _M_o_d_u_l_e.
+
+       iirr((MMoodduullee,, NNaammee,, AArriittyy)) -->> ookk || {{eerrrroorr,, ffuunnccttiioonn__nnoott__ffoouunndd}}
+
+              Types:
+
+                 Module = Name = atom()
+                 Arity = int()
+
+              Deletes the breakpoints at the first line of every clause of the
+              _M_o_d_u_l_e_:_N_a_m_e_/_A_r_i_t_y function.
+
+       iibbdd((MMoodduullee,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Makes the breakpoint at _L_i_n_e in _M_o_d_u_l_e inactive.
+
+       iibbee((MMoodduullee,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Makes the breakpoint at _L_i_n_e in _M_o_d_u_l_e active.
+
+       iibbaa((MMoodduullee,, LLiinnee,, AAccttiioonn)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+                 Action = enable | disable | delete
+
+              Sets the trigger action of the breakpoint at _L_i_n_e in _M_o_d_u_l_e to
+              _A_c_t_i_o_n.
+
+       iibbcc((MMoodduullee,, LLiinnee,, FFuunnccttiioonn)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+                 Function = {Module,Name}
+                  Name = atom()
+
+              Sets the conditional test of the breakpoint at _L_i_n_e in _M_o_d_u_l_e to
+              _F_u_n_c_t_i_o_n.
+
+              The conditional test is performed by calling
+              _M_o_d_u_l_e_:_N_a_m_e_(_B_i_n_d_i_n_g_s_), where _B_i_n_d_i_n_g_s is the current variable
+              bindings. The function must return _t_r_u_e (break) or _f_a_l_s_e (do not
+              break). Use _i_n_t_:_g_e_t___b_i_n_d_i_n_g_(_V_a_r_, _B_i_n_d_i_n_g_s_) to retrieve the value
+              of a variable _V_a_r.
+
+       iippbb(()) -->> ookk
+
+              Makes a printout of all existing breakpoints.
+
+       iippbb((MMoodduullee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+
+              Makes a printout of all existing breakpoints in _M_o_d_u_l_e.
+
+       iivv(()) -->> aattoomm(())
+
+              Returns the current version number of the interpreter. The same
+              as the version number of the Debugger application.
+
+       hheellpp(()) -->> ookk
+
+              Prints help text.
+
+UUSSAAGGEE
+       Refer to the Debugger User's Guide for information about the Debugger.
+
+SSEEEE AALLSSOO
+       _i_n_t_(_3_)
+
+
+
+Ericsson AB                     debugger 3.2.8                            i(3)

@@ -1,0 +1,376 @@
+wxFont(3)                  Erlang Module Definition                  wxFont(3)
+
+
+
+NNAAMMEE
+       wxFont - See external documentation: wxFont.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFont.
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_o_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxFFoonntt(())
+
+              See external documentation.
+
+       nneeww((FFoonnttnnaammee)) -->> wwxxFFoonntt(())
+
+              Types:
+
+                 Fontname = chardata() (see module unicode)
+
+              See external documentation.
+
+       nneeww((SSiizzee,, FFaammiillyy,, SSttyyllee,, WWeeiigghhtt)) -->> wwxxFFoonntt(())
+
+              Types:
+
+                 Size = integer()
+                 Family = wx_enum() (see module wx)
+                 Style = wx_enum() (see module wx)
+                 Weight = integer()
+
+              Equivalent to nneeww((SSiizzee,, FFaammiillyy,, SSttyyllee,, WWeeiigghhtt,, [[]])).
+
+       nneeww((SSiizzee,, FFaammiillyy,, SSttyyllee,, WWeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxFFoonntt(())
+
+              Types:
+
+                 Size = integer()
+                 Family = wx_enum() (see module wx)
+                 Style = wx_enum() (see module wx)
+                 Weight = integer()
+                 Option = {underlined, boolean()} | {face, chardata() (see
+                 module unicode)} | {encoding, wx_enum() (see module wx)}
+
+              See external documentation.
+              Encoding = ?wxFONTENCODING_SYSTEM | ?wxFONTENCODING_DEFAULT |
+              ?wxFONTENCODING_ISO8859_1 | ?wxFONTENCODING_ISO8859_2 |
+              ?wxFONTENCODING_ISO8859_3 | ?wxFONTENCODING_ISO8859_4 |
+              ?wxFONTENCODING_ISO8859_5 | ?wxFONTENCODING_ISO8859_6 |
+              ?wxFONTENCODING_ISO8859_7 | ?wxFONTENCODING_ISO8859_8 |
+              ?wxFONTENCODING_ISO8859_9 | ?wxFONTENCODING_ISO8859_10 |
+              ?wxFONTENCODING_ISO8859_11 | ?wxFONTENCODING_ISO8859_12 |
+              ?wxFONTENCODING_ISO8859_13 | ?wxFONTENCODING_ISO8859_14 |
+              ?wxFONTENCODING_ISO8859_15 | ?wxFONTENCODING_ISO8859_MAX |
+              ?wxFONTENCODING_KOI8 | ?wxFONTENCODING_KOI8_U |
+              ?wxFONTENCODING_ALTERNATIVE | ?wxFONTENCODING_BULGARIAN |
+              ?wxFONTENCODING_CP437 | ?wxFONTENCODING_CP850 |
+              ?wxFONTENCODING_CP852 | ?wxFONTENCODING_CP855 |
+              ?wxFONTENCODING_CP866 | ?wxFONTENCODING_CP874 |
+              ?wxFONTENCODING_CP932 | ?wxFONTENCODING_CP936 |
+              ?wxFONTENCODING_CP949 | ?wxFONTENCODING_CP950 |
+              ?wxFONTENCODING_CP1250 | ?wxFONTENCODING_CP1251 |
+              ?wxFONTENCODING_CP1252 | ?wxFONTENCODING_CP1253 |
+              ?wxFONTENCODING_CP1254 | ?wxFONTENCODING_CP1255 |
+              ?wxFONTENCODING_CP1256 | ?wxFONTENCODING_CP1257 |
+              ?wxFONTENCODING_CP12_MAX | ?wxFONTENCODING_UTF7 |
+              ?wxFONTENCODING_UTF8 | ?wxFONTENCODING_EUC_JP |
+              ?wxFONTENCODING_UTF16BE | ?wxFONTENCODING_UTF16LE |
+              ?wxFONTENCODING_UTF32BE | ?wxFONTENCODING_UTF32LE |
+              ?wxFONTENCODING_MACROMAN | ?wxFONTENCODING_MACJAPANESE |
+              ?wxFONTENCODING_MACCHINESETRAD | ?wxFONTENCODING_MACKOREAN |
+              ?wxFONTENCODING_MACARABIC | ?wxFONTENCODING_MACHEBREW |
+              ?wxFONTENCODING_MACGREEK | ?wxFONTENCODING_MACCYRILLIC |
+              ?wxFONTENCODING_MACDEVANAGARI | ?wxFONTENCODING_MACGURMUKHI |
+              ?wxFONTENCODING_MACGUJARATI | ?wxFONTENCODING_MACORIYA |
+              ?wxFONTENCODING_MACBENGALI | ?wxFONTENCODING_MACTAMIL |
+              ?wxFONTENCODING_MACTELUGU | ?wxFONTENCODING_MACKANNADA |
+              ?wxFONTENCODING_MACMALAJALAM | ?wxFONTENCODING_MACSINHALESE |
+              ?wxFONTENCODING_MACBURMESE | ?wxFONTENCODING_MACKHMER |
+              ?wxFONTENCODING_MACTHAI | ?wxFONTENCODING_MACLAOTIAN |
+              ?wxFONTENCODING_MACGEORGIAN | ?wxFONTENCODING_MACARMENIAN |
+              ?wxFONTENCODING_MACCHINESESIMP | ?wxFONTENCODING_MACTIBETAN |
+              ?wxFONTENCODING_MACMONGOLIAN | ?wxFONTENCODING_MACETHIOPIC |
+              ?wxFONTENCODING_MACCENTRALEUR | ?wxFONTENCODING_MACVIATNAMESE |
+              ?wxFONTENCODING_MACARABICEXT | ?wxFONTENCODING_MACSYMBOL |
+              ?wxFONTENCODING_MACDINGBATS | ?wxFONTENCODING_MACTURKISH |
+              ?wxFONTENCODING_MACCROATIAN | ?wxFONTENCODING_MACICELANDIC |
+              ?wxFONTENCODING_MACROMANIAN | ?wxFONTENCODING_MACCELTIC |
+              ?wxFONTENCODING_MACGAELIC | ?wxFONTENCODING_MACKEYBOARD |
+              ?wxFONTENCODING_MAX | ?wxFONTENCODING_MACMIN |
+              ?wxFONTENCODING_MACMAX | ?wxFONTENCODING_UTF16 |
+              ?wxFONTENCODING_UTF32 | ?wxFONTENCODING_UNICODE |
+              ?wxFONTENCODING_GB2312 | ?wxFONTENCODING_BIG5 |
+              ?wxFONTENCODING_SHIFT_JIS
+              Family = ?wxFONTFAMILY_DEFAULT | ?wxFONTFAMILY_DECORATIVE |
+              ?wxFONTFAMILY_ROMAN | ?wxFONTFAMILY_SCRIPT | ?wxFONTFAMILY_SWISS
+              | ?wxFONTFAMILY_MODERN | ?wxFONTFAMILY_TELETYPE |
+              ?wxFONTFAMILY_MAX | ?wxFONTFAMILY_UNKNOWN
+              Style = ?wxFONTSTYLE_NORMAL | ?wxFONTSTYLE_ITALIC |
+              ?wxFONTSTYLE_SLANT | ?wxFONTSTYLE_MAX
+
+       iissFFiixxeeddWWiiddtthh((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttEEnnccooddiinngg(()) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              See external documentation.
+              Res = ?wxFONTENCODING_SYSTEM | ?wxFONTENCODING_DEFAULT |
+              ?wxFONTENCODING_ISO8859_1 | ?wxFONTENCODING_ISO8859_2 |
+              ?wxFONTENCODING_ISO8859_3 | ?wxFONTENCODING_ISO8859_4 |
+              ?wxFONTENCODING_ISO8859_5 | ?wxFONTENCODING_ISO8859_6 |
+              ?wxFONTENCODING_ISO8859_7 | ?wxFONTENCODING_ISO8859_8 |
+              ?wxFONTENCODING_ISO8859_9 | ?wxFONTENCODING_ISO8859_10 |
+              ?wxFONTENCODING_ISO8859_11 | ?wxFONTENCODING_ISO8859_12 |
+              ?wxFONTENCODING_ISO8859_13 | ?wxFONTENCODING_ISO8859_14 |
+              ?wxFONTENCODING_ISO8859_15 | ?wxFONTENCODING_ISO8859_MAX |
+              ?wxFONTENCODING_KOI8 | ?wxFONTENCODING_KOI8_U |
+              ?wxFONTENCODING_ALTERNATIVE | ?wxFONTENCODING_BULGARIAN |
+              ?wxFONTENCODING_CP437 | ?wxFONTENCODING_CP850 |
+              ?wxFONTENCODING_CP852 | ?wxFONTENCODING_CP855 |
+              ?wxFONTENCODING_CP866 | ?wxFONTENCODING_CP874 |
+              ?wxFONTENCODING_CP932 | ?wxFONTENCODING_CP936 |
+              ?wxFONTENCODING_CP949 | ?wxFONTENCODING_CP950 |
+              ?wxFONTENCODING_CP1250 | ?wxFONTENCODING_CP1251 |
+              ?wxFONTENCODING_CP1252 | ?wxFONTENCODING_CP1253 |
+              ?wxFONTENCODING_CP1254 | ?wxFONTENCODING_CP1255 |
+              ?wxFONTENCODING_CP1256 | ?wxFONTENCODING_CP1257 |
+              ?wxFONTENCODING_CP12_MAX | ?wxFONTENCODING_UTF7 |
+              ?wxFONTENCODING_UTF8 | ?wxFONTENCODING_EUC_JP |
+              ?wxFONTENCODING_UTF16BE | ?wxFONTENCODING_UTF16LE |
+              ?wxFONTENCODING_UTF32BE | ?wxFONTENCODING_UTF32LE |
+              ?wxFONTENCODING_MACROMAN | ?wxFONTENCODING_MACJAPANESE |
+              ?wxFONTENCODING_MACCHINESETRAD | ?wxFONTENCODING_MACKOREAN |
+              ?wxFONTENCODING_MACARABIC | ?wxFONTENCODING_MACHEBREW |
+              ?wxFONTENCODING_MACGREEK | ?wxFONTENCODING_MACCYRILLIC |
+              ?wxFONTENCODING_MACDEVANAGARI | ?wxFONTENCODING_MACGURMUKHI |
+              ?wxFONTENCODING_MACGUJARATI | ?wxFONTENCODING_MACORIYA |
+              ?wxFONTENCODING_MACBENGALI | ?wxFONTENCODING_MACTAMIL |
+              ?wxFONTENCODING_MACTELUGU | ?wxFONTENCODING_MACKANNADA |
+              ?wxFONTENCODING_MACMALAJALAM | ?wxFONTENCODING_MACSINHALESE |
+              ?wxFONTENCODING_MACBURMESE | ?wxFONTENCODING_MACKHMER |
+              ?wxFONTENCODING_MACTHAI | ?wxFONTENCODING_MACLAOTIAN |
+              ?wxFONTENCODING_MACGEORGIAN | ?wxFONTENCODING_MACARMENIAN |
+              ?wxFONTENCODING_MACCHINESESIMP | ?wxFONTENCODING_MACTIBETAN |
+              ?wxFONTENCODING_MACMONGOLIAN | ?wxFONTENCODING_MACETHIOPIC |
+              ?wxFONTENCODING_MACCENTRALEUR | ?wxFONTENCODING_MACVIATNAMESE |
+              ?wxFONTENCODING_MACARABICEXT | ?wxFONTENCODING_MACSYMBOL |
+              ?wxFONTENCODING_MACDINGBATS | ?wxFONTENCODING_MACTURKISH |
+              ?wxFONTENCODING_MACCROATIAN | ?wxFONTENCODING_MACICELANDIC |
+              ?wxFONTENCODING_MACROMANIAN | ?wxFONTENCODING_MACCELTIC |
+              ?wxFONTENCODING_MACGAELIC | ?wxFONTENCODING_MACKEYBOARD |
+              ?wxFONTENCODING_MAX | ?wxFONTENCODING_MACMIN |
+              ?wxFONTENCODING_MACMAX | ?wxFONTENCODING_UTF16 |
+              ?wxFONTENCODING_UTF32 | ?wxFONTENCODING_UNICODE |
+              ?wxFONTENCODING_GB2312 | ?wxFONTENCODING_BIG5 |
+              ?wxFONTENCODING_SHIFT_JIS
+
+       ggeettFFaacceeNNaammee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ggeettFFaammiillyy((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+              Res = ?wxFONTFAMILY_DEFAULT | ?wxFONTFAMILY_DECORATIVE |
+              ?wxFONTFAMILY_ROMAN | ?wxFONTFAMILY_SCRIPT | ?wxFONTFAMILY_SWISS
+              | ?wxFONTFAMILY_MODERN | ?wxFONTFAMILY_TELETYPE |
+              ?wxFONTFAMILY_MAX | ?wxFONTFAMILY_UNKNOWN
+
+       ggeettNNaattiivveeFFoonnttIInnffooDDeesscc((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ggeettNNaattiivveeFFoonnttIInnffooUUsseerrDDeesscc((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ggeettPPooiinnttSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ggeettSSttyyllee((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+              Res = ?wxFONTSTYLE_NORMAL | ?wxFONTSTYLE_ITALIC |
+              ?wxFONTSTYLE_SLANT | ?wxFONTSTYLE_MAX
+
+       ggeettUUnnddeerrlliinneedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ggeettWWeeiigghhtt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       ookk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFont()
+
+              See external documentation.
+
+       sseettDDeeffaauullttEEnnccooddiinngg((EEnnccooddiinngg)) -->> ookk
+
+              Types:
+
+                 Encoding = wx_enum() (see module wx)
+
+              See external documentation.
+              Encoding = ?wxFONTENCODING_SYSTEM | ?wxFONTENCODING_DEFAULT |
+              ?wxFONTENCODING_ISO8859_1 | ?wxFONTENCODING_ISO8859_2 |
+              ?wxFONTENCODING_ISO8859_3 | ?wxFONTENCODING_ISO8859_4 |
+              ?wxFONTENCODING_ISO8859_5 | ?wxFONTENCODING_ISO8859_6 |
+              ?wxFONTENCODING_ISO8859_7 | ?wxFONTENCODING_ISO8859_8 |
+              ?wxFONTENCODING_ISO8859_9 | ?wxFONTENCODING_ISO8859_10 |
+              ?wxFONTENCODING_ISO8859_11 | ?wxFONTENCODING_ISO8859_12 |
+              ?wxFONTENCODING_ISO8859_13 | ?wxFONTENCODING_ISO8859_14 |
+              ?wxFONTENCODING_ISO8859_15 | ?wxFONTENCODING_ISO8859_MAX |
+              ?wxFONTENCODING_KOI8 | ?wxFONTENCODING_KOI8_U |
+              ?wxFONTENCODING_ALTERNATIVE | ?wxFONTENCODING_BULGARIAN |
+              ?wxFONTENCODING_CP437 | ?wxFONTENCODING_CP850 |
+              ?wxFONTENCODING_CP852 | ?wxFONTENCODING_CP855 |
+              ?wxFONTENCODING_CP866 | ?wxFONTENCODING_CP874 |
+              ?wxFONTENCODING_CP932 | ?wxFONTENCODING_CP936 |
+              ?wxFONTENCODING_CP949 | ?wxFONTENCODING_CP950 |
+              ?wxFONTENCODING_CP1250 | ?wxFONTENCODING_CP1251 |
+              ?wxFONTENCODING_CP1252 | ?wxFONTENCODING_CP1253 |
+              ?wxFONTENCODING_CP1254 | ?wxFONTENCODING_CP1255 |
+              ?wxFONTENCODING_CP1256 | ?wxFONTENCODING_CP1257 |
+              ?wxFONTENCODING_CP12_MAX | ?wxFONTENCODING_UTF7 |
+              ?wxFONTENCODING_UTF8 | ?wxFONTENCODING_EUC_JP |
+              ?wxFONTENCODING_UTF16BE | ?wxFONTENCODING_UTF16LE |
+              ?wxFONTENCODING_UTF32BE | ?wxFONTENCODING_UTF32LE |
+              ?wxFONTENCODING_MACROMAN | ?wxFONTENCODING_MACJAPANESE |
+              ?wxFONTENCODING_MACCHINESETRAD | ?wxFONTENCODING_MACKOREAN |
+              ?wxFONTENCODING_MACARABIC | ?wxFONTENCODING_MACHEBREW |
+              ?wxFONTENCODING_MACGREEK | ?wxFONTENCODING_MACCYRILLIC |
+              ?wxFONTENCODING_MACDEVANAGARI | ?wxFONTENCODING_MACGURMUKHI |
+              ?wxFONTENCODING_MACGUJARATI | ?wxFONTENCODING_MACORIYA |
+              ?wxFONTENCODING_MACBENGALI | ?wxFONTENCODING_MACTAMIL |
+              ?wxFONTENCODING_MACTELUGU | ?wxFONTENCODING_MACKANNADA |
+              ?wxFONTENCODING_MACMALAJALAM | ?wxFONTENCODING_MACSINHALESE |
+              ?wxFONTENCODING_MACBURMESE | ?wxFONTENCODING_MACKHMER |
+              ?wxFONTENCODING_MACTHAI | ?wxFONTENCODING_MACLAOTIAN |
+              ?wxFONTENCODING_MACGEORGIAN | ?wxFONTENCODING_MACARMENIAN |
+              ?wxFONTENCODING_MACCHINESESIMP | ?wxFONTENCODING_MACTIBETAN |
+              ?wxFONTENCODING_MACMONGOLIAN | ?wxFONTENCODING_MACETHIOPIC |
+              ?wxFONTENCODING_MACCENTRALEUR | ?wxFONTENCODING_MACVIATNAMESE |
+              ?wxFONTENCODING_MACARABICEXT | ?wxFONTENCODING_MACSYMBOL |
+              ?wxFONTENCODING_MACDINGBATS | ?wxFONTENCODING_MACTURKISH |
+              ?wxFONTENCODING_MACCROATIAN | ?wxFONTENCODING_MACICELANDIC |
+              ?wxFONTENCODING_MACROMANIAN | ?wxFONTENCODING_MACCELTIC |
+              ?wxFONTENCODING_MACGAELIC | ?wxFONTENCODING_MACKEYBOARD |
+              ?wxFONTENCODING_MAX | ?wxFONTENCODING_MACMIN |
+              ?wxFONTENCODING_MACMAX | ?wxFONTENCODING_UTF16 |
+              ?wxFONTENCODING_UTF32 | ?wxFONTENCODING_UNICODE |
+              ?wxFONTENCODING_GB2312 | ?wxFONTENCODING_BIG5 |
+              ?wxFONTENCODING_SHIFT_JIS
+
+       sseettFFaacceeNNaammee((TThhiiss,, FFaacceeNNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFont()
+                 FaceName = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettFFaammiillyy((TThhiiss,, FFaammiillyy)) -->> ookk
+
+              Types:
+
+                 This = wxFont()
+                 Family = wx_enum() (see module wx)
+
+              See external documentation.
+              Family = ?wxFONTFAMILY_DEFAULT | ?wxFONTFAMILY_DECORATIVE |
+              ?wxFONTFAMILY_ROMAN | ?wxFONTFAMILY_SCRIPT | ?wxFONTFAMILY_SWISS
+              | ?wxFONTFAMILY_MODERN | ?wxFONTFAMILY_TELETYPE |
+              ?wxFONTFAMILY_MAX | ?wxFONTFAMILY_UNKNOWN
+
+       sseettPPooiinnttSSiizzee((TThhiiss,, PPooiinnttSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxFont()
+                 PointSize = integer()
+
+              See external documentation.
+
+       sseettSSttyyllee((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxFont()
+                 Style = wx_enum() (see module wx)
+
+              See external documentation.
+              Style = ?wxFONTSTYLE_NORMAL | ?wxFONTSTYLE_ITALIC |
+              ?wxFONTSTYLE_SLANT | ?wxFONTSTYLE_MAX
+
+       sseettUUnnddeerrlliinneedd((TThhiiss,, UUnnddeerrlliinneedd)) -->> ookk
+
+              Types:
+
+                 This = wxFont()
+                 Underlined = boolean()
+
+              See external documentation.
+
+       sseettWWeeiigghhtt((TThhiiss,, WWeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxFont()
+                 Weight = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFoonntt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                         wxFont(3)

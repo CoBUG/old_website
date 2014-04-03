@@ -1,0 +1,361 @@
+string(3)                  Erlang Module Definition                  string(3)
+
+
+
+NNAAMMEE
+       string - String Processing Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for string processing.
+
+EEXXPPOORRTTSS
+       lleenn((SSttrriinngg)) -->> LLeennggtthh
+
+              Types:
+
+                 String = string()
+                 Length = integer() >= 0
+
+              Returns the number of characters in the string.
+
+       eeqquuaall((SSttrriinngg11,, SSttrriinngg22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 String1 = String2 = string()
+
+              Tests whether two strings are equal. Returns _t_r_u_e if they are,
+              otherwise _f_a_l_s_e.
+
+       ccoonnccaatt((SSttrriinngg11,, SSttrriinngg22)) -->> SSttrriinngg33
+
+              Types:
+
+                 String1 = String2 = String3 = string()
+
+              Concatenates two strings to form a new string. Returns the new
+              string.
+
+       cchhrr((SSttrriinngg,, CChhaarraacctteerr)) -->> IInnddeexx
+
+       rrcchhrr((SSttrriinngg,, CChhaarraacctteerr)) -->> IInnddeexx
+
+              Types:
+
+                 String = string()
+                 Character = char()
+                 Index = integer() >= 0
+
+              Returns the index of the first/last occurrence of _C_h_a_r_a_c_t_e_r in
+              _S_t_r_i_n_g. _0 is returned if _C_h_a_r_a_c_t_e_r does not occur.
+
+       ssttrr((SSttrriinngg,, SSuubbSSttrriinngg)) -->> IInnddeexx
+
+       rrssttrr((SSttrriinngg,, SSuubbSSttrriinngg)) -->> IInnddeexx
+
+              Types:
+
+                 String = SubString = string()
+                 Index = integer() >= 0
+
+              Returns the position where the first/last occurrence of
+              _S_u_b_S_t_r_i_n_g begins in _S_t_r_i_n_g. _0 is returned if _S_u_b_S_t_r_i_n_g does not
+              exist in _S_t_r_i_n_g. For example:
+
+              > string:str(" Hello Hello World World ", "Hello World").
+              8
+
+       ssppaann((SSttrriinngg,, CChhaarrss)) -->> LLeennggtthh
+
+       ccssppaann((SSttrriinngg,, CChhaarrss)) -->> LLeennggtthh
+
+              Types:
+
+                 String = Chars = string()
+                 Length = integer() >= 0
+
+              Returns the length of the maximum initial segment of _S_t_r_i_n_g,
+              which consists entirely of characters from (not from) _C_h_a_r_s.
+
+              For example:
+
+              > string:span("\t    abcdef", " \t").
+              5
+              > string:cspan("\t    abcdef", " \t").
+              0
+
+       ssuubbssttrr((SSttrriinngg,, SSttaarrtt)) -->> SSuubbSSttrriinngg
+
+       ssuubbssttrr((SSttrriinngg,, SSttaarrtt,, LLeennggtthh)) -->> SSuubbSSttrriinngg
+
+              Types:
+
+                 String = SubString = string()
+                 Start = integer() >= 1
+                 Length = integer() >= 0
+
+              Returns a substring of _S_t_r_i_n_g, starting at the position _S_t_a_r_t,
+              and ending at the end of the string or at length _L_e_n_g_t_h.
+
+              For example:
+
+              > substr("Hello World", 4, 5).
+              "lo Wo"
+
+       ttookkeennss((SSttrriinngg,, SSeeppaarraattoorrLLiisstt)) -->> TTookkeennss
+
+              Types:
+
+                 String = SeparatorList = string()
+                 Tokens = [Token :: nonempty_string()]
+
+              Returns a list of tokens in _S_t_r_i_n_g, separated by the characters
+              in _S_e_p_a_r_a_t_o_r_L_i_s_t.
+
+              For example:
+
+              > tokens("abc defxxghix jkl", "x ").
+              ["abc", "def", "ghi", "jkl"]
+
+       jjooiinn((SSttrriinnggLLiisstt,, SSeeppaarraattoorr)) -->> SSttrriinngg
+
+              Types:
+
+                 StringList = [string()]
+                 Separator = String = string()
+
+              Returns a string with the elements of _S_t_r_i_n_g_L_i_s_t separated by
+              the string in _S_e_p_a_r_a_t_o_r.
+
+              For example:
+
+              > join(["one", "two", "three"], ", ").
+              "one, two, three"
+
+       cchhaarrss((CChhaarraacctteerr,, NNuummbbeerr)) -->> SSttrriinngg
+
+       cchhaarrss((CChhaarraacctteerr,, NNuummbbeerr,, TTaaiill)) -->> SSttrriinngg
+
+              Types:
+
+                 Character = char()
+                 Number = integer() >= 0
+                 Tail = String = string()
+
+              Returns a string consisting of _N_u_m_b_e_r of characters _C_h_a_r_a_c_t_e_r.
+              Optionally, the string can end with the string _T_a_i_l.
+
+       ccooppiieess((SSttrriinngg,, NNuummbbeerr)) -->> CCooppiieess
+
+              Types:
+
+                 String = Copies = string()
+                 Number = integer() >= 0
+
+              Returns a string containing _S_t_r_i_n_g repeated _N_u_m_b_e_r times.
+
+       wwoorrddss((SSttrriinngg)) -->> CCoouunntt
+
+       wwoorrddss((SSttrriinngg,, CChhaarraacctteerr)) -->> CCoouunntt
+
+              Types:
+
+                 String = string()
+                 Character = char()
+                 Count = integer() >= 1
+
+              Returns the number of words in _S_t_r_i_n_g, separated by blanks or
+              _C_h_a_r_a_c_t_e_r.
+
+              For example:
+
+              > words(" Hello old boy!", $o).
+              4
+
+       ssuubb__wwoorrdd((SSttrriinngg,, NNuummbbeerr)) -->> WWoorrdd
+
+       ssuubb__wwoorrdd((SSttrriinngg,, NNuummbbeerr,, CChhaarraacctteerr)) -->> WWoorrdd
+
+              Types:
+
+                 String = Word = string()
+                 Number = integer()
+                 Character = char()
+
+              Returns the word in position _N_u_m_b_e_r of _S_t_r_i_n_g. Words are
+              separated by blanks or _C_h_a_r_a_c_t_e_rs.
+
+              For example:
+
+              > string:sub_word(" Hello old boy !",3,$o).
+              "ld b"
+
+       ssttrriipp((SSttrriinngg :::: ssttrriinngg(()))) -->> ssttrriinngg(())
+
+       ssttrriipp((SSttrriinngg,, DDiirreeccttiioonn)) -->> SSttrriippppeedd
+
+       ssttrriipp((SSttrriinngg,, DDiirreeccttiioonn,, CChhaarraacctteerr)) -->> SSttrriippppeedd
+
+              Types:
+
+                 String = Stripped = string()
+                 Direction = left | right | both
+                 Character = char()
+
+              Returns a string, where leading and/or trailing blanks or a
+              number of _C_h_a_r_a_c_t_e_r have been removed. _D_i_r_e_c_t_i_o_n can be _l_e_f_t,
+              _r_i_g_h_t, or _b_o_t_h and indicates from which direction blanks are to
+              be removed. The function _s_t_r_i_p_/_1 is equivalent to _s_t_r_i_p_(_S_t_r_i_n_g_,
+              _b_o_t_h_).
+
+              For example:
+
+              > string:strip("...Hello.....", both, $.).
+              "Hello"
+
+       lleefftt((SSttrriinngg,, NNuummbbeerr)) -->> LLeefftt
+
+       lleefftt((SSttrriinngg,, NNuummbbeerr,, CChhaarraacctteerr)) -->> LLeefftt
+
+              Types:
+
+                 String = Left = string()
+                 Number = integer() >= 0
+                 Character = char()
+
+              Returns the _S_t_r_i_n_g with the length adjusted in accordance with
+              _N_u_m_b_e_r. The left margin is fixed. If the _l_e_n_g_t_h_(_S_t_r_i_n_g_) <
+              _N_u_m_b_e_r, _S_t_r_i_n_g is padded with blanks or _C_h_a_r_a_c_t_e_rs.
+
+              For example:
+
+              > string:left("Hello",10,$.).
+              "Hello....."
+
+       rriigghhtt((SSttrriinngg,, NNuummbbeerr)) -->> RRiigghhtt
+
+       rriigghhtt((SSttrriinngg,, NNuummbbeerr,, CChhaarraacctteerr)) -->> RRiigghhtt
+
+              Types:
+
+                 String = Right = string()
+                 Number = integer() >= 0
+                 Character = char()
+
+              Returns the _S_t_r_i_n_g with the length adjusted in accordance with
+              _N_u_m_b_e_r. The right margin is fixed. If the length of _(_S_t_r_i_n_g_) <
+              _N_u_m_b_e_r, _S_t_r_i_n_g is padded with blanks or _C_h_a_r_a_c_t_e_rs.
+
+              For example:
+
+              > string:right("Hello", 10, $.).
+              ".....Hello"
+
+       cceennttrree((SSttrriinngg,, NNuummbbeerr)) -->> CCeenntteerreedd
+
+       cceennttrree((SSttrriinngg,, NNuummbbeerr,, CChhaarraacctteerr)) -->> CCeenntteerreedd
+
+              Types:
+
+                 String = Centered = string()
+                 Number = integer() >= 0
+                 Character = char()
+
+              Returns a string, where _S_t_r_i_n_g is centred in the string and
+              surrounded by blanks or characters. The resulting string will
+              have the length _N_u_m_b_e_r.
+
+       ssuubb__ssttrriinngg((SSttrriinngg,, SSttaarrtt)) -->> SSuubbSSttrriinngg
+
+       ssuubb__ssttrriinngg((SSttrriinngg,, SSttaarrtt,, SSttoopp)) -->> SSuubbSSttrriinngg
+
+              Types:
+
+                 String = SubString = string()
+                 Start = Stop = integer() >= 1
+
+              Returns a substring of _S_t_r_i_n_g, starting at the position _S_t_a_r_t to
+              the end of the string, or to and including the _S_t_o_p position.
+
+              For example:
+
+              sub_string("Hello World", 4, 8).
+              "lo Wo"
+
+       ttoo__ffllooaatt((SSttrriinngg)) -->> {{FFllooaatt,,RReesstt}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 String = string()
+                 Float = float()
+                 Rest = string()
+                 Reason = no_float | not_a_list
+
+              Argument _S_t_r_i_n_g is expected to start with a valid text
+              represented float (the digits being ASCII values). Remaining
+              characters in the string after the float are returned in _R_e_s_t.
+
+              Example:
+
+                        > {F1,Fs} = string:to_float("1.0-1.0e-1"),
+                        > {F2,[]} = string:to_float(Fs),
+                        > F1+F2.
+                        0.9
+                        > string:to_float("3/2=1.5").
+                        {error,no_float}
+                        > string:to_float("-1.5eX").
+                        {-1.5,"eX"}
+
+       ttoo__iinntteeggeerr((SSttrriinngg)) -->> {{IInntt,,RReesstt}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 String = string()
+                 Int = integer()
+                 Rest = string()
+                 Reason = no_integer | not_a_list
+
+              Argument _S_t_r_i_n_g is expected to start with a valid text
+              represented integer (the digits being ASCII values). Remaining
+              characters in the string after the integer are returned in _R_e_s_t.
+
+              Example:
+
+                        > {I1,Is} = string:to_integer("33+22"),
+                        > {I2,[]} = string:to_integer(Is),
+                        > I1-I2.
+                        11
+                        > string:to_integer("0.5").
+                        {0,".5"}
+                        > string:to_integer("x=2").
+                        {error,no_integer}
+
+       ttoo__lloowweerr((SSttrriinngg)) -->> RReessuulltt
+
+       ttoo__lloowweerr((CChhaarr)) -->> CChhaarrRReessuulltt
+
+       ttoo__uuppppeerr((SSttrriinngg)) -->> RReessuulltt
+
+       ttoo__uuppppeerr((CChhaarr)) -->> CChhaarrRReessuulltt
+
+              Types:
+
+                 String = Result = string()
+                 Char = CharResult = char()
+
+              The given string or character is case-converted. Note that the
+              supported character set is ISO/IEC 8859-1 (a.k.a. Latin 1), all
+              values outside this set is unchanged
+
+NNOOTTEESS
+       Some of the general string functions may seem to overlap each other.
+       The reason for this is that this string package is the combination of
+       two earlier packages and all the functions of both packages have been
+       retained.
+
+   NNoottee::
+       Any undocumented functions in _s_t_r_i_n_g should not be used.
+
+
+
+Ericsson AB                      stdlib 1.18.2                       string(3)

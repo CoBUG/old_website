@@ -1,0 +1,130 @@
+fixed(3)                   Erlang Module Definition                   fixed(3)
+
+
+
+NNAAMMEE
+       fixed - the corba fixed type
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions that gives an interface to the CORBA
+       fixed type.
+
+       The type _F_i_x_e_d used below is defined as:
+
+             -record(fixed, {digits, scale, value}).
+
+
+       where _d_i_g_i_t_s is the total amount of digits it consists of and _s_c_a_l_e is
+       the number of fractional digits. The _v_a_l_u_e field contains the actual
+       Fixed value represented as an integer. The limitations of each field
+       are:
+
+         * Digits - integer(), -1 > Digits < 32
+
+         * Scale - integer(), -1 > Scale =< Digits
+
+         * Value - integer(), range (31 digits):
+           +/-9999999999999999999999999999999
+
+       Since the Value part is represented by an integer, it is vital that the
+       Digits and Scale values are correct. This also means that trailing
+       zeros cannot be left out in some cases:
+
+         * fixed<5,3> eq. 03.140d eq. 3140
+
+         * fixed<3,2> eq. 3.14d eq. 314
+
+       Leading zeros can be left out.
+
+       For your convenience, this module exports functions which handle unary
+       (_-) and binary (_+_-_*_/) operations legal for the Fixed type. Since a
+       unary _+ have no effect, this module do not export such a function. Any
+       of the binary operations may cause an overflow (i.e. more than 31
+       significant digits; leading and trailing zeros are not considered
+       significant). If this is the case, the Digit and Scale values are
+       adjusted and the Value truncated (no rounding performed). This behavior
+       is compliant with the OMG CORBA specification. Each binary operation
+       have the following upper bounds:
+
+         * _F_i_x_e_d_1 _+ _F_i_x_e_d_2 - _f_i_x_e_d_<_m_a_x_(_d_1_-_s_1_,_d_2_-_s_2_) _+ _m_a_x_(_s_1_,_s_2_) _+ _1_,
+           _m_a_x_(_s_1_,_s_2_)_>
+
+         * _F_i_x_e_d_1 _- _F_i_x_e_d_2 - _f_i_x_e_d_<_m_a_x_(_d_1_-_s_1_,_d_2_-_s_2_) _+ _m_a_x_(_s_1_,_s_2_) _+ _1_,
+           _m_a_x_(_s_1_,_s_2_)_>
+
+         * _F_i_x_e_d_1 _* _F_i_x_e_d_2 - _f_i_x_e_d_<_d_1_+_d_2_, _s_1_+_s_2_>
+
+         * _F_i_x_e_d_1 _/ _F_i_x_e_d_2 - _f_i_x_e_d_<_(_d_1_-_s_1_+_s_2_) _+ _S_i_n_f _,_S_i_n_f _>
+
+       A quotient may have an arbitrary number of decimal places, which is
+       denoted by a scale of Sinf.
+
+EEXXPPOORRTTSS
+       ccrreeaattee((DDiiggiittss,, SSccaallee,, VVaalluuee)) -->> RReessuulltt
+
+              Types:
+
+                 Result = Fixed Type | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              This function creates a new instance of a _F_i_x_e_d _T_y_p_e. If the
+              limitations is not fulfilled (e.g. overflow) an exception is
+              raised.
+
+       ggeett__ttyyppeeccooddee((FFiixxeedd)) -->> RReessuulltt
+
+              Types:
+
+                 Result = TypeCode | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Returns the TypeCode which represents the supplied Fixed type.
+              If the parameter is not of the correct type, an exception is
+              raised.
+
+       aadddd((FFiixxeedd11,, FFiixxeedd22)) -->> RReessuulltt
+
+              Types:
+
+                 Result = Fixed1 + Fixed2 | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Performs a Fixed type addition. If the parameters are not of the
+              correct type, an exception is raised.
+
+       ssuubbttrraacctt((FFiixxeedd11,, FFiixxeedd22)) -->> RReessuulltt
+
+              Types:
+
+                 Result = Fixed1 - Fixed2 | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Performs a Fixed type subtraction. If the parameters are not of
+              the correct type, an exception is raised.
+
+       mmuullttiippllyy((FFiixxeedd11,, FFiixxeedd22)) -->> RReessuulltt
+
+              Types:
+
+                 Result = Fixed1 * Fixed2 | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Performs a Fixed type multiplication. If the parameters are not
+              of the correct type, an exception is raised.
+
+       ddiivviiddee((FFiixxeedd11,, FFiixxeedd22)) -->> RReessuulltt
+
+              Types:
+
+                 Result = Fixed1 / Fixed2 | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Performs a Fixed type division. If the parameters are not of the
+              correct type, an exception is raised.
+
+       uunnaarryy__mmiinnuuss((FFiixxeedd)) -->> RReessuulltt
+
+              Types:
+
+                 Result = -Fixed | {'EXCEPTION', #'BAD_PARAM'{}}
+
+              Negates the supplied Fixed type. If the parameter is not of the
+              correct type, an exception is raised.
+
+
+
+Ericsson AB                      orber 3.6.24                         fixed(3)

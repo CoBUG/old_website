@@ -1,0 +1,510 @@
+gen_tcp(3)                 Erlang Module Definition                 gen_tcp(3)
+
+
+
+NNAAMMEE
+       gen_tcp - Interface to TCP/IP sockets
+
+DDEESSCCRRIIPPTTIIOONN
+       The _g_e_n___t_c_p module provides functions for communicating with sockets
+       using the TCP/IP protocol.
+
+       The following code fragment provides a simple example of a client
+       connecting to a server at port 5678, transferring a binary and closing
+       the connection:
+
+       client() ->
+           SomeHostInNet = "localhost", % to make it runnable on one machine
+           {ok, Sock} = gen_tcp:connect(SomeHostInNet, 5678,
+                                        [binary, {packet, 0}]),
+           ok = gen_tcp:send(Sock, "Some Data"),
+           ok = gen_tcp:close(Sock).
+
+       At the other end a server is listening on port 5678, accepts the
+       connection and receives the binary:
+
+       server() ->
+           {ok, LSock} = gen_tcp:listen(5678, [binary, {packet, 0},
+                                               {active, false}]),
+           {ok, Sock} = gen_tcp:accept(LSock),
+           {ok, Bin} = do_recv(Sock, []),
+           ok = gen_tcp:close(Sock),
+           Bin.
+
+       do_recv(Sock, Bs) ->
+           case gen_tcp:recv(Sock, 0) of
+               {ok, B} ->
+                   do_recv(Sock, [Bs, B]);
+               {error, closed} ->
+                   {ok, list_to_binary(Bs)}
+           end.
+
+       For more examples, see the eexxaammpplleess section.
+
+DDAATTAA TTYYPPEESS
+       ooppttiioonn(()) = {active, true | false | once}
+                | {buffer, integer() >= 0}
+                | {delay_send, boolean()}
+                | {deliver, port | term}
+                | {dontroute, boolean()}
+                | {exit_on_close, boolean()}
+                | {header, integer() >= 0}
+                | {high_watermark, integer() >= 0}
+                | {keepalive, boolean()}
+                | {linger, {boolean(), integer() >= 0}}
+                | {low_watermark, integer() >= 0}
+                | {mode, list | binary}
+                | list
+                | binary
+                | {nodelay, boolean()}
+                | {packet,
+                   0 |
+                   1 |
+                   2 |
+                   4 |
+                   raw |
+                   sunrm |
+                   asn1 |
+                   cdr |
+                   fcgi |
+                   line |
+                   tpkt |
+                   http |
+                   httph |
+                   http_bin |
+                   httph_bin}
+                | {packet_size, integer() >= 0}
+                | {priority, integer() >= 0}
+                | {raw,
+                   Protocol :: integer() >= 0,
+                   OptionNum :: integer() >= 0,
+                   ValueBin :: binary()}
+                | {recbuf, integer() >= 0}
+                | {reuseaddr, boolean()}
+                | {send_timeout, integer() >= 0 | infinity}
+                | {send_timeout_close, boolean()}
+                | {sndbuf, integer() >= 0}
+                | {tos, integer() >= 0}
+
+       ooppttiioonn__nnaammee(()) = active
+                     | buffer
+                     | delay_send
+                     | deliver
+                     | dontroute
+                     | exit_on_close
+                     | header
+                     | high_watermark
+                     | keepalive
+                     | linger
+                     | low_watermark
+                     | mode
+                     | nodelay
+                     | packet
+                     | packet_size
+                     | priority
+                     | {raw,
+                        Protocol :: integer() >= 0,
+                        OptionNum :: integer() >= 0,
+                        ValueSpec :: (ValueSize :: integer() >= 0)
+                                   | (ValueBin :: binary())}
+                     | recbuf
+                     | reuseaddr
+                     | send_timeout
+                     | send_timeout_close
+                     | sndbuf
+                     | tos
+
+       ccoonnnneecctt__ooppttiioonn(()) = {ip, iinneett::iipp__aaddddrreessss(())}
+                        | {fd, Fd :: integer() >= 0}
+                        | {ifaddr, iinneett::iipp__aaddddrreessss(())}
+                        | iinneett::aaddddrreessss__ffaammiillyy(())
+                        | {port, iinneett::ppoorrtt__nnuummbbeerr(())}
+                        | {tcp_module, module()}
+                        | ooppttiioonn(())
+
+       lliisstteenn__ooppttiioonn(()) = {ip, iinneett::iipp__aaddddrreessss(())}
+                       | {fd, Fd :: integer() >= 0}
+                       | {ifaddr, iinneett::iipp__aaddddrreessss(())}
+                       | iinneett::aaddddrreessss__ffaammiillyy(())
+                       | {port, iinneett::ppoorrtt__nnuummbbeerr(())}
+                       | {backlog, B :: integer() >= 0}
+                       | {tcp_module, module()}
+                       | ooppttiioonn(())
+
+       ssoocckkeett(())
+
+              As returned by accept/1,2 and connect/3,4.
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt((AAddddrreessss,, PPoorrtt,, OOppttiioonnss)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+       ccoonnnneecctt((AAddddrreessss,, PPoorrtt,, OOppttiioonnss,, TTiimmeeoouutt)) -->>
+                  {{ookk,, SSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Address = iinneett::iipp__aaddddrreessss(()) | iinneett::hhoossttnnaammee(())
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Options = [ccoonnnneecctt__ooppttiioonn(())]
+                 Timeout = timeout()
+                 Socket = ssoocckkeett(())
+                 Reason = iinneett::ppoossiixx(())
+
+              Connects to a server on TCP port _P_o_r_t on the host with IP
+              address _A_d_d_r_e_s_s. The _A_d_d_r_e_s_s argument can be either a hostname,
+              or an IP address.
+
+              The available options are:
+
+                _{_i_p_, _i_p___a_d_d_r_e_s_s_(_)_}:
+                  If the host has several network interfaces, this option
+                  specifies which one to use.
+
+                _{_i_f_a_d_d_r_, _i_p___a_d_d_r_e_s_s_(_)_}:
+                  Same as _{_i_p_, _i_p___a_d_d_r_e_s_s_(_)_}. If the host has several network
+                  interfaces, this option specifies which one to use.
+
+                _{_f_d_, _i_n_t_e_g_e_r_(_) _>_= _0_}:
+                  If a socket has somehow been connected without using
+                  _g_e_n___t_c_p, use this option to pass the file descriptor for it.
+
+                _i_n_e_t:
+                  Set up the socket for IPv4.
+
+                _i_n_e_t_6:
+                  Set up the socket for IPv6.
+
+                _{_p_o_r_t_, _P_o_r_t_}:
+                  Specify which local port number to use.
+
+                _{_t_c_p___m_o_d_u_l_e_, _m_o_d_u_l_e_(_)_}:
+                  Override which callback module is used. Defaults to _i_n_e_t___t_c_p
+                  for IPv4 and _i_n_e_t_6___t_c_p for IPv6.
+
+                _O_p_t:
+                  See iinneett::sseettooppttss//22.
+
+              Packets can be sent to the returned socket _S_o_c_k_e_t using _s_e_n_d_/_2.
+              Packets sent from the peer are delivered as messages:
+
+              {tcp, Socket, Data}
+
+              If the socket is closed, the following message is delivered:
+
+              {tcp_closed, Socket}
+
+              If an error occurs on the socket, the following message is
+              delivered:
+
+              {tcp_error, Socket, Reason}
+
+              unless _{_a_c_t_i_v_e_, _f_a_l_s_e_} is specified in the option list for the
+              socket, in which case packets are retrieved by calling _r_e_c_v_/_2.
+
+              The optional _T_i_m_e_o_u_t parameter specifies a timeout in
+              milliseconds. The default value is _i_n_f_i_n_i_t_y.
+
+          NNoottee::
+              The default values for options given to _c_o_n_n_e_c_t can be affected
+              by the Kernel configuration parameter
+              _i_n_e_t___d_e_f_a_u_l_t___c_o_n_n_e_c_t___o_p_t_i_o_n_s. See iinneett((33)) for details.
+
+
+       lliisstteenn((PPoorrtt,, OOppttiioonnss)) -->> {{ookk,, LLiisstteennSSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Port = iinneett::ppoorrtt__nnuummbbeerr(())
+                 Options = [lliisstteenn__ooppttiioonn(())]
+                 ListenSocket = ssoocckkeett(())
+                 Reason = system_limit | iinneett::ppoossiixx(())
+
+              Sets up a socket to listen on the port _P_o_r_t on the local host.
+
+              If _P_o_r_t _=_= _0, the underlying OS assigns an available port
+              number, use _i_n_e_t_:_p_o_r_t_/_1 to retrieve it.
+
+              The available options are:
+
+                _l_i_s_t:
+                  Received _P_a_c_k_e_t is delivered as a list.
+
+                _b_i_n_a_r_y:
+                  Received _P_a_c_k_e_t is delivered as a binary.
+
+                _{_b_a_c_k_l_o_g_, _B_}:
+                  _B is an integer >= 0. The backlog value defaults to 5. The
+                  backlog value defines the maximum length that the queue of
+                  pending connections may grow to.
+
+                _{_i_p_, _i_p___a_d_d_r_e_s_s_(_)_}:
+                  If the host has several network interfaces, this option
+                  specifies which one to listen on.
+
+                _{_p_o_r_t_, _P_o_r_t_}:
+                  Specify which local port number to use.
+
+                _{_f_d_, _F_d_}:
+                  If a socket has somehow been connected without using
+                  _g_e_n___t_c_p, use this option to pass the file descriptor for it.
+
+                _{_i_f_a_d_d_r_, _i_p___a_d_d_r_e_s_s_(_)_}:
+                  Same as _{_i_p_, _i_p___a_d_d_r_e_s_s_(_)_}. If the host has several network
+                  interfaces, this option specifies which one to use.
+
+                _i_n_e_t_6:
+                  Set up the socket for IPv6.
+
+                _i_n_e_t:
+                  Set up the socket for IPv4.
+
+                _{_t_c_p___m_o_d_u_l_e_, _m_o_d_u_l_e_(_)_}:
+                  Override which callback module is used. Defaults to _i_n_e_t___t_c_p
+                  for IPv4 and _i_n_e_t_6___t_c_p for IPv6.
+
+                _O_p_t:
+                  See iinneett::sseettooppttss//22.
+
+              The returned socket _L_i_s_t_e_n_S_o_c_k_e_t can only be used in calls to
+              _a_c_c_e_p_t_/_1_,_2.
+
+          NNoottee::
+              The default values for options given to _l_i_s_t_e_n can be affected
+              by the Kernel configuration parameter
+              _i_n_e_t___d_e_f_a_u_l_t___l_i_s_t_e_n___o_p_t_i_o_n_s. See iinneett((33)) for details.
+
+
+       aacccceepptt((LLiisstteennSSoocckkeett)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+       aacccceepptt((LLiisstteennSSoocckkeett,, TTiimmeeoouutt)) -->> {{ookk,, SSoocckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ListenSocket = ssoocckkeett(())
+                   Returned by _l_i_s_t_e_n_/_2.
+                 Timeout = timeout()
+                 Socket = ssoocckkeett(())
+                 Reason = closed | timeout | system_limit | iinneett::ppoossiixx(())
+
+              Accepts an incoming connection request on a listen socket.
+              _S_o_c_k_e_t must be a socket returned from _l_i_s_t_e_n_/_2. _T_i_m_e_o_u_t
+              specifies a timeout value in ms, defaults to _i_n_f_i_n_i_t_y.
+
+              Returns _{_o_k_, _S_o_c_k_e_t_} if a connection is established, or _{_e_r_r_o_r_,
+              _c_l_o_s_e_d_} if _L_i_s_t_e_n_S_o_c_k_e_t is closed, or _{_e_r_r_o_r_, _t_i_m_e_o_u_t_} if no
+              connection is established within the specified time, or _{_e_r_r_o_r_,
+              _s_y_s_t_e_m___l_i_m_i_t_} if all available ports in the Erlang emulator are
+              in use. May also return a POSIX error value if something else
+              goes wrong, see inet(3) for possible error values.
+
+              Packets can be sent to the returned socket _S_o_c_k_e_t using _s_e_n_d_/_2.
+              Packets sent from the peer are delivered as messages:
+
+              {tcp, Socket, Data}
+
+              unless _{_a_c_t_i_v_e_, _f_a_l_s_e_} was specified in the option list for the
+              listen socket, in which case packets are retrieved by calling
+              _r_e_c_v_/_2.
+
+          NNoottee::
+              It is worth noting that the _a_c_c_e_p_t call does _n_o_t have to be
+              issued from the socket owner process. Using version 5.5.3 and
+              higher of the emulator, multiple simultaneous accept calls can
+              be issued from different processes, which allows for a pool of
+              acceptor processes handling incoming connections.
+
+
+       sseenndd((SSoocckkeett,, PPaacckkeett)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 Packet = iodata()
+                 Reason = iinneett::ppoossiixx(())
+
+              Sends a packet on a socket.
+
+              There is no _s_e_n_d call with timeout option, you use the
+              _s_e_n_d___t_i_m_e_o_u_t socket option if timeouts are desired. See the
+              eexxaammpplleess section.
+
+       rreeccvv((SSoocckkeett,, LLeennggtthh)) -->> {{ookk,, PPaacckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+       rreeccvv((SSoocckkeett,, LLeennggtthh,, TTiimmeeoouutt)) -->> {{ookk,, PPaacckkeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 Length = integer() >= 0
+                 Timeout = timeout()
+                 Packet = string() | binary() | HttpPacket
+                 Reason = closed | iinneett::ppoossiixx(())
+                 HttpPacket = term()
+                   See the description of _H_t_t_p_P_a_c_k_e_t in
+                   eerrllaanngg::ddeeccooddee__ppaacckkeett//33.
+
+              This function receives a packet from a socket in passive mode. A
+              closed socket is indicated by a return value _{_e_r_r_o_r_, _c_l_o_s_e_d_}.
+
+              The _L_e_n_g_t_h argument is only meaningful when the socket is in _r_a_w
+              mode and denotes the number of bytes to read. If _L_e_n_g_t_h = 0, all
+              available bytes are returned. If _L_e_n_g_t_h > 0, exactly _L_e_n_g_t_h
+              bytes are returned, or an error; possibly discarding less than
+              _L_e_n_g_t_h bytes of data when the socket gets closed from the other
+              side.
+
+              The optional _T_i_m_e_o_u_t parameter specifies a timeout in
+              milliseconds. The default value is _i_n_f_i_n_i_t_y.
+
+       ccoonnttrroolllliinngg__pprroocceessss((SSoocckkeett,, PPiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 Pid = pid()
+                 Reason = closed | not_owner | iinneett::ppoossiixx(())
+
+              Assigns a new controlling process _P_i_d to _S_o_c_k_e_t. The controlling
+              process is the process which receives messages from the socket.
+              If called by any other process than the current controlling
+              process, _{_e_r_r_o_r_, _n_o_t___o_w_n_e_r_} is returned.
+
+       cclloossee((SSoocckkeett)) -->> ookk
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+
+              Closes a TCP socket.
+
+       sshhuuttddoowwnn((SSoocckkeett,, HHooww)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Socket = ssoocckkeett(())
+                 How = read | write | read_write
+                 Reason = iinneett::ppoossiixx(())
+
+              Immediately close a socket in one or two directions.
+
+              _H_o_w _=_= _w_r_i_t_e means closing the socket for writing, reading from
+              it is still possible.
+
+              To be able to handle that the peer has done a shutdown on the
+              write side, the _{_e_x_i_t___o_n___c_l_o_s_e_, _f_a_l_s_e_} option is useful.
+
+EEXXAAMMPPLLEESS
+       The following example illustrates usage of the {active,once} option and
+       multiple accepts by implementing a server as a number of worker
+       processes doing accept on one single listen socket. The start/2
+       function takes the number of worker processes as well as a port number
+       to listen for incoming connections on. If _L_P_o_r_t is specified as _0, an
+       ephemeral portnumber is used, why the start function returns the actual
+       portnumber allocated:
+
+       start(Num,LPort) ->
+           case gen_tcp:listen(LPort,[{active, false},{packet,2}]) of
+               {ok, ListenSock} ->
+                   start_servers(Num,ListenSock),
+                   {ok, Port} = inet:port(ListenSock),
+                   Port;
+               {error,Reason} ->
+                   {error,Reason}
+           end.
+
+       start_servers(0,_) ->
+           ok;
+       start_servers(Num,LS) ->
+           spawn(?MODULE,server,[LS]),
+           start_servers(Num-1,LS).
+
+       server(LS) ->
+           case gen_tcp:accept(LS) of
+               {ok,S} ->
+                   loop(S),
+                   server(LS);
+               Other ->
+                   io:format("accept returned ~w - goodbye!~n",[Other]),
+                   ok
+           end.
+
+       loop(S) ->
+           inet:setopts(S,[{active,once}]),
+           receive
+               {tcp,S,Data} ->
+                   Answer = process(Data), % Not implemented in this example
+                   gen_tcp:send(S,Answer),
+                   loop(S);
+               {tcp_closed,S} ->
+                   io:format("Socket ~w closed [~w]~n",[S,self()]),
+                   ok
+           end.
+
+       A simple client could look like this:
+
+       client(PortNo,Message) ->
+           {ok,Sock} = gen_tcp:connect("localhost",PortNo,[{active,false},
+                                                           {packet,2}]),
+           gen_tcp:send(Sock,Message),
+           A = gen_tcp:recv(Sock,0),
+           gen_tcp:close(Sock),
+           A.
+
+       The fact that the _s_e_n_d call does not accept a timeout option, is
+       because timeouts on send is handled through the socket option
+       _s_e_n_d___t_i_m_e_o_u_t. The behavior of a send operation with no receiver is in a
+       very high degree defined by the underlying TCP stack, as well as the
+       network infrastructure. If one wants to write code that handles a
+       hanging receiver that might eventually cause the sender to hang on a
+       _s_e_n_d call, one writes code like the following.
+
+       Consider a process that receives data from a client process that is to
+       be forwarded to a server on the network. The process has connected to
+       the server via TCP/IP and does not get any acknowledge for each message
+       it sends, but has to rely on the send timeout option to detect that the
+       other end is unresponsive. We could use the _s_e_n_d___t_i_m_e_o_u_t option when
+       connecting:
+
+           ...
+           {ok,Sock} = gen_tcp:connect(HostAddress, Port,
+                                       [{active,false},
+                                        {send_timeout, 5000},
+                                        {packet,2}]),
+                           loop(Sock), % See below
+           ...
+
+       In the loop where requests are handled, we can now detect send
+       timeouts:
+
+       loop(Sock) ->
+           receive
+               {Client, send_data, Binary} ->
+                   case gen_tcp:send(Sock,[Binary]) of
+                       {error, timeout} ->
+                           io:format("Send timeout, closing!~n",
+                                     []),
+                           handle_send_timeout(), % Not implemented here
+                           Client ! {self(),{error_sending, timeout}},
+                           %% Usually, it's a good idea to give up in case of a
+                           %% send timeout, as you never know how much actually
+                           %% reached the server, maybe only a packet header?!
+                           gen_tcp:close(Sock);
+                       {error, OtherSendError} ->
+                           io:format("Some other error on socket (~p), closing",
+                                     [OtherSendError]),
+                           Client ! {self(),{error_sending, OtherSendError}},
+                           gen_tcp:close(Sock);
+                       ok ->
+                           Client ! {self(), data_sent},
+                           loop(Sock)
+                   end
+           end.
+
+       Usually it would suffice to detect timeouts on receive, as most
+       protocols include some sort of acknowledgment from the server, but if
+       the protocol is strictly one way, the _s_e_n_d___t_i_m_e_o_u_t option comes in
+       handy!
+
+
+
+Ericsson AB                      kernel 2.15.2                      gen_tcp(3)

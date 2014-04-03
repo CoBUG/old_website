@@ -1,0 +1,373 @@
+gb_sets(3)                 Erlang Module Definition                 gb_sets(3)
+
+
+
+NNAAMMEE
+       gb_sets - General Balanced Trees
+
+DDEESSCCRRIIPPTTIIOONN
+       An implementation of ordered sets using Prof. Arne Andersson's General
+       Balanced Trees. This can be much more efficient than using ordered
+       lists, for larger sets, but depends on the application.
+
+       This module considers two elements as different if and only if they do
+       not compare equal (_=_=).
+
+CCOOMMPPLLEEXXIITTYY NNOOTTEE
+       The complexity on set operations is bounded by either O(|S|) or O(|T| *
+       log(|S|)), where S is the largest given set, depending on which is
+       fastest for any particular function call. For operating on sets of
+       almost equal size, this implementation is about 3 times slower than
+       using ordered-list sets directly. For sets of very different sizes,
+       however, this solution can be arbitrarily much faster; in practical
+       cases, often between 10 and 100 times. This implementation is
+       particularly suited for accumulating elements a few at a time, building
+       up a large set (more than 100-200 elements), and repeatedly testing for
+       membership in the current set.
+
+       As with normal tree structures, lookup (membership testing), insertion
+       and deletion have logarithmic complexity.
+
+CCOOMMPPAATTIIBBIILLIITTYY
+       All of the following functions in this module also exist and do the
+       same thing in the _s_e_t_s and _o_r_d_s_e_t_s modules. That is, by only changing
+       the module name for each call, you can try out different set
+       representations.
+
+         * _a_d_d___e_l_e_m_e_n_t_/_2
+
+         * _d_e_l___e_l_e_m_e_n_t_/_2
+
+         * _f_i_l_t_e_r_/_2
+
+         * _f_o_l_d_/_3
+
+         * _f_r_o_m___l_i_s_t_/_1
+
+         * _i_n_t_e_r_s_e_c_t_i_o_n_/_1
+
+         * _i_n_t_e_r_s_e_c_t_i_o_n_/_2
+
+         * _i_s___e_l_e_m_e_n_t_/_2
+
+         * _i_s___s_e_t_/_1
+
+         * _i_s___s_u_b_s_e_t_/_2
+
+         * _n_e_w_/_0
+
+         * _s_i_z_e_/_1
+
+         * _s_u_b_t_r_a_c_t_/_2
+
+         * _t_o___l_i_s_t_/_1
+
+         * _u_n_i_o_n_/_1
+
+         * _u_n_i_o_n_/_2
+
+DDAATTAA TTYYPPEESS
+       ggbb__sseett(())
+
+              A GB set.
+
+       iitteerr(())
+
+              A GB set iterator.
+
+EEXXPPOORRTTSS
+       aadddd((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+       aadddd__eelleemmeenntt((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Element = term()
+                 Set1 = Set2 = gb_set()
+
+              Returns a new gb_set formed from _S_e_t_1 with _E_l_e_m_e_n_t inserted. If
+              _E_l_e_m_e_n_t is already an element in _S_e_t_1, nothing is changed.
+
+       bbaallaannccee((SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Set1 = Set2 = gb_set()
+
+              Rebalances the tree representation of _S_e_t_1. Note that this is
+              rarely necessary, but may be motivated when a large number of
+              elements have been deleted from the tree without further
+              insertions. Rebalancing could then be forced in order to
+              minimise lookup times, since deletion only does not rebalance
+              the tree.
+
+       ddeelleettee((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Element = term()
+                 Set1 = Set2 = gb_set()
+
+              Returns a new gb_set formed from _S_e_t_1 with _E_l_e_m_e_n_t removed.
+              Assumes that _E_l_e_m_e_n_t is present in _S_e_t_1.
+
+       ddeelleettee__aannyy((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+       ddeell__eelleemmeenntt((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Element = term()
+                 Set1 = Set2 = gb_set()
+
+              Returns a new gb_set formed from _S_e_t_1 with _E_l_e_m_e_n_t removed. If
+              _E_l_e_m_e_n_t is not an element in _S_e_t_1, nothing is changed.
+
+       ddiiffffeerreennccee((SSeett11,, SSeett22)) -->> SSeett33
+
+       ssuubbttrraacctt((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = gb_set()
+
+              Returns only the elements of _S_e_t_1 which are not also elements of
+              _S_e_t_2.
+
+       eemmppttyy(()) -->> SSeett
+
+       nneeww(()) -->> SSeett
+
+              Types:
+
+                 Set = gb_set()
+
+              Returns a new empty gb_set.
+
+       ffiilltteerr((PPrreedd,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Pred = fun((E :: term()) -> boolean())
+                 Set1 = Set2 = gb_set()
+
+              Filters elements in _S_e_t_1 using predicate function _P_r_e_d.
+
+       ffoolldd((FFuunnccttiioonn,, AAcccc00,, SSeett)) -->> AAcccc11
+
+              Types:
+
+                 Function = fun((E :: term(), AccIn) -> AccOut)
+                 Acc0 = Acc1 = AccIn = AccOut = term()
+                 Set = gb_set()
+
+              Folds _F_u_n_c_t_i_o_n over every element in _S_e_t returning the final
+              value of the accumulator.
+
+       ffrroomm__lliisstt((LLiisstt)) -->> SSeett
+
+              Types:
+
+                 List = [term()]
+                 Set = gb_set()
+
+              Returns a gb_set of the elements in _L_i_s_t, where _L_i_s_t may be
+              unordered and contain duplicates.
+
+       ffrroomm__oorrddsseett((LLiisstt)) -->> SSeett
+
+              Types:
+
+                 List = [term()]
+                 Set = gb_set()
+
+              Turns an ordered-set list _L_i_s_t into a gb_set. The list must not
+              contain duplicates.
+
+       iinnsseerrtt((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Element = term()
+                 Set1 = Set2 = gb_set()
+
+              Returns a new gb_set formed from _S_e_t_1 with _E_l_e_m_e_n_t inserted.
+              Assumes that _E_l_e_m_e_n_t is not present in _S_e_t_1.
+
+       iinntteerrsseeccttiioonn((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = gb_set()
+
+              Returns the intersection of _S_e_t_1 and _S_e_t_2.
+
+       iinntteerrsseeccttiioonn((SSeettLLiisstt)) -->> SSeett
+
+              Types:
+
+                 SetList = [gb_set(), ...]
+                 Set = gb_set()
+
+              Returns the intersection of the non-empty list of gb_sets.
+
+       iiss__ddiissjjooiinntt((SSeett11,, SSeett22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Set1 = Set2 = gb_set()
+
+              Returns _t_r_u_e if _S_e_t_1 and _S_e_t_2 are disjoint (have no elements in
+              common), and _f_a_l_s_e otherwise.
+
+       iiss__eemmppttyy((SSeett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Set = gb_set()
+
+              Returns _t_r_u_e if _S_e_t is an empty set, and _f_a_l_s_e otherwise.
+
+       iiss__mmeemmbbeerr((EElleemmeenntt,, SSeett)) -->> bboooolleeaann(())
+
+       iiss__eelleemmeenntt((EElleemmeenntt,, SSeett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Element = term()
+                 Set = gb_set()
+
+              Returns _t_r_u_e if _E_l_e_m_e_n_t is an element of _S_e_t, otherwise _f_a_l_s_e.
+
+       iiss__sseett((TTeerrmm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Term = term()
+
+              Returns _t_r_u_e if _T_e_r_m appears to be a gb_set, otherwise _f_a_l_s_e.
+
+       iiss__ssuubbsseett((SSeett11,, SSeett22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Set1 = Set2 = gb_set()
+
+              Returns _t_r_u_e when every element of _S_e_t_1 is also a member of
+              _S_e_t_2, otherwise _f_a_l_s_e.
+
+       iitteerraattoorr((SSeett)) -->> IItteerr
+
+              Types:
+
+                 Set = gb_set()
+                 Iter = iitteerr(())
+
+              Returns an iterator that can be used for traversing the entries
+              of _S_e_t; see _n_e_x_t_/_1. The implementation of this is very
+              efficient; traversing the whole set using _n_e_x_t_/_1 is only
+              slightly slower than getting the list of all elements using
+              _t_o___l_i_s_t_/_1 and traversing that. The main advantage of the
+              iterator approach is that it does not require the complete list
+              of all elements to be built in memory at one time.
+
+       llaarrggeesstt((SSeett)) -->> tteerrmm(())
+
+              Types:
+
+                 Set = gb_set()
+
+              Returns the largest element in _S_e_t. Assumes that _S_e_t is
+              nonempty.
+
+       nneexxtt((IItteerr11)) -->> {{EElleemmeenntt,, IItteerr22}} || nnoonnee
+
+              Types:
+
+                 Iter1 = Iter2 = iitteerr(())
+                 Element = term()
+
+              Returns _{_E_l_e_m_e_n_t_, _I_t_e_r_2_} where _E_l_e_m_e_n_t is the smallest element
+              referred to by the iterator _I_t_e_r_1, and _I_t_e_r_2 is the new iterator
+              to be used for traversing the remaining elements, or the atom
+              _n_o_n_e if no elements remain.
+
+       ssiinngglleettoonn((EElleemmeenntt)) -->> ggbb__sseett(())
+
+              Types:
+
+                 Element = term()
+
+              Returns a gb_set containing only the element _E_l_e_m_e_n_t.
+
+       ssiizzee((SSeett)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Set = gb_set()
+
+              Returns the number of elements in _S_e_t.
+
+       ssmmaalllleesstt((SSeett)) -->> tteerrmm(())
+
+              Types:
+
+                 Set = gb_set()
+
+              Returns the smallest element in _S_e_t. Assumes that _S_e_t is
+              nonempty.
+
+       ttaakkee__llaarrggeesstt((SSeett11)) -->> {{EElleemmeenntt,, SSeett22}}
+
+              Types:
+
+                 Set1 = Set2 = gb_set()
+                 Element = term()
+
+              Returns _{_E_l_e_m_e_n_t_, _S_e_t_2_}, where _E_l_e_m_e_n_t is the largest element in
+              _S_e_t_1, and _S_e_t_2 is this set with _E_l_e_m_e_n_t deleted. Assumes that
+              _S_e_t_1 is nonempty.
+
+       ttaakkee__ssmmaalllleesstt((SSeett11)) -->> {{EElleemmeenntt,, SSeett22}}
+
+              Types:
+
+                 Set1 = Set2 = gb_set()
+                 Element = term()
+
+              Returns _{_E_l_e_m_e_n_t_, _S_e_t_2_}, where _E_l_e_m_e_n_t is the smallest element
+              in _S_e_t_1, and _S_e_t_2 is this set with _E_l_e_m_e_n_t deleted. Assumes that
+              _S_e_t_1 is nonempty.
+
+       ttoo__lliisstt((SSeett)) -->> LLiisstt
+
+              Types:
+
+                 Set = gb_set()
+                 List = [term()]
+
+              Returns the elements of _S_e_t as a list.
+
+       uunniioonn((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = gb_set()
+
+              Returns the merged (union) gb_set of _S_e_t_1 and _S_e_t_2.
+
+       uunniioonn((SSeettLLiisstt)) -->> SSeett
+
+              Types:
+
+                 SetList = [gb_set(), ...]
+                 Set = gb_set()
+
+              Returns the merged (union) gb_set of the list of gb_sets.
+
+SSEEEE AALLSSOO
+       ggbb__ttrreeeess((33)), oorrddsseettss((33)), sseettss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                      gb_sets(3)

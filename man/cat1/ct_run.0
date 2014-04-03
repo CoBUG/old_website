@@ -1,0 +1,160 @@
+ct_run(1)                        User Commands                       ct_run(1)
+
+
+
+NNAAMMEE
+       ct_run - Program used for starting Common Test from the
+           OS command line.
+
+
+DDEESSCCRRIIPPTTIIOONN
+       The _c_t___r_u_n program is automatically installed with Erlang/OTP and
+       Common Test (please see the Installation chapter in the Common Test
+       User's Guide for more information). The program accepts a number of
+       different start flags. Some flags trigger _c_t___r_u_n to start the Common
+       Test application and pass on data to it. Some flags start an Erlang
+       node prepared for running Common Test in a particular mode.
+
+       There is an interface function that corresponds to this program, called
+       cctt::rruunn__tteesstt//11, for starting Common Test from the Erlang shell (or an
+       Erlang program). Please see the _c_t man page for details.
+
+       _c_t___r_u_n also accepts Erlang emulator flags. These are used when _c_t___r_u_n
+       calls _e_r_l to start the Erlang node (making it possible to e.g. add
+       directories to the code server path, change the cookie on the node,
+       start additional applications, etc).
+
+       With the optional flag:
+
+       -erl_args
+
+       it's possible to divide the options on the _c_t___r_u_n command line into two
+       groups, one that Common Test should process (those preceding
+       _-_e_r_l___a_r_g_s), and one it should completely ignore and pass on directly to
+       the emulator (those following _-_e_r_l___a_r_g_s). Options preceding _-_e_r_l___a_r_g_s
+       that Common Test doesn't recognize, also get passed on to the emulator
+       untouched. By means of _-_e_r_l___a_r_g_s the user may specify flags with the
+       same name, but with different destinations, on the _c_t___r_u_n command line.
+
+       If _-_p_a or _-_p_z flags are specified in the Common Test group of options
+       (preceding _-_e_r_l___a_r_g_s), relative directories will be converted to
+       absolute and re-inserted into the code path by Common Test (to avoid
+       problems loading user modules when Common Test changes working
+       directory during test runs). Common Test will however ignore _-_p_a and
+       _-_p_z flags following _-_e_r_l___a_r_g_s on the command line. These directories
+       are added to the code path normally (i.e. on specified form)
+
+       Exit status is set before the program ends. Value _0 indicates a
+       successful test result, _1 indicates one or more failed or auto-skipped
+       test cases, and _2 indicates test execution failure.
+
+       If _c_t___r_u_n is called with option:
+
+       -help
+
+       it prints all valid start flags to stdout.
+
+RRUUNN TTEESSTTSS FFRROOMM CCOOMMMMAANNDD LLIINNEE
+            ct_run [-dir TestDir1 TestDir2 .. TestDirN] |
+            [[-dir TestDir] -suite Suite1 Suite2 .. SuiteN
+             [[-group Group1 Group2 .. GroupN] [-case Case1 Case2 .. CaseN]]]
+            [-step [config | keep_inactive]]
+            [-config ConfigFile1 ConfigFile2 .. ConfigFileN]
+            [-userconfig CallbackModule1 ConfigString1 and CallbackModule2
+             ConfigString2 and .. CallbackModuleN ConfigStringN]
+            [-decrypt_key Key] | [-decrypt_file KeyFile]
+            [-label Label]
+            [-logdir LogDir]
+            [-logopts LogOpts]
+            [-verbosity GenVLevel | [Category1 VLevel1 and
+             Category2 VLevel2 and .. CategoryN VLevelN]]
+            [-silent_connections [ConnType1 ConnType2 .. ConnTypeN]]
+            [-stylesheet CSSFile]
+            [-cover CoverCfgFile]
+            [-event_handler EvHandler1 EvHandler2 .. EvHandlerN] |
+               [-event_handler_init EvHandler1 InitArg1 and
+             EvHandler2 InitArg2 and .. EvHandlerN InitArgN]
+            [-include InclDir1 InclDir2 .. InclDirN]
+            [-no_auto_compile]
+            [-muliply_timetraps Multiplier]
+            [-scale_timetraps]
+            [-create_priv_dir auto_per_run | auto_per_tc | manual_per_tc]
+               [-repeat N [-force_stop]] |
+               [-duration HHMMSS [-force_stop]] |
+               [-until [YYMoMoDD]HHMMSS [-force_stop]]
+            [-basic_html]
+            [-ct_hooks CTHModule1 CTHOpts1 and CTHModule2 CTHOpts2 and ..
+             CTHModuleN CTHOptsN]
+            [-exit_status ignore_config]
+
+
+RRUUNN TTEESSTTSS UUSSIINNGG TTEESSTT SSPPEECCIIFFIICCAATTIIOONN
+            ct_run -spec TestSpec1 TestSpec2 .. TestSpecN
+            [-config ConfigFile1 ConfigFile2 .. ConfigFileN]
+            [-userconfig CallbackModule1 ConfigString1 and CallbackModule2
+                ConfigString2 and .. and CallbackModuleN ConfigStringN]
+            [-decrypt_key Key] | [-decrypt_file KeyFile]
+            [-label Label]
+            [-logdir LogDir]
+            [-logopts LogOpts]
+            [-verbosity GenVLevel | [Category1 VLevel1 and
+             Category2 VLevel2 and .. CategoryN VLevelN]]
+            [-allow_user_terms]
+            [-silent_connections [ConnType1 ConnType2 .. ConnTypeN]]
+            [-stylesheet CSSFile]
+            [-cover CoverCfgFile]
+            [-event_handler EvHandler1 EvHandler2 .. EvHandlerN] |
+               [-event_handler_init EvHandler1 InitArg1 and
+             EvHandler2 InitArg2 and .. EvHandlerN InitArgN]
+            [-include InclDir1 InclDir2 .. InclDirN]
+            [-no_auto_compile]
+            [-muliply_timetraps Multiplier]
+            [-scale_timetraps]
+            [-create_priv_dir auto_per_run | auto_per_tc | manual_per_tc]
+               [-repeat N [-force_stop]] |
+               [-duration HHMMSS [-force_stop]] |
+               [-until [YYMoMoDD]HHMMSS [-force_stop]]
+            [-basic_html]
+            [-ct_hooks CTHModule1 CTHOpts1 and CTHModule2 CTHOpts2 and ..
+             CTHModuleN CTHOptsN]
+            [-exit_status ignore_config]
+
+
+RRUUNN TTEESSTTSS IINN WWEEBB BBAASSEEDD GGUUII
+               ct_run -vts [-browser Browser]
+               [-dir TestDir1 TestDir2 .. TestDirN] |
+               [[dir TestDir] -suite Suite [[-group Group] [-case Case]]]
+            [-config ConfigFile1 ConfigFile2 .. ConfigFileN]
+            [-userconfig CallbackModule1 ConfigString1 and CallbackModule2
+                ConfigString2 and .. and CallbackModuleN ConfigStringN]
+            [-logopts LogOpts]
+            [-verbosity GenVLevel | [Category1 VLevel1 and
+             Category2 VLevel2 and .. CategoryN VLevelN]]
+            [-decrypt_key Key] | [-decrypt_file KeyFile]
+            [-include InclDir1 InclDir2 .. InclDirN]
+            [-no_auto_compile]
+            [-muliply_timetraps Multiplier]
+            [-scale_timetraps]
+            [-create_priv_dir auto_per_run | auto_per_tc | manual_per_tc]
+            [-basic_html]
+
+RREEFFRREESSHH TTHHEE HHTTMMLL IINNDDEEXX FFIILLEESS
+            ct_run -refresh_logs [-logdir LogDir] [-basic_html]
+
+RRUUNN CCTT IINN IINNTTEERRAACCTTIIVVEE MMOODDEE
+            ct_run -shell
+            [-config ConfigFile1 ConfigFile2 ... ConfigFileN]
+            [-userconfig CallbackModule1 ConfigString1 and CallbackModule2
+                ConfigString2 and .. and CallbackModuleN ConfigStringN]
+            [-decrypt_key Key] | [-decrypt_file KeyFile]
+
+SSTTAARRTT AA CCOOMMMMOONN TTEESSTT MMAASSTTEERR NNOODDEE
+            ct_run -ctmaster
+
+SSEEEE AALLSSOO
+       Please read the RRuunnnniinngg TTeesstt SSuuiitteess chapter in the Common Test User's
+       Guide for information about the meaning of the different start flags.
+
+
+
+Ericsson AB                    common_test 1.6.2                     ct_run(1)

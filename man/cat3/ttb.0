@@ -1,0 +1,483 @@
+ttb(3)                     Erlang Module Definition                     ttb(3)
+
+
+
+NNAAMMEE
+       ttb - A base for building trace tools for distributed systems.
+
+DDEESSCCRRIIPPTTIIOONN
+       The Trace Tool Builder _t_t_b is a base for building trace tools for
+       distributed systems.
+
+       When using _t_t_b, _d_b_g shall not be used in parallel.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__ttrraaccee((NNooddeess,, PPaatttteerrnnss,, FFllaaggSSppeecc,, OOppttss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = see p/2
+                 Nodes = see tracer/2
+                 Patterns = [tuple()]
+                 FlagSpec = {Procs, Flags}
+                 Proc = see p/2
+                 Flags = see p/2
+                 Opts = see tracer/2
+
+              This function is a shortcut allowing to start a trace with one
+              command. Each tuple in _P_a_t_t_e_r_n_s is converted to list which is in
+              turn passed to _t_t_b_:_t_p_l. The call:
+
+              ttb:start_trace([Node, OtherNode],
+              [{mod, foo, []}, {mod, bar, 2}],
+              {all, call},
+              [{file, File}, {handler,{fun myhandler/4, S}}])
+
+              ttb:start_trace([Node, OtherNode], [{file, File}, {handler,{fun myhandler/4, S}}]),
+              ttb:tpl(mod, foo, []),
+              ttb:tpl(mod, bar, 2, []),
+              ttb:p(all, call)
+
+       ttrraacceerr(()) -->> RReessuulltt
+
+              This is equivalent to _t_r_a_c_e_r_(_n_o_d_e_(_)_).
+
+       ttrraacceerr((SShhoorrttccuutt)) -->> RReessuulltt
+
+              Types:
+
+                 Shortcut = shell | dbg
+
+              _s_h_e_l_l is equivalent to _t_r_a_c_e_r_(_n_o_d_e_(_)_,_[_{_f_i_l_e_, _{_l_o_c_a_l_, _"_t_t_b_"_}_}_,
+              _s_h_e_l_l_]_).
+
+              _d_b_g is equivalent to _t_r_a_c_e_r_(_n_o_d_e_(_)_,_[_{_s_h_e_l_l_, _o_n_l_y_}_]_).
+
+       ttrraacceerr((NNooddeess)) -->> RReessuulltt
+
+              This is equivalent to _t_r_a_c_e_r_(_N_o_d_e_s_,_[_]_).
+
+       ttrraacceerr((NNooddeess,,OOppttss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {ok, ActivatedNodes} | {error,Reason}
+                 Nodes = atom() | [atom()] | all | existing | new
+                 Opts = Opt | [Opt]
+                 Opt = {file,Client} | {handler, FormatHandler} |
+                 {process_info,PI} | shell | {shell, ShellSpec} | {timer,
+                 TimerSpec} | {overload, {MSec, Module, Function}} | {flush,
+                 MSec} | resume | {resume, FetchTimeout}
+                 TimerSpec = MSec | {MSec, StopOpts}
+                 MSec = FetchTimeout = integer()
+                 Module = Function = atom()
+                 StopOpts = see stop/2
+                 Client = File | {local, File}
+                 File = Filename | Wrap
+                 Filename = string()
+                 Wrap = {wrap,Filename} | {wrap,Filename,Size,Count}
+                 FormatHandler = See format/2
+                 PI = true | false
+                 ShellSpec = true | false | only
+
+              This function starts a file trace port on all given nodes and
+              also points the system tracer for sequential tracing to the same
+              port.
+
+              The given _F_i_l_e_n_a_m_e will be prefixed with the node name. Default
+              _F_i_l_e_n_a_m_e is "ttb".
+
+              _F_i_l_e_=_{_w_r_a_p_,_F_i_l_e_n_a_m_e_,_S_i_z_e_,_C_o_u_n_t_} can be used if the size of the
+              trace logs must be limited. Default values are _S_i_z_e_=_1_2_8_*_1_0_2_4 and
+              _C_o_u_n_t_=_8.
+
+              When tracing diskless nodes, _t_t_b must be started from an
+              external "trace control node" with disk access, and _C_l_i_e_n_t must
+              be _{_l_o_c_a_l_, _F_i_l_e_}. All trace information is then sent to the
+              trace control node where it is written to file.
+
+              The _p_r_o_c_e_s_s___i_n_f_o option indicates if process information should
+              be collected. If _P_I _= _t_r_u_e (which is default), each process
+              identifier _P_i_d is replaced by a tuple _{_P_i_d_,_P_r_o_c_e_s_s_I_n_f_o_,_N_o_d_e_},
+              where _P_r_o_c_e_s_s_I_n_f_o is the process' registered name its globally
+              registered name, or its initial function. It is possible to turn
+              off this functionality by setting _P_I _= _f_a_l_s_e.
+
+              The _{_s_h_e_l_l_, _S_h_e_l_l_S_p_e_c_} option indicates that the trace messages
+              should be printed on the console as they are received by the
+              tracing process. This implies _{_l_o_c_a_l_, _F_i_l_e_} trace client. If the
+              ShellSpec is _o_n_l_y (instead of _t_r_u_e), no trace logs are stored.
+
+              The _s_h_e_l_l option is a shortcut for _{_s_h_e_l_l_, _t_r_u_e_}.
+
+              The _t_i_m_e_r option indicates that the trace should be
+              automatically stopped after _M_S_e_c milliseconds. _S_t_o_p_O_p_t_s are
+              passed to _t_t_b_:_s_t_o_p_/_2 command if specified (default is _[_]). Note
+              that the timing is approximate, as delays related to network
+              communication are always present. The timer starts after _t_t_b_:_p_/_2
+              is issued, so you can set up your trace patterns before.
+
+              The _o_v_e_r_l_o_a_d option allows to enable overload checking on the
+              nodes under trace. _M_o_d_u_l_e_:_F_u_n_c_t_i_o_n_(_c_h_e_c_k_) is performed each _M_S_e_c
+              milliseconds. If the check returns _t_r_u_e, the tracing is disabled
+              on a given node.
+              _M_o_d_u_l_e_:_F_u_n_c_t_i_o_n should be able to handle at least three atoms:
+              _i_n_i_t, _c_h_e_c_k and _s_t_o_p. _i_n_i_t and _s_t_o_p give the user a possibility
+              to initialize and clean up the check environment.
+              When a node gets overloaded, it is not possible to issue _t_t_b_:_p
+              nor any command from the _t_t_b_:_t_p family, as it would lead to
+              inconsistent tracing state (different trace specifications on
+              different node).
+
+              The _f_l_u_s_h option periodically flushes all file trace port
+              clients (see _d_b_g_:_f_l_u_s_h___t_r_a_c_e___p_o_r_t_/_1). When enabled, the buffers
+              are freed each _M_S_e_c milliseconds. This option is not allowed
+              with _{_f_i_l_e_, _{_l_o_c_a_l_, _F_i_l_e_}_} tracing.
+
+              _{_r_e_s_u_m_e_, _F_e_t_c_h_T_i_m_e_o_u_t_} enables the autoresume feature. Whenever
+              enabled, remote nodes try to reconnect to the controlling node
+              in case they were restarted. The feature requires _r_u_n_t_i_m_e___t_o_o_l_s
+              application to be started (so it has to be present in the _._b_o_o_t
+              scripts if the traced nodes run with embedded erlang). If this
+              is not possible, resume may be performed manually by starting
+              _r_u_n_t_i_m_e___t_o_o_l_s remotely using _r_p_c_:_c_a_l_l_/_4.
+              _t_t_b tries to fetch all logs from a reconnecting node before
+              reinitializing the trace. This has to finish within FetchTimeout
+              milliseconds or is aborted
+              By default, autostart information is stored in a file called
+              _t_t_b___a_u_t_o_s_t_a_r_t_._b_i_n on each node. If this is not desired (i.e. on
+              diskless nodes), a custom module to handle autostart information
+              storage and retrieval can be provided by specifying
+              _t_t_b___a_u_t_o_s_t_a_r_t___m_o_d_u_l_e environment variable for the _r_u_n_t_i_m_e___t_o_o_l_s
+              application. The module has to respond to the following API:
+
+                _w_r_i_t_e___c_o_n_f_i_g_(_D_a_t_a_) _-_> _o_k:
+                  Store the provided data for further retrieval. It is
+                  important to realize that the data storage used must not be
+                  affected by the node crash.
+
+                _r_e_a_d___c_o_n_f_i_g_(_) _-_> _{_o_k_, _D_a_t_a_} _| _{_e_r_r_o_r_, _E_r_r_o_r_}:
+                  Retrieve configuration stored with _w_r_i_t_e___c_o_n_f_i_g_(_D_a_t_a_).
+
+                _d_e_l_e_t_e___c_o_n_f_i_g_(_) _-_> _o_k:
+                  Delete configuration stored with _w_r_i_t_e___c_o_n_f_i_g_(_D_a_t_a_). Note
+                  that after this call any subsequent calls to _r_e_a_d___c_o_n_f_i_g
+                  must return _{_e_r_r_o_r_, _E_r_r_o_r_}.
+
+              The _r_e_s_u_m_e option implies the default _F_e_t_c_h_T_i_m_e_o_u_t, which is 10
+              seconds
+
+       pp((PPrrooccss,,FFllaaggss)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = {ok,[{Procs,MatchDesc}]}
+                 Procs = Process | [Process] | all | new | existing
+                 Process = pid() | atom() | {global,atom()}
+                 Flags = Flag | [Flag]
+
+              This function sets the given trace flags on the given processes.
+              The _t_i_m_e_s_t_a_m_p flag is always turned on.
+
+              Please turn to the Reference manual for module _d_b_g for details
+              about the possible trace flags. The parameter _M_a_t_c_h_D_e_s_c is the
+              same as returned from _d_b_g_:_p_/_2
+
+              Processes can be given as registered names, globally registered
+              names or process identifiers. If a registered name is given, the
+              flags are set on processes with this name on all active nodes.
+
+              Issuing this command starts the timer for this trace if _t_i_m_e_r
+              option was specified with _t_r_a_c_e_r_/_2.
+
+       ttpp,, ttppll,, ccttpp,, ccttppll,, ccttppgg
+
+              These functions should be used in combination with the _c_a_l_l
+              trace flag for setting and clearing trace patterns. When the
+              _c_a_l_l trace flag is set on a process, function calls will be
+              traced on that process if a trace pattern has been set for the
+              called function. Trace patterns specifies how to trace a
+              function by using match specifications. Match specifications are
+              described in the User's Guide for the erlang runtime system
+              _e_r_t_s.
+
+              These functions are equivalent to the corresponding functions in
+              _d_b_g, but all calls are stored in the history. The history buffer
+              makes it easy to create config files so that the same trace
+              environment can be setup several times, e.g. if you want to
+              compare two test runs. It also reduces the amount of typing when
+              using _t_t_b from the erlang shell.
+
+                _t_p:
+                  Set trace pattern on global function calls
+
+                _t_p_l:
+                  Set trace pattern on local and global function calls
+
+                _c_t_p:
+                  Clear trace pattern on local and global function calls
+
+                _c_t_p_l:
+                  Clear trace pattern on local function calls
+
+                _c_t_p_g:
+                  Clear trace pattern on global function calls
+
+              With _t_p and _t_p_l one of match specification shortcuts may be used
+              (example: _t_t_b_:_t_p_(_f_o_o___m_o_d_u_l_e_, _c_a_l_l_e_r_)). The shortcuts are:
+
+       lliisstt__hhiissttoorryy(()) -->> HHiissttoorryy
+
+              Types:
+
+                 History = [{N,Func,Args}]
+
+              All calls to _t_t_b is stored in the history. This function returns
+              the current content of the history. Any entry can be re-executed
+              with _r_u_n___h_i_s_t_o_r_y_/_1 or stored in a config file with
+              _w_r_i_t_e___c_o_n_f_i_g_/_2_/_3.
+
+       rruunn__hhiissttoorryy((NN)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 N = integer() | [integer()]
+
+              Executes the given entry or entries from the history list.
+              History can be listed with _l_i_s_t___h_i_s_t_o_r_y_/_0.
+
+       wwrriittee__ccoonnffiigg((CCoonnffiiggFFiillee,,CCoonnffiigg))
+
+              Equivalent to _w_r_i_t_e___c_o_n_f_i_g_(_C_o_n_f_i_g_F_i_l_e_,_C_o_n_f_i_g_,_[_]_).
+
+       wwrriittee__ccoonnffiigg((CCoonnffiiggFFiillee,,CCoonnffiigg,,OOppttss)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 ConfigFile = string()
+                 Config = all | [integer()] | [{Mod,Func,Args}]
+                 Mod = atom()
+                 Func = atom()
+                 Args = [term()]
+                 Opts = Opt | [Opt]
+                 Opt = append
+
+              This function creates or extends a config file which can be used
+              for restoring a specific configuration later.
+
+              The content of the config file can either be fetched from the
+              history or given directly as a list of _{_M_o_d_,_F_u_n_c_,_A_r_g_s_}.
+
+              If the complete history is to be stored in the config file
+              _C_o_n_f_i_g should be _a_l_l. If only a selected number of entries from
+              the history should be stored, _C_o_n_f_i_g should be a list of
+              integers pointing out the entries to be stored.
+
+              If _O_p_t_s is not given or if it is _[_], _C_o_n_f_i_g_F_i_l_e is deleted and a
+              new file is created. If _O_p_t_s _= _[_a_p_p_e_n_d_], _C_o_n_f_i_g_F_i_l_e will not be
+              deleted. The new information will be appended at the end of the
+              file.
+
+       rruunn__ccoonnffiigg((CCoonnffiiggFFiillee)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 ConfigFile = string()
+
+              Executes all entries in the given config file. Note that the
+              history of the last trace is always available in the file named
+              _t_t_b___l_a_s_t___c_o_n_f_i_g.
+
+       rruunn__ccoonnffiigg((CCoonnffiiggFFiillee,,NNuummLLiisstt)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 ConfigFile = string()
+                 NumList = [integer()]
+
+              Executes selected entries from the given config file. _N_u_m_L_i_s_t is
+              a list of integers pointing out the entries to be executed.
+
+              The content of a config file can be listed with _l_i_s_t___c_o_n_f_i_g_/_1.
+
+              Note that the history of the last trace is always available in
+              the file named _t_t_b___l_a_s_t___c_o_n_f_i_g.
+
+       lliisstt__ccoonnffiigg((CCoonnffiiggFFiillee)) -->> CCoonnffiigg || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 ConfigFile = string()
+                 Config = [{N,Func,Args}]
+
+              Lists all entries in the given config file.
+
+       wwrriittee__ttrraaccee__iinnffoo((KKeeyy,,IInnffoo)) -->> ookk
+
+              Types:
+
+                 Key = term()
+                 Info = Data | fun() -> Data
+                 Data = term()
+
+              The _._t_i file contains _{_K_e_y_,_V_a_l_u_e_L_i_s_t_} tuples. This function adds
+              _D_a_t_a to the ValueList associated with _K_e_y. All information
+              written with this function will be included in the call to the
+              format handler.
+
+       sseeqq__ttrriiggggeerr__mmss(()) -->> MMaattcchhSSppeecc
+
+              Equivalent to _s_e_q___t_r_i_g_g_e_r___m_s_(_a_l_l_)
+
+       sseeqq__ttrriiggggeerr__mmss((FFllaaggss)) -->> MMaattcchhSSppeecc
+
+              Types:
+
+                 MatchSpec = match_spec()
+                 Flags = all | SeqTraceFlag | [SeqTraceFlag]
+                 SeqTraceFlag = atom()
+
+              A match specification can turn on or off sequential tracing.
+              This function returns a match specification which turns on
+              sequential tracing with the given _F_l_a_g_s.
+
+              This match specification can be given as the last argument to _t_p
+              or _t_p_l. The activated _I_t_e_m will then become a _t_r_i_g_g_e_r for
+              sequential tracing. This means that if the item is called on a
+              process with the _c_a_l_l trace flag set, the process will be
+              "contaminated" with the seq_trace token.
+
+              If _F_l_a_g_s _= _a_l_l, all possible flags are set.
+
+              Please turn to the reference manual for the _s_e_q___t_r_a_c_e module in
+              the _k_e_r_n_e_l application to see the possible values for
+              _S_e_q_T_r_a_c_e_F_l_a_g. For a description of the match_spec() syntax,
+              please turn to the _U_s_e_r_'_s _g_u_i_d_e for the runtime system (_e_r_t_s).
+              The chapter _M_a_t_c_h _S_p_e_c_i_f_i_c_a_t_i_o_n _i_n _E_r_l_a_n_g explains the general
+              match specification "language".
+
+          NNoottee::
+              The _s_y_s_t_e_m _t_r_a_c_e_r for sequential tracing is automatically
+              initiated by _t_t_b when a trace port is started with
+              _t_t_b_:_t_r_a_c_e_r_/_0_/_1_/_2.
+
+
+              Example of how to use the _s_e_q___t_r_i_g_g_e_r___m_s_/_0_/_1 function:
+
+              (tiger@durin)5> ttb:tracer().
+              {ok,[tiger@durin]}
+              (tiger@durin)6> ttb:p(all,call).
+              {ok,{[all],[call]}}
+              (tiger@durin)7> ttb:tp(mod,func,ttb:seq_trigger_ms()).
+              {ok,[{matched,1},{saved,1}]}
+              (tiger@durin)8>
+
+              Whenever _m_o_d_:_f_u_n_c_(_._._._) is called after this, the seq_trace token
+              will be set on the executing process.
+
+       ssttoopp(())
+
+              Equivalent to _s_t_o_p_(_[_]_).
+
+       ssttoopp((OOppttss)) -->> ssttooppppeedd || {{ssttooppppeedd,, DDiirr}}
+
+              Types:
+
+                 Opts = Opt | [Opt]
+                 Opt = nofetch | {fetch_dir, Dir} | format | {format,
+                 FormatOpts} | return_fetch_dir
+                 Dir = string()
+                 FormatOpts = see format/2
+
+              Stops tracing on all nodes. Logs and trace information files are
+              sent to the trace control node and stored in a directory named
+              _t_t_b___u_p_l_o_a_d___F_i_l_e_N_a_m_e_-_T_i_m_e_s_t_a_m_p, where _F_i_l_e_n_a_m_e is the one
+              provided with _{_f_i_l_e_, _F_i_l_e_} during trace setup and _T_i_m_e_s_t_a_m_p is
+              of the form _y_y_y_y_m_m_d_d_-_h_h_m_m_s_s. Even logs from nodes on the same
+              machine as the trace control node are moved to this directory.
+              The history list is saved to a file named _t_t_b___l_a_s_t___c_o_n_f_i_g for
+              further reference (as it will be not longer accessible through
+              history and configuration management functions (like
+              _t_t_b_:_l_i_s_t___h_i_s_t_o_r_y_/_0).
+
+              The _n_o_f_e_t_c_h option indicates that trace logs shall not be
+              collected after tracing is stopped.
+
+              The _{_f_e_t_c_h_, _D_i_r_} option allows to specify the directory to fetch
+              the data to. If the directory already exists, an error is
+              thrown.
+
+              The _f_o_r_m_a_t option indicates that the trace logs shall be
+              formatted after tracing is stopped. All logs in the fetch
+              directory will be merged. You may use _{_f_o_r_m_a_t_, _F_o_r_m_a_t_O_p_t_s_} to
+              pass additional arguments to _f_o_r_m_a_t_/_2.
+
+              The _r_e_t_u_r_n___f_e_t_c_h___d_i_r option indicates that the return value
+              should be _{_s_t_o_p_p_e_d_, _D_i_r_} and not just _s_t_o_p_p_e_d. This implies
+              _f_e_t_c_h.
+
+       ggeett__eett__hhaannddlleerr(())
+
+              The _e_t handler returned by the function may be used with
+              _f_o_r_m_a_t_/_2 or _t_r_a_c_e_r_/_2. Example: _t_t_b_:_f_o_r_m_a_t_(_D_i_r_, _[_{_h_a_n_d_l_e_r_,
+              _t_t_b_:_g_e_t___e_t___h_a_n_d_l_e_r_(_)_}_]_).
+
+       ffoorrmmaatt((FFiillee))
+
+              Same as _f_o_r_m_a_t_(_F_i_l_e_,_[_]_).
+
+       ffoorrmmaatt((FFiillee,,OOppttiioonnss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 File = string() | [string()]
+                   This can be the name of a binary log, a list of such logs
+                   or the name of a directory containing one or more binary
+                   logs.
+                 Options = Opt | [Opt]
+                 Opt = {out,Out} | {handler,FormatHandler} | disable_sort
+                 Out = standard_io | string()
+                 FormatHandler = {Function, InitialState}
+                 Function = fun(Fd,Trace,TraceInfo,State) -> State
+                 Fd = standard_io | FileDescriptor
+                   This is the file descriptor of the destination file _O_u_t
+                 Trace = tuple()
+                   This is the trace message. Please turn to the Reference
+                   manual for the _e_r_l_a_n_gmodule for details.
+                 TraceInfo = [{Key,ValueList}]
+                   This includes the keys _f_l_a_g_s, _c_l_i_e_n_t and _n_o_d_e, and if
+                   _h_a_n_d_l_e_r is given as option to the tracer function, this is
+                   also included. In addition all information written with the
+                   _w_r_i_t_e___t_r_a_c_e___i_n_f_o_/_2function is included.
+
+              Reads the given binary trace log(s). The logs are processed in
+              the order of their timestamp as long as _d_i_s_a_b_l_e___s_o_r_t option is
+              not given.
+
+              If _F_o_r_m_a_t_H_a_n_d_l_e_r _= _{_F_u_n_c_t_i_o_n_,_I_n_i_t_i_a_l_S_t_a_t_e_}, _F_u_n_c_t_i_o_n will be
+              called for each trace message. If _F_o_r_m_a_t_H_a_n_d_l_e_r _=
+              _g_e_t___e_t___h_a_n_d_l_e_r_(_), _e_t___v_i_e_w_e_r in the _E_v_e_n_t _T_r_a_c_e_r application (_e_t)
+              is used for presenting the trace log graphically. _t_t_b provides a
+              few different filters which can be selected from the Filter menu
+              in the _e_t___v_i_e_w_e_r. If _F_o_r_m_a_t_H_a_n_d_l_e_r is not given, a default
+              handler is used which presents each trace message as a line of
+              text.
+
+              The state returned from each call of _F_u_n_c_t_i_o_n is passed to the
+              next call, even if next call is to format a message from another
+              log file.
+
+              If _O_u_t is given, _F_o_r_m_a_t_H_a_n_d_l_e_r gets the file descriptor to _O_u_t
+              as the first parameter.
+
+              _O_u_t is ignored if _e_t format handler is used.
+
+              Wrap logs can be formatted one by one or all in one go. To
+              format one of the wrap logs in a set, give the exact name of the
+              file. To format the whole set of wrap logs, give the name with
+              '*' instead of the wrap count. See examples in the _t_t_b User's
+              Guide.
+
+
+
+Ericsson AB                      observer 1.2                           ttb(3)

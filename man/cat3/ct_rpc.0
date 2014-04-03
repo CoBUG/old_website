@@ -1,0 +1,146 @@
+ct_rpc(3)                  Erlang Module Definition                  ct_rpc(3)
+
+
+
+NNAAMMEE
+       ct_rpc - Common Test specific layer on Erlang/OTP rpc.
+
+DDEESSCCRRIIPPTTIIOONN
+       Common Test specific layer on Erlang/OTP rpc.
+
+EEXXPPOORRTTSS
+       aapppp__nnooddee((AApppp,, CCaannddiiddaatteess)) -->> NNooddeeNNaammee
+
+              Types:
+
+                 App = atom()
+                 Candidates = [NodeName]
+                 NodeName = atom()
+
+              From a set of candidate nodes determines which of them is
+              running the application App. If none of the candidate nodes is
+              running the application the function will make the test case
+              calling this function fail. This function is the same as calling
+              _a_p_p___n_o_d_e_(_A_p_p_, _C_a_n_d_i_d_a_t_e_s_, _t_r_u_e_).
+
+       aapppp__nnooddee((AApppp,, CCaannddiiddaatteess,, FFaaiillOOnnBBaaddRRPPCC)) -->> NNooddeeNNaammee
+
+              Types:
+
+                 App = atom()
+                 Candidates = [NodeName]
+                 NodeName = atom()
+                 FailOnBadRPC = true | false
+
+              Same as _a_p_p___n_o_d_e_/_2 only the _F_a_i_l_O_n_B_a_d_R_P_C argument will determine
+              if the search for a candidate node should stop or not if _b_a_d_r_p_c
+              is received at some point.
+
+       aapppp__nnooddee((AApppp,, CCaannddiiddaatteess,, FFaaiillOOnnBBaaddRRPPCC,, CCooookkiiee)) -->> NNooddeeNNaammee
+
+              Types:
+
+                 App = atom()
+                 Candidates = [NodeName]
+                 NodeName = atom()
+                 FailOnBadRPC = true | false
+                 Cookie = atom()
+
+              Same as _a_p_p___n_o_d_e_/_2 only the _F_a_i_l_O_n_B_a_d_R_P_C argument will determine
+              if the search for a candidate node should stop or not if _b_a_d_r_p_c
+              is received at some point. The cookie on the client node will be
+              set to _C_o_o_k_i_e for this rpc operation (use to match the server
+              node cookie).
+
+       ccaallll((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> tteerrmm(()) || {{bbaaddrrppcc,, RReeaassoonn}}
+
+              Same as call(Node, Module, Function, Args, infinity)
+
+       ccaallll((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss,, TTiimmeeOOuutt)) -->> tteerrmm(()) || {{bbaaddrrppcc,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Node = NodeName | {Fun, FunArgs}
+                 Fun = function()
+                 FunArgs = term()
+                 NodeName = atom()
+                 Module = atom()
+                 Function = atom()
+                 Args = [term()]
+                 Reason = timeout | term()
+
+              Evaluates apply(Module, Function, Args) on the node Node.
+              Returns whatever Function returns or {badrpc, Reason} if the
+              remote procedure call fails. If Node is {Fun, FunArgs} applying
+              Fun to FunArgs should return a node name.
+
+       ccaallll((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss,, TTiimmeeOOuutt,, CCooookkiiee)) -->> tteerrmm(()) ||
+       {{bbaaddrrppcc,, RReeaassoonn}}
+
+              Types:
+
+                 Node = NodeName | {Fun, FunArgs}
+                 Fun = function()
+                 FunArgs = term()
+                 NodeName = atom()
+                 Module = atom()
+                 Function = atom()
+                 Args = [term()]
+                 Reason = timeout | term()
+                 Cookie = atom()
+
+              Evaluates apply(Module, Function, Args) on the node Node.
+              Returns whatever Function returns or {badrpc, Reason} if the
+              remote procedure call fails. If Node is {Fun, FunArgs} applying
+              Fun to FunArgs should return a node name. The cookie on the
+              client node will be set to _C_o_o_k_i_e for this rpc operation (use to
+              match the server node cookie).
+
+       ccaasstt((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> ookk
+
+              Types:
+
+                 Node = NodeName | {Fun, FunArgs}
+                 Fun = function()
+                 FunArgs = term()
+                 NodeName = atom()
+                 Module = atom()
+                 Function = atom()
+                 Args = [term()]
+                 Reason = timeout | term()
+
+              Evaluates apply(Module, Function, Args) on the node Node. No
+              response is delivered and the process which makes the call is
+              not suspended until the evaluation is compleated as in the case
+              of call/[3,4]. If Node is {Fun, FunArgs} applying Fun to FunArgs
+              should return a node name.
+
+       ccaasstt((NNooddee,, MMoodduullee,, FFuunnccttiioonn,, AArrggss,, CCooookkiiee)) -->> ookk
+
+              Types:
+
+                 Node = NodeName | {Fun, FunArgs}
+                 Fun = function()
+                 FunArgs = term()
+                 NodeName = atom()
+                 Module = atom()
+                 Function = atom()
+                 Args = [term()]
+                 Reason = timeout | term()
+                 Cookie = atom()
+
+              Evaluates apply(Module, Function, Args) on the node Node. No
+              response is delivered and the process which makes the call is
+              not suspended until the evaluation is compleated as in the case
+              of call/[3,4]. If Node is {Fun, FunArgs} applying Fun to FunArgs
+              should return a node name. The cookie on the client node will be
+              set to _C_o_o_k_i_e for this rpc operation (use to match the server
+              node cookie).
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                     ct_rpc(3)

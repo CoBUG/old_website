@@ -1,0 +1,61 @@
+CosNotifyChannelAdmin_ProxyPEurslhaCnognsMuomdCeuorls(eN3o)DteiffiynCihtainonnelAdmin_ProxyPushConsumer(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_ProxyPushConsumer - This module implements the
+       OMG  CosNotifyChannelAdmin::ProxyPushConsumer interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyyPPuubblliisshh
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+         * CCoossNNoottiiffyyCChhaannnneellAAddmmiinn__PPrrooxxyyCCoonnssuummeerr
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt__aannyy__ppuusshh__ssuupppplliieerr((PPrrooxxyyPPuusshhCCoonnssuummeerr,, PPuusshhSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 ProxyPushConsumer = #objref
+                 PushSupplier = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_AlreadyConnected'{}}
+
+              This operation connects a _P_u_s_h_S_u_p_p_l_i_e_r to the target object. If
+              a connection already exists the _A_l_r_e_a_d_y_C_o_n_n_e_c_t_e_d exception is
+              raised.
+
+       ppuusshh((PPrrooxxyyPPuusshhCCoonnssuummeerr,, EEvveenntt)) -->> RReeppllyy
+
+              Types:
+
+                 ProxyPushConsumer = #objref
+                 Event = #any
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_Disconnected'{}}
+
+              This operation pushes an _#_a_n_y_{_} event to the target object. If
+              no client have been connected the _D_i_s_c_o_n_n_e_c_t_e_d exception is
+              raised.
+
+       ddiissccoonnnneecctt__ppuusshh__ccoonnssuummeerr((PPrrooxxyyPPuusshhCCoonnssuummeerr)) -->> ookk
+
+              Types:
+
+                 ProxyPushConsumer = #objref
+
+              Invoking this operation will cause the target object to close
+              the connection and terminate.
+
+
+
+Ericsson AB                 cosNotifiCcoastNiootnif1y.C1h.a1n8nelAdmin_ProxyPushConsumer(3)

@@ -1,0 +1,734 @@
+wxListCtrl(3)              Erlang Module Definition              wxListCtrl(3)
+
+
+
+NNAAMMEE
+       wxListCtrl - See external documentation: wxListCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxListCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_i_s_t_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxLLiissttCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt::::wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww)))) -->> wwxxLLiissttCCttrrll(())
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt::::wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww)),, OOppttiioonnss::::[[OOppttiioonn]])) -->>
+       wwxxLLiissttCCttrrll(())
+
+              Types:
+
+                 Option = {winid, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()} | {validator, wx() (see module wx)} |
+                 {onGetItemText, OnGetItemText} | {onGetItemAttr,
+                 OnGetItemAttr} | {onGetItemColumnImage, OnGetItemColumnImage}
+                 OnGetItemText = (This, Item, Column) -> wxString()
+                 OnGetItemAttr = (This, Item) -> wxListItemAttr()
+                 OnGetItemColumnImage = (This, Item, Column) -> integer()
+
+              See external documentation.
+
+       aarrrraannggee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              Equivalent to aarrrraannggee((TThhiiss,, [[]])).
+
+       aarrrraannggee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Option = {flag, integer()}
+
+              See external documentation.
+
+       aassssiiggnnIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt,, WWhhiicchh)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 ImageList = wxImageList() (see module wxImageList)
+                 Which = integer()
+
+              See external documentation.
+
+       cclleeaarrAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss::::wwxxLLiissttCCttrrll(()),, PPaarreenntt::::wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww)))) -->>
+       bbooooll(())
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss::::wwxxLLiissttCCttrrll(()),, PPaarreenntt::::wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww)),,
+       OOppttiioonnss::::[[OOppttiioonn]])) -->> bbooooll(())
+
+              Types:
+
+                 Option = {winid, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()} | {validator, wx() (see module wx)} |
+                 {onGetItemText, OnGetItemText} | {onGetItemAttr,
+                 OnGetItemAttr} | {onGetItemColumnImage, OnGetItemColumnImage}
+                 OnGetItemText = (This, Item, Column) -> wxString()
+                 OnGetItemAttr = (This, Item) -> wxListItemAttr()
+                 OnGetItemColumnImage = (This, Item, Column) -> integer()
+
+              See external documentation.
+
+       ddeelleetteeAAllllIItteemmss((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ddeelleetteeCCoolluummnn((TThhiiss,, CCooll)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+
+              See external documentation.
+
+       ddeelleetteeIItteemm((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       eeddiittLLaabbeell((TThhiiss,, IItteemm)) -->> wwxxTTeexxttCCttrrll(()) ((sseeee mmoodduullee wwxxTTeexxttCCttrrll))
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       eennssuurreeVViissiibbllee((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ffiinnddIItteemm((TThhiiss,, SSttaarrtt,, SSttrr)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Start = integer()
+                 Str = chardata() (see module unicode)
+
+              Equivalent to ffiinnddIItteemm((TThhiiss,, SSttaarrtt,, SSttrr,, [[]])).
+
+       ffiinnddIItteemm((TThhiiss,, SSttaarrtt,, SSttrr,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Start = integer()
+                 Str = chardata() (see module unicode)
+                 Option = {partial, boolean()}
+
+              See external documentation.
+              Also:
+              findItem(This, Start, Pt, Direction) -> integer() when
+              This::wxListCtrl(), Start::integer(), Pt::{X::integer(),
+              Y::integer()}, Direction::integer().
+
+
+       ggeettCCoolluummnn((TThhiiss,, CCooll,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+                 Item = wxListItem() (see module wxListItem)
+
+              See external documentation.
+
+       ggeettCCoolluummnnCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettCCoolluummnnWWiiddtthh((TThhiiss,, CCooll)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettCCoouunnttPPeerrPPaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettEEddiittCCoonnttrrooll((TThhiiss)) -->> wwxxTTeexxttCCttrrll(()) ((sseeee mmoodduullee wwxxTTeexxttCCttrrll))
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettIImmaaggeeLLiisstt((TThhiiss,, WWhhiicchh)) -->> wwxxIImmaaggeeLLiisstt(()) ((sseeee mmoodduullee wwxxIImmaaggeeLLiisstt))
+
+              Types:
+
+                 This = wxListCtrl()
+                 Which = integer()
+
+              See external documentation.
+
+       ggeettIItteemm((TThhiiss,, IInnffoo)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Info = wxListItem() (see module wxListItem)
+
+              See external documentation.
+
+       ggeettIItteemmBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, IItteemm)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettIItteemmDDaattaa((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmFFoonntt((TThhiiss,, IItteemm)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmPPoossiittiioonn((TThhiiss,, IItteemm)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Pos::{X::integer(), Y::integer()}}
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmRReecctt((TThhiiss,, IItteemm)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Rect::{X::integer(), Y::integer(),
+                 W::integer(), H::integer()}}
+                 This = wxListCtrl()
+                 Item = integer()
+
+              Equivalent to ggeettIItteemmRReecctt((TThhiiss,, IItteemm,, [[]])).
+
+       ggeettIItteemmRReecctt((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Rect::{X::integer(), Y::integer(),
+                 W::integer(), H::integer()}}
+                 This = wxListCtrl()
+                 Item = integer()
+                 Option = {code, integer()}
+
+              See external documentation.
+
+       ggeettIItteemmSSppaacciinngg((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettIItteemmSSttaattee((TThhiiss,, IItteemm,, SSttaatteeMMaasskk)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 StateMask = integer()
+
+              See external documentation.
+
+       ggeettIItteemmTTeexxtt((TThhiiss,, IItteemm)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmTTeexxttCCoolloouurr((TThhiiss,, IItteemm)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettNNeexxttIItteemm((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              Equivalent to ggeettNNeexxttIItteemm((TThhiiss,, IItteemm,, [[]])).
+
+       ggeettNNeexxttIItteemm((TThhiiss,, IItteemm,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Option = {geometry, integer()} | {state, integer()}
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddIItteemmCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettTTooppIItteemm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       ggeettVViieewwRReecctt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxListCtrl()
+
+              See external documentation.
+
+       hhiittTTeesstt((TThhiiss,, PPooiinntt,, FFllaaggss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Point = {X::integer(), Y::integer()}
+                 Flags = integer()
+
+              See external documentation.
+
+       iinnsseerrttCCoolluummnn((TThhiiss,, CCooll,, HHeeaaddiinngg)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+                 Heading = chardata() (see module unicode)
+
+              See external documentation.
+              Also:
+              insertColumn(This, Col, Info) -> integer() when
+              This::wxListCtrl(), Col::integer(),
+              Info::wxListItem:wxListItem().
+
+
+       iinnsseerrttCCoolluummnn((TThhiiss,, CCooll,, HHeeaaddiinngg,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+                 Heading = chardata() (see module unicode)
+                 Option = {format, integer()} | {width, integer()}
+
+              See external documentation.
+
+       iinnsseerrttIItteemm((TThhiiss,, IInnffoo)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Info = wxListItem() (see module wxListItem)
+
+              See external documentation.
+
+       iinnsseerrttIItteemm((TThhiiss,, IInnddeexx,, IImmaaggeeIInnddeexx)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Index = integer()
+                 ImageIndex = integer()
+
+              See external documentation.
+              Also:
+              insertItem(This, Index, Label) -> integer() when
+              This::wxListCtrl(), Index::integer(), Label::unicode:chardata().
+
+
+       iinnsseerrttIItteemm((TThhiiss,, IInnddeexx,, LLaabbeell,, IImmaaggeeIInnddeexx)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Index = integer()
+                 Label = chardata() (see module unicode)
+                 ImageIndex = integer()
+
+              See external documentation.
+
+       rreeffrreesshhIItteemm((TThhiiss,, IItteemm)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+
+              See external documentation.
+
+       rreeffrreesshhIItteemmss((TThhiiss,, IItteemmFFrroomm,, IItteemmTToo)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 ItemFrom = integer()
+                 ItemTo = integer()
+
+              See external documentation.
+
+       ssccrroollllLLiisstt((TThhiiss,, DDxx,, DDyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Dx = integer()
+                 Dy = integer()
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Colour = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettCCoolluummnn((TThhiiss,, CCooll,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+                 Item = wxListItem() (see module wxListItem)
+
+              See external documentation.
+
+       sseettCCoolluummnnWWiiddtthh((TThhiiss,, CCooll,, WWiiddtthh)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = integer()
+                 Width = integer()
+
+              See external documentation.
+
+       sseettIImmaaggeeLLiisstt((TThhiiss,, IImmaaggeeLLiisstt,, WWhhiicchh)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 ImageList = wxImageList() (see module wxImageList)
+                 Which = integer()
+
+              See external documentation.
+
+       sseettIItteemm((TThhiiss,, IInnffoo)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Info = wxListItem() (see module wxListItem)
+
+              See external documentation.
+
+       sseettIItteemm((TThhiiss,, IInnddeexx,, CCooll,, LLaabbeell)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Index = integer()
+                 Col = integer()
+                 Label = chardata() (see module unicode)
+
+              Equivalent to sseettIItteemm((TThhiiss,, IInnddeexx,, CCooll,, LLaabbeell,, [[]])).
+
+       sseettIItteemm((TThhiiss,, IInnddeexx,, CCooll,, LLaabbeell,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Index = integer()
+                 Col = integer()
+                 Label = chardata() (see module unicode)
+                 Option = {imageId, integer()}
+
+              See external documentation.
+
+       sseettIItteemmBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, IItteemm,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettIItteemmCCoouunntt((TThhiiss,, CCoouunntt)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Count = integer()
+
+              See external documentation.
+
+       sseettIItteemmDDaattaa((TThhiiss,, IItteemm,, DDaattaa)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Data = integer()
+
+              See external documentation.
+
+       sseettIItteemmFFoonntt((TThhiiss,, IItteemm,, FF)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 F = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettIItteemmIImmaaggee((TThhiiss,, IItteemm,, IImmaaggee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Image = integer()
+
+              Equivalent to sseettIItteemmIImmaaggee((TThhiiss,, IItteemm,, IImmaaggee,, [[]])).
+
+       sseettIItteemmIImmaaggee((TThhiiss,, IItteemm,, IImmaaggee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Image = integer()
+                 Option = {selImage, integer()}
+
+              See external documentation.
+
+       sseettIItteemmCCoolluummnnIImmaaggee((TThhiiss,, IItteemm,, CCoolluummnn,, IImmaaggee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Column = integer()
+                 Image = integer()
+
+              See external documentation.
+
+       sseettIItteemmPPoossiittiioonn((TThhiiss,, IItteemm,, PPooss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       sseettIItteemmSSttaattee((TThhiiss,, IItteemm,, SSttaattee,, SSttaatteeMMaasskk)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 State = integer()
+                 StateMask = integer()
+
+              See external documentation.
+
+       sseettIItteemmTTeexxtt((TThhiiss,, IItteemm,, SSttrr)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Str = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettIItteemmTTeexxttCCoolloouurr((TThhiiss,, IItteemm,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Item = integer()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettSSiinngglleeSSttyyllee((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Style = integer()
+
+              Equivalent to sseettSSiinngglleeSSttyyllee((TThhiiss,, SSttyyllee,, [[]])).
+
+       sseettSSiinngglleeSSttyyllee((TThhiiss,, SSttyyllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Style = integer()
+                 Option = {add, boolean()}
+
+              See external documentation.
+
+       sseettTTeexxttCCoolloouurr((TThhiiss,, CCooll)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Col = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettWWiinnddoowwSSttyylleeFFllaagg((TThhiiss,, SSttyyllee)) -->> ookk
+
+              Types:
+
+                 This = wxListCtrl()
+                 Style = integer()
+
+              See external documentation.
+
+       ssoorrttIItteemmss((TThhiiss::::wwxxLLiissttCCttrrll(()),, SSoorrttCCaallllBBaacckk::::ffuunnccttiioonn(()))) -->> bboooolleeaann(())
+
+              Sort the items in the list control
+
+
+              SortCallBack(Item1,Item2) -> integer()
+
+              SortCallBack receives the client data associated with two items
+              to compare, and should return 0 if the items are equal, a
+              negative value if the first item is less than the second one and
+              a positive value if the first item is greater than the second
+              one.
+              NOTE: The callback may not call other (wx) processes.
+
+       ddeessttrrooyy((TThhiiss::::wwxxLLiissttCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxListCtrl(3)

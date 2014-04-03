@@ -1,0 +1,289 @@
+wxGridBagSizer(3)          Erlang Module Definition          wxGridBagSizer(3)
+
+
+
+NNAAMMEE
+       wxGridBagSizer - See external documentation: wxGridBagSizer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridBagSizer.
+
+       This class is derived (and can use functions) from:
+       wwxxFFlleexxGGrriiddSSiizzeerr
+       wwxxGGrriiddSSiizzeerr
+       wwxxSSiizzeerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_B_a_g_S_i_z_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxGGrriiddBBaaggSSiizzeerr(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGrriiddBBaaggSSiizzeerr(())
+
+              Types:
+
+                 Option = {vgap, integer()} | {hgap, integer()}
+
+              See external documentation.
+
+       aadddd((TThhiiss,, IItteemm)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Item = wxSizerItem() (see module wxSizerItem) |
+                 wxGBSizerItem() (see module wxGBSizerItem)
+
+              See external documentation.
+
+       aadddd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              add(This, Window, Pos) -> wxSizerItem:wxSizerItem() when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer(), Pos::{R::integer(), C::integer()};
+              (This, Window, [Option]) -> wxSizerItem:wxSizerItem() when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer(),
+              Option :: {proportion, integer()}
+              | {flag, integer()}
+              | {border, integer()}
+              | {userData, wx:wx_object()}.
+
+
+       aadddd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, PPooss)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Width = integer()
+                 Height = integer()
+                 Pos = {R::integer(), C::integer()}
+
+              See external documentation.
+              Also:
+              add(This, Width, Height, [Option]) -> wxSizerItem:wxSizerItem()
+              when
+              This::wxGridBagSizer(), Width::integer(), Height::integer(),
+              Option :: {proportion, integer()}
+              | {flag, integer()}
+              | {border, integer()}
+              | {userData, wx:wx_object()};
+              (This, Window, Pos, [Option]) -> wxSizerItem:wxSizerItem() when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer(), Pos::{R::integer(), C::integer()},
+              Option :: {span, {RS::integer(), CS::integer()}}
+              | {flag, integer()}
+              | {border, integer()}
+              | {userData, wx:wx_object()}.
+
+
+       aadddd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, PPooss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee
+       mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Width = integer()
+                 Height = integer()
+                 Pos = {R::integer(), C::integer()}
+                 Option = {span, {RS::integer(), CS::integer()}} | {flag,
+                 integer()} | {border, integer()} | {userData, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ccaallccMMiinn((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridBagSizer()
+
+              See external documentation.
+
+       cchheecckkFFoorrIInntteerrsseeccttiioonn((TThhiiss,, IItteemm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Item = wxGBSizerItem() (see module wxGBSizerItem)
+
+              Equivalent to cchheecckkFFoorrIInntteerrsseeccttiioonn((TThhiiss,, IItteemm,, [[]])).
+
+       cchheecckkFFoorrIInntteerrsseeccttiioonn((TThhiiss,, PPooss,, SSppaann)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Pos = {R::integer(), C::integer()}
+                 Span = {RS::integer(), CS::integer()}
+
+              See external documentation.
+              Also:
+              checkForIntersection(This, Item, [Option]) -> boolean() when
+              This::wxGridBagSizer(), Item::wxGBSizerItem:wxGBSizerItem(),
+              Option :: {excludeItem, wxGBSizerItem:wxGBSizerItem()}.
+
+
+       cchheecckkFFoorrIInntteerrsseeccttiioonn((TThhiiss,, PPooss,, SSppaann,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Pos = {R::integer(), C::integer()}
+                 Span = {RS::integer(), CS::integer()}
+                 Option = {excludeItem, wxGBSizerItem() (see module
+                 wxGBSizerItem)}
+
+              See external documentation.
+
+       ffiinnddIItteemm((TThhiiss,, WWiinnddooww)) -->> wwxxGGBBSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxGGBBSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Window = wxWindow() (see module wxWindow) | wxSizer() (see
+                 module wxSizer)
+
+              See external documentation.
+
+       ffiinnddIItteemmAAttPPooiinntt((TThhiiss,, PPtt)) -->> wwxxGGBBSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxGGBBSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ffiinnddIItteemmAAttPPoossiittiioonn((TThhiiss,, PPooss)) -->> wwxxGGBBSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxGGBBSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Pos = {R::integer(), C::integer()}
+
+              See external documentation.
+
+       ffiinnddIItteemmWWiitthhDDaattaa((TThhiiss,, UUsseerrDDaattaa)) -->> wwxxGGBBSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxGGBBSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 UserData = wx_object() (see module wx)
+
+              See external documentation.
+
+       ggeettCCeellllSSiizzee((TThhiiss,, RRooww,, CCooll)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettEEmmppttyyCCeellllSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridBagSizer()
+
+              See external documentation.
+
+       ggeettIItteemmPPoossiittiioonn((TThhiiss,, IInnddeexx)) -->> {{RR::::iinntteeggeerr(()),, CC::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Index = integer()
+
+              See external documentation.
+              Also:
+              getItemPosition(This, Window) -> {R::integer(), C::integer()}
+              when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer().
+
+
+       ggeettIItteemmSSppaann((TThhiiss,, IInnddeexx)) -->> {{RRSS::::iinntteeggeerr(()),, CCSS::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Index = integer()
+
+              See external documentation.
+              Also:
+              getItemSpan(This, Window) -> {RS::integer(), CS::integer()} when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer().
+
+
+       sseettEEmmppttyyCCeellllSSiizzee((TThhiiss,, SSzz)) -->> ookk
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Sz = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettIItteemmPPoossiittiioonn((TThhiiss,, IInnddeexx,, PPooss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Index = integer()
+                 Pos = {R::integer(), C::integer()}
+
+              See external documentation.
+              Also:
+              setItemPosition(This, Window, Pos) -> boolean() when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer(), Pos::{R::integer(), C::integer()}.
+
+
+       sseettIItteemmSSppaann((TThhiiss,, IInnddeexx,, SSppaann)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridBagSizer()
+                 Index = integer()
+                 Span = {RS::integer(), CS::integer()}
+
+              See external documentation.
+              Also:
+              setItemSpan(This, Window, Span) -> boolean() when
+              This::wxGridBagSizer(), Window::wxWindow:wxWindow() |
+              wxSizer:wxSizer(), Span::{RS::integer(), CS::integer()}.
+
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGrriiddBBaaggSSiizzeerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxGridBagSizer(3)

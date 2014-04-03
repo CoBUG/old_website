@@ -1,0 +1,200 @@
+snmpm_user(3)              Erlang Module Definition              snmpm_user(3)
+
+
+
+NNAAMMEE
+       snmpm_user - Behaviour module for the SNMP manager user.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the manager user. A _s_n_m_p_m___u_s_e_r
+       compliant module must export the following functions:
+
+         * handle_error/3
+
+         * handle_agent/4
+
+         * handle_pdu/4
+
+         * handle_trap/3
+
+         * handle_inform/3
+
+         * handle_report/3
+
+       The semantics of them and their exact signatures are explained below.
+
+       Note that if an agent is registered using the old, no longer
+       documented, functions (using Addr and Port), the old variant of the
+       callback functions, handle_pdu, handle_trap, handle_inform and
+       handle_report, will be called.
+
+EEXXPPOORRTTSS
+       hhaannddllee__eerrrroorr((RReeqqIIdd,, RReeaassoonn,, UUsseerrDDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 ReqId = integer()
+                 Reason = {unexpected_pdu, SnmpInfo} | {invalid_sec_info,
+                 SecInfo, SnmpInfo} | {empty_message, Addr, Port} | term()
+                 Addr = ip_address()
+                 Port = integer()
+                 UserData = term()
+                 Reply = ignore
+
+              This function is called when the manager needs to communicate an
+              "asynchronous" error, to the user: e.g. failure to send an
+              asynchronous message (i.e. encoding error), a received message
+              was discarded due to security error, the manager failed to
+              generate a response message to a received inform-request, or
+              when receiving an unexpected PDU from an agent (could be an
+              expired async request).
+
+              If _R_e_q_I_d is less then 0, it means that this information was not
+              available to the manager (that info was never retrieved before
+              the message was discarded).
+
+              For _S_n_m_p_I_n_f_o see handle_agent below.
+
+       hhaannddllee__aaggeenntt((AAddddrr,, PPoorrtt,, TTyyppee,, SSnnmmppIInnffoo,, UUsseerrDDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 Addr = ip_address()
+                 Port = integer()
+                 Type = pdu | trap | report | inform
+                 SnmpInfo = SnmpPduInfo | SnmpTrapInfo | SnmpReportInfo |
+                 SnmpInformInfo
+                 ErrorStatus = atom()
+                 ErrorIndex = integer()
+                 Varbinds = [varbind()]
+                 varbind() = #varbind
+                 UserData = term()
+                 Reply = ignore | {register, UserId, TargetName, agent_info()}
+                 UserId = term()
+                 TargetName = target_name()
+                 agent_info() = [{agent_info_item(), agent_info_value()}]
+
+              This function is called when a message is received from an
+              unknown agent.
+
+              Note that this will always be the default user that is called.
+
+              For more info about the _a_g_e_n_t___i_n_f_o_(_), see rreeggiisstteerr__aaggeenntt.
+
+              The arguments _T_y_p_e and _S_n_m_p_I_n_f_o relates in the following way:
+
+                * _p_d_u - _S_n_m_p_P_d_u_I_n_f_o (see hhaannddllee__ppdduu for more info).
+
+                * _t_r_a_p - _S_n_m_p_T_r_a_p_I_n_f_o (see hhaannddllee__ttrraapp for more info).
+
+                * _r_e_p_o_r_t - _S_n_m_p_R_e_p_o_r_t_I_n_f_o (see hhaannddllee__rreeppoorrtt for more info).
+
+                * _i_n_f_o_r_m - _S_n_m_p_I_n_f_o_r_m_I_n_f_o (see hhaannddllee__iinnffoorrmm for more info).
+
+              The only user which would return _{_r_e_g_i_s_t_e_r_, _U_s_e_r_I_d_, _T_a_r_g_e_t_N_a_m_e_,
+              _a_g_e_n_t___i_n_f_o_(_)_} is the _d_e_f_a_u_l_t _u_s_e_r.
+
+       hhaannddllee__ppdduu((TTaarrggeettNNaammee,, RReeqqIIdd,, SSnnmmppPPdduuIInnffoo,, UUsseerrDDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 TargetName = target_name()
+                 ReqId = term()
+                 SnmpPduInfo = {ErrorStatus, ErrorIndex, Varbinds}
+                 ErrorStatus = atom()
+                 ErrorIndex = integer()
+                 Varbinds = [varbind()]
+                 varbind() = #varbind
+                 UserData = term()
+                 Reply = ignore
+
+              Handle the reply to an asynchronous request, such as aassyynncc__ggeett,
+              aassyynncc__ggeett__nneexxtt or aassyynncc__sseett.
+
+              It could also be a late reply to a synchronous request.
+
+              _R_e_q_I_d is returned by the asynchronous request function.
+
+       hhaannddllee__ttrraapp((TTaarrggeettNNaammee,, SSnnmmppTTrraappIInnffoo,, UUsseerrDDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 TargetName = TargetName2 = target_name()
+                 SnmpTrapInfo = {Enteprise, Generic, Spec, Timestamp,
+                 Varbinds} | {ErrorStatus, ErrorIndex, Varbinds}
+                 Enterprise = oid()
+                 Generic = integer()
+                 Spec = integer()
+                 Timestamp = integer()
+                 ErrorStatus = atom()
+                 ErrorIndex = integer()
+                 Varbinds = [varbind()]
+                 varbind() = #varbind
+                 UserData = term()
+                 Reply = ignore | unregister | {register, UserId, TargetName2,
+                 agent_info()}
+                 UserId = term()
+                 agent_info() = [{agent_info_item(), agent_info_value()}]
+
+              Handle a trap/notification message from an agent.
+
+              For more info about the _a_g_e_n_t___i_n_f_o_(_), see rreeggiisstteerr__aaggeenntt
+
+              The only user which would return _{_r_e_g_i_s_t_e_r_, _U_s_e_r_I_d_, _T_a_r_g_e_t_N_a_m_e_2_,
+              _a_g_e_n_t___i_n_f_o_(_)_} is the _d_e_f_a_u_l_t _u_s_e_r.
+
+       hhaannddllee__iinnffoorrmm((TTaarrggeettNNaammee,, SSnnmmppIInnffoorrmmIInnffoo,, UUsseerrDDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 TargetName = TargetName2 = target_name()
+                 SnmpInformInfo = {ErrorStatus, ErrorIndex, Varbinds}
+                 ErrorStatus = atom()
+                 ErrorIndex = integer()
+                 Varbinds = [varbind()]
+                 varbind() = #varbind
+                 UserData = term()
+                 Reply = ignore | unregister | {register, UserId, TargetName2,
+                 agent_info()}
+                 UserId = term()
+                 agent_info() = [{agent_info_item(), agent_info_value()}]
+
+              Handle a inform message.
+
+              For more info about the _a_g_e_n_t___i_n_f_o_(_), see rreeggiisstteerr__aaggeenntt
+
+              The only user which would return _{_r_e_g_i_s_t_e_r_, _U_s_e_r_I_d_, _T_a_r_g_e_t_N_a_m_e_2_,
+              _a_g_e_n_t___i_n_f_o_(_)_} is the _d_e_f_a_u_l_t _u_s_e_r.
+
+              If the iinnffoorrmm rreeqquueesstt bbeehhaavviioouurr configuration option is set to
+              _u_s_e_r or _{_u_s_e_r_, _i_n_t_e_g_e_r_(_)_}, the response (acknowledgment) to this
+              inform-request will be sent when this function returns.
+
+       hhaannddllee__rreeppoorrtt((TTaarrggeettNNaammee,, SSnnmmppRReeppoorrttIInnffoo,, UUsseerrDDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 TargetName = TargetName2 = target_name()
+                 Addr = ip_address()
+                 Port = integer()
+                 SnmpReportInfo = {ErrorStatus, ErrorIndex, Varbinds}
+                 ErrorStatus = atom()
+                 ErrorIndex = integer()
+                 Varbinds = [varbind()]
+                 varbind() = #varbind
+                 UserData = term()
+                 Reply = ignore | unregister | {register, UserId, TargetName2,
+                 agent_info()}
+                 UserId = term()
+                 agent_info() = [{agent_info_item(), agent_info_value()}]
+
+              Handle a report message.
+
+              For more info about the _a_g_e_n_t___i_n_f_o_(_), see rreeggiisstteerr__aaggeenntt
+
+              The only user which would return _{_r_e_g_i_s_t_e_r_, _U_s_e_r_I_d_, _T_a_r_g_e_t_N_a_m_e_2_,
+              _a_g_e_n_t___i_n_f_o_(_)_} is the _d_e_f_a_u_l_t _u_s_e_r.
+
+
+
+Ericsson AB                       snmp 4.22.1                    snmpm_user(3)

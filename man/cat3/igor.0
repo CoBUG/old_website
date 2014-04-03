@@ -1,0 +1,571 @@
+igor(3)                    Erlang Module Definition                    igor(3)
+
+
+
+NNAAMMEE
+       igor - Igor: the Module Merger and Renamer.
+
+DDEESSCCRRIIPPTTIIOONN
+       Igor: the Module Merger and Renamer.
+
+       The program Igor merges the source code of one or more Erlang modules
+       into a single module, which can then replace the original set of
+       modules. Igor is also able to rename a set of (possibly interdependent)
+       modules, without joining them into a single module.
+
+       The main user interface consists of the functions mmeerrggee//33 and rreennaammee//33.
+       See also the function ppaarrssee__ttrraannssffoorrmm//22.
+
+       A note of warning: Igor cannot do anything about the case when the name
+       of a remote function is passed to the built-in functions _a_p_p_l_y and
+       _s_p_a_w_n _u_n_l_e_s_s the module and function names are explicitly stated in the
+       call, as in e.g. _a_p_p_l_y_(_l_i_s_t_s_, _r_e_v_e_r_s_e_, _[_X_s_]_). In all other cases, Igor
+       leaves such calls unchanged, and warns the user that manual editing
+       might be necessary.
+
+       Also note that Erlang records will be renamed as necessary to avoid
+       non-equivalent definitions using the same record name. This does not
+       work if the source code accesses the name field of such record tuples
+       by _e_l_e_m_e_n_t_/_2 or similar methods. Always use the record syntax to handle
+       record tuples, if possible.
+
+       Disclaimer: the author of this program takes no responsibility for the
+       correctness of the produced output, or for any effects of its
+       execution. In particular, the author may not be held responsible should
+       Igor include the code of a deceased madman in the result.
+
+       For further information on Igors in general, see e.g. "Young
+       Frankenstein", Mel Brooks, 1974, and "The Fifth Elephant", Terry
+       Pratchett, 1999.
+
+DDAATTAA TTYYPPEESS
+         _s_t_u_b_D_e_s_c_r_i_p_t_o_r_(_) _= _{_M_o_d_u_l_e_N_a_m_e_, _F_u_n_c_t_i_o_n_s_, _[_A_t_t_r_i_b_u_t_e_]_}:
+
+
+           * _M_o_d_u_l_e_N_a_m_e _= _a_t_o_m_(_)
+
+           * _F_u_n_c_t_i_o_n_s _= _[_{_F_u_n_c_t_i_o_n_N_a_m_e_, _{_M_o_d_u_l_e_N_a_m_e_, _F_u_n_c_t_i_o_n_N_a_m_e_}_}_]
+
+           * _F_u_n_c_t_i_o_n_N_a_m_e _= _{_a_t_o_m_(_)_, _i_n_t_e_g_e_r_(_)_}
+
+           * _A_t_t_r_i_b_u_t_e _= _{_a_t_o_m_(_)_, _t_e_r_m_(_)_}
+
+           A stub module descriptor contains the module name, a list of
+           exported functions, and a list of module attributes. Each function
+           is described by its name (which includes its arity), and the
+           corresponding module and function that it calls. (The arities
+           should always match.) The attributes are simply described by key-
+           value pairs.
+
+EEXXPPOORRTTSS
+       ccrreeaattee__ssttuubbss((SSttuubbss::::[[ssttuubbDDeessccrriippttoorr(())]],, OOppttiioonnss::::[[tteerrmm(())]])) -->>
+       [[ssttrriinngg(())]]
+
+              Creates stub module source files corresponding to the given stub
+              descriptors. The returned value is the list of names of the
+              created files. See _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for more information about
+              stub descriptors.
+
+              Options:
+
+                _{_b_a_c_k_u_p___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+
+
+                _{_b_a_c_k_u_p_s_, _b_o_o_l_e_a_n_(_)_}:
+
+
+                _{_p_r_i_n_t_e_r_, _F_u_n_c_t_i_o_n_}:
+
+
+                _{_s_t_u_b___d_i_r_, _f_i_l_e_n_a_m_e_(_)_}:
+
+
+                _{_s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+
+
+                _{_v_e_r_b_o_s_e_, _b_o_o_l_e_a_n_(_)_}:
+
+
+              See _m_e_r_g_e_/_3 for details on these options.
+
+              _S_e_e _a_l_s_o_: mmeerrggee//33, mmeerrggee__ssoouurrcceess//33.
+
+       mmeerrggee((NNaammee::::aattoomm(()),, FFiilleess::::[[ffiilleennaammee(())]])) -->> [[ffiilleennaammee(())]]
+
+              Equivalent to mmeerrggee((NNaammee,, FFiilleess,, [[]])).
+
+       mmeerrggee((NNaammee::::aattoomm(()),, FFiilleess::::[[ffiilleennaammee(())]],, OOppttiioonnss::::[[tteerrmm(())]])) -->>
+       [[ffiilleennaammee(())]]
+
+              Types:
+
+                 filename() (see module file)
+
+              Merges source code files to a single file. _N_a_m_e specifies the
+              name of the resulting module - not the name of the output file.
+              _F_i_l_e_s is a list of file names and/or module names of source
+              modules to be read and merged (see _m_e_r_g_e___f_i_l_e_s_/_4 for details).
+              All the input modules must be distinctly named.
+
+              The resulting source code is written to a file named
+              "_<_e_m_>_N_a_m_e_<_/_e_m_>_._e_r_l" in the current directory, unless otherwise
+              specified by the options _d_i_r and _o_u_t_f_i_l_e described below.
+
+              Examples:
+
+                * given a module _m in file "_m_._e_r_l" which uses the standard
+                  library module _l_i_s_t_s, calling _i_g_o_r_:_m_e_r_g_e_(_m_, _[_m_, _l_i_s_t_s_]_) will
+                  create a new file "_m_._e_r_l which contains the code from _m and
+                  exports the same functions, and which includes the
+                  referenced code from the _l_i_s_t_s module. The original file
+                  will be renamed to "_m_._e_r_l_._b_a_k".
+
+                * given modules _m_1 and _m_2, in corresponding files, calling
+                  _i_g_o_r_:_m_e_r_g_e_(_m_, _[_m_1_, _m_2_]_) will create a file "_m_._e_r_l" which
+                  contains the code from _m_1 and _m_2 and exports the functions
+                  of _m_1.
+
+              Stub module files are created for those modules that are to be
+              exported by the target module (see options _e_x_p_o_r_t, _s_t_u_b_s and
+              _s_t_u_b___d_i_r).
+
+              The function returns the list of file names of all created
+              modules, including any automatically created stub modules. The
+              file name of the target module is always first in the list.
+
+              Note: If you get a "syntax error" message when trying to merge
+              files (and you know those files to be correct), then try the
+              _p_r_e_p_r_o_c_e_s_s option. It typically means that your code contains
+              too strange macros to be handled without actually performing the
+              preprocessor expansions.
+
+              Options:
+
+                _{_b_a_c_k_u_p___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the file name suffix to be used when a backup file
+                  is created; the default value is _"_._b_a_k_".
+
+                _{_b_a_c_k_u_p_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, existing files will be renamed before
+                  new files are opened for writing. The new names are formed
+                  by appending the string given by the _b_a_c_k_u_p___s_u_f_f_i_x option to
+                  the original name. The default value is _t_r_u_e.
+
+                _{_d_i_r_, _f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the name of the directory in which the output file
+                  is to be written. An empty string is interpreted as the
+                  current directory. By default, the current directory is
+                  used.
+
+                _{_o_u_t_f_i_l_e_, _f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the name of the file (without suffix) to which the
+                  resulting source code is to be written. By default, this is
+                  the same as the _N_a_m_e argument.
+
+                _{_p_r_e_p_r_o_c_e_s_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, preprocessing will be done when
+                  reading the source code. See _m_e_r_g_e___f_i_l_e_s_/_4 for details.
+
+                _{_p_r_i_n_t_e_r_, _F_u_n_c_t_i_o_n_}:
+
+
+                  * _F_u_n_c_t_i_o_n _= _(_s_y_n_t_a_x_T_r_e_e_(_)_) _-_> _s_t_r_i_n_g_(_)
+
+                  Specifies a function for prettyprinting Erlang syntax trees.
+                  This is used for outputting the resulting module definition,
+                  as well as for creating stub files. The function is assumed
+                  to return formatted text for the given syntax tree, and
+                  should raise an exception if an error occurs. The default
+                  formatting function calls _e_r_l___p_r_e_t_t_y_p_r_:_f_o_r_m_a_t_/_2.
+
+                _{_s_t_u_b___d_i_r_, _f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the name of the directory to which any generated
+                  stub module files are written. The default value is _"_s_t_u_b_s_".
+
+                _{_s_t_u_b_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, stub module files will be
+                  automatically generated for all exported modules that do not
+                  have the same name as the target module. The default value
+                  is _t_r_u_e.
+
+                _{_s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the suffix to be used for the output file names;
+                  the default value is _"_._e_r_l_".
+
+              See _m_e_r_g_e___f_i_l_e_s_/_4 for further options.
+
+              _S_e_e _a_l_s_o_: mmeerrggee//22, mmeerrggee__ffiilleess//44.
+
+       mmeerrggee__ffiilleess((NNaammee::::aattoomm(()),, FFiilleess::::[[ffiilleennaammee(())]],, OOppttiioonnss::::[[tteerrmm(())]])) -->>
+       {{ssyynnttaaxxTTrreeee(()),, [[ssttuubbDDeessccrriippttoorr(())]]}}
+
+              Equivalent to mmeerrggee__ffiilleess((NNaammee,, [[]],, FFiilleess,, OOppttiioonnss)).
+
+       mmeerrggee__ffiilleess((NNaammee::::aattoomm(()),, SSoouurrcceess::::[[FFoorrmmss]],, FFiilleess::::[[ffiilleennaammee(())]],,
+       OOppttiioonnss::::[[tteerrmm(())]])) -->> {{ssyynnttaaxxTTrreeee(()),, [[ssttuubbDDeessccrriippttoorr(())]]}}
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+
+              Merges source code files and syntax trees to a single syntax
+              tree. This is a file-reading front end to _m_e_r_g_e___s_o_u_r_c_e_s_/_3. _N_a_m_e
+              specifies the name of the resulting module - not the name of the
+              output file. _S_o_u_r_c_e_s is a list of syntax trees and/or lists of
+              "source code form" syntax trees, each entry representing a
+              module definition. _F_i_l_e_s is a list of file names and/or module
+              names of source modules to be read and included. All the input
+              modules must be distinctly named.
+
+              If a name in _F_i_l_e_s is not the name of an existing file, Igor
+              assumes it represents a module name, and tries to locate and
+              read the corresponding source file. The parsed files are
+              appended to _S_o_u_r_c_e_s and passed on to _m_e_r_g_e___s_o_u_r_c_e_s_/_3, i.e.,
+              entries in _S_o_u_r_c_e_s are listed before entries read from files.
+
+              If no exports are listed by an _e_x_p_o_r_t option (see
+              _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for details), then if _N_a_m_e is also the name of
+              one of the input modules, that module will be exported;
+              otherwise, the first listed module will be exported. Cf. the
+              examples under _m_e_r_g_e_/_3.
+
+              The result is a pair _{_T_r_e_e_, _S_t_u_b_s_}, where _T_r_e_e represents the
+              source code that is the result of merging all the code in
+              _S_o_u_r_c_e_s and _F_i_l_e_s, and _S_t_u_b_s is a list of stub module
+              descriptors (see _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for details).
+
+              Options:
+
+                _{_c_o_m_m_e_n_t_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, source code comments in the original
+                  files will be preserved in the output. The default value is
+                  _t_r_u_e.
+
+                _{_f_i_n_d___s_r_c___r_u_l_e_s_, _[_{_s_t_r_i_n_g_(_)_, _s_t_r_i_n_g_(_)_}_]_}:
+                  Specifies a list of rules for associating object files with
+                  source files, to be passed to the function
+                  _f_i_l_e_n_a_m_e_:_f_i_n_d___s_r_c_/_2. This can be used to change the way Igor
+                  looks for source files. If this option is not specified, the
+                  default system rules are used. The first occurrence of this
+                  option completely overrides any later in the option list.
+
+                _{_i_n_c_l_u_d_e_s_, _[_f_i_l_e_n_a_m_e_(_)_]_}:
+                  Specifies a list of directory names for the Erlang
+                  preprocessor, if used, to search for include files (cf. the
+                  _p_r_e_p_r_o_c_e_s_s option). The default value is the empty list. The
+                  directory of the source file and the current directory are
+                  automatically appended to the list.
+
+                _{_m_a_c_r_o_s_, _[_{_a_t_o_m_(_)_, _t_e_r_m_(_)_}_]_}:
+                  Specifies a list of "pre-defined" macro definitions for the
+                  Erlang preprocessor, if used (cf. the _p_r_e_p_r_o_c_e_s_s option).
+                  The default value is the empty list.
+
+                _{_p_r_e_p_r_o_c_e_s_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _f_a_l_s_e, Igor will read source files without
+                  passing them through the Erlang preprocessor (_e_p_p), in order
+                  to avoid expansion of preprocessor directives such as
+                  _-_i_n_c_l_u_d_e_(_._._._)_., _-_d_e_f_i_n_e_(_._._._)_. and _-_i_f_d_e_f_(_._._._), and macro
+                  calls such as _?_L_I_N_E and _?_M_Y___M_A_C_R_O_(_x_, _y_). The default value
+                  is _f_a_l_s_e, i.e., preprocessing is not done. (See the module
+                  _e_p_p___d_o_d_g_e_r for details.)
+
+                  Notes: If a file contains too exotic definitions or uses of
+                  macros, it will not be possible to read it without
+                  preprocessing. Furthermore, Igor does not currently try to
+                  sort out multiple inclusions of the same file, or
+                  redefinitions of the same macro name. Therefore, when
+                  preprocessing is turned off, it may become necessary to edit
+                  the resulting source code, removing such re-inclusions and
+                  redefinitions.
+
+              See _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for further options.
+
+              _S_e_e _a_l_s_o_: eepppp__ddooddggeerr, ffiilleennaammee::ffiinndd__ssrrcc//22, mmeerrggee//33,
+              mmeerrggee__ffiilleess//33, mmeerrggee__ssoouurrcceess//33.
+
+       mmeerrggee__ssoouurrcceess((NNaammee::::aattoomm(()),, SSoouurrcceess::::[[FFoorrmmss]],, OOppttiioonnss::::[[tteerrmm(())]])) -->>
+       {{ssyynnttaaxxTTrreeee(()),, [[ssttuubbDDeessccrriippttoorr(())]]}}
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+
+              Merges syntax trees to a single syntax tree. This is the main
+              code merging "engine". _N_a_m_e specifies the name of the resulting
+              module. _S_o_u_r_c_e_s is a list of syntax trees of type _f_o_r_m___l_i_s_t
+              and/or lists of "source code form" syntax trees, each entry
+              representing a module definition. All the input modules must be
+              distinctly named.
+
+              Unless otherwise specified by the options, all modules are
+              assumed to be at least "static", and all except the target
+              module are assumed to be "safe". See the _s_t_a_t_i_c and _s_a_f_e options
+              for details.
+
+              If _N_a_m_e is also the name of one of the input modules, the code
+              from that module will occur at the top of the resulting code,
+              and no extra "header" comments will be added. In other words,
+              the look of that module will be preserved.
+
+              The result is a pair _{_T_r_e_e_, _S_t_u_b_s_}, where _T_r_e_e represents the
+              source code that is the result of merging all the code in
+              _S_o_u_r_c_e_s, and _S_t_u_b_s is a list of stub module descriptors (see
+              below).
+
+              _S_t_u_b_s contains one entry for each exported input module (cf. the
+              _e_x_p_o_r_t option), each entry describing a stub module that
+              redirects calls of functions in the original module to the
+              corresponding (possibly renamed) functions in the new module.
+              The stub descriptors can be used to automatically generate stub
+              modules; see _c_r_e_a_t_e___s_t_u_b_s_/_2.
+
+              Options:
+
+                _{_e_x_p_o_r_t_, _[_a_t_o_m_(_)_]_}:
+                  Specifies a list of names of input modules whose interfaces
+                  should be exported by the output module. A stub descriptor
+                  is generated for each specified module, unless its name is
+                  _N_a_m_e. If no modules are specified, then if _N_a_m_e is also the
+                  name of an input module, that module will be exported;
+                  otherwise the first listed module in _S_o_u_r_c_e_s will be
+                  exported. The default value is the empty list.
+
+                _{_e_x_p_o_r_t___a_l_l_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, this is equivalent to listing all of
+                  the input modules in the _e_x_p_o_r_t option. The default value is
+                  _f_a_l_s_e.
+
+                _{_f_i_l_e___a_t_t_r_i_b_u_t_e_s_, _P_r_e_s_e_r_v_e_}:
+
+
+                  * _P_r_e_s_e_r_v_e _= _y_e_s _| _c_o_m_m_e_n_t _| _n_o
+
+                  If the value is _y_e_s, all file attributes _-_f_i_l_e_(_._._._) in the
+                  input sources will be preserved in the resulting code. If
+                  the value is _c_o_m_m_e_n_t, they will be turned into comments, but
+                  remain in their original positions in the code relative to
+                  the other source code forms. If the value is _n_o, all file
+                  attributes will be removed from the code, unless they have
+                  attached comments, in which case they will be handled as in
+                  the _c_o_m_m_e_n_t case. The default value is _n_o.
+
+                _{_n_o___b_a_n_n_e_r_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, no banner comment will be added at the
+                  top of the resulting module, even if the target module does
+                  not have the same name as any of the input modules. Instead,
+                  Igor will try to preserve the look of the module whose code
+                  is at the top of the output. The default value is _f_a_l_s_e.
+
+                _{_n_o___h_e_a_d_e_r_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, no header comments will be added to
+                  the resulting module at the beginning of each section of
+                  code that originates from a particular input module. The
+                  default value is _f_a_l_s_e, which means that section headers are
+                  normally added whenever more than two or more modules are
+                  merged.
+
+                _{_n_o___i_m_p_o_r_t_s_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, all _-_i_m_p_o_r_t_(_._._._) declarations in the
+                  original code will be expanded in the result; otherwise, as
+                  much as possible of the original import declarations will be
+                  preserved. The default value is _f_a_l_s_e.
+
+                _{_n_o_t_e_s_, _N_o_t_e_s_}:
+
+
+                  * _N_o_t_e_s _= _a_l_w_a_y_s _| _y_e_s _| _n_o
+
+                  If the value is _y_e_s, comments will be inserted where
+                  important changes have been made in the code. If the value
+                  is _a_l_w_a_y_s, _a_l_l changes to the code will be commented. If the
+                  value is _n_o, changes will be made without comments. The
+                  default value is _y_e_s.
+
+                _{_r_e_d_i_r_e_c_t_, _[_{_a_t_o_m_(_)_, _a_t_o_m_(_)_}_]_}:
+                  Specifies a list of pairs of module names, representing a
+                  mapping from old names to new. _T_h_e _s_e_t _o_f _o_l_d _n_a_m_e_s _m_a_y _n_o_t
+                  _i_n_c_l_u_d_e _a_n_y _o_f _t_h_e _n_a_m_e_s _o_f _t_h_e _i_n_p_u_t _m_o_d_u_l_e_s_. All calls to
+                  the listed old modules will be rewritten to refer to the
+                  corresponding new modules. _T_h_e _r_e_d_i_r_e_c_t_e_d _c_a_l_l_s _w_i_l_l _n_o_t _b_e
+                  _f_u_r_t_h_e_r _p_r_o_c_e_s_s_e_d_, _e_v_e_n _i_f _t_h_e _n_e_w _d_e_s_t_i_n_a_t_i_o_n _i_s _i_n _o_n_e _o_f
+                  _t_h_e _i_n_p_u_t _m_o_d_u_l_e_s_. This option mainly exists to support
+                  module renaming; cf. _r_e_n_a_m_e_/_3. The default value is the
+                  empty list.
+
+                _{_s_a_f_e_, _[_a_t_o_m_(_)_]_}:
+                  Specifies a list of names of input modules such that calls
+                  to these "safe" modules may be turned into direct local
+                  calls, that do not test for code replacement. Typically,
+                  this can be done for e.g. standard library modules. If a
+                  module is "safe", it is per definition also "static" (cf.
+                  below). The list may be empty. By default, all involved
+                  modules _e_x_c_e_p_t _t_h_e _t_a_r_g_e_t _m_o_d_u_l_e are considered "safe".
+
+                _{_s_t_a_t_i_c_, _[_a_t_o_m_(_)_]_}:
+                  Specifies a list of names of input modules which will be
+                  assumed never to be replaced (reloaded) unless the target
+                  module is also first replaced. The list may be empty. The
+                  target module itself (which may also be one of the input
+                  modules) is always regarded as "static", regardless of the
+                  value of this option. By default, all involved modules are
+                  assumed to be static.
+
+                _{_t_i_d_y_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, the resulting code will be processed
+                  using the _e_r_l___t_i_d_y module, which removes unused functions
+                  and does general code cleanup. (See _e_r_l___t_i_d_y_:_m_o_d_u_l_e_/_2 for
+                  additional options.) The default value is _t_r_u_e.
+
+                _{_v_e_r_b_o_s_e_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, progress messages will be output while
+                  the program is running; the default value is _f_a_l_s_e.
+
+              Note: The distinction between "static" and "safe" modules is
+              necessary in order not to break the semantics of dynamic code
+              replacement. A "static" source module will not be replaced
+              unless the target module also is. Now imagine a state machine
+              implemented by placing the code for each state in a separate
+              module, and suppose that we want to merge this into a single
+              target module, marking all source modules as static. At each
+              point in the original code where a call is made from one of the
+              modules to another (i.e., the state transitions), code
+              replacement is expected to be detected. Then, if we in the
+              merged code do not check at these points if the _t_a_r_g_e_t module
+              (the result of the merge) has been replaced, we can not be sure
+              in general that we will be able to do code replacement of the
+              merged state machine - it could run forever without detecting
+              the code change. Therefore, all such calls must remain remote-
+              calls (detecting code changes), but may call the target module
+              directly.
+
+              If we are sure that this kind of situation cannot ensue, we may
+              specify the involved modules as "safe", and all calls between
+              them will become local. Note that if the target module itself is
+              specified as safe, "remote" calls to itself will be turned into
+              local calls. This would destroy the code replacement properties
+              of e.g. a typical server loop.
+
+              _S_e_e _a_l_s_o_: ccrreeaattee__ssttuubbss//22, rreennaammee//33, eerrll__ttiiddyy::mmoodduullee//22.
+
+       ppaarrssee__ttrraannssffoorrmm((FFoorrmmss::::[[ssyynnttaaxxTTrreeee(())]],, OOppttiioonnss::::[[tteerrmm(())]])) -->>
+       [[ssyynnttaaxxTTrreeee(())]]
+
+              Types:
+
+                 syntaxTree() (see module erl_syntax)
+
+              Allows Igor to work as a component of the Erlang compiler.
+              Including the term _{_p_a_r_s_e___t_r_a_n_s_f_o_r_m_, _i_g_o_r_} in the compile
+              options when compiling an Erlang module (cf. _c_o_m_p_i_l_e_:_f_i_l_e_/_2),
+              will call upon Igor to process the source code, allowing
+              automatic inclusion of other source files. No files are created
+              or overwritten when this function is used.
+
+              Igor will look for terms _{_i_g_o_r_, _L_i_s_t_} in the compile options,
+              where _L_i_s_t is a list of Igor-specific options, as follows:
+
+                _{_f_i_l_e_s_, _[_f_i_l_e_n_a_m_e_(_)_]_}:
+                  The value specifies a list of source files to be merged with
+                  the file being compiled; cf. _m_e_r_g_e___f_i_l_e_s_/_4.
+
+              See _m_e_r_g_e___f_i_l_e_s_/_4 for further options. Note, however, that some
+              options are preset by this function and cannot be overridden by
+              the user; in particular, all cosmetic features are turned off,
+              for efficiency. Preprocessing is turned on.
+
+              _S_e_e _a_l_s_o_: ccoommppiillee::ffiillee//22, mmeerrggee__ffiilleess//44.
+
+       rreennaammee((FFiilleess::::[[ffiilleennaammee(())]],, RReennaammiinnggss)) -->> [[ssttrriinngg(())]]
+
+              Equivalent to rreennaammee((FFiilleess,, RReennaammiinnggss,, [[]])).
+
+       rreennaammee((FFiilleess::::[[ffiilleennaammee(())]],, RReennaammiinnggss,, OOppttiioonnss::::[[tteerrmm(())]])) -->> [[ssttrriinngg(())]]
+
+              Types:
+
+                 Renamings = [{atom(), atom()}]
+
+              Renames a set of possibly interdependent source code modules.
+              _F_i_l_e_s is a list of file names of source modules to be processed.
+              _R_e_n_a_m_i_n_g_s is a list of pairs of _m_o_d_u_l_e _n_a_m_e_s, representing a
+              mapping from old names to new. The returned value is the list of
+              output file names.
+
+              Each file in the list will be read and processed separately. For
+              every file, each reference to some module M, such that there is
+              an entry _{_<_e_m_>_M_<_/_e_m_>_, _<_e_m_>_M_1_<_/_e_m_>_} in _R_e_n_a_m_i_n_g_s, will be changed
+              to the corresponding M1. Furthermore, if a file F defines module
+              M, and there is an entry _{_<_e_m_>_M_<_/_e_m_>_, _<_e_m_>_M_1_<_/_e_m_>_} in _R_e_n_a_m_i_n_g_s,
+              a new file named _<_e_m_>_M_1_<_/_e_m_>_._e_r_l will be created in the same
+              directory as F, containing the source code for module M, renamed
+              to M1. If M does not have an entry in _R_e_n_a_m_i_n_g_s, the module is
+              not renamed, only updated, and the resulting source code is
+              written to _<_e_m_>_M_<_/_e_m_>_._e_r_l (typically, this overwrites the
+              original file). The _s_u_f_f_i_x option (see below) can be used to
+              change the default "_._e_r_l" suffix for the generated files.
+
+              Stub modules will automatically be created (see the _s_t_u_b_s and
+              _s_t_u_b___d_i_r options below) for each module that is renamed. These
+              can be used to redirect any calls still using the old module
+              names. The stub files are created in the same directory as the
+              source file (typically overwriting the original file).
+
+              Options:
+
+                _{_b_a_c_k_u_p___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+
+
+                _{_b_a_c_k_u_p_s_, _b_o_o_l_e_a_n_(_)_}:
+
+
+                _{_p_r_i_n_t_e_r_, _F_u_n_c_t_i_o_n_}:
+
+
+                _{_s_t_u_b_s_, _b_o_o_l_e_a_n_(_)_}:
+
+
+                _{_s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+
+
+              See _m_e_r_g_e_/_3 for details on these options.
+
+                _{_c_o_m_m_e_n_t_s_, _b_o_o_l_e_a_n_(_)_}:
+
+
+                _{_p_r_e_p_r_o_c_e_s_s_, _b_o_o_l_e_a_n_(_)_}:
+
+
+              See _m_e_r_g_e___f_i_l_e_s_/_4 for details on these options.
+
+                _{_n_o___b_a_n_n_e_r_, _b_o_o_l_e_a_n_(_)_}:
+
+
+              For the _r_e_n_a_m_e function, this option is _t_r_u_e by default. See
+              _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for details.
+
+                _{_t_i_d_y_, _b_o_o_l_e_a_n_(_)_}:
+
+
+              For the _r_e_n_a_m_e function, this option is _f_a_l_s_e by default. See
+              _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for details.
+
+                _{_n_o___h_e_a_d_e_r_s_, _b_o_o_l_e_a_n_(_)_}:
+
+
+                _{_s_t_u_b___d_i_r_, _f_i_l_e_n_a_m_e_(_)_}:
+
+
+              These options are preset by the _r_e_n_a_m_e function and cannot be
+              overridden by the user.
+
+              See _m_e_r_g_e___s_o_u_r_c_e_s_/_3 for further options.
+
+              _S_e_e _a_l_s_o_: mmeerrggee//33, mmeerrggee__ffiilleess//44, mmeerrggee__ssoouurrcceess//33.
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                              syntax_tools 1.6.9                       igor(3)

@@ -1,0 +1,150 @@
+CosNotifyChannelAdmin_SuppliEerrlAadnmginM(o3d)uleCDoesfNiontiitfiyoCnhannelAdmin_SupplierAdmin(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_SupplierAdmin - This module implements the OMG
+       CosNotifyChannelAdmin::SupplierAdmin interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyyPPuubblliisshh
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+EEXXPPOORRTTSS
+       __ggeett__MMyyIIDD((SSuupppplliieerrAAddmmiinn)) -->> AAddmmiinnIIDD
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 AdminID = long()
+
+              When a _S_u_p_p_l_i_e_r_A_d_m_i_n object is created it is given a unique Id
+              by the creating channel. This readonly attribute maintains this
+              Id.
+
+       __ggeett__MMyyCChhaannnneell((SSuupppplliieerrAAddmmiinn)) -->> CChhaannnneell
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 Channel = #objref
+
+              The creating channel's reference is maintained by this readonly
+              attribute.
+
+       __ggeett__MMyyOOppeerraattoorr((SSuupppplliieerrAAddmmiinn)) -->> OOppTTyyppee
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 OpType = 'AND_OP' | 'OR_OP'
+
+              The Operation Type, which determines the semantics the target
+              object will use for any associated _F_i_l_t_e_r_s, is maintained by
+              this readonly attribute.
+
+       __ggeett__ppuullll__ccoonnssuummeerrss((SSuupppplliieerrAAddmmiinn)) -->> PPrrooxxyyIIDDSSeeqq
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 ProxyIDSeq = [ProxyID]
+                 ProxyID = long()
+
+              A sequence of all associated _P_u_l_l_P_r_o_x_y Id's is maintained by
+              this readonly attribute.
+
+       __ggeett__ppuusshh__ccoonnssuummeerrss((SSuupppplliieerrAAddmmiinn)) -->> PPrrooxxyyIIDDSSeeqq
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 ProxyIDSeq = [ProxyID]
+                 ProxyID = long()
+
+              This operation returns all _P_u_s_h_P_r_o_x_y Id's created by the target
+              object.
+
+       ggeett__pprrooxxyy__ccoonnssuummeerr((SSuupppplliieerrAAddmmiinn,, PPrrooxxyyIIDD)) -->> RReeppllyy
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 ProxyID = long()
+                 Reply = Proxy | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ProxyNotFound'{}}
+                 Proxy = #objref
+
+              The Proxy which corresponds to the given Id is returned by this
+              operation.
+
+       oobbttaaiinn__nnoottiiffiiccaattiioonn__ppuullll__ccoonnssuummeerr((SSuupppplliieerrAAddmmiinn,, SSuupppplliieerrTTyyppee)) -->> RReeppllyy
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 SupplierType = 'ANY_EVENT' | 'STRUCTURED_EVENT' |
+                 'SEQUENCE_EVENT'
+                 Reply = {Proxy, ProxyID}
+                 Proxy = #objref
+                 ProxyID = long()
+
+              This operation creates a new proxy and returns its object
+              reference along with its ID. The _S_u_p_p_l_i_e_r_T_y_p_e parameter
+              determines the event type accepted by the proxy.
+
+       oobbttaaiinn__ppuullll__ccoonnssuummeerr((SSuupppplliieerrAAddmmiinn)) -->> PPrrooxxyy
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 Proxy = #objref
+
+              A proxy which accepts _#_a_n_y_{_} events is created by this
+              operation.
+
+       oobbttaaiinn__nnoottiiffiiccaattiioonn__ppuusshh__ccoonnssuummeerr((SSuupppplliieerrAAddmmiinn,, SSuupppplliieerrTTyyppee)) -->> RReeppllyy
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 SupplierType = 'ANY_EVENT' | 'STRUCTURED_EVENT' |
+                 'SEQUENCE_EVENT'
+                 Reply = {Proxy, ProxyID}
+                 Proxy = #objref
+                 ProxyID = long()
+
+              Determined by the _S_u_p_p_l_i_e_r_T_y_p_e parameter a compliant proxy is
+              created and its object reference along with its Id is returned
+              by this operation.
+
+       oobbttaaiinn__ppuusshh__ccoonnssuummeerr((SSuupppplliieerrAAddmmiinn)) -->> PPrrooxxyy
+
+              Types:
+
+                 SupplierAdmin = #objref
+                 Proxy = #objref
+
+              A proxy which accepts _#_a_n_y_{_} events is created by this
+              operation.
+
+       ddeessttrrooyy((SSuupppplliieerrAAddmmiinn)) -->> ookk
+
+              Types:
+
+                 SupplierAdmin = #objref
+
+              This operation terminates the SupplierAdmin object and notifies
+              the creating channel that the target object no longer is active.
+
+
+
+Ericsson AB                 cosNotificatiCoonsN1o.t1i.f1y8ChannelAdmin_SupplierAdmin(3)

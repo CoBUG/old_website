@@ -1,0 +1,621 @@
+reltool(3)                 Erlang Module Definition                 reltool(3)
+
+
+
+NNAAMMEE
+       reltool - Main API of the Reltool application
+
+DDEESSCCRRIIPPTTIIOONN
+       This is an interface module for the Reltool application.
+
+       _R_e_l_t_o_o_l is a release management tool. It analyses a given Erlang/OTP
+       installation and determines various dependencies between applications.
+       The _g_r_a_p_h_i_c_a_l frontend depicts the dependencies and enables interactive
+       customization of a target system. The backend provides a _b_a_t_c_h
+       interface for generation of customized target systems.
+
+       The tool uses an installed Erlang/OTP system as input. _r_o_o_t___d_i_r is the
+       root directory of the analysed system and it defaults to the system
+       executing _r_e_l_t_o_o_l. Applications may also be located outside _r_o_o_t___d_i_r.
+       _l_i_b___d_i_r_s defines library directories where additional applications may
+       reside and it defaults to the directories listed by the operating
+       system environment variable _E_R_L___L_I_B_S. See the module _c_o_d_e for more
+       info. Finally single modules and entire applications may be read from
+       Escripts.
+
+       Some configuration parameters control the behavior of Reltool on system
+       (_s_y_s) level. Others provide control on application (_a_p_p) level and yet
+       others are on module (_m_o_d) level. Module level parameters override
+       application level parameters and application level parameters override
+       system level parameters. Escript _e_s_c_r_i_p_t level parameters override
+       system level parameters.
+
+       The following top level _o_p_t_i_o_n_s are supported:
+
+         _c_o_n_f_i_g:
+           This is the main option and it controls the configuration of
+           _r_e_l_t_o_o_l. It can either be a _s_y_s tuple or a name of a _f_i_l_e
+           containing a sys tuple.
+
+         _t_r_a_p___e_x_i_t:
+           This option controls the error handling behavior of _r_e_l_t_o_o_l. By
+           default the window processes traps exit, but this behavior can
+           altered by setting _t_r_a_p___e_x_i_t to _f_a_l_s_e.
+
+         _w_x___d_e_b_u_g:
+           This option controls the debug level of _w_x. As its name indicates
+           it is only useful for debugging. See _w_x_:_d_e_b_u_g_/_1 for more info.
+
+       Besides the already mentioned source parameters _r_o_o_t___d_i_r and _l_i_b___d_i_r_s,
+       the following system (_s_y_s) level options are supported:
+
+         _e_r_t_s:
+           Erts specific configuration. See application level options below.
+
+         _e_s_c_r_i_p_t:
+           Escript specific configuration. An escript has a mandatory file
+           name and escript level options that are described below.
+
+         _a_p_p:
+           Application specific configuration. An application has a mandatory
+           name and application level options that are described below.
+
+         _m_o_d___c_o_n_d:
+           This parameter controls the module inclusion policy. It defaults to
+           _a_l_l which means that if an application is included (either
+           explicitly or implicitly) all modules in that application will be
+           included. This implies that both modules that exist in the _e_b_i_n
+           directory of the application, as well as modules that are named in
+           the _a_p_p file will be included. If the parameter is set to _e_b_i_n,
+           both modules in the _e_b_i_n directory and derived modules are
+           included. If the parameter is set to _a_p_p, both modules in the _a_p_p
+           file and derived modules are included. _d_e_r_i_v_e_d means that only
+           modules that are used by other included modules are included. The
+           _m_o_d___c_o_n_d setting on system level is used as default for all
+           applications.
+
+         _i_n_c_l___c_o_n_d:
+           This parameter controls the application and escript inclusion
+           policy. It defaults to _d_e_r_i_v_e_d which means that the applications
+           that do not have any explicit _i_n_c_l___c_o_n_d setting, will only be
+           included if any other (explicitly or implicitly included)
+           application uses it. The value _i_n_c_l_u_d_e implies that all
+           applications and escripts that do not have any explicit _i_n_c_l___c_o_n_d
+           setting will be included. _e_x_c_l_u_d_e implies that all applications and
+           escripts that do not have any explicit _i_n_c_l___c_o_n_d setting will be
+           excluded.
+
+         _b_o_o_t___r_e_l:
+           A target system may have several releases but the one given as
+           _b_o_o_t___r_e_l will be used as default when the system is booting up.
+
+         _r_e_l:
+           Release specific configuration. Each release maps to a _r_e_l, _s_c_r_i_p_t
+           and _b_o_o_t file. See the module _s_y_s_t_o_o_l_s for more info about the
+           details. Each release has a name, a version and a set of
+           applications with a few release specific parameters such as type
+           and included applications.
+
+         _r_e_l_o_c_a_t_a_b_l_e:
+           This parameter controls whether the _e_r_l executable in the target
+           system should automatically determine where it is installed or if
+           it should use a hardcoded path to the installation. In the latter
+           case the target system must be installed with _r_e_l_t_o_o_l_:_i_n_s_t_a_l_l_/_2
+           before it can be used. If the system is relocatable, the file tree
+           containing the target system can be moved to another location
+           without re-installation. The default is _t_r_u_e.
+
+         _p_r_o_f_i_l_e:
+           The creation of the specification for a target system is performed
+           in two steps. In the first step a complete specification is
+           generated. It will likely contain much more files than you are
+           interested in in your customized target system. In the second step
+           the specification will be filtered according to your filters. There
+           you have the ability to specify filters per application as well as
+           system wide filters. You can also select a _p_r_o_f_i_l_e for your system.
+           Depending on the _p_r_o_f_i_l_e, different default filters will be used.
+           There are three different profiles to choose from: _d_e_v_e_l_o_p_m_e_n_t,
+           _e_m_b_e_d_d_e_d and _s_t_a_n_d_a_l_o_n_e. _d_e_v_e_l_o_p_m_e_n_t is default. The parameters
+           that are affected by the _p_r_o_f_i_l_e are: _i_n_c_l___s_y_s___f_i_l_t_e_r_s,
+           _e_x_c_l___s_y_s___f_i_l_t_e_r_s, _i_n_c_l___a_p_p___f_i_l_t_e_r_s and _e_x_c_l___a_p_p___f_i_l_t_e_r_s.
+
+         _a_p_p___f_i_l_e:
+           This parameter controls the default handling of the _a_p_p files when
+           a target system is generated. It defaults to _k_e_e_p which means that
+           _a_p_p files are copied to the target system and their contents are
+           kept as they are. _s_t_r_i_p means that a new _a_p_p file is generated from
+           the contents of the original _a_p_p file where the non included
+           modules are removed from the file. _a_l_l does also imply that a new
+           _a_p_p file is generated from the contents of the original _a_p_p file,
+           with the difference that all included modules are added to the
+           file. If the application does not have any _a_p_p file a file will be
+           created for _a_l_l but not for _k_e_e_p and _s_t_r_i_p.
+
+         _d_e_b_u_g___i_n_f_o:
+           The _d_e_b_u_g___i_n_f_o parameter controls whether the debug information in
+           the beam file should be kept (_k_e_e_p) or stripped _s_t_r_i_p when the file
+           is copied to the target system.
+
+         _e_x_c_l___l_i_b:
+
+
+     WWaarrnniinngg::
+         This option is experimental.
+
+
+           If the _e_x_c_l___l_i_b option is set to _o_t_p___r_o_o_t then reltool will not
+           copy anything from the Erlang/OTP installation ($OTP_ROOT) into the
+           target structure. The goal is to create a "slim" release which can
+           be used together with an existing Erlang/OTP installation. The
+           target structure will therefore only contain a _l_i_b directory with
+           the applications that were found outside of $OTP_ROOT (typically
+           your own applications), and a _r_e_l_e_a_s_e_s directory with the generated
+           _._r_e_l_, _._s_c_r_i_p_t and _._b_o_o_t files.
+
+           When starting this release, three things must be specified:
+
+           WWhhiicchh _r_e_l_e_a_s_e_s directory to use :
+             Tell the release handler to use the _r_e_l_e_a_s_e_s directory in our
+             target structure instead of _$_O_T_P___R_O_O_T_/_r_e_l_e_a_s_e_s. This is done by
+             setting the SASL environment variable _r_e_l_e_a_s_e_s___d_i_r, either from
+             the command line (_-_s_a_s_l _r_e_l_e_a_s_e_s___d_i_r _<_t_a_r_g_e_t_-_d_i_r_>_/_r_e_l_e_a_s_e_s) or in
+             _s_y_s_._c_o_n_f_i_g.
+
+           WWhhiicchh bboooott ffiillee ttoo uussee :
+             The default boot file is _$_O_T_P___R_O_O_T_/_b_i_n_/_s_t_a_r_t, but in this case we
+             need to specify a boot file from our target structure, typically
+             _<_t_a_r_g_e_t_-_d_i_r_>_/_r_e_l_e_a_s_e_s_/_<_v_s_n_>_/_<_R_e_l_N_a_m_e_>. This is done with the
+             _-_b_o_o_t command line option to _e_r_l
+
+           TThhee llooccaattiioonn ooff oouurr aapppplliiccaattiioonnss :
+             The generated .script (and .boot) file uses the environment
+             variable _$_R_E_L_T_O_O_L___E_X_T___L_I_B as prefix for the paths to all
+             applications. The _-_b_o_o_t___v_a_r option to _e_r_l can be used for
+             specifying the value of this variable, typically _-_b_o_o_t___v_a_r
+             _R_E_L_T_O_O_L___E_X_T___L_I_B _<_t_a_r_g_e_t_-_d_i_r_>_/_l_i_b.
+
+           Example:
+
+           erl -sasl releases_dir \"mytarget/releases\" -boot mytarget/releases/1.0/myrel -boot_var RELTOOL_EXT_LIB mytarget/lib
+
+         _i_n_c_l___s_y_s___f_i_l_t_e_r_s:
+           This parameter normally contains a list of regular expressions that
+           controls which files in the system should be included. Each file in
+           the target system must match at least one of the listed regular
+           expressions in order to be included. Further the files may not
+           match any filter in _e_x_c_l___s_y_s___f_i_l_t_e_r_s in order to be included. Which
+           application files should be included is controlled with the
+           parameters _i_n_c_l___a_p_p___f_i_l_t_e_r_s and _e_x_c_l___a_p_p___f_i_l_t_e_r_s. This parameter
+           defaults to _[_"_._*_"_].
+
+         _e_x_c_l___s_y_s___f_i_l_t_e_r_s:
+           This parameter normally contains a list of regular expressions that
+           controls which files in the system should not be included in the
+           target system. In order to be included, a file must match some
+           filter in _i_n_c_l___s_y_s___f_i_l_t_e_r_s but not any filter in _e_x_c_l___s_y_s___f_i_l_t_e_r_s.
+           This parameter defaults to _[_].
+
+         _i_n_c_l___a_p_p___f_i_l_t_e_r_s:
+           This parameter normally contains a list of regular expressions that
+           controls which application specific files that should be included.
+           Each file in the application must match at least one of the listed
+           regular expressions in order to be included. Further the files may
+           not match any filter in _e_x_c_l___a_p_p___f_i_l_t_e_r_s in order to be included.
+           This parameter defaults to _[_"_._*_"_].
+
+         _e_x_c_l___a_p_p___f_i_l_t_e_r_s:
+           This parameter normally contains a list of regular expressions that
+           controls which application specific files should not be included in
+           the target system. In order to be included, a file must match some
+           filter in _i_n_c_l___a_p_p___f_i_l_t_e_r_s but not any filter in _e_x_c_l___a_p_p___f_i_l_t_e_r_s.
+           This parameter defaults to _[_].
+
+         _i_n_c_l___a_r_c_h_i_v_e___f_i_l_t_e_r_s:
+           This parameter normally contains a list of regular expressions that
+           controls which top level directories in an application should be
+           included in an archive file (as opposed to being included as a
+           regular directory outside the archive). Each top directory in the
+           application must match at least one of the listed regular
+           expressions in order to be included. Further the files may not
+           match any filter in _e_x_c_l___a_p_p___f_i_l_t_e_r_s in order to be included. This
+           parameter defaults to _[_"_._*_"_].
+
+         _e_x_c_l___a_r_c_h_i_v_e___f_i_l_t_e_r_s:
+           This parameter normally contains a list of regular expressions that
+           controls which top level directories in an application should not
+           be included in an archive file. In order to be included in the
+           application archive, a top directory must match some filter in
+           _i_n_c_l___a_r_c_h_i_v_e___f_i_l_t_e_r_s but not any filter in _e_x_c_l___a_r_c_h_i_v_e___f_i_l_t_e_r_s.
+           This parameter defaults to _[_"_^_i_n_c_l_u_d_e_$_"_,_"_^_p_r_i_v_$_"_].
+
+         _a_r_c_h_i_v_e___o_p_t_s:
+           This parameter contains a list of options that are given to
+           _z_i_p_:_c_r_e_a_t_e_/_3 when application specific files are packaged into an
+           archive. Only a subset of the options are supported. The most
+           useful options in this context are the ones that control which
+           types of files should be compressed. This parameter defaults to _[_].
+
+       On application (_e_s_c_r_i_p_t) level, the following options are supported:
+
+         _i_n_c_l___c_o_n_d:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+       On application (_a_p_p) level, the following options are supported:
+
+         _v_s_n:
+           The version of the application. In an installed system there may
+           exist several versions of an application. The _v_s_n parameter
+           controls which version of the application will be chosen.
+
+           This parameter is mutual exclusive with _l_i_b___d_i_r. If _v_s_n and _l_i_b___d_i_r
+           are both omitted, the latest version will be chosen.
+
+         _l_i_b___d_i_r:
+           The directory to read the application from. This parameter can be
+           used to point out a specific location to fetch the application
+           from. This is useful for instance if the parent directory for some
+           reason is no good as a library directory on system level.
+
+           This parameter is mutual exclusive with _v_s_n. If _v_s_n and _l_i_b___d_i_r are
+           both omitted, the latest version will be chosen.
+
+         _m_o_d:
+           Module specific configuration. A module has a mandatory name and
+           module level options that are described below.
+
+         _m_o_d___c_o_n_d:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _i_n_c_l___c_o_n_d:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _a_p_p___f_i_l_e:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _d_e_b_u_g___i_n_f_o:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _i_n_c_l___a_p_p___f_i_l_t_e_r_s:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _e_x_c_l___a_p_p___f_i_l_t_e_r_s:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _i_n_c_l___a_r_c_h_i_v_e___f_i_l_t_e_r_s:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _e_x_c_l___a_r_c_h_i_v_e___f_i_l_t_e_r_s:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+         _a_r_c_h_i_v_e___o_p_t_s:
+           The value of this parameter overrides the parameter with the same
+           name on system level.
+
+       On module (_m_o_d) level, the following options are supported:
+
+         _i_n_c_l___c_o_n_d:
+           This parameter controls whether the module is included or not. By
+           default the _m_o_d___i_n_c_l parameter on application and system level will
+           be used to control whether the module is included or not. The value
+           of _i_n_c_l___c_o_n_d overrides the module inclusion policy. _i_n_c_l_u_d_e implies
+           that the module is included, while _e_x_c_l_u_d_e implies that the module
+           is not included. _d_e_r_i_v_e_d implies that the module is included if it
+           is used by any other included module.
+
+         _d_e_b_u_g___i_n_f_o:
+           The value of this parameter overrides the parameter with the same
+           name on application level.
+
+DDAATTAA TTYYPPEESS
+       options()           = [option()]
+       option()            = {config, config() | file()}
+                           | {trap_exit, bool()}
+                           | {wx_debug, term()}
+       config()            = {sys, [sys()]}
+       sys()               = {root_dir, root_dir()}
+                           | {lib_dirs, [lib_dir()]}
+                           | {profile, profile()}
+                           | {erts, app()}
+                           | {escript, escript_file(), [escript()]}
+                           | {app, app_name(), [app()]}
+                           | {mod_cond, mod_cond()}
+                           | {incl_cond, incl_cond()}
+                           | {boot_rel, boot_rel()}
+                           | {rel, rel_name(), rel_vsn(), [rel_app()]}
+                           | {relocatable, relocatable()}
+                           | {app_file, app_file()}
+                           | {debug_info, debug_info()}
+                           | {incl_sys_filters, incl_sys_filters()}
+                           | {excl_sys_filters, excl_sys_filters()}
+                           | {incl_app_filters, incl_app_filters()}
+                           | {excl_app_filters, excl_app_filters()}
+                           | {incl_archive_filters, incl_archive_filters()}
+                           | {excl_archive_filters, excl_archive_filters()}
+                           | {archive_opts, [archive_opt()]}
+       app()               = {vsn, app_vsn()}
+                           | {lib_dir, lib_dir()}
+                           | {mod, mod_name(), [mod()]}
+                           | {mod_cond, mod_cond()}
+                           | {incl_cond, incl_cond()}
+                           | {debug_info, debug_info()}
+                           | {app_file, app_file()}
+                     | {excl_lib, excl_lib()}
+                           | {incl_sys_filters, incl_sys_filters()}
+                           | {excl_sys_filters, excl_sys_filters()}
+                           | {incl_app_filters, incl_app_filters()}
+                           | {excl_app_filters, excl_app_filters()}
+                           | {incl_archive_filters, incl_archive_filters()}
+                           | {excl_archive_filters, excl_archive_filters()}
+                           | {archive_opts, [archive_opt()]}
+       mod()               = {incl_cond, incl_cond()}
+                           | {debug_info, debug_info()}
+       rel_app()           = app_name()
+                           | {app_name(), app_type()}
+                           | {app_name(), [incl_app()]}
+                           | {app_name(), app_type(), [incl_app()]}
+       app_name()          = atom()
+       app_type()          = permanent | transient | temporary | load | none
+       app_vsn()           = string()
+       archive_opt         = zip_create_opt()
+       boot_rel()          = rel_name()
+       app_file()          = keep | strip | all
+       debug_info()        = keep | strip
+       dir()               = string()
+       escript()           = {incl_cond, incl_cond()}
+       escript_file()      = file()
+       excl_app_filters()  = regexps()
+       excl_archive_filters() = regexps()
+       excl_lib()          = otp_root
+       excl_sys_filters()  = regexps()
+       file()              = string()
+       incl_app()          = app_name()
+       incl_app_filters()  = regexps()
+       incl_archive_filters() = regexps()
+       incl_cond()         = include | exclude | derived
+       incl_sys_filters()  = regexps()
+       lib_dir()           = dir()
+       mod_cond()          = all | app | ebin | derived | none
+       mod_name()          = atom()
+       profile()           = development | embedded | standalone
+       re_regexp()         = string()
+       reason()            = string()
+       regexps()           = [re_regexp()]
+                           | {add, [re_regexp()]}
+                           | {del, [re_regexp()]}
+       rel_file()          = term()
+       rel_name()          = string()
+       rel_vsn()           = string()
+       relocatable         = boolean()
+       root_dir()          = dir()
+       script_file()       = term()
+       server()            = server_pid() | options()
+       server_pid()        = pid()
+       target_dir()        = file()
+       window_pid()        = pid()
+       base_dir()          = dir()
+       base_file()         = file()
+       top_dir()           = file()
+       top_file()          = file()
+       target_spec()       = [target_spec()]
+                           | {create_dir, base_dir(), [target_spec()]}
+                           | {create_dir, base_dir(), top_dir(), [target_spec()]}
+                           | {archive, base_file(), [archive_opt()], [target_spec()]}
+                           | {copy_file, base_file()}
+                           | {copy_file, base_file(), top_file()}
+                           | {write_file, base_file(), iolist()}
+                           | {strip_beam_file, base_file()}
+
+EEXXPPOORRTTSS
+       ccrreeaattee__ttaarrggeett((SSeerrvveerr,, TTaarrggeettDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 TargetDir = target_dir()
+                 Reason = reason()
+
+              Create a target system. Gives the same result as
+              _{_o_k_,_T_a_r_g_e_t_S_p_e_c_}_=_r_e_l_t_o_o_l_:_g_e_t___t_a_r_g_e_t___s_p_e_c_(_S_e_r_v_e_r_) and
+              _r_e_l_t_o_o_l_:_e_v_a_l___t_a_r_g_e_t___s_p_e_c_(_T_a_r_g_e_t_S_p_e_c_,_R_o_o_t_D_i_r_,_T_a_r_g_e_t_D_i_r_).
+
+       eevvaall__ttaarrggeett__ssppeecc((TTaarrggeettSSppeecc,, RRoooottDDiirr,, TTaarrggeettDDiirr)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 TargetSpec = target_spec()
+                 RootDir = root_dir()
+                 TargetDir = target_dir()
+                 Reason = reason()
+
+              Create the actual target system from a specification generated
+              by _r_e_l_t_o_o_l_:_g_e_t___t_a_r_g_e_t___s_p_e_c_/_1. The creation of the specification
+              for a target system is performed in two steps. In the first step
+              a complete specification will be generated. It will likely
+              contain much more files than you are interested in in your
+              target system. In the second step the specification will be
+              filtered according to your filters. There you have the ability
+              to specify filters per application as well as system wide
+              filters. You can also select a _p_r_o_f_i_l_e for your system.
+              Depending on the _p_r_o_f_i_l_e, different default filters will be
+              used.
+
+              The top directories _b_i_n, _r_e_l_e_a_s_e_s and _l_i_b are treated
+              differently from other files. All other files are by default
+              copied to the target system. The _r_e_l_e_a_s_e_s directory contains
+              generated _r_e_l, _s_c_r_i_p_t, and _b_o_o_t files. The _l_i_b directory
+              contains the applications. Which applications are included and
+              if they should be customized (archived, stripped from debug info
+              etc.) is specified with various configuration parameters. The
+              files in the _b_i_n directory are copied from the _e_r_t_s_-_v_s_n_/_b_i_n
+              directory, but only those files that were originally included in
+              the _b_i_n directory of the source system.
+
+              If the configuration parameter _r_e_l_o_c_a_t_a_b_l_e was set to _t_r_u_e there
+              is no need to install the target system with _r_e_l_t_o_o_l_:_i_n_s_t_a_l_l_/_2
+              before it can be started. In that case the file tree containing
+              the target system can be moved without re-installation.
+
+              In most cases, the _R_o_o_t_D_i_r parameter should be set to the same
+              as the _r_o_o_t___d_i_r configuration parameter used in the call to
+              _r_e_l_t_o_o_l_:_g_e_t___t_a_r_g_e_t___s_p_e_c_/_1 (or _c_o_d_e_:_r_o_o_t___d_i_r_(_) if the
+              configuration parameter is not set). In some cases it might be
+              useful to evaluate the same target specification towards
+              different root directories. This should, however, be used with
+              great care as it requires equivalent file structures under all
+              roots.
+
+       ggeett__ccoonnffiigg((SSeerrvveerr)) -->> {{ookk,, CCoonnffiigg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 Config = config()
+                 Reason = reason()
+
+              Get reltool configuration. Shorthand for
+              _r_e_l_t_o_o_l_:_g_e_t___c_o_n_f_i_g_(_S_e_r_v_e_r_,_f_a_l_s_e_,_f_a_l_s_e_).
+
+       ggeett__ccoonnffiigg((SSeerrvveerr,, IInnccllDDeeffaauullttss,, IInnccllDDeerriivveedd)) -->> {{ookk,, CCoonnffiigg}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 InclDefaults = incl_defaults()
+                 InclDerived = incl_derived()
+                 Config = config()
+                 Reason = reason()
+
+              Get reltool configuration. Normally, only the explicit
+              configuration parameters with values that differ from their
+              defaults are interesting. But the builtin default values can be
+              returned by setting _I_n_c_l_D_e_f_a_u_l_t_s to _t_r_u_e. The derived
+              configuration can be returned by setting _I_n_c_l_D_e_r_i_v_e_d to _t_r_u_e.
+
+       ggeett__rreell((SSeerrvveerr,, RReellnnaammee)) -->> {{ookk,, RReellFFiillee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 RelName = rel_name()
+                 RelFile = rel_file()
+                 Reason = reason()
+
+              Get contents of a release file. See _r_e_l_(_4_) for more details.
+
+       ggeett__ssccrriipptt((SSeerrvveerr,, RReellnnaammee)) -->> {{ookk,, SSccrriippttFFiillee || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 RelName = rel_name()
+                 ScriptFile = script_file()
+                 Reason = reason()
+
+              Get contents of a boot script file. See _s_c_r_i_p_t_(_4_) for more
+              details.
+
+       ggeett__ssttaattuuss((SSeerrvveerr)) -->> {{ookk,, [[WWaarrnniinngg]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 Warning = string()
+                 Reason = reason()
+
+              Get status about the configuration
+
+       ggeett__sseerrvveerr((WWiinnddoowwPPiidd)) -->> {{ookk,, SSeerrvveerrPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 WindowPid = window_pid()
+                 ServerPid = server_pid()
+                 Reason = reason()
+
+              Return the process identifier of the server process.
+
+       ggeett__ttaarrggeett__ssppeecc((SSeerrvveerr)) -->> {{ookk,, TTaarrggeettSSppeecc}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Server = server()
+                 TargetSpec = target_spec()
+                 Reason = reason()
+
+              Return a specification of the target system. The actual target
+              system can be created with _r_e_l_t_o_o_l_:_e_v_a_l___t_a_r_g_e_t___s_p_e_c_/_3.
+
+       iinnssttaallll((RReellNNaammee,, TTaarrggeettDDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 RelName = rel_name()
+                 TargetDir = target_dir()
+                 Reason = reason()
+
+              Install a created target system
+
+       ssttaarrtt(()) -->> {{ookk,, WWiinnddoowwPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 WindowPid = window_pid()
+                 Reason = reason()
+
+              Start a main window process with default options
+
+       ssttaarrtt((OOppttiioonnss)) -->> {{ookk,, WWiinnddoowwPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = options()
+                 WindowPid = window_pid()
+                 Reason = reason()
+
+              Start a main window process with options
+
+       ssttaarrtt__lliinnkk((OOppttiioonnss)) -->> {{ookk,, WWiinnddoowwPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = options()
+                 WindowPid = window_pid()
+                 Reason = reason()
+
+              Start a main window process with options. The process is linked.
+
+       ssttaarrtt__sseerrvveerr((OOppttiioonnss)) -->> {{ookk,, SSeerrvveerrPPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = options()
+                 ServerPid = server_pid()
+                 Reason = reason()
+
+              Start a server process with options. The server process identity
+              can be given as an argument to several other functions in the
+              API.
+
+       ssttoopp((PPiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = server_pid() | window_pid()()
+                 Reason = reason()
+
+              Stop a server or window process
+
+
+
+Ericsson AB                      reltool 0.6.1                      reltool(3)

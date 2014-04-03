@@ -1,0 +1,139 @@
+erl_set_memory_block(3)       C Library Functions      erl_set_memory_block(3)
+
+
+
+NNAAMMEE
+       erl_set_memory_block - Custom memory allocation for Erlang on
+       VxWorks(R)
+
+DDEESSCCRRIIPPTTIIOONN
+       This documentation is specific to VxWorks.
+
+       The _e_r_l___s_e_t___m_e_m_o_r_y___b_l_o_c_k function/command initiates custom memory
+       allocation for the Erlang emulator. It has to be called before the
+       Erlang emulator is started and makes Erlang use one single large memory
+       block for all memory allocation.
+
+       The memory within the block can be utilized by other tasks than Erlang.
+       This is accomplished by calling the functions _s_y_s___a_l_l_o_c, _s_y_s___r_e_a_l_l_o_c
+       and _s_y_s___f_r_e_e instead of _m_a_l_l_o_c, _r_e_a_l_l_o_c and _f_r_e_e respectively.
+
+       The purpose of this is to avoid problems inherent in the VxWorks
+       systems _m_a_l_l_o_c library. The memory allocation within the large memory
+       block avoids fragmentation by using an "address order first fit"
+       algorithm. Another advantage of using a separate memory block is that
+       resource reclamation can be made more easily when Erlang is stopped.
+
+       The _e_r_l___s_e_t___m_e_m_o_r_y___b_l_o_c_k function is callable from any C program as an
+       ordinary 10 argument function as well as from the commandline.
+
+EEXXPPOORRTTSS
+       iinntt eerrll__sseett__mmeemmoorryy__bblloocckk((ssiizzee__tt ssiizzee,,  vvooiidd **ppttrr,, iinntt
+       wwaarrnn__mmiixxeedd__mmaalllloocc,, iinntt rreeaalllloocc__aallwwaayyss__mmoovveess,, iinntt uussee__rreeccllaaiimm,, ......))
+
+              The function is called before Erlang is started to specify a
+              large memory block where Erlang can maintain memory internally.
+
+              Parameters:
+
+                ssiizzee__tt ssiizzee::
+                  The size in bytes of Erlang's internal memory block. Has to
+                  be specified. Note that the VxWorks system uses dynamic
+                  memory allocation heavily, so leave some memory to the
+                  system.
+
+                vvooiidd **ppttrr::
+                  A pointer to the actual memory block of size _s_i_z_e. If this
+                  is specified as 0 (NULL), Erlang will allocate the memory
+                  when starting and will reclaim the memory block (as a whole)
+                  when stopped.
+
+                  If a memory block is allocated and provided here, the
+                  _s_y_s___a_l_l_o_c etc routines can still be used after the Erlang
+                  emulator is stopped. The Erlang emulator can also be
+                  restarted while other tasks using the memory block are
+                  running without destroying the memory. If Erlang is to be
+                  restarted, also set the _u_s_e___r_e_c_l_a_i_m flag.
+
+                  If 0 is specified here, the Erlang system should not be
+                  stopped while some other task uses the memory block (has
+                  called _s_y_s___a_l_l_o_c).
+
+                iinntt wwaarrnn__mmiixxeedd__mmaalllloocc::
+                  If this flag is set to true (anything else than 0), the
+                  system will write a warning message on the console if a
+                  program is mixing normal _m_a_l_l_o_c with _s_y_s___r_e_a_l_l_o_c or
+                  _s_y_s___f_r_e_e.
+
+                iinntt rreeaalllloocc__aallwwaayyss__mmoovveess::
+                  If this flag is set to true (anything else than 0), all
+                  calls to _s_y_s___r_e_a_l_l_o_c result in a moved memory block. This
+                  can in certain conditions give less fragmentation. This flag
+                  may be removed in future releases.
+
+                iinntt uussee__rreeccllaaiimm::
+                  If this flag is set to true (anything else than 0), all
+                  memory allocated with _s_y_s___a_l_l_o_c is automatically reclaimed
+                  as soon as a task exits. This is very useful to make writing
+                  port programs (and other programs as well) easier. Combine
+                  this with using the routines _s_a_v_e___o_p_e_n etc. specified in the
+                  reclaim.h file delivered in the Erlang distribution.
+
+              Return Value:
+
+              Returns 0 (OK) on success, otherwise a value <> 0.
+
+       iinntt eerrll__mmeemmoorryy__sshhooww((......))
+
+              Return Value:
+
+              Returns 0 (OK) on success, otherwise a value <> 0.
+
+       iinntt eerrll__mmeemm__iinnffoo__ggeett((MMEEMM__PPAARRTT__SSTTAATTSS **ssttaattss))
+
+              Parameter:
+
+                MMEEMM__PPAARRTT__SSTTAATTSS **ssttaattss::
+                  A pointer to a MEM_PART_STATS structure as defined in
+                  _<_m_e_m_L_i_b_._h_>. A successful call will fill in all fields of the
+                  structure, on error all fields are left untouched.
+
+              Return Value:
+
+              Returns 0 (OK) on success, otherwise a value <> 0
+
+NNOOTTEESS
+       The memory block used by Erlang actually does not need to be inside the
+       area known to ordinary _m_a_l_l_o_c. It is possible to set the
+       _U_S_E_R___R_E_S_E_R_V_E_D___M_E_M preprocessor symbol when compiling the wind kernel
+       and then use user reserved memory for Erlang. Erlang can therefor
+       utilize memory above the 32 Mb limit of VxWorks on the PowerPC
+       architecture.
+
+       Example:
+
+       In config.h for the wind kernel:
+
+             #undef LOCAL_MEM_AUTOSIZE
+             #undef LOCAL_MEM_SIZE
+             #undef USER_RESERVED_MEM
+
+             #define LOCAL_MEM_SIZE        0x05000000
+             #define USER_RESERVED_MEM     0x03000000
+
+
+       In the start-up script/code for the VxWorks node:
+
+       erl_set_memory_block(sysPhysMemTop()-sysMemTop(),sysMemTop(),0,0,1);
+
+
+       Setting the _u_s_e___r_e_c_l_a_i_m flag decreases performance of the system, but
+       makes programming much easier. Other similar facilities are present in
+       the Erlang system even without using a separate memory block. The
+       routines called _s_a_v_e___m_a_l_l_o_c, _s_a_v_e___r_e_a_l_l_o_c and _s_a_v_e___f_r_e_e provide the
+       same facilities by using VxWorks own _m_a_l_l_o_c. Similar routines exist for
+       files, see the file _r_e_c_l_a_i_m_._h in the distribution.
+
+
+
+Ericsson AB                       erts 5.9.2           erl_set_memory_block(3)

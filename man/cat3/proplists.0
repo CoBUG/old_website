@@ -1,0 +1,326 @@
+proplists(3)               Erlang Module Definition               proplists(3)
+
+
+
+NNAAMMEE
+       proplists - Support functions for property lists
+
+DDEESSCCRRIIPPTTIIOONN
+       Property lists are ordinary lists containing entries in the form of
+       either tuples, whose first elements are keys used for lookup and
+       insertion, or atoms, which work as shorthand for tuples _{_A_t_o_m_, _t_r_u_e_}.
+       (Other terms are allowed in the lists, but are ignored by this module.)
+       If there is more than one entry in a list for a certain key, the first
+       occurrence normally overrides any later (irrespective of the arity of
+       the tuples).
+
+       Property lists are useful for representing inherited properties, such
+       as options passed to a function where a user may specify options
+       overriding the default settings, object properties, annotations, etc.
+
+       Two keys are considered equal if they match (_=_:_=). In other words,
+       numbers are compared literally rather than by value, so that, for
+       instance, _1 and _1_._0 are different keys.
+
+DDAATTAA TTYYPPEESS
+       pprrooppeerrttyy(()) = atom() | tuple()
+
+EEXXPPOORRTTSS
+       aappppeenndd__vvaalluueess((KKeeyy,, LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Similar to _g_e_t___a_l_l___v_a_l_u_e_s_/_2, but each value is wrapped in a list
+              unless it is already itself a list, and the resulting list of
+              lists is concatenated. This is often useful for "incremental"
+              options; e.g., _a_p_p_e_n_d___v_a_l_u_e_s_(_a_, _[_{_a_, _[_1_,_2_]_}_, _{_b_, _0_}_, _{_a_, _3_}_, _{_c_,
+              _-_1_}_, _{_a_, _[_4_]_}_]_) will return the list _[_1_,_2_,_3_,_4_].
+
+       ccoommppaacctt((LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 List = [pprrooppeerrttyy(())]
+
+              Minimizes the representation of all entries in the list. This is
+              equivalent to _[_p_r_o_p_e_r_t_y_(_P_) _|_| _P _<_- _L_i_s_t_].
+
+              See also: _p_r_o_p_e_r_t_y_/_1, _u_n_f_o_l_d_/_1.
+
+       ddeelleettee((KKeeyy,, LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Deletes all entries associated with _K_e_y from _L_i_s_t.
+
+       eexxppaanndd((EExxppaannssiioonnss,, LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 Expansions = [{Property :: pprrooppeerrttyy(()), Expansion ::
+                 [term()]}]
+                 List = [term()]
+
+              Expands particular properties to corresponding sets of
+              properties (or other terms). For each pair _{_P_r_o_p_e_r_t_y_, _E_x_p_a_n_s_i_o_n_}
+              in _E_x_p_a_n_s_i_o_n_s, if _E is the first entry in _L_i_s_t with the same key
+              as _P_r_o_p_e_r_t_y, and _E and _P_r_o_p_e_r_t_y have equivalent normal forms,
+              then _E is replaced with the terms in _E_x_p_a_n_s_i_o_n, and any
+              following entries with the same key are deleted from _L_i_s_t.
+
+              For example, the following expressions all return _[_f_i_e_, _b_a_r_,
+              _b_a_z_, _f_u_m_]:
+
+                        expand([{foo, [bar, baz]}],
+                        [fie, foo, fum])
+                        expand([{{foo, true}, [bar, baz]}],
+                        [fie, foo, fum])
+                        expand([{{foo, false}, [bar, baz]}],
+                        [fie, {foo, false}, fum])
+
+              However, no expansion is done in the following call:
+
+                        expand([{{foo, true}, [bar, baz]}],
+                        [{foo, false}, fie, foo, fum])
+
+              because _{_f_o_o_, _f_a_l_s_e_} shadows _f_o_o.
+
+              Note that if the original property term is to be preserved in
+              the result when expanded, it must be included in the expansion
+              list. The inserted terms are not expanded recursively. If
+              _E_x_p_a_n_s_i_o_n_s contains more than one property with the same key,
+              only the first occurrence is used.
+
+              See also: _n_o_r_m_a_l_i_z_e_/_2.
+
+       ggeett__aallll__vvaalluueess((KKeeyy,, LLiisstt)) -->> [[tteerrmm(())]]
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Similar to _g_e_t___v_a_l_u_e_/_2, but returns the list of values for _a_l_l
+              entries _{_K_e_y_, _V_a_l_u_e_} in _L_i_s_t. If no such entry exists, the
+              result is the empty list.
+
+              See also: _g_e_t___v_a_l_u_e_/_2.
+
+       ggeett__bbooooll((KKeeyy,, LLiisstt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Returns the value of a boolean key/value option. If _l_o_o_k_u_p_(_K_e_y_,
+              _L_i_s_t_) would yield _{_K_e_y_, _t_r_u_e_}, this function returns _t_r_u_e;
+              otherwise _f_a_l_s_e is returned.
+
+              See also: _g_e_t___v_a_l_u_e_/_2, _l_o_o_k_u_p_/_2.
+
+       ggeett__kkeeyyss((LLiisstt)) -->> [[tteerrmm(())]]
+
+              Types:
+
+                 List = [term()]
+
+              Returns an unordered list of the keys used in _L_i_s_t, not
+              containing duplicates.
+
+       ggeett__vvaalluuee((KKeeyy,, LLiisstt)) -->> tteerrmm(())
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Equivalent to _g_e_t___v_a_l_u_e_(_K_e_y_, _L_i_s_t_, _u_n_d_e_f_i_n_e_d_).
+
+       ggeett__vvaalluuee((KKeeyy,, LLiisstt,, DDeeffaauulltt)) -->> tteerrmm(())
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+                 Default = term()
+
+              Returns the value of a simple key/value property in _L_i_s_t. If
+              _l_o_o_k_u_p_(_K_e_y_, _L_i_s_t_) would yield _{_K_e_y_, _V_a_l_u_e_}, this function
+              returns the corresponding _V_a_l_u_e, otherwise _D_e_f_a_u_l_t is returned.
+
+              See also: _g_e_t___a_l_l___v_a_l_u_e_s_/_2, _g_e_t___b_o_o_l_/_2, _g_e_t___v_a_l_u_e_/_2, _l_o_o_k_u_p_/_2.
+
+       iiss__ddeeffiinneedd((KKeeyy,, LLiisstt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Returns _t_r_u_e if _L_i_s_t contains at least one entry associated with
+              _K_e_y, otherwise _f_a_l_s_e is returned.
+
+       llooookkuupp((KKeeyy,, LLiisstt)) -->> nnoonnee || ttuuppllee(())
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Returns the first entry associated with _K_e_y in _L_i_s_t, if one
+              exists, otherwise returns _n_o_n_e. For an atom _A in the list, the
+              tuple _{_A_, _t_r_u_e_} is the entry associated with _A.
+
+              See also: _g_e_t___b_o_o_l_/_2, _g_e_t___v_a_l_u_e_/_2, _l_o_o_k_u_p___a_l_l_/_2.
+
+       llooookkuupp__aallll((KKeeyy,, LLiisstt)) -->> [[ttuuppllee(())]]
+
+              Types:
+
+                 Key = term()
+                 List = [term()]
+
+              Returns the list of all entries associated with _K_e_y in _L_i_s_t. If
+              no such entry exists, the result is the empty list.
+
+              See also: _l_o_o_k_u_p_/_2.
+
+       nnoorrmmaalliizzee((LLiisstt,, SSttaaggeess)) -->> LLiisstt
+
+              Types:
+
+                 List = [term()]
+                 Stages = [Operation]
+                 Operation = {aliases, Aliases}
+                           | {negations, Negations}
+                           | {expand, Expansions}
+                 Aliases = Negations = [{Key, Key}]
+                 Expansions = [{Property :: pprrooppeerrttyy(()), Expansion ::
+                 [term()]}]
+
+              Passes _L_i_s_t through a sequence of substitution/expansion stages.
+              For an _a_l_i_a_s_e_s operation, the function _s_u_b_s_t_i_t_u_t_e___a_l_i_a_s_e_s_/_2 is
+              applied using the given list of aliases; for a _n_e_g_a_t_i_o_n_s
+              operation, _s_u_b_s_t_i_t_u_t_e___n_e_g_a_t_i_o_n_s_/_2 is applied using the given
+              negation list; for an _e_x_p_a_n_d operation, the function _e_x_p_a_n_d_/_2 is
+              applied using the given list of expansions. The final result is
+              automatically compacted (cf. _c_o_m_p_a_c_t_/_1).
+
+              Typically you want to substitute negations first, then aliases,
+              then perform one or more expansions (sometimes you want to pre-
+              expand particular entries before doing the main expansion). You
+              might want to substitute negations and/or aliases repeatedly, to
+              allow such forms in the right-hand side of aliases and expansion
+              lists.
+
+              See also: _c_o_m_p_a_c_t_/_1, _e_x_p_a_n_d_/_2, _s_u_b_s_t_i_t_u_t_e___a_l_i_a_s_e_s_/_2,
+              _s_u_b_s_t_i_t_u_t_e___n_e_g_a_t_i_o_n_s_/_2.
+
+       pprrooppeerrttyy((PPrrooppeerrttyy)) -->> PPrrooppeerrttyy
+
+              Types:
+
+                 Property = pprrooppeerrttyy(())
+
+              Creates a normal form (minimal) representation of a property. If
+              _P_r_o_p_e_r_t_y is _{_K_e_y_, _t_r_u_e_} where _K_e_y is an atom, this returns _K_e_y,
+              otherwise the whole term _P_r_o_p_e_r_t_y is returned.
+
+              See also: _p_r_o_p_e_r_t_y_/_2.
+
+       pprrooppeerrttyy((KKeeyy,, VVaalluuee)) -->> PPrrooppeerrttyy
+
+              Types:
+
+                 Key = Value = term()
+                 Property = atom() | {term(), term()}
+
+              Creates a normal form (minimal) representation of a simple
+              key/value property. Returns _K_e_y if _V_a_l_u_e is _t_r_u_e and _K_e_y is an
+              atom, otherwise a tuple _{_K_e_y_, _V_a_l_u_e_} is returned.
+
+              See also: _p_r_o_p_e_r_t_y_/_1.
+
+       sspplliitt((LLiisstt,, KKeeyyss)) -->> {{LLiissttss,, RReesstt}}
+
+              Types:
+
+                 List = Keys = [term()]
+                 Lists = [[term()]]
+                 Rest = [term()]
+
+              Partitions _L_i_s_t into a list of sublists and a remainder. _L_i_s_t_s
+              contains one sublist for each key in _K_e_y_s, in the corresponding
+              order. The relative order of the elements in each sublist is
+              preserved from the original _L_i_s_t. _R_e_s_t contains the elements in
+              _L_i_s_t that are not associated with any of the given keys, also
+              with their original relative order preserved.
+
+              Example: split([{c, 2}, {e, 1}, a, {c, 3, 4}, d, {b, 5}, b], [a,
+              b, c])
+
+              returns
+
+              {[[a], [{b, 5}, b],[{c, 2}, {c, 3, 4}]], [{e, 1}, d]}
+
+       ssuubbssttiittuuttee__aalliiaasseess((AAlliiaasseess,, LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 Aliases = [{Key, Key}]
+                 Key = term()
+                 List = [term()]
+
+              Substitutes keys of properties. For each entry in _L_i_s_t, if it is
+              associated with some key _K_1 such that _{_K_1_, _K_2_} occurs in
+              _A_l_i_a_s_e_s, the key of the entry is changed to _K_2. If the same _K_1
+              occurs more than once in _A_l_i_a_s_e_s, only the first occurrence is
+              used.
+
+              Example: _s_u_b_s_t_i_t_u_t_e___a_l_i_a_s_e_s_(_[_{_c_o_l_o_r_, _c_o_l_o_u_r_}_]_, _L_) will replace
+              all tuples _{_c_o_l_o_r_, _._._._} in _L with _{_c_o_l_o_u_r_, _._._._}, and all atoms
+              _c_o_l_o_r with _c_o_l_o_u_r.
+
+              See also: _n_o_r_m_a_l_i_z_e_/_2, _s_u_b_s_t_i_t_u_t_e___n_e_g_a_t_i_o_n_s_/_2.
+
+       ssuubbssttiittuuttee__nneeggaattiioonnss((NNeeggaattiioonnss,, LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 Negations = [{Key, Key}]
+                 Key = term()
+                 List = [term()]
+
+              Substitutes keys of boolean-valued properties and simultaneously
+              negates their values. For each entry in _L_i_s_t, if it is
+              associated with some key _K_1 such that _{_K_1_, _K_2_} occurs in
+              _N_e_g_a_t_i_o_n_s, then if the entry was _{_K_1_, _t_r_u_e_} it will be replaced
+              with _{_K_2_, _f_a_l_s_e_}, otherwise it will be replaced with _{_K_2_, _t_r_u_e_},
+              thus changing the name of the option and simultaneously negating
+              the value given by _g_e_t___b_o_o_l_(_L_i_s_t_). If the same _K_1 occurs more
+              than once in _N_e_g_a_t_i_o_n_s, only the first occurrence is used.
+
+              Example: _s_u_b_s_t_i_t_u_t_e___n_e_g_a_t_i_o_n_s_(_[_{_n_o___f_o_o_, _f_o_o_}_]_, _L_) will replace
+              any atom _n_o___f_o_o or tuple _{_n_o___f_o_o_, _t_r_u_e_} in _L with _{_f_o_o_, _f_a_l_s_e_},
+              and any other tuple _{_n_o___f_o_o_, _._._._} with _{_f_o_o_, _t_r_u_e_}.
+
+              See also: _g_e_t___b_o_o_l_/_2, _n_o_r_m_a_l_i_z_e_/_2, _s_u_b_s_t_i_t_u_t_e___a_l_i_a_s_e_s_/_2.
+
+       uunnffoolldd((LLiisstt)) -->> LLiisstt
+
+              Types:
+
+                 List = [term()]
+
+              Unfolds all occurrences of atoms in _L_i_s_t to tuples _{_A_t_o_m_, _t_r_u_e_}.
+
+
+
+Ericsson AB                      stdlib 1.18.2                    proplists(3)

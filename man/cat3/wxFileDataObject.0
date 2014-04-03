@@ -1,0 +1,53 @@
+wxFileDataObject(3)        Erlang Module Definition        wxFileDataObject(3)
+
+
+
+NNAAMMEE
+       wxFileDataObject - See external documentation: wxFileDataObject.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFileDataObject.
+
+       This class is derived (and can use functions) from:
+       wwxxDDaattaaOObbjjeecctt
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_i_l_e_D_a_t_a_O_b_j_e_c_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxFFiilleeDDaattaaOObbjjeecctt(())
+
+              See external documentation.
+
+       aaddddFFiillee((TThhiiss,, FFiilleennaammee)) -->> ookk
+
+              Types:
+
+                 This = wxFileDataObject()
+                 Filename = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettFFiilleennaammeess((TThhiiss)) -->> [[cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))]]
+
+              Types:
+
+                 This = wxFileDataObject()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFiilleeDDaattaaOObbjjeecctt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxFileDataObject(3)

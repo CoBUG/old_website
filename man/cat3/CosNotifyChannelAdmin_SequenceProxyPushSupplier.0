@@ -1,0 +1,79 @@
+CosNotifyChannelAdmin_SequenEcrCeloPasrnNogoxtyMiPofudysuChlhSeaunpDnpeelfliiAendrim(ti3in)o_nSequenceProxyPushSupplier(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_SequenceProxyPushSupplier - This module
+       implements the OMG  CosNotifyChannelAdmin::SequenceProxyPushSupplier
+       interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyySSuubbssccrriibbee
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+         * CCoossNNoottiiffyyCChhaannnneellAAddmmiinn__PPrrooxxyySSuupppplliieerr
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt__sseeqquueennccee__ppuusshh__ccoonnssuummeerr((SSeeqquueenncceePPrrooxxyyPPuusshhSSuupppplliieerr,, PPuusshhCCoonnssuummeerr))
+       -->> RReeppllyy
+
+              Types:
+
+                 SequenceProxyPushSupplier = #objref
+                 PushConsumer = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_AlreadyConnected'{}} | {'EXCEPTION',
+                 #'CosEventChannelAdmin_TypeError'{}}
+
+              This operation connects a _P_u_s_h_C_o_n_s_u_m_e_r to the target object. If
+              a connection already exists or the function
+              _p_s_u_h___s_t_r_u_c_t_u_r_e_d___e_v_e_n_t_s is not supported the exceptions
+              _A_l_r_e_a_d_y_C_o_n_n_e_c_t_e_d or _T_y_p_e_E_r_r_o_r will be raised respectively.
+
+       ssuussppeenndd__ccoonnnneeccttiioonn((SSeeqquueenncceePPrrooxxyyPPuusshhSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 SequenceProxyPushSupplier = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ConnectionAlreadyInactive'{}} |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_NotConnected'{}}
+
+              This operation suspends the connection between the client and
+              the target object. If no connection exists or the connection is
+              already suspended an exception is raised.
+
+       rreessuummee__ccoonnnneeccttiioonn((SSeeqquueenncceePPrrooxxyyPPuusshhSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 SequenceProxyPullConsumer = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_ConnectionAlreadyInactive'{}} |
+                 {'EXCEPTION', #'CosNotifyChannelAdmin_NotConnected'{}}
+
+              If the connection have previously been suspended this operation
+              must used if we want to resume the connection. If no object have
+              been connected or the connection already is active an exception
+              is raised.
+
+       ddiissccoonnnneecctt__sseeqquueennccee__ppuusshh__ssuupppplliieerr((SSeeqquueenncceePPrrooxxyyPPuusshhSSuupppplliieerr)) -->> ookk
+
+              Types:
+
+                 SequenceProxyPushSupplier = #objref
+
+              This operation cause the target object to close the connection
+              and terminate.
+
+
+
+Ericsson AB                 cCoossNNoottiiffiycCahtainonnel1A.d1m.i1n8_SequenceProxyPushSupplier(3)

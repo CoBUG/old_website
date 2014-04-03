@@ -1,0 +1,194 @@
+filelib(3)                 Erlang Module Definition                 filelib(3)
+
+
+
+NNAAMMEE
+       filelib - File utilities, such as wildcard matching of filenames
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains utilities on a higher level than the _f_i_l_e module.
+
+       The module supports Unicode file names, so that it will match against
+       regular expressions given in Unicode and that it will find and process
+       raw file names (i.e. files named in a way that does not confirm to the
+       expected encoding).
+
+       If the VM operates in Unicode file naming mode on a machine with
+       transparent file naming, the _f_u_n_(_) provided to _f_o_l_d___f_i_l_e_s_/_5 needs to be
+       prepared to handle binary file names.
+
+       For more information about raw file names, see the ffiillee module.
+
+DDAATTAA TTYYPPEESS
+       ffiilleennaammee(()) = ffiillee::nnaammee(())
+
+       ddiirrnnaammee(()) = ffiilleennaammee(())
+
+EEXXPPOORRTTSS
+       eennssuurree__ddiirr((NNaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = ffiilleennaammee(()) | ddiirrnnaammee(())
+                 Reason = ffiillee::ppoossiixx(())
+
+              The _e_n_s_u_r_e___d_i_r_/_1 function ensures that all parent directories
+              for the given file or directory name _N_a_m_e exist, trying to
+              create them if necessary.
+
+              Returns _o_k if all parent directories already exist or could be
+              created, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if some parent directory does not
+              exist and could not be created for some reason.
+
+       ffiillee__ssiizzee((FFiilleennaammee)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Filename = ffiilleennaammee(())
+
+              The _f_i_l_e___s_i_z_e function returns the size of the given file.
+
+       ffoolldd__ffiilleess((DDiirr,, RReeggEExxpp,, RReeccuurrssiivvee,, FFuunn,, AAccccIInn)) -->> AAccccOOuutt
+
+              Types:
+
+                 Dir = ddiirrnnaammee(())
+                 RegExp = string()
+                 Recursive = boolean()
+                 Fun = fun((F :: ffiillee::ffiilleennaammee(()), AccIn) -> AccOut)
+                 AccIn = AccOut = term()
+
+              The _f_o_l_d___f_i_l_e_s_/_5 function folds the function _F_u_n over all
+              (regular) files _F in the directory _D_i_r that match the regular
+              expression _R_e_g_E_x_p (see the rree module for a description of the
+              allowed regular expressions). If _R_e_c_u_r_s_i_v_e is true all sub-
+              directories to _D_i_r are processed. The regular expression
+              matching is done on just the filename without the directory
+              part.
+
+              If Unicode file name translation is in effect and the file
+              system is completely transparent, file names that cannot be
+              interpreted as Unicode may be encountered, in which case the
+              _f_u_n_(_) must be prepared to handle raw file names (i.e. binaries).
+              If the regular expression contains codepoints beyond 255, it
+              will not match file names that do not conform to the expected
+              character encoding (i.e. are not encoded in valid UTF-8).
+
+              For more information about raw file names, see the ffiillee module.
+
+       iiss__ddiirr((NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = ffiilleennaammee(()) | ddiirrnnaammee(())
+
+              The _i_s___d_i_r_/_1 function returns _t_r_u_e if _N_a_m_e refers to a
+              directory, and _f_a_l_s_e otherwise.
+
+       iiss__ffiillee((NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = ffiilleennaammee(()) | ddiirrnnaammee(())
+
+              The _i_s___f_i_l_e_/_1 function returns _t_r_u_e if _N_a_m_e refers to a file or
+              a directory, and _f_a_l_s_e otherwise.
+
+       iiss__rreegguullaarr((NNaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = ffiilleennaammee(())
+
+              The _i_s___r_e_g_u_l_a_r_/_1 function returns _t_r_u_e if _N_a_m_e refers to a file
+              (regular file), and _f_a_l_s_e otherwise.
+
+       llaasstt__mmooddiiffiieedd((NNaammee)) -->> ffiillee::ddaattee__ttiimmee(()) || 00
+
+              Types:
+
+                 Name = ffiilleennaammee(()) | ddiirrnnaammee(())
+
+              The _l_a_s_t___m_o_d_i_f_i_e_d_/_1 function returns the date and time the given
+              file or directory was last modified, or 0 if the file does not
+              exist.
+
+       wwiillddccaarrdd((WWiillddccaarrdd)) -->> [[ffiillee::ffiilleennaammee(())]]
+
+              Types:
+
+                 Wildcard = ffiilleennaammee(()) | ddiirrnnaammee(())
+
+              The _w_i_l_d_c_a_r_d_/_1 function returns a list of all files that match
+              Unix-style wildcard-string _W_i_l_d_c_a_r_d.
+
+              The wildcard string looks like an ordinary filename, except that
+              certain "wildcard characters" are interpreted in a special way.
+              The following characters are special:
+
+                ??::
+                  Matches one character.
+
+                **::
+                  Matches any number of characters up to the end of the
+                  filename, the next dot, or the next slash.
+
+                [[CChhaarraacctteerr11,,CChhaarraacctteerr22,,......]]::
+                  Matches any of the characters listed. Two characters
+                  separated by a hyphen will match a range of characters.
+                  Example: _[_A_-_Z_] will match any uppercase letter.
+
+                {{IItteemm,,......}}::
+                  Alternation. Matches one of the alternatives.
+
+              Other characters represent themselves. Only filenames that have
+              exactly the same character in the same position will match.
+              (Matching is case-sensitive; i.e. "a" will not match "A").
+
+              Note that multiple "*" characters are allowed (as in Unix
+              wildcards, but opposed to Windows/DOS wildcards).
+
+              Examples:
+
+              The following examples assume that the current directory is the
+              top of an Erlang/OTP installation.
+
+              To find all _._b_e_a_m files in all applications, the following line
+              can be used:
+
+                  filelib:wildcard("lib/*/ebin/*.beam").
+
+              To find either _._e_r_l or _._h_r_l in all applications _s_r_c directories,
+              the following
+
+                  filelib:wildcard("lib/*/src/*.?rl")
+
+              or the following line
+
+                  filelib:wildcard("lib/*/src/*.{erl,hrl}")
+
+              can be used.
+
+              To find all _._h_r_l files in either _s_r_c or _i_n_c_l_u_d_e directories,
+              use:
+
+                  filelib:wildcard("lib/*/{src,include}/*.hrl").
+
+              To find all _._e_r_l or _._h_r_l files in either _s_r_c or _i_n_c_l_u_d_e
+              directories, use:
+
+                  filelib:wildcard("lib/*/{src,include}/*.{erl,hrl}")
+
+       wwiillddccaarrdd((WWiillddccaarrdd,, CCwwdd)) -->> [[ffiillee::ffiilleennaammee(())]]
+
+              Types:
+
+                 Wildcard = ffiilleennaammee(()) | ddiirrnnaammee(())
+                 Cwd = ddiirrnnaammee(())
+
+              The _w_i_l_d_c_a_r_d_/_2 function works like _w_i_l_d_c_a_r_d_/_1, except that
+              instead of the actual working directory, _C_w_d will be used.
+
+
+
+Ericsson AB                      stdlib 1.18.2                      filelib(3)

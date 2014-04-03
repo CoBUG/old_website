@@ -1,0 +1,90 @@
+erl_boot_server(3)         Erlang Module Definition         erl_boot_server(3)
+
+
+
+NNAAMMEE
+       erl_boot_server - Boot Server for Other Erlang Machines
+
+DDEESSCCRRIIPPTTIIOONN
+       This server is used to assist diskless Erlang nodes which fetch all
+       Erlang code from another machine.
+
+       This server is used to fetch all code, including the start script, if
+       an Erlang runtime system is started with the _-_l_o_a_d_e_r _i_n_e_t command line
+       flag. All hosts specified with the _-_h_o_s_t_s _H_o_s_t command line flag must
+       have one instance of this server running.
+
+       This server can be started with the _k_e_r_n_e_l configuration parameter
+       _s_t_a_r_t___b_o_o_t___s_e_r_v_e_r.
+
+       The _e_r_l___b_o_o_t___s_e_r_v_e_r can both read regular files as well as files in
+       archives. See ccooddee((33)) and eerrll__pprriimm__llooaaddeerr((33)).
+
+   WWaarrnniinngg::
+       The support for loading of code from archive files is experimental. The
+       sole purpose of releasing it before it is ready is to obtain early
+       feedback. The file format, semantics, interfaces etc. may be changed in
+       a future release.
+
+
+EEXXPPOORRTTSS
+       ssttaarrtt((SSllaavveess)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Slaves = [Host]
+                 Host = atom()
+                 Pid = pid()
+                 What = any()
+
+              Starts the boot server. _S_l_a_v_e_s is a list of IP addresses for
+              hosts which are allowed to use this server as a boot server.
+
+       ssttaarrtt__lliinnkk((SSllaavveess)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Slaves = [Host]
+                 Host = atom()
+                 Pid = pid()
+                 What = any()
+
+              Starts the boot server and links to the caller. This function is
+              used to start the server if it is included in a supervision
+              tree.
+
+       aadddd__ssllaavvee((SSllaavvee)) -->> ookk || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Slave = Host
+                 Host = atom()
+                 What = any()
+
+              Adds a _S_l_a_v_e node to the list of allowed slave hosts.
+
+       ddeelleettee__ssllaavvee((SSllaavvee)) -->> ookk || {{eerrrroorr,, WWhhaatt}}
+
+              Types:
+
+                 Slave = Host
+                 Host = atom()
+                 What = any()
+
+              Deletes a _S_l_a_v_e node from the list of allowed slave hosts.
+
+       wwhhiicchh__ssllaavveess(()) -->> SSllaavveess
+
+              Types:
+
+                 Slaves = [Host]
+                 Host = atom()
+
+              Returns the current list of allowed slave hosts.
+
+SSEEEE AALLSSOO
+       iinniitt((33)), eerrll__pprriimm__llooaaddeerr((33))
+
+
+
+Ericsson AB                      kernel 2.15.2              erl_boot_server(3)

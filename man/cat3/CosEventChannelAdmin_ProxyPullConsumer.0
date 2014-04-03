@@ -1,0 +1,56 @@
+CosEventChannelAdmin_ProxyPuElrllCaonngsuMmoedruC(lo3es)EDveefnitnCihtainonnelAdmin_ProxyPullConsumer(3)
+
+
+
+NNAAMMEE
+       CosEventChannelAdmin_ProxyPullConsumer - This module implements a
+       ProxyPullConsumer interface which acts as a middleman between pull
+       supplier and the event channel.
+
+DDEESSCCRRIIPPTTIIOONN
+       The ProxyPullConsumer interface defines the second step for connecting
+       pull suppliers to the event channel. A proxy consumer is similar to a
+       normal consumer, but includes an additional method for connecting a
+       supplier to the proxy consumer.
+
+       To get access to all definitions, e.g., exceptions, include necessary
+       _h_r_l files by using:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       Any object that possesses an object reference that supports the
+       ProxyPullConsumer interface can perform the following operations:
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt__ppuullll__ssuupppplliieerr((OObbjjeecctt,, PPuullllSSuupppplliieerr)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 PullSupplier = #objref of PullSupplier type
+                 Return = ok | {'EXCEPTION', E}
+                 E = #'CosEventChannelAdmin_AlreadyConnected'{} |
+                 #'CosEventChannelAdmin_TypeError'{}
+
+              This operation connects PullSupplier object to the
+              ProxyPullConsumer object. If a nil object reference is passed
+              CORBA standard _B_A_D___P_A_R_A_M exception is raised. If the
+              ProxyPullConsumer is already connected to a PullSupplier, then
+              the _C_o_s_E_v_e_n_t_C_h_a_n_n_e_l_A_d_m_i_n___A_l_r_e_a_d_y_C_o_n_n_e_c_t_e_d exception is raised.
+              Implementations of ProxyPullConsumers may require additional
+              interface functionality; if these requirements are not met the
+              _C_o_s_E_v_e_n_t_C_h_a_n_n_e_l_A_d_m_i_n___T_y_p_e_E_r_r_o_r exception will be raised.
+
+       ddiissccoonnnneecctt__ppuullll__ccoonnssuummeerr((OObbjjeecctt)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Return = ok
+
+              This operation disconnects proxy pull consumer from the event
+              channel and sends a notification about the loss of the
+              connection to the pull supplier attached to it.
+
+
+
+Ericsson AB                     cosEveCnotsE2v.e1n.t1C2hannelAdmin_ProxyPullConsumer(3)

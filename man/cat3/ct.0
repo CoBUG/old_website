@@ -1,0 +1,995 @@
+ct(3)                      Erlang Module Definition                      ct(3)
+
+
+
+NNAAMMEE
+       ct - Main user interface for the Common Test framework.
+
+DDEESSCCRRIIPPTTIIOONN
+       Main user interface for the Common Test framework.
+
+       This module implements the command line interface for running tests and
+       some basic functions for common test case issues such as configuration
+       and logging.
+
+       _T_e_s_t _S_u_i_t_e _S_u_p_p_o_r_t _M_a_c_r_o_s
+
+       The _c_o_n_f_i_g macro is defined in _c_t_._h_r_l. This macro should be used to
+       retrieve information from the _C_o_n_f_i_g variable sent to all test cases.
+       It is used with two arguments, where the first is the name of the
+       configuration variable you wish to retrieve, and the second is the
+       _C_o_n_f_i_g variable supplied to the test case.
+
+       Possible configuration variables include:
+
+         * _d_a_t_a___d_i_r - Data file directory.
+
+         * _p_r_i_v___d_i_r - Scratch file directory.
+
+         * Whatever added by _i_n_i_t___p_e_r___s_u_i_t_e_/_1 or _i_n_i_t___p_e_r___t_e_s_t_c_a_s_e_/_2 in the
+           test suite.
+
+DDAATTAA TTYYPPEESS
+         _h_a_n_d_l_e_(_) _= _h_a_n_d_l_e_(_) _(_s_e_e _m_o_d_u_l_e _c_t___g_e_n___c_o_n_n_) _| _t_e_r_m_(_):
+
+
+           The identity of a specific connection.
+
+         _t_a_r_g_e_t___n_a_m_e_(_) _= _v_a_r___n_a_m_e_(_):
+
+
+           The name of a target.
+
+         _v_a_r___n_a_m_e_(_) _= _a_t_o_m_(_):
+
+
+           A variable name which is specified when _c_t_:_r_e_q_u_i_r_e_/_2 is called,
+           e.g. _c_t_:_r_e_q_u_i_r_e_(_m_y_n_o_d_e_n_a_m_e_,_{_n_o_d_e_,_[_t_e_l_n_e_t_]_}_)
+
+EEXXPPOORRTTSS
+       aabboorrtt__ccuurrrreenntt__tteessttccaassee((RReeaassoonn)) -->> ookk || {{eerrrroorr,, nnoo__tteessttccaassee__rruunnnniinngg}}
+
+              Types:
+
+                 Reason = term()
+
+              When calling this function, the currently executing test case
+              will be aborted. It is the user's responsibility to know for
+              sure which test case is currently executing. The function is
+              therefore only safe to call from a function which has been
+              called (or synchronously invoked) by the test case.
+
+              _R_e_a_s_o_n, the reason for aborting the test case, is printed in the
+              test case log.
+
+       aadddd__ccoonnffiigg((CCaallllbbaacckk,, CCoonnffiigg)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Callback = atom()
+                 Config = string()
+                 Reason = term()
+
+              This function loads configuration variables using the given
+              callback module and configuration string. Callback module should
+              be either loaded or present in the code part. Loaded
+              configuration variables can later be removed using
+              _r_e_m_o_v_e___c_o_n_f_i_g_/_2 function.
+
+       bbrreeaakk((CCoommmmeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Comment = string()
+                 Reason = {multiple_cases_running, TestCases} | 'enable break
+                 with release_shell option'
+                 TestCases = [atom()]
+
+              This function will cancel any active timetrap and pause the
+              execution of the current test case until the user calls the
+              _c_o_n_t_i_n_u_e_/_0 function. It gives the user the opportunity to
+              interact with the erlang node running the tests, e.g. for
+              debugging purposes or for manually executing a part of the test
+              case. If a parallel group is executing, _b_r_e_a_k_/_2 should be called
+              instead.
+
+              A cancelled timetrap will not be automatically reactivated after
+              the break, but must be started exlicitly with _c_t_:_t_i_m_e_t_r_a_p_/_1
+
+              In order for the break/continue functionality to work, Common
+              Test must release the shell process controlling stdin. This is
+              done by setting the _r_e_l_e_a_s_e___s_h_e_l_l start option to _t_r_u_e. See the
+              User's Guide for more information.
+
+       bbrreeaakk((TTeessttCCaassee,, CCoommmmeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TestCase = atom()
+                 Comment = string()
+                 Reason = 'test case not running' | 'enable break with
+                 release_shell option'
+
+              This function works the same way as _b_r_e_a_k_/_1, only the _T_e_s_t_C_a_s_e
+              argument makes it possible to pause a test case executing in a
+              parallel group. The _c_o_n_t_i_n_u_e_/_1 function should be used to resume
+              execution of _T_e_s_t_C_a_s_e.
+
+              See _b_r_e_a_k_/_1 for more details.
+
+       ccaappttuurree__ggeett(()) -->> LLiissttOOffSSttrriinnggss
+
+              Types:
+
+                 ListOfStrings = [string()]
+
+              Equivalent to ccaappttuurree__ggeett(([[ddeeffaauulltt]])).
+
+       ccaappttuurree__ggeett((EExxccllCCaatteeggoorriieess)) -->> LLiissttOOffSSttrriinnggss
+
+              Types:
+
+                 ExclCategories = [atom()]
+                 ListOfStrings = [string()]
+
+              Return and purge the list of text strings buffered during the
+              latest session of capturing printouts to stdout. With
+              _E_x_c_l_C_a_t_e_g_o_r_i_e_s it's possible to specify log categories that
+              should be ignored in _L_i_s_t_O_f_S_t_r_i_n_g_s. If _E_x_c_l_C_a_t_e_g_o_r_i_e_s _= _[_], no
+              filtering takes place.
+
+              _S_e_e _a_l_s_o_: ccaappttuurree__ssttaarrtt//00, ccaappttuurree__ssttoopp//00, lloogg//33.
+
+       ccaappttuurree__ssttaarrtt(()) -->> ookk
+
+              Start capturing all text strings printed to stdout during
+              execution of the test case.
+
+              _S_e_e _a_l_s_o_: ccaappttuurree__ggeett//11, ccaappttuurree__ssttoopp//00.
+
+       ccaappttuurree__ssttoopp(()) -->> ookk
+
+              Stop capturing text strings (a session started with
+              _c_a_p_t_u_r_e___s_t_a_r_t_/_0).
+
+              _S_e_e _a_l_s_o_: ccaappttuurree__ggeett//11, ccaappttuurree__ssttaarrtt//00.
+
+       ccoommmmeenntt((CCoommmmeenntt)) -->> vvooiidd(())
+
+              Types:
+
+                 Comment = term()
+
+              Print the given _C_o_m_m_e_n_t in the comment field in the table on the
+              test suite result page.
+
+              If called several times, only the last comment is printed. The
+              test case return value _{_c_o_m_m_e_n_t_,_C_o_m_m_e_n_t_} overwrites the string
+              set by this function.
+
+       ccoommmmeenntt((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              Print the formatted string in the comment field in the table on
+              the test suite result page.
+
+              The _F_o_r_m_a_t and _A_r_g_s arguments are used in call to
+              _i_o___l_i_b_:_f_o_r_m_a_t_/_2 in order to create the comment string. The
+              behaviour of _c_o_m_m_e_n_t_/_2 is otherwise the same as the _c_o_m_m_e_n_t_/_1
+              function (see above for details).
+
+       ccoonnttiinnuuee(()) -->> ookk
+
+              This function must be called in order to continue after a test
+              case (not executing in a parallel group) has called _b_r_e_a_k_/_1.
+
+       ccoonnttiinnuuee((TTeessttCCaassee)) -->> ookk
+
+              Types:
+
+                 TestCase = atom()
+
+              This function must be called in order to continue after a test
+              case has called _b_r_e_a_k_/_2. If the paused test case, _T_e_s_t_C_a_s_e,
+              executes in a parallel group, this function - rather than
+              _c_o_n_t_i_n_u_e_/_0 - must be used in order to let the test case proceed.
+
+       ddeeccrryypptt__ccoonnffiigg__ffiillee((EEnnccrryyppttFFiilleeNNaammee,, TTaarrggeettFFiilleeNNaammee)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 EncryptFileName = string()
+                 TargetFileName = string()
+                 Reason = term()
+
+              This function decrypts _E_n_c_r_y_p_t_F_i_l_e_N_a_m_e, previously generated
+              with _e_n_c_r_y_p_t___c_o_n_f_i_g___f_i_l_e_/_2_/_3. The original file contents is
+              saved in the target file. The encryption key, a string, must be
+              available in a text file named _._c_t___c_o_n_f_i_g_._c_r_y_p_t in the current
+              directory, or the home directory of the user (it is searched for
+              in that order).
+
+       ddeeccrryypptt__ccoonnffiigg__ffiillee((EEnnccrryyppttFFiilleeNNaammee,, TTaarrggeettFFiilleeNNaammee,, KKeeyyOOrrFFiillee)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 EncryptFileName = string()
+                 TargetFileName = string()
+                 KeyOrFile = {key, string()} | {file, string()}
+                 Reason = term()
+
+              This function decrypts _E_n_c_r_y_p_t_F_i_l_e_N_a_m_e, previously generated
+              with _e_n_c_r_y_p_t___c_o_n_f_i_g___f_i_l_e_/_2_/_3. The original file contents is
+              saved in the target file. The key must have the the same value
+              as that used for encryption.
+
+       eennccrryypptt__ccoonnffiigg__ffiillee((SSrrccFFiilleeNNaammee,, EEnnccrryyppttFFiilleeNNaammee)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 SrcFileName = string()
+                 EncryptFileName = string()
+                 Reason = term()
+
+              This function encrypts the source config file with DES3 and
+              saves the result in file _E_n_c_r_y_p_t_F_i_l_e_N_a_m_e. The key, a string,
+              must be available in a text file named _._c_t___c_o_n_f_i_g_._c_r_y_p_t in the
+              current directory, or the home directory of the user (it is
+              searched for in that order).
+
+              See the Common Test User's Guide for information about using
+              encrypted config files when running tests.
+
+              See the _c_r_y_p_t_o application for details on DES3
+              encryption/decryption.
+
+       eennccrryypptt__ccoonnffiigg__ffiillee((SSrrccFFiilleeNNaammee,, EEnnccrryyppttFFiilleeNNaammee,, KKeeyyOOrrFFiillee)) -->> ookk ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SrcFileName = string()
+                 EncryptFileName = string()
+                 KeyOrFile = {key, string()} | {file, string()}
+                 Reason = term()
+
+              This function encrypts the source config file with DES3 and
+              saves the result in the target file _E_n_c_r_y_p_t_F_i_l_e_N_a_m_e. The
+              encryption key to use is either the value in _{_k_e_y_,_K_e_y_} or the
+              value stored in the file specified by _{_f_i_l_e_,_F_i_l_e_}.
+
+              See the Common Test User's Guide for information about using
+              encrypted config files when running tests.
+
+              See the _c_r_y_p_t_o application for details on DES3
+              encryption/decryption.
+
+       ffaaiill((RReeaassoonn)) -->> vvooiidd(())
+
+              Types:
+
+                 Reason = term()
+
+              Terminate a test case with the given error _R_e_a_s_o_n.
+
+       ffaaiill((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              Terminate a test case with an error message specified by a
+              format string and a list of values (used as arguments to
+              _i_o___l_i_b_:_f_o_r_m_a_t_/_2).
+
+       ggeett__ccoonnffiigg((RReeqquuiirreedd)) -->> VVaalluuee
+
+              Equivalent to ggeett__ccoonnffiigg((RReeqquuiirreedd,, uunnddeeffiinneedd,, [[]])).
+
+       ggeett__ccoonnffiigg((RReeqquuiirreedd,, DDeeffaauulltt)) -->> VVaalluuee
+
+              Equivalent to ggeett__ccoonnffiigg((RReeqquuiirreedd,, DDeeffaauulltt,, [[]])).
+
+       ggeett__ccoonnffiigg((RReeqquuiirreedd,, DDeeffaauulltt,, OOppttss)) -->> VVaalluueeOOrrEElleemmeenntt
+
+              Types:
+
+                 Required = KeyOrName | {KeyOrName, SubKey} | {KeyOrName,
+                 SubKey, SubKey}
+                 KeyOrName = atom()
+                 SubKey = atom()
+                 Default = term()
+                 Opts = [Opt] | []
+                 Opt = element | all
+                 ValueOrElement = term() | Default
+
+              Read config data values.
+
+              This function returns the matching value(s) or config
+              element(s), given a config variable key or its associated name
+              (if one has been specified with _r_e_q_u_i_r_e_/_2 or a require
+              statement).
+
+              Example, given the following config file:
+
+                 {unix,[{telnet,IpAddr},
+                        {user,[{username,Username},
+                               {password,Password}]}]}.
+
+              _c_t_:_g_e_t___c_o_n_f_i_g_(_u_n_i_x_,_D_e_f_a_u_l_t_) _-_> _[_{_t_e_l_n_e_t_,_I_p_A_d_d_r_}_, _{_u_s_e_r_,
+              _[_{_u_s_e_r_n_a_m_e_,_U_s_e_r_n_a_m_e_}_, _{_p_a_s_s_w_o_r_d_,_P_a_s_s_w_o_r_d_}_]_}_]
+              _c_t_:_g_e_t___c_o_n_f_i_g_(_{_u_n_i_x_,_t_e_l_n_e_t_}_,_D_e_f_a_u_l_t_) _-_> _I_p_A_d_d_r
+              _c_t_:_g_e_t___c_o_n_f_i_g_(_{_u_n_i_x_,_u_s_e_r_,_u_s_e_r_n_a_m_e_}_,_D_e_f_a_u_l_t_) _-_> _U_s_e_r_n_a_m_e
+              _c_t_:_g_e_t___c_o_n_f_i_g_(_{_u_n_i_x_,_f_t_p_}_,_D_e_f_a_u_l_t_) _-_> _D_e_f_a_u_l_t
+              _c_t_:_g_e_t___c_o_n_f_i_g_(_u_n_k_n_o_w_n_k_e_y_,_D_e_f_a_u_l_t_) _-_> _D_e_f_a_u_l_t
+
+              If a config variable key has been associated with a name (by
+              means of _r_e_q_u_i_r_e_/_2 or a require statement), the name may be used
+              instead of the key to read the value:
+
+              _c_t_:_r_e_q_u_i_r_e_(_m_y_u_s_e_r_,_{_u_n_i_x_,_u_s_e_r_}_) _-_> _o_k_.
+              _c_t_:_g_e_t___c_o_n_f_i_g_(_m_y_u_s_e_r_,_D_e_f_a_u_l_t_) _-_> _[_{_u_s_e_r_n_a_m_e_,_U_s_e_r_n_a_m_e_}_,
+              _{_p_a_s_s_w_o_r_d_,_P_a_s_s_w_o_r_d_}_]
+
+              If a config variable is defined in multiple files and you want
+              to access all possible values, use the _a_l_l option. The values
+              will be returned in a list and the order of the elements
+              corresponds to the order that the config files were specified at
+              startup.
+
+              If you want config elements (key-value tuples) returned as
+              result instead of values, use the _e_l_e_m_e_n_t option. The returned
+              elements will then be on the form _{_R_e_q_u_i_r_e_d_,_V_a_l_u_e_}
+
+              _S_e_e _a_l_s_o_: ggeett__ccoonnffiigg//11, ggeett__ccoonnffiigg//22, rreeqquuiirree//11, rreeqquuiirree//22.
+
+       ggeett__ssttaattuuss(()) -->> TTeessttSSttaattuuss || {{eerrrroorr,, RReeaassoonn}} || nnoo__tteessttss__rruunnnniinngg
+
+              Types:
+
+                 TestStatus = [StatusElem]
+                 StatusElem = {current, TestCaseInfo} | {successful,
+                 Successful} | {failed, Failed} | {skipped, Skipped} | {total,
+                 Total}
+                 TestCaseInfo = {Suite, TestCase} | [{Suite, TestCase}]
+                 Suite = atom()
+                 TestCase = atom()
+                 Successful = integer()
+                 Failed = integer()
+                 Skipped = {UserSkipped, AutoSkipped}
+                 UserSkipped = integer()
+                 AutoSkipped = integer()
+                 Total = integer()
+                 Reason = term()
+
+              Returns status of ongoing test. The returned list contains info
+              about which test case is currently executing (a list of cases
+              when a parallel test case group is executing), as well as
+              counters for successful, failed, skipped, and total test cases
+              so far.
+
+       ggeett__ttaarrggeett__nnaammee((HHaannddllee)) -->> {{ookk,, TTaarrggeettNNaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Handle = handle()
+                 TargetName = target_name()
+
+              Return the name of the target that the given connection belongs
+              to.
+
+       ggeett__ttiimmeettrraapp__iinnffoo(()) -->> {{TTiimmee,, SSccaallee}}
+
+              Types:
+
+                 Time = integer() | infinity
+                 Scale = true | false
+
+              Read info about the timetrap set for the current test case.
+              _S_c_a_l_e indicates if Common Test will attempt to automatically
+              compensate timetraps for runtime delays introduced by e.g. tools
+              like cover.
+
+       iinnssttaallll((OOppttss)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Opts = [Opt]
+                 Opt = {config, ConfigFiles} | {event_handler, Modules} |
+                 {decrypt, KeyOrFile}
+                 ConfigFiles = [ConfigFile]
+                 ConfigFile = string()
+                 Modules = [atom()]
+                 KeyOrFile = {key, Key} | {file, KeyFile}
+                 Key = string()
+                 KeyFile = string()
+
+              Install config files and event handlers.
+
+              Run this function once before first test.
+
+              Example:
+              _i_n_s_t_a_l_l_(_[_{_c_o_n_f_i_g_,_[_"_c_o_n_f_i_g___n_o_d_e_._c_t_c_"_,_"_c_o_n_f_i_g___u_s_e_r_._c_t_c_"_]_}_]_).
+
+              Note that this function is automatically run by the _c_t___r_u_n
+              program.
+
+       lliisstteennvv((TTeellnneett)) -->> [[EEnnvv]]
+
+              Types:
+
+                 Telnet = term()
+                 Env = {Key, Value}
+                 Key = string()
+                 Value = string()
+
+              Performs the listenv command on the given telnet connection and
+              returns the result as a list of Key-Value pairs.
+
+       lloogg((FFoorrmmaatt)) -->> ookk
+
+              Equivalent to lloogg((ddeeffaauulltt,, 5500,, FFoorrmmaatt,, [[]])).
+
+       lloogg((XX11,, XX22)) -->> ookk
+
+              Types:
+
+                 X1 = Category | Importance | Format
+                 X2 = Format | Args
+
+              Equivalent to lloogg((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)).
+
+       lloogg((XX11,, XX22,, XX33)) -->> ookk
+
+              Types:
+
+                 X1 = Category | Importance
+                 X2 = Importance | Format
+                 X3 = Format | Args
+
+              Equivalent to lloogg((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)).
+
+       lloogg((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)) -->> ookk
+
+              Types:
+
+                 Category = atom()
+                 Importance = integer()
+                 Format = string()
+                 Args = list()
+
+              Printout from a test case to the log file.
+
+              This function is meant for printing a string directly from a
+              test case to the test case log file.
+
+              Default _C_a_t_e_g_o_r_y is _d_e_f_a_u_l_t, default _I_m_p_o_r_t_a_n_c_e is
+              _?_S_T_D___I_M_P_O_R_T_A_N_C_E, and default value for _A_r_g_s is _[_].
+
+              Please see the User's Guide for details on _C_a_t_e_g_o_r_y and
+              _I_m_p_o_r_t_a_n_c_e.
+
+       mmaakkee__pprriivv__ddiirr(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              If the test has been started with the create_priv_dir option set
+              to manual_per_tc, in order for the test case to use the private
+              directory, it must first create it by calling this function.
+
+       nnoottiiffyy((NNaammee,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 Name = atom()
+                 Data = term()
+
+              Sends a asynchronous notification of type _N_a_m_e with _D_a_t_ato the
+              common_test event manager. This can later be caught by any
+              installed event manager.
+
+              _S_e_e _a_l_s_o_: ggeenn__eevveenntt((33)).
+
+       ppaall((FFoorrmmaatt)) -->> ookk
+
+              Equivalent to ppaall((ddeeffaauulltt,, 5500,, FFoorrmmaatt,, [[]])).
+
+       ppaall((XX11,, XX22)) -->> ookk
+
+              Types:
+
+                 X1 = Category | Importance | Format
+                 X2 = Format | Args
+
+              Equivalent to ppaall((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)).
+
+       ppaall((XX11,, XX22,, XX33)) -->> ookk
+
+              Types:
+
+                 X1 = Category | Importance
+                 X2 = Importance | Format
+                 X3 = Format | Args
+
+              Equivalent to ppaall((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)).
+
+       ppaall((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)) -->> ookk
+
+              Types:
+
+                 Category = atom()
+                 Importance = integer()
+                 Format = string()
+                 Args = list()
+
+              Print and log from a test case.
+
+              This function is meant for printing a string from a test case,
+              both to the test case log file and to the console.
+
+              Default _C_a_t_e_g_o_r_y is _d_e_f_a_u_l_t, default _I_m_p_o_r_t_a_n_c_e is
+              _?_S_T_D___I_M_P_O_R_T_A_N_C_E, and default value for _A_r_g_s is _[_].
+
+              Please see the User's Guide for details on _C_a_t_e_g_o_r_y and
+              _I_m_p_o_r_t_a_n_c_e.
+
+       ppaarrssee__ttaabbllee((DDaattaa)) -->> {{HHeeaaddiinngg,, TTaabbllee}}
+
+              Types:
+
+                 Data = [string()]
+                 Heading = tuple()
+                 Table = [tuple()]
+
+              Parse the printout from an SQL table and return a list of
+              tuples.
+
+              The printout to parse would typically be the result of a _s_e_l_e_c_t
+              command in SQL. The returned _T_a_b_l_e is a list of tuples, where
+              each tuple is a row in the table.
+
+              _H_e_a_d_i_n_g is a tuple of strings representing the headings of each
+              column in the table.
+
+       pprriinntt((FFoorrmmaatt)) -->> ookk
+
+              Equivalent to pprriinntt((ddeeffaauulltt,, 5500,, FFoorrmmaatt,, [[]])).
+
+       pprriinntt((XX11,, XX22)) -->> ookk
+
+              Types:
+
+                 X1 = Category | Importance | Format
+                 X2 = Format | Args
+
+              Equivalent to pprriinntt((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)).
+
+       pprriinntt((XX11,, XX22,, XX33)) -->> ookk
+
+              Types:
+
+                 X1 = Category | Importance
+                 X2 = Importance | Format
+                 X3 = Format | Args
+
+              Equivalent to pprriinntt((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)).
+
+       pprriinntt((CCaatteeggoorryy,, IImmppoorrttaannccee,, FFoorrmmaatt,, AArrggss)) -->> ookk
+
+              Types:
+
+                 Category = atom()
+                 Importance = integer()
+                 Format = string()
+                 Args = list()
+
+              Printout from a test case to the console.
+
+              This function is meant for printing a string from a test case to
+              the console.
+
+              Default _C_a_t_e_g_o_r_y is _d_e_f_a_u_l_t, default _I_m_p_o_r_t_a_n_c_e is
+              _?_S_T_D___I_M_P_O_R_T_A_N_C_E, and default value for _A_r_g_s is _[_].
+
+              Please see the User's Guide for details on _C_a_t_e_g_o_r_y and
+              _I_m_p_o_r_t_a_n_c_e.
+
+       rreellooaadd__ccoonnffiigg((RReeqquuiirreedd)) -->> VVaalluueeOOrrEElleemmeenntt
+
+              Types:
+
+                 Required = KeyOrName | {KeyOrName, SubKey} | {KeyOrName,
+                 SubKey, SubKey}
+                 KeyOrName = atom()
+                 SubKey = atom()
+                 ValueOrElement = term()
+
+              Reload config file which contains specified configuration key.
+
+              This function performs updating of the configuration data from
+              which the given configuration variable was read, and returns the
+              (possibly) new value of this variable.
+
+              Note that if some variables were present in the configuration
+              but are not loaded using this function, they will be removed
+              from the configuration table together with their aliases.
+
+       rreemmoovvee__ccoonnffiigg((CCaallllbbaacckk,, CCoonnffiigg)) -->> ookk
+
+              Types:
+
+                 Callback = atom()
+                 Config = string()
+                 Reason = term()
+
+              This function removes configuration variables (together with
+              their aliases) which were loaded with specified callback module
+              and configuration string.
+
+       rreeqquuiirree((RReeqquuiirreedd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Required = Key | {Key, SubKeys} | {Key, SubKey, SubKeys}
+                 Key = atom()
+                 SubKeys = SubKey | [SubKey]
+                 SubKey = atom()
+
+              Check if the required configuration is available. It is possible
+              to specify arbitrarily deep tuples as _R_e_q_u_i_r_e_d. Note that it is
+              only the last element of the tuple which can be a list of
+              _S_u_b_K_e_ys.
+
+              Example 1: require the variable _m_y_v_a_r:
+
+              ok = ct:require(myvar).
+
+              In this case the config file must at least contain:
+
+              {myvar,Value}.
+
+              Example 2: require the key _m_y_v_a_r with subkeys _s_u_b_1 and _s_u_b_2:
+
+              ok = ct:require({myvar,[sub1,sub2]}).
+
+              In this case the config file must at least contain:
+
+              {myvar,[{sub1,Value},{sub2,Value}]}.
+
+              Example 3: require the key _m_y_v_a_r with subkey _s_u_b_1 with _s_u_b_s_u_b_1:
+
+              ok = ct:require({myvar,sub1,sub2}).
+
+              In this case the config file must at least contain:
+
+              {myvar,[{sub1,[{sub2,Value}]}]}.
+
+              _S_e_e _a_l_s_o_: ggeett__ccoonnffiigg//11, ggeett__ccoonnffiigg//22, ggeett__ccoonnffiigg//33, rreeqquuiirree//22.
+
+       rreeqquuiirree((NNaammee,, RReeqquuiirreedd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = atom()
+                 Required = Key | {Key, SubKey} | {Key, SubKey, SubKey}
+                 SubKey = Key
+                 Key = atom()
+
+              Check if the required configuration is available, and give it a
+              name. The semantics for _R_e_q_u_i_r_e_d is the same as in _r_e_q_u_i_r_e_d_/_1
+              except that it is not possible to specify a list of _S_u_b_K_e_ys.
+
+              If the requested data is available, the sub entry will be
+              associated with _N_a_m_e so that the value of the element can be
+              read with _g_e_t___c_o_n_f_i_g_/_1_,_2 provided _N_a_m_e instead of the whole
+              _R_e_q_u_i_r_e_d term.
+
+              Example: Require one node with a telnet connection and an ftp
+              connection. Name the node _a:
+
+              ok = ct:require(a,{machine,node}).
+
+              All references to this node may then use the node name. E.g. you
+              can fetch a file over ftp like this:
+
+              ok = ct:ftp_get(a,RemoteFile,LocalFile).
+
+              For this to work, the config file must at least contain:
+
+              {machine,[{node,[{telnet,IpAddr},{ftp,IpAddr}]}]}.
+
+          NNoottee::
+              The behaviour of this function changed radically in common_test
+              1.6.2. In order too keep some backwards compatability it is
+              still possible to do:
+              _c_t_:_r_e_q_u_i_r_e_(_a_,_{_n_o_d_e_,_[_t_e_l_n_e_t_,_f_t_p_]_}_)_.
+              This will associate the name _a with the top level _n_o_d_e entry.
+              For this to work, the config file must at least contain:
+              _{_n_o_d_e_,_[_{_t_e_l_n_e_t_,_I_p_A_d_d_r_}_,_{_f_t_p_,_I_p_A_d_d_r_}_]_}_.
+
+
+              _S_e_e _a_l_s_o_: ggeett__ccoonnffiigg//11, ggeett__ccoonnffiigg//22, ggeett__ccoonnffiigg//33, rreeqquuiirree//11.
+
+       rruunn((TTeessttDDiirrss)) -->> RReessuulltt
+
+              Types:
+
+                 TestDirs = TestDir | [TestDir]
+
+              Run all test cases in all suites in the given directories.
+
+              _S_e_e _a_l_s_o_: rruunn//33.
+
+       rruunn((TTeessttDDiirr,, SSuuiittee)) -->> RReessuulltt
+
+              Run all test cases in the given suite.
+
+              _S_e_e _a_l_s_o_: rruunn//33.
+
+       rruunn((TTeessttDDiirr,, SSuuiittee,, CCaasseess)) -->> RReessuulltt
+
+              Types:
+
+                 TestDir = string()
+                 Suite = atom()
+                 Cases = atom() | [atom()]
+                 Result = [TestResult] | {error, Reason}
+
+              Run the given test case(s).
+
+              Requires that _c_t_:_i_n_s_t_a_l_l_/_1 has been run first.
+
+              Suites (*_SUITE.erl) files must be stored in _T_e_s_t_D_i_r or
+              _T_e_s_t_D_i_r_/_t_e_s_t. All suites will be compiled when test is run.
+
+       rruunn__tteesstt((OOppttss)) -->> RReessuulltt
+
+              Types:
+
+                 Opts = [OptTuples]
+                 OptTuples = {dir, TestDirs} | {suite, Suites} | {group,
+                 Groups} | {testcase, Cases} | {spec, TestSpecs} | {label,
+                 Label} | {config, CfgFiles} | {userconfig, UserConfig} |
+                 {allow_user_terms, Bool} | {logdir, LogDir} |
+                 {silent_connections, Conns} | {stylesheet, CSSFile} | {cover,
+                 CoverSpecFile} | {step, StepOpts} | {event_handler,
+                 EventHandlers} | {include, InclDirs} | {auto_compile, Bool} |
+                 {create_priv_dir, CreatePrivDir} | {multiply_timetraps, M} |
+                 {scale_timetraps, Bool} | {repeat, N} | {duration, DurTime} |
+                 {until, StopTime} | {force_stop, Bool} | {decrypt,
+                 DecryptKeyOrFile} | {refresh_logs, LogDir} | {logopts,
+                 LogOpts} | {verbosity, VLevels} | {basic_html, Bool} |
+                 {ct_hooks, CTHs} | {enable_builtin_hooks, Bool} |
+                 {release_shell, Bool}
+                 TestDirs = [string()] | string()
+                 Suites = [string()] | [atom()] | string() | atom()
+                 Cases = [atom()] | atom()
+                 Groups = [atom()] | atom()
+                 TestSpecs = [string()] | string()
+                 Label = string() | atom()
+                 CfgFiles = [string()] | string()
+                 UserConfig = [{CallbackMod, CfgStrings}] | {CallbackMod,
+                 CfgStrings}
+                 CallbackMod = atom()
+                 CfgStrings = [string()] | string()
+                 LogDir = string()
+                 Conns = all | [atom()]
+                 CSSFile = string()
+                 CoverSpecFile = string()
+                 StepOpts = [StepOpt] | []
+                 StepOpt = config | keep_inactive
+                 EventHandlers = EH | [EH]
+                 EH = atom() | {atom(), InitArgs} | {[atom()], InitArgs}
+                 InitArgs = [term()]
+                 InclDirs = [string()] | string()
+                 CreatePrivDir = auto_per_run | auto_per_tc | manual_per_tc
+                 M = integer()
+                 N = integer()
+                 DurTime = string(HHMMSS)
+                 StopTime = string(YYMoMoDDHHMMSS) | string(HHMMSS)
+                 DecryptKeyOrFile = {key, DecryptKey} | {file, DecryptFile}
+                 DecryptKey = string()
+                 DecryptFile = string()
+                 LogOpts = [LogOpt]
+                 LogOpt = no_nl | no_src
+                 VLevels = VLevel | [{Category, VLevel}]
+                 VLevel = integer()
+                 Category = atom()
+                 CTHs = [CTHModule | {CTHModule, CTHInitArgs}]
+                 CTHModule = atom()
+                 CTHInitArgs = term()
+                 Result = {Ok, Failed, {UserSkipped, AutoSkipped}} |
+                 TestRunnerPid | {error, Reason}
+                 Ok = integer()
+                 Failed = integer()
+                 UserSkipped = integer()
+                 AutoSkipped = integer()
+                 TestRunnerPid = pid()
+                 Reason = term()
+
+              Run tests as specified by the combination of options in _O_p_t_s.
+              The options are the same as those used with the _c_t___r_u_n program.
+              Note that here a _T_e_s_t_D_i_r can be used to point out the path to a
+              _S_u_i_t_e. Note also that the option _t_e_s_t_c_a_s_e corresponds to the
+              _-_c_a_s_e option in the _c_t___r_u_n program. Configuration files
+              specified in _O_p_t_s will be installed automatically at startup.
+
+              _T_e_s_t_R_u_n_n_e_r_P_i_d is returned if _r_e_l_e_a_s_e___s_h_e_l_l _=_= _t_r_u_e (see _b_r_e_a_k_/_1
+              for details).
+
+              _R_e_a_s_o_n indicates what type of error has been encountered.
+
+       rruunn__tteessttssppeecc((TTeessttSSppeecc)) -->> RReessuulltt
+
+              Types:
+
+                 TestSpec = [term()]
+                 Result = {Ok, Failed, {UserSkipped, AutoSkipped}} | {error,
+                 Reason}
+                 Ok = integer()
+                 Failed = integer()
+                 UserSkipped = integer()
+                 AutoSkipped = integer()
+                 Reason = term()
+
+              Run test specified by _T_e_s_t_S_p_e_c. The terms are the same as those
+              used in test specification files.
+
+              _R_e_a_s_o_n indicates what type of error has been encountered.
+
+       sslleeeepp((TTiimmee)) -->> ookk
+
+              Types:
+
+                 Time = {hours, Hours} | {minutes, Mins} | {seconds, Secs} |
+                 Millisecs | infinity
+                 Hours = integer()
+                 Mins = integer()
+                 Secs = integer()
+                 Millisecs = integer() | float()
+
+              This function, similar to _t_i_m_e_r_:_s_l_e_e_p_/_1, suspends the test case
+              for specified time. However, this function also multiplies _T_i_m_e
+              with the 'multiply_timetraps' value (if set) and under certain
+              circumstances also scales up the time automatically if
+              'scale_timetraps' is set to true (default is false).
+
+       ssttaarrtt__iinntteerraaccttiivvee(()) -->> ookk
+
+              Start CT in interactive mode.
+
+              From this mode all test case support functions can be executed
+              directly from the erlang shell. The interactive mode can also be
+              started from the OS command line with _c_t___r_u_n _-_s_h_e_l_l _[_-_c_o_n_f_i_g
+              _F_i_l_e_._._._].
+
+              If any functions using "required config data" (e.g. telnet or
+              ftp functions) are to be called from the erlang shell, config
+              data must first be required with _c_t_:_r_e_q_u_i_r_e_/_2.
+
+              Example:
+              _> _c_t_:_r_e_q_u_i_r_e_(_u_n_i_x___t_e_l_n_e_t_, _u_n_i_x_)_.
+              _o_k
+              _> _c_t___t_e_l_n_e_t_:_o_p_e_n_(_u_n_i_x___t_e_l_n_e_t_)_.
+              _{_o_k_,_<_0_._1_0_5_._0_>_}
+              _> _c_t___t_e_l_n_e_t_:_c_m_d_(_u_n_i_x___t_e_l_n_e_t_, _"_l_s _._"_)_.
+              _{_o_k_,_[_"_l_s_"_,_"_f_i_l_e_1 _._._._"_,_._._._]_}
+
+       sstteepp((TTeessttDDiirr,, SSuuiittee,, CCaassee)) -->> RReessuulltt
+
+              Types:
+
+                 Case = atom()
+
+              Step through a test case with the debugger.
+
+              _S_e_e _a_l_s_o_: rruunn//33.
+
+       sstteepp((TTeessttDDiirr,, SSuuiittee,, CCaassee,, OOppttss)) -->> RReessuulltt
+
+              Types:
+
+                 Case = atom()
+                 Opts = [Opt] | []
+                 Opt = config | keep_inactive
+
+              Step through a test case with the debugger. If the _c_o_n_f_i_g option
+              has been given, breakpoints will be set also on the
+              configuration functions in _S_u_i_t_e.
+
+              _S_e_e _a_l_s_o_: rruunn//33.
+
+       ssttoopp__iinntteerraaccttiivvee(()) -->> ookk
+
+              Exit the interactive mode.
+
+              _S_e_e _a_l_s_o_: ssttaarrtt__iinntteerraaccttiivvee//00.
+
+       ssyynncc__nnoottiiffyy((NNaammee,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 Name = atom()
+                 Data = term()
+
+              Sends a synchronous notification of type _N_a_m_e with _D_a_t_ato the
+              common_test event manager. This can later be caught by any
+              installed event manager.
+
+              _S_e_e _a_l_s_o_: ggeenn__eevveenntt((33)).
+
+       tteessttccaasseess((TTeessttDDiirr,, SSuuiittee)) -->> TTeessttccaasseess || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TestDir = string()
+                 Suite = atom()
+                 Testcases = list()
+                 Reason = term()
+
+              Returns all test cases in the specified suite.
+
+       ttiimmeettrraapp((TTiimmee)) -->> ookk
+
+              Types:
+
+                 Time = {hours, Hours} | {minutes, Mins} | {seconds, Secs} |
+                 Millisecs | infinity | Func
+                 Hours = integer()
+                 Mins = integer()
+                 Secs = integer()
+                 Millisecs = integer() | float()
+                 Func = {M, F, A} | function()
+                 M = atom()
+                 F = atom()
+                 A = list()
+
+              Use this function to set a new timetrap for the running test
+              case. If the argument is _F_u_n_c, the timetrap will be triggered
+              when this function returns. _F_u_n_c may also return a new _T_i_m_e
+              value, which in that case will be the value for the new
+              timetrap.
+
+       uusseerrddaattaa((TTeessttDDiirr,, SSuuiittee)) -->> SSuuiitteeUUsseerrDDaattaa || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TestDir = string()
+                 Suite = atom()
+                 SuiteUserData = [term()]
+                 Reason = term()
+
+              Returns any data specified with the tag _u_s_e_r_d_a_t_a in the list of
+              tuples returned from _S_u_i_t_e_:_s_u_i_t_e_/_0.
+
+       uusseerrddaattaa((TTeessttDDiirr,, SSuuiittee,, CCaassee::::GGrroouuppOOrrCCaassee)) -->> TTCCUUsseerrDDaattaa || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 TestDir = string()
+                 Suite = atom()
+                 GroupOrCase = {group, GroupName} | atom()
+                 GroupName = atom()
+                 TCUserData = [term()]
+                 Reason = term()
+
+              Returns any data specified with the tag _u_s_e_r_d_a_t_a in the list of
+              tuples returned from _S_u_i_t_e_:_g_r_o_u_p_(_G_r_o_u_p_N_a_m_e_) or _S_u_i_t_e_:_C_a_s_e_(_).
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                         ct(3)

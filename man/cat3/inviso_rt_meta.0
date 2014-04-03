@@ -1,0 +1,69 @@
+inviso_rt_meta(3)          Erlang Module Definition          inviso_rt_meta(3)
+
+
+
+NNAAMMEE
+       inviso_rt_meta - Direct API to the Inviso Runtime Component's meta
+       tracer
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides a direct API to the inviso meta tracer. These
+       functions are only meant to be used in meta tracing _C_a_l_l_F_u_n_c and
+       _R_e_m_o_v_e_F_u_n_c.
+
+       It can sometimes be necessary to manipulate meta match-patterns from
+       _C_a_l_l_F_u_n_cs and _R_e_m_o_v_e_F_u_n_cs. The problem then is that call-funcs and
+       remove-funcs are meta trace call-backs executed inside the inviso meta
+       tracer's context. Hence making calls to the regular API's manipulating
+       meta trace-patterns will hang the inviso meta tracer!.
+
+       To remedy this problem, a number of useful tpm-functions are available
+       in this API. It must be understood that their actions are local to the
+       Erlang node where they are called.
+
+EEXXPPOORRTTSS
+       ttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->> {{ookk,,00}} || {{ookk,,11}} ||
+       {{eerrrroorr,,nnoott__iinniittiiaatteedd}}
+
+              See inviso:tpm_ms/6 for details. Note that this function only
+              effects meta trace-patterns on the Erlang node where the
+              function is called. This also implies that only the local inviso
+              meta tracer's name-database is updated with _M_S_n_a_m_e.
+
+       ttppmm__mmss__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->> {{ookk,,00}} || {{ookk,,11}} ||
+       {{eerrrroorr,,nnoott__iinniittiiaatteedd}}
+
+              See inviso:tpm_ms_ms/6 for details. Note that this function only
+              effects meta trace-patterns on the Erlang node where the
+              function is called. This also implies that only the local inviso
+              meta tracer's name-database is updated with _M_S_n_a_m_e.
+
+       lliisstt__ttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy)) -->> [[MMSSnnaammee]]
+
+              Returns a list of all _M_S_n_a_m_e in use for _M_o_d_:_F_u_n_c_/_A_r_i_t_y. This can
+              be useful instead of having to have an own-implemented database
+              over currently in use meta match-functions for a particular
+              function.
+
+       ccttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee)) -->> ookk
+
+              See inviso:ctpm_ms/5 for details. Note that this function only
+              effects meta trace-patterns on the Erlang node where the
+              function is called. This also implies that only the local inviso
+              meta tracer's name-database is updated with _M_S_n_a_m_e.
+
+       ggeett__ttrraacceerr(()) -->> TTrraacceerr
+
+              Types:
+
+                 Tracer = pid() | port()
+
+              Returns the pid or port acting as the receiver of regular trace
+              messages. This is useful if it is necessary to manipulate meta
+              trace-patterns by hand (using _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_3) and the
+              _{_t_r_a_c_e_r_,_T_r_a_c_e_r_} must be used in one of the match-function
+              bodies.
+
+
+
+Ericsson AB                      inviso 0.6.3                inviso_rt_meta(3)

@@ -1,0 +1,377 @@
+driver_entry(3)               C Library Functions              driver_entry(3)
+
+
+
+NNAAMMEE
+       driver_entry - The driver-entry structure used by erlang drivers.
+
+DDEESSCCRRIIPPTTIIOONN
+       As of erts version 5.9 (OTP release R15B) the driver interface has been
+       changed with larger types for the callbacks oouuttppuutt, ccoonnttrrooll and ccaallll.
+       See driver  vveerrssiioonn mmaannaaggeemmeenntt in eerrll__ddrriivveerr.
+
+   NNoottee::
+       Old drivers (compiled with an _e_r_l___d_r_i_v_e_r_._h from an earlier erts version
+       than 5.9) have to be updated and have to use the extended interface
+       (with vveerrssiioonn mmaannaaggeemmeenntt ).
+
+
+       The _d_r_i_v_e_r___e_n_t_r_y structure is a C struct that all erlang drivers
+       define. It contains entry points for the erlang driver that are called
+       by the erlang emulator when erlang code accesses the driver.
+
+       The eerrll__ddrriivveerr driver API functions need a port handle that identifies
+       the driver instance (and the port in the emulator). This is only passed
+       to the _s_t_a_r_t function, but not to the other functions. The _s_t_a_r_t
+       function returns a driver-defined handle that is passed to the other
+       functions. A common practice is to have the _s_t_a_r_t function allocate
+       some application-defined structure and stash the _p_o_r_t handle in it, to
+       use it later with the driver API functions.
+
+       The driver call-back functions are called synchronously from the erlang
+       emulator. If they take too long before completing, they can cause
+       timeouts in the emulator. Use the queue or asynchronous calls if
+       necessary, since the emulator must be responsive.
+
+       The driver structure contains the name of the driver and some 15
+       function pointers. These pointers are called at different times by the
+       emulator.
+
+       The only exported function from the driver is _d_r_i_v_e_r___i_n_i_t. This
+       function returns the _d_r_i_v_e_r___e_n_t_r_y structure that points to the other
+       functions in the driver. The _d_r_i_v_e_r___i_n_i_t function is declared with a
+       macro _D_R_I_V_E_R___I_N_I_T_(_d_r_i_v_e_r_n_a_m_e_). (This is because different OS's have
+       different names for it.)
+
+       When writing a driver in C++, the driver entry should be of _"_C_"
+       linkage. One way to do this is to put this line somewhere before the
+       driver entry: _e_x_t_e_r_n _"_C_" _D_R_I_V_E_R___I_N_I_T_(_d_r_i_v_e_r_n_a_m_e_)_;.
+
+       When the driver has passed the _d_r_i_v_e_r___e_n_t_r_y over to the emulator, the
+       driver is _n_o_t allowed to modify the _d_r_i_v_e_r___e_n_t_r_y.
+
+   NNoottee::
+       Do _n_o_t declare the _d_r_i_v_e_r___e_n_t_r_y _c_o_n_s_t. This since the emulator needs to
+       modify the _h_a_n_d_l_e, and the _h_a_n_d_l_e_2 fields. A statically allocated, and
+       _c_o_n_s_t declared _d_r_i_v_e_r___e_n_t_r_y may be located in read only memory which
+       will cause the emulator to crash.
+
+
+DDAATTAA TTYYPPEESS
+         EErrllDDrrvvEEnnttrryy :
+
+
+         typedef struct erl_drv_entry {
+             int (*init)(void);          /* called at system start up for statically
+                                            linked drivers, and after loading for
+                                            dynamically loaded drivers */
+
+         #ifndef ERL_SYS_DRV
+             ErlDrvData (*start)(ErlDrvPort port, char *command);
+                                         /* called when open_port/2 is invoked.
+                                            return value -1 means failure. */
+         #else
+             ErlDrvData (*start)(ErlDrvPort port, char *command, SysDriverOpts* opts);
+                                         /* special options, only for system driver */
+         #endif
+             void (*stop)(ErlDrvData drv_data);
+                                         /* called when port is closed, and when the
+                                            emulator is halted. */
+             void (*output)(ErlDrvData drv_data, char *buf, ErlDrvSizeT len);
+                                         /* called when we have output from erlang to
+                                            the port */
+             void (*ready_input)(ErlDrvData drv_data, ErlDrvEvent event);
+                                         /* called when we have input from one of
+                                            the driver's handles */
+             void (*ready_output)(ErlDrvData drv_data, ErlDrvEvent event);
+                                         /* called when output is possible to one of
+                                            the driver's handles */
+             char *driver_name;          /* name supplied as command
+                                            in open_port XXX ? */
+             void (*finish)(void);       /* called before unloading the driver -
+                                            DYNAMIC DRIVERS ONLY */
+             void *handle;               /* Reserved -- Used by emulator internally */
+             ErlDrvSSizeT (*control)(ErlDrvData drv_data, unsigned int command,
+                                     char *buf, ErlDrvSizeT len,
+                            char **rbuf, ErlDrvSizeT rlen);
+                                         /* "ioctl" for drivers - invoked by
+                                            port_control/3 */
+             void (*timeout)(ErlDrvData drv_data);        /* Handling of timeout in driver */
+             void (*outputv)(ErlDrvData drv_data, ErlIOVec *ev);
+                                         /* called when we have output from erlang
+                                            to the port */
+             void (*ready_async)(ErlDrvData drv_data, ErlDrvThreadData thread_data);
+             void (*flush)(ErlDrvData drv_data);
+                                         /* called when the port is about to be
+                                            closed, and there is data in the
+                                            driver queue that needs to be flushed
+                                            before 'stop' can be called */
+             ErlDrvSSizeT (*call)(ErlDrvData drv_data, unsigned int command,
+                                  char *buf, ErlDrvSizeT len,
+                         char **rbuf, ErlDrvSizeT rlen, unsigned int *flags);
+                                         /* Works mostly like 'control', a synchronous
+                                            call into the driver. */
+             void (*event)(ErlDrvData drv_data, ErlDrvEvent event,
+                           ErlDrvEventData event_data);
+                                         /* Called when an event selected by
+                                            driver_event() has occurred */
+             int extended_marker;        /* ERL_DRV_EXTENDED_MARKER */
+             int major_version;          /* ERL_DRV_EXTENDED_MAJOR_VERSION */
+             int minor_version;          /* ERL_DRV_EXTENDED_MINOR_VERSION */
+             int driver_flags;           /* ERL_DRV_FLAGs */
+             void *handle2;              /* Reserved -- Used by emulator internally */
+             void (*process_exit)(ErlDrvData drv_data, ErlDrvMonitor *monitor);
+                                         /* Called when a process monitor fires */
+             void (*stop_select)(ErlDrvEvent event, void* reserved);
+                                         /* Called to close an event object */
+          } ErlDrvEntry;
+
+
+           iinntt ((**iinniitt))((vvooiidd))::
+             This is called directly after the driver has been loaded by
+             _e_r_l___d_d_l_l_:_l_o_a_d___d_r_i_v_e_r_/_2. (Actually when the driver is added to the
+             driver list.) The driver should return 0, or if the driver can't
+             initialize, -1.
+
+           EErrllDDrrvvDDaattaa ((**ssttaarrtt))((EErrllDDrrvvPPoorrtt ppoorrtt,, cchhaarr** ccoommmmaanndd))::
+             This is called when the driver is instantiated, when _o_p_e_n___p_o_r_t_/_2
+             is called. The driver should return a number >= 0 or a pointer,
+             or if the driver can't be started, one of three error codes
+             should be returned:
+
+             ERL_DRV_ERROR_GENERAL - general error, no error code
+
+             ERL_DRV_ERROR_ERRNO - error with error code in erl_errno
+
+             ERL_DRV_ERROR_BADARG - error, badarg
+
+             If an error code is returned, the port isn't started.
+
+           vvooiidd ((**ssttoopp))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa))::
+             This is called when the port is closed, with _p_o_r_t___c_l_o_s_e_/_1 or _P_o_r_t
+             _! _{_s_e_l_f_(_)_, _c_l_o_s_e_}. Note that terminating the port owner process
+             also closes the port. If _d_r_v___d_a_t_a is a pointer to memory
+             allocated in _s_t_a_r_t, then _s_t_o_p is the place to deallocate that
+             memory.
+
+           vvooiidd ((**oouuttppuutt))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, cchhaarr **bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn))::
+             This is called when an erlang process has sent data to the port.
+             The data is pointed to by _b_u_f, and is _l_e_n bytes. Data is sent to
+             the port with _P_o_r_t _! _{_s_e_l_f_(_)_, _{_c_o_m_m_a_n_d_, _D_a_t_a_}_}, or with
+             _p_o_r_t___c_o_m_m_a_n_d_/_2. Depending on how the port was opened, it should
+             be either a list of integers 0...255 or a binary. See _o_p_e_n___p_o_r_t_/_3
+             and _p_o_r_t___c_o_m_m_a_n_d_/_2.
+
+           vvooiidd ((**rreeaaddyy__iinnppuutt))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, EErrllDDrrvvEEvveenntt eevveenntt))::
+
+
+           vvooiidd ((**rreeaaddyy__oouuttppuutt))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, EErrllDDrrvvEEvveenntt eevveenntt))::
+             This is called when a driver event (given in the _e_v_e_n_t parameter)
+             is signaled. This is used to help asynchronous drivers "wake up"
+             when something happens.
+
+             On unix the _e_v_e_n_t is a pipe or socket handle (or something that
+             the _s_e_l_e_c_t system call understands).
+
+             On Windows the _e_v_e_n_t is an Event or Semaphore (or something that
+             the _W_a_i_t_F_o_r_M_u_l_t_i_p_l_e_O_b_j_e_c_t_s API function understands). (Some
+             trickery in the emulator allows more than the built-in limit of
+             64 _E_v_e_n_t_s to be used.)
+
+             To use this with threads and asynchronous routines, create a pipe
+             on unix and an Event on Windows. When the routine completes,
+             write to the pipe (use _S_e_t_E_v_e_n_t on Windows), this will make the
+             emulator call _r_e_a_d_y___i_n_p_u_t or _r_e_a_d_y___o_u_t_p_u_t.
+
+             Spurious events may happen. That is, calls to _r_e_a_d_y___i_n_p_u_t or
+             _r_e_a_d_y___o_u_t_p_u_t even though no real events are signaled. In reality
+             it should be rare (and OS dependant), but a robust driver must
+             nevertheless be able to handle such cases.
+
+           cchhaarr **ddrriivveerr__nnaammee::
+             This is the name of the driver, it must correspond to the atom
+             used in _o_p_e_n___p_o_r_t, and the name of the driver library file
+             (without the extension).
+
+           vvooiidd ((**ffiinniisshh))((vvooiidd))::
+             This function is called by the _e_r_l___d_d_l_l driver when the driver is
+             unloaded. (It is only called in dynamic drivers.)
+
+             The driver is only unloaded as a result of calling
+             _u_n_l_o_a_d___d_r_i_v_e_r_/_1, or when the emulator halts.
+
+           vvooiidd **hhaannddllee::
+             This field is reserved for the emulator's internal use. The
+             emulator will modify this field; therefore, it is important that
+             the _d_r_i_v_e_r___e_n_t_r_y isn't declared _c_o_n_s_t.
+
+           EErrllDDrrvvSSSSiizzeeTT ((**ccoonnttrrooll))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, uunnssiiggnneedd iinntt ccoommmmaanndd,,
+           cchhaarr **bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn,, cchhaarr ****rrbbuuff,, EErrllDDrrvvSSiizzeeTT rrlleenn))::
+             This is a special routine invoked with the erlang function
+             _p_o_r_t___c_o_n_t_r_o_l_/_3. It works a little like an "ioctl" for erlang
+             drivers. The data given to _p_o_r_t___c_o_n_t_r_o_l_/_3 arrives in _b_u_f and _l_e_n.
+             The driver may send data back, using _*_r_b_u_f and _r_l_e_n.
+
+             This is the fastest way of calling a driver and get a response.
+             It won't make any context switch in the erlang emulator, and
+             requires no message passing. It is suitable for calling C
+             function to get faster execution, when erlang is too slow.
+
+             If the driver wants to return data, it should return it in _r_b_u_f.
+             When _c_o_n_t_r_o_l is called, _*_r_b_u_f points to a default buffer of _r_l_e_n
+             bytes, which can be used to return data. Data is returned
+             different depending on the port control flags (those that are set
+             with sseett__ppoorrtt__ccoonnttrrooll__ffllaaggss).
+
+             If the flag is set to _P_O_R_T___C_O_N_T_R_O_L___F_L_A_G___B_I_N_A_R_Y, a binary will be
+             returned. Small binaries can be returned by writing the raw data
+             into the default buffer. A binary can also be returned by setting
+             _*_r_b_u_f to point to a binary allocated with ddrriivveerr__aalllloocc__bbiinnaarryy.
+             This binary will be freed automatically after _c_o_n_t_r_o_l has
+             returned. The driver can retain the binary for _r_e_a_d _o_n_l_y access
+             with ddrriivveerr__bbiinnaarryy__iinncc__rreeffcc to be freed later with
+             ddrriivveerr__ffrreeee__bbiinnaarryy. It is never allowed to alter the binary after
+             _c_o_n_t_r_o_l has returned. If _*_r_b_u_f is set to NULL, an empty list will
+             be returned.
+
+             If the flag is set to _0, data is returned as a list of integers.
+             Either use the default buffer or set _*_r_b_u_f to point to a larger
+             buffer allocated with ddrriivveerr__aalllloocc. The buffer will be freed
+             automatically after _c_o_n_t_r_o_l has returned.
+
+             Using binaries is faster if more than a few bytes are returned.
+
+             The return value is the number of bytes returned in _*_r_b_u_f.
+
+           vvooiidd ((**ttiimmeeoouutt))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa))::
+             This function is called any time after the driver's timer reaches
+             0. The timer is activated with _d_r_i_v_e_r___s_e_t___t_i_m_e_r. There are no
+             priorities or ordering among drivers, so if several drivers time
+             out at the same time, any one of them is called first.
+
+           vvooiidd ((**oouuttppuuttvv))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, EErrllIIOOVVeecc **eevv))::
+             This function is called whenever the port is written to. If it is
+             _N_U_L_L, the _o_u_t_p_u_t function is called instead. This function is
+             faster than _o_u_t_p_u_t, because it takes an _E_r_l_I_O_V_e_c directly, which
+             requires no copying of the data. The port should be in binary
+             mode, see _o_p_e_n___p_o_r_t_/_2.
+
+             The _E_r_l_I_O_V_e_c contains both a _S_y_s_I_O_V_e_c, suitable for _w_r_i_t_e_v, and
+             one or more binaries. If these binaries should be retained, when
+             the driver returns from _o_u_t_p_u_t_v, they can be queued (using
+             ddrriivveerr__eennqq__bbiinn for instance), or if they are kept in a static or
+             global variable, the reference counter can be incremented.
+
+           vvooiidd ((**rreeaaddyy__aassyynncc))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, EErrllDDrrvvTThhrreeaaddDDaattaa
+           tthhrreeaadd__ddaattaa))::
+             This function is called after an asynchronous call has completed.
+             The asynchronous call is started with ddrriivveerr__aassyynncc. This function
+             is called from the erlang emulator thread, as opposed to the
+             asynchronous function, which is called in some thread (if
+             multithreading is enabled).
+
+           EErrllDDrrvvSSSSiizzeeTT ((**ccaallll))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, uunnssiiggnneedd iinntt ccoommmmaanndd,,
+           cchhaarr **bbuuff,, EErrllDDrrvvSSiizzeeTT lleenn,, cchhaarr ****rrbbuuff,, EErrllDDrrvvSSiizzeeTT rrlleenn,, uunnssiiggnneedd
+           iinntt **ffllaaggss))::
+             This function is called from _e_r_l_a_n_g_:_p_o_r_t___c_a_l_l_/_3. It works a lot
+             like the _c_o_n_t_r_o_l call-back, but uses the external term format for
+             input and output.
+
+             _c_o_m_m_a_n_d is an integer, obtained from the call from erlang (the
+             second argument to _e_r_l_a_n_g_:_p_o_r_t___c_a_l_l_/_3).
+
+             _b_u_f and _l_e_n provide the arguments to the call (the third argument
+             to _e_r_l_a_n_g_:_p_o_r_t___c_a_l_l_/_3). They can be decoded using _e_i functions.
+
+             _r_b_u_f points to a return buffer, _r_l_e_n bytes long. The return data
+             should be a valid erlang term in the external (binary) format.
+             This is converted to an erlang term and returned by
+             _e_r_l_a_n_g_:_p_o_r_t___c_a_l_l_/_3 to the caller. If more space than _r_l_e_n bytes
+             is needed to return data, _*_r_b_u_f can be set to memory allocated
+             with _d_r_i_v_e_r___a_l_l_o_c. This memory will be freed automatically after
+             _c_a_l_l has returned.
+
+             The return value is the number of bytes returned in _*_r_b_u_f. If
+             _E_R_L___D_R_V___E_R_R_O_R___G_E_N_E_R_A_L is returned (or in fact, anything < 0),
+             _e_r_l_a_n_g_:_p_o_r_t___c_a_l_l_/_3 will throw a _B_A_D___A_R_G.
+
+           vvooiidd ((**eevveenntt))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, EErrllDDrrvvEEvveenntt eevveenntt,,
+           EErrllDDrrvvEEvveennttDDaattaa eevveenntt__ddaattaa))::
+             Intentionally left undocumented.
+
+           iinntt eexxtteennddeedd__mmaarrkkeerr::
+             This field should either be equal to _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_R_K_E_R or
+             _0. An old driver (not aware of the extended driver interface)
+             should set this field to _0. If this field is equal to _0, all the
+             fields following this field also _h_a_v_e to be _0, or _N_U_L_L in case it
+             is a pointer field.
+
+           iinntt mmaajjoorr__vveerrssiioonn::
+             This field should equal _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_J_O_R___V_E_R_S_I_O_N if the
+             _e_x_t_e_n_d_e_d___m_a_r_k_e_r field equals _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_R_K_E_R.
+
+           iinntt mmiinnoorr__vveerrssiioonn::
+             This field should equal _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_I_N_O_R___V_E_R_S_I_O_N if the
+             _e_x_t_e_n_d_e_d___m_a_r_k_e_r field equals _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_R_K_E_R.
+
+           iinntt ddrriivveerr__ffllaaggss::
+             This field is used to pass driver capability information to the
+             runtime system. If the _e_x_t_e_n_d_e_d___m_a_r_k_e_r field equals
+             _E_R_L___D_R_V___E_X_T_E_N_D_E_D___M_A_R_K_E_R, it should contain _0 or driver flags
+             (_E_R_L___D_R_V___F_L_A_G___*) ored bitwise. Currently the following driver
+             flags exist:
+
+             _E_R_L___D_R_V___F_L_A_G___U_S_E___P_O_R_T___L_O_C_K_I_N_G:
+                The runtime system will use port level locking on all ports
+               executing this driver instead of driver level locking when the
+               driver is run in a runtime system with SMP support. For more
+               information see the eerrll__ddrriivveerr documentation.
+
+             _E_R_L___D_R_V___F_L_A_G___S_O_F_T___B_U_S_Y:
+                Marks that driver instances can handle being called in the
+               oouuttppuutt and/or oouuttppuuttvv callbacks even though a driver instance
+               has marked itself as busy (see sseett__bbuussyy__ppoorrtt(())). Since erts
+               version 5.7.4 this flag is required for drivers used by the
+               Erlang distribution (the behaviour has always been required by
+               drivers used by the distribution).
+
+           vvooiidd **hhaannddllee22::
+             This field is reserved for the emulator's internal use. The
+             emulator will modify this field; therefore, it is important that
+             the _d_r_i_v_e_r___e_n_t_r_y isn't declared _c_o_n_s_t.
+
+           vvooiidd ((**pprroocceessss__eexxiitt))((EErrllDDrrvvDDaattaa ddrrvv__ddaattaa,, EErrllDDrrvvMMoonniittoorr **mmoonniittoorr))::
+             This callback is called when a monitored process exits. The
+             _d_r_v___d_a_t_a is the data associated with the port for which the
+             process is monitored (using ddrriivveerr__mmoonniittoorr__pprroocceessss) and the
+             _m_o_n_i_t_o_r corresponds to the _E_r_l_D_r_v_M_o_n_i_t_o_r structure filled in when
+             creating the monitor. The driver interface function
+             ddrriivveerr__ggeett__mmoonniittoorreedd__pprroocceessss can be used to retrieve the process
+             id of the exiting process as an _E_r_l_D_r_v_T_e_r_m_D_a_t_a.
+
+           vvooiidd ((**ssttoopp__sseelleecctt))((EErrllDDrrvvEEvveenntt eevveenntt,, vvooiidd** rreesseerrvveedd))::
+             This function is called on behalf of ddrriivveerr__sseelleecctt when it is
+             safe to close an event object.
+
+             A typical implementation on Unix is to do _c_l_o_s_e_(_(_i_n_t_)_e_v_e_n_t_).
+
+             Argument _r_e_s_e_r_v_e_d is intended for future use and should be
+             ignored.
+
+             In contrast to most of the other call-back functions, _s_t_o_p___s_e_l_e_c_t
+             is called independent of any port. No _E_r_l_D_r_v_D_a_t_a argument is
+             passed to the function. No driver lock or port lock is guaranteed
+             to be held. The port that called _d_r_i_v_e_r___s_e_l_e_c_t might even be
+             closed at the time _s_t_o_p___s_e_l_e_c_t is called. But it could also be
+             the case that _s_t_o_p___s_e_l_e_c_t is called directly by _d_r_i_v_e_r___s_e_l_e_c_t.
+
+             It is not allowed to call any functions in the ddrriivveerr AAPPII from
+             _s_t_o_p___s_e_l_e_c_t. This strict limitation is due to the volatile
+             context that _s_t_o_p___s_e_l_e_c_t may be called.
+
+SSEEEE AALLSSOO
+       eerrll__ddrriivveerr((33)), eerrll__ddddllll((33)), eerrllaanngg((33)), kernel(3)
+
+
+
+Ericsson AB                       erts 5.9.2                   driver_entry(3)

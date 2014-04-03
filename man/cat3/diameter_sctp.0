@@ -1,0 +1,77 @@
+diameter_sctp(3)           Erlang Module Definition           diameter_sctp(3)
+
+
+
+NNAAMMEE
+       diameter_sctp - Diameter transport over SCTP.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements diameter transport over SCTP using gen_sctp. It
+       can be specified as the value of a transport_module option to
+       ddiiaammeetteerr::aadddd__ttrraannssppoorrtt//22 and implements the behaviour documented in
+       ddiiaammeetteerr__ttrraannssppoorrtt((33)).
+
+EEXXPPOORRTTSS
+       ssttaarrtt(({{TTyyppee,, RReeff}},, SSvvcc,, [[OOpptt]])) -->> {{ookk,, PPiidd,, [[LLAAddddrr]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = connect | accept
+                 Ref = ddiiaammeetteerr::ttrraannssppoorrtt__rreeff(())
+                 Svc = #diameter_service{}
+                 Opt = {raddr, iinneett::iipp__aaddddrreessss(())} | {rport, integer()} |
+                 term()
+                 Pid = pid()
+                 LAddr = iinneett::iipp__aaddddrreessss(())
+                 Reason = term()
+
+              The start function required by ddiiaammeetteerr__ttrraannssppoorrtt((33)).
+
+              The only diameter_sctp-specific argument is the options list.
+              Options _r_a_d_d_r and _r_p_o_r_t specify the remote address and port for
+              a connecting transport and not valid for a listening transport:
+              the former is required while latter defaults to 3868 if
+              unspecified. More than one _r_a_d_d_r option can be specified, in
+              which case the connecting transport in question attempts each in
+              sequence until an association is established. Remaining options
+              are any accepted by ggeenn__ssccttpp::ooppeenn//11, with the exception of
+              options _m_o_d_e, _b_i_n_a_r_y, _l_i_s_t, _a_c_t_i_v_e and _s_c_t_p___e_v_e_n_t_s. Note that
+              options _i_p and _p_o_r_t specify the local address and port
+              respectively.
+
+              Multiple _i_p options can be specified for a multihomed peer. If
+              none are specified then the values of _H_o_s_t_-_I_P_-_A_d_d_r_e_s_s in the
+              _#_d_i_a_m_e_t_e_r___s_e_r_v_i_c_e_{_} record are used. (In particular, one of
+              these must be specified.) Option _p_o_r_t defaults to 3868 for a
+              listening transport and 0 for a connecting transport.
+
+          WWaarrnniinngg::
+              An insufficiently large receive buffer may result in a peer
+              having to resend incoming messages: set the iinneett((33)) option
+              _r_e_c_b_u_f to increase the buffer size.
+
+              An insufficiently large send buffer may result in outgoing
+              messages being discarded: set the iinneett((33)) option _s_n_d_b_u_f to
+              increase the buffer size.
+
+
+              diameter_sctp uses the _t_r_a_n_s_p_o_r_t___d_a_t_a field of the
+              _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_} record to communicate the stream on which an
+              inbound message has been received, or on which an outbound
+              message should be sent: the value will be of the form _{_s_t_r_e_a_m_,
+              _I_d_} on an inbound message passed to a hhaannddllee__rreeqquueesstt or
+              hhaannddllee__aannsswweerr callback. For an outbound message, either
+              _u_n_d_e_f_i_n_e_d (explicitly or by receiving the outbound message as a
+              _b_i_n_a_r_y_(_)) or a tuple should be set in the return value of
+              hhaannddllee__rreeqquueesstt (typically by retaining the value passed into
+              this function) or pprreeppaarree__rreeqquueesstt. The value _u_n_d_e_f_i_n_e_d uses a
+              "next outbound stream" id and increments this modulo the total
+              number outbound streams. That is, successive values of _u_n_d_e_f_i_n_e_d
+              cycle through all outbound streams.
+
+SSEEEE AALLSSOO
+       ddiiaammeetteerr__ttrraannssppoorrtt((33)), ggeenn__ssccttpp((33)), iinneett((33))
+
+
+
+Ericsson AB                      diameter 1.2                 diameter_sctp(3)

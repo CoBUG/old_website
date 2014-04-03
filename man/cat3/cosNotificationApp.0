@@ -1,0 +1,247 @@
+cosNotificationApp(3)      Erlang Module Definition      cosNotificationApp(3)
+
+
+
+NNAAMMEE
+       cosNotificationApp - The main module of the cosNotification
+       application.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application.
+
+EEXXPPOORRTTSS
+       iinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation installs the cosNotification application.
+
+       iinnssttaallll((SSeeccoonnddss)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation installs the cosNotification application using
+              _S_e_c_o_n_d_s delay between each block, currently 6, of IFR-
+              registrations. This approach spreads the IFR database access
+              over a period of time to allow other applications to run
+              smother.
+
+       iinnssttaallll__eevveenntt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation, which may _o_n_l_y be used if it is impossible to
+              upgrade to _c_o_s_E_v_e_n_t_-_2_._0 or later, installs the necessary
+              cosEvent interfaces. If cosEvent-2.0 is available, use
+              _c_o_s_E_v_e_n_t_A_p_p_:_i_n_s_t_a_l_l_(_) instead.
+
+       iinnssttaallll__eevveenntt((SSeeccoonnddss)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation, which may _o_n_l_y be used if it is impossible to
+              upgrade to _c_o_s_E_v_e_n_t_-_2_._0 or later, installs the necessary
+              cosEvent interfaces using _S_e_c_o_n_d_s delay between each block of
+              IFR-registrations. If cosEvent-2.0 is available, use
+              _c_o_s_E_v_e_n_t_A_p_p_:_i_n_s_t_a_l_l_(_) instead.
+
+       uunniinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation uninstalls the cosNotification application.
+
+       uunniinnssttaallll((SSeeccoonnddss)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation uninstalls the cosNotification application using
+              _S_e_c_o_n_d_s delay between each block, currently 6, of IFR-
+              unregistrations. This approach spreads the IFR database access
+              over a period of time to allow other applications to run
+              smother.
+
+       uunniinnssttaallll__eevveenntt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation uninstalls the inherited cosEvent interfaces. If
+              cosEvent is in use this function may not be used. This function
+              may only be used if _c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_A_p_p_:_i_n_s_t_a_l_l___e_v_e_n_t_/_1_/_2 was
+              used. If not, use _c_o_s_E_v_e_n_t_A_p_p_:_u_n_i_n_s_t_a_l_l_(_) instead.
+
+       uunniinnssttaallll__eevveenntt((SSeeccoonnddss)) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E}
+
+              This operation uninstalls the inherited cosEvent interfaces,
+              using _S_e_c_o_n_d_s delay between each block of IFR-unregistrations.
+              If cosEvent is in use this function may not be used. This
+              function may only be used if
+              _c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_A_p_p_:_i_n_s_t_a_l_l___e_v_e_n_t_/_1_/_2 was used. If not, use
+              _c_o_s_E_v_e_n_t_A_p_p_:_u_n_i_n_s_t_a_l_l_(_) instead.
+
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosNotification application.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosNotification application.
+
+       ssttaarrtt__gglloobbaall__ffaaccttoorryy(()) -->> CChhaannnneellFFaaccttoorryy
+
+              Types:
+
+                 ChannelFactory = #objref
+
+              This operation creates a EEvveenntt CChhaannnneell FFaaccttoorryy should be used
+              for a multi-node Orber. The Factory is used to create a new
+              cchhaannnneell.
+
+       ssttaarrtt__gglloobbaall__ffaaccttoorryy((OOppttiioonnss)) -->> CChhaannnneellFFaaccttoorryy
+
+              Types:
+
+                 Options = [Option]
+                 Option = {pullInterval, Seconds} | {filterOp, Op} | {gcTime,
+                 Seconds} | {gcLimit, Anount} | {timeService, #objref}
+                 ChannelFactory = #objref
+
+              This operation creates a EEvveenntt CChhaannnneell FFaaccttoorryy and should be
+              used for a multi-node Orber. The Factory is used to create a new
+              cchhaannnneell.
+
+                * _{_p_u_l_l_I_n_t_e_r_v_a_l_, _S_e_c_o_n_d_s_} - determine how often Proxy Pull
+                  Consumers will check for new events with the client
+                  application. The default value is 20 seconds.
+
+                * _{_f_i_l_t_e_r_O_p_, _O_p_e_r_a_t_i_o_n_T_y_p_e_} - determine which type of
+                  Administrator objects should be started, i.e., _'_O_R___O_P_' or
+                  _'_A_N_D___O_P_'. The default value is _'_O_R___O_P_'.
+
+                * _{_t_i_m_e_S_e_r_v_i_c_e_, _T_i_m_e_S_e_r_v_i_c_e_O_b_j _| _'_u_n_d_e_f_i_n_e_d_'_} - to be able to
+                  use Start and/or Stop QoS this option must be used. See the
+                  function _s_t_a_r_t___t_i_m_e___s_e_r_v_i_c_e_/_2 in the _c_o_s_T_i_m_e application.
+                  The default value is _'_u_n_d_e_f_i_n_e_d_'.
+
+                * _{_f_i_l_t_e_r_O_p_, _O_p_e_r_a_t_i_o_n_T_y_p_e_} - determine which type of
+                  Administrator objects should be started, i.e., _'_O_R___O_P_' or
+                  _'_A_N_D___O_P_'. The default value is _'_O_R___O_P_'.
+
+                * _{_g_c_T_i_m_e_, _S_e_c_o_n_d_s_} - this option determines how often, for
+                  example, proxies will garbage collect expired events. The
+                  default value is 60.
+
+                * _{_g_c_L_i_m_i_t_, _A_m_o_u_n_t_} - determines how many events will be
+                  stored before, for example, proxies will garbage collect
+                  expired events. The default value is 50. This option is
+                  tightly coupled with the QoS property _M_a_x_E_v_e_n_t_s_P_e_r_C_o_n_s_u_m_e_r,
+                  i.e., the _g_c_L_i_m_i_t should be less than _M_a_x_E_v_e_n_t_s_P_e_r_C_o_n_s_u_m_e_r
+                  and greater than 0.
+
+       ssttaarrtt__ffaaccttoorryy(()) -->> CChhaannnneellFFaaccttoorryy
+
+              Types:
+
+                 ChannelFactory = #objref
+
+              This operation creates a EEvveenntt CChhaannnneell FFaaccttoorryy. The Factory is
+              used to create a new cchhaannnneell.
+
+       ssttaarrtt__ffaaccttoorryy((OOppttiioonnss)) -->> CChhaannnneellFFaaccttoorryy
+
+              Types:
+
+                 Options = [Option]
+                 Option = {pullInterval, Seconds} | {filterOp, Op} | {gcTime,
+                 Seconds} | {gcLimit, Amount} | {timeService, #objref}
+                 ChannelFactory = #objref
+
+              This operation creates a EEvveenntt CChhaannnneell FFaaccttoorryy. The Factory is
+              used to create a new cchhaannnneell.
+
+       ssttoopp__ffaaccttoorryy((CChhaannnneellFFaaccttoorryy)) -->> RReeppllyy
+
+              Types:
+
+                 ChannelFactory = #objref
+                 Reply = ok | {'EXCEPTION', E}
+
+              This operation stop the target channel factory.
+
+       ssttaarrtt__ffiilltteerr__ffaaccttoorryy(()) -->> FFiilltteerrFFaaccttoorryy
+
+              Types:
+
+                 FilterFactory = #objref
+
+              This operation creates a FFiilltteerr FFaaccttoorryy. The Factory is used to
+              create a new FFiilltteerr''ss and MMaappppiinnggFFiilltteerr''ss.
+
+       ssttoopp__ffiilltteerr__ffaaccttoorryy((FFiilltteerrFFaaccttoorryy)) -->> RReeppllyy
+
+              Types:
+
+                 FilterFactory = #objref
+                 Reply = ok | {'EXCEPTION', E}
+
+              This operation stop the target filter factory.
+
+       ccrreeaattee__ssttrruuccttuurreedd__eevveenntt((DDoommaaiinn,, TTyyppee,, EEvveenntt,, VVaarriiaabblleeHHeeaaddeerr,,
+       FFiilltteerraabblleeBBooddyy,, BBooddyyRReemmaaiinnddeerr)) -->> RReeppllyy
+
+              Types:
+
+                 Domain = string()
+                 Type = string()
+                 Event = string()
+                 VariableHeader = [CosNotification::Property]
+                 FilterableBody = [CosNotification::Property]
+                 BodyRemainder = #any data-type
+                 Reply = CosNotification::StructuredEvent | {'EXCEPTION', E}
+
+              An easy way to create a structured event is to use this
+              function. Simple typechecks are performed and if one of the
+              arguments is not correct a 'BAD_PARAM' exception is thrown.
+
+       ttyyppee__cchheecckk(()) -->> RReeppllyy
+
+              Types:
+
+                 Reply = true | false
+
+              This operation returns the value of the configuration parameter
+              _t_y_p_e___c_h_e_c_k.
+
+
+
+Ericsson AB                 cosNotification 1.1.18       cosNotificationApp(3)

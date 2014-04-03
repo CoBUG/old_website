@@ -1,0 +1,57 @@
+CosFileTransfer_FileIteratorE(r3l)ang Module DefinitCioosnFileTransfer_FileIterator(3)
+
+
+
+NNAAMMEE
+       CosFileTransfer_FileIterator - This module implements the OMG
+       CosFileTransfer::FileIterator interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_F_i_l_e_T_r_a_n_s_f_e_r_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       nneexxtt__oonnee((IItteerraattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Iterator = #objref
+                 Return = {boolean(), #'CosFileTransfer_FileWrapper'{the_file
+                 = File file_type = Type}}
+                 File = #objref
+                 Type = nfile | ndirectory
+
+              This operation returns true if a _F_i_l_e_W_r_a_p_p_e_r exists at the
+              current position and the out parameter contains a valid _F_i_l_e
+              reference. If false is returned the out parameter is a non-valid
+              _F_i_l_e_W_r_a_p_p_e_r.
+
+       nneexxtt__nn((IItteerraattoorr,, MMaaxx)) -->> RReettuurrnn
+
+              Types:
+
+                 Iterator = #objref
+                 Max = unsigned long()
+                 Return = {boolean(), FileList}
+                 FileList = [#'CosFileTransfer_FileWrapper'{the_file = File
+                 file_type = Type}]
+                 File = #objref
+                 Type = nfile | ndirectory
+
+              This operation returns true if the requested number of
+              _F_i_l_e_W_r_a_p_p_e_r_s can be delivered and there are additional
+              _F_i_l_e_W_r_a_p_p_e_r_s. If false is returned a list, of length _M_a_x or
+              less, containing the last valid _F_i_l_e_W_r_a_p_p_e_r_s associated with the
+              target object.
+
+       ddeessttrrooyy((IItteerraattoorr)) -->> ookk
+
+              Types:
+
+                 Iterator = #objref
+
+              This operation terminates the target object.
+
+
+
+Ericsson AB                 cosFileTransfer 1.1.C1o3sFileTransfer_FileIterator(3)

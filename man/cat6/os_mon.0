@@ -1,0 +1,79 @@
+os_mon(7)                Erlang Application Definition               os_mon(7)
+
+
+
+NNAAMMEE
+       os_mon - OS Monitoring Application
+
+DDEESSCCRRIIPPTTIIOONN
+       The operating system monitor, OS_Mon, provides the following services:
+
+         * ccppuu__ssuupp CPU load and utilization supervision (Unix)
+
+         * ddiisskkssuupp Disk supervision(Unix, Windows)
+
+         * mmeemmssuupp Memory supervision (Unix, Windows, VxWorks)
+
+         * ooss__ssuupp Interface to OS system messages (Solaris, Windows)
+
+       To simplify usage of OS_Mon on distributed Erlang systems, it is not
+       considered an error trying to use a service at a node where it is not
+       available (either because OS_Mon is not running, or because the service
+       is not available for that OS, or because the service is not started).
+       Instead, a warning message is issued via _e_r_r_o_r___l_o_g_g_e_r and a dummy value
+       is returned, which one is specified in the man pages for the respective
+       services.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       When OS_Mon is started, by default all services available for the OS,
+       except _o_s___s_u_p, are automatically started. This configuration can be
+       changed using the following application configuration parameters:
+
+         _s_t_a_r_t___c_p_u___s_u_p _= _b_o_o_l_(_):
+           Specifies if _c_p_u___s_u_p should be started. Defaults to _t_r_u_e.
+
+         _s_t_a_r_t___d_i_s_k_s_u_p _= _b_o_o_l_(_):
+           Specifies if _d_i_s_k_s_u_p should be started. Defaults to _t_r_u_e.
+
+         _s_t_a_r_t___m_e_m_s_u_p _= _b_o_o_l_(_):
+           Specifies if _m_e_m_s_u_p should be started. Defaults to _t_r_u_e.
+
+         _s_t_a_r_t___o_s___s_u_p _= _b_o_o_l_(_):
+           Specifies if _o_s___s_u_p should be started. Defaults to _f_a_l_s_e.
+
+       Configuration parameters effecting the different OS_Mon services are
+       described in the respective man pages.
+
+       See ccoonnffiigg((44)) for information about how to change the value of
+       configuration parameters.
+
+SSNNMMPP MMIIBBSS
+       The following MIBs are defined in OS_Mon:
+
+         OOTTPP--OOSS--MMOONN--MMIIBB::
+           This MIB contains objects for instrumentation of disk, memory and
+           CPU usage of the nodes in the system.
+
+       The MIB is stored in the _m_i_b_s directory. It is defined in SNMPv2 SMI
+       syntax. An SNMPv1 version of the MIB is delivered in the _m_i_b_s_/_v_1
+       directory.
+
+       The compiled MIB is located under _p_r_i_v_/_m_i_b_s, and the generated _._h_r_l
+       file under the _i_n_c_l_u_d_e directory. To compile a MIB that IMPORTS the
+       _O_T_P_-_O_S_-_M_O_N_-_M_I_B, give the option _{_i_l_, _[_"_o_s___m_o_n_/_p_r_i_v_/_m_i_b_s_"_]_} to the MIB
+       compiler.
+
+       If the MIB should be used in a system, it should be loaded into an
+       agent with a call to _o_s___m_o_n___m_i_b_:_l_o_a_d_(_A_g_e_n_t_), where _A_g_e_n_t is the pid or
+       registered name of an SNMP agent. Use _o_s___m_o_n___m_i_b_:_u_n_l_o_a_d_(_A_g_e_n_t_) to
+       unload the MIB. The implementation of this MIB uses Mnesia to store a
+       cache with data needed, which implicates that Mnesia must be up and
+       running. The MIB also use functions defined for the _O_T_P_-_M_I_B, thus that
+       MIB must be loaded as well.
+
+SSEEEE AALLSSOO
+       ccppuu__ssuupp((33)), ddiisskkssuupp((33)), mmeemmssuupp((33)), ooss__ssuupp((33)), nntteevveennttlloogg((33)), ssnnmmpp((33)).
+
+
+
+Ericsson AB                      os_mon 2.2.10                       os_mon(7)

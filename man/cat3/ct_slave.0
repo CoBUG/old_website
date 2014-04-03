@@ -1,0 +1,166 @@
+ct_slave(3)                Erlang Module Definition                ct_slave(3)
+
+
+
+NNAAMMEE
+       ct_slave - Common Test Framework functions for starting and stopping
+       nodes for Large Scale Testing.
+
+DDEESSCCRRIIPPTTIIOONN
+       Common Test Framework functions for starting and stopping nodes for
+       Large Scale Testing.
+
+       This module exports functions which are used by the Common Test Master
+       to start and stop "slave" nodes. It is the default callback module for
+       the _{_i_n_i_t_, _n_o_d_e___s_t_a_r_t_} term of the Test Specification.
+
+EEXXPPOORRTTSS
+       ssttaarrtt((NNooddee)) -->> RReessuulltt
+
+              Types:
+
+                 Node = atom()
+                 Result = {ok, NodeName} | {error, already_started, NodeName}
+                 | {error, started_not_connected, NodeName} | {error,
+                 boot_timeout, NodeName} | {error, init_timeout, NodeName} |
+                 {error, startup_timeout, NodeName} | {error, not_alive,
+                 NodeName}
+                 NodeName = atom()
+
+              Starts an Erlang node with name _N_o_d_e on the local host.
+
+              _S_e_e _a_l_s_o_: ssttaarrtt//33.
+
+       ssttaarrtt((HHoosstt,, NNooddee)) -->> RReessuulltt
+
+              Types:
+
+                 Node = atom()
+                 Host = atom()
+                 Result = {ok, NodeName} | {error, already_started, NodeName}
+                 | {error, started_not_connected, NodeName} | {error,
+                 boot_timeout, NodeName} | {error, init_timeout, NodeName} |
+                 {error, startup_timeout, NodeName} | {error, not_alive,
+                 NodeName}
+                 NodeName = atom()
+
+              Starts an Erlang node with name _N_o_d_e on host _H_o_s_t with the
+              default options.
+
+              _S_e_e _a_l_s_o_: ssttaarrtt//33.
+
+       ssttaarrtt((HHoosstt,, NNooddee,, OOppttiioonnss::::OOppttss)) -->> RReessuulltt
+
+              Types:
+
+                 Node = atom()
+                 Host = atom()
+                 Opts = [OptTuples]
+                 OptTuples = {username, Username} | {password, Password} |
+                 {boot_timeout, BootTimeout} | {init_timeout, InitTimeout} |
+                 {startup_timeout, StartupTimeout} | {startup_functions,
+                 StartupFunctions} | {monitor_master, Monitor} |
+                 {kill_if_fail, KillIfFail} | {erl_flags, ErlangFlags}
+                 Username = string()
+                 Password = string()
+                 BootTimeout = integer()
+                 InitTimeout = integer()
+                 StartupTimeout = integer()
+                 StartupFunctions = [StartupFunctionSpec]
+                 StartupFunctionSpec = {Module, Function, Arguments}
+                 Module = atom()
+                 Function = atom()
+                 Arguments = [term]
+                 Monitor = bool()
+                 KillIfFail = bool()
+                 ErlangFlags = string()
+                 Result = {ok, NodeName} | {error, already_started, NodeName}
+                 | {error, started_not_connected, NodeName} | {error,
+                 boot_timeout, NodeName} | {error, init_timeout, NodeName} |
+                 {error, startup_timeout, NodeName} | {error, not_alive,
+                 NodeName}
+                 NodeName = atom()
+
+              Starts an Erlang node with name _N_o_d_e on host _H_o_s_t as specified
+              by the combination of options in _O_p_t_s.
+
+              Options _U_s_e_r_n_a_m_e and _P_a_s_s_w_o_r_d will be used to log in onto the
+              remote host _H_o_s_t. Username, if omitted, defaults to the current
+              user name, and password is empty by default.
+
+              A list of functions specified in the _S_t_a_r_t_u_p option will be
+              executed after startup of the node. Note that all used modules
+              should be present in the code path on the _H_o_s_t.
+
+              The timeouts are applied as follows:
+
+                * _B_o_o_t_T_i_m_e_o_u_t - time to start the Erlang node, in seconds.
+                  Defaults to 3 seconds. If node does not become pingable
+                  within this time, the result _{_e_r_r_o_r_, _b_o_o_t___t_i_m_e_o_u_t_, _N_o_d_e_N_a_m_e_}
+                  is returned;
+
+                * _I_n_i_t_T_i_m_e_o_u_t - time to wait for the node until it calls the
+                  internal callback function informing master about
+                  successfull startup. Defaults to one second. In case of
+                  timed out message the result _{_e_r_r_o_r_, _i_n_i_t___t_i_m_e_o_u_t_, _N_o_d_e_N_a_m_e_}
+                  is returned;
+
+                * _S_t_a_r_t_u_p_T_i_m_e_o_u_t - time to wait intil the node finishes to run
+                  the _S_t_a_r_t_u_p_F_u_n_c_t_i_o_n_s. Defaults to one second. If this
+                  timeout occurs, the result _{_e_r_r_o_r_, _s_t_a_r_t_u_p___t_i_m_e_o_u_t_,
+                  _N_o_d_e_N_a_m_e_} is returned.
+
+              Option _m_o_n_i_t_o_r___m_a_s_t_e_r specifies, if the slave node should be
+              stopped in case of master node stop. Defaults to false.
+
+              Option _k_i_l_l___i_f___f_a_i_l specifies, if the slave node should be
+              killed in case of a timeout during initialization or startup.
+              Defaults to true. Note that node also may be still alive it the
+              boot timeout occurred, but it will not be killed in this case.
+
+              Option _e_r_l_a_n_g___f_l_a_g_s specifies, which flags will be added to the
+              parameters of the _e_r_l executable.
+
+              Special return values are:
+
+                * _{_e_r_r_o_r_, _a_l_r_e_a_d_y___s_t_a_r_t_e_d_, _N_o_d_e_N_a_m_e_} - if the node with the
+                  given name is already started on a given host;
+
+                * _{_e_r_r_o_r_, _s_t_a_r_t_e_d___n_o_t___c_o_n_n_e_c_t_e_d_, _N_o_d_e_N_a_m_e_} - if node is
+                  started, but not connected to the master node.
+
+                * _{_e_r_r_o_r_, _n_o_t___a_l_i_v_e_, _N_o_d_e_N_a_m_e_} - if node on which the
+                  _c_t___s_l_a_v_e_:_s_t_a_r_t_/_3 is called, is not alive. Note that _N_o_d_e_N_a_m_e
+                  is the name of current node in this case.
+
+       ssttoopp((NNooddee)) -->> RReessuulltt
+
+              Types:
+
+                 Node = atom()
+                 Result = {ok, NodeName} | {error, not_started, NodeName} |
+                 {error, not_connected, NodeName} | {error, stop_timeout,
+                 NodeName}
+                 NodeName = atom()
+
+              Stops the running Erlang node with name _N_o_d_e on the localhost.
+
+       ssttoopp((HHoosstt,, NNooddee)) -->> RReessuulltt
+
+              Types:
+
+                 Host = atom()
+                 Node = atom()
+                 Result = {ok, NodeName} | {error, not_started, NodeName} |
+                 {error, not_connected, NodeName} | {error, stop_timeout,
+                 NodeName}
+                 NodeName = atom()
+
+              Stops the running Erlang node with name _N_o_d_e on host _H_o_s_t.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                   ct_slave(3)

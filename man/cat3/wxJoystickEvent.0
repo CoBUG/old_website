@@ -1,0 +1,148 @@
+wxJoystickEvent(3)         Erlang Module Definition         wxJoystickEvent(3)
+
+
+
+NNAAMMEE
+       wxJoystickEvent - See external documentation: wxJoystickEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxJoystickEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _j_o_y___b_u_t_t_o_n___d_o_w_n, _j_o_y___b_u_t_t_o_n___u_p, _j_o_y___m_o_v_e, _j_o_y___z_m_o_v_e
+
+       See also the message variant ##wwxxJJooyyssttiicckk{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_J_o_y_s_t_i_c_k_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       bbuuttttoonnDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              Equivalent to bbuuttttoonnDDoowwnn((TThhiiss,, [[]])).
+
+       bbuuttttoonnDDoowwnn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+                 Option = {but, integer()}
+
+              See external documentation.
+
+       bbuuttttoonnIIssDDoowwnn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              Equivalent to bbuuttttoonnIIssDDoowwnn((TThhiiss,, [[]])).
+
+       bbuuttttoonnIIssDDoowwnn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+                 Option = {but, integer()}
+
+              See external documentation.
+
+       bbuuttttoonnUUpp((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              Equivalent to bbuuttttoonnUUpp((TThhiiss,, [[]])).
+
+       bbuuttttoonnUUpp((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+                 Option = {but, integer()}
+
+              See external documentation.
+
+       ggeettBBuuttttoonnCChhaannggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       ggeettBBuuttttoonnSSttaattee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       ggeettJJooyyssttiicckk((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       ggeettZZPPoossiittiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       iissBBuuttttoonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       iissMMoovvee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+       iissZZMMoovvee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxJoystickEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxJoystickEvent(3)

@@ -1,0 +1,219 @@
+wxGridCellAttr(3)          Erlang Module Definition          wxGridCellAttr(3)
+
+
+
+NNAAMMEE
+       wxGridCellAttr - See external documentation: wxGridCellAttr.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridCellAttr.
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_C_e_l_l_A_t_t_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       sseettTTeexxttCCoolloouurr((TThhiiss,, CCoollTTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 ColText = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoollBBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 ColBack = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettAAlliiggnnmmeenntt((TThhiiss,, HHAAlliiggnn,, VVAAlliiggnn)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 HAlign = integer()
+                 VAlign = integer()
+
+              See external documentation.
+
+       sseettRReeaaddOOnnllyy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              Equivalent to sseettRReeaaddOOnnllyy((TThhiiss,, [[]])).
+
+       sseettRReeaaddOOnnllyy((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 Option = {isReadOnly, boolean()}
+
+              See external documentation.
+
+       sseettRReennddeerreerr((TThhiiss,, RReennddeerreerr)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 Renderer = wxGridCellRenderer() (see module
+                 wxGridCellRenderer)
+
+              See external documentation.
+
+       sseettEEddiittoorr((TThhiiss,, EEddiittoorr)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 Editor = wxGridCellEditor() (see module wxGridCellEditor)
+
+              See external documentation.
+
+       hhaassTTeexxttCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       hhaassBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       hhaassFFoonntt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       hhaassAAlliiggnnmmeenntt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       hhaassRReennddeerreerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       hhaassEEddiittoorr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       ggeettTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       ggeettAAlliiggnnmmeenntt((TThhiiss)) -->> {{HHAAlliiggnn::::iinntteeggeerr(()),, VVAAlliiggnn::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       ggeettRReennddeerreerr((TThhiiss,, GGrriidd,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllRReennddeerreerr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllRReennddeerreerr))
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 Grid = wxGrid() (see module wxGrid)
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       ggeettEEddiittoorr((TThhiiss,, GGrriidd,, RRooww,, CCooll)) -->> wwxxGGrriiddCCeellllEEddiittoorr(()) ((sseeee mmoodduullee
+       wwxxGGrriiddCCeellllEEddiittoorr))
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 Grid = wxGrid() (see module wxGrid)
+                 Row = integer()
+                 Col = integer()
+
+              See external documentation.
+
+       iissRReeaaddOOnnllyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellAttr()
+
+              See external documentation.
+
+       sseettDDeeffAAttttrr((TThhiiss,, DDeeffAAttttrr)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellAttr()
+                 DefAttr = wxGridCellAttr()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxGridCellAttr(3)

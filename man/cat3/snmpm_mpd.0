@@ -1,0 +1,98 @@
+snmpm_mpd(3)               Erlang Module Definition               snmpm_mpd(3)
+
+
+
+NNAAMMEE
+       snmpm_mpd - Message Processing and Dispatch module for the SNMP manager
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_m___m_p_d implements the version independent Message
+       Processing and Dispatch functionality in SNMP for the manager. It is
+       supposed to be used from a Network Interface process (DDeeffiinniittiioonn ooff
+       MMaannaaggeerr NNeett iiff).
+
+EEXXPPOORRTTSS
+       iinniitt__mmppdd((VVssnnss)) -->> mmppdd__ssttaattee(())
+
+              Types:
+
+                 Vsns = [Vsn]
+                 Vsn = v1 | v2 | v3
+
+              This function can be called from the net_if process at start-up.
+              The options list defines which versions to use.
+
+              It also initializes some SNMP counters.
+
+       pprroocceessss__mmssgg((MMssgg,, TTDDoommaaiinn,, AAddddrr,, PPoorrtt,, SSttaattee,, NNootteeSSttoorree,, LLooggggeerr)) -->> {{ookk,,
+       VVssnn,, PPdduu,, PPdduuMMSS,, MMssggDDaattaa}} || {{ddiissccaarrddeedd,, RReeaassoonn}}
+
+              Types:
+
+                 Msg = binary()
+                 TDomain = snmpUDPDomain
+                 Addr = {integer(), integer(), integer(), integer()}
+                 Port = integer()
+                 State = mpd_state()
+                 NoteStore = pid()
+                 Logger = function()
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 Pdu = #pdu
+                 PduMs = integer()
+                 MsgData = term()
+
+              Processes an incoming message. Performs authentication and
+              decryption as necessary. The return values should be passed the
+              manager server.
+
+              _N_o_t_e_S_t_o_r_e is the _p_i_d_(_) of the note-store process.
+
+              _L_o_g_g_e_r is the function used for audit trail logging.
+
+              In the case when the pdu type is _r_e_p_o_r_t, _M_s_g_D_a_t_a is either _o_k or
+              _{_e_r_r_o_r_, _R_e_q_I_d_, _R_e_a_s_o_n_}.
+
+       ggeenneerraattee__mmssgg((VVssnn,, NNootteeSSttoorree,, PPdduu,, MMssggDDaattaa,, LLooggggeerr)) -->> {{ookk,, PPaacckkeett}} ||
+       {{ddiissccaarrddeedd,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 NoteStore = pid()
+                 Pdu = #pdu
+                 MsgData = term()
+                 Logger = function()
+                 Packet = binary()
+                 Reason = term()
+
+              Generates a possibly encrypted packet to be sent to the network.
+
+              _N_o_t_e_S_t_o_r_e is the _p_i_d_(_) of the note-store process.
+
+              _M_s_g_D_a_t_a is the message specific data used in the SNMP message.
+              In SNMPv1 and SNMPv2c, this message data is the community
+              string. In SNMPv3, it is the context information.
+
+              _L_o_g_g_e_r is the function used for audit trail logging.
+
+       ggeenneerraattee__rreessppoonnssee__mmssgg((VVssnn,, PPdduu,, MMssggDDaattaa,, LLooggggeerr)) -->> {{ookk,, PPaacckkeett}} ||
+       {{ddiissccaarrddeedd,, RReeaassoonn}}
+
+              Types:
+
+                 Vsn = 'version-1' | 'version-2' | 'version-3'
+                 Pdu = #pdu
+                 MsgData = term()
+                 Logger = function()
+                 Packet = binary()
+                 Reason = term()
+
+              Generates a possibly encrypted response packet to be sent to the
+              network.
+
+              _M_s_g_D_a_t_a is the message specific data used in the SNMP message.
+              This value is received from the pprroocceessss__mmssgg function.
+
+
+
+Ericsson AB                       snmp 4.22.1                     snmpm_mpd(3)

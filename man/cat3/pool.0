@@ -1,0 +1,107 @@
+pool(3)                    Erlang Module Definition                    pool(3)
+
+
+
+NNAAMMEE
+       pool - Load Distribution Facility
+
+DDEESSCCRRIIPPTTIIOONN
+       _p_o_o_l can be used to run a set of Erlang nodes as a pool of
+       computational processors. It is organized as a master and a set of
+       slave nodes and includes the following features:
+
+         * The slave nodes send regular reports to the master about their
+           current load.
+
+         * Queries can be sent to the master to determine which node will have
+           the least load.
+
+       The BIF _s_t_a_t_i_s_t_i_c_s_(_r_u_n___q_u_e_u_e_) is used for estimating future loads. It
+       returns the length of the queue of ready to run processes in the Erlang
+       runtime system.
+
+       The slave nodes are started with the _s_l_a_v_e module. This effects, tty
+       IO, file IO, and code loading.
+
+       If the master node fails, the entire pool will exit.
+
+EEXXPPOORRTTSS
+       ssttaarrtt((NNaammee)) -->> NNooddeess
+
+       ssttaarrtt((NNaammee,, AArrggss)) -->> NNooddeess
+
+              Types:
+
+                 Name = atom()
+                 Args = string()
+                 Nodes = [node()]
+
+              Starts a new pool. The file _._h_o_s_t_s_._e_r_l_a_n_g is read to find host
+              names where the pool nodes can be started. See section FFiilleess
+              below. The start-up procedure fails if the file is not found.
+
+              The slave nodes are started with _s_l_a_v_e_:_s_t_a_r_t_/_2_,_3, passing along
+              _N_a_m_e and, if provided, _A_r_g_s. _N_a_m_e is used as the first part of
+              the node names, _A_r_g_s is used to specify command line arguments.
+              See ssllaavvee((33)).
+
+              Access rights must be set so that all nodes in the pool have the
+              authority to access each other.
+
+              The function is synchronous and all the nodes, as well as all
+              the system servers, are running when it returns a value.
+
+       aattttaacchh((NNooddee)) -->> aallrreeaaddyy__aattttaacchheedd || aattttaacchheedd
+
+              Types:
+
+                 Node = node()
+
+              This function ensures that a pool master is running and includes
+              _N_o_d_e in the pool master's pool of nodes.
+
+       ssttoopp(()) -->> ssttooppppeedd
+
+              Stops the pool and kills all the slave nodes.
+
+       ggeett__nnooddeess(()) -->> [[nnooddee(())]]
+
+              Returns a list of the current member nodes of the pool.
+
+       ppssppaawwnn((MMoodd,, FFuunn,, AArrggss)) -->> ppiidd(())
+
+              Types:
+
+                 Mod = module()
+                 Fun = atom()
+                 Args = [term()]
+
+              Spawns a process on the pool node which is expected to have the
+              lowest future load.
+
+       ppssppaawwnn__lliinnkk((MMoodd,, FFuunn,, AArrggss)) -->> ppiidd(())
+
+              Types:
+
+                 Mod = module()
+                 Fun = atom()
+                 Args = [term()]
+
+              Spawn links a process on the pool node which is expected to have
+              the lowest future load.
+
+       ggeett__nnooddee(()) -->> nnooddee(())
+
+              Returns the node with the expected lowest future load.
+
+FFIILLEESS
+       _._h_o_s_t_s_._e_r_l_a_n_g is used to pick hosts where nodes can be started. See
+       nneett__aaddmm((33)) for information about format and location of this file.
+
+       _$_H_O_M_E_/_._e_r_l_a_n_g_._s_l_a_v_e_._o_u_t_._H_O_S_T is used for all additional IO that may
+       come from the slave nodes on standard IO. If the start-up procedure
+       does not work, this file may indicate the reason.
+
+
+
+Ericsson AB                      stdlib 1.18.2                         pool(3)

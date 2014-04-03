@@ -1,0 +1,150 @@
+wxScrollBar(3)             Erlang Module Definition             wxScrollBar(3)
+
+
+
+NNAAMMEE
+       wxScrollBar - See external documentation: wxScrollBar.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxScrollBar.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_c_r_o_l_l_B_a_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSccrroollllBBaarr(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxSSccrroollllBBaarr(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSccrroollllBBaarr(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxScrollBar()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxScrollBar()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ggeettRRaannggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxScrollBar()
+
+              See external documentation.
+
+       ggeettPPaaggeeSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxScrollBar()
+
+              See external documentation.
+
+       ggeettTThhuummbbPPoossiittiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxScrollBar()
+
+              See external documentation.
+
+       ggeettTThhuummbbSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxScrollBar()
+
+              See external documentation.
+
+       sseettTThhuummbbPPoossiittiioonn((TThhiiss,, VViieewwSSttaarrtt)) -->> ookk
+
+              Types:
+
+                 This = wxScrollBar()
+                 ViewStart = integer()
+
+              See external documentation.
+
+       sseettSSccrroollllbbaarr((TThhiiss,, PPoossiittiioonn,, TThhuummbbSSiizzee,, RRaannggee,, PPaaggeeSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxScrollBar()
+                 Position = integer()
+                 ThumbSize = integer()
+                 Range = integer()
+                 PageSize = integer()
+
+              Equivalent to sseettSSccrroollllbbaarr((TThhiiss,, PPoossiittiioonn,, TThhuummbbSSiizzee,, RRaannggee,,
+              PPaaggeeSSiizzee,, [[]])).
+
+       sseettSSccrroollllbbaarr((TThhiiss,, PPoossiittiioonn,, TThhuummbbSSiizzee,, RRaannggee,, PPaaggeeSSiizzee,,
+       OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxScrollBar()
+                 Position = integer()
+                 ThumbSize = integer()
+                 Range = integer()
+                 PageSize = integer()
+                 Option = {refresh, boolean()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSccrroollllBBaarr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxScrollBar(3)

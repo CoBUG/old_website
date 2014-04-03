@@ -1,0 +1,733 @@
+test_server(3)             Erlang Module Definition             test_server(3)
+
+
+
+NNAAMMEE
+       test_server - This module provides support for test suite authors.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _t_e_s_t___s_e_r_v_e_r module aids the test suite author by providing various
+       support functions. The supported functionality includes:
+
+         * Logging and timestamping
+
+         * Capturing output to stdout
+
+         * Retrieving and flushing the message queue of a process
+
+         * Watchdog timers, process sleep, time measurement and unit
+           conversion
+
+         * Private scratch directory for all test suites
+
+         * Start and stop of slave- or peer nodes
+
+       For more information on how to write test cases and for examples,
+       please see the Test Server User's Guide.
+
+TTEESSTT SSUUIITTEE SSUUPPPPOORRTT FFUUNNCCTTIIOONNSS
+       The following functions are supposed to be used inside a test suite.
+
+EEXXPPOORRTTSS
+       ooss__ttyyppee(()) -->> OOSSTTyyppee
+
+              Types:
+
+                 OSType = term()
+                   This is the same as returned from _o_s_:_t_y_p_e_/_0
+
+              This function can be called on controller or target node, and it
+              will always return the OS type of the target node.
+
+       ffaaiill(())
+       ffaaiill((RReeaassoonn))
+
+              Types:
+
+                 Reason = term()
+                   The reason why the test case failed.
+
+              This will make the test suite fail with a given reason, or with
+              _s_u_i_t_e___f_a_i_l_e_d if no reason was given. Use this function if you
+              want to terminate a test case, as this will make it easier to
+              read the log- and HTML files. _R_e_a_s_o_n will appear in the comment
+              field in the HTML log.
+
+       ttiimmeettrraapp((TTiimmoouutt)) -->> HHaannddllee
+
+              Types:
+
+                 Timeout = integer() | {hours,H} | {minutes,M} | {seconds,S}
+                 H = M = S = integer()
+                 Pid = pid()
+                   The process that is to be timetrapped (_s_e_l_f_(_)by default)
+
+              Sets up a time trap for the current process. An expired timetrap
+              kills the process with reason _t_i_m_e_t_r_a_p___t_i_m_e_o_u_t. The returned
+              handle is to be given as argument to _t_i_m_e_t_r_a_p___c_a_n_c_e_l before the
+              timetrap expires. If _T_i_m_e_o_u_t is an integer, it is expected to be
+              milliseconds.
+
+          NNoottee::
+              If the current process is trapping exits, it will not be killed
+              by the exit signal with reason _t_i_m_e_t_r_a_p___t_i_m_e_o_u_t. If this
+              happens, the process will be sent an exit signal with reason
+              _k_i_l_l 10 seconds later which will kill the process. Information
+              about the timetrap timeout will in this case not be found in the
+              test logs. However, the error_logger will be sent a warning.
+
+
+       ttiimmeettrraapp__ccaanncceell((HHaannddllee)) -->> ookk
+
+              Types:
+
+                 Handle = term()
+                   Handle returned from _t_i_m_e_t_r_a_p
+
+              This function cancels a timetrap. This must be done before the
+              timetrap expires.
+
+       ttiimmeettrraapp__ssccaallee__ffaaccttoorr(()) -->> SSccaalleeFFaaccttoorr
+
+              Types:
+
+                 ScaleFactor = integer()
+
+              This function returns the scale factor by which all timetraps
+              are scaled. It is normally 1, but can be greater than 1 if the
+              test_server is running _c_o_v_e_r, using a larger amount of scheduler
+              threads than the amount of logical processors on the system,
+              running under purify, valgrind or in a debug-compiled emulator.
+              The scale factor can be used if you need to scale you own
+              timeouts in test cases with same factor as the test_server uses.
+
+       sslleeeepp((MMSSeeccss)) -->> ookk
+
+              Types:
+
+                 MSecs = integer() | float() | infinity
+                   The number of milliseconds to sleep
+
+              This function suspends the calling process for at least the
+              supplied number of milliseconds. There are two major reasons why
+              you should use this function instead of _t_i_m_e_r_:_s_l_e_e_p, the first
+              being that the module _t_i_m_e_r may be unavailable at the time the
+              test suite is run, and the second that it also accepts floating
+              point numbers.
+
+       aaddjjuusstteedd__sslleeeepp((MMSSeeccss)) -->> ookk
+
+              Types:
+
+                 MSecs = integer() | float() | infinity
+                   The default number of milliseconds to sleep
+
+              This function suspends the calling process for at least the
+              supplied number of milliseconds. The function behaves the same
+              way as _t_e_s_t___s_e_r_v_e_r_:_s_l_e_e_p_/_1, only _M_S_e_c_s will be multiplied by the
+              'multiply_timetraps' value, if set, and also automatically
+              scaled up if 'scale_timetraps' is set to true (which it is by
+              default).
+
+       hhoouurrss((NN)) -->> MMSSeeccss
+       mmiinnuutteess((NN)) -->> MMSSeeccss
+       sseeccoonnddss((NN)) -->> MMSSeeccss
+
+              Types:
+
+                 N = integer()
+                   Value to convert to milliseconds.
+
+              Theese functions convert _N number of hours, minutes or seconds
+              into milliseconds.
+
+              Use this function when you want to _t_e_s_t___s_e_r_v_e_r_:_s_l_e_e_p_/_1 for a
+              number of seconds, minutes or hours(!).
+
+       ffoorrmmaatt((FFoorrmmaatt)) -->> ookk
+       ffoorrmmaatt((FFoorrmmaatt,, AArrggss))
+       ffoorrmmaatt((PPrrii,, FFoorrmmaatt))
+       ffoorrmmaatt((PPrrii,, FFoorrmmaatt,, AArrggss))
+
+              Types:
+
+                 Format = string()
+                   Format as described for _i_o___:_f_o_r_m_a_t.
+                 Args = list()
+                   List of arguments to format.
+
+              Formats output just like _i_o_:_f_o_r_m_a_t but sends the formatted
+              string to a logfile. If the urgency value, _P_r_i, is lower than
+              some threshold value, it will also be written to the test
+              person's console. Default urgency is 50, default threshold for
+              display on the console is 1.
+
+              Typically, the test person don't want to see everything a test
+              suite outputs, but is merely interested in if the test cases
+              succeeded or not, which the test server tells him. If he would
+              like to see more, he could manually change the threshold values
+              by using the _t_e_s_t___s_e_r_v_e_r___c_t_r_l_:_s_e_t___l_e_v_e_l_s_/_3 function.
+
+       ccaappttuurree__ssttaarrtt(()) -->> ookk
+       ccaappttuurree__ssttoopp(()) -->> ookk
+       ccaappttuurree__ggeett(()) -->> lliisstt(())
+
+              These functions makes it possible to capture all output to
+              stdout from a process started by the test suite. The list of
+              characters captured can be purged by using _c_a_p_t_u_r_e___g_e_t.
+
+       mmeessssaaggeess__ggeett(()) -->> lliisstt(())
+
+              This function will empty and return all the messages currently
+              in the calling process' message queue.
+
+       ttiimmeeccaallll((MM,, FF,, AA)) -->> {{TTiimmee,, VVaalluuee}}
+
+              Types:
+
+                 M = atom()
+                   The name of the module where the function resides.
+                 F = atom()
+                   The name of the function to call in the module.
+                 A = list()
+                   The arguments to supply the called function.
+                 Time = integer()
+                   The number of seconds it took to call the function.
+                 Value = term()
+                   Value returned from the called function.
+
+              This function measures the time (in seconds) it takes to call a
+              certain function. The function call is _n_o_t caught within a
+              catch.
+
+       ddoo__ttiimmeess((NN,, MM,, FF,, AA)) -->> ookk
+       ddoo__ttiimmeess((NN,, FFuunn))
+
+              Types:
+
+                 N = integer()
+                   Number of times to call MFA.
+                 M = atom()
+                   Module name where the function resides.
+                 F = atom()
+                   Function name to call.
+                 A = list()
+                   Arguments to M:F.
+
+              Calls MFA or Fun N times. Useful for extensive testing of a
+              sensitive function.
+
+       mm__oouutt__ooff__nn((MM,, NN,, FFuunn)) -->> ookk || eexxiitt(({{mm__oouutt__ooff__nn__ffaaiilleedd,, {{RR,,lleefftt__ttoo__ddoo}}}}
+
+              Types:
+
+                 N = integer()
+                   Number of times to call the Fun.
+                 M = integer()
+                   Number of times to require a successful return.
+
+              Repeatedly evaluates the given function until it succeeds
+              (doesn't crash) M times. If, after N times, M successful
+              attempts have not been accomplished, the process crashes with
+              reason {m_out_of_n_failed, {R,left_to_do}}, where R indicates
+              how many cases that was still to be successfully completed.
+
+              For example:
+
+              _m___o_u_t___o_f___n_(_1_,_4_,_f_u_n_(_) _-_> _t_r_i_c_k_y___t_e_s_t___c_a_s_e_(_) _e_n_d_)
+              Tries to run tricky_test_case() up to 4 times, and is happy if
+              it succeeds once.
+
+              _m___o_u_t___o_f___n_(_7_,_8_,_f_u_n_(_) _-_> _c_l_o_c_k___s_a_n_i_t_y___c_h_e_c_k_(_) _e_n_d_)
+              Tries running clock_sanity_check() up to 8 times,and allows the
+              function to fail once. This might be useful if
+              clock_sanity_check/0 is known to fail if the clock crosses an
+              hour boundary during the test (and the up to 8 test runs could
+              never cross 2 boundaries)
+
+       ccaallll__ccrraasshh((MM,, FF,, AA)) -->> RReessuulltt
+       ccaallll__ccrraasshh((TTiimmee,, MM,, FF,, AA)) -->> RReessuulltt
+       ccaallll__ccrraasshh((TTiimmee,, CCrraasshh,, MM,, FF,, AA)) -->> RReessuulltt
+
+              Types:
+
+                 Result = ok | exit(call_crash_timeout) |
+                 exit({wrong_crash_reason, Reason})
+                 Crash = term()
+                   Crash return from the function.
+                 Time = integer()
+                   Timeout in milliseconds.
+                 M = atom()
+                   Module name where the function resides.
+                 F = atom()
+                   Function name to call.
+                 A = list()
+                   Arguments to M:F.
+
+              Spawns a new process that calls MFA. The call is considered
+              successful if the call crashes with the gives reason (_C_r_a_s_h) or
+              any reason if not specified. The call must terminate within the
+              given time (default _i_n_f_i_n_i_t_y), or it is considered a failure.
+
+       tteemmpp__nnaammee((SStteemm)) -->> NNaammee
+
+              Types:
+
+                 Stem = string()
+
+              Returns a unique filename starting with _S_t_e_m with enough extra
+              characters appended to make up a unique filename. The filename
+              returned is guaranteed not to exist in the filesystem at the
+              time of the call.
+
+       bbrreeaakk((CCoommmmeenntt)) -->> ookk
+
+              Types:
+
+                 Comment = string()
+
+              _C_o_m_m_e_n_t is a string which will be written in the shell, e.g.
+              explaining what to do.
+
+              This function will cancel all timetraps and pause the execution
+              of the test case until the user executes the _c_o_n_t_i_n_u_e_/_0
+              function. It gives the user the opportunity to interact with the
+              erlang node running the tests, e.g. for debugging purposes or
+              for manually executing a part of the test case.
+
+              When the _b_r_e_a_k_/_1 function is called, the shell will look
+              something like this:
+
+                 --- SEMIAUTOMATIC TESTING ---
+                 The test case executes on process <0.51.0>
+
+
+                 "Here is a comment, it could e.g. instruct to pull out a card"
+
+
+                 -----------------------------
+
+                 Continue with --> test_server:continue().
+
+              The user can now interact with the erlang node, and when ready
+              call _t_e_s_t___s_e_r_v_e_r_:_c_o_n_t_i_n_u_e_(_)_.
+
+              Note that this function can not be used if the test is executed
+              with _t_s_:_r_u_n_/_0_/_1_/_2_/_3_/_4 in _b_a_t_c_h mode.
+
+       ccoonnttiinnuuee(()) -->> ookk
+
+              This function must be called in order to continue after a test
+              case has called _b_r_e_a_k_/_1.
+
+       rruunn__oonn__sshhiieellddeedd__nnooddee((FFuunn,, CCAArrggss)) -->> tteerrmm(())
+
+              Types:
+
+                 Fun = function() (arity 0)
+                   Function to execute on the shielded node.
+                 CArg = string()
+                   Extra command line arguments to use when starting the
+                   shielded node.
+
+              _F_u_n is executed in a process on a temporarily created hidden
+              node with a proxy for communication with the test server node.
+              The node is called a shielded node (should have been called a
+              shield node). If _F_u_n is successfully executed, the result is
+              returned. A peer node (see _s_t_a_r_t___n_o_d_e_/_3) started from the
+              shielded node will be shielded from test server node, i.e. they
+              will not be aware of each other. This is useful when you want to
+              start nodes from earlier OTP releases than the OTP release of
+              the test server node.
+
+              Nodes from an earlier OTP release can normally not be started if
+              the test server hasn't been started in compatibility mode (see
+              the _+_R flag in the _e_r_l_(_1_) documentation) of an earlier release.
+              If a shielded node is started in compatibility mode of an
+              earlier OTP release than the OTP release of the test server
+              node, the shielded node can start nodes of an earlier OTP
+              release.
+
+          NNoottee::
+              You _m_u_s_t make sure that nodes started by the shielded node never
+              communicate directly with the test server node.
+
+
+          NNoottee::
+              Slave nodes always communicate with the test server node;
+              therefore, _n_e_v_e_r start _s_l_a_v_e _n_o_d_e_s from the shielded node,
+              _a_l_w_a_y_s start _p_e_e_r _n_o_d_e_s.
+
+
+       ssttaarrtt__nnooddee((NNaammee,, TTyyppee,, OOppttiioonnss)) -->> {{ookk,, NNooddee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = atom() | string()
+                   Name of the slavenode to start (as given to -sname or
+                   -name)
+                 Type = slave | peer
+                   The type of node to start.
+                 Options = [{atom(), term()]
+                   Tuplelist of options
+
+              This functions starts a node, possibly on a remote machine, and
+              guarantees cross architecture transparency. Type is set to
+              either _s_l_a_v_e or _p_e_e_r.
+
+              _s_l_a_v_e means that the new node will have a master, i.e. the slave
+              node will terminate if the master terminates, TTY output
+              produced on the slave will be sent back to the master node and
+              file I/O is done via the master. The master is normally the
+              target node unless the target is itself a slave.
+
+              _p_e_e_r means that the new node is an independent node with no
+              master.
+
+              _O_p_t_i_o_n_s is a tuplelist which can contain one or more of
+
+                _{_r_e_m_o_t_e_, _t_r_u_e_}:
+                  Start the node on a remote host. If not specified, the node
+                  will be started on the local host (with some exceptions, as
+                  for the case of VxWorks, where all nodes are started on a
+                  remote host). Test cases that require a remote host will
+                  fail with a reasonable comment if no remote hosts are
+                  available at the time they are run.
+
+                _{_a_r_g_s_, _A_r_g_u_m_e_n_t_s_}:
+                  Arguments passed directly to the node. This is typically a
+                  string appended to the command line.
+
+                _{_w_a_i_t_, _f_a_l_s_e_}:
+                  Don't wait until the node is up. By default, this function
+                  does not return until the node is up and running, but this
+                  option makes it return as soon as the node start command is
+                  given..
+                   Only valid for peer nodes
+
+                _{_f_a_i_l___o_n___e_r_r_o_r_, _f_a_l_s_e_}:
+                  Returns _{_e_r_r_o_r_, _R_e_a_s_o_n_} rather than failing the test case.
+                   Only valid for peer nodes. Note that slave nodes always act
+                  as if they had _f_a_i_l___o_n___e_r_r_o_r_=_f_a_l_s_e
+
+                _{_e_r_l_, _R_e_l_e_a_s_e_L_i_s_t_}:
+                  Use an Erlang emulator determined by ReleaseList when
+                  starting nodes, instead of the same emulator as the test
+                  server is running. ReleaseList is a list of specifiers,
+                  where a specifier is either {release, Rel}, {prog, Prog}, or
+                  'this'. Rel is either the name of a release, e.g.,
+                  "r12b_patched" or 'latest'. 'this' means using the same
+                  emulator as the test server. Prog is the name of an emulator
+                  executable. If the list has more than one element, one of
+                  them is picked randomly. (Only works on Solaris and Linux,
+                  and the test server gives warnings when it notices that
+                  nodes are not of the same version as itself.)
+
+                   When specifying this option to run a previous release, use
+                  _i_s___r_e_l_e_a_s_e___a_v_a_i_l_a_b_l_e_/_1 function to test if the given release
+                  is available and skip the test case if not.
+
+                   In order to avoid compatibility problems (may not appear
+                  right away), use a shielded node (see
+                  _r_u_n___o_n___s_h_i_e_l_d_e_d___n_o_d_e_/_2) when starting nodes from different
+                  OTP releases than the test server.
+
+                _{_c_l_e_a_n_u_p_, _f_a_l_s_e_}:
+                  Tells the test server not to kill this node if it is still
+                  alive after the test case is completed. This is useful if
+                  the same node is to be used by a group of test cases.
+
+                _{_e_n_v_, _E_n_v_}:
+                  _E_n_v should be a list of tuples _{_N_a_m_e_, _V_a_l_}, where _N_a_m_e is
+                  the name of an environment variable, and _V_a_l is the value it
+                  is to have in the started node. Both _N_a_m_e and _V_a_l must be
+                  strings. The one exception is _V_a_l being the atom _f_a_l_s_e (in
+                  analogy with _o_s_:_g_e_t_e_n_v_/_1), which removes the environment
+                  variable. Only valid for peer nodes. Not available on
+                  VxWorks.
+
+       ssttoopp__nnooddee((NNooddeeNNaammee)) -->> bbooooll(())
+
+              Types:
+
+                 NodeName = term()
+                   Name of the node to stop
+
+              This functions stops a node previously started with
+              _s_t_a_r_t___n_o_d_e_/_3. Use this function to stop any node you start, or
+              the test server will produce a warning message in the test logs,
+              and kill the nodes automatically unless it was started with the
+              _{_c_l_e_a_n_u_p_, _f_a_l_s_e_} option.
+
+       iiss__ccoommmmeerrcciiaall(()) -->> bbooooll(())
+
+              This function test whether the emulator is commercially
+              supported emulator. The tests for a commercially supported
+              emulator could be more stringent (for instance, a commercial
+              release should always contain documentation for all
+              applications).
+
+       iiss__rreelleeaassee__aavvaaiillaabbllee((RReelleeaassee)) -->> bbooooll(())
+
+              Types:
+
+                 Release = string() | atom()
+                   Release to test for
+
+              This function test whether the release given by _R_e_l_e_a_s_e (for
+              instance, "r12b_patched") is available on the computer that the
+              test_server controller is running on. Typically, you should skip
+              the test case if not.
+
+              Caution: This function may not be called from the _s_u_i_t_e clause
+              of a test case, as the test_server will deadlock.
+
+       iiss__nnaattiivvee((MMoodd)) -->> bbooooll(())
+
+              Types:
+
+                 Mod = atom()
+                   A module name
+
+              Checks whether the module is natively compiled or not
+
+       aapppp__tteesstt((AApppp)) -->> ookk || tteesstt__sseerrvveerr::ffaaiill(())
+       aapppp__tteesstt((AApppp,,MMooddee))
+
+              Types:
+
+                 App = term()
+                   The name of the application to test
+                 Mode = pedantic | tolerant
+                   Default is pedantic
+
+              Checks an applications .app file for obvious errors. The
+              following is checked:
+
+                * required fields
+
+                * that all modules specified actually exists
+
+                * that all requires applications exists
+
+                * that no module included in the application has export_all
+
+                * that all modules in the ebin/ dir is included (If
+                  _M_o_d_e_=_=_t_o_l_e_r_a_n_t this only produces a warning, as all modules
+                  does not have to be included)
+
+       ccoommmmeenntt((CCoommmmeenntt)) -->> ookk
+
+              Types:
+
+                 Comment = string()
+
+              The given String will occur in the comment field of the table on
+              the HTML result page. If called several times, only the last
+              comment is printed. comment/1 is also overwritten by the return
+              value {comment,Comment} from a test case or by fail/1 (which
+              prints Reason as a comment).
+
+TTEESSTT SSUUIITTEE EEXXPPOORRTTSS
+       The following functions must be exported from a test suite module.
+
+EEXXPPOORRTTSS
+       aallll((ssuuiittee)) -->> TTeessttSSppeecc || {{sskkiipp,, CCoommmmeenntt}}
+
+              Types:
+
+                 TestSpec = list()
+                 Comment = string()
+                   This comment will be printed on the HTML result page
+
+              This function must return the test specification for the test
+              suite module. The syntax of a test specification is described in
+              the Test Server User's Guide.
+
+       iinniitt__ppeerr__ssuuiittee((CCoonnffiigg00)) -->> CCoonnffiigg11 || {{sskkiipp,, CCoommmmeenntt}}
+
+              Types:
+
+                 Config0 = Config1 = [tuple()]
+                 Comment = string()
+                   Describes why the suite is skipped
+
+              This function is called before all other test cases in the
+              suite. _C_o_n_f_i_g is the configuration which can be modified here.
+              Whatever is returned from this function is given as _C_o_n_f_i_g to
+              the test cases.
+
+              If this function fails, all test cases in the suite will be
+              skipped.
+
+       eenndd__ppeerr__ssuuiittee((CCoonnffiigg)) -->> vvooiidd(())
+
+              Types:
+
+                 Config = [tuple()]
+
+              This function is called after the last test case in the suite,
+              and can be used to clean up whatever the test cases have done.
+              The return value is ignored.
+
+       iinniitt__ppeerr__tteessttccaassee((CCaassee,, CCoonnffiigg00)) -->> CCoonnffiigg11 || {{sskkiipp,, CCoommmmeenntt}}
+
+              Types:
+
+                 Case = atom()
+                 Config0 = Config1 = [tuple()]
+                 Comment = string()
+                   Describes why the test case is skipped
+
+              This function is called before each test case. The _C_a_s_e argument
+              is the name of the test case, and _C_o_n_f_i_g is the configuration
+              which can be modified here. Whatever is returned from this
+              function is given as _C_o_n_f_i_g to the test case.
+
+       eenndd__ppeerr__tteessttccaassee((CCaassee,, CCoonnffiigg)) -->> vvooiidd(())
+
+              Types:
+
+                 Case = atom()
+                 Config = [tuple()]
+
+              This function is called after each test case, and can be used to
+              clean up whatever the test case has done. The return value is
+              ignored.
+
+       CCaassee((ddoocc)) -->> [[DDeeccrriippttiioonn]]
+       CCaassee((ssuuiittee)) -->> [[]] || TTeessttSSppeecc || {{sskkiipp,, CCoommmmeenntt}}
+       CCaassee((CCoonnffiigg)) -->> {{sskkiipp,, CCoommmmeenntt}} || {{ccoommmmeenntt,, CCoommmmeenntt}} || OOkk
+
+              Types:
+
+                 Description = string()
+                   Short description of the test case
+                 TestSpec = list()
+                 Comment = string()
+                   This comment will be printed on the HTML result page
+                 Ok = term()
+                 Config = [tuple()]
+                   Elements from the Config parameter can be read with the
+                   ?config macro, see section about test suite support macros
+
+              The _d_o_c_u_m_e_n_t_a_t_i_o_n _c_l_a_u_s_e (argument _d_o_c) can be used for
+              automatic generation of test documentation or test descriptions.
+
+              The _s_p_e_c_i_f_i_c_a_t_i_o_n _c_l_a_u_s_e (argument _s_p_e_c) shall return an empty
+              list, the test specification for the test case or
+              _{_s_k_i_p_,_C_o_m_m_e_n_t_}. The syntax of a test specification is described
+              in the Test Server User's Guide.
+
+              _N_o_t_e _t_h_a_t _t_h_e _s_p_e_c_i_f_i_c_a_t_i_o_n _c_l_a_u_s_e _a_l_w_a_y_s _i_s _e_x_e_c_u_t_e_d _o_n _t_h_e
+              _c_o_n_t_r_o_l_l_e_r _h_o_s_t_.
+
+              The _e_x_e_c_u_t_i_o_n _c_l_a_u_s_e (argument _C_o_n_f_i_g) is only called if the
+              specification clause returns an empty list. The execution clause
+              is the real test case. Here you must call the functions you want
+              to test, and do whatever you need to check the result. If
+              something fails, make sure the process crashes or call
+              _t_e_s_t___s_e_r_v_e_r_:_f_a_i_l_/_0_/_1 (which also will cause the process to
+              crash).
+
+              You can return _{_s_k_i_p_,_C_o_m_m_e_n_t_} if you decide not to run the test
+              case after all, e.g. if it is not applicable on this platform.
+
+              You can return _{_c_o_m_m_e_n_t_,_C_o_m_m_e_n_t_} if you wish to print some
+              information in the 'Comment' field on the HTML result page.
+
+              If the execution clause returns anything else, it is considered
+              a success, unless it is _{_'_E_X_I_T_'_,_R_e_a_s_o_n_} or _{_'_E_X_I_T_'_,_P_i_d_,_R_e_a_s_o_n_}
+              which can't be distinguished from a crash, and thus will be
+              considered a failure.
+
+              A _c_o_n_f _t_e_s_t _c_a_s_e is a group of test cases with an init and a
+              cleanup function. The init and cleanup functions are also test
+              cases, but they have special rules:
+
+                * They do not need a specification clause.
+
+                * They must always have the execution clause.
+
+                * They must return the _C_o_n_f_i_g parameter, a modified version of
+                  it or _{_s_k_i_p_,_C_o_m_m_e_n_t_} from the execution clause.
+
+                * The cleanup function may also return a tuple
+                  _{_r_e_t_u_r_n___g_r_o_u_p___r_e_s_u_l_t_,_S_t_a_t_u_s_}, which is used to return the
+                  status of the conf case to Test Server and/or to a conf case
+                  on a higher level. (_S_t_a_t_u_s _= _o_k _| _s_k_i_p_p_e_d _| _f_a_i_l_e_d).
+
+                * _i_n_i_t___p_e_r___t_e_s_t_c_a_s_e and _e_n_d___p_e_r___t_e_s_t_c_a_s_e are not called before
+                  and after these functions.
+
+TTEESSTT SSUUIITTEE LLIINNEE NNUUMMBBEERRSS
+       If a test case fails, the test server can report the exact line number
+       at which it failed. There are two ways of doing this, either by using
+       the _l_i_n_e macro or by using the _t_e_s_t___s_e_r_v_e_r___l_i_n_e parse transform.
+
+       The _l_i_n_e macro is described under TEST SUITE SUPPORT MACROS below. The
+       _l_i_n_e macro will only report the last line executed when a test case
+       failed.
+
+       The _t_e_s_t___s_e_r_v_e_r___l_i_n_e parse transform is activated by including the
+       headerfile _t_e_s_t___s_e_r_v_e_r___l_i_n_e_._h_r_l in the test suite. When doing this, it
+       is important that the _t_e_s_t___s_e_r_v_e_r___l_i_n_e module is in the code path of
+       the erlang node compiling the test suite. The parse transform will
+       report a history of a maximum of 10 lines when a test case fails.
+       Consecutive lines in the same function are not shown.
+
+       The attribute _-_n_o___l_i_n_e_s_(_F_u_n_c_L_i_s_t_)_. can be used in the test suite to
+       exclude specific functions from the parse transform. This is necessary
+       e.g. for functions that are executed on old (i.e. <R10B) OTP releases.
+       _F_u_n_c_L_i_s_t _= _[_{_F_u_n_c_,_A_r_i_t_y_}_].
+
+       If both the _l_i_n_e macro and the parse transform is used in the same
+       module, the parse transform will overrule the macro.
+
+TTEESSTT SSUUIITTEE SSUUPPPPOORRTT MMAACCRROOSS
+       There are some macros defined in the _t_e_s_t___s_e_r_v_e_r_._h_r_l that are quite
+       useful for test suite programmers:
+
+       The _l_i_n_e macro, is quite essential when writing test cases. It tells
+       the test server exactly what line of code that is being executed, so
+       that it can report this line back if the test case fails. Use this
+       macro at the beginning of every test case line of code.
+
+       The _c_o_n_f_i_g macro, is used to retrieve information from the _C_o_n_f_i_g
+       variable sent to all test cases. It is used with two arguments, where
+       the first is the name of the configuration variable you wish to
+       retrieve, and the second is the _C_o_n_f_i_g variable supplied to the test
+       case from the test server.
+
+       Possible configuration variables include:
+
+         * _d_a_t_a___d_i_r - Data file directory.
+
+         * _p_r_i_v___d_i_r - Scratch file directory.
+
+         * _n_o_d_e_s - Nodes specified in the spec file
+
+         * _n_o_d_e_n_a_m_e_s - Generated nodenames.
+
+         * Whatever added by conf test cases or _i_n_i_t___p_e_r___t_e_s_t_c_a_s_e_/_2
+
+       Examples of the _l_i_n_e and _c_o_n_f_i_g macros can be seen in the Examples
+       chapter in the user's guide.
+
+       If the _l_i_n_e___t_r_a_c_e macro is defined, you will get a timestamp
+       (_e_r_l_a_n_g_:_n_o_w_(_)) in your minor log for each _l_i_n_e macro in your suite.
+       This way you can at any time see which line is currently being
+       executed, and when the line was called.
+
+       The _l_i_n_e___t_r_a_c_e macro can also be used together with the
+       _t_e_s_t___s_e_r_v_e_r___l_i_n_e parse transform described above. A timestamp will then
+       be written for each line in the suite, except for functions stated in
+       the _-_n_o___l_i_n_e_s attribute.
+
+       The _l_i_n_e___t_r_a_c_e macro can e.g. be defined as a compile option, like
+       this:
+       _e_r_l_c _-_W _-_D_l_i_n_e___t_r_a_c_e _m_y___S_U_I_T_E_._e_r_l
+
+
+
+Ericsson AB                    test_server 3.5.2                test_server(3)

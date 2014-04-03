@@ -1,0 +1,282 @@
+ssh(3)                     Erlang Module Definition                     ssh(3)
+
+
+
+NNAAMMEE
+       ssh - Main API of the SSH application
+
+DDEESSCCRRIIPPTTIIOONN
+       Interface module for the SSH application.
+
+SSSSHH
+         * ssh requires the crypto and public_key applications.
+
+         * Supported SSH-version is 2.0
+
+         * Currently supports only a minimum of mac and encryption algorithms
+           i.e. hmac-sha1, and aes128-cb and 3des-cbc.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module:
+
+       _b_o_o_l_e_a_n_(_) _= _t_r_u_e _| _f_a_l_s_e
+
+       _s_t_r_i_n_g_(_) _= _l_i_s_t _o_f _A_S_C_I_I _c_h_a_r_a_c_t_e_r_s
+
+       _s_s_h___d_a_e_m_o_n___r_e_f_(_) _- _o_p_a_q_u_e _t_o _t_h_e _u_s_e_r _r_e_t_u_r_n_e_d _b_y _s_s_h_:_d_a_e_m_o_n_/_[_1_,_2_,_3_]
+
+       _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_) _- _o_p_a_q_u_e _t_o _t_h_e _u_s_e_r _r_e_t_u_r_n_e_d _b_y _s_s_h_:_c_o_n_n_e_c_t_/_3
+
+       _i_p___a_d_d_r_e_s_s_(_) _- _{_N_1_,_N_2_,_N_3_,_N_4_} _% _I_P_v_4 _| _{_K_1_,_K_2_,_K_3_,_K_4_,_K_5_,_K_6_,_K_7_,_K_8_} _% _I_P_v_6
+
+       _s_u_b_s_y_s_t_e_m___s_p_e_c_(_) _= _{_s_u_b_s_y_s_t_e_m___n_a_m_e_(_)_, _{_c_h_a_n_n_e_l___c_a_l_l_b_a_c_k_(_)_,
+       _c_h_a_n_n_e_l___i_n_i_t___a_r_g_s_(_)_}_}
+
+       _s_u_b_s_y_s_t_e_m___n_a_m_e_(_) _= _s_t_r_i_n_g_(_)
+
+       _c_h_a_n_n_e_l___c_a_l_l_b_a_c_k_(_) _= _a_t_o_m_(_) _- _N_a_m_e _o_f _t_h_e _e_r_l_a_n_g _m_o_d_u_l_e _i_m_p_l_e_m_e_n_t_i_n_g
+       _t_h_e _s_u_b_s_y_s_t_e_m _u_s_i_n_g _t_h_e _s_s_h___c_h_a_n_n_e_l _b_e_h_a_v_i_o_r _s_e_e sssshh__cchhaannnneell((33))
+
+       _c_h_a_n_n_e_l___i_n_i_t___a_r_g_s_(_) _= _l_i_s_t_(_)
+
+EEXXPPOORRTTSS
+       cclloossee((CCoonnnneeccttiioonnRReeff)) -->> ookk
+
+              Types:
+
+                 ConnectionRef = ssh_connection_ref()
+
+              Closes a ssh connection.
+
+       ccoonnnneecctt((HHoosstt,, PPoorrtt,, OOppttiioonnss)) -->>
+       ccoonnnneecctt((HHoosstt,, PPoorrtt,, OOppttiioonnss,, TTiimmeeoouutt)) -->> {{ookk,, sssshh__ccoonnnneeccttiioonn__rreeff(())}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Host = string()
+                 Port = integer()
+                   The default is _2_2, the registered port for SSH.
+                 Options = [{Option, Value}]
+                 Timeout = infinity | integer(milliseconds)
+
+              Connects to an SSH server. No channel is started this is done by
+              calling ssh_connect:session_channel/2.
+
+              Options are:
+
+                _{_u_s_e_r___d_i_r_, _s_t_r_i_n_g_(_)_}:
+                  Sets the user directory e.i. the directory containing ssh
+                  configuration files for the user such as _k_n_o_w_n___h_o_s_t_s,
+                  _i_d___r_s_a_, _i_d___d_s_a and _a_u_t_h_o_r_i_z_e_d___k_e_y. Defaults to the directory
+                  normally referred to as _~_/_._s_s_h
+
+                _{_d_s_a___p_a_s_s___p_h_r_a_s_e_, _s_t_r_i_n_g_(_)_}:
+                  If the user dsa key is protected by a pass phrase it can be
+                  supplied with this option.
+
+                _{_r_s_a___p_a_s_s___p_h_r_a_s_e_, _s_t_r_i_n_g_(_)_}:
+                  If the user rsa key is protected by a pass phrase it can be
+                  supplied with this option.
+
+                _{_s_i_l_e_n_t_l_y___a_c_c_e_p_t___h_o_s_t_s_, _b_o_o_l_e_a_n_(_)_}:
+                  When true hosts are added to the file _k_n_o_w_n___h_o_s_t_s without
+                  asking the user. Defaults to false.
+
+                _{_u_s_e_r___i_n_t_e_r_a_c_t_i_o_n_, _b_o_o_l_e_a_n_(_)_}:
+                  If false disables the client to connect to the server if any
+                  user interaction is needed such as accepting that the server
+                  will be added to the _k_n_o_w_n___h_o_s_t_s file or supplying a
+                  password. Defaults to true. Even if user interaction is
+                  allowed it can be suppressed by other options such as
+                  silently_accept_hosts and password. Do note that it may not
+                  always be desirable to use those options from a security
+                  point of view.
+
+                _{_p_u_b_l_i_c___k_e_y___a_l_g_, _s_s_h___r_s_a _| _s_s_h___d_s_a_}:
+                  Sets the preferred public key algorithm to use for user
+                  authentication. If the the preferred algorithm fails of some
+                  reason, the other algorithm is tried. The default is to try
+                  _s_s_h___r_s_a first.
+
+                _{_c_o_n_n_e_c_t___t_i_m_e_o_u_t_, _t_i_m_e_o_u_t_(_)_}:
+                  Sets a timeout on the transport layer connection. Defaults
+                  to infinity.
+
+                _{_u_s_e_r_, _S_t_r_i_n_g_}:
+                  Provide a user name. If this option is not given, ssh reads
+                  from the environment (_L_O_G_N_A_M_E or _U_S_E_R on unix, _U_S_E_R_N_A_M_E on
+                  Windows).
+
+                _{_p_a_s_s_w_o_r_d_, _s_t_r_i_n_g_(_)_}:
+                  Provide a password for password authentication. If this
+                  option is not given, the user will be asked for a password
+                  if the password authentication method is attempted.
+
+                _{_u_s_e_r___a_u_t_h_, _F_u_n_/_3_}:
+                  Provide a fun for password authentication. The fun will be
+                  called as _f_u_n_(_U_s_e_r_, _P_a_s_s_w_o_r_d_, _O_p_t_s_) and should return _t_r_u_e
+                  or _f_a_l_s_e.
+
+                _{_k_e_y___c_b_, _a_t_o_m_(_) _= _K_e_y_C_a_l_l_b_a_c_k_M_o_d_u_l_e_}:
+                  Provide a special call-back module for key handling. The
+                  call-back module should be modeled after the _s_s_h___f_i_l_e
+                  module. The functions that must be exported are:
+                  _p_r_i_v_a_t_e___h_o_s_t___r_s_a___k_e_y_/_2, _p_r_i_v_a_t_e___h_o_s_t___d_s_a___k_e_y_/_2,
+                  _l_o_o_k_u_p___h_o_s_t___k_e_y_/_3 and _a_d_d___h_o_s_t___k_e_y_/_3. This is considered
+                  somewhat experimental and will be better documented later
+                  on.
+
+                _{_f_d_, _f_i_l_e___d_e_s_c_r_i_p_t_o_r_(_)_}:
+                  Allow an existing file-descriptor to be used (simply passed
+                  on to the transport protocol).
+
+                _{_i_p___v_6___d_i_s_a_b_l_e_d_, _b_o_o_l_e_a_n_(_)_}:
+                  Determines if SSH shall use IPv6 or not.
+
+       ccoonnnneeccttiioonn__iinnffoo((CCoonnnneeccttiioonnRReeff,, [[OOppttiioonn]])) -->>[[{{OOppttiioonn,, VVaalluuee}}]]
+
+              Types:
+
+                 Option = client_version | server_version | peer
+                 Value = term()
+
+              Retrieves information about a connection.
+
+       ddaaeemmoonn((PPoorrtt)) -->>
+       ddaaeemmoonn((PPoorrtt,, OOppttiioonnss)) -->>
+       ddaaeemmoonn((HHoossttAAddddrreessss,, PPoorrtt,, OOppttiioonnss)) -->> sssshh__ddaaeemmoonn__rreeff(())
+
+              Types:
+
+                 Port = integer()
+                 HostAddress = ip_address() | any
+                 Options = [{Option, Value}]
+                 Option = atom()
+                 Value = term()
+
+              Starts a server listening for SSH connections on the given port.
+
+              Options are:
+
+                _{_s_u_b_s_y_s_t_e_m_s_, _[_s_u_b_s_y_s_t_e_m___s_p_e_c_(_)_]:
+                   Provides specifications for handling of subsystems. The
+                  "sftp" subsystem-spec can be retrieved by calling
+                  ssh_sftpd:subsystem_spec/1. If the subsystems option in not
+                  present the value of _[_s_s_h___s_f_t_p_d_:_s_u_b_s_y_s_t_e_m___s_p_e_c_(_[_]_)_] will be
+                  used. It is of course possible to set the option to the
+                  empty list if you do not want the daemon to run any
+                  subsystems at all.
+
+                _{_s_h_e_l_l_, _{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _A_r_g_s_} _| _f_u_n_(_s_t_r_i_n_g_(_) _= _U_s_e_r_) _- _>
+                _p_i_d_(_) _| _f_u_n_(_s_t_r_i_n_g_(_) _= _U_s_e_r_, _i_p___a_d_d_r_e_s_s_(_) _= _P_e_e_r_A_d_d_r_) _-_>
+                _p_i_d_(_)_}:
+                   Defines the read-eval-print loop used when a shell is
+                  requested by the client. Example use the erlang shell:
+                  _{_s_h_e_l_l_, _s_t_a_r_t_, _[_]_} which is the default behavior.
+
+                _{_s_s_h___c_l_i_,_{_c_h_a_n_n_e_l___c_a_l_l_b_a_c_k_(_)_, _c_h_a_n_n_e_l___i_n_i_t___a_r_g_s_(_)_}_}:
+                   Provide your own cli implementation, e.i. a channel
+                  callback module that implements a shell and command
+                  execution. Note that you may customize the shell read-eval-
+                  print loop using the option _s_h_e_l_l which is much less work
+                  than implementing your own cli channel.
+
+                _{_u_s_e_r___d_i_r_, _S_t_r_i_n_g_}:
+                  Sets the user directory e.i. the directory containing ssh
+                  configuration files for the user such as _k_n_o_w_n___h_o_s_t_s,
+                  _i_d___r_s_a_, _i_d___d_s_a and _a_u_t_h_o_r_i_z_e_d___k_e_y. Defaults to the directory
+                  normally referred to as _~_/_._s_s_h
+
+                _{_s_y_s_t_e_m___d_i_r_, _s_t_r_i_n_g_(_)_}:
+                  Sets the system directory, containing the host files that
+                  identifies the host for ssh. The default is _/_e_t_c_/_s_s_h, note
+                  that SSH normally requires the host files there to be
+                  readable only by root.
+
+                _{_a_u_t_h___m_e_t_h_o_d_s_, _s_t_r_i_n_g_(_)_}:
+                  Comma separated string that determines which authentication
+                  methodes that the server should support and in what order
+                  they will be tried. Defaults to
+                  _"_p_u_b_l_i_c_k_e_y_,_k_e_y_b_o_a_r_d___i_n_t_e_r_a_c_t_i_v_e_,_p_a_s_s_w_o_r_d_"
+
+                _{_u_s_e_r___p_a_s_s_w_o_r_d_s_, _[_{_s_t_r_i_n_g_(_) _= _U_s_e_r_, _s_t_r_i_n_g_(_) _= _P_a_s_s_w_o_r_d_}_]_}:
+                  Provide passwords for password authentication.They will be
+                  used when someone tries to connect to the server and public
+                  key user authentication fails. The option provides a list of
+                  valid user names and the corresponding password.
+
+                _{_p_a_s_s_w_o_r_d_, _s_t_r_i_n_g_(_)_}:
+                  Provide a global password that will authenticate any user.
+                  From a security perspective this option makes the server
+                  very vulnerable.
+
+                _{_p_w_d_f_u_n_, _f_u_n_/_2_}:
+                  Provide a function for password validation. This is called
+                  with user and password as strings, and should return _t_r_u_e if
+                  the password is valid and _f_a_l_s_e otherwise.
+
+                _{_f_d_, _f_i_l_e___d_e_s_c_r_i_p_t_o_r_(_)_}:
+                  Allow an existing file-descriptor to be used (simply passed
+                  on to the transport protocol).
+
+                _{_i_p___v_6___d_i_s_a_b_l_e_d_, _b_o_o_l_e_a_n_(_)_}:
+                  Determines if SSH shall use IPv6 or not (only used when
+                  HostAddress is set to any).
+
+       sshheellll((HHoosstt)) -->>
+       sshheellll((HHoosstt,, OOppttiioonn)) -->>
+       sshheellll((HHoosstt,, PPoorrtt,, OOppttiioonn)) -->> __
+
+              Types:
+
+                  Host = string()
+                  Port = integer()
+                  Options - see ssh:connect/3
+
+              Starts an interactive shell to an SSH server on the given _H_o_s_t.
+              The function waits for user input, and will not return until the
+              remote shell is ended (e.g. on exit from the shell).
+
+       ssttaarrtt(()) -->>
+       ssttaarrtt((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = permanent | transient | temporary
+                 Reason = term()
+
+              Starts the Ssh application. Default type is temporary. See also
+              aapppplliiccaattiioonn((33)) Requires that the crypto application has been
+              started.
+
+       ssttoopp(()) -->> ookk
+
+              Stops the Ssh application. See also aapppplliiccaattiioonn((33))
+
+       ssttoopp__ddaaeemmoonn((DDaaeemmoonnRReeff)) -->>
+       ssttoopp__ddaaeemmoonn((AAddddrreessss,, PPoorrtt)) -->> ookk
+
+              Types:
+
+                 DaemonRef = ssh_daemon_ref()
+                 Address = ip_address()
+                 Port = integer()
+
+              Stops the listener and all connections started by the listener.
+
+       ssttoopp__lliisstteenneerr((DDaaeemmoonnRReeff)) -->>
+       ssttoopp__lliisstteenneerr((AAddddrreessss,, PPoorrtt)) -->> ookk
+
+              Types:
+
+                 DaemonRef = ssh_daemon_ref()
+                 Address = ip_address()
+                 Port = integer()
+
+              Stops the listener, but leaves existing connections started by
+              the listener up and running.
+
+
+
+Ericsson AB                        ssh 2.1.1                            ssh(3)

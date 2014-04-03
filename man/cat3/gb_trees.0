@@ -1,0 +1,286 @@
+gb_trees(3)                Erlang Module Definition                gb_trees(3)
+
+
+
+NNAAMMEE
+       gb_trees - General Balanced Trees
+
+DDEESSCCRRIIPPTTIIOONN
+       An efficient implementation of Prof. Arne Andersson's General Balanced
+       Trees. These have no storage overhead compared to unbalanced binary
+       trees, and their performance is in general better than AVL trees.
+
+       This module considers two keys as different if and only if they do not
+       compare equal (_=_=).
+
+DDAATTAA SSTTRRUUCCTTUURREE
+       Data structure:
+
+       - {Size, Tree}, where `Tree' is composed of nodes of the form:
+         - {Key, Value, Smaller, Bigger}, and the "empty tree" node:
+         - nil.
+
+       There is no attempt to balance trees after deletions. Since deletions
+       do not increase the height of a tree, this should be OK.
+
+       Original balance condition _h_(_T_) _<_= _c_e_i_l_(_c _* _l_o_g_(_|_T_|_)_) has been changed
+       to the similar (but not quite equivalent) condition _2 _^ _h_(_T_) _<_= _|_T_| _^
+       _c. This should also be OK.
+
+       Performance is comparable to the AVL trees in the Erlang book (and
+       faster in general due to less overhead); the difference is that
+       deletion works for these trees, but not for the book's trees. Behaviour
+       is logarithmic (as it should be).
+
+DDAATTAA TTYYPPEESS
+       ggbb__ttrreeee(())
+
+              A GB tree.
+
+       iitteerr(())
+
+              A GB tree iterator.
+
+EEXXPPOORRTTSS
+       bbaallaannccee((TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Tree1 = Tree2 = gb_tree()
+
+              Rebalances _T_r_e_e_1. Note that this is rarely necessary, but may be
+              motivated when a large number of nodes have been deleted from
+              the tree without further insertions. Rebalancing could then be
+              forced in order to minimise lookup times, since deletion only
+              does not rebalance the tree.
+
+       ddeelleettee((KKeeyy,, TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Key = term()
+                 Tree1 = Tree2 = gb_tree()
+
+              Removes the node with key _K_e_y from _T_r_e_e_1; returns new tree.
+              Assumes that the key is present in the tree, crashes otherwise.
+
+       ddeelleettee__aannyy((KKeeyy,, TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Key = term()
+                 Tree1 = Tree2 = gb_tree()
+
+              Removes the node with key _K_e_y from _T_r_e_e_1 if the key is present
+              in the tree, otherwise does nothing; returns new tree.
+
+       eemmppttyy(()) -->> ggbb__ttrreeee(())
+
+              Returns a new empty tree
+
+       eenntteerr((KKeeyy,, VVaall,, TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Key = Val = term()
+                 Tree1 = Tree2 = gb_tree()
+
+              Inserts _K_e_y with value _V_a_l into _T_r_e_e_1 if the key is not present
+              in the tree, otherwise updates _K_e_y to value _V_a_l in _T_r_e_e_1.
+              Returns the new tree.
+
+       ffrroomm__oorrddddiicctt((LLiisstt)) -->> TTrreeee
+
+              Types:
+
+                 List = [{Key :: term(), Val :: term()}]
+                 Tree = gb_tree()
+
+              Turns an ordered list _L_i_s_t of key-value tuples into a tree. The
+              list must not contain duplicate keys.
+
+       ggeett((KKeeyy,, TTrreeee)) -->> VVaall
+
+              Types:
+
+                 Key = term()
+                 Tree = gb_tree()
+                 Val = term()
+
+              Retrieves the value stored with _K_e_y in _T_r_e_e. Assumes that the
+              key is present in the tree, crashes otherwise.
+
+       iinnsseerrtt((KKeeyy,, VVaall,, TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Key = Val = term()
+                 Tree1 = Tree2 = gb_tree()
+
+              Inserts _K_e_y with value _V_a_l into _T_r_e_e_1; returns the new tree.
+              Assumes that the key is not present in the tree, crashes
+              otherwise.
+
+       iiss__ddeeffiinneedd((KKeeyy,, TTrreeee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Key = term()
+                 Tree = gb_tree()
+
+              Returns _t_r_u_e if _K_e_y is present in _T_r_e_e, otherwise _f_a_l_s_e.
+
+       iiss__eemmppttyy((TTrreeee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Tree = gb_tree()
+
+              Returns _t_r_u_e if _T_r_e_e is an empty tree, and _f_a_l_s_e otherwise.
+
+       iitteerraattoorr((TTrreeee)) -->> IItteerr
+
+              Types:
+
+                 Tree = gb_tree()
+                 Iter = iitteerr(())
+
+              Returns an iterator that can be used for traversing the entries
+              of _T_r_e_e; see _n_e_x_t_/_1. The implementation of this is very
+              efficient; traversing the whole tree using _n_e_x_t_/_1 is only
+              slightly slower than getting the list of all elements using
+              _t_o___l_i_s_t_/_1 and traversing that. The main advantage of the
+              iterator approach is that it does not require the complete list
+              of all elements to be built in memory at one time.
+
+       kkeeyyss((TTrreeee)) -->> [[KKeeyy]]
+
+              Types:
+
+                 Tree = gb_tree()
+                 Key = term()
+
+              Returns the keys in _T_r_e_e as an ordered list.
+
+       llaarrggeesstt((TTrreeee)) -->> {{KKeeyy,, VVaall}}
+
+              Types:
+
+                 Tree = gb_tree()
+                 Key = Val = term()
+
+              Returns _{_K_e_y_, _V_a_l_}, where _K_e_y is the largest key in _T_r_e_e, and
+              _V_a_l is the value associated with this key. Assumes that the tree
+              is nonempty.
+
+       llooookkuupp((KKeeyy,, TTrreeee)) -->> nnoonnee || {{vvaalluuee,, VVaall}}
+
+              Types:
+
+                 Key = Val = term()
+                 Tree = gb_tree()
+
+              Looks up _K_e_y in _T_r_e_e; returns _{_v_a_l_u_e_, _V_a_l_}, or _n_o_n_e if _K_e_y is
+              not present.
+
+       mmaapp((FFuunnccttiioonn,, TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Function = fun((K :: term(), V1 :: term()) -> V2 :: term())
+                 Tree1 = Tree2 = gb_tree()
+
+              Maps the function F(K, V1) -> V2 to all key-value pairs of the
+              tree _T_r_e_e_1 and returns a new tree _T_r_e_e_2 with the same set of
+              keys as _T_r_e_e_1 and the new set of values _V_2.
+
+       nneexxtt((IItteerr11)) -->> nnoonnee || {{KKeeyy,, VVaall,, IItteerr22}}
+
+              Types:
+
+                 Iter1 = Iter2 = iitteerr(())
+                 Key = Val = term()
+
+              Returns _{_K_e_y_, _V_a_l_, _I_t_e_r_2_} where _K_e_y is the smallest key referred
+              to by the iterator _I_t_e_r_1, and _I_t_e_r_2 is the new iterator to be
+              used for traversing the remaining nodes, or the atom _n_o_n_e if no
+              nodes remain.
+
+       ssiizzee((TTrreeee)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Tree = gb_tree()
+
+              Returns the number of nodes in _T_r_e_e.
+
+       ssmmaalllleesstt((TTrreeee)) -->> {{KKeeyy,, VVaall}}
+
+              Types:
+
+                 Tree = gb_tree()
+                 Key = Val = term()
+
+              Returns _{_K_e_y_, _V_a_l_}, where _K_e_y is the smallest key in _T_r_e_e, and
+              _V_a_l is the value associated with this key. Assumes that the tree
+              is nonempty.
+
+       ttaakkee__llaarrggeesstt((TTrreeee11)) -->> {{KKeeyy,, VVaall,, TTrreeee22}}
+
+              Types:
+
+                 Tree1 = Tree2 = gb_tree()
+                 Key = Val = term()
+
+              Returns _{_K_e_y_, _V_a_l_, _T_r_e_e_2_}, where _K_e_y is the largest key in
+              _T_r_e_e_1, _V_a_l is the value associated with this key, and _T_r_e_e_2 is
+              this tree with the corresponding node deleted. Assumes that the
+              tree is nonempty.
+
+       ttaakkee__ssmmaalllleesstt((TTrreeee11)) -->> {{KKeeyy,, VVaall,, TTrreeee22}}
+
+              Types:
+
+                 Tree1 = Tree2 = gb_tree()
+                 Key = Val = term()
+
+              Returns _{_K_e_y_, _V_a_l_, _T_r_e_e_2_}, where _K_e_y is the smallest key in
+              _T_r_e_e_1, _V_a_l is the value associated with this key, and _T_r_e_e_2 is
+              this tree with the corresponding node deleted. Assumes that the
+              tree is nonempty.
+
+       ttoo__lliisstt((TTrreeee)) -->> [[{{KKeeyy,, VVaall}}]]
+
+              Types:
+
+                 Tree = gb_tree()
+                 Key = Val = term()
+
+              Converts a tree into an ordered list of key-value tuples.
+
+       uuppddaattee((KKeeyy,, VVaall,, TTrreeee11)) -->> TTrreeee22
+
+              Types:
+
+                 Key = Val = term()
+                 Tree1 = Tree2 = gb_tree()
+
+              Updates _K_e_y to value _V_a_l in _T_r_e_e_1; returns the new tree. Assumes
+              that the key is present in the tree.
+
+       vvaalluueess((TTrreeee)) -->> [[VVaall]]
+
+              Types:
+
+                 Tree = gb_tree()
+                 Val = term()
+
+              Returns the values in _T_r_e_e as an ordered list, sorted by their
+              corresponding keys. Duplicates are not removed.
+
+SSEEEE AALLSSOO
+       ggbb__sseettss((33)), ddiicctt((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                     gb_trees(3)

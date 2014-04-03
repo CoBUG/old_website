@@ -1,0 +1,69 @@
+wxNotebookEvent(3)         Erlang Module Definition         wxNotebookEvent(3)
+
+
+
+NNAAMMEE
+       wxNotebookEvent - See external documentation: wxNotebookEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxNotebookEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_o_m_m_a_n_d___n_o_t_e_b_o_o_k___p_a_g_e___c_h_a_n_g_e_d, _c_o_m_m_a_n_d___n_o_t_e_b_o_o_k___p_a_g_e___c_h_a_n_g_i_n_g
+
+       See also the message variant ##wwxxNNootteebbooookk{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxNNoottiiffyyEEvveenntt
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_N_o_t_e_b_o_o_k_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettOOllddSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxNotebookEvent()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxNotebookEvent()
+
+              See external documentation.
+
+       sseettOOllddSSeelleeccttiioonn((TThhiiss,, NNOOllddSSeell)) -->> ookk
+
+              Types:
+
+                 This = wxNotebookEvent()
+                 NOldSel = integer()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, NNSSeell)) -->> ookk
+
+              Types:
+
+                 This = wxNotebookEvent()
+                 NSel = integer()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxNotebookEvent(3)

@@ -1,0 +1,198 @@
+wxScrolledWindow(3)        Erlang Module Definition        wxScrolledWindow(3)
+
+
+
+NNAAMMEE
+       wxScrolledWindow - See external documentation: wxScrolledWindow.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxScrolledWindow.
+
+       This class is derived (and can use functions) from:
+       wwxxPPaanneell
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_c_r_o_l_l_e_d_W_i_n_d_o_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSccrroolllleeddWWiinnddooww(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSccrroolllleeddWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSccrroolllleeddWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {winid, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ccaallccSSccrroolllleeddPPoossiittiioonn((TThhiiss,, PPtt)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ccaallccSSccrroolllleeddPPoossiittiioonn((TThhiiss,, XX,, YY)) -->> {{XXxx::::iinntteeggeerr(()),, YYyy::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ccaallccUUnnssccrroolllleeddPPoossiittiioonn((TThhiiss,, PPtt)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ccaallccUUnnssccrroolllleeddPPoossiittiioonn((TThhiiss,, XX,, YY)) -->> {{XXxx::::iinntteeggeerr(()),, YYyy::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       eennaabblleeSSccrroolllliinngg((TThhiiss,, XX__ssccrroolllliinngg,, YY__ssccrroolllliinngg)) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 X_scrolling = boolean()
+                 Y_scrolling = boolean()
+
+              See external documentation.
+
+       ggeettSSccrroollllPPiixxeellssPPeerrUUnniitt((TThhiiss)) -->> {{PPiixxeellssPPeerrUUnniittXX::::iinntteeggeerr(()),,
+       PPiixxeellssPPeerrUUnniittYY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxScrolledWindow()
+
+              See external documentation.
+
+       ggeettVViieewwSSttaarrtt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxScrolledWindow()
+
+              See external documentation.
+
+       ddooPPrreeppaarreeDDCC((TThhiiss,, DDcc)) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 Dc = wxDC() (see module wxDC)
+
+              See external documentation.
+
+       pprreeppaarreeDDCC((TThhiiss,, DDcc)) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 Dc = wxDC() (see module wxDC)
+
+              See external documentation.
+
+       ssccrroollll((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettSSccrroollllbbaarrss((TThhiiss,, PPiixxeellssPPeerrUUnniittXX,, PPiixxeellssPPeerrUUnniittYY,, NNooUUnniittssXX,, NNooUUnniittssYY))
+       -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 PixelsPerUnitX = integer()
+                 PixelsPerUnitY = integer()
+                 NoUnitsX = integer()
+                 NoUnitsY = integer()
+
+              Equivalent to sseettSSccrroollllbbaarrss((TThhiiss,, PPiixxeellssPPeerrUUnniittXX,,
+              PPiixxeellssPPeerrUUnniittYY,, NNooUUnniittssXX,, NNooUUnniittssYY,, [[]])).
+
+       sseettSSccrroollllbbaarrss((TThhiiss,, PPiixxeellssPPeerrUUnniittXX,, PPiixxeellssPPeerrUUnniittYY,, NNooUUnniittssXX,, NNooUUnniittssYY,,
+       OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 PixelsPerUnitX = integer()
+                 PixelsPerUnitY = integer()
+                 NoUnitsX = integer()
+                 NoUnitsY = integer()
+                 Option = {xPos, integer()} | {yPos, integer()} | {noRefresh,
+                 boolean()}
+
+              See external documentation.
+
+       sseettSSccrroollllRRaattee((TThhiiss,, XXsstteepp,, YYsstteepp)) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 Xstep = integer()
+                 Ystep = integer()
+
+              See external documentation.
+
+       sseettTTaarrggeettWWiinnddooww((TThhiiss,, TTaarrggeett)) -->> ookk
+
+              Types:
+
+                 This = wxScrolledWindow()
+                 Target = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSccrroolllleeddWWiinnddooww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxScrolledWindow(3)

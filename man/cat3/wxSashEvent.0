@@ -1,0 +1,62 @@
+wxSashEvent(3)             Erlang Module Definition             wxSashEvent(3)
+
+
+
+NNAAMMEE
+       wxSashEvent - See external documentation: wxSashEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSashEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _s_a_s_h___d_r_a_g_g_e_d
+
+       See also the message variant ##wwxxSSaasshh{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_a_s_h_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettEEddggee((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxSashEvent()
+
+              See external documentation.
+              Res = ?wxSASH_TOP | ?wxSASH_RIGHT | ?wxSASH_BOTTOM |
+              ?wxSASH_LEFT | ?wxSASH_NONE
+
+       ggeettDDrraaggRReecctt((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSashEvent()
+
+              See external documentation.
+
+       ggeettDDrraaggSSttaattuuss((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxSashEvent()
+
+              See external documentation.
+              Res = ?wxSASH_STATUS_OK | ?wxSASH_STATUS_OUT_OF_RANGE
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxSashEvent(3)

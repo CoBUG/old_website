@@ -1,0 +1,177 @@
+ic_clib(3)                    C Library Functions                   ic_clib(3)
+
+
+
+NNAAMMEE
+       ic_clib - IC C Library Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This manual page lists some of the functions in the IC C runtime
+       library.
+
+AALLLLOOCCAATTIIOONN AANNDD DDEEAALLLLOOCCAATTIIOONN FFUUNNCCTTIIOONNSS
+       The following functions are used for allocating and deallocating a
+       _C_O_R_B_A___E_n_v_i_r_o_n_m_e_n_t structure.
+
+EEXXPPOORRTTSS
+       CCOORRBBAA__EEnnvviirroonnmmeenntt **CCOORRBBAA__EEnnvviirroonnmmeenntt__aalllloocc((iinntt iinnbbuuffsszz,, iinntt oouuttbbuuffsszz))
+
+              This function is used to allocate and initiate the
+              _C_O_R_B_A___E_n_v_i_r_o_n_m_e_n_t structure. In particular, it is used to
+              dynamically allocate a CORBA_Environment structure and set the
+              default values for the structure's fields.
+
+              _i_n_b_u_f_s_i_z_e is the initial size of the input buffer.
+
+              _o_u_t_b_u_f_s_i_z_e is the initial size of the output buffer.
+
+              _C_O_R_B_A___E_n_v_i_r_o_n_m_e_n_t is the CORBA 2.0 state structure used by the
+              generated stub.
+
+              This function will set all needed default values and allocate
+              buffers the lengths of which are equal to the values passed, but
+              will not allocate space for the _to_pid and _from_pid fields.
+
+              To free the space allocated by CORBA_Environment_alloc() do as
+              follows.
+
+                * First call CORBA_free for the input and output buffers.
+
+                * After freeing the buffer space, call CORBA_free for the
+                  CORBA_Environment space.
+
+       vvooiidd CCOORRBBAA__ffrreeee((vvooiidd **pp))
+
+              Frees allocated space pointed to by _p.
+
+       CCOORRBBAA__cchhaarr **CCOORRBBAA__ssttrriinngg__aalllloocc((CCOORRBBAA__uunnssiiggnneedd__lloonngg lleenn))
+
+              Allocates a (simple) CORBA character string of length _l_e_n _+ _1.
+
+       CCOORRBBAA__wwcchhaarr **CCOORRBBAA__wwssttrriinngg__aalllloocc((CCOORRBBAA__uunnssiiggnneedd__lloonngg lleenn))
+
+              Allocates a CORBA wide string of length _l_e_n _+ _1.
+
+EEXXCCEEPPTTIIOONN FFUUNNCCTTIIOONNSS
+       Functions for retrieving exception ids and values, and for setting
+       exceptions.
+
+EEXXPPOORRTTSS
+       CCOORRBBAA__cchhaarr **CCOORRBBAA__eexxcceeppttiioonn__iidd((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              Returns the exception identity if an exception is set, otherwise
+              it returns _N_U_L_L.
+
+       vvooiidd **CCOORRBBAA__eexxcceeppttiioonn__vvaalluuee((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              Returns the exception value, if an exception is set, otherwise
+              it returns _N_U_L_L.
+
+       vvooiidd CCOORRBBAA__eexxcc__sseett((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv,, CCOORRBBAA__eexxcceeppttiioonn__ttyyppee MMaajjoorr,,
+       CCOORRBBAA__cchhaarr **IIdd,, CCOORRBBAA__cchhaarr **VVaalluuee))
+
+              Sets the exception type, exception identity, and exception value
+              in the environment pointed to by _e_n_v.
+
+SSEERRVVEERR RREECCEEPPTTIIOONN
+       The following function is provided for convenience.
+
+EEXXPPOORRTTSS
+       iinntt ooee__sseerrvveerr__rreecceeiivvee((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv,, ooee__mmaapp__tt **mmaapp))
+       iinntt ooee__sseerrvveerr__rreecceeiivvee__ttmmoo((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv,, ooee__mmaapp__tt **mmaapp,,
+       uunnssiiggnneedd iinntt sseenndd__mmss,, uunnssiiggnneedd iinntt rreeccvv__mmss))
+
+              Provides a loop that receives one message, executes the
+              operation in question, and in case of a two-way operation sends
+              a reply.
+
+              _s_e_n_d___m_s and _r_e_c_v___m_s specify timeout values in milliseconds for
+              send and receive, respectively.
+
+GGEENNEERRIICC EEXXEECCUUTTIIOONN SSWWIITTCCHH AANNDD MMAAPP MMEERRGGIINNGG
+       Function for searching for server operation function, and for calling
+       it if found. Function for merging maps (see the include file _i_c_._h for
+       definitions).
+
+EEXXPPOORRTTSS
+       iinntt ooee__eexxeecc__sswwiittcchh((CCOORRBBAA__OObbjjeecctt oobbjj,, CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv,, ooee__mmaapp__tt
+       **mmaapp))
+
+              Search for server operation and execute it.
+
+       ooee__mmaapp__tt **ooee__mmeerrggee__mmaappss((ooee__mmaapp__tt **mmaappss,, iinntt ssiizzee))
+
+              Merge an array of server maps to one single map.
+
+TTHHEE CCOORRBBAA__EENNVVIIRROONNMMEENNTT SSTTRRUUCCTTUURREE
+       Here is the complete definition of the CORBA_Environment structure,
+       defined in file _i_c_._h:
+
+             /* Environment definition */
+             typedef struct {
+
+             /*----- CORBA compatibility part ------------------------*/
+             /* Exception tag, initially set to CORBA_NO_EXCEPTION ---*/
+             CORBA_exception_type   _major;
+
+             /*----- External Implementation part - initiated by the user ---*/
+             /* File descriptor                                              */
+             int                    _fd;
+             /* Size of input buffer                                         */
+             int                    _inbufsz;
+             /* Pointer to always dynamically allocated buffer for input     */
+             char                  *_inbuf;
+             /* Size of output buffer                                        */
+             int                    _outbufsz;
+             /* Pointer to always dynamically allocated buffer for output    */
+             char                  *_outbuf;
+             /* Size of memory chunks in bytes, used for increasing the output
+             buffer, set to >= 32, should be around >= 1024 for performance
+             reasons                                                       */
+             int                    _memchunk;
+             /* Pointer for registered name                                   */
+             char                   _regname[256];
+             /* Process identity for caller                                   */
+             erlang_pid            *_to_pid;
+             /* Process identity for callee                                  */
+             erlang_pid            *_from_pid;
+
+             /*- Internal Implementation part - used by the server/client ---*/
+             /* Index for input buffer                                       */
+             int                    _iin;
+             /* Index for output buffer                                      */
+             int                    _iout;
+             /* Pointer for operation name                                   */
+             char                   _operation[256];
+             /* Used to count parameters                                    */
+             int                    _received;
+             /* Used to identify the caller                                  */
+             erlang_pid             _caller;
+             /* Used to identify the call                                     */
+             erlang_ref             _unique;
+             /* Exception id field                                           */
+             CORBA_char            *_exc_id;
+             /* Exception value field                                        */
+             void                  *_exc_value;
+
+
+             } CORBA_Environment;
+
+
+   NNoottee::
+       Always set the field values ___f_d, ___r_e_g_n_a_m_e, ___t_o___p_i_d and/or _*___f_r_o_m___p_i_d to
+       appropriate application values. These are not automatically set by the
+       stubs.
+
+
+   WWaarrnniinngg::
+       Never assign static buffers to the buffer pointers, and never set the
+       ___m_e_m_c_h_u_n_k field to a value less than _3_2.
+
+
+SSEEEE AALLSSOO
+       ic(3), ic_c_protocol(3)
+
+
+
+Ericsson AB                        ic 4.2.31                        ic_clib(3)

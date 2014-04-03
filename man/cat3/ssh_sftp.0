@@ -1,0 +1,414 @@
+ssh_sftp(3)                Erlang Module Definition                ssh_sftp(3)
+
+
+
+NNAAMMEE
+       ssh_sftp - SFTP client.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements an SFTP (SSH FTP) client. SFTP is a secure,
+       encrypted file transfer service available for SSH.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module and/or
+       abstractions to indicate the intended use of the data type:
+
+       _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_) _- _o_p_a_q_u_e _t_o _t_h_e _u_s_e_r _r_e_t_u_r_n_e_d _b_y _s_s_h_:_c_o_n_n_e_c_t_/_3
+
+       _t_i_m_e_o_u_t_(_) _= _i_n_f_i_n_i_t_y _| _i_n_t_e_g_e_r_(_) _- _i_n _m_i_l_l_i_s_e_c_o_n_d_s_.
+
+TTIIMMEEOOUUTTSS
+       If the request functions for the sftp channel return {error, timeout}
+       it does not mean that the request did not reach the server and was not
+       performed, it only means that we did not receive an answer from the
+       server within the time that was expected.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__cchhaannnneell((CCoonnnneeccttiioonnRReeff)) -->>
+       ssttaarrtt__cchhaannnneell((CCoonnnneeccttiioonnRReeff,, OOppttiioonnss)) -->>
+       ssttaarrtt__cchhaannnneell((HHoosstt,, OOppttiioonnss)) -->>
+       ssttaarrtt__cchhaannnneell((HHoosstt,, PPoorrtt,, OOppttiioonnss)) -->> {{ookk,, PPiidd}} || {{ookk,, PPiidd,,
+       CCoonnnneeccttiioonnRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Host = string()
+                 ConnectionRef = ssh_connection_ref()
+                 Port = integer()
+                 Options = [{Option, Value}]
+                 Reason = term()
+
+              If not provided, setups a ssh connection in this case a
+              connection reference will be returned too. A ssh channel process
+              is started to handle the communication with the SFTP server, the
+              returned pid for this process should be used as input to all
+              other API functions in this module.
+
+              Options are:
+
+                _{_t_i_m_e_o_u_t_, _t_i_m_e_o_u_t_(_)_}:
+                  The timeout is passed to the ssh_channel start function, and
+                  defaults to infinity.
+
+              All other options are directly passed to sssshh::ccoonnnneecctt//33 or
+              ignored if a connection is already provided.
+
+       ssttoopp__cchhaannnneell((CChhaannnneellPPiidd)) -->> ookk
+
+              Types:
+
+                 ChannelPid = pid()
+
+              Stops a sftp channel. If the ssh connection should be closed
+              call sssshh::cclloossee//11.
+
+       rreeaadd__ffiillee((CChhaannnneellPPiidd,, FFiillee)) -->>
+       rreeaadd__ffiillee((CChhaannnneellPPiidd,, FFiillee,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 File = string()
+                 Data = binary()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Reads a file from the server, and returns the data in a binary,
+              like _f_i_l_e_:_r_e_a_d___f_i_l_e_/_1.
+
+       wwrriittee__ffiillee((CChhaannnneellPPiidd,, FFiillee,, IIoolliisstt)) -->>
+       wwrriittee__ffiillee((CChhaannnneellPPiidd,, FFiillee,, IIoolliisstt,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 File = string()
+                 Iolist = iolist()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Writes a file to the server, like _f_i_l_e_:_w_r_i_t_e___f_i_l_e_/_2. The file is
+              created if it's not there.
+
+       lliisstt__ddiirr((CChhaannnneellPPiidd,, PPaatthh)) -->>
+       lliisstt__ddiirr((CChhaannnneellPPiidd,, PPaatthh,, TTiimmeeoouutt)) -->> {{ookk,, FFiilleennaammeess}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Path = string()
+                 Filenames = [Filename]
+                 Filename = string()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Lists the given directory on the server, returning the filenames
+              as a list of strings.
+
+       ooppeenn((CChhaannnneellPPiidd,, FFiillee,, MMooddee)) -->>
+       ooppeenn((CChhaannnneellPPiidd,, FFiillee,, MMooddee,, TTiimmeeoouutt)) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 File = string()
+                 Mode = [Modeflag]
+                 Modeflag = read | write | creat | trunc | append | binary
+                 Timeout = timeout()
+                 Handle = term()
+                 Reason = term()
+
+              Opens a file on the server, and returns a handle that is used
+              for reading or writing.
+
+       ooppeennddiirr((CChhaannnneellPPiidd,, PPaatthh)) -->>
+       ooppeennddiirr((CChhaannnneellPPiidd,, PPaatthh,, TTiimmeeoouutt)) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Path = string()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Opens a handle to a directory on the server, the handle is used
+              for reading directory contents.
+
+       cclloossee((CChhaannnneellPPiidd,, HHaannddllee)) -->>
+       cclloossee((CChhaannnneellPPiidd,, HHaannddllee,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Handle = term()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Closes a handle to an open file or directory on the server.
+
+       rreeaadd((CChhaannnneellPPiidd,, HHaannddllee,, LLeenn)) -->>
+       rreeaadd((CChhaannnneellPPiidd,, HHaannddllee,, LLeenn,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} || eeooff || {{eerrrroorr,,
+       EErrrroorr}}
+       pprreeaadd((CChhaannnneellPPiidd,, HHaannddllee,, PPoossiittiioonn,, LLeenn)) -->>
+       pprreeaadd((CChhaannnneellPPiidd,, HHaannddllee,, PPoossiittiioonn,, LLeenn,, TTiimmeeoouutt)) -->> {{ookk,, DDaattaa}} || eeooff ||
+       {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Handle = term()
+                 Position = integer()
+                 Len = integer()
+                 Timeout = timeout()
+                 Data = string() | binary()
+                 Reason = term()
+
+              Reads _L_e_n bytes from the file referenced by _H_a_n_d_l_e. Returns _{_o_k_,
+              _D_a_t_a_}, or _e_o_f, or _{_e_r_r_o_r_, _R_e_a_s_o_n_}. If the file is opened with
+              _b_i_n_a_r_y, _D_a_t_a is a binary, otherwise it is a string.
+
+              If the file is read past eof, only the remaining bytes will be
+              read and returned. If no bytes are read, _e_o_f is returned.
+
+              The _p_r_e_a_d function reads from a specified position, combining
+              the _p_o_s_i_t_i_o_n and _r_e_a_d functions.
+
+       aarreeaadd((CChhaannnneellPPiidd,, HHaannddllee,, LLeenn)) -->> {{aassyynncc,, NN}} || {{eerrrroorr,, EErrrroorr}}
+       aapprreeaadd((CChhaannnneellPPiidd,, HHaannddllee,, PPoossiittiioonn,, LLeenn)) -->> {{aassyynncc,, NN}} || {{eerrrroorr,,
+       EErrrroorr}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Handle = term()
+                 Position = integer()
+                 Len = integer()
+                 N = term()
+                 Reason = term()
+
+              Reads from an open file, without waiting for the result. If the
+              handle is valid, the function returns _{_a_s_y_n_c_, _N_}, where N is a
+              term guaranteed to be unique between calls of _a_r_e_a_d. The actual
+              data is sent as a message to the calling process. This message
+              has the form _{_a_s_y_n_c___r_e_p_l_y_, _N_, _R_e_s_u_l_t_}, where _R_e_s_u_l_t is the
+              result from the read, either _{_o_k_, _D_a_t_a_}, or _e_o_f, or _{_e_r_r_o_r_,
+              _E_r_r_o_r_}.
+
+              The _a_p_r_e_a_d function reads from a specified position, combining
+              the _p_o_s_i_t_i_o_n and _a_r_e_a_d functions.
+
+       wwrriittee((CChhaannnneellPPiidd,, HHaannddllee,, DDaattaa)) -->>
+       wwrriittee((CChhaannnneellPPiidd,, HHaannddllee,, DDaattaa,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+       ppwwrriittee((CChhaannnneellPPiidd,, HHaannddllee,, PPoossiittiioonn,, DDaattaa)) -->> ookk
+       ppwwrriittee((CChhaannnneellPPiidd,, HHaannddllee,, PPoossiittiioonn,, DDaattaa,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,,
+       EErrrroorr}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Handle = term()
+                 Position = integer()
+                 Data = iolist()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Write _d_a_t_a to the file referenced by _H_a_n_d_l_e. The file should be
+              opened with _w_r_i_t_e or _a_p_p_e_n_d flag. Returns _o_k if successful and
+              _{_e_r_r_o_r_, _R_e_a_s_o_n_} otherwise.
+
+              Typical error reasons are:
+
+                _e_b_a_d_f:
+                  The file is not opened for writing.
+
+                _e_n_o_s_p_c:
+                  There is a no space left on the device.
+
+       aawwrriittee((CChhaannnneellPPiidd,, HHaannddllee,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+       aappwwrriittee((CChhaannnneellPPiidd,, HHaannddllee,, PPoossiittiioonn,, DDaattaa)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Handle = term()
+                 Position = integer()
+                 Len = integer()
+                 Data = binary()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Writes to an open file, without waiting for the result. If the
+              handle is valid, the function returns _{_a_s_y_n_c_, _N_}, where N is a
+              term guaranteed to be unique between calls of _a_w_r_i_t_e. The result
+              of the _w_r_i_t_e operation is sent as a message to the calling
+              process. This message has the form _{_a_s_y_n_c___r_e_p_l_y_, _N_, _R_e_s_u_l_t_},
+              where _R_e_s_u_l_t is the result from the write, either _o_k, or _{_e_r_r_o_r_,
+              _E_r_r_o_r_}.
+
+              The _a_p_w_r_i_t_e writes on a specified position, combining the
+              _p_o_s_i_t_i_o_n and _a_w_r_i_t_e operations.
+
+       ppoossiittiioonn((CChhaannnneellPPiidd,, HHaannddllee,, LLooccaattiioonn)) -->>
+       ppoossiittiioonn((CChhaannnneellPPiidd,, HHaannddllee,, LLooccaattiioonn,, TTiimmeeoouutt)) -->> {{ookk,, NNeewwPPoossiittiioonn ||
+       {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Handle = term()
+                 Location = Offset | {bof, Offset} | {cur, Offset} | {eof,
+                 Offset} | bof | cur | eof
+                 Offset = int()
+                 Timeout = timeout()
+                 NewPosition = integer()
+                 Reason = term()
+
+              Sets the file position of the file referenced by _H_a_n_d_l_e. Returns
+              _{_o_k_, _N_e_w_P_o_s_i_t_i_o_n (as an absolute offset) if successful,
+              otherwise _{_e_r_r_o_r_, _R_e_a_s_o_n_}. _L_o_c_a_t_i_o_n is one of the following:
+
+                _O_f_f_s_e_t:
+                  The same as _{_b_o_f_, _O_f_f_s_e_t_}.
+
+                _{_b_o_f_, _O_f_f_s_e_t_}:
+                  Absolute offset.
+
+                _{_c_u_r_, _O_f_f_s_e_t_}:
+                  Offset from the current position.
+
+                _{_e_o_f_, _O_f_f_s_e_t_}:
+                  Offset from the end of file.
+
+                _b_o_f _| _c_u_r _| _e_o_f:
+                  The same as above with _O_f_f_s_e_t 0.
+
+       rreeaadd__ffiillee__iinnffoo((CChhaannnneellPPiidd,, NNaammee)) -->>
+       rreeaadd__ffiillee__iinnffoo((CChhaannnneellPPiidd,, NNaammee,, TTiimmeeoouutt)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Handle = term()
+                 Timeout = timeout()
+                 FileInfo = record()
+                 Reason = term()
+
+              Returns a _f_i_l_e___i_n_f_o record from the file specified by _N_a_m_e or
+              _H_a_n_d_l_e, like _f_i_l_e_:_r_e_a_d___f_i_l_e___i_n_f_o_/_2.
+
+       rreeaadd__lliinnkk__iinnffoo((CChhaannnneellPPiidd,, NNaammee)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,, RReeaassoonn}}
+       rreeaadd__lliinnkk__iinnffoo((CChhaannnneellPPiidd,, NNaammee,, TTiimmeeoouutt)) -->> {{ookk,, FFiilleeIInnffoo}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Handle = term()
+                 Timeout = timeout()
+                 FileInfo = record()
+                 Reason = term()
+
+              Returns a _f_i_l_e___i_n_f_o record from the symbolic link specified by
+              _N_a_m_e or _H_a_n_d_l_e, like _f_i_l_e_:_r_e_a_d___l_i_n_k___i_n_f_o_/_2.
+
+       wwrriittee__ffiillee__iinnffoo((CChhaannnneellPPiidd,, NNaammee,, IInnffoo)) -->>
+       wwrriittee__ffiillee__iinnffoo((CChhaannnneellPPiidd,, NNaammee,, IInnffoo,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Info = record()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Writes file information from a _f_i_l_e___i_n_f_o record to the file
+              specified by _N_a_m_e, like _f_i_l_e_:_w_r_i_t_e___f_i_l_e___i_n_f_o.
+
+       rreeaadd__lliinnkk((CChhaannnneellPPiidd,, NNaammee)) -->>
+       rreeaadd__lliinnkk((CChhaannnneellPPiidd,, NNaammee,, TTiimmeeoouutt)) -->> {{ookk,, TTaarrggeett}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Target = string()
+                 Reason = term()
+
+              Read the link target from the symbolic link specified by _n_a_m_e,
+              like _f_i_l_e_:_r_e_a_d___l_i_n_k_/_1.
+
+       mmaakkee__ssyymmlliinnkk((CChhaannnneellPPiidd,, NNaammee,, TTaarrggeett)) -->>
+       mmaakkee__ssyymmlliinnkk((CChhaannnneellPPiidd,, NNaammee,, TTaarrggeett,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Target = string()
+                 Reason = term()
+
+              Creates a symbolic link pointing to _T_a_r_g_e_t with the name _N_a_m_e,
+              like _f_i_l_e_:_m_a_k_e___s_y_m_l_i_n_k_/_2.
+
+       rreennaammee((CChhaannnneellPPiidd,, OOllddNNaammee,, NNeewwNNaammee)) -->>
+       rreennaammee((CChhaannnneellPPiidd,, OOllddNNaammee,, NNeewwNNaammee,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 OldName = string()
+                 NewName = string()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Renames a file named _O_l_d_N_a_m_e, and gives it the name _N_e_w_N_a_m_e,
+              like _f_i_l_e_:_r_e_n_a_m_e_/_2
+
+       ddeelleettee((CChhaannnneellPPiidd,, NNaammee)) -->>
+       ddeelleettee((CChhaannnneellPPiidd,, NNaammee,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Deletes the file specified by _N_a_m_e, like _f_i_l_e_:_d_e_l_e_t_e_/_1
+
+       mmaakkee__ddiirr((CChhaannnneellPPiidd,, NNaammee)) -->>
+       mmaakkee__ddiirr((CChhaannnneellPPiidd,, NNaammee,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Creates a directory specified by _N_a_m_e. _N_a_m_e should be a full
+              path to a new directory. The directory can only be created in an
+              existing directory.
+
+       ddeell__ddiirr((CChhaannnneellPPiidd,, NNaammee)) -->>
+       ddeell__ddiirr((CChhaannnneellPPiidd,, NNaammee,, TTiimmeeoouutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelPid = pid()
+                 Name = string()
+                 Timeout = timeout()
+                 Reason = term()
+
+              Deletes a directory specified by _N_a_m_e. The directory should be
+              empty.
+
+
+
+Ericsson AB                        ssh 2.1.1                       ssh_sftp(3)

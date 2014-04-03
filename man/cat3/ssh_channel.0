@@ -1,0 +1,396 @@
+ssh_channel(3)             Erlang Module Definition             ssh_channel(3)
+
+
+
+NNAAMMEE
+       ssh_channel - Generic Ssh Channel Behavior
+
+
+DDEESSCCRRIIPPTTIIOONN
+       Ssh services are implemented as channels that are multiplexed over an
+       ssh connection and communicates via the ssh connection protocol. This
+       module provides a callback API that takes care of generic channel
+       aspects such as flow control and close messages and lets the callback
+       functions take care of the service specific parts.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module and/or
+       abstractions to indicate the intended use of the data type:
+
+       _b_o_o_l_e_a_n_(_) _= _t_r_u_e _| _f_a_l_s_e
+
+       _s_t_r_i_n_g_(_) _= _l_i_s_t _o_f _A_S_C_I_I _c_h_a_r_a_c_t_e_r_s
+
+       _t_i_m_e_o_u_t_(_) _= _i_n_f_i_n_i_t_y _| _i_n_t_e_g_e_r_(_) _- _i_n _m_i_l_l_i_s_e_c_o_n_d_s_.
+
+       _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_) _- _o_p_a_q_u_e _t_o _t_h_e _u_s_e_r _r_e_t_u_r_n_e_d _b_y _s_s_h_:_c_o_n_n_e_c_t_/_3 _o_r
+       _s_e_n_t _t_o _a _s_s_h _c_h_a_n_n_e_l _p_r_o_c_e_s_s
+
+       _s_s_h___c_h_a_n_n_e_l___i_d_(_) _= _i_n_t_e_g_e_r_(_)
+
+       _s_s_h___d_a_t_a___t_y_p_e___c_o_d_e_(_) _= _1 _(_"_s_t_d_e_r_r_"_) _| _0 _(_"_n_o_r_m_a_l_"_) _a_r_e _c_u_r_r_e_n_t_l_y _v_a_l_i_d
+       _v_a_l_u_e_s _s_e_e _R_F_C _4_2_5_4 _s_e_c_t_i_o_n _5_._2_.
+
+EEXXPPOORRTTSS
+       ccaallll((CChhaannnneellRReeff,, MMssgg)) -->>
+       ccaallll((CChhaannnneellRReeff,, MMssgg,, TTiimmeeoouutt)) -->> RReeppllyy || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ChannelRef = pid()
+                   As returned by start_link/4
+                 Msg = term()
+                 Timeout = timeout()
+                 Reply = term()
+                 Reason = closed | timeout
+
+              Makes a synchronous call to the channel process by sending a
+              message and waiting until a reply arrives or a timeout occurs.
+              The channel will call _C_a_l_l_b_a_c_k_M_o_d_u_l_e_:_h_a_n_d_l_e___c_a_l_l_/_3 to handle the
+              message. If the channel process does not exist _{_e_r_r_o_r_, _c_l_o_s_e_d_}
+              is returned.
+
+       ccaasstt((CChhaannnneellRReeff,, MMssgg)) -->> ookk
+
+              Types:
+
+                 ChannelRef = pid()
+                   As returned by start_link/4
+                 Msg = term()
+
+              Sends an asynchronous message to the channel process and returns
+              ok immediately, ignoring if the destination node or channel
+              process does not exist. The channel will call
+              _C_a_l_l_b_a_c_k_M_o_d_u_l_e_:_h_a_n_d_l_e___c_a_s_t_/_2 to handle the message.
+
+       eenntteerr__lloooopp((SSttaattee)) -->> __
+
+              Types:
+
+                  State = term() - as returned by ssh_channel:init/1
+
+              Makes an existing process into a _s_s_h___c_h_a_n_n_e_l process. Does not
+              return, instead the calling process will enter the _s_s_h___c_h_a_n_n_e_l
+              process receive loop and become a _s_s_h___c_h_a_n_n_e_l _p_r_o_c_e_s_s_. The
+              process must have been started using one of the start functions
+              in proc_lib, see pprroocc__lliibb((33)). The user is responsible for any
+              initialization of the process and needs to call
+              ssh_channel:init/1.
+
+       iinniitt((OOppttiioonnss)) -->> {{ookk,, SSttaattee}} || {{ookk,, SSttaattee,, TTiimmeeoouutt}} || {{ssttoopp,, RReeaassoonn}}
+
+              Types:
+
+                  Options = [{Option, Value}]
+
+              The following options must be present:
+
+                _{_c_h_a_n_n_e_l___c_b_, _a_t_o_m_(_)_}:
+                  The module that implements the channel behavior.
+
+                _{_i_n_i_t___a_r_g_s_(_)_, _l_i_s_t_(_)_}:
+                   The list of arguments to the callback modules init
+                  function.
+
+                _{_c_m_, _c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_}:
+                   Reference to the ssh connection.
+
+                _{_c_h_a_n_n_e_l___i_d_, _c_h_a_n_n_e_l___i_d_(_)_}:
+                   Id of the ssh channel.
+
+          NNoottee::
+              This function is normally not called by the user, it is only
+              needed if for some reason the channel process needs to be
+              started with help of _p_r_o_c___l_i_b instead calling
+              _s_s_h___c_h_a_n_n_e_l_:_s_t_a_r_t_/_4 or _s_s_h___c_h_a_n_n_e_l_:_s_t_a_r_t___l_i_n_k_/_4
+
+
+       rreeppllyy((CClliieenntt,, RReeppllyy)) -->> __
+
+              Types:
+
+                 Client - opaque to the user, see explanation below
+                 Reply = term()
+
+              This function can be used by a channel to explicitly send a
+              reply to a client that called _c_a_l_l_/_[_2_,_3_] when the reply cannot
+              be defined in the return value of _C_a_l_l_b_a_c_k_M_o_d_u_l_e_:_h_a_n_d_l_e___c_a_l_l_/_3.
+
+              _C_l_i_e_n_t must be the _F_r_o_m argument provided to the callback
+              function _h_a_n_d_l_e___c_a_l_l_/_3. _R_e_p_l_y is an arbitrary term, which will
+              be given back to the client as the return value of
+              _s_s_h___c_h_a_n_n_e_l_:_c_a_l_l_/_[_2_,_3_]_.
+
+       ssttaarrtt((SSsshhCCoonnnneeccttiioonn,, CChhaannnneellIIdd,, CChhaannnneellCCbb,, CCbbIInniittAArrggss)) -->>
+       ssttaarrtt__lliinnkk((SSsshhCCoonnnneeccttiioonn,, CChhaannnneellIIdd,, CChhaannnneellCCbb,, CCbbIInniittAArrggss)) -->> {{ookk,,
+       CChhaannnneellRReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SshConnection = ssh_connection_ref()
+                 ChannelId = ssh_channel_id()
+                    As returned by ssh_connection:session_channel/[2,4]
+                 ChannelCb = atom()
+                    The name of the module implementing the service specific
+                   parts of the channel.
+                 CbInitArgs = [term()]
+                   Argument list for the init function in the callback module.
+                 ChannelRef = pid()
+
+              Starts a processes that handles a ssh channel. Will be called
+              internally by the ssh daemon or explicitly by the ssh client
+              implementations. A channel process traps exit signals by
+              default.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The functions init/1, terminate/2, handle_ssh_msg/2 and handle_msg/2
+       are the functions that are required to provide the implementation for a
+       server side channel, such as a ssh subsystem channel that can be
+       plugged into the erlang ssh daemon see sssshh::ddaaeemmoonn//[[22,, 33]]. The
+       handle_call/3, handle_cast/2 code_change/3 and enter_loop/1 functions
+       are only relevant when implementing a client side channel.
+
+ CCAALLLLBBAACCKK TTIIMMEEOOUUTTSS
+       If an integer timeout value is provided in a return value of one of the
+       callback functions, a timeout will occur unless a message is received
+       within _T_i_m_e_o_u_t milliseconds. A timeout is represented by the atom
+       _t_i_m_e_o_u_t which should be handled by the hhaannddllee__mmssgg//22 callback function.
+       The atom infinity can be used to wait indefinitely, this is the default
+       value.
+
+EEXXPPOORRTTSS
+       CCaallllbbaacckkMMoodduullee::ccooddee__cchhaannggee((OOllddVVssnn,, SSttaattee,, EExxttrraa)) -->> {{ookk,, NNeewwSSttaattee}}
+
+              Types:
+
+                  Converts process state when code is changed.
+
+              This function is called by a client side channel when it should
+              update its internal state during a release upgrade/downgrade,
+              i.e. when the instruction _{_u_p_d_a_t_e_,_M_o_d_u_l_e_,_C_h_a_n_g_e_,_._._._} where
+              _C_h_a_n_g_e_=_{_a_d_v_a_n_c_e_d_,_E_x_t_r_a_} is given in the _a_p_p_u_p file. See OOTTPP
+              DDeessiiggnn PPrriinncciipplleess for more information. Any new connection will
+              benefit from a server side upgrade but already started
+              connections on the server side will not be affected.
+
+          NNoottee::
+              If there are long lived ssh connections and more than one
+              upgrade in a short time this may cause the old connections to
+              fail as only two versions of the code may be loaded
+              simultaneously.
+
+
+              In the case of an upgrade, _O_l_d_V_s_n is _V_s_n, and in the case of a
+              downgrade, _O_l_d_V_s_n is _{_d_o_w_n_,_V_s_n_}. _V_s_n is defined by the _v_s_n
+              attribute(s) of the old version of the callback module _M_o_d_u_l_e.
+              If no such attribute is defined, the version is the checksum of
+              the BEAM file.
+
+              _S_t_a_t_e is the internal state of the channel.
+
+              _E_x_t_r_a is passed as-is from the _{_a_d_v_a_n_c_e_d_,_E_x_t_r_a_} part of the
+              update instruction.
+
+              The function should return the updated internal state.
+
+       CCaallllbbaacckkMMoodduullee::iinniitt((AArrggss)) -->> {{ookk,, SSttaattee}} || {{ookk,, SSttaattee,, TTiimmeeoouutt}} ||
+       {{ssttoopp,, RReeaassoonn}}
+
+              Types:
+
+                  Args = term()
+                    Last argument to ssh_channel:start_link/4.
+                  State = term()
+                 Timeout = timeout()
+                  Reason = term()
+
+              Makes necessary initializations and returns the initial channel
+              state if the initializations succeed.
+
+              For more detailed information on timeouts see the section
+              CCAALLLLBBAACCKK TTIIMMEEOOUUTTSS.
+
+       CCaallllbbaacckkMMoodduullee::hhaannddllee__ccaallll((MMssgg,, FFrroomm,, SSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 Msg = term()
+                 From = opaque to the user should be used as argument to
+                 ssh_channel:reply/2
+                 State = term()
+                 Result = {reply, Reply, NewState} | {reply, Reply, NewState,
+                 Timeout} | {noreply, NewState} | {noreply , NewState,
+                 Timeout} | {stop, Reason, Reply, NewState} | {stop, Reason,
+                 NewState}
+                 Reply = term() - will be the return value of
+                 ssh_channel:call/[2,3]
+                 Timeout = timeout()
+                 NewState = term() - a possible updated version of State
+                 Reason = term()
+
+              Handles messages sent by calling _s_s_h___c_h_a_n_n_e_l_:_c_a_l_l_/_[_2_,_3_]
+
+              For more detailed information on timeouts see the section
+              CCAALLLLBBAACCKK TTIIMMEEOOUUTTSS.
+
+       CCaallllbbaacckkMMoodduullee::hhaannddllee__ccaasstt((MMssgg,, SSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 Msg = term()
+                 State = term()
+                 Result = {noreply, NewState} | {noreply, NewState, Timeout} |
+                 {stop, Reason, NewState}
+                 NewState = term() - a possible updated version of State
+                 Timeout = timeout()
+                 Reason = term()
+
+              Handles messages sent by calling _s_s_h___c_h_a_n_n_e_l_:_c_a_s_t_/_2
+
+              For more detailed information on timeouts see the section
+              CCAALLLLBBAACCKK TTIIMMEEOOUUTTSS.
+
+       CCaallllbbaacckkMMoodduullee::hhaannddllee__mmssgg((MMssgg,, SSttaattee)) -->> {{ookk,, SSttaattee}} || {{ssttoopp,,
+       CChhaannnneellIIdd,, SSttaattee}}
+
+              Types:
+
+                 Msg = timeout | term()
+                 State = term()
+
+              Handle other messages than ssh connection protocol, call or cast
+              messages sent to the channel.
+
+              Possible erlang 'EXIT'-messages should be handled by this
+              function and all channels should handle the following message.
+
+                _{_s_s_h___c_h_a_n_n_e_l___u_p_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_}:
+                  This is the first messages that will be received by the
+                  channel, it is sent just before the ssh_channel:init/1
+                  function returns successfully. This is especially useful if
+                  the server wants to send a message to the client without
+                  first receiving a message from the client. If the message is
+                  not useful for your particular problem just ignore it by
+                  immediately returning {ok, State}.
+
+       CCaallllbbaacckkMMoodduullee::hhaannddllee__sssshh__mmssgg((MMssgg,, SSttaattee)) -->> {{ookk,, SSttaattee}} || {{ssttoopp,,
+       sssshh__cchhaannnneell__iidd(()),, SSttaattee}}
+
+              Types:
+
+                 Msg = {ssh_cm, ssh_connection_ref(), SshMsg}
+                  SshMsg = tuple() - see message list below
+                 State = term()
+
+              Handles ssh connection protocol messages that may need service
+              specific attention.
+
+              All channels should handle the following messages. For channels
+              implementing subsystems the handle_ssh_msg-callback will not be
+              called for any other messages.
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_d_a_t_a_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _s_s_h___d_a_t_a___t_y_p_e___c_o_d_e_(_)_, _b_i_n_a_r_y_(_) _= _D_a_t_a_}_}:
+                   Data has arrived on the channel. When the callback for this
+                  message returns the channel behavior will adjust the ssh
+                  flow control window.
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_o_f_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_}_}:
+                  Indicteas that the other side will not send any more data.
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_s_i_g_n_a_l_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _s_s_h___s_i_g_n_a_l_(_)_}_} :
+                  A signal can be delivered to the remote process/service
+                  using the following message. Some systems may not implement
+                  signals, in which case they should ignore this message.
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_x_i_t___s_i_g_n_a_l_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _s_t_r_i_n_g_(_) _= _e_x_i_t___s_i_g_n_a_l_, _s_t_r_i_n_g_(_) _= _E_r_r_o_r_M_s_g_, _s_t_r_i_n_g_(_) _=
+                _L_a_n_g_u_a_g_e_S_t_r_i_n_g_}_}:
+                  A remote execution may terminate violently due to a signal
+                  then this message may be received. For details on valid
+                  string values see RFC 4254 section 6.10
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_x_i_t___s_t_a_t_u_s_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _i_n_t_e_g_e_r_(_) _= _E_x_i_t_S_t_a_t_u_s_}_}:
+                   When the command running at the other end terminates, the
+                  following message can be sent to return the exit status of
+                  the command. A zero 'exit_status' usually means that the
+                  command terminated successfully.
+
+              Channels implementing a shell and command execution on the
+              server side should also handle the following messages.
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_e_n_v_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _b_o_o_l_e_a_n_(_) _= _W_a_n_t_R_e_p_l_y_, _s_t_r_i_n_g_(_) _= _V_a_r_, _s_t_r_i_n_g_(_) _= _V_a_l_u_e_}_}:
+                   Environment variables may be passed to the shell/command to
+                  be started later. Note that before the callback returns it
+                  should call the function ssh_connection:reply_request/4 with
+                  the boolean value of  _W_a_n_t_R_e_p_l_y as the second argument.
+
+                _{_s_s_h___c_m_, _C_o_n_n_e_c_t_i_o_n_R_e_f_, _{_e_x_e_c_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_, _b_o_o_l_e_a_n_(_) _=
+                _W_a_n_t_R_e_p_l_y_, _s_t_r_i_n_g_(_) _= _C_m_d_}_}:
+                   This message will request that the server start the
+                  execution of the given command. Note that before the
+                  callback returns it should call the function
+                  ssh_connection:reply_request/4 with the boolean value of
+                  _W_a_n_t_R_e_p_l_y as the second argument.
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_p_t_y_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_,
+                _b_o_o_l_e_a_n_(_) _= _W_a_n_t_R_e_p_l_y_, _{_s_t_r_i_n_g_(_) _= _T_e_r_m_i_n_a_l_, _i_n_t_e_g_e_r_(_) _=
+                _C_h_a_r_W_i_d_t_h_, _i_n_t_e_g_e_r_(_) _= _R_o_w_H_e_i_g_h_t_, _i_n_t_e_g_e_r_(_) _= _P_i_x_e_l_W_i_d_t_h_,
+                _i_n_t_e_g_e_r_(_) _= _P_i_x_e_l_H_i_g_h_t_, _[_{_a_t_o_m_(_) _| _i_n_t_e_g_e_r_(_) _= _O_p_c_o_d_e_,
+                _i_n_t_e_g_e_r_(_) _= _V_a_l_u_e_}_] _= _T_e_r_m_i_n_a_l_M_o_d_e_s_}_}_}:
+                  A pseudo-terminal has been requested for the session.
+                  Terminal is the value of the TERM environment variable value
+                  (e.g., vt100). Zero dimension parameters must be ignored.
+                  The character/row dimensions override the pixel dimensions
+                  (when nonzero). Pixel dimensions refer to the drawable area
+                  of the window. The _O_p_c_o_d_e in the _T_e_r_m_i_n_a_l_M_o_d_e_s list is the
+                  mnemonic name, represented as an lowercase erlang atom,
+                  defined in RFC 4254 section 8, or the opcode if the mnemonic
+                  name is not listed in the RFC. Example _O_P _c_o_d_e_: _5_3_, _m_n_e_m_o_n_i_c
+                  _n_a_m_e _E_C_H_O _e_r_l_a_n_g _a_t_o_m_: _e_c_h_o. Note that before the callback
+                  returns it should call the function
+                  ssh_connection:reply_request/4 with the boolean value of
+                  _W_a_n_t_R_e_p_l_y as the second argument.
+
+                _{_s_s_h___c_m_, _C_o_n_n_e_c_t_i_o_n_R_e_f_, _{_s_h_e_l_l_, _b_o_o_l_e_a_n_(_) _= _W_a_n_t_R_e_p_l_y_}_}:
+                   This message will request that the user's default shell be
+                  started at the other end. Note that before the callback
+                  returns it should call the function
+                  ssh_connection:reply_request/4 with the value of  _W_a_n_t_R_e_p_l_y
+                  as the second argument.
+
+                 _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_w_i_n_d_o_w___c_h_a_n_g_e_,
+                _s_s_h___c_h_a_n_n_e_l___i_d_(_)_, _i_n_t_e_g_e_r_(_) _= _C_h_a_r_W_i_d_t_h_, _i_n_t_e_g_e_r_(_) _=
+                _R_o_w_H_e_i_g_h_t_, _i_n_t_e_g_e_r_(_) _= _P_i_x_W_i_d_t_h_, _i_n_t_e_g_e_r_(_) _= _P_i_x_H_e_i_g_h_t_}_}:
+                   When the window (terminal) size changes on the client side,
+                  it MAY send a message to the other side to inform it of the
+                  new dimensions.
+
+              The following message is completely taken care of by the ssh
+              channel behavior
+
+                _{_s_s_h___c_m_, _s_s_h___c_o_n_n_e_c_t_i_o_n___r_e_f_(_)_, _{_c_l_o_s_e_d_, _s_s_h___c_h_a_n_n_e_l___i_d_(_)_}_}:
+                   The channel behavior will send a close message to the other
+                  side if such a message has not already been sent and then
+                  terminate the channel with reason normal.
+
+       CCaallllbbaacckkMMoodduullee::tteerrmmiinnaattee((RReeaassoonn,, SSttaattee)) -->> __
+
+              Types:
+
+                 Reason = term()
+                 State = term()
+
+              This function is called by a channel process when it is about to
+              terminate. Before this function is called ssh_connection:close/2
+              will be called if it has not been called earlier. This function
+              should be the opposite of _C_a_l_l_b_a_c_k_M_o_d_u_l_e_:_i_n_i_t_/_1 and do any
+              necessary cleaning up. When it returns, the channel process
+              terminates with reason _R_e_a_s_o_n. The return value is ignored.
+
+
+
+Ericsson AB                        ssh 2.1.1                    ssh_channel(3)

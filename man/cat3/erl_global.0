@@ -1,0 +1,104 @@
+erl_global(3)                 C Library Functions                erl_global(3)
+
+
+
+NNAAMMEE
+       erl_global - Access globally registered names
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides support for registering, looking up and
+       unregistering names in the Erlang Global module. For more information,
+       see the description of Global in the reference manual.
+
+       Note that the functions below perform an RPC using an open file
+       descriptor provided by the caller. This file descriptor must not be
+       used for other traffic during the global operation or the function may
+       receive unexpected data and fail.
+
+EEXXPPOORRTTSS
+       cchhaarr ****eerrll__gglloobbaall__nnaammeess((ffdd,,ccoouunntt))
+
+              Types:
+
+                 int fd;
+                 int *count;
+
+              Retrieve a list of all known global names.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _c_o_u_n_t is the address of an integer, or NULL. If _c_o_u_n_t is not
+              NULL, it will be set by the function to the number of names
+              found.
+
+              On success, the function returns an array of strings, each
+              containing a single registered name, and sets _c_o_u_n_t to the
+              number of names found. The array is terminated by a single NULL
+              pointer. On failure, the function returns NULL and _c_o_u_n_t is not
+              modified.
+
+          NNoottee::
+              It is the caller's responsibility to free the array afterwards.
+              It has been allocated by the function with a single call to
+              _m_a_l_l_o_c_(_), so a single _f_r_e_e_(_) is all that is necessary.
+
+
+       iinntt eerrll__gglloobbaall__rreeggiisstteerr((ffdd,,nnaammee,,ppiidd))
+
+              Types:
+
+                 int fd;
+                 const char *name;
+                 ETERM *pid;
+
+              This function registers a name in Global.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _n_a_m_e is the name to register in Global.
+
+              _p_i_d is the pid that should be associated with _n_a_m_e. This is the
+              value that Global will return when processes request the
+              location of _n_a_m_e.
+
+              The function returns 0 on success, or -1 on failure.
+
+       iinntt eerrll__gglloobbaall__uunnrreeggiisstteerr((ffdd,,nnaammee))
+
+              Types:
+
+                 int fd;
+                 const char *name;
+
+              This function unregisters a name from Global.
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _n_a_m_e is the name to unregister from Global.
+
+              The function returns 0 on success, or -1 on failure.
+
+       EETTEERRMM **eerrll__gglloobbaall__wwhheerreeiiss((ffdd,,nnaammee,,nnooddee))
+
+              Types:
+
+                 int fd;
+                 const char *name;
+                 char *node;
+
+              _f_d is an open descriptor to an Erlang connection.
+
+              _n_a_m_e is the name that is to be looked up in Global.
+
+              If _n_o_d_e is not NULL, it is a pointer to a buffer where the
+              function can fill in the name of the node where _n_a_m_e is found.
+              _n_o_d_e can be passed directly to _e_r_l___c_o_n_n_e_c_t_(_) if necessary.
+
+              On success, the function returns an Erlang Pid containing the
+              address of the given name, and node will be initialized to the
+              nodename where _n_a_m_e is found. On failure NULL will be returned
+              and _n_o_d_e will not be modified.
+
+
+
+Ericsson AB                   erl_interface 3.7.8                erl_global(3)

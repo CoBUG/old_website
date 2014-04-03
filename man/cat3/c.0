@@ -1,0 +1,240 @@
+c(3)                       Erlang Module Definition                       c(3)
+
+
+
+NNAAMMEE
+       c - Command Interface Module
+
+DDEESSCCRRIIPPTTIIOONN
+       The _c module enables users to enter the short form of some commonly
+       used commands.
+
+   NNoottee::
+       These functions are are intended for interactive use in the Erlang
+       shell only. The module prefix may be omitted.
+
+
+EEXXPPOORRTTSS
+       bbtt((PPiidd)) -->> ookk || uunnddeeffiinneedd
+
+              Types:
+
+                 Pid = pid()
+
+              Stack backtrace for a process. Equivalent to
+              _e_r_l_a_n_g_:_p_r_o_c_e_s_s___d_i_s_p_l_a_y_(_P_i_d_, _b_a_c_k_t_r_a_c_e_).
+
+       cc((FFiillee)) -->> {{ookk,, MMoodduullee}} || eerrrroorr
+
+       cc((FFiillee,, OOppttiioonnss)) -->> {{ookk,, MMoodduullee}} || eerrrroorr
+
+              Types:
+
+                 File = ffiillee::nnaammee(())
+                 Options = [ccoommppiillee::ooppttiioonn(())]
+                 Module = module()
+
+              _c_/_1_,_2 compiles and then purges and loads the code for a file.
+              _O_p_t_i_o_n_s defaults to []. Compilation is equivalent to:
+
+              compile:file(File, Options ++ [report_errors, report_warnings])
+
+              Note that purging the code means that any processes lingering in
+              old code for the module are killed without warning. See _c_o_d_e_/_3
+              for more information.
+
+       ccdd((DDiirr)) -->> ookk
+
+              Types:
+
+                 Dir = ffiillee::nnaammee(())
+
+              Changes working directory to _D_i_r, which may be a relative name,
+              and then prints the name of the new working directory.
+
+              2> cd("../erlang").
+              /home/ron/erlang
+
+       fflluusshh(()) -->> ookk
+
+              Flushes any messages sent to the shell.
+
+       hheellpp(()) -->> ookk
+
+              Displays help information: all valid shell internal commands,
+              and commands in this module.
+
+       ii(()) -->> ookk
+
+       nnii(()) -->> ookk
+
+              _i_/_0 displays information about the system, listing information
+              about all processes. _n_i_/_0 does the same, but for all nodes the
+              network.
+
+       ii((XX,, YY,, ZZ)) -->> [[{{aattoomm(()),, tteerrmm(())}}]]
+
+              Types:
+
+                 X = Y = Z = integer() >= 0
+
+              Displays information about a process, Equivalent to
+              _p_r_o_c_e_s_s___i_n_f_o_(_p_i_d_(_X_, _Y_, _Z_)_), but location transparent.
+
+       ll((MMoodduullee)) -->> ccooddee::llooaadd__rreett(())
+
+              Types:
+
+                 Module = module()
+
+              Purges and loads, or reloads, a module by calling
+              _c_o_d_e_:_p_u_r_g_e_(_M_o_d_u_l_e_) followed by _c_o_d_e_:_l_o_a_d___f_i_l_e_(_M_o_d_u_l_e_).
+
+              Note that purging the code means that any processes lingering in
+              old code for the module are killed without warning. See _c_o_d_e_/_3
+              for more information.
+
+       llcc((FFiilleess)) -->> ookk
+
+              Types:
+
+                 Files = [File]
+                 File = ffiillee::ffiilleennaammee(())
+
+              Compiles a list of files by calling _c_o_m_p_i_l_e_:_f_i_l_e_(_F_i_l_e_,
+              _[_r_e_p_o_r_t___e_r_r_o_r_s_, _r_e_p_o_r_t___w_a_r_n_i_n_g_s_]_) for each _F_i_l_e in _F_i_l_e_s.
+
+       llss(()) -->> ookk
+
+              Lists files in the current directory.
+
+       llss((DDiirr)) -->> ookk
+
+              Types:
+
+                 Dir = ffiillee::nnaammee(())
+
+              Lists files in directory _D_i_r.
+
+       mm(()) -->> ookk
+
+              Displays information about the loaded modules, including the
+              files from which they have been loaded.
+
+       mm((MMoodduullee)) -->> ookk
+
+              Types:
+
+                 Module = module()
+
+              Displays information about _M_o_d_u_l_e.
+
+       mmeemmoorryy(()) -->> [[{{TTyyppee,, SSiizzee}}]]
+
+              Types:
+
+                 Type = atom()
+                 Size = integer() >= 0
+
+              Memory allocation information. Equivalent to _e_r_l_a_n_g_:_m_e_m_o_r_y_/_0.
+
+       mmeemmoorryy((TTyyppee)) -->> SSiizzee
+
+       mmeemmoorryy((TTyyppeess)) -->> [[{{TTyyppee,, SSiizzee}}]]
+
+              Types:
+
+                 Types = [Type]
+                 Type = atom()
+                 Size = integer() >= 0
+
+              Memory allocation information. Equivalent to _e_r_l_a_n_g_:_m_e_m_o_r_y_/_1.
+
+       nncc((FFiillee)) -->> {{ookk,, MMoodduullee}} || eerrrroorr
+
+       nncc((FFiillee,, OOppttiioonnss)) -->> {{ookk,, MMoodduullee}} || eerrrroorr
+
+              Types:
+
+                 File = ffiillee::nnaammee(())
+                 Options = [Option] | Option
+                 Option = ccoommppiillee::ooppttiioonn(())
+                 Module = module()
+
+              Compiles and then loads the code for a file on all nodes.
+              _O_p_t_i_o_n_s defaults to []. Compilation is equivalent to:
+
+              compile:file(File, Options ++ [report_errors, report_warnings])
+
+       nnll((MMoodduullee)) -->> aabbccaasstt || eerrrroorr
+
+              Types:
+
+                 Module = module()
+
+              Loads _M_o_d_u_l_e on all nodes.
+
+       ppiidd((XX,, YY,, ZZ)) -->> ppiidd(())
+
+              Types:
+
+                 X = Y = Z = integer() >= 0
+
+              Converts _X, _Y, _Z to the pid _<_X_._Y_._Z_>. This function should only
+              be used when debugging.
+
+       ppwwdd(()) -->> ookk
+
+              Prints the name of the working directory.
+
+       qq(()) -->> nnoo__rreettuurrnn(())
+
+              This function is shorthand for _i_n_i_t_:_s_t_o_p_(_), that is, it causes
+              the node to stop in a controlled fashion.
+
+       rreeggss(()) -->> ookk
+
+       nnrreeggss(()) -->> ookk
+
+              _r_e_g_s_/_0 displays information about all registered processes.
+              _n_r_e_g_s_/_0 does the same, but for all nodes in the network.
+
+       xxmm((MMooddSSppeecc)) -->> vvooiidd(())
+
+              Types:
+
+                 ModSpec = Module | Filename
+                  Module = atom()
+                  Filename = string()
+
+              This function finds undefined functions, unused functions, and
+              calls to deprecated functions in a module by calling _x_r_e_f_:_m_/_1.
+
+       yy((FFiillee)) -->> YYeeccccRReett
+
+              Types:
+
+                 File = name() -- see filename(3)
+                 YeccRet = -- see yecc:file/2
+
+              Generates an LALR-1 parser. Equivalent to:
+
+              yecc:file(File)
+
+       yy((FFiillee,, OOppttiioonnss)) -->> YYeeccccRReett
+
+              Types:
+
+                 File = name() -- see filename(3)
+                 Options, YeccRet = -- see yecc:file/2
+
+              Generates an LALR-1 parser. Equivalent to:
+
+              yecc:file(File, Options)
+
+SSEEEE AALLSSOO
+       ccoommppiillee((33)), ffiilleennaammee((33)), eerrllaanngg((33)), yyeecccc((33)), xxrreeff((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                            c(3)

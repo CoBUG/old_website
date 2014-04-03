@@ -1,0 +1,535 @@
+ei(3)                         C Library Functions                        ei(3)
+
+
+
+NNAAMMEE
+       ei - routines for handling the erlang binary term format
+
+DDEESSCCRRIIPPTTIIOONN
+       The library _e_i contains macros and functions to encode and decode the
+       erlang binary term format.
+
+       With _e_i, you can convert atoms, lists, numbers and binaries to and from
+       the binary format. This is useful when writing port programs and
+       drivers. _e_i uses a given buffer, and no dynamic memory (with the
+       exception of _e_i___d_e_c_o_d_e___f_u_n_(_)), and is often quite fast.
+
+       It also handles C-nodes, C-programs that talks erlang distribution with
+       erlang nodes (or other C-nodes) using the erlang distribution format.
+       The difference between _e_i and _e_r_l___i_n_t_e_r_f_a_c_e is that _e_i uses the binary
+       format directly when sending and receiving terms. It is also thread
+       safe, and using threads, one process can handle multiple C-nodes. The
+       _e_r_l___i_n_t_e_r_f_a_c_e library is built on top of _e_i, but of legacy reasons, it
+       doesn't allow for multiple C-nodes. In general, _e_i is the preferred way
+       of doing C-nodes.
+
+       The decode and encode functions use a buffer an index into the buffer,
+       which points at the point where to encode and decode. The index is
+       updated to point right after the term encoded/decoded. No checking is
+       done whether the term fits in the buffer or not. If encoding goes
+       outside the buffer, the program may crash.
+
+       All functions takes two parameter, _b_u_f is a pointer to the buffer where
+       the binary data is / will be, _i_n_d_e_x is a pointer to an index into the
+       buffer. This parameter will be incremented with the size of the term
+       decoded / encoded. The data is thus at _b_u_f_[_*_i_n_d_e_x_] when an _e_i function
+       is called.
+
+       The encode functions all assumes that the _b_u_f and _i_n_d_e_x parameters
+       points to a buffer big enough for the data. To get the size of an
+       encoded term, without encoding it, pass _N_U_L_L instead of a buffer
+       pointer. The _i_n_d_e_x parameter will be incremented, but nothing will be
+       encoded. This is the way in _e_i to "preflight" term encoding.
+
+       There are also encode-functions that uses a dynamic buffer. It is often
+       more convenient to use these to encode data. All encode functions comes
+       in two versions: those starting with _e_i___x, uses a dynamic buffer.
+
+       All functions return _0 if successful, and _-_1 if not. (For instance, if
+       a term is not of the expected type, or the data to decode is not a
+       valid erlang term.)
+
+       Some of the decode-functions needs a preallocated buffer. This buffer
+       must be allocated big enough, and for non compound types the
+       _e_i___g_e_t___t_y_p_e_(_) function returns the size required (note that for strings
+       an extra byte is needed for the 0 string terminator).
+
+EEXXPPOORRTTSS
+       vvooiidd eeii__sseett__ccoommppaatt__rreell((rreelleeaassee__nnuummbbeerr))
+
+              Types:
+
+                 unsigned release_number;
+
+              By default, the _e_i library is only guaranteed to be compatible
+              with other Erlang/OTP components from the same release as the _e_i
+              library itself. For example, _e_i from the OTP R10 release is not
+              compatible with an Erlang emulator from the OTP R9 release by
+              default.
+
+              A call to _e_i___s_e_t___c_o_m_p_a_t___r_e_l_(_r_e_l_e_a_s_e___n_u_m_b_e_r_) sets the _e_i library
+              in compatibility mode of release _r_e_l_e_a_s_e___n_u_m_b_e_r. Valid range of
+              _r_e_l_e_a_s_e___n_u_m_b_e_r is [7, current release]. This makes it possible
+              to communicate with Erlang/OTP components from earlier releases.
+
+          NNoottee::
+              If this function is called, it may only be called once and must
+              be called before any other functions in the _e_i library is
+              called.
+
+
+          WWaarrnniinngg::
+              You may run into trouble if this feature is used carelessly.
+              Always make sure that all communicating components are either
+              from the same Erlang/OTP release, or from release X and release
+              Y where all components from release Y are in compatibility mode
+              of release X.
+
+
+       iinntt eeii__eennccooddee__vveerrssiioonn((cchhaarr **bbuuff,, iinntt **iinnddeexx))
+       iinntt eeii__xx__eennccooddee__vveerrssiioonn((eeii__xx__bbuuffff** xx))
+
+              Encodes a version magic number for the binary format. Must be
+              the first token in a binary term.
+
+       iinntt eeii__eennccooddee__lloonngg((cchhaarr **bbuuff,, iinntt **iinnddeexx,, lloonngg pp))
+       iinntt eeii__xx__eennccooddee__lloonngg((eeii__xx__bbuuffff** xx,, lloonngg pp))
+
+              Encodes a long integer in the binary format. Note that if the
+              code is 64 bits the function ei_encode_long() is exactly the
+              same as ei_encode_longlong().
+
+       iinntt eeii__eennccooddee__uulloonngg((cchhaarr **bbuuff,, iinntt **iinnddeexx,, uunnssiiggnneedd lloonngg pp))
+       iinntt eeii__xx__eennccooddee__uulloonngg((eeii__xx__bbuuffff** xx,, uunnssiiggnneedd lloonngg pp))
+
+              Encodes an unsigned long integer in the binary format. Note that
+              if the code is 64 bits the function ei_encode_ulong() is exactly
+              the same as ei_encode_ulonglong().
+
+       iinntt eeii__eennccooddee__lloonngglloonngg((cchhaarr **bbuuff,, iinntt **iinnddeexx,, lloonngg lloonngg pp))
+       iinntt eeii__xx__eennccooddee__lloonngglloonngg((eeii__xx__bbuuffff** xx,, lloonngg lloonngg pp))
+
+              Encodes a GCC _l_o_n_g _l_o_n_g or Visual C++ _____i_n_t_6_4 (64 bit) integer
+              in the binary format. Note that this function is missing in the
+              VxWorks port.
+
+       iinntt eeii__eennccooddee__uulloonngglloonngg((cchhaarr **bbuuff,, iinntt **iinnddeexx,, uunnssiiggnneedd lloonngg lloonngg pp))
+       iinntt eeii__xx__eennccooddee__uulloonngglloonngg((eeii__xx__bbuuffff** xx,, uunnssiiggnneedd lloonngg lloonngg pp))
+
+              Encodes a GCC _u_n_s_i_g_n_e_d _l_o_n_g _l_o_n_g or Visual C++ _u_n_s_i_g_n_e_d _____i_n_t_6_4
+              (64 bit) integer in the binary format. Note that this function
+              is missing in the VxWorks port.
+
+       iinntt eeii__eennccooddee__bbiiggnnuumm((cchhaarr **bbuuff,, iinntt **iinnddeexx,, mmppzz__tt oobbjj))
+       iinntt eeii__xx__eennccooddee__bbiiggnnuumm((eeii__xx__bbuuffff **xx,, mmppzz__tt oobbjj))
+
+              Encodes a GMP _m_p_z___t integer to binary format. To use this
+              function the ei library needs to be configured and compiled to
+              use the GMP library.
+
+       iinntt eeii__eennccooddee__ddoouubbllee((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ddoouubbllee pp))
+       iinntt eeii__xx__eennccooddee__ddoouubbllee((eeii__xx__bbuuffff** xx,, ddoouubbllee pp))
+
+              Encodes a double-precision (64 bit) floating point number in the
+              binary format.
+
+       iinntt eeii__eennccooddee__bboooolleeaann((cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt pp))
+       iinntt eeii__xx__eennccooddee__bboooolleeaann((eeii__xx__bbuuffff** xx,, iinntt pp))
+
+              Encodes a boolean value, as the atom _t_r_u_e if p is not zero or
+              _f_a_l_s_e if p is zero.
+
+       iinntt eeii__eennccooddee__cchhaarr((cchhaarr **bbuuff,, iinntt **iinnddeexx,, cchhaarr pp))
+       iinntt eeii__xx__eennccooddee__cchhaarr((eeii__xx__bbuuffff** xx,, cchhaarr pp))
+
+              Encodes a char (8-bit) as an integer between 0-255 in the binary
+              format. Note that for historical reasons the integer argument is
+              of type _c_h_a_r. Your C code should consider the given argument to
+              be of type _u_n_s_i_g_n_e_d _c_h_a_r even if the C compilers and system may
+              define _c_h_a_r to be signed.
+
+       iinntt eeii__eennccooddee__ssttrriinngg((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt cchhaarr **pp))
+       iinntt eeii__eennccooddee__ssttrriinngg__lleenn((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt cchhaarr **pp,, iinntt lleenn))
+       iinntt eeii__xx__eennccooddee__ssttrriinngg((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr **pp))
+       iinntt eeii__xx__eennccooddee__ssttrriinngg__lleenn((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr** ss,, iinntt lleenn))
+
+              Encodes a string in the binary format. (A string in erlang is a
+              list, but is encoded as a character array in the binary format.)
+              The string should be zero-terminated, except for the
+              _e_i___x___e_n_c_o_d_e___s_t_r_i_n_g___l_e_n_(_) function.
+
+       iinntt eeii__eennccooddee__aattoomm((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt cchhaarr **pp))
+       iinntt eeii__eennccooddee__aattoomm__lleenn((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt cchhaarr **pp,, iinntt lleenn))
+       iinntt eeii__xx__eennccooddee__aattoomm((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr **pp))
+       iinntt eeii__xx__eennccooddee__aattoomm__lleenn((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr **pp,, iinntt lleenn))
+
+              Encodes an atom in the binary format. The _p parameter is the
+              name of the atom. Only upto _M_A_X_A_T_O_M_L_E_N bytes are encoded. The
+              name should be zero-terminated, except for the
+              _e_i___x___e_n_c_o_d_e___a_t_o_m___l_e_n_(_) function.
+
+       iinntt eeii__eennccooddee__bbiinnaarryy((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt vvooiidd **pp,, lloonngg lleenn))
+       iinntt eeii__xx__eennccooddee__bbiinnaarryy((eeii__xx__bbuuffff** xx,, ccoonnsstt vvooiidd **pp,, lloonngg lleenn))
+
+              Encodes a binary in the binary format. The data is at _p, of _l_e_n
+              bytes length.
+
+       iinntt eeii__eennccooddee__ppiidd((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt eerrllaanngg__ppiidd **pp))
+       iinntt eeii__xx__eennccooddee__ppiidd((eeii__xx__bbuuffff** xx,, ccoonnsstt eerrllaanngg__ppiidd **pp))
+
+              Encodes an erlang process identifier, pid, in the binary format.
+              The _p parameter points to an _e_r_l_a_n_g___p_i_d structure (which should
+              have been obtained earlier with _e_i___d_e_c_o_d_e___p_i_d_(_)).
+
+       iinntt eeii__eennccooddee__ffuunn((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt eerrllaanngg__ffuunn **pp))
+       iinntt eeii__xx__eennccooddee__ffuunn((eeii__xx__bbuuffff** xx,, ccoonnsstt eerrllaanngg__ffuunn** ffuunn))
+
+              Encodes a fun in the binary format. The _p parameter points to an
+              _e_r_l_a_n_g___f_u_n structure. The _e_r_l_a_n_g___f_u_n is not freed automatically,
+              the _f_r_e_e___f_u_n should be called if the fun is not needed after
+              encoding.
+
+       iinntt eeii__eennccooddee__ppoorrtt((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt eerrllaanngg__ppoorrtt **pp))
+       iinntt eeii__xx__eennccooddee__ppoorrtt((eeii__xx__bbuuffff** xx,, ccoonnsstt eerrllaanngg__ppoorrtt **pp))
+
+              Encodes an erlang port in the binary format. The _p parameter
+              points to a _e_r_l_a_n_g___p_o_r_t structure (which should have been
+              obtained earlier with _e_i___d_e_c_o_d_e___p_o_r_t_(_).
+
+       iinntt eeii__eennccooddee__rreeff((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt eerrllaanngg__rreeff **pp))
+       iinntt eeii__xx__eennccooddee__rreeff((eeii__xx__bbuuffff** xx,, ccoonnsstt eerrllaanngg__rreeff **pp))
+
+              Encodes an erlang reference in the binary format. The _p
+              parameter points to a _e_r_l_a_n_g___r_e_f structure (which should have
+              been obtained earlier with _e_i___d_e_c_o_d_e___r_e_f_(_).
+
+       iinntt eeii__eennccooddee__tteerrmm((cchhaarr **bbuuff,, iinntt **iinnddeexx,, vvooiidd **tt))
+       iinntt eeii__xx__eennccooddee__tteerrmm((eeii__xx__bbuuffff** xx,, vvooiidd **tt))
+
+              This function encodes an _E_T_E_R_M, as obtained from _e_r_l___i_n_t_e_r_f_a_c_e.
+              The _t parameter is actually an _E_T_E_R_M pointer. This function
+              doesn't free the _E_T_E_R_M.
+
+       iinntt eeii__eennccooddee__ttrraaccee((cchhaarr **bbuuff,, iinntt **iinnddeexx,, ccoonnsstt eerrllaanngg__ttrraaccee **pp))
+       iinntt eeii__xx__eennccooddee__ttrraaccee((eeii__xx__bbuuffff** xx,, ccoonnsstt eerrllaanngg__ttrraaccee **pp))
+
+              This function encodes an erlang trace token in the binary
+              format. The _p parameter points to a _e_r_l_a_n_g___t_r_a_c_e structure
+              (which should have been obtained earlier with _e_i___d_e_c_o_d_e___t_r_a_c_e_(_).
+
+       iinntt eeii__eennccooddee__ttuuppllee__hheeaaddeerr((cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt aarriittyy))
+       iinntt eeii__xx__eennccooddee__ttuuppllee__hheeaaddeerr((eeii__xx__bbuuffff** xx,, iinntt aarriittyy))
+
+              This function encodes a tuple header, with a specified arity.
+              The next _a_r_i_t_y terms encoded will be the elements of the tuple.
+              Tuples and lists are encoded recursively, so that a tuple may
+              contain another tuple or list.
+
+              E.g. to encode the tuple _{_a_, _{_b_, _{_}_}_}:
+
+              ei_encode_tuple_header(buf, &i, 2);
+              ei_encode_atom(buf, &i, "a");
+              ei_encode_tuple_header(buf, &i, 2);
+              ei_encode_atom(buf, &i, "b");
+              ei_encode_tuple_header(buf, &i, 0);
+
+
+       iinntt eeii__eennccooddee__lliisstt__hheeaaddeerr((cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt aarriittyy))
+       iinntt eeii__xx__eennccooddee__lliisstt__hheeaaddeerr((eeii__xx__bbuuffff** xx,, iinntt aarriittyy))
+
+              This function encodes a list header, with a specified arity. The
+              next _a_r_i_t_y_+_1 terms are the elements (actually its _a_r_i_t_y cons
+              cells) and the tail of the list. Lists and tuples are encoded
+              recursively, so that a list may contain another list or tuple.
+
+              E.g. to encode the list _[_c_, _d_, _[_e _| _f_]_]:
+
+              ei_encode_list_header(buf, &i, 3);
+              ei_encode_atom(buf, &i, "c");
+              ei_encode_atom(buf, &i, "d");
+              ei_encode_list_header(buf, &i, 1);
+              ei_encode_atom(buf, &i, "e");
+              ei_encode_atom(buf, &i, "f");
+              ei_encode_empty_list(buf, &i);
+
+
+          NNoottee::
+              It may seem that there is no way to create a list without
+              knowing the number of elements in advance. But indeed there is a
+              way. Note that the list _[_a_, _b_, _c_] can be written as _[_a _| _[_b _|
+              _[_c_]_]_]. Using this, a list can be written as conses.
+
+
+              To encode a list, without knowing the arity in advance:
+
+              while (something()) {
+                  ei_x_encode_list_header(&x, 1);
+                  ei_x_encode_ulong(&x, i); /* just an example */
+              }
+              ei_x_encode_empty_list(&x);
+
+
+       iinntt eeii__eennccooddee__eemmppttyy__lliisstt((cchhaarr** bbuuff,, iinntt** iinnddeexx))
+       iinntt eeii__xx__eennccooddee__eemmppttyy__lliisstt((eeii__xx__bbuuffff** xx))
+
+              This function encodes an empty list. It's often used at the tail
+              of a list.
+
+       iinntt eeii__ggeett__ttyyppee((ccoonnsstt cchhaarr **bbuuff,, ccoonnsstt iinntt **iinnddeexx,, iinntt **ttyyppee,, iinntt
+       **ssiizzee))
+
+              This function returns the type in _t_y_p_e and size in _s_i_z_e of the
+              encoded term. For strings and atoms, size is the number of
+              characters _n_o_t including the terminating 0. For binaries, _s_i_z_e
+              is the number of bytes. For lists and tuples, _s_i_z_e is the arity
+              of the object. For other types, _s_i_z_e is 0. In all cases, _i_n_d_e_x
+              is left unchanged.
+
+       iinntt eeii__ddeeccooddee__vveerrssiioonn((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt **vveerrssiioonn))
+
+              This function decodes the version magic number for the erlang
+              binary term format. It must be the first token in a binary term.
+
+       iinntt eeii__ddeeccooddee__lloonngg((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, lloonngg **pp))
+
+              This function decodes a long integer from the binary format.
+              Note that if the code is 64 bits the function ei_decode_long()
+              is exactly the same as ei_decode_longlong().
+
+       iinntt eeii__ddeeccooddee__uulloonngg((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, uunnssiiggnneedd lloonngg **pp))
+
+              This function decodes an unsigned long integer from the binary
+              format. Note that if the code is 64 bits the function
+              ei_decode_ulong() is exactly the same as ei_decode_ulonglong().
+
+       iinntt eeii__ddeeccooddee__lloonngglloonngg((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, lloonngg lloonngg **pp))
+
+              This function decodes a GCC _l_o_n_g _l_o_n_g or Visual C++ _____i_n_t_6_4 (64
+              bit) integer from the binary format. Note that this function is
+              missing in the VxWorks port.
+
+       iinntt eeii__ddeeccooddee__uulloonngglloonngg((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, uunnssiiggnneedd lloonngg lloonngg
+       **pp))
+
+              This function decodes a GCC _u_n_s_i_g_n_e_d _l_o_n_g _l_o_n_g or Visual C++
+              _u_n_s_i_g_n_e_d _____i_n_t_6_4 (64 bit) integer from the binary format. Note
+              that this function is missing in the VxWorks port.
+
+       iinntt eeii__ddeeccooddee__bbiiggnnuumm((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, mmppzz__tt oobbjj))
+
+              This function decodes an integer in the binary format to a GMP
+              _m_p_z___t integer. To use this function the ei library needs to be
+              configured and compiled to use the GMP library.
+
+       iinntt eeii__ddeeccooddee__ddoouubbllee((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, ddoouubbllee **pp))
+
+              This function decodes an double-precision (64 bit) floating
+              point number from the binary format.
+
+       iinntt eeii__ddeeccooddee__bboooolleeaann((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt **pp))
+
+              This function decodes a boolean value from the binary format. A
+              boolean is actually an atom, _t_r_u_e decodes 1 and _f_a_l_s_e decodes 0.
+
+       iinntt eeii__ddeeccooddee__cchhaarr((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, cchhaarr **pp))
+
+              This function decodes a char (8-bit) integer between 0-255 from
+              the binary format. Note that for historical reasons the returned
+              integer is of type _c_h_a_r. Your C code should consider the
+              returned value to be of type _u_n_s_i_g_n_e_d _c_h_a_r even if the C
+              compilers and system may define _c_h_a_r to be signed.
+
+       iinntt eeii__ddeeccooddee__ssttrriinngg((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, cchhaarr **pp))
+
+              This function decodes a string from the binary format. A string
+              in erlang is a list of integers between 0 and 255. Note that
+              since the string is just a list, sometimes lists are encoded as
+              strings by _t_e_r_m___t_o___b_i_n_a_r_y_/_1, even if it was not intended.
+
+              The string is copied to _p, and enough space must be allocated.
+              The returned string is null terminated so you need to add an
+              extra byte to the memory requirement.
+
+       iinntt eeii__ddeeccooddee__aattoomm((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, cchhaarr **pp))
+
+              This function decodes an atom from the binary format. The name
+              of the atom is placed at _p. There can be at most _M_A_X_A_T_O_M_L_E_N
+              bytes placed in the buffer.
+
+       iinntt eeii__ddeeccooddee__bbiinnaarryy((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, vvooiidd **pp,, lloonngg **lleenn))
+
+              This function decodes a binary from the binary format. The _l_e_n
+              parameter is set to the actual size of the binary. Note that
+              _e_i___d_e_c_o_d_e___b_i_n_a_r_y_(_) assumes that there are enough room for the
+              binary. The size required can be fetched by _e_i___g_e_t___t_y_p_e_(_).
+
+       iinntt eeii__ddeeccooddee__ffuunn((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, eerrllaanngg__ffuunn **pp))
+       vvooiidd ffrreeee__ffuunn((eerrllaanngg__ffuunn** ff))
+
+              This function decodes a fun from the binary format. The _p
+              parameter should be NULL or point to an _e_r_l_a_n_g___f_u_n structure.
+              This is the only decode function that allocates memory; when the
+              _e_r_l_a_n_g___f_u_n is no longer needed, it should be freed with
+              _f_r_e_e___f_u_n. (This has to do with the arbitrary size of the
+              environment for a fun.)
+
+       iinntt eeii__ddeeccooddee__ppiidd((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, eerrllaanngg__ppiidd **pp))
+
+              Decodes a pid, process identifier, from the binary format.
+
+       iinntt eeii__ddeeccooddee__ppoorrtt((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, eerrllaanngg__ppoorrtt **pp))
+
+              This function decodes a port identifier from the binary format.
+
+       iinntt eeii__ddeeccooddee__rreeff((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, eerrllaanngg__rreeff **pp))
+
+              This function decodes a reference from the binary format.
+
+       iinntt eeii__ddeeccooddee__ttrraaccee((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, eerrllaanngg__ttrraaccee **pp))
+
+              Decodes an erlang trace token from the binary format.
+
+       iinntt eeii__ddeeccooddee__ttuuppllee__hheeaaddeerr((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt **aarriittyy))
+
+              This function decodes a tuple header, the number of elements is
+              returned in _a_r_i_t_y. The tuple elements follows in order in the
+              buffer.
+
+       iinntt eeii__ddeeccooddee__lliisstt__hheeaaddeerr((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, iinntt **aarriittyy))
+
+              This function decodes a list header from the binary format. The
+              number of elements is returned in _a_r_i_t_y. The _a_r_i_t_y_+_1 elements
+              follows (the last one is the tail of the list, normally an empty
+              list.) If _a_r_i_t_y is _0, it's an empty list.
+
+              Note that lists are encoded as strings, if they consist entirely
+              of integers in the range 0..255. This function will not decode
+              such strings, use _e_i___d_e_c_o_d_e___s_t_r_i_n_g_(_) instead.
+
+       iinntt eeii__ddeeccooddee__eeii__tteerrmm((ccoonnsstt cchhaarr** bbuuff,, iinntt** iinnddeexx,, eeii__tteerrmm** tteerrmm))
+
+              This function decodes any term, or at least tries to. If the
+              term pointed at by _*_i_n_d_e_x in _b_u_f fits in the _t_e_r_m union, it is
+              decoded, and the appropriate field in _t_e_r_m_-_>_v_a_l_u_e is set, and
+              _*_i_n_d_e_x is incremented by the term size.
+
+              The function returns 1 on successful decoding, -1 on error, and
+              0 if the term seems alright, but does not fit in the _t_e_r_m
+              structure. If it returns 1, the _i_n_d_e_x will be incremented, and
+              the _t_e_r_m contains the decoded term.
+
+              The _t_e_r_m structure will contain the arity for a tuple or list,
+              size for a binary, string or atom. It will contains a term if
+              it's any of the following: integer, float, atom, pid, port or
+              ref.
+
+       iinntt eeii__ddeeccooddee__tteerrmm((ccoonnsstt cchhaarr **bbuuff,, iinntt **iinnddeexx,, vvooiidd **tt))
+
+              This function decodes a term from the binary format. The term is
+              return in _t as a _E_T_E_R_M_*, so _t is actually an _E_T_E_R_M_*_* (see
+              _e_r_l___i_n_t_e_r_f_a_c_e_(_3_). The term should later be deallocated.
+
+              Note that this function is located in the erl_interface library.
+
+       iinntt eeii__pprriinntt__tteerrmm((FFIILLEE** ffpp,, ccoonnsstt cchhaarr** bbuuff,, iinntt** iinnddeexx))
+       iinntt eeii__ss__pprriinntt__tteerrmm((cchhaarr**** ss,, ccoonnsstt cchhaarr** bbuuff,, iinntt** iinnddeexx))
+
+              This function prints a term, in clear text, to the file given by
+              _f_p, or the buffer pointed to by _s. It tries to resemble the term
+              printing in the erlang shell.
+
+              In _e_i___s___p_r_i_n_t___t_e_r_m_(_), the parameter _s should point to a
+              dynamically (malloc) allocated string of _B_U_F_S_I_Z bytes or a NULL
+              pointer. The string may be reallocated (and _*_s may be updated)
+              by this function if the result is more than _B_U_F_S_I_Z characters.
+              The string returned is zero-terminated.
+
+              The return value is the number of characters written to the file
+              or string, or -1 if _b_u_f_[_i_n_d_e_x_] doesn't contain a valid term.
+              Unfortunately, I/O errors on _f_p is not checked.
+
+              The argument _i_n_d_e_x is updated, i.e. this function can be viewed
+              as en decode function that decodes a term into a human readable
+              format.
+
+       iinntt eeii__xx__ffoorrmmaatt((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr** ffmmtt,, ......))
+       iinntt eeii__xx__ffoorrmmaatt__wwoo__vveerr((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr **ffmmtt,, ...... ))
+
+              Format a term, given as a string, to a buffer. This functions
+              works like a sprintf for erlang terms. The _f_m_t contains a format
+              string, with arguments like _~_d, to insert terms from variables.
+              The following formats are supported (with the C types given):
+
+              ~a - an atom, char*
+              ~c - a character, char
+              ~s - a string, char*
+              ~i - an integer, int
+              ~l - a long integer, long int
+              ~u - a unsigned long integer, unsigned long int
+              ~f - a float, float
+              ~d - a double float, double float
+              ~p - an Erlang PID, erlang_pid*
+
+
+              For instance, to encode a tuple with some stuff:
+
+              ei_x_format("{~a,~i,~d}", "numbers", 12, 3.14159)
+              encodes the tuple {numbers,12,3.14159}
+
+
+              The _e_i___x___f_o_r_m_a_t___w_o___v_e_r_(_) formats into a buffer, without the
+              initial version byte.
+
+       iinntt eeii__xx__nneeww((eeii__xx__bbuuffff** xx))
+       iinntt eeii__xx__nneeww__wwiitthh__vveerrssiioonn((eeii__xx__bbuuffff** xx))
+
+              This function allocates a new _e_i___x___b_u_f_f buffer. The fields of
+              the structure pointed to by _x parameter is filled in, and a
+              default buffer is allocated. The _e_i___x___n_e_w___w_i_t_h___v_e_r_s_i_o_n_(_) also
+              puts an initial version byte, that is used in the binary format.
+              (So that _e_i___x___e_n_c_o_d_e___v_e_r_s_i_o_n_(_) won't be needed.)
+
+       iinntt eeii__xx__ffrreeee((eeii__xx__bbuuffff** xx))
+
+              This function frees an _e_i___x___b_u_f_f buffer. The memory used by the
+              buffer is returned to the OS.
+
+       iinntt eeii__xx__aappppeenndd((eeii__xx__bbuuffff** xx,, ccoonnsstt eeii__xx__bbuuffff** xx22))
+       iinntt eeii__xx__aappppeenndd__bbuuff((eeii__xx__bbuuffff** xx,, ccoonnsstt cchhaarr** bbuuff,, iinntt lleenn))
+
+              These functions appends data at the end of the buffer _x.
+
+       iinntt eeii__sskkiipp__tteerrmm((ccoonnsstt cchhaarr** bbuuff,, iinntt** iinnddeexx))
+
+              This function skips a term in the given buffer, it recursively
+              skips elements of lists and tuples, so that a full term is
+              skipped. This is a way to get the size of an erlang term.
+
+              _b_u_f is the buffer.
+
+              _i_n_d_e_x is updated to point right after the term in the buffer.
+
+          NNoottee::
+              This can be useful when you want to hold arbitrary terms: just
+              skip them and copy the binary term data to some buffer.
+
+
+              The function returns _0 on success and _-_1 on failure.
+
+DDEEBBUUGG IINNFFOORRMMAATTIIOONN
+       Some tips on what to check when the emulator doesn't seem to receive
+       the terms that you send.
+
+         * be careful with the version header, use _e_i___x___n_e_w___w_i_t_h___v_e_r_s_i_o_n_(_)
+           when appropriate
+
+         * turn on distribution tracing on the erlang node
+
+         * check the result codes from ei_decode_-calls
+
+SSEEEE AALLSSOO
+       erl_interface(3)
+
+
+
+Ericsson AB                   erl_interface 3.7.8                        ei(3)

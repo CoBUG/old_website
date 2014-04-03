@@ -1,0 +1,1062 @@
+crypto(3)                  Erlang Module Definition                  crypto(3)
+
+
+
+NNAAMMEE
+       crypto - Crypto Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides a set of cryptographic functions.
+
+       References:
+
+         * md4: The MD4 Message Digest Algorithm (RFC 1320)
+
+         * md5: The MD5 Message Digest Algorithm (RFC 1321)
+
+         * sha: Secure Hash Standard (FIPS 180-2)
+
+         * hmac: Keyed-Hashing for Message Authentication (RFC 2104)
+
+         * des: Data Encryption Standard (FIPS 46-3)
+
+         * aes: Advanced Encryption Standard (AES) (FIPS 197)
+
+         * ecb, cbc, cfb, ofb, ctr: Recommendation for Block Cipher Modes of
+           Operation (NIST SP 800-38A).
+
+         * rsa: Recommendation for Block Cipher Modes of Operation (NIST
+           800-38A)
+
+         * dss: Digital Signature Standard (FIPS 186-2)
+
+       The above publications can be found at NIST publications, at IETF.
+
+       _T_y_p_e_s
+
+       byte() = 0 ... 255
+       ioelem() = byte() | binary() | iolist()
+       iolist() = [ioelem()]
+       Mpint() = <<ByteLen:32/integer-big, Bytes:ByteLen/binary>>
+
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> ookk
+
+              Starts the crypto server.
+
+       ssttoopp(()) -->> ookk
+
+              Stops the crypto server.
+
+       iinnffoo(()) -->> [[aattoomm(())]]
+
+              Provides the available crypto functions in terms of a list of
+              atoms.
+
+       iinnffoo__lliibb(()) -->> [[{{NNaammee,,VVeerrNNuumm,,VVeerrSSttrr}}]]
+
+              Types:
+
+                 Name = binary()
+                 VerNum = integer()
+                 VerStr = binary()
+
+              Provides the name and version of the libraries used by crypto.
+
+              _N_a_m_e is the name of the library. _V_e_r_N_u_m is the numeric version
+              according to the library's own versioning scheme. _V_e_r_S_t_r
+              contains a text variant of the version.
+
+              > info_lib().
+              [{<<"OpenSSL">>,9469983,<<"OpenSSL 0.9.8a 11 Oct 2005">>}]
+
+
+       mmdd44((DDaattaa)) -->> DDiiggeesstt
+
+              Types:
+
+                 Data = iolist() | binary()
+                 Digest = binary()
+
+              Computes an _M_D_4 message digest from _D_a_t_a, where the length of
+              the digest is 128 bits (16 bytes).
+
+       mmdd44__iinniitt(()) -->> CCoonntteexxtt
+
+              Types:
+
+                 Context = binary()
+
+              Creates an MD4 context, to be used in subsequent calls to
+              _m_d_4___u_p_d_a_t_e_/_2.
+
+       mmdd44__uuppddaattee((CCoonntteexxtt,, DDaattaa)) -->> NNeewwCCoonntteexxtt
+
+              Types:
+
+                 Data = iolist() | binary()
+                 Context = NewContext = binary()
+
+              Updates an MD4 _C_o_n_t_e_x_t with _D_a_t_a, and returns a _N_e_w_C_o_n_t_e_x_t.
+
+       mmdd44__ffiinnaall((CCoonntteexxtt)) -->> DDiiggeesstt
+
+              Types:
+
+                 Context = Digest = binary()
+
+              Finishes the update of an MD4 _C_o_n_t_e_x_t and returns the computed
+              _M_D_4 message digest.
+
+       mmdd55((DDaattaa)) -->> DDiiggeesstt
+
+              Types:
+
+                 Data = iolist() | binary()
+                 Digest = binary()
+
+              Computes an _M_D_5 message digest from _D_a_t_a, where the length of
+              the digest is 128 bits (16 bytes).
+
+       mmdd55__iinniitt(()) -->> CCoonntteexxtt
+
+              Types:
+
+                 Context = binary()
+
+              Creates an MD5 context, to be used in subsequent calls to
+              _m_d_5___u_p_d_a_t_e_/_2.
+
+       mmdd55__uuppddaattee((CCoonntteexxtt,, DDaattaa)) -->> NNeewwCCoonntteexxtt
+
+              Types:
+
+                 Data = iolist() | binary()
+                 Context = NewContext = binary()
+
+              Updates an MD5 _C_o_n_t_e_x_t with _D_a_t_a, and returns a _N_e_w_C_o_n_t_e_x_t.
+
+       mmdd55__ffiinnaall((CCoonntteexxtt)) -->> DDiiggeesstt
+
+              Types:
+
+                 Context = Digest = binary()
+
+              Finishes the update of an MD5 _C_o_n_t_e_x_t and returns the computed
+              _M_D_5 message digest.
+
+       sshhaa((DDaattaa)) -->> DDiiggeesstt
+
+              Types:
+
+                 Data = iolist() | binary()
+                 Digest = binary()
+
+              Computes an _S_H_A message digest from _D_a_t_a, where the length of
+              the digest is 160 bits (20 bytes).
+
+       sshhaa__iinniitt(()) -->> CCoonntteexxtt
+
+              Types:
+
+                 Context = binary()
+
+              Creates an SHA context, to be used in subsequent calls to
+              _s_h_a___u_p_d_a_t_e_/_2.
+
+       sshhaa__uuppddaattee((CCoonntteexxtt,, DDaattaa)) -->> NNeewwCCoonntteexxtt
+
+              Types:
+
+                 Data = iolist() | binary()
+                 Context = NewContext = binary()
+
+              Updates an SHA _C_o_n_t_e_x_t with _D_a_t_a, and returns a _N_e_w_C_o_n_t_e_x_t.
+
+       sshhaa__ffiinnaall((CCoonntteexxtt)) -->> DDiiggeesstt
+
+              Types:
+
+                 Context = Digest = binary()
+
+              Finishes the update of an SHA _C_o_n_t_e_x_t and returns the computed
+              _S_H_A message digest.
+
+       hhaasshh((TTyyppee,, DDaattaa)) -->> DDiiggeesstt
+
+              Types:
+
+                 Type = md4 | md5 | sha | sha224 | sha256 | sha384 | sha512
+                 Data = iodata()
+                 Digest = binary()
+
+              Computes a message digest of type _T_y_p_e from _D_a_t_a.
+
+       hhaasshh__iinniitt((TTyyppee)) -->> CCoonntteexxtt
+
+              Types:
+
+                 Type = md4 | md5 | sha | sha224 | sha256 | sha384 | sha512
+
+              Initializes the context for streaming hash operations. _T_y_p_e
+              determines which digest to use. The returned context should be
+              used as argument to hhaasshh__uuppddaattee.
+
+       hhaasshh__uuppddaattee((CCoonntteexxtt,, DDaattaa)) -->> NNeewwCCoonntteexxtt
+
+              Types:
+
+                 Data = iodata()
+
+              Updates the digest represented by _C_o_n_t_e_x_t using the given _D_a_t_a.
+              _C_o_n_t_e_x_t must have been generated using hhaasshh__iinniitt or a previous
+              call to this function. _D_a_t_a can be any length. _N_e_w_C_o_n_t_e_x_t must
+              be passed into the next call to _h_a_s_h___u_p_d_a_t_e or hhaasshh__ffiinnaall.
+
+       hhaasshh__ffiinnaall((CCoonntteexxtt)) -->> DDiiggeesstt
+
+              Types:
+
+                 Digest = binary()
+
+              Finalizes the hash operation referenced by _C_o_n_t_e_x_t returned from
+              a previous call to hhaasshh__uuppddaattee. The size of _D_i_g_e_s_t is determined
+              by the type of hash function used to generate it.
+
+       mmdd55__mmaacc((KKeeyy,, DDaattaa)) -->> MMaacc
+
+              Types:
+
+                 Key = Data = iolist() | binary()
+                 Mac = binary()
+
+              Computes an _M_D_5 _M_A_C message authentification code from _K_e_y and
+              _D_a_t_a, where the the length of the Mac is 128 bits (16 bytes).
+
+       mmdd55__mmaacc__9966((KKeeyy,, DDaattaa)) -->> MMaacc
+
+              Types:
+
+                 Key = Data = iolist() | binary()
+                 Mac = binary()
+
+              Computes an _M_D_5 _M_A_C message authentification code from _K_e_y and
+              _D_a_t_a, where the length of the Mac is 96 bits (12 bytes).
+
+       hhmmaacc__iinniitt((TTyyppee,, KKeeyy)) -->> CCoonntteexxtt
+
+              Types:
+
+                 Type = sha | md5 | ripemd160
+                 Key = iolist() | binary()
+                 Context = binary()
+
+              Initializes the context for streaming HMAC operations. _T_y_p_e
+              determines which hash function to use in the HMAC operation. _K_e_y
+              is the authentication key. The key can be any length.
+
+       hhmmaacc__uuppddaattee((CCoonntteexxtt,, DDaattaa)) -->> NNeewwCCoonntteexxtt
+
+              Types:
+
+                 Context = NewContext = binary()
+                 Data = iolist() | binary()
+
+              Updates the HMAC represented by _C_o_n_t_e_x_t using the given _D_a_t_a.
+              _C_o_n_t_e_x_t must have been generated using an HMAC init function
+              (such as hhmmaacc__iinniitt). _D_a_t_a can be any length. _N_e_w_C_o_n_t_e_x_t must be
+              passed into the next call to _h_m_a_c___u_p_d_a_t_e.
+
+       hhmmaacc__ffiinnaall((CCoonntteexxtt)) -->> MMaacc
+
+              Types:
+
+                 Context = Mac = binary()
+
+              Finalizes the HMAC operation referenced by _C_o_n_t_e_x_t. The size of
+              the resultant MAC is determined by the type of hash function
+              used to generate it.
+
+       hhmmaacc__ffiinnaall__nn((CCoonntteexxtt,, HHaasshhLLeenn)) -->> MMaacc
+
+              Types:
+
+                 Context = Mac = binary()
+                 HashLen = non_neg_integer()
+
+              Finalizes the HMAC operation referenced by _C_o_n_t_e_x_t. _H_a_s_h_L_e_n must
+              be greater than zero. _M_a_c will be a binary with at most _H_a_s_h_L_e_n
+              bytes. Note that if HashLen is greater than the actual number of
+              bytes returned from the underlying hash, the returned hash will
+              have fewer than _H_a_s_h_L_e_n bytes.
+
+       sshhaa__mmaacc((KKeeyy,, DDaattaa)) -->> MMaacc
+       sshhaa__mmaacc((KKeeyy,, DDaattaa,, MMaaccLLeennggtthh)) -->> MMaacc
+
+              Types:
+
+                 Key = Data = iolist() | binary()
+                 Mac = binary()
+                 MacLenength = integer() =< 20
+
+              Computes an _S_H_A _M_A_C message authentification code from _K_e_y and
+              _D_a_t_a, where the default length of the Mac is 160 bits (20
+              bytes).
+
+       sshhaa__mmaacc__9966((KKeeyy,, DDaattaa)) -->> MMaacc
+
+              Types:
+
+                 Key = Data = iolist() | binary()
+                 Mac = binary()
+
+              Computes an _S_H_A _M_A_C message authentification code from _K_e_y and
+              _D_a_t_a, where the length of the Mac is 96 bits (12 bytes).
+
+       ddeess__ccbbcc__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to DES in CBC mode. _T_e_x_t must be a
+              multiple of 64 bits (8 bytes). _K_e_y is the DES key, and _I_V_e_c is
+              an arbitrary initializing vector. The lengths of _K_e_y and _I_V_e_c
+              must be 64 bits (8 bytes).
+
+       ddeess__ccbbcc__ddeeccrryypptt((KKeeyy,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to DES in CBC mode. _K_e_y is the DES
+              key, and _I_V_e_c is an arbitrary initializing vector. _K_e_y and _I_V_e_c
+              must have the same values as those used when encrypting. _C_i_p_h_e_r
+              must be a multiple of 64 bits (8 bytes). The lengths of _K_e_y and
+              _I_V_e_c must be 64 bits (8 bytes).
+
+       ddeess__ccbbcc__iivveecc((DDaattaa)) -->> IIVVeecc
+
+              Types:
+
+                 Data = iolist() | binary()
+                 IVec = binary()
+
+              Returns the _I_V_e_c to be used in a next iteration of
+              _d_e_s___c_b_c___[_e_n_c_r_y_p_t_|_d_e_c_r_y_p_t_]. _D_a_t_a is the encrypted data from the
+              previous iteration step.
+
+       ddeess__ccffbb__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to DES in 8-bit CFB mode. _K_e_y is the DES
+              key, and _I_V_e_c is an arbitrary initializing vector. The lengths
+              of _K_e_y and _I_V_e_c must be 64 bits (8 bytes).
+
+       ddeess__ccffbb__ddeeccrryypptt((KKeeyy,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to DES in 8-bit CFB mode. _K_e_y is the
+              DES key, and _I_V_e_c is an arbitrary initializing vector. _K_e_y and
+              _I_V_e_c must have the same values as those used when encrypting.
+              The lengths of _K_e_y and _I_V_e_c must be 64 bits (8 bytes).
+
+       ddeess__ccffbb__iivveecc((IIVVeecc,, DDaattaa)) -->> NNeexxttIIVVeecc
+
+              Types:
+
+                 IVec = iolist() | binary()
+                 Data = iolist() | binary()
+                 NextIVec = binary()
+
+              Returns the _I_V_e_c to be used in a next iteration of
+              _d_e_s___c_f_b___[_e_n_c_r_y_p_t_|_d_e_c_r_y_p_t_]. _I_V_e_c is the vector used in the
+              previous iteration step. _D_a_t_a is the encrypted data from the
+              previous iteration step.
+
+       ddeess33__ccbbcc__eennccrryypptt((KKeeyy11,, KKeeyy22,, KKeeyy33,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key1 =Key2 = Key3 Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to DES3 in CBC mode. _T_e_x_t must be a
+              multiple of 64 bits (8 bytes). _K_e_y_1, _K_e_y_2, _K_e_y_3, are the DES
+              keys, and _I_V_e_c is an arbitrary initializing vector. The lengths
+              of each of _K_e_y_1, _K_e_y_2, _K_e_y_3 and _I_V_e_c must be 64 bits (8 bytes).
+
+       ddeess33__ccbbcc__ddeeccrryypptt((KKeeyy11,, KKeeyy22,, KKeeyy33,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key1 = Key2 = Key3 = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to DES3 in CBC mode. _K_e_y_1, _K_e_y_2, _K_e_y_3
+              are the DES key, and _I_V_e_c is an arbitrary initializing vector.
+              _K_e_y_1, _K_e_y_2, _K_e_y_3 and _I_V_e_c must and _I_V_e_c must have the same
+              values as those used when encrypting. _C_i_p_h_e_r must be a multiple
+              of 64 bits (8 bytes). The lengths of _K_e_y_1, _K_e_y_2, _K_e_y_3, and _I_V_e_c
+              must be 64 bits (8 bytes).
+
+       ddeess33__ccffbb__eennccrryypptt((KKeeyy11,, KKeeyy22,, KKeeyy33,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key1 =Key2 = Key3 Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to DES3 in 8-bit CFB mode. _K_e_y_1, _K_e_y_2,
+              _K_e_y_3, are the DES keys, and _I_V_e_c is an arbitrary initializing
+              vector. The lengths of each of _K_e_y_1, _K_e_y_2, _K_e_y_3 and _I_V_e_c must be
+              64 bits (8 bytes).
+
+       ddeess33__ccffbb__ddeeccrryypptt((KKeeyy11,, KKeeyy22,, KKeeyy33,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key1 = Key2 = Key3 = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to DES3 in 8-bit CFB mode. _K_e_y_1, _K_e_y_2,
+              _K_e_y_3 are the DES key, and _I_V_e_c is an arbitrary initializing
+              vector. _K_e_y_1, _K_e_y_2, _K_e_y_3 and _I_V_e_c must and _I_V_e_c must have the
+              same values as those used when encrypting. The lengths of _K_e_y_1,
+              _K_e_y_2, _K_e_y_3, and _I_V_e_c must be 64 bits (8 bytes).
+
+       ddeess__eeccbb__eennccrryypptt((KKeeyy,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 Cipher = binary()
+
+              Encrypts _T_e_x_t according to DES in ECB mode. _K_e_y is the DES key.
+              The lengths of _K_e_y and _T_e_x_t must be 64 bits (8 bytes).
+
+       ddeess__eeccbb__ddeeccrryypptt((KKeeyy,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Cipher = iolist() | binary()
+                 Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to DES in ECB mode. _K_e_y is the DES
+              key. The lengths of _K_e_y and _C_i_p_h_e_r must be 64 bits (8 bytes).
+
+       bblloowwffiisshh__eeccbb__eennccrryypptt((KKeeyy,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 Cipher = binary()
+
+              Encrypts the first 64 bits of _T_e_x_t using Blowfish in ECB mode.
+              _K_e_y is the Blowfish key. The length of _T_e_x_t must be at least 64
+              bits (8 bytes).
+
+       bblloowwffiisshh__eeccbb__ddeeccrryypptt((KKeeyy,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 Cipher = binary()
+
+              Decrypts the first 64 bits of _T_e_x_t using Blowfish in ECB mode.
+              _K_e_y is the Blowfish key. The length of _T_e_x_t must be at least 64
+              bits (8 bytes).
+
+       bblloowwffiisshh__ccbbcc__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t using Blowfish in CBC mode. _K_e_y is the Blowfish
+              key, and _I_V_e_c is an arbitrary initializing vector. The length of
+              _I_V_e_c must be 64 bits (8 bytes). The length of _T_e_x_t must be a
+              multiple of 64 bits (8 bytes).
+
+       bblloowwffiisshh__ccbbcc__ddeeccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Decrypts _T_e_x_t using Blowfish in CBC mode. _K_e_y is the Blowfish
+              key, and _I_V_e_c is an arbitrary initializing vector. The length of
+              _I_V_e_c must be 64 bits (8 bytes). The length of _T_e_x_t must be a
+              multiple 64 bits (8 bytes).
+
+       bblloowwffiisshh__ccffbb6644__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t using Blowfish in CFB mode with 64 bit feedback.
+              _K_e_y is the Blowfish key, and _I_V_e_c is an arbitrary initializing
+              vector. The length of _I_V_e_c must be 64 bits (8 bytes).
+
+       bblloowwffiisshh__ccffbb6644__ddeeccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Decrypts _T_e_x_t using Blowfish in CFB mode with 64 bit feedback.
+              _K_e_y is the Blowfish key, and _I_V_e_c is an arbitrary initializing
+              vector. The length of _I_V_e_c must be 64 bits (8 bytes).
+
+       bblloowwffiisshh__ooffbb6644__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t using Blowfish in OFB mode with 64 bit feedback.
+              _K_e_y is the Blowfish key, and _I_V_e_c is an arbitrary initializing
+              vector. The length of _I_V_e_c must be 64 bits (8 bytes).
+
+       aaeess__ccffbb__112288__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to AES in Cipher Feedback mode (CFB).
+              _K_e_y is the AES key, and _I_V_e_c is an arbitrary initializing
+              vector. The lengths of _K_e_y and _I_V_e_c must be 128 bits (16 bytes).
+
+       aaeess__ccffbb__112288__ddeeccrryypptt((KKeeyy,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to AES in Cipher Feedback Mode (CFB).
+              _K_e_y is the AES key, and _I_V_e_c is an arbitrary initializing
+              vector. _K_e_y and _I_V_e_c must have the same values as those used
+              when encrypting. The lengths of _K_e_y and _I_V_e_c must be 128 bits
+              (16 bytes).
+
+       aaeess__ccbbcc__112288__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to AES in Cipher Block Chaining mode
+              (CBC). _T_e_x_t must be a multiple of 128 bits (16 bytes). _K_e_y is
+              the AES key, and _I_V_e_c is an arbitrary initializing vector. The
+              lengths of _K_e_y and _I_V_e_c must be 128 bits (16 bytes).
+
+       aaeess__ccbbcc__112288__ddeeccrryypptt((KKeeyy,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to AES in Cipher Block Chaining mode
+              (CBC). _K_e_y is the AES key, and _I_V_e_c is an arbitrary initializing
+              vector. _K_e_y and _I_V_e_c must have the same values as those used
+              when encrypting. _C_i_p_h_e_r must be a multiple of 128 bits (16
+              bytes). The lengths of _K_e_y and _I_V_e_c must be 128 bits (16 bytes).
+
+       aaeess__ccbbcc__iivveecc((DDaattaa)) -->> IIVVeecc
+
+              Types:
+
+                 Data = iolist() | binary()
+                 IVec = binary()
+
+              Returns the _I_V_e_c to be used in a next iteration of
+              _a_e_s___c_b_c___*___[_e_n_c_r_y_p_t_|_d_e_c_r_y_p_t_]. _D_a_t_a is the encrypted data from the
+              previous iteration step.
+
+       aaeess__ccttrr__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 IVec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to AES in Counter mode (CTR). _T_e_x_t can
+              be any number of bytes. _K_e_y is the AES key and must be either
+              128, 192 or 256 bits long. _I_V_e_c is an arbitrary initializing
+              vector of 128 bits (16 bytes).
+
+       aaeess__ccttrr__ddeeccrryypptt((KKeeyy,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Cipher = iolist() | binary()
+                 IVec = Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to AES in Counter mode (CTR). _C_i_p_h_e_r
+              can be any number of bytes. _K_e_y is the AES key and must be
+              either 128, 192 or 256 bits long. _I_V_e_c is an arbitrary
+              initializing vector of 128 bits (16 bytes).
+
+       aaeess__ccttrr__ssttrreeaamm__iinniitt((KKeeyy,, IIVVeecc)) -->> SSttaattee
+
+              Types:
+
+                 State = { K, I, E, C }
+                 Key = K = iolist()
+                 IVec = I = E = binary()
+                 C = integer()
+
+              Initializes the state for use in streaming AES encryption using
+              Counter mode (CTR). _K_e_y is the AES key and must be either 128,
+              192, or 256 bts long. _I_V_e_c is an arbitrary initializing vector
+              of 128 bits (16 bytes). This state is for use with
+              aaeess__ccttrr__ssttrreeaamm__eennccrryypptt and aaeess__ccttrr__ssttrreeaamm__ddeeccrryypptt.
+
+       aaeess__ccttrr__ssttrreeaamm__eennccrryypptt((SSttaattee,, TTeexxtt)) -->> {{ NNeewwSSttaattee,, CCiipphheerr}}
+
+              Types:
+
+                 Text = iolist() | binary()
+                 Cipher = binary()
+
+              Encrypts _T_e_x_t according to AES in Counter mode (CTR). This
+              function can be used to encrypt a stream of text using a series
+              of calls instead of requiring all text to be in memory. _T_e_x_t can
+              be any number of bytes. State is initialized using
+              aaeess__ccttrr__ssttrreeaamm__iinniitt. _N_e_w_S_t_a_t_e is the new streaming encryption
+              state that must be passed to the next call to
+              _a_e_s___c_t_r___s_t_r_e_a_m___e_n_c_r_y_p_t. _C_i_p_h_e_r is the encrypted cipher text.
+
+       aaeess__ccttrr__ssttrreeaamm__ddeeccrryypptt((SSttaattee,, CCiipphheerr)) -->> {{ NNeewwSSttaattee,, TTeexxtt }}
+
+              Types:
+
+                 Cipher = iolist() | binary()
+                 Text = binary()
+
+              Decrypts _C_i_p_h_e_r according to AES in Counter mode (CTR). This
+              function can be used to decrypt a stream of ciphertext using a
+              series of calls instead of requiring all ciphertext to be in
+              memory. _C_i_p_h_e_r can be any number of bytes. State is initialized
+              using aaeess__ccttrr__ssttrreeaamm__iinniitt. _N_e_w_S_t_a_t_e is the new streaming
+              encryption state that must be passed to the next call to
+              _a_e_s___c_t_r___s_t_r_e_a_m___e_n_c_r_y_p_t. _T_e_x_t is the decrypted data.
+
+       eerrlliinntt((MMppiinntt)) -->> NN
+       mmppiinntt((NN)) -->> MMppiinntt
+
+              Types:
+
+                 Mpint = binary()
+                 N = integer()
+
+              Convert a binary multi-precision integer _M_p_i_n_t to and from an
+              erlang big integer. A multi-precision integer is a binary with
+              the following form: _<_<_B_y_t_e_L_e_n_:_3_2_/_i_n_t_e_g_e_r_, _B_y_t_e_s_:_B_y_t_e_L_e_n_/_b_i_n_a_r_y_>_>
+              where both _B_y_t_e_L_e_n and _B_y_t_e_s are big-endian. Mpints are used in
+              some of the functions in _c_r_y_p_t_o and are not translated in the
+              API for performance reasons.
+
+       rraanndd__bbyytteess((NN)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 N = integer()
+
+              Generates N bytes randomly uniform 0..255, and returns the
+              result in a binary. Uses the _c_r_y_p_t_o library pseudo-random number
+              generator.
+
+       ssttrroonngg__rraanndd__bbyytteess((NN)) -->> bbiinnaarryy(())
+
+              Types:
+
+                 N = integer()
+
+              Generates N bytes randomly uniform 0..255, and returns the
+              result in a binary. Uses a cryptographically secure prng seeded
+              and periodically mixed with operating system provided entropy.
+              By default this is the _R_A_N_D___b_y_t_e_s method from OpenSSL.
+
+              May throw exception _l_o_w___e_n_t_r_o_p_y in case the random generator
+              failed due to lack of secure "randomness".
+
+       rraanndd__uunniiffoorrmm((LLoo,, HHii)) -->> NN
+
+              Types:
+
+                 Lo, Hi, N = Mpint | integer()
+                 Mpint = binary()
+
+              Generate a random number _N_, _L_o _=_< _N _< _H_i_. Uses the _c_r_y_p_t_o
+              library pseudo-random number generator. The arguments (and
+              result) can be either erlang integers or binary multi-precision
+              integers. _H_i must be larger than _L_o.
+
+       ssttrroonngg__rraanndd__mmppiinntt((NN,, TToopp,, BBoottttoomm)) -->> MMppiinntt
+
+              Types:
+
+                 N = non_neg_integer()
+                 Top = -1 | 0 | 1
+                 Bottom = 0 | 1
+                 Mpint = binary()
+
+              Generate an N bit random number using OpenSSL's
+              cryptographically strong pseudo random number generator _B_N___r_a_n_d.
+
+              The parameter _T_o_p places constraints on the most significant
+              bits of the generated number. If _T_o_p is 1, then the two most
+              significant bits will be set to 1, if _T_o_p is 0, the most
+              significant bit will be 1, and if _T_o_p is -1 then no constraints
+              are applied and thus the generated number may be less than N
+              bits long.
+
+              If _B_o_t_t_o_m is 1, then the generated number is constrained to be
+              odd.
+
+              May throw exception _l_o_w___e_n_t_r_o_p_y in case the random generator
+              failed due to lack of secure "randomness".
+
+       mmoodd__eexxpp((NN,, PP,, MM)) -->> RReessuulltt
+
+              Types:
+
+                 N, P, M, Result = Mpint
+                 Mpint = binary()
+
+              This function performs the exponentiation _N _^ _P _m_o_d _M, using the
+              _c_r_y_p_t_o library.
+
+       rrssaa__ssiiggnn((DDaattaaOOrrDDiiggeesstt,, KKeeyy)) -->> SSiiggnnaattuurree
+       rrssaa__ssiiggnn((DDiiggeessttTTyyppee,, DDaattaaOOrrDDiiggeesstt,, KKeeyy)) -->> SSiiggnnaattuurree
+
+              Types:
+
+                 DataOrDigest = Data | {digest,Digest}
+                 Data = Mpint
+                 Digest = binary()
+                 Key = [E, N, D] | [E, N, D, P1, P2, E1, E2, C]
+                 E, N, D = Mpint
+                   Where _E is the public exponent, _N is public modulus and _D
+                   is the private exponent.
+                 P1, P2, E1, E2, C = Mpint
+                   The longer key format contains redundant information that
+                   will make the calculation faster. _P_1_,_P_2 are first and
+                   second prime factors. _E_1_,_E_2 are first and second exponents.
+                   _C is the CRT coefficient. Terminology is taken from RFC
+                   3447.
+                 DigestType = md5 | sha | sha224 | sha256 | sha384 | sha512
+                   The default _D_i_g_e_s_t_T_y_p_e is sha.
+                 Mpint = binary()
+                 Signature = binary()
+
+              Creates a RSA signature with the private key _K_e_y of a digest.
+              The digest is either calculated as a _D_i_g_e_s_t_T_y_p_e digest of _D_a_t_a
+              or a precalculated binary _D_i_g_e_s_t.
+
+       rrssaa__vveerriiffyy((DDaattaaOOrrDDiiggeesstt,, SSiiggnnaattuurree,, KKeeyy)) -->> VVeerriiffiieedd
+       rrssaa__vveerriiffyy((DDiiggeessttTTyyppee,, DDaattaaOOrrDDiiggeesstt,, SSiiggnnaattuurree,, KKeeyy)) -->> VVeerriiffiieedd
+
+              Types:
+
+                 Verified = boolean()
+                 DataOrDigest = Data | {digest|Digest}
+                 Data, Signature = Mpint
+                 Digest = binary()
+                 Key = [E, N]
+                 E, N = Mpint
+                   Where _E is the public exponent and _N is public modulus.
+                 DigestType = md5 | sha | sha224 | sha256 | sha384 | sha512
+                   The default _D_i_g_e_s_t_T_y_p_e is sha.
+                 Mpint = binary()
+
+              Verifies that a digest matches the RSA signature using the
+              signer's public key _K_e_y. The digest is either calculated as a
+              _D_i_g_e_s_t_T_y_p_e digest of _D_a_t_a or a precalculated binary _D_i_g_e_s_t.
+
+              May throw exception _n_o_t_s_u_p in case the chosen _D_i_g_e_s_t_T_y_p_e is not
+              supported by the underlying OpenSSL implementation.
+
+       rrssaa__ppuubblliicc__eennccrryypptt((PPllaaiinnTTeexxtt,, PPuubblliiccKKeeyy,, PPaaddddiinngg)) -->> CChhiipphheerrTTeexxtt
+
+              Types:
+
+                 PlainText = binary()
+                 PublicKey = [E, N]
+                 E, N = Mpint
+                   Where _E is the public exponent and _N is public modulus.
+                 Padding = rsa_pkcs1_padding | rsa_pkcs1_oaep_padding |
+                 rsa_no_padding
+                 ChipherText = binary()
+
+              Encrypts the _P_l_a_i_n_T_e_x_t (usually a session key) using the
+              _P_u_b_l_i_c_K_e_y and returns the cipher. The _P_a_d_d_i_n_g decides what
+              padding mode is used, _r_s_a___p_k_c_s_1___p_a_d_d_i_n_g is PKCS #1 v1.5
+              currently the most used mode and _r_s_a___p_k_c_s_1___o_a_e_p___p_a_d_d_i_n_g is EME-
+              OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty
+              encoding parameter. This mode is recommended for all new
+              applications. The size of the _M_s_g must be less than
+              _b_y_t_e___s_i_z_e_(_N_)_-_1_1 if _r_s_a___p_k_c_s_1___p_a_d_d_i_n_g is used, _b_y_t_e___s_i_z_e_(_N_)_-_4_1 if
+              _r_s_a___p_k_c_s_1___o_a_e_p___p_a_d_d_i_n_g is used and _b_y_t_e___s_i_z_e_(_N_) if
+              _r_s_a___n_o___p_a_d_d_i_n_g is used. Where byte_size(N) is the size part of
+              an _M_p_i_n_t_-_1.
+
+       rrssaa__pprriivvaattee__ddeeccrryypptt((CChhiipphheerrTTeexxtt,, PPrriivvaatteeKKeeyy,, PPaaddddiinngg)) -->> PPllaaiinnTTeexxtt
+
+              Types:
+
+                 ChipherText = binary()
+                 PrivateKey = [E, N, D] | [E, N, D, P1, P2, E1, E2, C]
+                 E, N, D = Mpint
+                   Where _E is the public exponent, _N is public modulus and _D
+                   is the private exponent.
+                 P1, P2, E1, E2, C = Mpint
+                   The longer key format contains redundant information that
+                   will make the calculation faster. _P_1_,_P_2 are first and
+                   second prime factors. _E_1_,_E_2 are first and second exponents.
+                   _C is the CRT coefficient. Terminology is taken from RFC
+                   3447.
+                 Padding = rsa_pkcs1_padding | rsa_pkcs1_oaep_padding |
+                 rsa_no_padding
+                 PlainText = binary()
+
+              Decrypts the _C_h_i_p_h_e_r_T_e_x_t (usually a session key encrypted with
+              rrssaa__ppuubblliicc__eennccrryypptt//33) using the _P_r_i_v_a_t_e_K_e_y and returns the
+              message. The _P_a_d_d_i_n_g is the padding mode that was used to
+              encrypt the data, see rrssaa__ppuubblliicc__eennccrryypptt//33.
+
+       rrssaa__pprriivvaattee__eennccrryypptt((PPllaaiinnTTeexxtt,, PPrriivvaatteeKKeeyy,, PPaaddddiinngg)) -->> CChhiipphheerrTTeexxtt
+
+              Types:
+
+                 PlainText = binary()
+                 PrivateKey = [E, N, D] | [E, N, D, P1, P2, E1, E2, C]
+                 E, N, D = Mpint
+                   Where _E is the public exponent, _N is public modulus and _D
+                   is the private exponent.
+                 P1, P2, E1, E2, C = Mpint
+                   The longer key format contains redundant information that
+                   will make the calculation faster. _P_1_,_P_2 are first and
+                   second prime factors. _E_1_,_E_2 are first and second exponents.
+                   _C is the CRT coefficient. Terminology is taken from RFC
+                   3447.
+                 Padding = rsa_pkcs1_padding | rsa_no_padding
+                 ChipherText = binary()
+
+              Encrypts the _P_l_a_i_n_T_e_x_t using the _P_r_i_v_a_t_e_K_e_y and returns the
+              cipher. The _P_a_d_d_i_n_g decides what padding mode is used,
+              _r_s_a___p_k_c_s_1___p_a_d_d_i_n_g is PKCS #1 v1.5 currently the most used mode.
+              The size of the _M_s_g must be less than _b_y_t_e___s_i_z_e_(_N_)_-_1_1 if
+              _r_s_a___p_k_c_s_1___p_a_d_d_i_n_g is used, and _b_y_t_e___s_i_z_e_(_N_) if _r_s_a___n_o___p_a_d_d_i_n_g is
+              used. Where byte_size(N) is the size part of an _M_p_i_n_t_-_1.
+
+       rrssaa__ppuubblliicc__ddeeccrryypptt((CChhiipphheerrTTeexxtt,, PPuubblliiccKKeeyy,, PPaaddddiinngg)) -->> PPllaaiinnTTeexxtt
+
+              Types:
+
+                 ChipherText = binary()
+                 PublicKey = [E, N]
+                 E, N = Mpint
+                   Where _E is the public exponent and _N is public modulus
+                 Padding = rsa_pkcs1_padding | rsa_no_padding
+                 PlainText = binary()
+
+              Decrypts the _C_h_i_p_h_e_r_T_e_x_t (encrypted with rrssaa__pprriivvaattee__eennccrryypptt//33)
+              using the _P_r_i_v_a_t_e_K_e_y and returns the message. The _P_a_d_d_i_n_g is the
+              padding mode that was used to encrypt the data, see
+              rrssaa__pprriivvaattee__eennccrryypptt//33.
+
+       ddssss__ssiiggnn((DDaattaaOOrrDDiiggeesstt,, KKeeyy)) -->> SSiiggnnaattuurree
+       ddssss__ssiiggnn((DDiiggeessttTTyyppee,, DDaattaaOOrrDDiiggeesstt,, KKeeyy)) -->> SSiiggnnaattuurree
+
+              Types:
+
+                 DigestType = sha
+                 DataOrDigest = Mpint | {digest,Digest}
+                 Key = [P, Q, G, X]
+                 P, Q, G, X = Mpint
+                    Where _P, _Q and _G are the dss parameters and _X is the
+                   private key.
+                 Digest = binary() with length 20 bytes
+                 Signature = binary()
+
+              Creates a DSS signature with the private key _K_e_y of a digest.
+              The digest is either calculated as a SHA1 digest of _D_a_t_a or a
+              precalculated binary _D_i_g_e_s_t.
+
+              A deprecated feature is having _D_i_g_e_s_t_T_y_p_e _= _'_n_o_n_e_' in which case
+              _D_a_t_a_O_r_D_i_g_e_s_t is a precalculated SHA1 digest.
+
+       ddssss__vveerriiffyy((DDaattaaOOrrDDiiggeesstt,, SSiiggnnaattuurree,, KKeeyy)) -->> VVeerriiffiieedd
+       ddssss__vveerriiffyy((DDiiggeessttTTyyppee,, DDaattaaOOrrDDiiggeesstt,, SSiiggnnaattuurree,, KKeeyy)) -->> VVeerriiffiieedd
+
+              Types:
+
+                 Verified = boolean()
+                 DigestType = sha
+                 DataOrDigest = Mpint | {digest,Digest}
+                 Data = Mpint | ShaDigest
+                 Signature = Mpint
+                 Key = [P, Q, G, Y]
+                 P, Q, G, Y = Mpint
+                    Where _P, _Q and _G are the dss parameters and _Y is the
+                   public key.
+                 Digest = binary() with length 20 bytes
+
+              Verifies that a digest matches the DSS signature using the
+              public key _K_e_y. The digest is either calculated as a SHA1 digest
+              of _D_a_t_a or is a precalculated binary _D_i_g_e_s_t.
+
+              A deprecated feature is having _D_i_g_e_s_t_T_y_p_e _= _'_n_o_n_e_' in which case
+              _D_a_t_a_O_r_D_i_g_e_s_t is a precalculated SHA1 digest binary.
+
+       rrcc22__ccbbcc__eennccrryypptt((KKeeyy,, IIVVeecc,, TTeexxtt)) -->> CCiipphheerr
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 Ivec = Cipher = binary()
+
+              Encrypts _T_e_x_t according to RC2 in CBC mode.
+
+       rrcc22__ccbbcc__ddeeccrryypptt((KKeeyy,, IIVVeecc,, CCiipphheerr)) -->> TTeexxtt
+
+              Types:
+
+                 Key = Text = iolist() | binary()
+                 Ivec = Cipher = binary()
+
+              Decrypts _C_i_p_h_e_r according to RC2 in CBC mode.
+
+       rrcc44__eennccrryypptt((KKeeyy,, DDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Key, Data = iolist() | binary()
+                 Result = binary()
+
+              Encrypts the data with RC4 symmetric stream encryption. Since it
+              is symmetric, the same function is used for decryption.
+
+       ddhh__ggeenneerraattee__kkeeyy((DDHHPPaarraammss)) -->> {{PPuubblliiccKKeeyy,,PPrriivvaatteeKKeeyy}}
+       ddhh__ggeenneerraattee__kkeeyy((PPrriivvaatteeKKeeyy,, DDHHPPaarraammss)) -->> {{PPuubblliiccKKeeyy,,PPrriivvaatteeKKeeyy}}
+
+              Types:
+
+                 DHParameters = [P, G]
+                 P, G = Mpint
+                    Where _P is the shared prime number and _G is the shared
+                   generator.
+                 PublicKey, PrivateKey = Mpint()
+
+              Generates a Diffie-Hellman _P_u_b_l_i_c_K_e_y and _P_r_i_v_a_t_e_K_e_y (if not
+              given).
+
+       ddhh__ccoommppuuttee__kkeeyy((OOtthheerrssPPuubblliiccKKeeyy,, MMyyPPrriivvaatteeKKeeyy,, DDHHPPaarraammss)) -->> SShhaarreeddSSeeccrreett
+
+              Types:
+
+                 DHParameters = [P, G]
+                 P, G = Mpint
+                    Where _P is the shared prime number and _G is the shared
+                   generator.
+                 OthersPublicKey, MyPrivateKey = Mpint()
+                 SharedSecret = binary()
+
+              Computes the shared secret from the private key and the other
+              party's public key.
+
+       eexxoorr((DDaattaa11,, DDaattaa22)) -->> RReessuulltt
+
+              Types:
+
+                 Data1, Data2 = iolist() | binary()
+                 Result = binary()
+
+              Performs bit-wise XOR (exclusive or) on the data supplied.
+
+DDEESS IINN CCBBCC MMOODDEE
+       The Data Encryption Standard (DES) defines an algorithm for encrypting
+       and decrypting an 8 byte quantity using an 8 byte key (actually only 56
+       bits of the key is used).
+
+       When it comes to encrypting and decrypting blocks that are multiples of
+       8 bytes various modes are defined (NIST SP 800-38A). One of those modes
+       is the Cipher Block Chaining (CBC) mode, where the encryption of an 8
+       byte segment depend not only of the contents of the segment itself, but
+       also on the result of encrypting the previous segment: the encryption
+       of the previous segment becomes the initializing vector of the
+       encryption of the current segment.
+
+       Thus the encryption of every segment depends on the encryption key
+       (which is secret) and the encryption of the previous segment, except
+       the first segment which has to be provided with an initial initializing
+       vector. That vector could be chosen at random, or be a counter of some
+       kind. It does not have to be secret.
+
+       The following example is drawn from the old FIPS 81 standard (replaced
+       by NIST SP 800-38A), where both the plain text and the resulting cipher
+       text is settled. The following code fragment returns `true'.
+
+             Key = <<16#01,16#23,16#45,16#67,16#89,16#ab,16#cd,16#ef>>,
+             IVec = <<16#12,16#34,16#56,16#78,16#90,16#ab,16#cd,16#ef>>,
+             P = "Now is the time for all ",
+             C = crypto:des_cbc_encrypt(Key, IVec, P),
+                % Which is the same as
+             P1 = "Now is t", P2 = "he time ", P3 = "for all ",
+             C1 = crypto:des_cbc_encrypt(Key, IVec, P1),
+             C2 = crypto:des_cbc_encrypt(Key, C1, P2),
+             C3 = crypto:des_cbc_encrypt(Key, C2, P3),
+
+             C = <<C1/binary, C2/binary, C3/binary>>,
+             C = <<16#e5,16#c7,16#cd,16#de,16#87,16#2b,16#f2,16#7c,
+                    16#43,16#e9,16#34,16#00,16#8c,16#38,16#9c,16#0f,
+                    16#68,16#37,16#88,16#49,16#9a,16#7c,16#05,16#f6>>,
+             <<"Now is the time for all ">> ==
+                               crypto:des_cbc_decrypt(Key, IVec, C).
+
+
+       The following is true for the DES CBC mode. For all decompositions _P_1
+       _+_+ _P_2 _= _P of a plain text message _P (where the length of all quantities
+       are multiples of 8 bytes), the encryption _C of _P is equal to _C_1 _+_+ _C_2,
+       where _C_1 is obtained by encrypting _P_1 with _K_e_y and the initializing
+       vector _I_V_e_c, and where _C_2 is obtained by encrypting _P_2 with _K_e_y and the
+       initializing vector _l_a_s_t_8_(_C_1_), where _l_a_s_t_(_B_i_n_a_r_y_) denotes the last 8
+       bytes of the binary _B_i_n_a_r_y.
+
+       Similarly, for all decompositions _C_1 _+_+ _C_2 _= _C of a cipher text message
+       _C (where the length of all quantities are multiples of 8 bytes), the
+       decryption _P of _C is equal to _P_1 _+_+ _P_2, where _P_1 is obtained by
+       decrypting _C_1 with _K_e_y and the initializing vector _I_V_e_c, and where _P_2
+       is obtained by decrypting _C_2 with _K_e_y and the initializing vector
+       _l_a_s_t_8_(_C_1_), where _l_a_s_t_8_(_B_i_n_a_r_y_) is as above.
+
+       For DES3 (which uses three 64 bit keys) the situation is the same.
+
+
+
+Ericsson AB                       crypto 2.2                         crypto(3)

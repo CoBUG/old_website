@@ -1,0 +1,1131 @@
+erl_nif(3)                    C Library Functions                   erl_nif(3)
+
+
+
+NNAAMMEE
+       erl_nif - API functions for an Erlang NIF library
+
+DDEESSCCRRIIPPTTIIOONN
+   NNoottee::
+       The NIF concept is officially supported from R14B. NIF source code
+       written for earlier experimental versions might need adaption to run on
+       R14B.
+
+       No incompatible changes between _R_1_4_B and R14A.
+
+       Incompatible changes between _R_1_4_A and R13B04:
+
+         * Environment argument removed for _e_n_i_f___a_l_l_o_c, _e_n_i_f___r_e_a_l_l_o_c,
+           _e_n_i_f___f_r_e_e, _e_n_i_f___a_l_l_o_c___b_i_n_a_r_y, _e_n_i_f___r_e_a_l_l_o_c___b_i_n_a_r_y,
+           _e_n_i_f___r_e_l_e_a_s_e___b_i_n_a_r_y, _e_n_i_f___a_l_l_o_c___r_e_s_o_u_r_c_e, _e_n_i_f___r_e_l_e_a_s_e___r_e_s_o_u_r_c_e,
+           _e_n_i_f___i_s___i_d_e_n_t_i_c_a_l and _e_n_i_f___c_o_m_p_a_r_e.
+
+         * Character encoding argument added to _e_n_i_f___g_e_t___a_t_o_m and
+           _e_n_i_f___m_a_k_e___e_x_i_s_t_i_n_g___a_t_o_m.
+
+         * Module argument added to _e_n_i_f___o_p_e_n___r_e_s_o_u_r_c_e___t_y_p_e while changing
+           name spaces of resource types from global to module local.
+
+       Incompatible changes between _R_1_3_B_0_4 and R13B03:
+
+         * The function prototypes of the NIFs have changed to expect _a_r_g_c and
+           _a_r_g_v arguments. The arity of a NIF is by that no longer limited to
+           3.
+
+         * _e_n_i_f___g_e_t___d_a_t_a renamed as _e_n_i_f___p_r_i_v___d_a_t_a.
+
+         * _e_n_i_f___m_a_k_e___s_t_r_i_n_g got a third argument for character encoding.
+
+       A NIF library contains native implementation of some functions of an
+       Erlang module. The native implemented functions (NIFs) are called like
+       any other functions without any difference to the caller. Each NIF must
+       also have an implementation in Erlang that will be invoked if the
+       function is called before the NIF library has been successfully loaded.
+       A typical such stub implementation is to throw an exception. But it can
+       also be used as a fallback implementation if the NIF library is not
+       implemented for some architecture.
+
+       A minimal example of a NIF library can look like this:
+
+       /* niftest.c */
+       #include "erl_nif.h"
+
+       static ERL_NIF_TERM hello(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+       {
+           return enif_make_string(env, "Hello world!", ERL_NIF_LATIN1);
+       }
+
+       static ErlNifFunc nif_funcs[] =
+       {
+           {"hello", 0, hello}
+       };
+
+       ERL_NIF_INIT(niftest,nif_funcs,NULL,NULL,NULL,NULL)
+
+
+       and the Erlang module would have to look something like this:
+
+       -module(niftest).
+
+       -export([init/0, hello/0]).
+
+       init() ->
+             erlang:load_nif("./niftest", 0).
+
+       hello() ->
+             "NIF library not loaded".
+
+
+       and compile and test something like this (on Linux):
+
+       $> gcc -fPIC -shared -o niftest.so niftest.c -I $ERL_ROOT/usr/include/
+       $> erl
+
+       1> c(niftest).
+       {ok,niftest}
+       2> niftest:hello().
+       "NIF library not loaded"
+       3> niftest:init().
+       ok
+       4> niftest:hello().
+       "Hello world!"
+
+
+       A better solution for a real module is to take advantage of the new
+       directive oonn__llooaadd to automatically load the NIF library when the module
+       is loaded.
+
+   NNoottee::
+       A NIF does not have to be exported, it can be local to the module. Note
+       however that unused local stub functions will be optimized away by the
+       compiler causing loading of the NIF library to fail.
+
+
+       A loaded NIF library is tied to the Erlang module code version that
+       loaded it. If the module is upgraded with a new version, the new Erlang
+       code will have to load its own NIF library (or maybe choose not to).
+       The new code version can however choose to load the exact same NIF
+       library as the old code if it wants to. Sharing the same dynamic
+       library will mean that static data defined by the library will be
+       shared as well. To avoid unintentionally shared static data, each
+       Erlang module code can keep its own private data. This private data can
+       be set when the NIF library is loaded and then retrieved by calling
+       eenniiff__pprriivv__ddaattaa.
+
+       There is no way to explicitly unload a NIF library. A library will be
+       automatically unloaded when the module code that it belongs to is
+       purged by the code server.
+
+FFUUNNCCTTIIOONNAALLIITTYY
+       All functions that a NIF library needs to do with Erlang are performed
+       through the NIF API functions. There are functions for the following
+       functionality:
+
+         RReeaadd aanndd wwrriittee EErrllaanngg tteerrmmss::
+           Any Erlang terms can be passed to a NIF as function arguments and
+           be returned as function return values. The terms are of C-type
+           EERRLL__NNIIFF__TTEERRMM and can only be read or written using API functions.
+           Most functions to read the content of a term are prefixed _e_n_i_f___g_e_t__
+           and usually return true (or false) if the term was of the expected
+           type (or not). The functions to write terms are all prefixed
+           _e_n_i_f___m_a_k_e__ and usually return the created _E_R_L___N_I_F___T_E_R_M. There are
+           also some functions to query terms, like _e_n_i_f___i_s___a_t_o_m,
+           _e_n_i_f___i_s___i_d_e_n_t_i_c_a_l and _e_n_i_f___c_o_m_p_a_r_e.
+
+           All terms of type _E_R_L___N_I_F___T_E_R_M belong to an environment of type
+           EErrllNNiiffEEnnvv. The lifetime of a term is controlled by the lifetime of
+           its environment object. All API functions that read or write terms
+           has the environment, that the term belongs to, as the first
+           function argument.
+
+         BBiinnaarriieess::
+           Terms of type binary are accessed with the help of the struct type
+           EErrllNNiiffBBiinnaarryy that contains a pointer (_d_a_t_a) to the raw binary data
+           and the length (_s_i_z_e) of the data in bytes. Both _d_a_t_a and _s_i_z_e are
+           read-only and should only be written using calls to API functions.
+           Instances of _E_r_l_N_i_f_B_i_n_a_r_y are however always allocated by the user
+           (usually as local variables).
+
+           The raw data pointed to by _d_a_t_a is only mutable after a call to
+           eenniiff__aalllloocc__bbiinnaarryy or eenniiff__rreeaalllloocc__bbiinnaarryy. All other functions that
+           operates on a binary will leave the data as read-only. A mutable
+           binary must in the end either be freed with eenniiff__rreelleeaassee__bbiinnaarryy or
+           made read-only by transferring it to an Erlang term with
+           eenniiff__mmaakkee__bbiinnaarryy. But it does not have to happen in the same NIF
+           call. Read-only binaries do not have to be released.
+
+           eenniiff__mmaakkee__nneeww__bbiinnaarryy can be used as a shortcut to allocate and
+           return a binary in the same NIF call.
+
+           Binaries are sequences of whole bytes. Bitstrings with an arbitrary
+           bit length have no support yet.
+
+         RReessoouurrccee oobbjjeeccttss::
+           The use of resource objects is a way to return pointers to native
+           data structures from a NIF in a safe way. A resource object is just
+           a block of memory allocated with eenniiff__aalllloocc__rreessoouurrccee. A handle
+           ("safe pointer") to this memory block can then be returned to
+           Erlang by the use of eenniiff__mmaakkee__rreessoouurrccee. The term returned by
+           _e_n_i_f___m_a_k_e___r_e_s_o_u_r_c_e is totally opaque in nature. It can be stored
+           and passed between processes on the same node, but the only real
+           end usage is to pass it back as an argument to a NIF. The NIF can
+           then call eenniiff__ggeett__rreessoouurrccee and get back a pointer to the memory
+           block that is guaranteed to still be valid. A resource object will
+           not be deallocated until the last handle term has been garbage
+           collected by the VM and the resource has been released with
+           eenniiff__rreelleeaassee__rreessoouurrccee (not necessarily in that order).
+
+           All resource objects are created as instances of some _r_e_s_o_u_r_c_e
+           _t_y_p_e. This makes resources from different modules to be
+           distinguishable. A resource type is created by calling
+           eenniiff__ooppeenn__rreessoouurrccee__ttyyppee when a library is loaded. Objects of that
+           resource type can then later be allocated and _e_n_i_f___g_e_t___r_e_s_o_u_r_c_e
+           verifies that the resource is of the expected type. A resource type
+           can have a user supplied destructor function that is automatically
+           called when resources of that type are released (by either the
+           garbage collector or _e_n_i_f___r_e_l_e_a_s_e___r_e_s_o_u_r_c_e). Resource types are
+           uniquely identified by a supplied name string and the name of the
+           implementing module.
+
+           Here is a template example of how to create and return a resource
+           object.
+
+             ERL_NIF_TERM term;
+             MyStruct* obj = enif_alloc_resource(my_resource_type, sizeof(MyStruct));
+
+             /* initialize struct ... */
+
+             term = enif_make_resource(env, obj);
+
+             if (keep_a_reference_of_our_own) {
+                 /* store 'obj' in static variable, private data or other resource object */
+             }
+             else {
+                 enif_release_resource(obj);
+                 /* resource now only owned by "Erlang" */
+             }
+             return term;
+
+
+           Note that once _e_n_i_f___m_a_k_e___r_e_s_o_u_r_c_e creates the term to return to
+           Erlang, the code can choose to either keep its own native pointer
+           to the allocated struct and release it later, or release it
+           immediately and rely solely on the garbage collector to eventually
+           deallocate the resource object when it collects the term.
+
+           Another usage of resource objects is to create binary terms with
+           user defined memory management. eenniiff__mmaakkee__rreessoouurrccee__bbiinnaarryy will
+           create a binary term that is connected to a resource object. The
+           destructor of the resource will be called when the binary is
+           garbage collected, at which time the binary data can be released.
+           An example of this can be a binary term consisting of data from a
+           _m_m_a_p'ed file. The destructor can then do _m_u_n_m_a_p to release the
+           memory region.
+
+           Resource types support upgrade in runtime by allowing a loaded NIF
+           library to takeover an already existing resource type and thereby
+           "inherit" all existing objects of that type. The destructor of the
+           new library will thereafter be called for the inherited objects and
+           the library with the old destructor function can be safely
+           unloaded. Existing resource objects, of a module that is upgraded,
+           must either be deleted or taken over by the new NIF library. The
+           unloading of a library will be postponed as long as there exist
+           resource objects with a destructor function in the library.
+
+         TThhrreeaaddss aanndd ccoonnccuurrrreennccyy::
+           A NIF is thread-safe without any explicit synchronization as long
+           as it acts as a pure function and only reads the supplied
+           arguments. As soon as you write towards a shared state either
+           through static variables or eenniiff__pprriivv__ddaattaa you need to supply your
+           own explicit synchronization. This includes terms in process
+           independent environments that are shared between threads. Resource
+           objects will also require synchronization if you treat them as
+           mutable.
+
+           The library initialization callbacks _l_o_a_d, _r_e_l_o_a_d and _u_p_g_r_a_d_e are
+           all thread-safe even for shared state data.
+
+           Avoid doing lengthy work in NIF calls as that may degrade the
+           responsiveness of the VM. NIFs are called directly by the same
+           scheduler thread that executed the calling Erlang code. The calling
+           scheduler will thus be blocked from doing any other work until the
+           NIF returns.
+
+IINNIITTIIAALLIIZZAATTIIOONN
+         EERRLL__NNIIFF__IINNIITT((MMOODDUULLEE,, EErrllNNiiffFFuunncc ffuunnccss[[]],, llooaadd,, rreellooaadd,, uuppggrraaddee,,
+         uunnllooaadd))::
+           This is the magic macro to initialize a NIF library. It should be
+           evaluated in global file scope.
+
+           _M_O_D_U_L_E is the name of the Erlang module as an identifier without
+           string quotations. It will be stringified by the macro.
+
+           _f_u_n_c_s is a static array of function descriptors for all the
+           implemented NIFs in this library.
+
+           _l_o_a_d, _r_e_l_o_a_d, _u_p_g_r_a_d_e and _u_n_l_o_a_d are pointers to functions. One of
+           _l_o_a_d, _r_e_l_o_a_d or _u_p_g_r_a_d_e will be called to initialize the library.
+           _u_n_l_o_a_d is called to release the library. They are all described
+           individually below.
+
+         iinntt ((**llooaadd))((EErrllNNiiffEEnnvv** eennvv,, vvooiidd**** pprriivv__ddaattaa,, EERRLL__NNIIFF__TTEERRMM
+         llooaadd__iinnffoo))::
+           _l_o_a_d is called when the NIF library is loaded and there is no
+           previously loaded library for this module.
+
+           _*_p_r_i_v___d_a_t_a can be set to point to some private data that the
+           library needs in order to keep a state between NIF calls.
+           _e_n_i_f___p_r_i_v___d_a_t_a will return this pointer. _*_p_r_i_v___d_a_t_a will be
+           initialized to NULL when _l_o_a_d is called.
+
+           _l_o_a_d___i_n_f_o is the second argument to eerrllaanngg::llooaadd__nniiff//22.
+
+           The library will fail to load if _l_o_a_d returns anything other than
+           0. _l_o_a_d can be NULL in case no initialization is needed.
+
+         iinntt ((**uuppggrraaddee))((EErrllNNiiffEEnnvv** eennvv,, vvooiidd**** pprriivv__ddaattaa,, vvooiidd****
+         oolldd__pprriivv__ddaattaa,, EERRLL__NNIIFF__TTEERRMM llooaadd__iinnffoo))::
+           _u_p_g_r_a_d_e is called when the NIF library is loaded and there is old
+           code of this module with a loaded NIF library.
+
+           Works the same as _l_o_a_d. The only difference is that _*_o_l_d___p_r_i_v___d_a_t_a
+           already contains the value set by the last call to _l_o_a_d or _r_e_l_o_a_d
+           for the old module code. _*_p_r_i_v___d_a_t_a will be initialized to NULL
+           when _u_p_g_r_a_d_e is called. It is allowed to write to both *priv_data
+           and *old_priv_data.
+
+           The library will fail to load if _u_p_g_r_a_d_e returns anything other
+           than 0 or if _u_p_g_r_a_d_e is NULL.
+
+         vvooiidd ((**uunnllooaadd))((EErrllNNiiffEEnnvv** eennvv,, vvooiidd** pprriivv__ddaattaa))::
+           _u_n_l_o_a_d is called when the module code that the NIF library belongs
+           to is purged as old. New code of the same module may or may not
+           exist. Note that _u_n_l_o_a_d is not called for a replaced library as a
+           consequence of _r_e_l_o_a_d.
+
+         iinntt ((**rreellooaadd))((EErrllNNiiffEEnnvv** eennvv,, vvooiidd**** pprriivv__ddaattaa,, EERRLL__NNIIFF__TTEERRMM
+         llooaadd__iinnffoo))::
+           _r_e_l_o_a_d is called when the NIF library is loaded and there is
+           already a previously loaded library for this module code.
+
+           Works the same as _l_o_a_d. The only difference is that _*_p_r_i_v___d_a_t_a
+           already contains the value set by the previous call to _l_o_a_d or
+           _r_e_l_o_a_d.
+
+           The library will fail to load if _r_e_l_o_a_d returns anything other than
+           0 or if _r_e_l_o_a_d is NULL.
+
+DDAATTAA TTYYPPEESS
+         EERRLL__NNIIFF__TTEERRMM::
+           Variables of type _E_R_L___N_I_F___T_E_R_M can refer to any Erlang term. This
+           is an opaque type and values of it can only by used either as
+           arguments to API functions or as return values from NIFs. All
+           _E_R_L___N_I_F___T_E_R_M's belong to an environment (EErrllNNiiffEEnnvv). A term can not
+           be destructed individually, it is valid until its environment is
+           destructed.
+
+         EErrllNNiiffEEnnvv::
+           _E_r_l_N_i_f_E_n_v represents an environment that can host Erlang terms. All
+           terms in an environment are valid as long as the environment is
+           valid. _E_r_l_N_i_f_E_n_v is an opaque type and pointers to it can only be
+           passed on to API functions. There are two types of environments;
+           process bound and process independent.
+
+           A _p_r_o_c_e_s_s _b_o_u_n_d _e_n_v_i_r_o_n_m_e_n_t is passed as the first argument to all
+           NIFs. All function arguments passed to a NIF will belong to that
+           environment. The return value from a NIF must also be a term
+           belonging to the same environment. In addition a process bound
+           environment contains transient information about the calling Erlang
+           process. The environment is only valid in the thread where it was
+           supplied as argument until the NIF returns. It is thus useless and
+           dangerous to store pointers to process bound environments between
+           NIF calls.
+
+           A _p_r_o_c_e_s_s _i_n_d_e_p_e_n_d_e_n_t _e_n_v_i_r_o_n_m_e_n_t is created by calling
+           eenniiff__aalllloocc__eennvv. It can be used to store terms between NIF calls and
+           to send terms with eenniiff__sseenndd. A process independent environment
+           with all its terms is valid until you explicitly invalidates it
+           with eenniiff__ffrreeee__eennvv or _e_n_i_f___s_e_n_d.
+
+           All elements of a list/tuple must belong to the same environment as
+           the list/tuple itself. Terms can be copied between environments
+           with eenniiff__mmaakkee__ccooppyy.
+
+         EErrllNNiiffFFuunncc::
+
+
+         typedef struct {
+             const char* _n_a_m_e;
+             unsigned _a_r_i_t_y;
+             ERL_NIF_TERM (*_f_p_t_r)(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
+         } ErlNifFunc;
+
+
+           Describes a NIF by its name, arity and implementation. _f_p_t_r is a
+           pointer to the function that implements the NIF. The argument _a_r_g_v
+           of a NIF will contain the function arguments passed to the NIF and
+           _a_r_g_c is the length of the array, i.e. the function arity. _a_r_g_v_[_N_-_1_]
+           will thus denote the Nth argument to the NIF. Note that the _a_r_g_c
+           argument allows for the same C function to implement several Erlang
+           functions with different arity (but same name probably).
+
+         EErrllNNiiffBBiinnaarryy::
+
+
+         typedef struct {
+             unsigned _s_i_z_e;
+             unsigned char* _d_a_t_a;
+         } ErlNifBinary;
+
+
+           _E_r_l_N_i_f_B_i_n_a_r_y contains transient information about an inspected
+           binary term. _d_a_t_a is a pointer to a buffer of _s_i_z_e bytes with the
+           raw content of the binary.
+
+           Note that _E_r_l_N_i_f_B_i_n_a_r_y is a semi-opaque type and you are only
+           allowed to read fields _s_i_z_e and _d_a_t_a.
+
+         EErrllNNiiffPPiidd::
+           _E_r_l_N_i_f_P_i_d is a process identifier (pid). In contrast to pid terms
+           (instances of _E_R_L___N_I_F___T_E_R_M), _E_r_l_N_i_f_P_i_d's are self contained and not
+           bound to any eennvviirroonnmmeenntt. _E_r_l_N_i_f_P_i_d is an opaque type.
+
+         EErrllNNiiffRReessoouurrcceeTTyyppee::
+           Each instance of _E_r_l_N_i_f_R_e_s_o_u_r_c_e_T_y_p_e represent a class of memory
+           managed resource objects that can be garbage collected. Each
+           resource type has a unique name and a destructor function that is
+           called when objects of its type are released.
+
+         EErrllNNiiffRReessoouurrcceeDDttoorr::
+
+
+         typedef void ErlNifResourceDtor(ErlNifEnv* env, void* obj);
+
+
+           The function prototype of a resource destructor function. A
+           destructor function is not allowed to call any term-making
+           functions.
+
+         EErrllNNiiffCChhaarrEEnnccooddiinngg::
+
+
+         typedef enum {
+             ERL_NIF_LATIN1
+         }ErlNifCharEncoding;
+
+
+           The character encoding used in strings and atoms. The only
+           supported encoding is currently _E_R_L___N_I_F___L_A_T_I_N_1 for iso-latin-1
+           (8-bit ascii).
+
+         EErrllNNiiffSSyyssIInnffoo::
+           Used by eenniiff__ssyysstteemm__iinnffoo to return information about the runtime
+           system. Contains currently the exact same content as EErrllDDrrvvSSyyssIInnffoo.
+
+         EErrllNNiiffSSIInntt6644::
+           A native signed 64-bit integer type.
+
+         EErrllNNiiffUUIInntt6644::
+           A native unsigned 64-bit integer type.
+
+EEXXPPOORRTTSS
+       vvooiidd **eenniiff__aalllloocc((ssiizzee__tt ssiizzee))
+
+              Allocate memory of _s_i_z_e bytes. Return NULL if allocation failed.
+
+       iinntt eenniiff__aalllloocc__bbiinnaarryy((ssiizzee__tt ssiizzee,, EErrllNNiiffBBiinnaarryy** bbiinn))
+
+              Allocate a new binary of size _s_i_z_e bytes. Initialize the
+              structure pointed to by _b_i_n to refer to the allocated binary.
+              The binary must either be released by eenniiff__rreelleeaassee__bbiinnaarryy or
+              ownership transferred to an Erlang term with eenniiff__mmaakkee__bbiinnaarryy.
+              An allocated (and owned) _E_r_l_N_i_f_B_i_n_a_r_y can be kept between NIF
+              calls.
+
+              Return true on success or false if allocation failed.
+
+       EErrllNNiiffEEnnvv **eenniiff__aalllloocc__eennvv(())
+
+              Allocate a new process independent environment. The environment
+              can be used to hold terms that is not bound to any process. Such
+              terms can later be copied to a process environment with
+              eenniiff__mmaakkee__ccooppyy or be sent to a process as a message with
+              eenniiff__sseenndd.
+
+              Return pointer to the new environment.
+
+       vvooiidd **eenniiff__aalllloocc__rreessoouurrccee((EErrllNNiiffRReessoouurrcceeTTyyppee** ttyyppee,, uunnssiiggnneedd ssiizzee))
+
+              Allocate a memory managed resource object of type _t_y_p_e and size
+              _s_i_z_e bytes.
+
+       vvooiidd eenniiff__cclleeaarr__eennvv((EErrllNNiiffEEnnvv** eennvv))
+
+              Free all terms in an environment and clear it for reuse. The
+              environment must have been allocated with eenniiff__aalllloocc__eennvv.
+
+       iinntt eenniiff__ccoommppaarree((EERRLL__NNIIFF__TTEERRMM llhhss,, EERRLL__NNIIFF__TTEERRMM rrhhss))
+
+              Return an integer less than, equal to, or greater than zero if
+              _l_h_s is found, respectively, to be less than, equal, or greater
+              than _r_h_s. Corresponds to the Erlang operators _=_=, _/_=, _=_<, _<, _>_=
+              and _> (but _n_o_t _=_:_= or _=_/_=).
+
+       vvooiidd eenniiff__ccoonndd__bbrrooaaddccaasstt((EErrllNNiiffCCoonndd **ccnndd))
+
+              Same as eerrll__ddrrvv__ccoonndd__bbrrooaaddccaasstt.
+
+       EErrllNNiiffCCoonndd **eenniiff__ccoonndd__ccrreeaattee((cchhaarr **nnaammee))
+
+              Same as eerrll__ddrrvv__ccoonndd__ccrreeaattee.
+
+       vvooiidd eenniiff__ccoonndd__ddeessttrrooyy((EErrllNNiiffCCoonndd **ccnndd))
+
+              Same as eerrll__ddrrvv__ccoonndd__ddeessttrrooyy.
+
+       vvooiidd eenniiff__ccoonndd__ssiiggnnaall((EErrllNNiiffCCoonndd **ccnndd))
+
+              Same as eerrll__ddrrvv__ccoonndd__ssiiggnnaall.
+
+       vvooiidd eenniiff__ccoonndd__wwaaiitt((EErrllNNiiffCCoonndd **ccnndd,, EErrllNNiiffMMuutteexx **mmttxx))
+
+              Same as eerrll__ddrrvv__ccoonndd__wwaaiitt.
+
+       iinntt eenniiff__eeqquuaall__ttiiddss((EErrllNNiiffTTiidd ttiidd11,, EErrllNNiiffTTiidd ttiidd22))
+
+              Same as eerrll__ddrrvv__eeqquuaall__ttiiddss.
+
+       vvooiidd eenniiff__ffrreeee((vvooiidd** ppttrr))
+
+              Free memory allocated by _e_n_i_f___a_l_l_o_c.
+
+       vvooiidd eenniiff__ffrreeee__eennvv((EErrllNNiiffEEnnvv** eennvv))
+
+              Free an environment allocated with eenniiff__aalllloocc__eennvv. All terms
+              created in the environment will be freed as well.
+
+       iinntt eenniiff__ggeett__aattoomm((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, cchhaarr** bbuuff,,
+       uunnssiiggnneedd ssiizzee,, EErrllNNiiffCChhaarrEEnnccooddiinngg eennccooddee))
+
+              Write a null-terminated string, in the buffer pointed to by _b_u_f
+              of size _s_i_z_e, consisting of the string representation of the
+              atom _t_e_r_m with encoding eennccooddee. Return the number of bytes
+              written (including terminating null character) or 0 if _t_e_r_m is
+              not an atom with maximum length of _s_i_z_e_-_1.
+
+       iinntt eenniiff__ggeett__aattoomm__lleennggtthh((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, uunnssiiggnneedd**
+       lleenn,, EErrllNNiiffCChhaarrEEnnccooddiinngg eennccooddee))
+
+              Set _*_l_e_n to the length (number of bytes excluding terminating
+              null character) of the atom _t_e_r_m with encoding _e_n_c_o_d_e. Return
+              true on success or false if _t_e_r_m is not an atom.
+
+       iinntt eenniiff__ggeett__ddoouubbllee((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, ddoouubbllee** ddpp))
+
+              Set _*_d_p to the floating point value of _t_e_r_m. Return true on
+              success or false if _t_e_r_m is not a float.
+
+       iinntt eenniiff__ggeett__iinntt((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, iinntt** iipp))
+
+              Set _*_i_p to the integer value of _t_e_r_m. Return true on success or
+              false if _t_e_r_m is not an integer or is outside the bounds of type
+              _i_n_t.
+
+       iinntt eenniiff__ggeett__iinntt6644((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, EErrllNNiiffSSIInntt6644** iipp))
+
+              Set _*_i_p to the integer value of _t_e_r_m. Return true on success or
+              false if _t_e_r_m is not an integer or is outside the bounds of a
+              signed 64-bit integer.
+
+       iinntt eenniiff__ggeett__llooccaall__ppiidd((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, EErrllNNiiffPPiidd**
+       ppiidd))
+
+              If _t_e_r_m is the pid of a node local process, initialize the pid
+              variable _*_p_i_d from it and return true. Otherwise return false.
+              No check if the process is alive is done.
+
+       iinntt eenniiff__ggeett__lliisstt__cceellll((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM lliisstt,, EERRLL__NNIIFF__TTEERRMM**
+       hheeaadd,, EERRLL__NNIIFF__TTEERRMM** ttaaiill))
+
+              Set _*_h_e_a_d and _*_t_a_i_l from _l_i_s_t and return true, or return false
+              if _l_i_s_t is not a non-empty list.
+
+       iinntt eenniiff__ggeett__lliisstt__lleennggtthh((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, uunnssiiggnneedd**
+       lleenn))
+
+              Set _*_l_e_n to the length of list _t_e_r_m and return true, or return
+              false if _t_e_r_m is not a list.
+
+       iinntt eenniiff__ggeett__lloonngg((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, lloonngg iinntt** iipp))
+
+              Set _*_i_p to the long integer value of _t_e_r_m and return true, or
+              return false if _t_e_r_m is not an integer or is outside the bounds
+              of type _l_o_n_g _i_n_t.
+
+       iinntt eenniiff__ggeett__rreessoouurrccee((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,,
+       EErrllNNiiffRReessoouurrcceeTTyyppee** ttyyppee,, vvooiidd**** oobbjjpp))
+
+              Set _*_o_b_j_p to point to the resource object referred to by _t_e_r_m.
+
+              Return true on success or false if _t_e_r_m is not a handle to a
+              resource object of type _t_y_p_e.
+
+       iinntt eenniiff__ggeett__ssttrriinngg((EErrllNNiiffEEnnvv** eennvv,,
+                                       ERL_NIF_TERM list, char* buf, unsigned
+       size,
+                                       ErlNifCharEncoding encode)
+
+              Write a null-terminated string, in the buffer pointed to by _b_u_f
+              with size _s_i_z_e, consisting of the characters in the string _l_i_s_t.
+              The characters are written using encoding eennccooddee. Return the
+              number of bytes written (including terminating null character),
+              or _-_s_i_z_e if the string was truncated due to buffer space, or 0
+              if _l_i_s_t is not a string that can be encoded with _e_n_c_o_d_e or if
+              _s_i_z_e was less than 1. The written string is always null-
+              terminated unless buffer _s_i_z_e is less than 1.
+
+       iinntt eenniiff__ggeett__ttuuppllee((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, iinntt** aarriittyy,, ccoonnsstt
+       EERRLL__NNIIFF__TTEERRMM**** aarrrraayy))
+
+              If _t_e_r_m is a tuple, set _*_a_r_r_a_y to point to an array containing
+              the elements of the tuple and set _*_a_r_i_t_y to the number of
+              elements. Note that the array is read-only and _(_*_a_r_r_a_y_)_[_N_-_1_]
+              will be the Nth element of the tuple. _*_a_r_r_a_y is undefined if the
+              arity of the tuple is zero.
+
+              Return true on success or false if _t_e_r_m is not a tuple.
+
+       iinntt eenniiff__ggeett__uuiinntt((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, uunnssiiggnneedd iinntt** iipp))
+
+              Set _*_i_p to the unsigned integer value of _t_e_r_m and return true,
+              or return false if _t_e_r_m is not an unsigned integer or is outside
+              the bounds of type _u_n_s_i_g_n_e_d _i_n_t.
+
+       iinntt eenniiff__ggeett__uuiinntt6644((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, EErrllNNiiffUUIInntt6644**
+       iipp))
+
+              Set _*_i_p to the unsigned integer value of _t_e_r_m and return true,
+              or return false if _t_e_r_m is not an unsigned integer or is outside
+              the bounds of an unsigned 64-bit integer.
+
+       iinntt eenniiff__ggeett__uulloonngg((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,, uunnssiiggnneedd lloonngg**
+       iipp))
+
+              Set _*_i_p to the unsigned long integer value of _t_e_r_m and return
+              true, or return false if _t_e_r_m is not an unsigned integer or is
+              outside the bounds of type _u_n_s_i_g_n_e_d _l_o_n_g.
+
+       iinntt eenniiff__iinnssppeecctt__bbiinnaarryy((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM bbiinn__tteerrmm,,
+       EErrllNNiiffBBiinnaarryy** bbiinn))
+
+              Initialize the structure pointed to by _b_i_n with information
+              about the binary term _b_i_n___t_e_r_m. Return true on success or false
+              if _b_i_n___t_e_r_m is not a binary.
+
+       iinntt eenniiff__iinnssppeecctt__iioolliisstt__aass__bbiinnaarryy((EErrllNNiiffEEnnvv**
+                                       env, ERL_NIF_TERM term, ErlNifBinary*
+       bin)
+
+
+              Initialize the structure pointed to by _b_i_n with one continuous
+              buffer with the same byte content as _i_o_l_i_s_t. As with
+              inspect_binary, the data pointed to by _b_i_n is transient and does
+              not need to be released. Return true on success or false if
+              _i_o_l_i_s_t is not an iolist.
+
+       iinntt eenniiff__iiss__aattoomm((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is an atom.
+
+       iinntt eenniiff__iiss__bbiinnaarryy((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a binary
+
+       iinntt eenniiff__iiss__eemmppttyy__lliisstt((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is an empty list.
+
+       iinntt eenniiff__iiss__eexxcceeppttiioonn((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is an exception.
+
+       iinntt eenniiff__iiss__nnuummbbeerr((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a number.
+
+       iinntt eenniiff__iiss__ffuunn((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a fun.
+
+       iinntt eenniiff__iiss__iiddeennttiiccaall((EERRLL__NNIIFF__TTEERRMM llhhss,, EERRLL__NNIIFF__TTEERRMM rrhhss))
+
+              Return true if the two terms are identical. Corresponds to the
+              Erlang operators _=_:_= and _=_/_=.
+
+       iinntt eenniiff__iiss__ppiidd((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a pid.
+
+       iinntt eenniiff__iiss__ppoorrtt((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a port.
+
+       iinntt eenniiff__iiss__rreeff((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a reference.
+
+       iinntt eenniiff__iiss__ttuuppllee((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a tuple.
+
+       iinntt eenniiff__iiss__lliisstt((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm))
+
+              Return true if _t_e_r_m is a list.
+
+       iinntt eenniiff__kkeeeepp__rreessoouurrccee((vvooiidd** oobbjj))
+
+              Add a reference to resource object _o_b_j obtained from
+              eenniiff__aalllloocc__rreessoouurrccee. Each call to _e_n_i_f___k_e_e_p___r_e_s_o_u_r_c_e for an
+              object must be balanced by a call to eenniiff__rreelleeaassee__rreessoouurrccee
+              before the object will be destructed.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__aattoomm((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt cchhaarr** nnaammee))
+
+              Create an atom term from the null-terminated C-string _n_a_m_e with
+              iso-latin-1 encoding.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__aattoomm__lleenn((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt cchhaarr** nnaammee,,
+       ssiizzee__tt lleenn))
+
+              Create an atom term from the string _n_a_m_e with length _l_e_n. Null-
+              characters are treated as any other characters.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__bbaaddaarrgg((EErrllNNiiffEEnnvv** eennvv))
+
+              Make a badarg exception to be returned from a NIF, and set an
+              associated exception reason in _e_n_v. If _e_n_i_f___m_a_k_e___b_a_d_a_r_g is
+              called, the term it returns _m_u_s_t be returned from the function
+              that called it. No other return value is allowed. Also, the term
+              returned from _e_n_i_f___m_a_k_e___b_a_d_a_r_g may be passed only to
+              eenniiff__iiss__eexxcceeppttiioonn and not to any other NIF API function.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__bbiinnaarryy((EErrllNNiiffEEnnvv** eennvv,, EErrllNNiiffBBiinnaarryy** bbiinn))
+
+              Make a binary term from _b_i_n. Any ownership of the binary data
+              will be transferred to the created term and _b_i_n should be
+              considered read-only for the rest of the NIF call and then as
+              released.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ccooppyy((EErrllNNiiffEEnnvv** ddsstt__eennvv,, EERRLL__NNIIFF__TTEERRMM ssrrcc__tteerrmm))
+
+              Make a copy of term _s_r_c___t_e_r_m. The copy will be created in
+              environment _d_s_t___e_n_v. The source term may be located in any
+              environment.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ddoouubbllee((EErrllNNiiffEEnnvv** eennvv,, ddoouubbllee dd))
+
+              Create a floating-point term from a _d_o_u_b_l_e.
+
+       iinntt eenniiff__mmaakkee__eexxiissttiinngg__aattoomm((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt cchhaarr** nnaammee,,
+       EERRLL__NNIIFF__TTEERRMM** aattoomm,, EErrllNNiiffCChhaarrEEnnccooddiinngg eennccooddee))
+
+              Try to create the term of an already existing atom from the
+              null-terminated C-string _n_a_m_e with encoding eennccooddee. If the atom
+              already exists store the term in _*_a_t_o_m and return true,
+              otherwise return false.
+
+       iinntt eenniiff__mmaakkee__eexxiissttiinngg__aattoomm__lleenn((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt cchhaarr** nnaammee,,
+       ssiizzee__tt lleenn,, EERRLL__NNIIFF__TTEERRMM** aattoomm,, EErrllNNiiffCChhaarrEEnnccooddiinngg eennccooddiinngg))
+
+              Try to create the term of an already existing atom from the
+              string _n_a_m_e with length _l_e_n and encoding eennccooddee. Null-characters
+              are treated as any other characters. If the atom already exists
+              store the term in _*_a_t_o_m and return true, otherwise return false.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__iinntt((EErrllNNiiffEEnnvv** eennvv,, iinntt ii))
+
+              Create an integer term.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__iinntt6644((EErrllNNiiffEEnnvv** eennvv,, EErrllNNiiffSSIInntt6644 ii))
+
+              Create an integer term from a signed 64-bit integer.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt((EErrllNNiiffEEnnvv** eennvv,, uunnssiiggnneedd ccnntt,, ......))
+
+              Create an ordinary list term of length _c_n_t. Expects _c_n_t number
+              of arguments (after _c_n_t) of type ERL_NIF_TERM as the elements of
+              the list. An empty list is returned if _c_n_t is 0.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt11((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt22((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,,
+       EERRLL__NNIIFF__TTEERRMM ee22))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt33((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,,
+       EERRLL__NNIIFF__TTEERRMM ee22,, EERRLL__NNIIFF__TTEERRMM ee33))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt44((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee44))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt55((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee55))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt66((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee66))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt77((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee77))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt88((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee88))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt99((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee99))
+
+              Create an ordinary list term with length indicated by the
+              function name. Prefer these functions (macros) over the variadic
+              _e_n_i_f___m_a_k_e___l_i_s_t to get a compile time error if the number of
+              arguments does not match.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt__cceellll((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM hheeaadd,,
+       EERRLL__NNIIFF__TTEERRMM ttaaiill))
+
+              Create a list cell _[_h_e_a_d _| _t_a_i_l_].
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lliisstt__ffrroomm__aarrrraayy((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt
+       EERRLL__NNIIFF__TTEERRMM aarrrr[[]],, uunnssiiggnneedd ccnntt))
+
+              Create an ordinary list containing the elements of array _a_r_r of
+              length _c_n_t. An empty list is returned if _c_n_t is 0.
+
+       iinntt eenniiff__mmaakkee__rreevveerrssee__lliisstt((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM tteerrmm,,
+       EERRLL__NNIIFF__TTEERRMM **lliisstt))
+
+              Set _*_l_i_s_t to the reverse list of the list _t_e_r_m and return true,
+              or return false if _t_e_r_m is not a list. This function should only
+              be used on short lists as a copy will be created of the list
+              which will not be released until after the nif returns.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__lloonngg((EErrllNNiiffEEnnvv** eennvv,, lloonngg iinntt ii))
+
+              Create an integer term from a _l_o_n_g _i_n_t.
+
+       uunnssiiggnneedd cchhaarr **eenniiff__mmaakkee__nneeww__bbiinnaarryy((EErrllNNiiffEEnnvv** eennvv,, ssiizzee__tt ssiizzee,,
+       EERRLL__NNIIFF__TTEERRMM** tteerrmmpp))
+
+              Allocate a binary of size _s_i_z_e bytes and create an owning term.
+              The binary data is mutable until the calling NIF returns. This
+              is a quick way to create a new binary without having to use
+              EErrllNNiiffBBiinnaarryy. The drawbacks are that the binary can not be kept
+              between NIF calls and it can not be reallocated.
+
+              Return a pointer to the raw binary data and set _*_t_e_r_m_p to the
+              binary term.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ppiidd((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt EErrllNNiiffPPiidd** ppiidd))
+
+              Make a pid term from _*_p_i_d.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__rreeff((EErrllNNiiffEEnnvv** eennvv))
+
+              Create a reference like eerrllaanngg::mmaakkee__rreeff//00.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__rreessoouurrccee((EErrllNNiiffEEnnvv** eennvv,, vvooiidd** oobbjj))
+
+              Create an opaque handle to a memory managed resource object
+              obtained by eenniiff__aalllloocc__rreessoouurrccee. No ownership transfer is done,
+              as the resource object still needs to be released by
+              eenniiff__rreelleeaassee__rreessoouurrccee, but note that the call to
+              _e_n_i_f___r_e_l_e_a_s_e___r_e_s_o_u_r_c_e can occur immediately after obtaining the
+              term from _e_n_i_f___m_a_k_e___r_e_s_o_u_r_c_e, in which case the resource object
+              will be deallocated when the term is garbage collected. See the
+              eexxaammppllee ooff ccrreeaattiinngg aanndd rreettuurrnniinngg aa rreessoouurrccee oobbjjeecctt for more
+              details.
+
+              Note that the only defined behaviour of using a resource term in
+              an Erlang program is to store it and send it between processes
+              on the same node. Other operations such as matching or
+              _t_e_r_m___t_o___b_i_n_a_r_y will have unpredictable (but harmless) results.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__rreessoouurrccee__bbiinnaarryy((EErrllNNiiffEEnnvv** eennvv,, vvooiidd** oobbjj,, ccoonnsstt
+       vvooiidd** ddaattaa,, ssiizzee__tt ssiizzee))
+
+              Create a binary term that is memory managed by a resource object
+              _o_b_j obtained by eenniiff__aalllloocc__rreessoouurrccee. The returned binary term
+              will consist of _s_i_z_e bytes pointed to by _d_a_t_a. This raw binary
+              data must be kept readable and unchanged until the destructor of
+              the resource is called. The binary data may be stored external
+              to the resource object in which case it is the responsibility of
+              the destructor to release the data.
+
+              Several binary terms may be managed by the same resource object.
+              The destructor will not be called until the last binary is
+              garbage collected. This can be useful as a way to return
+              different parts of a larger binary buffer.
+
+              As with eenniiff__mmaakkee__rreessoouurrccee, no ownership transfer is done. The
+              resource still needs to be released with eenniiff__rreelleeaassee__rreessoouurrccee.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ssttrriinngg((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt cchhaarr** ssttrriinngg,,
+       EErrllNNiiffCChhaarrEEnnccooddiinngg eennccooddiinngg))
+
+              Create a list containing the characters of the null-terminated
+              string _s_t_r_i_n_g with encoding eennccooddiinngg.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ssttrriinngg__lleenn((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt cchhaarr** ssttrriinngg,,
+       ssiizzee__tt lleenn,, EErrllNNiiffCChhaarrEEnnccooddiinngg eennccooddiinngg))
+
+              Create a list containing the characters of the string _s_t_r_i_n_g
+              with length _l_e_n and encoding eennccooddiinngg. Null-characters are
+              treated as any other characters.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ssuubb__bbiinnaarryy((EErrllNNiiffEEnnvv**
+             env, ERL_NIF_TERM bin_term, size_t pos, size_t size)
+
+              Make a subbinary of binary _b_i_n___t_e_r_m, starting at zero-based
+              position _p_o_s with a length of _s_i_z_e bytes. _b_i_n___t_e_r_m must be a
+              binary or bitstring and _p_o_s_+_s_i_z_e must be less or equal to the
+              number of whole bytes in _b_i_n___t_e_r_m.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee((EErrllNNiiffEEnnvv** eennvv,, uunnssiiggnneedd ccnntt,, ......))
+
+              Create a tuple term of arity _c_n_t. Expects _c_n_t number of
+              arguments (after _c_n_t) of type ERL_NIF_TERM as the elements of
+              the tuple.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee11((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee22((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,,
+       EERRLL__NNIIFF__TTEERRMM ee22))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee33((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,,
+       EERRLL__NNIIFF__TTEERRMM ee22,, EERRLL__NNIIFF__TTEERRMM ee33))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee44((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee44))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee55((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee55))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee66((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee66))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee77((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee77))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee88((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee88))
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee99((EErrllNNiiffEEnnvv** eennvv,, EERRLL__NNIIFF__TTEERRMM ee11,, ......,,
+       EERRLL__NNIIFF__TTEERRMM ee99))
+
+              Create a tuple term with length indicated by the function name.
+              Prefer these functions (macros) over the variadic
+              _e_n_i_f___m_a_k_e___t_u_p_l_e to get a compile time error if the number of
+              arguments does not match.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__ttuuppllee__ffrroomm__aarrrraayy((EErrllNNiiffEEnnvv** eennvv,, ccoonnsstt
+       EERRLL__NNIIFF__TTEERRMM aarrrr[[]],, uunnssiiggnneedd ccnntt))
+
+              Create a tuple containing the elements of array _a_r_r of length
+              _c_n_t.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__uuiinntt((EErrllNNiiffEEnnvv** eennvv,, uunnssiiggnneedd iinntt ii))
+
+              Create an integer term from an _u_n_s_i_g_n_e_d _i_n_t.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__uuiinntt6644((EErrllNNiiffEEnnvv** eennvv,, EErrllNNiiffUUIInntt6644 ii))
+
+              Create an integer term from an unsigned 64-bit integer.
+
+       EERRLL__NNIIFF__TTEERRMM eenniiff__mmaakkee__uulloonngg((EErrllNNiiffEEnnvv** eennvv,, uunnssiiggnneedd lloonngg ii))
+
+              Create an integer term from an _u_n_s_i_g_n_e_d _l_o_n_g _i_n_t.
+
+       EErrllNNiiffMMuutteexx **eenniiff__mmuutteexx__ccrreeaattee((cchhaarr **nnaammee))
+
+              Same as eerrll__ddrrvv__mmuutteexx__ccrreeaattee.
+
+       vvooiidd eenniiff__mmuutteexx__ddeessttrrooyy((EErrllNNiiffMMuutteexx **mmttxx))
+
+              Same as eerrll__ddrrvv__mmuutteexx__ddeessttrrooyy.
+
+       vvooiidd eenniiff__mmuutteexx__lloocckk((EErrllNNiiffMMuutteexx **mmttxx))
+
+              Same as eerrll__ddrrvv__mmuutteexx__lloocckk.
+
+       iinntt eenniiff__mmuutteexx__ttrryylloocckk((EErrllNNiiffMMuutteexx **mmttxx))
+
+              Same as eerrll__ddrrvv__mmuutteexx__ttrryylloocckk.
+
+       vvooiidd eenniiff__mmuutteexx__uunnlloocckk((EErrllNNiiffMMuutteexx **mmttxx))
+
+              Same as eerrll__ddrrvv__mmuutteexx__uunnlloocckk.
+
+       EErrllNNiiffRReessoouurrcceeTTyyppee **eenniiff__ooppeenn__rreessoouurrccee__ttyyppee((EErrllNNiiffEEnnvv** eennvv,,
+                                    const char* module_str, const char* name,
+                                    ErlNifResourceDtor* dtor,
+       ErlNifResourceFlags flags, ErlNifResourceFlags* tried)
+
+              Create or takeover a resource type identified by the string _n_a_m_e
+              and give it the destructor function pointed to by ddttoorr. Argument
+              _f_l_a_g_s can have the following values:
+
+                _E_R_L___N_I_F___R_T___C_R_E_A_T_E:
+                  Create a new resource type that does not already exist.
+
+                _E_R_L___N_I_F___R_T___T_A_K_E_O_V_E_R:
+                  Open an existing resource type and take over ownership of
+                  all its instances. The supplied destructor _d_t_o_r will be
+                  called both for existing instances as well as new instances
+                  not yet created by the calling NIF library.
+
+              The two flag values can be combined with bitwise-or. The name of
+              the resource type is local to the calling module. Argument
+              _m_o_d_u_l_e___s_t_r is not (yet) used and must be NULL. The _d_t_o_r may be
+              _N_U_L_L in case no destructor is needed.
+
+              On success, return a pointer to the resource type and _*_t_r_i_e_d
+              will be set to either _E_R_L___N_I_F___R_T___C_R_E_A_T_E or _E_R_L___N_I_F___R_T___T_A_K_E_O_V_E_R
+              to indicate what was actually done. On failure, return _N_U_L_L and
+              set _*_t_r_i_e_d to _f_l_a_g_s. It is allowed to set _t_r_i_e_d to _N_U_L_L.
+
+              Note that _e_n_i_f___o_p_e_n___r_e_s_o_u_r_c_e___t_y_p_e is only allowed to be called
+              in the three callbacks llooaadd, rreellooaadd and uuppggrraaddee.
+
+       vvooiidd **eenniiff__pprriivv__ddaattaa((EErrllNNiiffEEnnvv** eennvv))
+
+              Return the pointer to the private data that was set by _l_o_a_d,
+              _r_e_l_o_a_d or _u_p_g_r_a_d_e.
+
+              Was previously named _e_n_i_f___g_e_t___d_a_t_a.
+
+       iinntt eenniiff__rreeaalllloocc__bbiinnaarryy((EErrllNNiiffBBiinnaarryy** bbiinn,, ssiizzee__tt ssiizzee))
+
+              Change the size of a binary _b_i_n. The source binary may be read-
+              only, in which case it will be left untouched and a mutable copy
+              is allocated and assigned to _*_b_i_n. Return true on success, false
+              if memory allocation failed.
+
+       vvooiidd eenniiff__rreelleeaassee__bbiinnaarryy((EErrllNNiiffBBiinnaarryy** bbiinn))
+
+              Release a binary obtained from _e_n_i_f___a_l_l_o_c___b_i_n_a_r_y.
+
+       vvooiidd eenniiff__rreelleeaassee__rreessoouurrccee((vvooiidd** oobbjj))
+
+              Remove a reference to resource object _o_b_jobtained from
+              eenniiff__aalllloocc__rreessoouurrccee. The resource object will be destructed when
+              the last reference is removed. Each call to
+              _e_n_i_f___r_e_l_e_a_s_e___r_e_s_o_u_r_c_e must correspond to a previous call to
+              _e_n_i_f___a_l_l_o_c___r_e_s_o_u_r_c_e or eenniiff__kkeeeepp__rreessoouurrccee. References made by
+              eenniiff__mmaakkee__rreessoouurrccee can only be removed by the garbage collector.
+
+       EErrllNNiiffRRWWLLoocckk **eenniiff__rrwwlloocckk__ccrreeaattee((cchhaarr **nnaammee))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__ccrreeaattee.
+
+       vvooiidd eenniiff__rrwwlloocckk__ddeessttrrooyy((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__ddeessttrrooyy.
+
+       vvooiidd eenniiff__rrwwlloocckk__rrlloocckk((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__rrlloocckk.
+
+       vvooiidd eenniiff__rrwwlloocckk__rruunnlloocckk((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__rruunnlloocckk.
+
+       vvooiidd eenniiff__rrwwlloocckk__rrwwlloocckk((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__rrwwlloocckk.
+
+       vvooiidd eenniiff__rrwwlloocckk__rrwwuunnlloocckk((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__rrwwuunnlloocckk.
+
+       iinntt eenniiff__rrwwlloocckk__ttrryyrrlloocckk((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__ttrryyrrlloocckk.
+
+       iinntt eenniiff__rrwwlloocckk__ttrryyrrwwlloocckk((EErrllNNiiffRRWWLLoocckk **rrwwllcckk))
+
+              Same as eerrll__ddrrvv__rrwwlloocckk__ttrryyrrwwlloocckk.
+
+       EErrllNNiiffPPiidd **eenniiff__sseellff((EErrllNNiiffEEnnvv** ccaalllleerr__eennvv,, EErrllNNiiffPPiidd** ppiidd))
+
+              Initialize the pid variable _*_p_i_d to represent the calling
+              process. Return _p_i_d.
+
+       iinntt eenniiff__sseenndd((EErrllNNiiffEEnnvv** eennvv,, EErrllNNiiffPPiidd** ttoo__ppiidd,, EErrllNNiiffEEnnvv** mmssgg__eennvv,,
+       EERRLL__NNIIFF__TTEERRMM mmssgg))
+
+              Send a message to a process.
+
+                _e_n_v:
+                  The environment of the calling process. Must be NULL if and
+                  only if calling from a created thread.
+
+                _*_t_o___p_i_d:
+                  The pid of the receiving process. The pid should refer to a
+                  process on the local node.
+
+                _m_s_g___e_n_v:
+                  The environment of the message term. Must be a process
+                  independent environment allocated with eenniiff__aalllloocc__eennvv.
+
+                _m_s_g:
+                  The message term to send.
+
+              Return true on success, or false if _*_t_o___p_i_d does not refer to an
+              alive local process.
+
+              The message environment _m_s_g___e_n_v with all its terms (including
+              _m_s_g) will be invalidated by a successful call to _e_n_i_f___s_e_n_d. The
+              environment should either be freed with eenniiff__ffrreeee__eennvv of cleared
+              for reuse with eenniiff__cclleeaarr__eennvv.
+
+              This function is only thread-safe when the emulator with SMP
+              support is used. It can only be used in a non-SMP emulator from
+              a NIF-calling thread.
+
+       uunnssiiggnneedd eenniiff__ssiizzeeooff__rreessoouurrccee((vvooiidd** oobbjj))
+
+              Get the byte size of a resource object _o_b_j obtained by
+              eenniiff__aalllloocc__rreessoouurrccee.
+
+       vvooiidd eenniiff__ssyysstteemm__iinnffoo((EErrllNNiiffSSyyssIInnffoo **ssyyss__iinnffoo__ppttrr,, ssiizzee__tt ssiizzee))
+
+              Same as ddrriivveerr__ssyysstteemm__iinnffoo.
+
+       iinntt eenniiff__tthhrreeaadd__ccrreeaattee((cchhaarr **nnaammee,,EErrllNNiiffTTiidd **ttiidd,,vvooiidd ** ((**ffuunncc))((vvooiidd
+       **)),,vvooiidd **aarrggss,,EErrllNNiiffTThhrreeaaddOOppttss **ooppttss))
+
+              Same as eerrll__ddrrvv__tthhrreeaadd__ccrreeaattee.
+
+       vvooiidd eenniiff__tthhrreeaadd__eexxiitt((vvooiidd **rreesspp))
+
+              Same as eerrll__ddrrvv__tthhrreeaadd__eexxiitt.
+
+       iinntt eenniiff__tthhrreeaadd__jjooiinn((EErrllNNiiffTTiidd,, vvooiidd ****rreesspppp))
+
+              Same as eerrll__ddrrvv__tthhrreeaadd__jjooiinn .
+
+       EErrllNNiiffTThhrreeaaddOOppttss **eenniiff__tthhrreeaadd__ooppttss__ccrreeaattee((cchhaarr **nnaammee))
+
+              Same as eerrll__ddrrvv__tthhrreeaadd__ooppttss__ccrreeaattee.
+
+       vvooiidd eenniiff__tthhrreeaadd__ooppttss__ddeessttrrooyy((EErrllNNiiffTThhrreeaaddOOppttss **ooppttss))
+
+              Same as eerrll__ddrrvv__tthhrreeaadd__ooppttss__ddeessttrrooyy.
+
+       EErrllNNiiffTTiidd eenniiff__tthhrreeaadd__sseellff((vvooiidd))
+
+              Same as eerrll__ddrrvv__tthhrreeaadd__sseellff.
+
+       iinntt eenniiff__ttssdd__kkeeyy__ccrreeaattee((cchhaarr **nnaammee,, EErrllNNiiffTTSSDDKKeeyy **kkeeyy))
+
+              Same as eerrll__ddrrvv__ttssdd__kkeeyy__ccrreeaattee.
+
+       vvooiidd eenniiff__ttssdd__kkeeyy__ddeessttrrooyy((EErrllNNiiffTTSSDDKKeeyy kkeeyy))
+
+              Same as eerrll__ddrrvv__ttssdd__kkeeyy__ddeessttrrooyy.
+
+       vvooiidd **eenniiff__ttssdd__ggeett((EErrllNNiiffTTSSDDKKeeyy kkeeyy))
+
+              Same as eerrll__ddrrvv__ttssdd__ggeett.
+
+       vvooiidd eenniiff__ttssdd__sseett((EErrllNNiiffTTSSDDKKeeyy kkeeyy,, vvooiidd **ddaattaa))
+
+              Same as eerrll__ddrrvv__ttssdd__sseett.
+
+SSEEEE AALLSSOO
+       eerrllaanngg::llooaadd__nniiff//22
+
+
+
+Ericsson AB                       erts 5.9.2                        erl_nif(3)

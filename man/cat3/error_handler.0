@@ -1,0 +1,68 @@
+error_handler(3)           Erlang Module Definition           error_handler(3)
+
+
+
+NNAAMMEE
+       error_handler - Default System Error Handler
+
+DDEESSCCRRIIPPTTIIOONN
+       The error handler module defines what happens when certain types of
+       errors occur.
+
+EEXXPPOORRTTSS
+       uunnddeeffiinneedd__ffuunnccttiioonn((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> aannyy(())
+
+              Types:
+
+                 Module = Function = atom()
+                 Args = list()
+                    A (possibly empty) list of arguments _A_r_g_1_,_._._,_A_r_g_N
+
+              This function is evaluated if a call is made to
+              _M_o_d_u_l_e_:_F_u_n_c_t_i_o_n_(_A_r_g_1_,_._._, _A_r_g_N_) and _M_o_d_u_l_e_:_F_u_n_c_t_i_o_n_/_N is
+              undefined. Note that _u_n_d_e_f_i_n_e_d___f_u_n_c_t_i_o_n_/_3 is evaluated inside
+              the process making the original call.
+
+              If _M_o_d_u_l_e is interpreted, the interpreter is invoked and the
+              return value of the interpreted _F_u_n_c_t_i_o_n_(_A_r_g_1_,_._._, _A_r_g_N_) call is
+              returned.
+
+              Otherwise, it returns, if possible, the value of _a_p_p_l_y_(_M_o_d_u_l_e_,
+              _F_u_n_c_t_i_o_n_, _A_r_g_s_) after an attempt has been made to autoload
+              _M_o_d_u_l_e. If this is not possible, the call to
+              _M_o_d_u_l_e_:_F_u_n_c_t_i_o_n_(_A_r_g_1_,_._._, _A_r_g_N_) fails with exit reason _u_n_d_e_f.
+
+       uunnddeeffiinneedd__llaammbbddaa((MMoodduullee,, FFuunn,, AArrggss)) -->> tteerrmm(())
+
+              Types:
+
+                 Module = atom()
+                 Fun = function()
+                 Args = list()
+                    A (possibly empty) list of arguments _A_r_g_1_,_._._,_A_r_g_N
+
+              This function is evaluated if a call is made to _F_u_n_(_A_r_g_1_,_._._,
+              _A_r_g_N_) when the module defining the fun is not loaded. The
+              function is evaluated inside the process making the original
+              call.
+
+              If _M_o_d_u_l_e is interpreted, the interpreter is invoked and the
+              return value of the interpreted _F_u_n_(_A_r_g_1_,_._._, _A_r_g_N_) call is
+              returned.
+
+              Otherwise, it returns, if possible, the value of _a_p_p_l_y_(_F_u_n_,
+              _A_r_g_s_) after an attempt has been made to autoload _M_o_d_u_l_e. If this
+              is not possible, the call fails with exit reason _u_n_d_e_f.
+
+NNOOTTEESS
+       The code in _e_r_r_o_r___h_a_n_d_l_e_r is complex and should not be changed without
+       fully understanding the interaction between the error handler, the _i_n_i_t
+       process of the code server, and the I/O mechanism of the code.
+
+       Changes in the code which may seem small can cause a deadlock as
+       unforeseen consequences may occur. The use of _i_n_p_u_t is dangerous in
+       this type of code.
+
+
+
+Ericsson AB                      kernel 2.15.2                error_handler(3)

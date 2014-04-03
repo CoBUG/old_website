@@ -1,0 +1,294 @@
+eldap(3)                   Erlang Module Definition                   eldap(3)
+
+
+
+NNAAMMEE
+       eldap - Eldap Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides a client api to the Lightweight Directory Access
+       Protocol (LDAP).
+
+       References:
+
+         * RFC 4510 - RFC 4519
+
+       The above publications can be found at IETF.
+
+       _T_y_p_e_s
+
+       handle()    Connection handle
+       attribute() {Type = string(), Values=[string()]}
+       modify_op() See mod_add/2, mod_delete/2, mod_replace/2
+       scope()     See baseObject/0, singleLevel/0, wholeSubtree/0
+       dereference() See neverDerefAliases/0, derefInSearching/0, derefFindingBaseObj/0, derefAlways/0
+       filter()    See present/1, substrings/2,
+                       equalityMatch/2, greaterOrEqual/2, lessOrEqual/2,
+                       approxMatch/2,
+                       'and'/1, 'or'/1, 'not'/1.
+
+
+EEXXPPOORRTTSS
+       ooppeenn(([[HHoosstt]])) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Handle = handle()
+
+              Setup a connection to an LDAP server, the _H_O_S_T's are tried in
+              order.
+
+       ooppeenn(([[HHoosstt]],, [[OOppttiioonn]])) -->> {{ookk,, HHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Handle = handle()
+                 Option = {port, integer()} | {log, function()} | {timeout,
+                 integer()} | {ssl, boolean()}
+
+              Setup a connection to an LDAP server, the _H_O_S_T's are tried in
+              order.
+
+              The log function takes three arguments, _f_u_n_(_L_e_v_e_l_, _F_o_r_m_a_t_S_t_r_i_n_g_,
+              _[_F_o_r_m_a_t_A_r_g_]_) _e_n_d.
+
+              Timeout set the maximum time in milliseconds that each server
+              request may take.
+
+       cclloossee((HHaannddllee)) -->> ookk
+
+              Types:
+
+                 Handle = handle()
+
+              Shutdown the connection.
+
+       ssiimmppllee__bbiinndd((HHaannddllee,, DDnn,, PPaasssswwoorrdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Handle = handle()
+                 Dn = string()
+                 Password = string()
+
+              Authenticate the connection using simple authentication.
+
+       aadddd((HHaannddllee,, DDnn,, [[AAttttrriibbuuttee]])) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Handle = handle()
+                 Dn = string()
+                 Attribute = attribute()
+
+              Add an entry. The entry must not exist.
+
+                add(Handle,
+                    "cn=Bill Valentine, ou=people, o=Example Org, dc=example, dc=com",
+                     [{"objectclass", ["person"]},
+                      {"cn", ["Bill Valentine"]},
+                      {"sn", ["Valentine"]},
+                      {"telephoneNumber", ["545 555 00"]}]
+                   )
+
+
+       ddeelleettee((HHaannddllee,, DDnn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dn = string()
+
+              Delete an entry.
+
+                delete(Handle, "cn=Bill Valentine, ou=people, o=Example Org, dc=example, dc=com")
+
+
+       mmoodd__aadddd((TTyyppee,, [[VVaalluuee]])) -->> mmooddiiffyy__oopp(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create an add modification operation.
+
+       mmoodd__ddeelleettee((TTyyppee,, [[VVaalluuee]])) -->> mmooddiiffyy__oopp(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create a delete modification operation.
+
+       mmoodd__rreeppllaaccee((TTyyppee,, [[VVaalluuee]])) -->> mmooddiiffyy__oopp(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create a replace modification operation.
+
+       mmooddiiffyy((HHaannddllee,, DDnn,, [[MMooddiiffyyOOpp]])) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Dn = string()
+                 ModifyOp = modify_op()
+
+              Modify an entry.
+
+                modify(Handle, "cn=Bill Valentine, ou=people, o=Example Org, dc=example, dc=com",
+                       [eldap:mod_replace("telephoneNumber", ["555 555 00"]),
+                     eldap:mod_add("description", ["LDAP Hacker"]) ])
+
+
+       mmooddiiffyy__ddnn((HHaannddllee,, DDnn,, NNeewwRRDDNN,, DDeelleetteeOOllddRRDDNN,, NNeewwSSuuppDDNN)) -->> ookk || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Dn = string()
+                 NewRDN = string()
+                 DeleteOldRDN = boolean()
+                 NewSupDN = string()
+
+              Modify the DN of an entry. _D_e_l_e_t_e_O_l_d_R_D_N indicates whether the
+              current RDN should be removed after operation. _N_e_w_S_u_p_D_N should
+              be "" if the RDN should not be moved or the new parent which the
+              RDN will be moved to.
+
+                modify_dn(Handle, "cn=Bill Valentine, ou=people, o=Example Org, dc=example, dc=com ",
+                          "cn=Bill Jr Valentine", true, "")
+
+
+       sseeaarrcchh((HHaannddllee,, SSeeaarrcchhOOppttiioonnss)) -->> {{ookk,, ##eellddaapp__sseeaarrcchh__rreessuulltt{{}}}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 SearchOptions = #eldap_search{} | [SearchOption]
+                 SearchOption = {base, string()} | {filter, filter()} |
+                 {scope, scope()} | {attributes, [string()]} | {deref,
+                 dereference()} | | {types_only, boolean()} | {timeout,
+                 integer()}
+
+              Search the directory with the supplied the SearchOptions. The
+              base and filter options must be supplied. Default values: scope
+              is _w_h_o_l_e_S_u_b_t_r_e_e_(_), deref is _d_e_r_e_f_A_l_w_a_y_s_(_), types_only is _f_a_l_s_e
+              and timeout is _0 (meaning infinity).
+
+                Filter = eldap:substrings("cn", [{any,"V"}]),
+                search(Handle, [{base, "dc=example, dc=com"}, {filter, Filter}, {attributes, ["cn"]}]),
+
+
+       bbaasseeOObbjjeecctt(()) -->> ssccooppee(())
+
+              Search baseobject only.
+
+       ssiinngglleeLLeevveell(()) -->> ssccooppee(())
+
+              Search the specified level only, i.e. do not recurse.
+
+       wwhhoolleeSSuubbttrreeee(()) -->> ssccooppee(())
+
+              Search the entire subtree.
+
+       nneevveerrDDeerreeffAAlliiaasseess(()) -->> ddeerreeffeerreennccee(())
+
+              Never derefrence aliases, treat aliases as entries.
+
+       ddeerreeffAAllwwaayyss(()) -->> ddeerreeffeerreennccee(())
+
+              Always derefrence aliases.
+
+       ddeerreeffIInnSSeeaarrcchhiinngg(()) -->> ddeerreeffeerreennccee(())
+
+              Derefrence aliases only when searching.
+
+       ddeerreeffFFiinnddiinnggBBaasseeOObbjj(()) -->> ddeerreeffeerreennccee(())
+
+              Derefrence aliases only in finding the base.
+
+       pprreesseenntt((TTyyppee)) -->> ffiilltteerr(())
+
+              Types:
+
+                 Type = string()
+
+              Create a filter which filters on attribute type presence.
+
+       ssuubbssttrriinnggss((TTyyppee,, [[SSuubbSSttrriinngg]])) -->> ffiilltteerr(())
+
+              Types:
+
+                 Type = string()
+                 SubString = {StringPart, string()}
+                 StringPart = initial | any | final
+
+              Create a filter which filters on substrings.
+
+       eeqquuaalliittyyMMaattcchh((TTyyppee,, VVaalluuee)) -->> ffiilltteerr(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create a equality filter.
+
+       ggrreeaatteerrOOrrEEqquuaall((TTyyppee,, VVaalluuee)) -->> ffiilltteerr(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create a greater or equal filter.
+
+       lleessssOOrrEEqquuaall((TTyyppee,, VVaalluuee)) -->> ffiilltteerr(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create a less or equal filter.
+
+       aapppprrooxxMMaattcchh((TTyyppee,, VVaalluuee)) -->> ffiilltteerr(())
+
+              Types:
+
+                 Type = string()
+                 Value = string()
+
+              Create a approximation match filter.
+
+       ''aanndd''(([[FFiilltteerr]])) -->> ffiilltteerr(())
+
+              Types:
+
+                 Filter = filter()
+
+              Creates a filter where all _F_i_l_t_e_r must be true.
+
+       ''oorr''(([[FFiilltteerr]])) -->> ffiilltteerr(())
+
+              Types:
+
+                 Filter = filter()
+
+              Create a filter where at least one of the _F_i_l_t_e_r must be true.
+
+       ''nnoott''((FFiilltteerr)) -->> ffiilltteerr(())
+
+              Types:
+
+                 Filter = filter()
+
+              Negate a filter.
+
+
+
+Ericsson AB                        eldap 1.0                          eldap(3)

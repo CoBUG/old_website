@@ -1,0 +1,159 @@
+corba_object(3)            Erlang Module Definition            corba_object(3)
+
+
+
+NNAAMMEE
+       corba_object - The CORBA Object interface functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains the CORBA Object interface functions that can be
+       called for all objects.
+
+EEXXPPOORRTTSS
+       ggeett__iinntteerrffaaccee((OObbjjeecctt)) -->> IInntteerrffaacceeDDeeff
+
+              Types:
+
+                 Object = #objref
+                 InterfaceDef = term()
+
+              This function returns the full interface description for an
+              object.
+
+       iiss__nniill((OObbjjeecctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Object = #objref
+
+              This function checks if the object reference has a nil object
+              value, which denotes no object. It is the reference that is
+              tested and no object implementation is involved in the test.
+
+       iiss__aa((OObbjjeecctt,, LLooggiiccaall__ttyyppee__iidd)) -->> RReettuurrnn
+       iiss__aa((OObbjjeecctt,, LLooggiiccaall__ttyyppee__iidd,, CCoonntteexxttss)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Logical_type_id = string()
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 Return = boolean() | {'EXCEPTION', E}
+
+              The _L_o_g_i_c_a_l___t_y_p_e___i_d is a string that is a share type identifier
+              (repository id). The function returns true if the object is an
+              instance of that type or an ancestor of the "most derived" type
+              of that object.
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+              Note: Other ORB suppliers may not support this function
+              completely according to the OMG specification. Thus, a _i_s___a call
+              may raise an exception or respond unpredictable if the Object is
+              located on a remote node.
+
+       iiss__rreemmoottee((OObbjjeecctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Object = #objref
+
+              This function returns true if an object reference is remote
+              otherwise false.
+
+       nnoonn__eexxiisstteenntt((OObbjjeecctt)) -->> RReettuurrnn
+       nnoonn__eexxiisstteenntt((OObbjjeecctt,, CCoonntteexxttss)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 Return = boolean() | {'EXCEPTION', E}
+
+              This function can be used to test if the object has been
+              destroyed. It does this without invoking any application level
+              code. The ORB returns true if it knows that the object is
+              destroyed otherwise false.
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+              Note: The OMG have specified two different operators,
+              ___n_o_t___e_x_i_s_t_e_n_t (CORBA version 2.0 and 2.2) and ___n_o_n___e_x_i_s_t_e_n_t
+              (CORBA version 2.3), to be used for this function. It is not
+              mandatory to support both versions. Thus, a _n_o_n___e_x_i_s_t_e_n_t call
+              may raise an exception or respond unpredictable if the Object is
+              located on a remote node. Depending on which version, ORB:s you
+              intend to communicate with supports, you can either use this
+              function or _n_o_t___e_x_i_s_t_e_n_t_/_1.
+
+       nnoott__eexxiisstteenntt((OObbjjeecctt)) -->> RReettuurrnn
+       nnoott__eexxiisstteenntt((OObbjjeecctt,, CCoonntteexxttss)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Contexts = [Context]
+                 Context = #'IOP_ServiceContext'{context_id = CtxId,
+                 context_data = CtxData}
+                 CtxId = ?ORBER_GENERIC_CTX_ID
+                 CtxData = {interface, Interface} | {userspecific, term()} |
+                 {configuration, Options}
+                 Interface = string()
+                 Options = [{Key, Value}]
+                 Key = ssl_client_options
+                 Value = allowed value associated with the given key
+                 Return = boolean() | {'EXCEPTION', E}
+
+              This function is implemented due to Interoperable purposes.
+              Behaves as _n_o_n___e_x_i_s_t_e_n_t except the operator ___n_o_t___e_x_i_s_t_e_n_t is
+              used when communicating with other ORB:s.
+
+              The _c_o_n_f_i_g_u_r_a_t_i_o_n context is used to override the global SSL
+              client side ccoonnffiigguurraattiioonn.
+
+       iiss__eeqquuiivvaalleenntt((OObbjjeecctt,, OOtthheerrOObbjjeecctt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Object = #objref
+                 OtherObject = #objref
+
+              This function is used to determine if two object references are
+              equivalent so far the ORB easily can determine. It returns _t_r_u_e
+              if the target object reference is equal to the other object
+              reference and _f_a_l_s_e otherwise.
+
+       hhaasshh((OObbjjeecctt,, MMaaxxiimmuumm)) -->> iinntt(())
+
+              Types:
+
+                 Object = #objref
+                 Maximum = int()
+
+              This function returns a hash value based on the object reference
+              that not will change during the lifetime of the object. The
+              _M_a_x_i_m_u_m parameter denotes the upper bound of the value.
+
+
+
+Ericsson AB                      orber 3.6.24                  corba_object(3)

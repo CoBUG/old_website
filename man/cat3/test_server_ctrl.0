@@ -1,0 +1,736 @@
+test_server_ctrl(3)        Erlang Module Definition        test_server_ctrl(3)
+
+
+
+NNAAMMEE
+       test_server_ctrl - This module provides a low level interface to the
+       Test Server.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _t_e_s_t___s_e_r_v_e_r___c_t_r_l module provides a low level interface to the Test
+       Server. This interface is normally not used directly by the tester, but
+       through a framework built on top of _t_e_s_t___s_e_r_v_e_r___c_t_r_l.
+
+       Common Test is such a framework, well suited for automated black box
+       testing of target systems of any kind (not necessarily implemented in
+       Erlang). Common Test is also a very useful tool for white box testing
+       Erlang programs and OTP applications. Please see the Common Test User's
+       Guide and reference manual for more information.
+
+       If you want to write your own framework, some more information can be
+       found in the chapter "Writing your own test server framework" in the
+       Test Server User's Guide. Details about the interface provided by
+       _t_e_s_t___s_e_r_v_e_r___c_t_r_l follows below.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> RReessuulltt
+       ssttaarrtt((PPaarraammeetteerrFFiillee)) -->> RReessuulltt
+
+              Types:
+
+                 Result = ok | {error, {already_started, pid()}
+                 ParameterFile = atom() | string()
+
+              This function starts the test server. If the parameter file is
+              given, it indicates that the target is remote. In that case the
+              target node is started and a socket connection is established
+              between the controller and the target node.
+
+              The parameter file is a text file containing key-value tuples.
+              Each tuple must be followed by a dot-newline sequence. The
+              following key-value tuples are allowed:
+
+                _{_t_y_p_e_,_P_l_a_t_f_o_r_m_T_y_p_e_}:
+                  This is an atom indicating the target platform type,
+                  currently supported: _P_l_a_t_f_o_r_m_T_y_p_e _= _v_x_w_o_r_k_s
+                   Mandatory
+
+                _{_t_a_r_g_e_t_,_T_a_r_g_e_t_H_o_s_t_}:
+                  This is the name of the target host, can be atom or string.
+                   Mandatory
+
+                _{_s_l_a_v_e_t_a_r_g_e_t_s_,_S_l_a_v_e_T_a_r_g_e_t_s_}:
+                  This is a list of available hosts where slave nodes can be
+                  started. The hostnames are given as atoms or strings.
+                   Optional, default _S_l_a_v_e_T_a_r_g_e_t_s _= _[_]
+
+                _{_l_o_n_g_n_a_m_e_s_,_B_o_o_l_}:
+                  This indicates if longnames shall be used, i.e. if the _-_n_a_m_e
+                  option should be used for the target node instead of _-_s_n_a_m_e
+                   Optional, default _B_o_o_l _= _f_a_l_s_e
+
+                _{_m_a_s_t_e_r_, _{_M_a_s_t_e_r_H_o_s_t_, _M_a_s_t_e_r_C_o_o_k_i_e_}_}:
+                  If target is remote and the target node is started as a
+                  slave node, this option indicates which master and cookie to
+                  use. The given master will also be used as master for slave
+                  nodes started with _t_e_s_t___s_e_r_v_e_r_:_s_t_a_r_t___n_o_d_e_/_3. It is expected
+                  that the _e_r_l___b_o_o_t___s_e_r_v_e_r is started on the master node
+                  before the _t_e_s_t___s_e_r_v_e_r___c_t_r_l_:_s_t_a_r_t_/_1 function is called.
+                   Optional, if not given the test server controller node is
+                  used as master and the _e_r_l___b_o_o_t___s_e_r_v_e_r is automatically
+                  started.
+
+       ssttoopp(()) -->> ookk
+
+              This stops the test server (both controller and target) and all
+              its activity. The running test suite (if any) will be halted.
+
+       aadddd__ddiirr((NNaammee,, DDiirr)) -->> ookk
+       aadddd__ddiirr((NNaammee,, DDiirr,, PPaatttteerrnn)) -->> ookk
+       aadddd__ddiirr((NNaammee,, [[DDiirr||DDiirrss]])) -->> ookk
+       aadddd__ddiirr((NNaammee,, [[DDiirr||DDiirrss]],, PPaatttteerrnn)) -->> ookk
+
+              Types:
+
+                 Name = term()
+                   The jobname for this directory.
+                 Dir = term()
+                   The directory to scan for test suites.
+                 Dirs = [term()]
+                   List of directories to scan for test suites.
+                 Pattern = term()
+                   Suite match pattern. Directories will be scanned for
+                   Pattern_SUITE.erl files.
+
+              Puts a collection of suites matching (*_SUITE) in given
+              directories into the job queue. _N_a_m_e is an arbitrary name for
+              the job, it can be any erlang term. If _P_a_t_t_e_r_n is given, only
+              modules matching _P_a_t_t_e_r_n_* will be added.
+
+       aadddd__mmoodduullee((MMoodd)) -->> ookk
+       aadddd__mmoodduullee((NNaammee,, [[MMoodd||MMooddss]])) -->> ookk
+
+              Types:
+
+                 Mod = atom()
+                 Mods = [atom()]
+                   The name(s) of the module(s) to add.
+                 Name = term()
+                   Name for the job.
+
+              This function adds a module or a list of modules, to the test
+              servers job queue. _N_a_m_e may be any Erlang term. When _N_a_m_e is not
+              given, the job gets the name of the module.
+
+       aadddd__ccaassee((MMoodd,, CCaassee)) -->> ookk
+
+              Types:
+
+                 Mod = atom()
+                   Name of the module the test case is in.
+                 Case = atom()
+                   Function name of the test case to add.
+
+              This function will add one test case to the job queue. The job
+              will be given the module's name.
+
+       aadddd__ccaassee((NNaammee,, MMoodd,, CCaassee)) -->> ookk
+
+              Types:
+
+                 Name = string()
+                   Name to use for the test job.
+
+              Equivalent to _a_d_d___c_a_s_e_/_2, but the test job will get the
+              specified name.
+
+       aadddd__ccaasseess((MMoodd,, CCaasseess)) -->> ookk
+
+              Types:
+
+                 Mod = atom()
+                   Name of the module the test case is in.
+                 Cases = [Case]
+                 Case = atom()
+                   Function names of the test cases to add.
+
+              This function will add one or more test cases to the job queue.
+              The job will be given the module's name.
+
+       aadddd__ccaasseess((NNaammee,, MMoodd,, CCaasseess)) -->> ookk
+
+              Types:
+
+                 Name = string()
+                   Name to use for the test job.
+
+              Equivalent to _a_d_d___c_a_s_e_s_/_2, but the test job will get the
+              specified name.
+
+       aadddd__ssppeecc((TTeessttSSppeeccFFiillee)) -->> ookk || {{eerrrroorr,, nnooffiillee}}
+
+              Types:
+
+                 TestSpecFile = string()
+                   Name of the test specification file
+
+              This function will add the content of the given test
+              specification file to the job queue. The job will be given the
+              name of the test specification file, e.g. if the file is called
+              _t_e_s_t_._s_p_e_c, the job will be called _t_e_s_t.
+
+              See the reference manual for the test server application for
+              details about the test specification file.
+
+       aadddd__ddiirr__wwiitthh__sskkiipp((NNaammee,, [[DDiirr||DDiirrss]],, SSkkiipp)) -->> ookk
+       aadddd__ddiirr__wwiitthh__sskkiipp((NNaammee,, [[DDiirr||DDiirrss]],, PPaatttteerrnn,, SSkkiipp)) -->> ookk
+       aadddd__mmoodduullee__wwiitthh__sskkiipp((MMoodd,, SSkkiipp)) -->> ookk
+       aadddd__mmoodduullee__wwiitthh__sskkiipp((NNaammee,, [[MMoodd||MMooddss]],, SSkkiipp)) -->> ookk
+       aadddd__ccaassee__wwiitthh__sskkiipp((MMoodd,, CCaassee,, SSkkiipp)) -->> ookk
+       aadddd__ccaassee__wwiitthh__sskkiipp((NNaammee,, MMoodd,, CCaassee,, SSkkiipp)) -->> ookk
+       aadddd__ccaasseess__wwiitthh__sskkiipp((MMoodd,, CCaasseess,, SSkkiipp)) -->> ookk
+       aadddd__ccaasseess__wwiitthh__sskkiipp((NNaammee,, MMoodd,, CCaasseess,, SSkkiipp)) -->> ookk
+
+              Types:
+
+                 Skip = [SkipItem]
+                   List of items to be skipped from the test.
+                 SkipItem = {Mod,Comment} | {Mod,Case,Comment} |
+                 {Mod,Cases,Comment}
+                 Mod = atom()
+                   Test suite name.
+                 Comment = string()
+                   Reason why suite or case is being skipped.
+                 Cases = [Case]
+                 Case = atom()
+                   Name of test case function.
+
+              These functions add test jobs just like the add_dir, add_module,
+              add_case and add_cases functions above, but carry an additional
+              argument, Skip. Skip is a list of items that should be skipped
+              in the current test run. Test job items that occur in the Skip
+              list will be logged as SKIPPED with the associated Comment.
+
+       aadddd__tteessttss__wwiitthh__sskkiipp((NNaammee,, TTeessttss,, SSkkiipp)) -->> ookk
+
+              Types:
+
+                 Name = term()
+                   The jobname for this directory.
+                 Tests = [TestItem]
+                   List of jobs to add to the run queue.
+                 TestItem = {Dir,all,all} | {Dir,Mods,all} | {Dir,Mod,Cases}
+                 Dir = term()
+                   The directory to scan for test suites.
+                 Mods = [Mod]
+                 Mod = atom()
+                   Test suite name.
+                 Cases = [Case]
+                 Case = atom()
+                   Name of test case function.
+                 Skip = [SkipItem]
+                   List of items to be skipped from the test.
+                 SkipItem = {Mod,Comment} | {Mod,Case,Comment} |
+                 {Mod,Cases,Comment}
+                 Comment = string()
+                   Reason why suite or case is being skipped.
+
+              This function adds various test jobs to the test_server_ctrl job
+              queue. These jobs can be of different type (all or specific
+              suites in one directory, all or specific cases in one suite,
+              etc). It is also possible to get particular items skipped by
+              passing them along in the Skip list (see the add_*_with_skip
+              functions above).
+
+       aabboorrtt__ccuurrrreenntt__tteessttccaassee((RReeaassoonn)) -->> ookk || {{eerrrroorr,,nnoo__tteessttccaassee__rruunnnniinngg}}
+
+              Types:
+
+                 Reason = term()
+                   The reason for stopping the test case, which will be
+                   printed in the log.
+
+              When calling this function, the currently executing test case
+              will be aborted. It is the user's responsibility to know for
+              sure which test case is currently executing. The function is
+              therefore only safe to call from a function which has been
+              called (or synchronously invoked) by the test case.
+
+       sseett__lleevveellss((CCoonnssoollee,, MMaajjoorr,, MMiinnoorr)) -->> ookk
+
+              Types:
+
+                 Console = integer()
+                   Level for I/O to be sent to console.
+                 Major = integer()
+                   Level for I/O to be sent to the major logfile.
+                 Minor = integer()
+                   Level for I/O to be sent to the minor logfile.
+
+              Determines where I/O from test suites/test server will go. All
+              text output from test suites and the test server is tagged with
+              a priority value which ranges from 0 to 100, 100 being the most
+              detailed. (see the section about log files in the user's guide).
+              Output from the test cases (using _i_o_:_f_o_r_m_a_t_/_2) has a detail
+              level of 50. Depending on the levels set by this function, this
+              I/O may be sent to the console, the major log file (for the
+              whole test suite) or to the minor logfile (separate for each
+              test case).
+
+              All output with detail level:
+
+                * Less than or equal to _C_o_n_s_o_l_e is displayed on the screen
+                  (default 1)
+
+                * Less than or equal to _M_a_j_o_r is logged in the major log file
+                  (default 19)
+
+                * Greater than or equal to _M_i_n_o_r is logged in the minor log
+                  files (default 10)
+
+              To view the currently set thresholds, use the _g_e_t___l_e_v_e_l_s_/_0
+              function.
+
+       ggeett__lleevveellss(()) -->> {{CCoonnssoollee,, MMaajjoorr,, MMiinnoorr}}
+
+              Returns the current levels. See _s_e_t___l_e_v_e_l_s_/_3 for types.
+
+       jjoobbss(()) -->> JJoobbQQuueeuuee
+
+              Types:
+
+                 JobQueue = [{list(), pid()}]
+
+              This function will return all the jobs currently in the job
+              queue.
+
+       mmuullttiippllyy__ttiimmeettrraappss((NN)) -->> ookk
+
+              Types:
+
+                 N = integer() | infinity
+
+              This function should be called before a test is started which
+              requires extended timetraps, e.g. if extensive tracing is used.
+              All timetraps started after this call will be multiplied by _N.
+
+       ssccaallee__ttiimmeettrraappss((BBooooll)) -->> ookk
+
+              Types:
+
+                 Bool = true | false
+
+              This function should be called before a test is started. The
+              parameter specifies if test_server should attempt to
+              automatically scale the timetrap value in order to compensate
+              for delays caused by e.g. the cover tool.
+
+       ggeett__ttiimmeettrraapp__ppaarraammeetteerrss(()) -->> {{NN,,BBooooll}}
+
+              Types:
+
+                 N = integer() | infinity
+                 Bool = true | false
+
+              This function may be called to read the values set by
+              _m_u_l_t_i_p_l_y___t_i_m_e_t_r_a_p_s_/_1 and _s_c_a_l_e___t_i_m_e_t_r_a_p_s_/_1.
+
+       ccoovveerr((AApppplliiccaattiioonn,,AAnnaallyyssee)) -->> ookk
+       ccoovveerr((CCoovveerrFFiillee,,AAnnaallyyssee)) -->> ookk
+       ccoovveerr((AApppp,,CCoovveerrFFiillee,,AAnnaallyyssee)) -->> ookk
+
+              Types:
+
+                 Application = atom()
+                   OTP application to cover compile
+                 CoverFile = string()
+                   Name of file listing modules to exclude from or include in
+                   cover compilation. The filename must include full path to
+                   the file.
+                 Analyse = details | overview
+
+              This function informs the test_server controller that next test
+              shall run with code coverage analysis. All timetraps will
+              automatically be multiplied by 10 when cover i run.
+
+              _A_p_p_l_i_c_a_t_i_o_n and _C_o_v_e_r_F_i_l_e indicates what to cover compile. If
+              _A_p_p_l_i_c_a_t_i_o_n is given, the default is that all modules in the
+              _e_b_i_n directory of the application will be cover compiled. The
+              _e_b_i_n directory is found by adding _e_b_i_n to
+              _c_o_d_e_:_l_i_b___d_i_r_(_A_p_p_l_i_c_a_t_i_o_n_).
+
+              A _C_o_v_e_r_F_i_l_e can have the following entries:
+
+              {exclude, all | ExcludeModuleList}.
+              {include, IncludeModuleList}.
+
+              Note that each line must end with a full stop. _E_x_c_l_u_d_e_M_o_d_u_l_e_L_i_s_t
+              and _I_n_c_l_u_d_e_M_o_d_u_l_e_L_i_s_t are lists of atoms, where each atom is a
+              module name.
+
+              If both an _A_p_p_l_i_c_a_t_i_o_n and a _C_o_v_e_r_F_i_l_e is given, all modules in
+              the application are cover compiled, except for the modules
+              listed in _E_x_c_l_u_d_e_M_o_d_u_l_e_L_i_s_t. The modules in _I_n_c_l_u_d_e_M_o_d_u_l_e_L_i_s_t
+              are also cover compiled.
+
+              If a _C_o_v_e_r_F_i_l_e is given, but no _A_p_p_l_i_c_a_t_i_o_n, only the modules in
+              _I_n_c_l_u_d_e_M_o_d_u_l_e_L_i_s_t are cover compiled.
+
+              _A_n_a_l_y_s_e indicates the detail level of the cover analysis. If
+              _A_n_a_l_y_s_e _= _d_e_t_a_i_l_s, each cover compiled module will be analysed
+              with _c_o_v_e_r_:_a_n_a_l_y_s_e___t_o___f_i_l_e_/_1. If _A_n_a_l_y_s_e _= _o_v_e_r_v_i_e_w an overview
+              of all cover compiled modules is created, listing the number of
+              covered and not covered lines for each module.
+
+              If the test following this call starts any slave or peer nodes
+              with _t_e_s_t___s_e_r_v_e_r_:_s_t_a_r_t___n_o_d_e_/_3, the same cover compiled code will
+              be loaded on all nodes. If the loading fails, e.g. if the node
+              runs an old version of OTP, the node will simply not be a part
+              of the coverage analysis. Note that slave or peer nodes must be
+              stopped with _t_e_s_t___s_e_r_v_e_r_:_s_t_o_p___n_o_d_e_/_1 for the node to be part of
+              the coverage analysis, else the test server will not be able to
+              fetch coverage data from the node.
+
+              When the test is finished, the coverage analysis is
+              automatically completed, logs are created and the cover compiled
+              modules are unloaded. If another test is to be run with coverage
+              analysis, _t_e_s_t___s_e_r_v_e_r___c_t_r_l_:_c_o_v_e_r_/_2_/_3 must be called again.
+
+       ccrroossss__ccoovveerr__aannaallyyssee((LLeevveell)) -->> ookk
+
+              Types:
+
+                 Level = details | overview
+
+              Analyse cover data collected from all tests. The modules
+              analysed are the ones listed in the cross cover file _c_r_o_s_s_._c_o_v_e_r
+              in the current directory of the test server.
+
+              The modules listed in the _c_r_o_s_s_._c_o_v_e_r file are modules that are
+              heavily used by other applications than the one they belong to.
+              This function should be run after all tests are completed, and
+              the result will be stored in a file called cross_cover.html in
+              the run.<timestamp> directory of the application the modules
+              belong to.
+
+              The _c_r_o_s_s_._c_o_v_e_r file contains elements like this:
+
+              {App,Modules}.
+
+              where _A_p_p can be an application name or the atom _a_l_l. The
+              application (or all applications) will cover compile the listed
+              _M_o_d_u_l_e_s.
+
+       ttrrcc((TTrraacceeIInnffooFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 TraceInfoFile = atom() | string()
+                   Name of a file defining which functions to trace and how
+
+              This function starts call trace on target and on slave or peer
+              nodes that are started or will be started by the test suites.
+
+              Timetraps are not extended automatically when tracing is used.
+              Use _m_u_l_t_i_p_l_y___t_i_m_e_t_r_a_p_s_/_1 if necessary.
+
+              Note that the trace support in the test server is in a very
+              early stage of the implementation, and thus not yet as powerful
+              as one might wish for.
+
+              The trace information file specified by the _T_r_a_c_e_I_n_f_o_F_i_l_e
+              argument is a text file containing one or more of the following
+              elements:
+
+                * _{_S_e_t_T_P_,_M_o_d_u_l_e_,_P_a_t_t_e_r_n_}_.
+
+                * _{_S_e_t_T_P_,_M_o_d_u_l_e_,_F_u_n_c_t_i_o_n_,_P_a_t_t_e_r_n_}_.
+
+                * _{_S_e_t_T_P_,_M_o_d_u_l_e_,_F_u_n_c_t_i_o_n_,_A_r_i_t_y_,_P_a_t_t_e_r_n_}_.
+
+                * _C_l_e_a_r_T_P_.
+
+                * _{_C_l_e_a_r_T_P_,_M_o_d_u_l_e_}_.
+
+                * _{_C_l_e_a_r_T_P_,_M_o_d_u_l_e_,_F_u_n_c_t_i_o_n_}_.
+
+                * _{_C_l_e_a_r_T_P_,_M_o_d_u_l_e_,_F_u_n_c_t_i_o_n_,_A_r_i_t_y_}_.
+
+                _S_e_t_T_P _= _t_p _| _t_p_l:
+                  This is maps to the corresponding functions in the _t_t_b
+                  module in the _o_b_s_e_r_v_e_r application. _t_p means set trace
+                  pattern on global function calls. _t_p_l means set trace
+                  pattern on local and global function calls.
+
+                _C_l_e_a_r_T_P _= _c_t_p _| _c_t_p_l _| _c_t_p_g:
+                  This is maps to the corresponding functions in the _t_t_b
+                  module in the _o_b_s_e_r_v_e_r application. _c_t_p means clear trace
+                  pattern (i.e. turn off) on global and local function calls.
+                  _c_t_p_l means clear trace pattern on local function calls only
+                  and _c_t_p_g means clear trace pattern on global function calls
+                  only.
+
+                _M_o_d_u_l_e _= _a_t_o_m_(_):
+                  The module to trace
+
+                _F_u_n_c_t_i_o_n _= _a_t_o_m_(_):
+                  The name of the function to trace
+
+                _A_r_i_t_y _= _i_n_t_e_g_e_r_(_):
+                  The arity of the function to trace
+
+                _P_a_t_t_e_r_n _= _[_] _| _m_a_t_c_h___s_p_e_c_(_):
+                  The trace pattern to set for the module or function. For a
+                  description of the match_spec() syntax, please turn to the
+                  User's guide for the runtime system (erts). The chapter
+                  "Match Specification in Erlang" explains the general match
+                  specification language.
+
+              The trace result will be logged in a (binary) file called
+              _N_o_d_e_N_a_m_e_-_t_e_s_t___s_e_r_v_e_r in the current directory of the test server
+              controller node. The log must be formatted using _t_t_b_:_f_o_r_m_a_t_/_1_/_2.
+
+       ssttoopp__ttrraaccee(()) -->> ookk || {{eerrrroorr,, nnoott__ttrraacciinngg}}
+
+              This function stops tracing on target, and on slave or peer
+              nodes that are currently running. New slave or peer nodes will
+              no longer be traced after this.
+
+FFUUNNCCTTIIOONNSS IINNVVOOKKEEDD FFRROOMM CCOOMMMMAANNDD LLIINNEE
+       The following functions are supposed to be invoked from the command
+       line using the _-_s option when starting the erlang node.
+
+EEXXPPOORRTTSS
+       rruunn__tteesstt((CCoommmmaannddLLiinnee)) -->> ookk
+
+              Types:
+
+                 CommandLine = FlagList
+
+              This function is supposed to be invoked from the commandline. It
+              starts the test server, interprets the argument supplied from
+              the commandline, runs the tests specified and when all tests are
+              done, stops the test server and returns to the Erlang prompt.
+
+              The _C_o_m_m_a_n_d_L_i_n_e argument is a list of command line flags,
+              typically _[_'_K_E_Y_1_'_, _V_a_l_u_e_1_, _'_K_E_Y_2_'_, _V_a_l_u_e_2_, _._._._]. The valid
+              command line flags are listed below.
+
+              Under a UNIX command prompt, this function can be invoked like
+              this:
+              _e_r_l _-_n_o_s_h_e_l_l _-_s _t_e_s_t___s_e_r_v_e_r___c_t_r_l _r_u_n___t_e_s_t _K_E_Y_1 _V_a_l_u_e_1 _K_E_Y_2
+              _V_a_l_u_e_2 _._._. _-_s _e_r_l_a_n_g _h_a_l_t
+
+              Or make an alias (this is for unix/tcsh)
+              _a_l_i_a_s _e_r_l___t_e_s_t _'_e_r_l _-_n_o_s_h_e_l_l _-_s _t_e_s_t___s_e_r_v_e_r___c_t_r_l _r_u_n___t_e_s_t _\_!_* _-_s
+              _e_r_l_a_n_g _h_a_l_t_'
+
+              And then use it like this
+              _e_r_l___t_e_s_t _K_E_Y_1 _V_a_l_u_e_1 _K_E_Y_2 _V_a_l_u_e_2 _._._.
+
+
+              The valid command line flags are
+
+                _D_I_R _d_i_r:
+                  Adds all test modules in the directory _d_i_r to the job queue.
+
+                _M_O_D_U_L_E _m_o_d:
+                  Adds the module _m_o_d to the job queue.
+
+                _C_A_S_E _m_o_d _c_a_s_e:
+                  Adds the case _c_a_s_e in module _m_o_d to the job queue.
+
+                _S_P_E_C _s_p_e_c:
+                  Runs the test specification file _s_p_e_c.
+
+                _S_K_I_P_M_O_D _m_o_d:
+                  Skips all test cases in the module _m_o_d
+
+                _S_K_I_P_C_A_S_E _m_o_d _c_a_s_e:
+                  Skips the test case _c_a_s_e in module _m_o_d.
+
+                _N_A_M_E _n_a_m_e:
+                  Names the test suite to something else than the default
+                  name. This does not apply to _S_P_E_C which keeps its names.
+
+                _P_A_R_A_M_E_T_E_R_S _p_a_r_a_m_e_t_e_r_f_i_l_e:
+                  Specifies the parameter file to use when starting remote
+                  target
+
+                _C_O_V_E_R _a_p_p _c_o_v_e_r___f_i_l_e _a_n_a_l_y_s_e:
+                  Indicates that the test should be run with cover analysis.
+                  _a_p_p, _c_o_v_e_r___f_i_l_e and _a_n_a_l_y_s_e corresponds to the parameters to
+                  _t_e_s_t___s_e_r_v_e_r___c_t_r_l_:_c_o_v_e_r_/_3. If no cover file is used, the atom
+                  _n_o_n_e should be given.
+
+                _T_R_A_C_E _t_r_a_c_e_i_n_f_o_f_i_l_e:
+                  Specifies a trace information file. When this option is
+                  given, call tracing is started on the target node and all
+                  slave or peer nodes that are started. The trace information
+                  file specifies which modules and functions to trace. See the
+                  function _t_r_c_/_1 above for more information about the syntax
+                  of this file.
+
+FFRRAAMMEEWWOORRKK CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       A test server framework can be defined by setting the environment
+       variable _T_E_S_T___S_E_R_V_E_R___F_R_A_M_E_W_O_R_K to a module name. This module will then
+       be framework callback module, and it must export the following
+       function:
+
+EEXXPPOORRTTSS
+       ggeett__ssuuiittee((MMoodd,,FFuunncc)) -->> TTeessttCCaasseeLLiisstt
+
+              Types:
+
+                 Mod = atom()
+                   Test suite name.
+                 Func = atom()
+                   Name of test case.
+                 TestCaseList = [SubCase]
+                   List of test cases.
+                 SubCase = atom()
+                   Name of a case.
+
+              This function is called before a test case is started. The
+              purpose is to retrieve a list of subcases. The default behaviour
+              of this function should be to call _M_o_d_:_F_u_n_c_(_s_u_i_t_e_) and return
+              the result from this call.
+
+       iinniitt__ttcc((MMoodd,,FFuunncc,,AArrggss00)) -->> {{ookk,,AArrggss11}} || {{sskkiipp,,RReeaassoonnTTooSSkkiipp}} ||
+       {{aauuttoo__sskkiipp,,RReeaassoonnTTooSSkkiipp}} || {{ffaaiill,,RReeaassoonnTTooFFaaiill}}
+
+              Types:
+
+                 Mod = atom()
+                   Test suite name.
+                 Func = atom()
+                   Name of test case or configuration function.
+                 Args0 = Args1 = [tuple()]
+                   Normally Args = [Config]
+                 ReasonToSkip = term()
+                   Reason to skip the test case or configuration function.
+                 ReasonToFail = term()
+                   Reason to fail the test case or configuration function.
+
+              This function is called before a test case or configuration
+              function starts. It is called on the process executing the
+              function _M_o_d_:_F_u_n_c. Typical use of this function can be to alter
+              the input parameters to the test case function (_A_r_g_s) or to set
+              properties for the executing process.
+
+              By returning _{_s_k_i_p_,_R_e_a_s_o_n_}, _F_u_n_c gets skipped. _F_u_n_c also gets
+              skipped if _{_a_u_t_o___s_k_i_p_,_R_e_a_s_o_n_} is returned, but then gets an auto
+              skipped status (rather than user skipped).
+
+              To fail _F_u_n_c immediately instead of executing it, return
+              _{_f_a_i_l_,_R_e_a_s_o_n_T_o_F_a_i_l_}_.
+
+       eenndd__ttcc((MMoodd,,FFuunncc,,SSttaattuuss)) -->> ookk || {{ffaaiill,,RReeaassoonnTTooFFaaiill}}
+
+              Types:
+
+                 Mod = atom()
+                   Test suite name.
+                 Func = atom()
+                   Name of test case or configuration function.
+                 Status = {Result,Args} | {TCPid,Result,Args}
+                   The status of the test case or configuration function.
+                 ReasonToFail = term()
+                   Reason to fail the test case or configuration function.
+                 Result = ok | Skip | Fail
+                   The final result of the test case or configuration
+                   function.
+                 TCPid = pid()
+                   Pid of the process executing Func
+                 Skip = {skip,SkipReason}
+                 SkipReason = term() | {failed,{Mod,init_per_testcase,term()}}
+                   Reason why the function was skipped.
+                 Fail = {error,term()} | {'EXIT',term()} |
+                 {timetrap_timeout,integer()} | {testcase_aborted,term()} |
+                 testcase_aborted_or_killed | {failed,term()} |
+                 {failed,{Mod,end_per_testcase,term()}}
+                   Reason why the function failed.
+                 Args = [tuple()]
+                   Normally Args = [Config]
+
+              This function is called when a test case, or a configuration
+              function, is finished. It is normally called on the process
+              where the function _M_o_d_:_F_u_n_c has been executing, but if not, the
+              pid of the test case process is passed with the _S_t_a_t_u_s argument.
+
+              Typical use of the _e_n_d___t_c_/_3 function can be to clean up after
+              _i_n_i_t___t_c_/_3.
+
+              If _F_u_n_c is a test case, it is possible to analyse the value of
+              _R_e_s_u_l_t to verify that _i_n_i_t___p_e_r___t_e_s_t_c_a_s_e_/_2 and _e_n_d___p_e_r___t_e_s_t_c_a_s_e_/_2
+              executed successfully.
+
+              It is possible with _e_n_d___t_c_/_3 to fail an otherwise successful
+              test case, by returning _{_f_a_i_l_,_R_e_a_s_o_n_T_o_F_a_i_l_}. The test case _F_u_n_c
+              will be logged as failed with the provided term as reason.
+
+       rreeppoorrtt((WWhhaatt,,DDaattaa)) -->> ookk
+
+              Types:
+
+                 What = atom()
+                 Data = term()
+
+              This function is called in order to keep the framework up-to-
+              date with the progress of the test. This is useful e.g. if the
+              framework implements a GUI where the progress information is
+              constantly updated. The following can be reported:
+
+              _W_h_a_t _= _t_e_s_t_s___s_t_a_r_t_, _D_a_t_a _= _{_N_a_m_e_,_N_u_m_C_a_s_e_s_}
+              _W_h_a_t _= _l_o_g_i_n_f_o_, _D_a_t_a _=
+              _[_{_t_o_p_d_i_r_,_T_e_s_t_R_o_o_t_D_i_r_}_,_{_r_u_n_d_i_r_,_C_u_r_r_L_o_g_D_i_r_}_]
+              _W_h_a_t _= _t_e_s_t_s___d_o_n_e_, _D_a_t_a _= _{_O_k_,_F_a_i_l_e_d_,_{_U_s_e_r_S_k_i_p_p_e_d_,_A_u_t_o_S_k_i_p_p_e_d_}_}
+              _W_h_a_t _= _t_c___s_t_a_r_t_, _D_a_t_a _= _{_{_M_o_d_,_F_u_n_c_}_,_T_C_L_o_g_F_i_l_e_}
+              _W_h_a_t _= _t_c___d_o_n_e_, _D_a_t_a _= _{_M_o_d_,_F_u_n_c_,_R_e_s_u_l_t_}
+              _W_h_a_t _= _t_c___u_s_e_r___s_k_i_p_, _D_a_t_a _= _{_M_o_d_,_F_u_n_c_,_C_o_m_m_e_n_t_}
+              _W_h_a_t _= _t_c___a_u_t_o___s_k_i_p_, _D_a_t_a _= _{_M_o_d_,_F_u_n_c_,_C_o_m_m_e_n_t_}
+              _W_h_a_t _= _f_r_a_m_e_w_o_r_k___e_r_r_o_r_, _D_a_t_a _= _{_{_F_W_M_o_d_,_F_W_F_u_n_c_}_,_E_r_r_o_r_}
+
+       eerrrroorr__nnoottiiffiiccaattiioonn((MMoodd,, FFuunncc,, AArrggss,, EErrrroorr)) -->> ookk
+
+              Types:
+
+                 Mod = atom()
+                   Test suite name.
+                 Func = atom()
+                   Name of test case or configuration function.
+                 Args = [tuple()]
+                   Normally Args = [Config]
+                 Error = {Reason,Location}
+                 Reason = term()
+                   Reason for termination.
+                 Location = unknown | [{Mod,Func,Line}]
+                   Last known position in Mod before termination.
+                 Line = integer()
+                   Line number in file Mod.erl.
+
+              This function is called as the result of function _M_o_d_:_F_u_n_c
+              failing with Reason at Location. The function is intended mainly
+              to aid specific logging or error handling in the framework
+              application. Note that for Location to have relevant values
+              (i.e. other than unknown), the _l_i_n_e macro or _t_e_s_t___s_e_r_v_e_r___l_i_n_e
+              parse transform must be used. For details, please see the
+              section about test suite line numbers in the _t_e_s_t___s_e_r_v_e_r
+              reference manual page.
+
+       wwaarrnn((WWhhaatt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 What = processes | nodes
+
+              The test server checks the number of processes and nodes before
+              and after the test is executed. This function is a question to
+              the framework if the test server should warn when the number of
+              processes or nodes has changed during the test execution. If
+              _t_r_u_e is returned, a warning will be written in the test case
+              minor log file.
+
+       ttaarrggeett__iinnffoo(()) -->> IInnffooSSttrr
+
+              Types:
+
+                 InfoStr = string() | ""
+
+              The test server will ask the framework for information about the
+              test target system and print InfoStr in the test case log file
+              below the host information.
+
+
+
+Ericsson AB                    test_server 3.5.2           test_server_ctrl(3)

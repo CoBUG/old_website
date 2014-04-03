@@ -1,0 +1,90 @@
+wxIconBundle(3)            Erlang Module Definition            wxIconBundle(3)
+
+
+
+NNAAMMEE
+       wxIconBundle - See external documentation: wxIconBundle.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxIconBundle.
+
+DDAATTAA TTYYPPEESS
+         _w_x_I_c_o_n_B_u_n_d_l_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxIIccoonnBBuunnddllee(())
+
+              See external documentation.
+
+       nneeww((IIcc)) -->> wwxxIIccoonnBBuunnddllee(())
+
+              Types:
+
+                 Ic = wxIconBundle() | wxIcon() (see module wxIcon)
+
+              See external documentation.
+
+       nneeww((FFiillee,, TTyyppee)) -->> wwxxIIccoonnBBuunnddllee(())
+
+              Types:
+
+                 File = chardata() (see module unicode)
+                 Type = integer()
+
+              See external documentation.
+
+       aaddddIIccoonn((TThhiiss,, IIccoonn)) -->> ookk
+
+              Types:
+
+                 This = wxIconBundle()
+                 Icon = wxIcon() (see module wxIcon)
+
+              See external documentation.
+
+       aaddddIIccoonn((TThhiiss,, FFiillee,, TTyyppee)) -->> ookk
+
+              Types:
+
+                 This = wxIconBundle()
+                 File = chardata() (see module unicode)
+                 Type = integer()
+
+              See external documentation.
+
+       ggeettIIccoonn((TThhiiss)) -->> wwxxIIccoonn(()) ((sseeee mmoodduullee wwxxIIccoonn))
+
+              Types:
+
+                 This = wxIconBundle()
+
+              Equivalent to ggeettIIccoonn((TThhiiss,, [[]])).
+
+       ggeettIIccoonn((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxIIccoonn(()) ((sseeee mmoodduullee wwxxIIccoonn))
+
+              Types:
+
+                 This = wxIconBundle()
+                 Option = {size, integer()}
+
+              See external documentation.
+              Also:
+              getIcon(This, Size) -> wxIcon:wxIcon() when
+              This::wxIconBundle(), Size::{W::integer(), H::integer()}.
+
+
+       ddeessttrrooyy((TThhiiss::::wwxxIIccoonnBBuunnddllee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxIconBundle(3)

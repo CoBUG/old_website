@@ -1,0 +1,175 @@
+sets(3)                    Erlang Module Definition                    sets(3)
+
+
+
+NNAAMMEE
+       sets - Functions for Set Manipulation
+
+DDEESSCCRRIIPPTTIIOONN
+       Sets are collections of elements with no duplicate elements. The
+       representation of a set is not defined.
+
+       This module provides exactly the same interface as the module _o_r_d_s_e_t_s
+       but with a defined representation. One difference is that while this
+       module considers two elements as different if they do not match (_=_:_=),
+       _o_r_d_s_e_t_s considers two elements as different if and only if they do not
+       compare equal (_=_=).
+
+DDAATTAA TTYYPPEESS
+       sseett(())
+
+              As returned by _n_e_w_/_0.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> sseett(())
+
+              Returns a new empty set.
+
+       iiss__sseett((SSeett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Set = term()
+
+              Returns _t_r_u_e if _S_e_t is a set of elements, otherwise _f_a_l_s_e.
+
+       ssiizzee((SSeett)) -->> iinntteeggeerr(()) >>== 00
+
+              Types:
+
+                 Set = set()
+
+              Returns the number of elements in _S_e_t.
+
+       ttoo__lliisstt((SSeett)) -->> LLiisstt
+
+              Types:
+
+                 Set = set()
+                 List = [term()]
+
+              Returns the elements of _S_e_t as a list.
+
+       ffrroomm__lliisstt((LLiisstt)) -->> SSeett
+
+              Types:
+
+                 List = [term()]
+                 Set = set()
+
+              Returns an set of the elements in _L_i_s_t.
+
+       iiss__eelleemmeenntt((EElleemmeenntt,, SSeett)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Element = term()
+                 Set = set()
+
+              Returns _t_r_u_e if _E_l_e_m_e_n_t is an element of _S_e_t, otherwise _f_a_l_s_e.
+
+       aadddd__eelleemmeenntt((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Element = term()
+                 Set1 = Set2 = set()
+
+              Returns a new set formed from _S_e_t_1 with _E_l_e_m_e_n_t inserted.
+
+       ddeell__eelleemmeenntt((EElleemmeenntt,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Element = term()
+                 Set1 = Set2 = set()
+
+              Returns _S_e_t_1, but with _E_l_e_m_e_n_t removed.
+
+       uunniioonn((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = set()
+
+              Returns the merged (union) set of _S_e_t_1 and _S_e_t_2.
+
+       uunniioonn((SSeettLLiisstt)) -->> SSeett
+
+              Types:
+
+                 SetList = [set()]
+                 Set = set()
+
+              Returns the merged (union) set of the list of sets.
+
+       iinntteerrsseeccttiioonn((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = set()
+
+              Returns the intersection of _S_e_t_1 and _S_e_t_2.
+
+       iinntteerrsseeccttiioonn((SSeettLLiisstt)) -->> SSeett
+
+              Types:
+
+                 SetList = [set(), ...]
+                 Set = set()
+
+              Returns the intersection of the non-empty list of sets.
+
+       iiss__ddiissjjooiinntt((SSeett11,, SSeett22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Set1 = Set2 = set()
+
+              Returns _t_r_u_e if _S_e_t_1 and _S_e_t_2 are disjoint (have no elements in
+              common), and _f_a_l_s_e otherwise.
+
+       ssuubbttrraacctt((SSeett11,, SSeett22)) -->> SSeett33
+
+              Types:
+
+                 Set1 = Set2 = Set3 = set()
+
+              Returns only the elements of _S_e_t_1 which are not also elements of
+              _S_e_t_2.
+
+       iiss__ssuubbsseett((SSeett11,, SSeett22)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Set1 = Set2 = set()
+
+              Returns _t_r_u_e when every element of _S_e_t_11 is also a member of
+              _S_e_t_2, otherwise _f_a_l_s_e.
+
+       ffoolldd((FFuunnccttiioonn,, AAcccc00,, SSeett)) -->> AAcccc11
+
+              Types:
+
+                 Function = fun((E :: term(), AccIn) -> AccOut)
+                 Set = set()
+                 Acc0 = Acc1 = AccIn = AccOut = T
+
+              Fold _F_u_n_c_t_i_o_n over every element in _S_e_t returning the final
+              value of the accumulator.
+
+       ffiilltteerr((PPrreedd,, SSeett11)) -->> SSeett22
+
+              Types:
+
+                 Pred = fun((E :: term()) -> boolean())
+                 Set1 = Set2 = set()
+
+              Filter elements in _S_e_t_1 with boolean function _P_r_e_d.
+
+SSEEEE AALLSSOO
+       oorrddsseettss((33)), ggbb__sseettss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                         sets(3)

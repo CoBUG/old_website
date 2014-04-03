@@ -1,0 +1,551 @@
+httpc(3)                   Erlang Module Definition                   httpc(3)
+
+
+
+NNAAMMEE
+       httpc - An HTTP/1.1 client
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides the API to a HTTP/1.1 compatible client according
+       to RFC 2616, caching is currently not supported.
+
+   NNoottee::
+       When starting the Inets application a manager process for the default
+       profile will be started. The functions in this API that do not
+       explicitly use a profile will access the default profile. A profile
+       keeps track of proxy options, cookies and other options that can be
+       applied to more than one request.
+
+       If the scheme https is used the ssl application needs to be started.
+
+       Also note that pipelining will only be used if the pipeline timeout is
+       set, otherwise persistent connections without pipelining will be used
+       e.i. the client always waits for the previous response before sending
+       the next request.
+
+
+       There are some usage examples in the IInneettss UUsseerr''ss GGuuiiddee..
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module:
+
+       boolean()    = true | false
+       string()     = list of ASCII characters
+       request_id() = ref()
+       profile()    = atom()
+       path()       = string() representing a file path or directory path
+       ip_address() = See inet(3)
+       socket_opt() = See the Options used by gen_tcp(3) and
+                      ssl(3) connect(s)
+
+
+HHTTTTPP DDAATTAA TTYYPPEESS
+       Type definitions that are related to HTTP:
+
+       For more information about HTTP see rfc 2616
+
+       method()         = head | get | put | post | trace | options | delete
+       request()        = {url(), headers()} |
+                          {url(), headers(), content_type(), body()}
+       url()            = string() - Syntax according to the URI definition in rfc 2396, ex: "http://www.erlang.org"
+       status_line()    = {http_version(), status_code(), reason_phrase()}
+       http_version()   = string() ex: "HTTP/1.1"
+       status_code()    = integer()
+       reason_phrase()  = string()
+       content_type()   = string()
+       headers()        = [header()]
+       header()         = {field(), value()}
+       field()          = string()
+       value()          = string()
+       body()           = string() |
+                          binary() |
+                          {fun(accumulator()) -> body_processing_result(),
+                           accumulator()} |
+                          {chunkify,
+                           fun(accumulator()) -> body_processing_result(),
+                           accumulator()}
+       body_processing_result() = eof | {ok, iolist(), accumulator()}
+       accumulator()    = term()
+       filename()       = string()
+
+
+SSSSLL DDAATTAA TTYYPPEESS
+       See ssssll((33)) for information about ssl options (_s_s_l_o_p_t_i_o_n_s_(_)).
+
+HHTTTTPP CCLLIIEENNTT SSEERRVVIICCEE SSTTAARRTT//SSTTOOPP
+       A HTTP client can be configured to start when starting the inets
+       application or started dynamically in runtime by calling the inets
+       application API _i_n_e_t_s_:_s_t_a_r_t_(_h_t_t_p_c_, _S_e_r_v_i_c_e_C_o_n_f_i_g_), or
+       _i_n_e_t_s_:_s_t_a_r_t_(_h_t_t_p_c_, _S_e_r_v_i_c_e_C_o_n_f_i_g_, _H_o_w_) see iinneettss((33)). Below follows a
+       description of the available configuration options.
+
+         {{pprrooffiillee,, pprrooffiillee(())}}::
+           Name of the profile, see common data types below, this option is
+           mandatory.
+
+         {{ddaattaa__ddiirr,, ppaatthh(())}}::
+           Directory where the profile may save persistent data, if omitted
+           all cookies will be treated as session cookies.
+
+       The client can be stopped using _i_n_e_t_s_:_s_t_o_p_(_h_t_t_p_c_, _P_i_d_) or
+       _i_n_e_t_s_:_s_t_o_p_(_h_t_t_p_c_, _P_r_o_f_i_l_e_).
+
+EEXXPPOORRTTSS
+       rreeqquueesstt((UUrrll)) -->>
+       rreeqquueesstt((UUrrll,, PPrrooffiillee)) -->> {{ookk,, RReessuulltt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Url = url()
+                 Result = {status_line(), headers(), Body} | {status_code(),
+                 Body} | request_id()
+                 Body = string() | binary()
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+                 Reason = term()
+
+              Equivalent to _h_t_t_p_c_:_r_e_q_u_e_s_t_(_g_e_t_, _{_U_r_l_, _[_]_}_, _[_]_, _[_]_).
+
+       rreeqquueesstt((MMeetthhoodd,, RReeqquueesstt,, HHTTTTPPOOppttiioonnss,, OOppttiioonnss)) -->>
+       rreeqquueesstt((MMeetthhoodd,, RReeqquueesstt,, HHTTTTPPOOppttiioonnss,, OOppttiioonnss,, PPrrooffiillee)) -->> {{ookk,, RReessuulltt}}
+       || {{ookk,, ssaavveedd__ttoo__ffiillee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Method = method()
+                 Request = request()
+                 HTTPOptions = http_options()
+                 http_options() = [http_option()]
+                 http_option() = {timeout, timeout()} | {connect_timeout,
+                 timeout()} | {ssl, ssloptions()} | {essl, ssloptions()} |
+                 {autoredirect, boolean()} | {proxy_auth, {userstring(),
+                 passwordstring()}} | {version, http_version()} | {relaxed,
+                 boolean()} | {url_encode, boolean()}
+                 timeout() = integer() >= 0 | infinity
+                 Options = options()
+                 options() = [option()]
+                 option() = {sync, boolean()} | {stream, stream_to()} |
+                 {body_format, body_format()} | {full_result, boolean()} |
+                 {headers_as_is, boolean() | {socket_opts, socket_opts()} |
+                 {receiver, receiver()}, {ipv6_host_with_brackets, boolean()}}
+                 stream_to() = none | self | {self, once} | filename()
+                 socket_opts() = [socket_opt()]
+                 receiver() = pid() | function()/1 | {Module, Function, Args}
+                 Module = atom()
+                 Function = atom()
+                 Args = list()
+                 body_format() = string | binary
+                 Result = {status_line(), headers(), Body} | {status_code(),
+                 Body} | request_id()
+                 Body = string() | binary()
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+                 Reason = {connect_failed, term()} | {send_failed, term()} |
+                 term()
+
+              Sends a HTTP-request. The function can be both synchronous and
+              asynchronous. In the later case the function will return _{_o_k_,
+              _R_e_q_u_e_s_t_I_d_} and later on the information will be delivered to the
+              _r_e_c_e_i_v_e_r depending on that value.
+
+              Http option (_h_t_t_p___o_p_t_i_o_n_(_)) details:
+
+                _t_i_m_e_o_u_t:
+                  Timeout time for the request.
+
+                  The clock starts ticking as soon as the request has been
+                  sent.
+
+                  Time is in milliseconds.
+
+                  Defaults to _i_n_f_i_n_i_t_y.
+
+                _c_o_n_n_e_c_t___t_i_m_e_o_u_t:
+                  Connection timeout time, used during the initial request,
+                  when the client is _c_o_n_n_e_c_t_i_n_g to the server.
+
+                  Time is in milliseconds.
+
+                  Defaults to the value of the _t_i_m_e_o_u_t option.
+
+                _s_s_l:
+                  This is the default ssl config option, currently defaults to
+                  _e_s_s_l, see below.
+
+                  Defaults to _[_].
+
+                _e_s_s_l:
+                  If using the Erlang based implementation of SSL, these SSL-
+                  specific options are used.
+
+                  Defaults to _[_].
+
+                _a_u_t_o_r_e_d_i_r_e_c_t:
+                  Should the client automatically retrieve the information
+                  from the new URI and return that as the result instead of a
+                  30X-result code.
+
+                  Note that for some 30X-result codes automatic redirect is
+                  not allowed. In these cases the 30X-result will always be
+                  returned.
+
+                  Defaults to _t_r_u_e.
+
+                _p_r_o_x_y___a_u_t_h:
+                  A proxy-authorization header using the provided user name
+                  and password will be added to the request.
+
+                _v_e_r_s_i_o_n:
+                  Can be used to make the client act as an _H_T_T_P_/_1_._0 or
+                  _H_T_T_P_/_0_._9 client. By default this is an _H_T_T_P_/_1_._1 client. When
+                  using _H_T_T_P_/_1_._0 persistent connections will not be used.
+
+                  Defaults to the string _"_H_T_T_P_/_1_._1_".
+
+                _r_e_l_a_x_e_d:
+                  If set to _t_r_u_e workarounds for known server deviations from
+                  the HTTP-standard are enabled.
+
+                  Defaults to _f_a_l_s_e.
+
+                _u_r_l___e_n_c_o_d_e:
+                  Will apply Percent-encoding, also known as URL encoding on
+                  the URL.
+
+                  Defaults to _f_a_l_s_e.
+
+              Option (_o_p_t_i_o_n_(_)) details:
+
+                _s_y_n_c:
+                  Shall the request be synchronous or asynchronous.
+
+                  Defaults to _t_r_u_e.
+
+                _s_t_r_e_a_m:
+                  Streams the body of a 200 or 206 response to the calling
+                  process or to a file. When streaming to the calling process
+                  using the option _s_e_l_f the following stream messages will be
+                  sent to that process: _{_h_t_t_p_, _{_R_e_q_u_e_s_t_I_d_, _s_t_r_e_a_m___s_t_a_r_t_,
+                  _H_e_a_d_e_r_s_}_, _{_h_t_t_p_, _{_R_e_q_u_e_s_t_I_d_, _s_t_r_e_a_m_, _B_i_n_B_o_d_y_P_a_r_t_}_, _{_h_t_t_p_,
+                  _{_R_e_q_u_e_s_t_I_d_, _s_t_r_e_a_m___e_n_d_, _H_e_a_d_e_r_s_}. When streaming to to the
+                  calling processes using the option _{_s_e_l_f_, _o_n_c_e_} the first
+                  message will have an additional element e.i. _{_h_t_t_p_,
+                  _{_R_e_q_u_e_s_t_I_d_, _s_t_r_e_a_m___s_t_a_r_t_, _H_e_a_d_e_r_s_, _P_i_d_}, this is the process
+                  id that should be used as an argument to _h_t_t_p_:_s_t_r_e_a_m___n_e_x_t_/_1
+                  to trigger the next message to be sent to the calling
+                  process.
+
+                  Note that it is possible that chunked encoding will add
+                  headers so that there are more headers in the _s_t_r_e_a_m___e_n_d
+                  message than in the _s_t_r_e_a_m___s_t_a_r_t. When streaming to a file
+                  and the request is asynchronous the message _{_h_t_t_p_,
+                  _{_R_e_q_u_e_s_t_I_d_, _s_a_v_e_d___t_o___f_i_l_e_}_} will be sent.
+
+                  Defaults to _n_o_n_e.
+
+                _b_o_d_y___f_o_r_m_a_t:
+                  Defines if the body shall be delivered as a string or as a
+                  binary. This option is only valid for the synchronous
+                  request.
+
+                  Defaults to _s_t_r_i_n_g.
+
+                _f_u_l_l___r_e_s_u_l_t:
+                  Should a "full result" be returned to the caller (that is,
+                  the body, the headers and the entire status-line) or not
+                  (the body and the status code).
+
+                  Defaults to _t_r_u_e.
+
+                _h_e_a_d_e_r___a_s___i_s:
+                  Shall the headers provided by the user be made lower case or
+                  be regarded as case sensitive.
+
+                  Note that the http standard requires them to be case
+                  insenstive. This feature should only be used if there is no
+                  other way to communicate with the server or for testing
+                  purpose. Also note that when this option is used no headers
+                  will be automatically added, all necessary headers have to
+                  be provided by the user.
+
+                  Defaults to _f_a_l_s_e.
+
+                _s_o_c_k_e_t___o_p_t_s:
+                  Socket options to be used for this and subsequent
+                  request(s).
+
+                  Overrides any value set by the sseett__ooppttiioonnss function.
+
+                  Note that the validity of the options are _n_o_t checked in any
+                  way.
+
+                  Note that this may change the socket behaviour (see
+                  iinneett::sseettooppttss//22) for an already existing one, and therefore
+                  an already connected request handler.
+
+                  By default the socket options set by the sseett__ooppttiioonnss//11,,22
+                  function are used when establishing a connection.
+
+                _r_e_c_e_i_v_e_r:
+                  Defines how the client will deliver the result of an
+                  asynchroneous request (_s_y_n_c has the value _f_a_l_s_e).
+
+                  _p_i_d_(_):
+                    Message(s) will be sent to this process in the format:
+
+                  {http, ReplyInfo}
+
+
+                  _f_u_n_c_t_i_o_n_/_1:
+                    Information will be delivered to the receiver via calls to
+                    the provided fun:
+
+                  Receiver(ReplyInfo)
+
+
+                  _{_M_o_d_u_l_e_, _F_u_n_c_i_o_n_, _A_r_g_s_}:
+                    Information will be delivered to the receiver via calls to
+                    the callback function:
+
+                  apply(Module, Function, [ReplyInfo | Args])
+
+
+                  In all of the above cases, _R_e_p_l_y_I_n_f_o has the following
+                  structure:
+
+                {RequestId, saved_to_file}
+                {RequestId, {error, Reason}}
+                {RequestId, Result}
+                {RequestId, stream_start, Headers}
+                {RequestId, stream_start, Headers, HandlerPid}
+                {RequestId, stream,       BinBodyPart}
+                {RequestId, stream_end,   Headers}
+
+
+                  Defaults to the _p_i_d_(_) of the process calling the request
+                  function (_s_e_l_f_(_)).
+
+                _i_p_v_6___h_o_s_t___w_i_t_h___b_r_a_c_k_e_t_s:
+                  When parsing the Host-Port part of an URI with a IPv6
+                  address with brackets, shall we retain those brackets (_t_r_u_e)
+                  or strip them (_f_a_l_s_e).
+
+                  Defaults to _f_a_l_s_e.
+
+       ccaanncceell__rreeqquueesstt((RReeqquueessttIIdd)) -->>
+       ccaanncceell__rreeqquueesstt((RReeqquueessttIIdd,, PPrrooffiillee)) -->> ookk
+
+              Types:
+
+                 RequestId = request_id() - A unique identifier as returned by
+                 request/4
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+
+              Cancels an asynchronous HTTP-request.
+
+       sseett__ooppttiioonnss((OOppttiioonnss)) -->>
+       sseett__ooppttiioonnss((OOppttiioonnss,, PPrrooffiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [Option]
+                 Option = {proxy, {Proxy, NoProxy}} | {max_sessions,
+                 MaxSessions} | {max_keep_alive_length, MaxKeepAlive} |
+                 {keep_alive_timeout, KeepAliveTimeout} |
+                 {max_pipeline_length, MaxPipeline} | {pipeline_timeout,
+                 PipelineTimeout} | {cookies, CookieMode} | {ipfamily,
+                 IpFamily} | {ip, IpAddress} | {port, Port} | {socket_opts,
+                 socket_opts()} | {verbose, VerboseMode}
+                 Proxy = {Hostname, Port}
+                 Hostname = string()
+                   ex: "localhost" or "foo.bar.se"
+                 Port = integer()
+                   ex: 8080
+                 socket_opts() = [socket_opt()]
+                   The options are appended to the socket options used by the
+                   client.
+                   These are the default values when a new request handler is
+                   started (for the initial connect). They are passed directly
+                   to the underlying transport (gen_tcp or ssl) _w_i_t_h_o_u_t
+                   verification!
+                 NoProxy = [NoProxyDesc]
+                 NoProxyDesc = DomainDesc | HostName | IPDesc
+                 DomainDesc = "*.Domain"
+                   ex: "*.ericsson.se"
+                 IpDesc = string()
+                   ex: "134.138" or "[FEDC:BA98" (all IP-addresses starting
+                   with 134.138 or FEDC:BA98), "66.35.250.150" or
+                   "[2010:836B:4179::836B:4179]" (a complete IP-address).
+                 MaxSessions = integer()
+                   Default is _2. Maximum number of persistent connections to a
+                   host.
+                 MaxKeepAlive = integer()
+                   Default is _5. Maximum number of outstanding requests on the
+                   same connection to a host.
+                 KeepAliveTimeout = integer()
+                   Default is _1_2_0_0_0_0 (= 2 min). If a persistent connection is
+                   idle longer than the _k_e_e_p___a_l_i_v_e___t_i_m_e_o_u_t in milliseconds,
+                   the client will close the connection. The server may also
+                   have such a time out but you should not count on it!
+                 MaxPipeline = integer()
+                   Default is _2. Maximum number of outstanding requests on a
+                   pipelined connection to a host.
+                 PipelineTimeout = integer()
+                   Default is _0, which will result in pipelining not being
+                   used. If a persistent connection is idle longer than the
+                   _p_i_p_e_l_i_n_e___t_i_m_e_o_u_t in milliseconds, the client will close the
+                   connection.
+                 CookieMode = enabled | disabled | verify
+                   Default is _d_i_s_a_b_l_e_d. If Cookies are enabled all valid
+                   cookies will automatically be saved in the client manager's
+                   cookie database. If the option _v_e_r_i_f_y is used the function
+                   _s_t_o_r_e___c_o_o_k_i_e_s_/_2 has to be called for the cookies to be
+                   saved.
+                 IpFamily = inet | inet6 | inet6fb4
+                   By default _i_n_e_t. When it is set to _i_n_e_t_6_f_b_4 you can use
+                   both ipv4 and ipv6. It first tries _i_n_e_t_6 and if that does
+                   not works falls back to _i_n_e_t. The option is here to provide
+                   a workaround for buggy ipv6 stacks to ensure that ipv4 will
+                   always work.
+                 IpAddress = ip_address()
+                   If the host has several network interfaces, this option
+                   specifies which one to use. See ggeenn__ttccpp::ccoonnnneecctt//33,,44 for
+                   more info.
+                 Port = integer()
+                   Specify which local port number to use. See
+                   ggeenn__ttccpp::ccoonnnneecctt//33,,44 for more info.
+                 VerboseMode = false | verbose | debug | trace
+                   Default is _f_a_l_s_e. This option is used to switch on (or off)
+                   different levels of erlang trace on the client. It is a
+                   debug feature.
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+
+              Sets options to be used for subsequent requests.
+
+          NNoottee::
+              If possible the client will keep its connections alive and use
+              persistent connections with or without pipeline depending on
+              configuration and current circumstances. The HTTP/1.1
+              specification does not provide a guideline for how many requests
+              would be ideal to be sent on a persistent connection, this very
+              much depends on the application. Note that a very long queue of
+              requests may cause a user perceived delay as earlier requests
+              may take a long time to complete. The HTTP/1.1 specification
+              does suggest a limit of 2 persistent connections per server,
+              which is the default value of the _m_a_x___s_e_s_s_i_o_n_s option.
+
+
+       ggeett__ooppttiioonnss((OOppttiioonnIItteemmss)) -->> {{ookk,, VVaalluueess}} || {{eerrrroorr,, RReeaassoonn}}
+       ggeett__ooppttiioonnss((OOppttiioonnIItteemmss,, PPrrooffiillee)) -->> {{ookk,, VVaalluueess}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 OptionItems = all | [option_item()]
+                 option_item() = proxy | max_sessions | keep_alive_timeout |
+                 max_keep_alive_length | pipeline_timeout |
+                 max_pipeline_length | cookies | ipfamily | ip | port |
+                 socket_opts | verbose
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+                 Values = [{option_item(), term()}]
+                 Reason = term()
+
+              Retrieves the options currently used by the client.
+
+       ssttrreeaamm__nneexxtt((PPiidd)) -->> ookk
+
+              Types:
+
+                 Pid = pid() - as received in the stream_start message
+
+              Triggers the next message to be streamed, e.i. same behavior as
+              active once for sockets.
+
+       ssttoorree__ccooookkiieess((SSeettCCooookkiieeHHeeaaddeerrss,, UUrrll)) -->>
+       ssttoorree__ccooookkiieess((SSeettCCooookkiieeHHeeaaddeerrss,, UUrrll,, PPrrooffiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SetCookieHeaders = headers() - where field = "set-cookie"
+                 Url = url()
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+
+              Saves the cookies defined in SetCookieHeaders in the client
+              profile's cookie database. You need to call this function if you
+              have set the option _c_o_o_k_i_e_s to _v_e_r_i_f_y. If no profile is
+              specified the default profile will be used.
+
+       ccooookkiiee__hheeaaddeerr((UUrrll)) -->>
+       ccooookkiiee__hheeaaddeerr((UUrrll,, PPrrooffiillee || OOppttss)) -->> hheeaaddeerr(()) || {{eerrrroorr,, RReeaassoonn}}
+       ccooookkiiee__hheeaaddeerr((UUrrll,, OOppttss,, PPrrooffiillee)) -->> hheeaaddeerr(()) || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Url = url()
+                 Opts = [cookie_header_opt()]
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+                 cookie_header_opt() = {ipv6_host_with_brackets, boolean()}
+
+              Returns the cookie header that would be sent when making a
+              request to _U_r_l using the profile _P_r_o_f_i_l_e. If no profile is
+              specified the default profile will be used.
+
+              The option _i_p_v_6___h_o_s_t___w_i_t_h___b_r_a_c_k_e_t deals with how to parse IPv6
+              addresses. See the _O_p_t_i_o_n_s argument of the rreeqquueesstt//44,,55 for more
+              info.
+
+       rreesseett__ccooookkiieess(()) -->> vvooiidd(())
+       rreesseett__ccooookkiieess((PPrrooffiillee)) -->> vvooiidd(())
+
+              Types:
+
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+
+              Resets (clears) the cookie database for the specified _P_r_o_f_i_l_e.
+              If no profile is specified the default profile will be used.
+
+       wwhhiicchh__ccooookkiieess(()) -->> ccooookkiieess(())
+       wwhhiicchh__ccooookkiieess((PPrrooffiillee)) -->> ccooookkiieess(())
+
+              Types:
+
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+                 cookies() = [cookie_stores()]
+                 cookie_stores() = {cookies, cookies()} | {session_cookies,
+                 cookies()}
+                 cookies() = [cookie()]
+                 cookie() = term()
+
+              This function produces a list of the entire cookie database. It
+              is intended for debugging/testing purposes. If no profile is
+              specified the default profile will be used.
+
+       wwhhiicchh__sseessssiioonnss(()) -->> sseessssiioonn__iinnffoo(())
+       wwhhiicchh__sseessssiioonnss((PPrrooffiillee)) -->> sseessssiioonn__iinnffoo(())
+
+              Types:
+
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+                 session_info() = {GoodSessions, BadSessions, NonSessions}
+                 GoodSessions = session()
+                 BadSessions = tuple()
+                 NonSessions = term()
+
+              This function produces a slightly processed dump of the session
+              database. It is intended for debugging. If no profile is
+              specified the default profile will be used.
+
+       iinnffoo(()) -->> lliisstt(())
+       iinnffoo((PPrrooffiillee)) -->> lliisstt(())
+
+              Types:
+
+                 Profile = profile() | pid() (when started _s_t_a_n_d___a_l_o_n_e)
+
+              This function produces a list of miscelleneous info. It is
+              intended for debugging. If no profile is specified the default
+              profile will be used.
+
+SSEEEE AALLSSOO
+       RFC 2616, iinneettss((33)), ggeenn__ttccpp((33)), ssssll((33))
+
+
+
+Ericsson AB                       inets 5.9.1                         httpc(3)

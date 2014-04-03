@@ -1,0 +1,44 @@
+CosNotifyFilter_FilterFactorEyr(l3a)ng Module DefiniCtoisoNnotifyFilter_FilterFactory(3)
+
+
+
+NNAAMMEE
+       CosNotifyFilter_FilterFactory - This module implements the OMG
+       CosNotifyFilter::FilterFactory interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccrreeaattee__ffiilltteerr((FFiilltteerrFFaaccttoorryy,, GGrraammmmaarr)) -->> RReeppllyy
+
+              Types:
+
+                 FilterFactory = #objref
+                 Grammar = string()
+                 Reply = Filter | {'EXCEPTION',
+                 #'CosNotifyFilter_InvalidGrammar'{}}
+                 Filter = #objref
+
+              This operation creates a new Filter object, under the condition
+              that Grammar given is supported. Currently, only _"_E_X_T_E_N_D_E_D___T_C_L_"
+              is supported.
+
+       ccrreeaattee__mmaappppiinngg__ffiilltteerr((FFiilltteerrFFaaccttoorryy,, GGrraammmmaarr)) -->> RReeppllyy
+
+              Types:
+
+                 FilterFactory = #objref
+                 Grammar = string()
+                 Reply = MappingFilter | {'EXCEPTION',
+                 #'CosNotifyFilter_InvalidGrammar'{}}
+                 Filter = #objref
+
+              This operation creates a new MappingFilter object, under the
+              condition that Grammar given is supported. Currently, only
+              _"_E_X_T_E_N_D_E_D___T_C_L_" is supported.
+
+
+
+Ericsson AB                 cosNotification 1.1C.o1s8NotifyFilter_FilterFactory(3)

@@ -1,0 +1,322 @@
+xmerl_sax_parser(3)        Erlang Module Definition        xmerl_sax_parser(3)
+
+
+
+NNAAMMEE
+       xmerl_sax_parser - XML SAX parser API
+
+DDEESSCCRRIIPPTTIIOONN
+       A SAX parser for XML that sends the events through a callback
+       interface. SAX is the _S_i_m_p_l_e _A_P_I _f_o_r _X_M_L, originally a Java-only API.
+       SAX was the first widely adopted API for XML in Java, and is a _d_e _f_a_c_t_o
+       standard where there are versions for several programming language
+       environments other than Java.
+
+DDAATTAA TTYYPPEESS
+         _o_p_t_i_o_n_(_):
+           Options used to customize the behaviour of the parser. Possible
+           options are:
+
+           _{_c_o_n_t_i_n_u_a_t_i_o_n___f_u_n_, _C_o_n_t_i_n_u_a_t_i_o_n_F_u_n_}:
+             CCoonnttiinnuuaattiioonnFFuunn is a call back function to decide what to do if
+             the parser runs into EOF before the document is complete.
+
+           _{_c_o_n_t_i_n_u_a_t_i_o_n___s_t_a_t_e_, _t_e_r_m_(_)_}:
+              State that is accessible in the continuation call back function.
+
+           _{_e_v_e_n_t___f_u_n_, _E_v_e_n_t_F_u_n_}:
+             EEvveennttFFuunn is the call back function for parser events.
+
+           _{_e_v_e_n_t___s_t_a_t_e_, _t_e_r_m_(_)_}:
+              State that is accessible in the event call back function.
+
+           _{_f_i_l_e___t_y_p_e_, _F_i_l_e_T_y_p_e_}:
+              Flag that tells the parser if it's parsing a DTD or a normal XML
+             file (default normal).
+
+             * _F_i_l_e_T_y_p_e _= _n_o_r_m_a_l _| _d_t_d
+
+           _{_e_n_c_o_d_i_n_g_, _E_n_c_o_d_i_n_g_}:
+              Set default character set used (default UTF-8). This character
+             set is used only if not explicitly given by the XML document.
+
+             * _E_n_c_o_d_i_n_g _= _u_t_f_8 _| _{_u_t_f_1_6_,_b_i_g_} _| _{_u_t_f_1_6_,_l_i_t_t_l_e_} _| _l_a_t_i_n_1 _| _l_i_s_t
+
+           _s_k_i_p___e_x_t_e_r_n_a_l___d_t_d:
+              Skips the external DTD during parsing.
+
+         ::
+
+
+         _e_v_e_n_t_(_):
+           The SAX events that are sent to the user via the callback.
+
+           _s_t_a_r_t_D_o_c_u_m_e_n_t:
+              Receive notification of the beginning of a document. The SAX
+             parser will send this event only once before any other event
+             callbacks.
+
+           _e_n_d_D_o_c_u_m_e_n_t:
+              Receive notification of the end of a document. The SAX parser
+             will send this event only once, and it will be the last event
+             during the parse.
+
+           _{_s_t_a_r_t_P_r_e_f_i_x_M_a_p_p_i_n_g_, _P_r_e_f_i_x_, _U_r_i_}:
+              Begin the scope of a prefix-URI Namespace mapping. Note that
+             start/endPrefixMapping events are not guaranteed to be properly
+             nested relative to each other: all startPrefixMapping events will
+             occur immediately before the corresponding startElement event,
+             and all endPrefixMapping events will occur immediately after the
+             corresponding endElement event, but their order is not otherwise
+             guaranteed. There will not be start/endPrefixMapping events for
+             the "xml" prefix, since it is predeclared and immutable.
+
+             * _P_r_e_f_i_x _= _s_t_r_i_n_g_(_)
+
+             * _U_r_i _= _s_t_r_i_n_g_(_)
+
+           _{_e_n_d_P_r_e_f_i_x_M_a_p_p_i_n_g_, _P_r_e_f_i_x_}:
+              End the scope of a prefix-URI mapping.
+
+             * _P_r_e_f_i_x _= _s_t_r_i_n_g_(_)
+
+           _{_s_t_a_r_t_E_l_e_m_e_n_t_, _U_r_i_, _L_o_c_a_l_N_a_m_e_, _Q_u_a_l_i_f_i_e_d_N_a_m_e_, _A_t_t_r_i_b_u_t_e_s_}:
+              Receive notification of the beginning of an element. The Parser
+             will send this event at the beginning of every element in the XML
+             document; there will be a corresponding endElement event for
+             every startElement event (even when the element is empty). All of
+             the element's content will be reported, in order, before the
+             corresponding endElement event.
+
+             * _U_r_i _= _s_t_r_i_n_g_(_)
+
+             * _L_o_c_a_l_N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _Q_u_a_l_i_f_i_e_d_N_a_m_e _= _{_P_r_e_f_i_x_, _L_o_c_a_l_N_a_m_e_}
+
+             * _P_r_e_f_i_x _= _s_t_r_i_n_g_(_)
+
+             * _A_t_t_r_i_b_u_t_e_s _= _[_{_U_r_i_, _P_r_e_f_i_x_, _A_t_t_r_i_b_u_t_e_N_a_m_e_, _V_a_l_u_e_}_]
+
+             * _A_t_t_r_i_b_u_t_e_N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _V_a_l_u_e _= _s_t_r_i_n_g_(_)
+
+           _{_e_n_d_E_l_e_m_e_n_t_, _U_r_i_, _L_o_c_a_l_N_a_m_e_, _Q_u_a_l_i_f_i_e_d_N_a_m_e_}:
+              Receive notification of the end of an element. The SAX parser
+             will send this event at the end of every element in the XML
+             document; there will be a corresponding startElement event for
+             every endElement event (even when the element is empty).
+
+             * _U_r_i _= _s_t_r_i_n_g_(_)
+
+             * _L_o_c_a_l_N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _Q_u_a_l_i_f_i_e_d_N_a_m_e _= _{_P_r_e_f_i_x_, _L_o_c_a_l_N_a_m_e_}
+
+             * _P_r_e_f_i_x _= _s_t_r_i_n_g_(_)
+
+           _{_c_h_a_r_a_c_t_e_r_s_, _s_t_r_i_n_g_(_)_}:
+              Receive notification of character data.
+
+           _{_i_g_n_o_r_a_b_l_e_W_h_i_t_e_s_p_a_c_e_, _s_t_r_i_n_g_(_)_}:
+              Receive notification of ignorable whitespace in element content.
+
+           _{_p_r_o_c_e_s_s_i_n_g_I_n_s_t_r_u_c_t_i_o_n_, _T_a_r_g_e_t_, _D_a_t_a_}:
+              Receive notification of a processing instruction. The Parser
+             will send this event once for each processing instruction found:
+             note that processing instructions may occur before or after the
+             main document element.
+
+             * _T_a_r_g_e_t _= _s_t_r_i_n_g_(_)
+
+             * _D_a_t_a _= _s_t_r_i_n_g_(_)
+
+           _{_c_o_m_m_e_n_t_, _s_t_r_i_n_g_(_)_}:
+              Report an XML comment anywhere in the document (both inside and
+             outside of the document element).
+
+           _s_t_a_r_t_C_D_A_T_A:
+              Report the start of a CDATA section. The contents of the CDATA
+             section will be reported through the regular characters event.
+
+           _e_n_d_C_D_A_T_A:
+              Report the end of a CDATA section.
+
+           _{_s_t_a_r_t_D_T_D_, _N_a_m_e_, _P_u_b_l_i_c_I_d_, _S_y_s_t_e_m_I_d_}:
+              Report the start of DTD declarations, it's reporting the start
+             of the DOCTYPE declaration. If the document has no DOCTYPE
+             declaration, this event will not be sent.
+
+             * _N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _P_u_b_l_i_c_I_d _= _s_t_r_i_n_g_(_)
+
+             * _S_y_s_t_e_m_I_d _= _s_t_r_i_n_g_(_)
+
+           _e_n_d_D_T_D:
+              Report the end of DTD declarations, it's reporting the end of
+             the DOCTYPE declaration.
+
+           _{_s_t_a_r_t_E_n_t_i_t_y_, _S_y_s_I_d_}:
+              Report the beginning of some internal and external XML entities.
+             ???
+
+           _{_e_n_d_E_n_t_i_t_y_, _S_y_s_I_d_}:
+              Report the end of an entity. ???
+
+           _{_e_l_e_m_e_n_t_D_e_c_l_, _N_a_m_e_, _M_o_d_e_l_}:
+              Report an element type declaration. The content model will
+             consist of the string "EMPTY", the string "ANY", or a
+             parenthesised group, optionally followed by an occurrence
+             indicator. The model will be normalized so that all parameter
+             entities are fully resolved and all whitespace is removed,and
+             will include the enclosing parentheses. Other normalization (such
+             as removing redundant parentheses or simplifying occurrence
+             indicators) is at the discretion of the parser.
+
+             * _N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _M_o_d_e_l _= _s_t_r_i_n_g_(_)
+
+           _{_a_t_t_r_i_b_u_t_e_D_e_c_l_, _E_l_e_m_e_n_t_N_a_m_e_, _A_t_t_r_i_b_u_t_e_N_a_m_e_, _T_y_p_e_, _M_o_d_e_, _V_a_l_u_e_}:
+              Report an attribute type declaration.
+
+             * _E_l_e_m_e_n_t_N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _A_t_t_r_i_b_u_t_e_N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _T_y_p_e _= _s_t_r_i_n_g_(_)
+
+             * _M_o_d_e _= _s_t_r_i_n_g_(_)
+
+             * _V_a_l_u_e _= _s_t_r_i_n_g_(_)
+
+           _{_i_n_t_e_r_n_a_l_E_n_t_i_t_y_D_e_c_l_, _N_a_m_e_, _V_a_l_u_e_}:
+              Report an internal entity declaration.
+
+             * _N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _V_a_l_u_e _= _s_t_r_i_n_g_(_)
+
+           _{_e_x_t_e_r_n_a_l_E_n_t_i_t_y_D_e_c_l_, _N_a_m_e_, _P_u_b_l_i_c_I_d_, _S_y_s_t_e_m_I_d_}:
+              Report a parsed external entity declaration.
+
+             * _N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _P_u_b_l_i_c_I_d _= _s_t_r_i_n_g_(_)
+
+             * _S_y_s_t_e_m_I_d _= _s_t_r_i_n_g_(_)
+
+           _{_u_n_p_a_r_s_e_d_E_n_t_i_t_y_D_e_c_l_, _N_a_m_e_, _P_u_b_l_i_c_I_d_, _S_y_s_t_e_m_I_d_, _N_d_a_t_a_}:
+              Receive notification of an unparsed entity declaration event.
+
+             * _N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _P_u_b_l_i_c_I_d _= _s_t_r_i_n_g_(_)
+
+             * _S_y_s_t_e_m_I_d _= _s_t_r_i_n_g_(_)
+
+             * _N_d_a_t_a _= _s_t_r_i_n_g_(_)
+
+           _{_n_o_t_a_t_i_o_n_D_e_c_l_, _N_a_m_e_, _P_u_b_l_i_c_I_d_, _S_y_s_t_e_m_I_d_}:
+              Receive notification of a notation declaration event.
+
+             * _N_a_m_e _= _s_t_r_i_n_g_(_)
+
+             * _P_u_b_l_i_c_I_d _= _s_t_r_i_n_g_(_)
+
+             * _S_y_s_t_e_m_I_d _= _s_t_r_i_n_g_(_)
+
+         _u_n_i_c_o_d_e___c_h_a_r_(_):
+            Integer representing valid unicode codepoint.
+
+         _u_n_i_c_o_d_e___b_i_n_a_r_y_(_):
+            Binary with characters encoded in UTF-8 or UTF-16.
+
+         _l_a_t_i_n_1___b_i_n_a_r_y_(_):
+            Binary with characters encoded in iso-latin-1.
+
+EEXXPPOORRTTSS
+       ffiillee((FFiilleennaammee,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 Filename = string()
+                 Options = [option()]
+                 Result = {ok, EventState, Rest} |
+                  {Tag, Location, Reason, EndTags, EventState}
+                 Rest = unicode_binary() | latin1_binary()
+                 Tag = atom() (fatal_error, or user defined tag)
+                 Location = {CurrentLocation, EntityName, LineNo}
+                 CurrentLocation = string()
+                 EntityName = string()
+                 LineNo = integer()
+                 EventState = term()
+                 Reason = term()
+
+              Parse file containing an XML document. This functions uses a
+              default continuation function to read the file in blocks.
+
+       ssttrreeaamm((XXmmll,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 Xml = unicode_binary() | latin1_binary() | [unicode_char()]
+                 Options = [option()]
+                 Result = {ok, EventState, Rest} |
+                  {Tag, Location, Reason, EndTags, EventState}
+                 Rest = unicode_binary() | latin1_binary() | [unicode_char()]
+                 Tag = atom() (fatal_error or user defined tag)
+                 Location = {CurrentLocation, EntityName, LineNo}
+                 CurrentLocation = string()
+                 EntityName = string()
+                 LineNo = integer()
+                 EventState = term()
+                 Reason = term()
+
+              Parse a stream containing an XML document.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The callback interface is based on that the user sends a fun with the
+       correct signature to the parser.
+
+EEXXPPOORRTTSS
+       CCoonnttiinnuuaattiioonnFFuunn((SSttaattee)) -->> {{NNeewwBByytteess,, NNeewwSSttaattee}}
+
+              Types:
+
+                 State = NewState = term()
+                 NewBytes = binary() | list() (should be same as start input
+                 in stream/2)
+
+              This function is called whenever the parser runs out of input
+              data. If the function can't get hold of more input an empty list
+              or binary (depends on start input in stream/2) is returned.
+              Other types of errors is handled through exceptions. Use throw/1
+              to send the following tuple {Tag = atom(), Reason = string()} if
+              the continuation function encounters a fatal error. Tag is an
+              atom that identifies the functional entity that sends the
+              exception and Reason is a string that describes the problem.
+
+       EEvveennttFFuunn((EEvveenntt,, LLooccaattiioonn,, SSttaattee)) -->> NNeewwSSttaattee
+
+              Types:
+
+                 Event = event()
+                 Location = {CurrentLocation, Entityname, LineNo}
+                 CurrentLocation = string()
+                 Entityname = string()
+                 LineNo = integer()
+                 State = NewState = term()
+
+              This function is called for every event sent by the parser. The
+              error handling is done through exceptions. Use throw/1 to send
+              the following tuple {Tag = atom(), Reason = string()} if the
+              application encounters a fatal error. Tag is an atom that
+              identifies the functional entity that sends the exception and
+              Reason is a string that describes the problem.
+
+
+
+Ericsson AB                       xmerl 1.3.2              xmerl_sax_parser(3)

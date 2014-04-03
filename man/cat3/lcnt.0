@@ -1,0 +1,393 @@
+lcnt(3)                    Erlang Module Definition                    lcnt(3)
+
+
+
+NNAAMMEE
+       lcnt - A runtime system Lock Profiling tool.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _l_c_n_t module is used to profile the internal ethread locks in the
+       Erlang Runtime System. With _l_c_n_t enabled, Internal counters in the
+       runtime system are updated each time a lock is taken. The counters
+       stores information about the number of acquisition tries and the number
+       of collisions that has occurred during the acquisition tries. The
+       counters also record the waiting time a lock has caused for a blocked
+       thread when a collision has occurred.
+
+       The data produced by the lock counters will give an estimate on how
+       well the runtime system will behave from a parallelizable view point
+       for the scenarios tested. This tool was mainly developed to help erlang
+       runtime developers iron out potential and generic bottlenecks.
+
+       Locks in the emulator are named after what type of resource they
+       protect and where in the emulator they are initialized, those are lock
+       'classes'. Most of those locks are also instantiated several times, and
+       given unique identifiers, to increase locking granularity. Typically an
+       instantiated lock protects a disjunct set of the resource, i.e ets-
+       tables, processes or ports. In other cases it protects a specific range
+       of a resource, e.g. _p_i_x___l_o_c_k which protects index to process mappings,
+       and is given a unique number within the class. A unique lock in _l_c_n_t is
+       referenced by a name (class) and an identifier, _{_N_a_m_e_, _I_d_}.
+
+       Some locks in the system are static and protects global resources, for
+       example _b_i_f___t_i_m_e_r_s and the _r_u_n___q_u_e_u_e locks. Other locks are dynamic and
+       not necessarily long lived, for example process locks and ets-table
+       locks. The statistics data from short lived locks can be stored
+       separately when the locks are deleted. This behavior is by default
+       turned off to save memory but can be turned on via
+       _l_c_n_t_:_r_t___o_p_t_(_{_c_o_p_y___s_a_v_e_, _t_r_u_e_}_). The _l_c_n_t_:_a_p_p_l_y_/_1_,_2_,_3 functions enables
+       this behavior during profiling.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, {{aallrreeaaddyy__ssttaarrtteedd,, PPiidd}}}}
+
+              Types:
+
+                 Pid = pid()
+
+              Starts the lock profiler server. The server only act as a medium
+              for the user and performs filtering and printing of data
+              collected by _l_c_n_t_:_c_o_l_l_e_c_t_/_1.
+
+       ssttoopp(()) -->> ookk
+
+              Stops the lock profiler server.
+
+       ccoolllleecctt(()) -->> ookk
+
+              Same as _c_o_l_l_e_c_t_(_n_o_d_e_(_)_).
+
+       ccoolllleecctt((NNooddee)) -->> ookk
+
+              Types:
+
+                 Node = node()
+
+              Collects lock statistics from the runtime system. The function
+              starts a server if it is not already started. It then populates
+              the server with lock statistics. If the server held any lock
+              statistics data before the collect then that data is lost.
+
+          NNoottee::
+              When collection occurs the runtime system transitions to a
+              single thread, blocking all other threads. No other tasks will
+              be scheduled during this operation. Depending on the size of the
+              data this might take a long time (several seconds) and cause
+              timeouts in the system.
+
+
+       cclleeaarr(()) -->> ookk
+
+              Same as _c_l_e_a_r_(_n_o_d_e_(_)_).
+
+       cclleeaarr((NNooddee)) -->> ookk
+
+              Types:
+
+                 Node = node()
+
+              Clears the internal lock statistics from the runtime system.
+              This does not clear the data on the server only on runtime
+              system. All counters for static locks are zeroed, all dynamic
+              locks currently alive are zeroed and all saved locks now
+              destroyed are removed. It also resets the duration timer.
+
+       ccoonnfflliiccttss(()) -->> ookk
+
+              Same as _c_o_n_f_l_i_c_t_s_(_[_]_).
+
+       ccoonnfflliiccttss(([[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 Option = {sort, Sort} | {reverse, bool()} | {thresholds,
+                 [Thresholds]} | {print, [Print | {Print, integer()}]} |
+                 {max_locks, MaxLocks} | {combine, bool()}
+                 Sort = name | id | type | tries | colls | ratio | time |
+                 entry
+                 Thresholds = {tries, integer()} | {colls, integer()} | {time,
+                 integer()}
+                 Print = name | id | type | entry | tries | colls | ratio |
+                 time | duration
+                 MaxLocks = integer() | none
+
+              Prints a list of internal locks and its statistics.
+
+              For option description, see llccnntt::iinnssppeecctt//22.
+
+       llooccaattiioonnss(()) -->> ookk
+
+              Same as _l_o_c_a_t_i_o_n_s_(_[_]_).
+
+       llooccaattiioonnss(([[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 Option = {sort, Sort} | {thresholds, [Thresholds]} | {print,
+                 [Print | {Print, integer()}]} | {max_locks, MaxLocks} |
+                 {combine, bool()}
+                 Sort = name | id | type | tries | colls | ratio | time |
+                 entry
+                 Thresholds = {tries, integer()} | {colls, integer()} | {time,
+                 integer()}
+                 Print = name | id | type | entry | tries | colls | ratio |
+                 time | duration
+                 MaxLocks = integer() | none
+
+              Prints a list of internal lock counters by source code
+              locations.
+
+              For option description, see llccnntt::iinnssppeecctt//22.
+
+       iinnssppeecctt((LLoocckk)) -->> ookk
+
+              Same as _i_n_s_p_e_c_t_(_L_o_c_k_, _[_]_).
+
+       iinnssppeecctt((LLoocckk,, [[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 Lock = Name | {Name, Id | [Id]}
+                 Name = atom() | pid() | port()
+                 Id = atom() | integer() | pid() | port()
+                 Option = {sort, Sort} | {thresholds, [Thresholds]} | {print,
+                 [Print | {Print, integer()}]} | {max_locks, MaxLocks} |
+                 {combine, bool()} | {locations, bool()}
+                 Sort = name | id | type | tries | colls | ratio | time
+                 Thresholds = {tries, integer()} | {colls, integer()} | {time,
+                 integer()}
+                 Print = name | id | type | entry | tries | colls | ratio |
+                 time | duration
+                 MaxLocks = integer() | none
+
+              Prints a list of internal lock counters for a specific lock.
+
+              Lock _N_a_m_e and _I_d for ports and processes are interchangeable
+              with the use of _l_c_n_t_:_s_w_a_p___p_i_d___k_e_y_s_/_0 and is the reason why _p_i_d_(_)
+              and _p_o_r_t_(_) options can be used in both _N_a_m_e and _I_d space. Both
+              pids and ports are special identifiers with stripped creation
+              and can be recreated with llccnntt::ppiidd//22,,33 and llccnntt::ppoorrtt//11,,22.
+
+              Option description:
+
+                _{_c_o_m_b_i_n_e_, _b_o_o_l_(_)_}:
+                  Combine the statistics from different instances of a lock
+                  class.
+                  Default: _t_r_u_e
+
+                _{_l_o_c_a_t_i_o_n_s_, _b_o_o_l_(_)_}:
+                  Print the statistics by source file and line numbers.
+                  Default: _f_a_l_s_e
+
+                _{_m_a_x___l_o_c_k_s_, _M_a_x_L_o_c_k_s_}:
+                  Maximum number of locks printed or no limit with _n_o_n_e.
+                  Default: _2_0
+
+                _{_p_r_i_n_t_, _P_r_i_n_t_O_p_t_i_o_n_s_}:
+                  Printing options:
+
+                  _n_a_m_e:
+                    Named lock or named set of locks (classes). The same name
+                    used for initializing the lock in the VM.
+
+                  _i_d:
+                    Internal id for set of locks, not always unique. This
+                    could be table name for ets tables (db_tab), port id for
+                    ports, integer identifiers for allocators, etc.
+
+                  _t_y_p_e:
+                    Type of lock: _r_w___m_u_t_e_x, _m_u_t_e_x, _s_p_i_n_l_o_c_k, _r_w___s_p_i_n_l_o_c_k or
+                    _p_r_o_c_l_o_c_k.
+
+                  _e_n_t_r_y:
+                    In combination with _{_l_o_c_a_t_i_o_n_s_, _t_r_u_e_} this option prints
+                    the lock operations source file and line number entry-
+                    points along with statistics for each entry.
+
+                  _t_r_i_e_s:
+                    Number of acquisitions of this lock.
+
+                  _c_o_l_l_s:
+                    Number of collisions when a thread tried to acquire this
+                    lock. This is when a trylock is EBUSY, a write try on read
+                    held rw_lock, a try read on write held rw_lock, a thread
+                    tries to lock an already locked lock. (Internal states
+                    supervises this).
+
+                  _r_a_t_i_o:
+                    The ratio between the number of collisions and the number
+                    of tries (acquisitions) in percentage.
+
+                  _t_i_m_e:
+                    Accumulated waiting time for this lock. This could be
+                    greater than actual wall clock time, it is accumulated for
+                    all threads. Trylock conflicts does not accumulate time.
+
+                  _d_u_r_a_t_i_o_n:
+                    Percentage of accumulated waiting time of wall clock time.
+                    This percentage can be higher than 100% since accumulated
+                    time is from all threads.
+                Default: _[_n_a_m_e_,_i_d_,_t_r_i_e_s_,_c_o_l_l_s_,_r_a_t_i_o_,_t_i_m_e_,_d_u_r_a_t_i_o_n_]
+
+                _{_r_e_v_e_r_s_e_, _b_o_o_l_(_)_}:
+                  Reverses the order of sorting.
+                  Default: _f_a_l_s_e
+
+                _{_s_o_r_t_, _S_o_r_t_}:
+                  Column sorting orders.
+                  Default: _t_i_m_e
+
+                _{_t_h_r_e_s_h_o_l_d_s_, _T_h_r_e_s_h_o_l_d_s_}:
+                  Filtering thresholds. Anything values above the threshold
+                  value are passed through.
+                  Default: _[_{_t_r_i_e_s_, _0_}_, _{_c_o_l_l_s_, _0_}_, _{_t_i_m_e_, _0_}_]
+
+       iinnffoorrmmaattiioonn(()) -->> ookk
+
+              Prints lcnt server state and generic information about collected
+              lock statistics.
+
+       sswwaapp__ppiidd__kkeeyyss(()) -->> ookk
+
+              Swaps places on _N_a_m_e and _I_d space for ports and processes.
+
+       llooaadd((FFiilleennaammee)) -->> ookk
+
+              Types:
+
+                 Filename = filename()
+
+              Restores previously saved data to the server.
+
+       ssaavvee((FFiilleennaammee)) -->> ookk
+
+              Types:
+
+                 Filename = filename()
+
+              Saves the collected data to file.
+
+CCOONNVVEENNIIEENNCCEE FFUUNNCCTTIIOONNSS
+       The following functions are used for convenience.
+
+EEXXPPOORRTTSS
+       aappppllyy((FFuunn)) -->> tteerrmm(())
+
+              Same as _a_p_p_l_y_(_F_u_n_, _[_]_).
+
+       aappppllyy((FFuunn,, AArrggss)) -->> tteerrmm(())
+
+              Types:
+
+                 Fun = fun()
+                 Args = [term()]
+
+              Clears the lock counters and then setups the instrumentation to
+              save all destroyed locks. After setup the fun is called, passing
+              the elements in _A_r_g_s as arguments. When the fun returns the
+              statistics are immediately collected to the server. After the
+              collection the instrumentation is returned to its previous
+              behavior. The result of the applied fun is returned.
+
+       aappppllyy((MMoodduullee,, FFuunnccttiioonn,, AArrggss)) -->> tteerrmm(())
+
+              Types:
+
+                 Module = atom()
+                 Function = atom()
+                 Args = [term()]
+
+              Clears the lock counters and then setups the instrumentation to
+              save all destroyed locks. After setup the function is called,
+              passing the elements in _A_r_g_s as arguments. When the function
+              returns the statistics are immediately collected to the server.
+              After the collection the instrumentation is returned to its
+              previous behavior. The result of the applied function is
+              returned.
+
+       ppiidd((IIdd,, SSeerriiaall)) -->> ppiidd(())
+
+              Same as _p_i_d_(_n_o_d_e_(_)_, _I_d_, _S_e_r_i_a_l_).
+
+       ppiidd((NNooddee,, IIdd,, SSeerriiaall)) -->> ppiidd(())
+
+              Types:
+
+                 Node = node()
+                 Id = integer()
+                 Serial = integer()
+
+              Creates a process id with creation 0. Example:
+
+       ppoorrtt((IIdd)) -->> ppoorrtt(())
+
+              Same as _p_o_r_t_(_n_o_d_e_(_)_, _I_d_).
+
+       ppoorrtt((NNooddee,, IIdd)) -->> ppoorrtt(())
+
+              Types:
+
+                 Node = node()
+                 Id = integer()
+
+              Creates a port id with creation 0.
+
+IINNTTEERRNNAALL RRUUNNTTIIMMEE LLOOCCKK CCOOUUNNTTEERR CCOONNTTRROOLLLLEERRSS
+       The following functions control the behavior of the internal counters.
+
+EEXXPPOORRTTSS
+       rrtt__ccoolllleecctt(()) -->> [[lloocckk__ccoouunntteerr__ddaattaa(())]]
+
+              Same as _r_t___c_o_l_l_e_c_t_(_n_o_d_e_(_)_).
+
+       rrtt__ccoolllleecctt((NNooddee)) -->> [[lloocckk__ccoouunntteerr__ddaattaa(())]]
+
+              Types:
+
+                 Node = node()
+
+              Returns a list of raw lock counter data.
+
+       rrtt__cclleeaarr(()) -->> ookk
+
+              Same as _r_t___c_l_e_a_r_(_n_o_d_e_(_)_).
+
+       rrtt__cclleeaarr((NNooddee)) -->> ookk
+
+              Types:
+
+                 Node = node()
+
+              Clear the internal counters. Same as _l_c_n_t_:_c_l_e_a_r_(_N_o_d_e_).
+
+       rrtt__oopptt(({{TTyyppee,, bbooooll(())}})) -->> bbooooll(())
+
+              Same as _r_t___o_p_t_(_n_o_d_e_(_)_, _{_T_y_p_e_, _O_p_t_}_).
+
+       rrtt__oopptt((NNooddee,, {{TTyyppee,, bbooooll(())}})) -->> bbooooll(())
+
+              Types:
+
+                 Node = node()
+                 Type = copy_save | process_locks
+
+              Changes the lock counter behavior and returns the previous
+              behaviour.
+
+              Option description:
+
+                _{_c_o_p_y___s_a_v_e_, _b_o_o_l_(_)_}:
+                  Enable statistics saving from destroyed locks by copying.
+                  This might consume a lot of memory.
+                  Default: _f_a_l_s_e
+
+                _{_p_r_o_c_e_s_s___l_o_c_k_s_, _b_o_o_l_(_)_}:
+                  Profile process locks.
+                  Default: _t_r_u_e
+
+SSEEEE AALLSSOO
+       LLCCNNTT UUsseerr''ss GGuuiiddee
+
+
+
+Ericsson AB                       tools 2.6.8                          lcnt(3)

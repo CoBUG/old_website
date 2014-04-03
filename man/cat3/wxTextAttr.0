@@ -1,0 +1,257 @@
+wxTextAttr(3)              Erlang Module Definition              wxTextAttr(3)
+
+
+
+NNAAMMEE
+       wxTextAttr - See external documentation: wxTextAttr.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxTextAttr.
+
+DDAATTAA TTYYPPEESS
+         _w_x_T_e_x_t_A_t_t_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxTTeexxttAAttttrr(())
+
+              See external documentation.
+
+       nneeww((CCoollTTeexxtt)) -->> wwxxTTeexxttAAttttrr(())
+
+              Types:
+
+                 ColText = wx_colour() (see module wx)
+
+              Equivalent to nneeww((CCoollTTeexxtt,, [[]])).
+
+       nneeww((CCoollTTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxTTeexxttAAttttrr(())
+
+              Types:
+
+                 ColText = wx_colour() (see module wx)
+                 Option = {colBack, wx_colour() (see module wx)} | {font,
+                 wxFont() (see module wxFont)} | {alignment, wx_enum() (see
+                 module wx)}
+
+              See external documentation.
+              Alignment = ?wxTEXT_ALIGNMENT_DEFAULT | ?wxTEXT_ALIGNMENT_LEFT |
+              ?wxTEXT_ALIGNMENT_CENTRE | ?wxTEXT_ALIGNMENT_CENTER |
+              ?wxTEXT_ALIGNMENT_RIGHT | ?wxTEXT_ALIGNMENT_JUSTIFIED
+
+       ggeettAAlliiggnnmmeenntt((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+              Res = ?wxTEXT_ALIGNMENT_DEFAULT | ?wxTEXT_ALIGNMENT_LEFT |
+              ?wxTEXT_ALIGNMENT_CENTRE | ?wxTEXT_ALIGNMENT_CENTER |
+              ?wxTEXT_ALIGNMENT_RIGHT | ?wxTEXT_ALIGNMENT_JUSTIFIED
+
+       ggeettBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettLLeeffttIInnddeenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettLLeeffttSSuubbIInnddeenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettRRiigghhttIInnddeenntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettTTaabbss((TThhiiss)) -->> [[iinntteeggeerr(())]]
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       hhaassBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       hhaassFFoonntt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       hhaassTTeexxttCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       ggeettFFllaaggss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       iissDDeeffaauulltt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxTextAttr()
+
+              See external documentation.
+
+       sseettAAlliiggnnmmeenntt((TThhiiss,, AAlliiggnnmmeenntt)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Alignment = wx_enum() (see module wx)
+
+              See external documentation.
+              Alignment = ?wxTEXT_ALIGNMENT_DEFAULT | ?wxTEXT_ALIGNMENT_LEFT |
+              ?wxTEXT_ALIGNMENT_CENTRE | ?wxTEXT_ALIGNMENT_CENTER |
+              ?wxTEXT_ALIGNMENT_RIGHT | ?wxTEXT_ALIGNMENT_JUSTIFIED
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoollBBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 ColBack = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettFFllaaggss((TThhiiss,, FFllaaggss)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Flags = integer()
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Font = wxFont() (see module wxFont)
+
+              Equivalent to sseettFFoonntt((TThhiiss,, FFoonntt,, [[]])).
+
+       sseettFFoonntt((TThhiiss,, FFoonntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Font = wxFont() (see module wxFont)
+                 Option = {flags, integer()}
+
+              See external documentation.
+
+       sseettLLeeffttIInnddeenntt((TThhiiss,, IInnddeenntt)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Indent = integer()
+
+              Equivalent to sseettLLeeffttIInnddeenntt((TThhiiss,, IInnddeenntt,, [[]])).
+
+       sseettLLeeffttIInnddeenntt((TThhiiss,, IInnddeenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Indent = integer()
+                 Option = {subIndent, integer()}
+
+              See external documentation.
+
+       sseettRRiigghhttIInnddeenntt((TThhiiss,, IInnddeenntt)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Indent = integer()
+
+              See external documentation.
+
+       sseettTTaabbss((TThhiiss,, TTaabbss)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 Tabs = [integer()]
+
+              See external documentation.
+
+       sseettTTeexxttCCoolloouurr((TThhiiss,, CCoollTTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxTextAttr()
+                 ColText = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxTTeexxttAAttttrr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxTextAttr(3)

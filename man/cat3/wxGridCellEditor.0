@@ -1,0 +1,140 @@
+wxGridCellEditor(3)        Erlang Module Definition        wxGridCellEditor(3)
+
+
+
+NNAAMMEE
+       wxGridCellEditor - See external documentation: wxGridCellEditor.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGridCellEditor.
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_i_d_C_e_l_l_E_d_i_t_o_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, EEvvttHHaannddlleerr)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 EvtHandler = wxEvtHandler() (see module wxEvtHandler)
+
+              See external documentation.
+
+       iissCCrreeaatteedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellEditor()
+
+              See external documentation.
+
+       sseettSSiizzee((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       sshhooww((TThhiiss,, SShhooww)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Show = boolean()
+
+              Equivalent to sshhooww((TThhiiss,, SShhooww,, [[]])).
+
+       sshhooww((TThhiiss,, SShhooww,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Show = boolean()
+                 Option = {attr, wxGridCellAttr() (see module wxGridCellAttr)}
+
+              See external documentation.
+
+       ppaaiinnttBBaacckkggrroouunndd((TThhiiss,, RReeccttCCeellll,, AAttttrr)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 RectCell = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+                 Attr = wxGridCellAttr() (see module wxGridCellAttr)
+
+              See external documentation.
+
+       bbeeggiinnEEddiitt((TThhiiss,, RRooww,, CCooll,, GGrriidd)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Row = integer()
+                 Col = integer()
+                 Grid = wxGrid() (see module wxGrid)
+
+              See external documentation.
+
+       eennddEEddiitt((TThhiiss,, RRooww,, CCooll,, GGrriidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Row = integer()
+                 Col = integer()
+                 Grid = wxGrid() (see module wxGrid)
+
+              See external documentation.
+
+       rreesseett((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+
+              See external documentation.
+
+       ssttaarrttiinnggKKeeyy((TThhiiss,, EEvveenntt)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Event = wxKeyEvent() (see module wxKeyEvent)
+
+              See external documentation.
+
+       ssttaarrttiinnggCClliicckk((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+
+              See external documentation.
+
+       hhaannddlleeRReettuurrnn((TThhiiss,, EEvveenntt)) -->> ookk
+
+              Types:
+
+                 This = wxGridCellEditor()
+                 Event = wxKeyEvent() (see module wxKeyEvent)
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxGridCellEditor(3)

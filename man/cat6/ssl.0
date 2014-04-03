@@ -1,0 +1,43 @@
+ssl(7)                   Erlang Application Definition                  ssl(7)
+
+
+
+NNAAMMEE
+       ssl - The SSL application provides secure communication over
+         sockets.
+
+
+EENNVVIIRROONNMMEENNTT
+       The following application environment configuration parameters are
+       defined for the SSL application. Refer to application(3) for more
+       information about configuration parameters.
+
+       Note that the environment parameters can be set on the command line,
+       for instance,
+
+       _e_r_l _._._. _-_s_s_l _p_r_o_t_o_c_o_l___v_e_r_s_i_o_n _'_[_s_s_l_v_3_, _t_l_s_v_1_]_' _._._..
+
+         _p_r_o_t_o_c_o_l___v_e_r_s_i_o_n _= _[_s_s_l_v_3_|_t_l_s_v_1_] _<_o_p_t_i_o_n_a_l_>.:
+           Protocol that will be supported by started clients and servers. If
+           this option is not set it will default to all protocols currently
+           supported by the erlang ssl application. Note that this option may
+           be overridden by the version option to ssl:connect/[2,3] and
+           ssl:listen/2.
+
+         _s_e_s_s_i_o_n___l_i_f_e_t_i_m_e _= _i_n_t_e_g_e_r_(_) _<_o_p_t_i_o_n_a_l_>:
+           The lifetime of session data in seconds.
+
+         _s_e_s_s_i_o_n___c_b _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Name of session cache callback module that implements the
+           ssl_session_cache_api behavior, defaults to ssl_session_cache.erl.
+
+         _s_e_s_s_i_o_n___c_b___i_n_i_t___a_r_g_s _= _l_i_s_t_(_) _<_o_p_t_i_o_n_a_l_>:
+           List of arguments to the init function in session cache callback
+           module, defaults to [].
+
+SSEEEE AALLSSOO
+       application(3)
+
+
+
+Ericsson AB                         ssl 5.1                             ssl(7)

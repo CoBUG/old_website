@@ -1,0 +1,80 @@
+edoc_doclet(3)             Erlang Module Definition             edoc_doclet(3)
+
+
+
+NNAAMMEE
+       edoc_doclet - Standard doclet module for EDoc.
+
+DDEESSCCRRIIPPTTIIOONN
+       Standard doclet module for EDoc.
+
+DDAATTAA TTYYPPEESS
+         _d_o_c_l_e_t___g_e_n_(_) _= _#_d_o_c_l_e_t___g_e_n_{_s_o_u_r_c_e_s_=_[_s_t_r_i_n_g_(_)_]_, _a_p_p_=_n_o___a_p_p_(_) _| _a_t_o_m_(_)_,
+         _p_a_c_k_a_g_e_s_=_[_a_t_o_m_(_)_]_, _m_o_d_u_l_e_s_=_[_a_t_o_m_(_)_]_, _m_o_d_u_l_e_s_=_[_a_t_o_m_(_)_]_,
+         _f_i_l_e_m_a_p_=_f_u_n_c_t_i_o_n_(_)_}:
+
+
+         _d_o_c_l_e_t___t_o_c_(_) _= _#_d_o_c_l_e_t___g_e_n_{_p_a_t_h_s_=_[_s_t_r_i_n_g_(_)_]_, _i_n_d_i_r_=_s_t_r_i_n_g_(_)_}:
+
+
+         _e_d_o_c___c_o_n_t_e_x_t_(_) _= _#_c_o_n_t_e_x_t_{_d_i_r_=_s_t_r_i_n_g_(_)_, _e_n_v_=_e_d_o_c___e_n_v_(_) _(_s_e_e _m_o_d_u_l_e
+         _e_d_o_c___l_i_b_)_, _o_p_t_s_=_[_t_e_r_m_(_)_]_}:
+
+
+         _n_o___a_p_p_(_):
+
+
+           A value used to mark absence of an Erlang application context. Use
+           the macro _N_O___A_P_P defined in edoc_doclet.hrl to produce this value.
+
+EEXXPPOORRTTSS
+       rruunn((CCoommmmaanndd::::ddoocclleett__ggeenn(()) || ddoocclleett__ttoocc(()),, CCttxxtt::::eeddoocc__ccoonntteexxtt(()))) -->> ookk
+
+              Main doclet entry point. See the file edoc_doclet.hrl for the
+              data structures used for passing parameters.
+
+              Also see eeddoocc::llaayyoouutt//22 for layout-related options, and
+              eeddoocc::ggeett__ddoocc//22 for options related to reading source files.
+
+              Options:
+
+                _{_f_i_l_e___s_u_f_f_i_x_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the suffix used for output files. The default
+                  value is _"_._h_t_m_l_".
+
+                _{_h_i_d_d_e_n_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, documentation of hidden modules and
+                  functions will also be included. The default value is _f_a_l_s_e.
+
+                _{_o_v_e_r_v_i_e_w_, _e_d_o_c_:_f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the name of the overview-file. By default, this
+                  doclet looks for a file _"_o_v_e_r_v_i_e_w_._e_d_o_c_" in the target
+                  directory.
+
+                _{_p_r_i_v_a_t_e_, _b_o_o_l_e_a_n_(_)_}:
+                  If the value is _t_r_u_e, documentation of private modules and
+                  functions will also be included. The default value is _f_a_l_s_e.
+
+                _{_s_t_y_l_e_s_h_e_e_t_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the URI used for referencing the stylesheet. The
+                  default value is _"_s_t_y_l_e_s_h_e_e_t_._c_s_s_". If an empty string is
+                  specified, no stylesheet reference will be generated.
+
+                _{_s_t_y_l_e_s_h_e_e_t___f_i_l_e_, _e_d_o_c_:_f_i_l_e_n_a_m_e_(_)_}:
+                  Specifies the name of the stylesheet file. By default, this
+                  doclet uses the file _"_s_t_y_l_e_s_h_e_e_t_._c_s_s_" in the _p_r_i_v
+                  subdirectory of the EDoc installation directory. The named
+                  file will be copied to the target directory.
+
+                _{_t_i_t_l_e_, _s_t_r_i_n_g_(_)_}:
+                  Specifies the title of the overview-page.
+
+SSEEEE AALLSSOO
+       eeddoocc
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  edoc 0.7.10                   edoc_doclet(3)

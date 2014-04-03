@@ -1,0 +1,274 @@
+snmpm_conf(3)              Erlang Module Definition              snmpm_conf(3)
+
+
+
+NNAAMMEE
+       snmpm_conf - Utility functions for handling the manager config files.
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_m___c_o_n_f contains various utility functions to used for
+       manipulating (write/append/read) the config files of the SNMP manager.
+
+EEXXPPOORRTTSS
+       mmaannaaggeerr__eennttrryy((TTaagg,, VVaall)) -->> mmaannaaggeerr__eennttrryy(())
+
+              Types:
+
+                 Tag = address | port | engine_id | max_message_size
+                 Val = term()
+                 manager_entry() = term()
+
+              Create an entry for the manager config file, _m_a_n_a_g_e_r_._c_o_n_f.
+
+              The type of _V_a_l depends on the value of _T_a_g, see MMaannaaggeerr
+              IInnffoorrmmaattiioonn for more info.
+
+       wwrriittee__mmaannaaggeerr__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__mmaannaaggeerr__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [manager_entry()]
+
+              Write the manager config to the manager config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See MMaannaaggeerr IInnffoorrmmaattiioonn for more info.
+
+       aappppeenndd__mmaannaaggeerr__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [manager_entry()]
+
+              Append the config to the current manager config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See MMaannaaggeerr IInnffoorrmmaattiioonn for more info.
+
+       rreeaadd__mmaannaaggeerr__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [manager_entry()]
+
+              Read the current manager config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See MMaannaaggeerr IInnffoorrmmaattiioonn for more info.
+
+       uusseerrss__eennttrryy((UUsseerrIIdd)) -->> uusseerrss__eennttrryy(())
+       uusseerrss__eennttrryy((UUsseerrIIdd,, UUsseerrMMoodd)) -->> uusseerrss__eennttrryy(())
+       uusseerrss__eennttrryy((UUsseerrIIdd,, UUsseerrMMoodd,, UUsseerrDDaattaa)) -->> uusseerrss__eennttrryy(())
+
+              Types:
+
+                 UserId = term()
+                 UserMod = atom()
+                 UserData = term()
+                 standard_entry() = term()
+
+              Create an entry for the manager users config file, _u_s_e_r_s_._c_o_n_f.
+
+              _u_s_e_r_s___e_n_t_r_y_(_U_s_e_r_I_d_) translates to the following call:
+              _u_s_e_r_s___e_n_t_r_y_(_U_s_e_r_I_d_, _s_n_m_p_m___u_s_e_r___d_e_f_a_u_l_t_).
+
+              _u_s_e_r_s___e_n_t_r_y_(_U_s_e_r_I_d_, _U_s_e_r_M_o_d_) translates to the following call:
+              _u_s_e_r_s___e_n_t_r_y_(_U_s_e_r_I_d_, _U_s_e_r_M_o_d_, _u_n_d_e_f_i_n_e_d_).
+
+              See UUsseerrss for more info.
+
+       wwrriittee__uusseerrss__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__uusseerrss__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [users_entry()]
+
+              Write the manager users config to the manager users config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See UUsseerrss for more info.
+
+       aappppeenndd__uusseerrss__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [users_entry()]
+
+              Append the users config to the current manager users config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See UUsseerrss for more info.
+
+       rreeaadd__uusseerrss__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [users_entry()]
+
+              Read the current manager users config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See UUsseerrss for more info.
+
+       aaggeennttss__eennttrryy((UUsseerrIIdd,, TTaarrggeettNNaammee,, CCoommmm,, IIpp,, PPoorrtt,, EEnnggiinneeIIDD,, TTiimmeeoouutt,,
+       MMaaxxMMeessssaaggeeSSiizzee,, VVeerrssiioonn,, SSeeccMMooddeell,, SSeeccNNaammee,, SSeeccLLeevveell)) -->> aaggeennttss__eennttrryy(())
+
+              Types:
+
+                 UserId = term()
+                 TargetName = string()
+                 Comm = string()
+                 Ip = string()
+                 Port = integer()
+                 EngineID = string()
+                 Timeout = integer()
+                 MaxMessageSize = integer()
+                 Version = v1 | v2 | v3
+                 SecModel = v1 | v2c | usm
+                 SecName = string()
+                 SecLevel = noAuthNoPriv | authNoPriv | authPriv
+                 agents_entry() = term()
+
+              Create an entry for the manager agents config file, _a_g_e_n_t_s_._c_o_n_f.
+
+              See AAggeennttss for more info.
+
+       wwrriittee__aaggeennttss__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__aaggeennttss__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [_entry()]
+
+              Write the manager agents config to the manager agents config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See AAggeennttss for more info.
+
+       aappppeenndd__aaggeennttss__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [agents_entry()]
+
+              Append the agents config to the current manager agents config
+              file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See AAggeennttss for more info.
+
+       rreeaadd__aaggeennttss__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [agents_entry()]
+
+              Read the current manager agents config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See AAggeennttss for more info.
+
+       uussmm__eennttrryy((EEnnggiinneeIIDD,, UUsseerrNNaammee,, AAuutthhPP,, AAuutthhKKeeyy,, PPrriivvPP,, PPrriivvKKeeyy)) -->>
+       uussmm__eennttrryy(())
+       uussmm__eennttrryy((EEnnggiinneeIIDD,, UUsseerrNNaammee,, SSeeccNNaammee,, AAuutthhPP,, AAuutthhKKeeyy,, PPrriivvPP,, PPrriivvKKeeyy))
+       -->> uussmm__eennttrryy(())
+
+              Types:
+
+                 EngineID = string()
+                 UserName = string()
+                 SecName = string()
+                 AuthP = usmNoAuthProtocol | usmHMACMD5AuthProtocol |
+                 usmHMACSHAAuthProtocol
+                 AuthKey = [integer()]
+                 PrivP = usmNoPrivProtocol | usmDESPrivProtocol |
+                 usmAesCfb128Protocol
+                 PrivKey = [integer()]
+                 usm_entry() = term()
+
+              Create an entry for the agent community config file,
+              _c_o_m_m_u_n_i_t_y_._c_o_n_f.
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       wwrriittee__uussmm__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+       wwrriittee__uussmm__ccoonnffiigg((DDiirr,, HHddrr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Hdr = string()
+                 Conf = [usm_entry()]
+
+              Write the manager usm config to the manager usm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              _H_d_r is an optional file header (note that this text is written
+              to the file as is).
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       aappppeenndd__uussmm__ccoonnffiigg((DDiirr,, CCoonnff)) -->> ookk
+
+              Types:
+
+                 Dir = string()
+                 Conf = [usm_entry()]
+
+              Append the usm config to the current manager usm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+       rreeaadd__uussmm__ccoonnffiigg((DDiirr)) -->> CCoonnff
+
+              Types:
+
+                 Dir = string()
+                 Conf = [usm_entry()]
+
+              Read the current manager usm config file.
+
+              _D_i_r is the path to the directory where to store the config file.
+
+              See SSeeccuurriittyy ddaattaa ffoorr UUSSMM for more info.
+
+
+
+Ericsson AB                       snmp 4.22.1                    snmpm_conf(3)

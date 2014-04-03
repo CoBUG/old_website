@@ -1,0 +1,117 @@
+wxCommandEvent(3)          Erlang Module Definition          wxCommandEvent(3)
+
+
+
+NNAAMMEE
+       wxCommandEvent - See external documentation: wxCommandEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCommandEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_o_m_m_a_n_d___b_u_t_t_o_n___c_l_i_c_k_e_d, _c_o_m_m_a_n_d___c_h_e_c_k_b_o_x___c_l_i_c_k_e_d,
+           _c_o_m_m_a_n_d___c_h_o_i_c_e___s_e_l_e_c_t_e_d, _c_o_m_m_a_n_d___l_i_s_t_b_o_x___s_e_l_e_c_t_e_d,
+           _c_o_m_m_a_n_d___l_i_s_t_b_o_x___d_o_u_b_l_e_c_l_i_c_k_e_d, _c_o_m_m_a_n_d___t_e_x_t___u_p_d_a_t_e_d,
+           _c_o_m_m_a_n_d___t_e_x_t___e_n_t_e_r, _c_o_m_m_a_n_d___m_e_n_u___s_e_l_e_c_t_e_d, _c_o_m_m_a_n_d___s_l_i_d_e_r___u_p_d_a_t_e_d,
+           _c_o_m_m_a_n_d___r_a_d_i_o_b_o_x___s_e_l_e_c_t_e_d, _c_o_m_m_a_n_d___r_a_d_i_o_b_u_t_t_o_n___s_e_l_e_c_t_e_d,
+           _c_o_m_m_a_n_d___s_c_r_o_l_l_b_a_r___u_p_d_a_t_e_d, _c_o_m_m_a_n_d___v_l_b_o_x___s_e_l_e_c_t_e_d,
+           _c_o_m_m_a_n_d___c_o_m_b_o_b_o_x___s_e_l_e_c_t_e_d, _c_o_m_m_a_n_d___t_o_o_l___r_c_l_i_c_k_e_d,
+           _c_o_m_m_a_n_d___t_o_o_l___e_n_t_e_r, _c_o_m_m_a_n_d___c_h_e_c_k_l_i_s_t_b_o_x___t_o_g_g_l_e_d,
+           _c_o_m_m_a_n_d___t_o_g_g_l_e_b_u_t_t_o_n___c_l_i_c_k_e_d, _c_o_m_m_a_n_d___l_e_f_t___c_l_i_c_k,
+           _c_o_m_m_a_n_d___l_e_f_t___d_c_l_i_c_k, _c_o_m_m_a_n_d___r_i_g_h_t___c_l_i_c_k, _c_o_m_m_a_n_d___s_e_t___f_o_c_u_s,
+           _c_o_m_m_a_n_d___k_i_l_l___f_o_c_u_s, _c_o_m_m_a_n_d___e_n_t_e_r
+
+       See also the message variant ##wwxxCCoommmmaanndd{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_o_m_m_a_n_d_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettCClliieennttDDaattaa((TThhiiss)) -->> tteerrmm(())
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       ggeettEExxttrraaLLoonngg((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       ggeettIInntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       ggeettSSttrriinngg((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       iissCChheecckkeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       iissSSeelleeccttiioonn((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCommandEvent()
+
+              See external documentation.
+
+       sseettIInntt((TThhiiss,, II)) -->> ookk
+
+              Types:
+
+                 This = wxCommandEvent()
+                 I = integer()
+
+              See external documentation.
+
+       sseettSSttrriinngg((TThhiiss,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxCommandEvent()
+                 S = chardata() (see module unicode)
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxCommandEvent(3)

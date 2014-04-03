@@ -1,0 +1,117 @@
+pg2(3)                     Erlang Module Definition                     pg2(3)
+
+
+
+NNAAMMEE
+       pg2 - Distributed Named Process Groups
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements process groups. The groups in this module differ
+       from the groups in the module _p_g in several ways. In _p_g, each message
+       is sent to all members in the group. In this module, each message may
+       be sent to one, some, or all members.
+
+       A group of processes can be accessed by a common name. For example, if
+       there is a group named _f_o_o_b_a_r, there can be a set of processes (which
+       can be located on different nodes) which are all members of the group
+       _f_o_o_b_a_r. There are no special functions for sending a message to the
+       group. Instead, client functions should be written with the functions
+       _g_e_t___m_e_m_b_e_r_s_/_1 and _g_e_t___l_o_c_a_l___m_e_m_b_e_r_s_/_1 to find out which processes are
+       members of the group. Then the message can be sent to one or more
+       members of the group.
+
+       If a member terminates, it is automatically removed from the group.
+
+   WWaarrnniinngg::
+       This module is used by the _d_i_s_k___l_o_g module for managing distributed
+       disk logs. The disk log names are used as group names, which means that
+       some action may need to be taken to avoid name clashes.
+
+
+DDAATTAA TTYYPPEESS
+       nnaammee(()) = any()
+
+              The name of a process group.
+
+EEXXPPOORRTTSS
+       ccrreeaattee((NNaammee :::: nnaammee(()))) -->> ookk
+
+              Creates a new, empty process group. The group is globally
+              visible on all nodes. If the group exists, nothing happens.
+
+       ddeelleettee((NNaammee :::: nnaammee(()))) -->> ookk
+
+              Deletes a process group.
+
+       ggeett__cclloosseesstt__ppiidd((NNaammee)) -->> ppiidd(()) || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Name = nnaammee(())
+                 Reason = {no_process, Name} | {no_such_group, Name}
+
+              This is a useful dispatch function which can be used from client
+              functions. It returns a process on the local node, if such a
+              process exist. Otherwise, it chooses one randomly.
+
+       ggeett__mmeemmbbeerrss((NNaammee)) -->> [[ppiidd(())]] || {{eerrrroorr,, {{nnoo__ssuucchh__ggrroouupp,, NNaammee}}}}
+
+              Types:
+
+                 Name = nnaammee(())
+
+              Returns all processes in the group _N_a_m_e. This function should be
+              used from within a client function that accesses the group. It
+              is therefore optimized for speed.
+
+       ggeett__llooccaall__mmeemmbbeerrss((NNaammee)) -->>
+                            [[ppiidd(())]] || {{eerrrroorr,, {{nnoo__ssuucchh__ggrroouupp,, NNaammee}}}}
+
+              Types:
+
+                 Name = nnaammee(())
+
+              Returns all processes running on the local node in the group
+              _N_a_m_e. This function should to be used from within a client
+              function that accesses the group. It is therefore optimized for
+              speed.
+
+       jjooiinn((NNaammee,, PPiidd :::: ppiidd(()))) -->> ookk || {{eerrrroorr,, {{nnoo__ssuucchh__ggrroouupp,, NNaammee}}}}
+
+              Types:
+
+                 Name = nnaammee(())
+
+              Joins the process _P_i_d to the group _N_a_m_e. A process can join a
+              group several times; it must then leave the group the same
+              number of times.
+
+       lleeaavvee((NNaammee,, PPiidd :::: ppiidd(()))) -->> ookk || {{eerrrroorr,, {{nnoo__ssuucchh__ggrroouupp,, NNaammee}}}}
+
+              Types:
+
+                 Name = nnaammee(())
+
+              Makes the process _P_i_d leave the group _N_a_m_e. If the process is
+              not a member of the group, _o_k is returned.
+
+       wwhhiicchh__ggrroouuppss(()) -->> [[NNaammee :::: nnaammee(())]]
+
+              Returns a list of all known groups.
+
+       ssttaarrtt(()) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,, aannyy(())}}
+
+       ssttaarrtt__lliinnkk(()) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,, aannyy(())}}
+
+              Starts the pg2 server. Normally, the server does not need to be
+              started explicitly, as it is started dynamically if it is
+              needed. This is useful during development, but in a target
+              system the server should be started explicitly. Use
+              configuration parameters for _k_e_r_n_e_l for this.
+
+SSEEEE AALLSSOO
+       kkeerrnneell((66)), ppgg((33))
+
+
+
+Ericsson AB                      kernel 2.15.2                          pg2(3)

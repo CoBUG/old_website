@@ -1,0 +1,56 @@
+percept_profile(3)         Erlang Module Definition         percept_profile(3)
+
+
+
+NNAAMMEE
+       percept_profile - Percept Collector.
+
+DDEESSCCRRIIPPTTIIOONN
+       Percept Collector
+
+       This module provides the user interface for the percept data collection
+       (profiling).
+
+DDAATTAA TTYYPPEESS
+         _p_e_r_c_e_p_t___o_p_t_i_o_n_(_) _= _p_r_o_c_s _| _p_o_r_t_s _| _e_x_c_l_u_s_i_v_e:
+
+
+EEXXPPOORRTTSS
+       ssttaarrtt((FFiilleennaammee::::ssttrriinngg(()))) -->> {{ookk,, PPoorrtt}} || {{aallrreeaaddyy__ssttaarrtteedd,, PPoorrtt}}
+
+              Equivalent to ssttaarrtt((FFiilleennaammee,, [[pprrooccss]])).
+
+       ssttaarrtt((FFiilleennaammee::::ssttrriinngg(()),, OOppttiioonnss::::[[ppeerrcceepptt__ooppttiioonn(())]])) -->> {{ookk,, PPoorrtt}} ||
+       {{aallrreeaaddyy__ssttaarrtteedd,, PPoorrtt}}
+
+              Types:
+
+                 Port = port()
+
+              Starts profiling with supplied options. All events are stored in
+              the file given by Filename. An explicit call to stop/0 is needed
+              to stop profiling.
+
+       ssttaarrtt((FFiilleennaammee::::ssttrriinngg(()),, MMFFAA::::mmffaa(()),, OOppttiioonnss::::[[ppeerrcceepptt__ooppttiioonn(())]])) -->>
+       ookk || {{aallrreeaaddyy__ssttaarrtteedd,, PPoorrtt}} || {{eerrrroorr,, nnoott__ssttaarrtteedd}}
+
+              Types:
+
+                 Port = port()
+
+              Starts profiling at the entrypoint specified by the MFA. All
+              events are collected, this means that processes outside the
+              scope of the entry-point are also profiled. No explicit call to
+              stop/0 is needed, the profiling stops when the entry function
+              returns.
+
+       ssttoopp(()) -->> ookk || {{eerrrroorr,, nnoott__ssttaarrtteedd}}
+
+              Stops profiling.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                percept 0.8.6.1             percept_profile(3)

@@ -1,0 +1,320 @@
+global(3)                  Erlang Module Definition                  global(3)
+
+
+
+NNAAMMEE
+       global - A Global Name Registration Facility
+
+DDEESSCCRRIIPPTTIIOONN
+       This documentation describes the Global module which consists of the
+       following functionalities:
+
+         * registration of global names;
+
+         * global locks;
+
+         * maintenance of the fully connected network.
+
+       These services are controlled via the process _g_l_o_b_a_l___n_a_m_e___s_e_r_v_e_r which
+       exists on every node. The global name server is started automatically
+       when a node is started. With the term _g_l_o_b_a_l is meant over a system
+       consisting of several Erlang nodes.
+
+       The ability to globally register names is a central concept in the
+       programming of distributed Erlang systems. In this module, the
+       equivalent of the _r_e_g_i_s_t_e_r_/_2 and _w_h_e_r_e_i_s_/_1 BIFs (for local name
+       registration) are implemented, but for a network of Erlang nodes. A
+       registered name is an alias for a process identifier (pid). The global
+       name server monitors globally registered pids. If a process terminates,
+       the name will also be globally unregistered.
+
+       The registered names are stored in replica global name tables on every
+       node. There is no central storage point. Thus, the translation of a
+       name to a pid is fast, as it is always done locally. When any action in
+       taken which results in a change to the global name table, all tables on
+       other nodes are automatically updated.
+
+       Global locks have lock identities and are set on a specific resource.
+       For instance, the specified resource could be a pid. When a global lock
+       is set, access to the locked resource is denied for all other resources
+       other than the lock requester.
+
+       Both the registration and lock functionalities are atomic. All nodes
+       involved in these actions will have the same view of the information.
+
+       The global name server also performs the critical task of continuously
+       monitoring changes in node configuration: if a node which runs a
+       globally registered process goes down, the name will be globally
+       unregistered. To this end the global name server subscribes to _n_o_d_e_u_p
+       and _n_o_d_e_d_o_w_n messages sent from the _n_e_t___k_e_r_n_e_l module. Relevant Kernel
+       application variables in this context are _n_e_t___s_e_t_u_p_t_i_m_e, _n_e_t___t_i_c_k_t_i_m_e,
+       and _d_i_s_t___a_u_t_o___c_o_n_n_e_c_t. See also kkeerrnneell((66)).
+
+       The name server will also maintain a fully connected network. For
+       example, if node _N_1 connects to node _N_2 (which is already connected to
+       _N_3), the global name servers on the nodes _N_1 and _N_3 will make sure that
+       also _N_1 and _N_3 are connected. If this is not desired, the command line
+       flag _-_c_o_n_n_e_c_t___a_l_l _f_a_l_s_e can be used (see also eerrll((11))). In this case the
+       name registration facility cannot be used, but the lock mechanism will
+       still work.
+
+       If the global name server fails to connect nodes (_N_1 and _N_3 in the
+       example above) a warning event is sent to the error logger. The
+       presence of such an event does not exclude the possibility that the
+       nodes will later connect--one can for example try the command
+       _r_p_c_:_c_a_l_l_(_N_1_, _n_e_t___a_d_m_, _p_i_n_g_, _[_N_2_]_) in the Erlang shell--but it indicates
+       some kind of problem with the network.
+
+   NNoottee::
+       If the fully connected network is not set up properly, the first thing
+       to try is to increase the value of _n_e_t___s_e_t_u_p_t_i_m_e.
+
+
+DDAATTAA TTYYPPEESS
+       iidd(()) = {ResourceId :: term(), LockRequesterId :: term()}
+
+EEXXPPOORRTTSS
+       ddeell__lloocckk((IIdd)) -->> ttrruuee
+
+       ddeell__lloocckk((IIdd,, NNooddeess)) -->> ttrruuee
+
+              Types:
+
+                 Id = iidd(())
+                 Nodes = [node()]
+
+              Deletes the lock _I_d synchronously.
+
+       nnoottiiffyy__aallll__nnaammee((NNaammee,, PPiidd11,, PPiidd22)) -->> nnoonnee
+
+              Types:
+
+                 Name = term()
+                 Pid1 = Pid2 = pid()
+
+              This function can be used as a name resolving function for
+              _r_e_g_i_s_t_e_r___n_a_m_e_/_3 and _r_e___r_e_g_i_s_t_e_r___n_a_m_e_/_3. It unregisters both
+              pids, and sends the message _{_g_l_o_b_a_l___n_a_m_e___c_o_n_f_l_i_c_t_, _N_a_m_e_,
+              _O_t_h_e_r_P_i_d_} to both processes.
+
+       rraannddoomm__eexxiitt__nnaammee((NNaammee,, PPiidd11,, PPiidd22)) -->> ppiidd(())
+
+              Types:
+
+                 Name = term()
+                 Pid1 = Pid2 = pid()
+
+              This function can be used as a name resolving function for
+              _r_e_g_i_s_t_e_r___n_a_m_e_/_3 and _r_e___r_e_g_i_s_t_e_r___n_a_m_e_/_3. It randomly chooses one
+              of the pids for registration and kills the other one.
+
+       rraannddoomm__nnoottiiffyy__nnaammee((NNaammee,, PPiidd11,, PPiidd22)) -->> ppiidd(())
+
+              Types:
+
+                 Name = term()
+                 Pid1 = Pid2 = pid()
+
+              This function can be used as a name resolving function for
+              _r_e_g_i_s_t_e_r___n_a_m_e_/_3 and _r_e___r_e_g_i_s_t_e_r___n_a_m_e_/_3. It randomly chooses one
+              of the pids for registration, and sends the message
+              _{_g_l_o_b_a_l___n_a_m_e___c_o_n_f_l_i_c_t_, _N_a_m_e_} to the other pid.
+
+       rreeggiisstteerr__nnaammee((NNaammee,, PPiidd)) -->> yyeess || nnoo
+
+       rreeggiisstteerr__nnaammee((NNaammee,, PPiidd,, RReessoollvvee)) -->> yyeess || nnoo
+
+              Types:
+
+                 Name = term()
+                 Pid = pid()
+                 Resolve = mmeetthhoodd(())
+                 mmeetthhoodd(()) =
+                     fun((Name :: term(), Pid :: pid(), Pid2 :: pid()) ->
+                             pid() | none)
+                   {_M_o_d_u_l_e, _F_u_n_c_t_i_o_n} is also allowed
+
+              Globally associates the name _N_a_m_e with a pid, that is, Globally
+              notifies all nodes of a new global name in a network of Erlang
+              nodes.
+
+              When new nodes are added to the network, they are informed of
+              the globally registered names that already exist. The network is
+              also informed of any global names in newly connected nodes. If
+              any name clashes are discovered, the _R_e_s_o_l_v_e function is called.
+              Its purpose is to decide which pid is correct. If the function
+              crashes, or returns anything other than one of the pids, the
+              name is unregistered. This function is called once for each name
+              clash.
+
+              There are three pre-defined resolve functions:
+              _r_a_n_d_o_m___e_x_i_t___n_a_m_e_/_3, _r_a_n_d_o_m___n_o_t_i_f_y___n_a_m_e_/_3, and _n_o_t_i_f_y___a_l_l___n_a_m_e_/_3.
+              If no _R_e_s_o_l_v_e function is defined, _r_a_n_d_o_m___e_x_i_t___n_a_m_e is used.
+              This means that one of the two registered processes will be
+              selected as correct while the other is killed.
+
+              This function is completely synchronous. This means that when
+              this function returns, the name is either registered on all
+              nodes or none.
+
+              The function returns _y_e_s if successful, _n_o if it fails. For
+              example, _n_o is returned if an attempt is made to register an
+              already registered process or to register a process with a name
+              that is already in use.
+
+          NNoottee::
+              Releases up to and including OTP R10 did not check if the
+              process was already registered. As a consequence the global name
+              table could become inconsistent. The old (buggy) behavior can be
+              chosen by giving the Kernel application variable
+              _g_l_o_b_a_l___m_u_l_t_i___n_a_m_e___a_c_t_i_o_n the value _a_l_l_o_w.
+
+
+              If a process with a registered name dies, or the node goes down,
+              the name is unregistered on all nodes.
+
+       rreeggiisstteerreedd__nnaammeess(()) -->> [[NNaammee]]
+
+              Types:
+
+                 Name = term()
+
+              Returns a lists of all globally registered names.
+
+       rree__rreeggiisstteerr__nnaammee((NNaammee,, PPiidd)) -->> yyeess
+
+       rree__rreeggiisstteerr__nnaammee((NNaammee,, PPiidd,, RReessoollvvee)) -->> yyeess
+
+              Types:
+
+                 Name = term()
+                 Pid = pid()
+                 Resolve = mmeetthhoodd(())
+                 mmeetthhoodd(()) =
+                     fun((Name :: term(), Pid :: pid(), Pid2 :: pid()) ->
+                             pid() | none)
+                   {_M_o_d_u_l_e, _F_u_n_c_t_i_o_n} is also allowed
+
+              Atomically changes the registered name _N_a_m_e on all nodes to
+              refer to _P_i_d.
+
+              The _R_e_s_o_l_v_e function has the same behavior as in
+              _r_e_g_i_s_t_e_r___n_a_m_e_/_2_,_3.
+
+       sseenndd((NNaammee,, MMssgg)) -->> PPiidd
+
+              Types:
+
+                 Name = Msg = term()
+                 Pid = pid()
+
+              Sends the message _M_s_g to the pid globally registered as _N_a_m_e.
+
+              Failure: If _N_a_m_e is not a globally registered name, the calling
+              function will exit with reason _{_b_a_d_a_r_g_, _{_N_a_m_e_, _M_s_g_}_}.
+
+       sseett__lloocckk((IIdd)) -->> bboooolleeaann(())
+
+       sseett__lloocckk((IIdd,, NNooddeess)) -->> bboooolleeaann(())
+
+       sseett__lloocckk((IIdd,, NNooddeess,, RReettrriieess)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Id = iidd(())
+                 Nodes = [node()]
+                 Retries = rreettrriieess(())
+                 iidd(()) = {ResourceId :: term(), LockRequesterId :: term()}
+                 rreettrriieess(()) = integer() >= 0 | infinity
+
+              Sets a lock on the specified nodes (or on all nodes if none are
+              specified) on _R_e_s_o_u_r_c_e_I_d for _L_o_c_k_R_e_q_u_e_s_t_e_r_I_d. If a lock already
+              exists on _R_e_s_o_u_r_c_e_I_d for another requester than _L_o_c_k_R_e_q_u_e_s_t_e_r_I_d,
+              and _R_e_t_r_i_e_s is not equal to 0, the process sleeps for a while
+              and will try to execute the action later. When _R_e_t_r_i_e_s attempts
+              have been made, _f_a_l_s_e is returned, otherwise _t_r_u_e. If _R_e_t_r_i_e_s is
+              _i_n_f_i_n_i_t_y, _t_r_u_e is eventually returned (unless the lock is never
+              released).
+
+              If no value for _R_e_t_r_i_e_s is given, _i_n_f_i_n_i_t_y is used.
+
+              This function is completely synchronous.
+
+              If a process which holds a lock dies, or the node goes down, the
+              locks held by the process are deleted.
+
+              The global name server keeps track of all processes sharing the
+              same lock, that is, if two processes set the same lock, both
+              processes must delete the lock.
+
+              This function does not address the problem of a deadlock. A
+              deadlock can never occur as long as processes only lock one
+              resource at a time. But if some processes try to lock two or
+              more resources, a deadlock may occur. It is up to the
+              application to detect and rectify a deadlock.
+
+          NNoottee::
+              Some values of _R_e_s_o_u_r_c_e_I_d should be avoided or Erlang/OTP will
+              not work properly. A list of resources to avoid: _g_l_o_b_a_l,
+              _d_i_s_t___a_c, _m_n_e_s_i_a___t_a_b_l_e___l_o_c_k, _m_n_e_s_i_a___a_d_j_u_s_t___l_o_g___w_r_i_t_e_s, _p_g_2.
+
+
+       ssyynncc(()) -->> ookk || {{eerrrroorr,, RReeaassoonn :::: tteerrmm(())}}
+
+              Synchronizes the global name server with all nodes known to this
+              node. These are the nodes which are returned from
+              _e_r_l_a_n_g_:_n_o_d_e_s_(_). When this function returns, the global name
+              server will receive global information from all nodes. This
+              function can be called when new nodes are added to the network.
+
+              The only possible error reason _R_e_a_s_o_n is _{_"_g_l_o_b_a_l___g_r_o_u_p_s
+              _d_e_f_i_n_i_t_i_o_n _e_r_r_o_r_"_, _E_r_r_o_r_}.
+
+       ttrraannss((IIdd,, FFuunn)) -->> RReess || aabboorrtteedd
+
+       ttrraannss((IIdd,, FFuunn,, NNooddeess)) -->> RReess || aabboorrtteedd
+
+       ttrraannss((IIdd,, FFuunn,, NNooddeess,, RReettrriieess)) -->> RReess || aabboorrtteedd
+
+              Types:
+
+                 Id = iidd(())
+                 Fun = ttrraannss__ffuunn(())
+                 Nodes = [node()]
+                 Retries = rreettrriieess(())
+                 Res = term()
+                 rreettrriieess(()) = integer() >= 0 | infinity
+                 ttrraannss__ffuunn(()) = function() | {module(), atom()}
+
+              Sets a lock on _I_d (using _s_e_t___l_o_c_k_/_3). If this succeeds, _F_u_n_(_) is
+              evaluated and the result _R_e_s is returned. Returns _a_b_o_r_t_e_d if the
+              lock attempt failed. If _R_e_t_r_i_e_s is set to _i_n_f_i_n_i_t_y, the
+              transaction will not abort.
+
+              _i_n_f_i_n_i_t_y is the default setting and will be used if no value is
+              given for _R_e_t_r_i_e_s.
+
+       uunnrreeggiisstteerr__nnaammee((NNaammee)) -->> tteerrmm(())
+
+              Types:
+
+                 Name = term()
+
+              Removes the globally registered name _N_a_m_e from the network of
+              Erlang nodes.
+
+       wwhheerreeiiss__nnaammee((NNaammee)) -->> ppiidd(()) || uunnddeeffiinneedd
+
+              Types:
+
+                 Name = term()
+
+              Returns the pid with the globally registered name _N_a_m_e. Returns
+              _u_n_d_e_f_i_n_e_d if the name is not globally registered.
+
+SSEEEE AALLSSOO
+       gglloobbaall__ggrroouupp((33)), nneett__kkeerrnneell((33))
+
+
+
+Ericsson AB                      kernel 2.15.2                       global(3)

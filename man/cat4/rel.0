@@ -1,0 +1,67 @@
+rel(5)                               Files                              rel(5)
+
+
+
+NNAAMMEE
+       rel - Release resource file
+
+DDEESSCCRRIIPPTTIIOONN
+       The _r_e_l_e_a_s_e _r_e_s_o_u_r_c_e _f_i_l_e specifies which applications are are included
+       in a release (system) based on Erlang/OTP.
+
+       This file is used by the functions in _s_y_s_t_o_o_l_s when generating start
+       scripts (_._s_c_r_i_p_t, _._b_o_o_t) and release upgrade files (_r_e_l_u_p).
+
+FFIILLEE SSYYNNTTAAXX
+       The release resource file should be called _N_a_m_e_._r_e_l.
+
+       The _._r_e_l file contains one single Erlang term, which is called a
+       _r_e_l_e_a_s_e _s_p_e_c_i_f_i_c_a_t_i_o_n. The file has the following syntax:
+
+       {release, {RelName,Vsn}, {erts, EVsn},
+         [{Application, AppVsn} |
+          {Application, AppVsn, Type} |
+          {Application, AppVsn, IncApps} |
+          {Application, AppVsn, Type, IncApps}]}.
+
+
+         * _R_e_l_N_a_m_e _= _s_t_r_i_n_g_(_) is the name of the release.
+
+         * _V_s_n _= _s_t_r_i_n_g_(_) is the version of the release.
+
+         * _E_V_s_n _= _s_t_r_i_n_g_(_) is the version of ERTS the release is intended for.
+
+         * _A_p_p_l_i_c_a_t_i_o_n _= _a_t_o_m_(_) is the name of an application included in the
+           release.
+
+         * _A_p_p_V_s_n _= _s_t_r_i_n_g_(_) is the version of an application included in the
+           release.
+
+         * _T_y_p_e _= _p_e_r_m_a_n_e_n_t _| _t_r_a_n_s_i_e_n_t _| _t_e_m_p_o_r_a_r_y _| _l_o_a_d _| _n_o_n_e is the start
+           type of an application included in the release.
+
+           If _T_y_p_e _= _p_e_r_m_a_n_e_n_t _| _t_r_a_n_s_i_e_n_t _| _t_e_m_p_o_r_a_r_y, the application will
+           be loaded and started in the corresponding way, see _a_p_p_l_i_c_a_t_i_o_n_(_3_).
+           If _T_y_p_e _= _l_o_a_d, the application will only be loaded. If _T_y_p_e _=
+           _n_o_n_e, the application will be neither loaded nor started, although
+           the code for its modules will be loaded. Defaults to _p_e_r_m_a_n_e_n_t
+
+         * _I_n_c_A_p_p_s _= _[_a_t_o_m_(_)_] is a list of applications that are included by
+           an application included in the release.
+
+           The list must be a subset of the included applications specified in
+           the application resource file (_A_p_p_l_i_c_a_t_i_o_n_._a_p_p) and overrides this
+           value. Defaults to the same value as in the application resource
+           file.
+
+   NNoottee::
+       The list of applications must contain the _k_e_r_n_e_l and _s_t_d_l_i_b
+       applications.
+
+
+SSEEEE AALLSSOO
+       application(3), relup(4), systools(3)
+
+
+
+Ericsson AB                       sasl 2.2.1                            rel(5)

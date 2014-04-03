@@ -1,0 +1,42 @@
+snmpa_notification_filter(3)Erlang Module Definitionsnmpa_notification_filter(3)
+
+
+
+NNAAMMEE
+       snmpa_notification_filter - Behaviour module for the SNMP agent
+       notification filters.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines the behaviour of the agent notification filters. A
+       _s_n_m_p_a___n_o_t_i_f_i_c_a_t_i_o_n___f_i_l_t_e_r compliant module must export the following
+       functions:
+
+         * handle_notification/2
+
+       The semantics of them and their exact signatures are explained below.
+
+       The purpose of notification filters is to allow for modification and/or
+       suppression of a notification.
+
+       A misbehaving filter will be removed.
+
+EEXXPPOORRTTSS
+       hhaannddllee__nnoottiiffiiccaattiioonn((NNoottiiff,, DDaattaa)) -->> RReeppllyy
+
+              Types:
+
+                 Reply = send | {send, NewNotif} | dont_send
+                 Notif = NewNotif = notification() | trap()
+                 Data = term()
+
+              Handle a notification to be sent. The filter can either accept
+              the notification as is, return _s_e_n_d, modify the notification,
+              return _{_s_e_n_d_, _N_e_w_N_o_t_i_f_} or suppress the notification, return
+              _d_o_n_t___s_e_n_d.
+
+              _D_a_t_a is supplied at filter registration time, see
+              rreeggiisstteerr__nnoottiiffiiccaattiioonn__ffiilltteerr.
+
+
+
+Ericsson AB                       snmp 4.22.1     snmpa_notification_filter(3)

@@ -1,0 +1,93 @@
+wxAcceleratorEntry(3)      Erlang Module Definition      wxAcceleratorEntry(3)
+
+
+
+NNAAMMEE
+       wxAcceleratorEntry - See external documentation: wxAcceleratorEntry.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxAcceleratorEntry.
+
+DDAATTAA TTYYPPEESS
+         _w_x_A_c_c_e_l_e_r_a_t_o_r_E_n_t_r_y_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxAAcccceelleerraattoorrEEnnttrryy(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAcccceelleerraattoorrEEnnttrryy(())
+
+              Types:
+
+                 Option = {flags, integer()} | {keyCode, integer()} | {cmd,
+                 integer()} | {item, wxMenuItem() (see module wxMenuItem)}
+
+              See external documentation.
+              Also:
+              new(Entry) -> wxAcceleratorEntry() when
+              Entry::wxAcceleratorEntry().
+
+
+       ggeettCCoommmmaanndd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAcceleratorEntry()
+
+              See external documentation.
+
+       ggeettFFllaaggss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAcceleratorEntry()
+
+              See external documentation.
+
+       ggeettKKeeyyCCooddee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAcceleratorEntry()
+
+              See external documentation.
+
+       sseett((TThhiiss,, FFllaaggss,, KKeeyyCCooddee,, CCmmdd)) -->> ookk
+
+              Types:
+
+                 This = wxAcceleratorEntry()
+                 Flags = integer()
+                 KeyCode = integer()
+                 Cmd = integer()
+
+              Equivalent to sseett((TThhiiss,, FFllaaggss,, KKeeyyCCooddee,, CCmmdd,, [[]])).
+
+       sseett((TThhiiss,, FFllaaggss,, KKeeyyCCooddee,, CCmmdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxAcceleratorEntry()
+                 Flags = integer()
+                 KeyCode = integer()
+                 Cmd = integer()
+                 Option = {item, wxMenuItem() (see module wxMenuItem)}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxAAcccceelleerraattoorrEEnnttrryy(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxAcceleratorEntry(3)

@@ -1,0 +1,158 @@
+wxListBox(3)               Erlang Module Definition               wxListBox(3)
+
+
+
+NNAAMMEE
+       wxListBox - See external documentation: wxListBox.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxListBox.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrroollWWiitthhIItteemmss
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_i_s_t_B_o_x_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxLLiissttBBooxx(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxLLiissttBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxLLiissttBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {choices, [chardata() (see
+                 module unicode)]} | {style, integer()} | {validator,
+                 wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, PPooss,, SSiizzee,, CChhooiicceess)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListBox()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+                 Choices = [chardata() (see module unicode)]
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, PPooss,, SSiizzee,, CChhooiicceess,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, PPooss,, SSiizzee,, CChhooiicceess,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       bboooolleeaann(())
+
+              Types:
+
+                 This = wxListBox()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+                 Choices = [chardata() (see module unicode)]
+                 Option = {style, integer()} | {validator, wx_object() (see
+                 module wx)}
+
+              See external documentation.
+
+       ddeesseelleecctt((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxListBox()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonnss((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::integer(), ASelections::[integer()]}
+                 This = wxListBox()
+
+              See external documentation.
+
+       iinnsseerrttIItteemmss((TThhiiss,, IItteemmss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxListBox()
+                 Items = [chardata() (see module unicode)]
+                 Pos = integer()
+
+              See external documentation.
+
+       iissSSeelleecctteedd((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListBox()
+                 N = integer()
+
+              See external documentation.
+
+       sseett((TThhiiss,, IItteemmss)) -->> ookk
+
+              Types:
+
+                 This = wxListBox()
+                 Items = [chardata() (see module unicode)]
+
+              See external documentation.
+
+       hhiittTTeesstt((TThhiiss,, PPooiinntt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxListBox()
+                 Point = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       sseettFFiirrssttIItteemm((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxListBox()
+                 N = integer()
+
+              See external documentation.
+              Also:
+              setFirstItem(This, S) -> ok when
+              This::wxListBox(), S::unicode:chardata().
+
+
+       ddeessttrrooyy((TThhiiss::::wwxxLLiissttBBooxx(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                      wxListBox(3)

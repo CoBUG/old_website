@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- Standards Compliance</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/diameter-1.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Diameter</strong><br><strong>User's Guide</strong><br><small>Version 1.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Chapters</strong></small></p>
+<ul class="flipMenu" imagepath="../../../../doc/js/flipmenu">
+<li id="no" title="Introduction" expanded="false">Introduction<ul><li><a href="diameter_intro.html">
+              Top of chapter
+            </a></li></ul>
+</li>
+<li id="no" title="Usage" expanded="false">Usage<ul><li><a href="diameter_using.html">
+              Top of chapter
+            </a></li></ul>
+</li>
+<li id="no" title="Examples" expanded="false">Examples<ul><li><a href="diameter_examples.html">
+              Top of chapter
+            </a></li></ul>
+</li>
+<li id="loadscrollpos" title="Standards Compliance" expanded="true">Standards Compliance<ul>
+<li><a href="diameter_soc.html">
+              Top of chapter
+            </a></li>
+<li title="RFC 3588"><a href="diameter_soc.html#id61027">RFC 3588</a></li>
+<li title="RFC 3539"><a href="diameter_soc.html#id60913">RFC 3539</a></li>
+</ul>
+</li>
+</ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<h1>4 Standards Compliance</h1>
+
+
+
+<p>
+Known points of questionable or non-compliance.</p>
+
+
+
+<h3><a name="id61027">4.1 
+        RFC 3588</a></h3>
+
+
+<ul>
+
+<li>
+<p>
+The End-to-End Security framework (section 2.9) isn't implemented
+since it is largely unspecified.
+The document that was to describe it
+(reference [AAACMS]) was abandoned in an uncompleted state several
+years ago and the current draft RFC deprecates the framework,
+including the P Flag in the AVP header.</p>
+</li>
+
+<li>
+<p>
+There is no TLS support over SCTP.
+RFC 3588 requires that a Diameter server support TLS but in
+practise this seems to mean TLS over SCTP since there are limitations
+with running over SCTP: see RFC 6083 (DTLS over SCTP), which is a
+response to RFC 3436 (TLS over SCTP).
+The current RFC 3588 draft acknowledges this by equating
+TLS with TLS/TCP and DTLS/SCTP but we do not yet support DTLS.</p>
+</li>
+
+<li>
+<p>
+There is no explicit support for peer discovery (section 5.2).
+It can possibly be implemented on top of diameter as is but this is
+probably something that diameter should do.
+The current draft deprecates portions of the original RFC's mechanisms
+however.</p>
+</li>
+
+<li>
+<p>
+The peer state machine's election process (section 5.6.4) isn't
+implemented as specified since it assumes knowledge of a
+peer's Origin-Host before sending it a CER. (The identity becoming known
+upon reception of CEA.)
+The possibility of configuring
+the peer's Origin-Host could be added, along with handling of the case
+that it sends something else, but for many applications this will
+just be unnecessary configuration of a value that it has no control over.</p>
+</li>
+
+
+</ul>
+
+
+
+
+
+<h3><a name="id60913">4.2 
+        RFC 3539</a></h3>
+
+
+<p>
+RFC 3539 is more difficult to comply to since it discusses
+problems as much as it requires functionality but all the MUST's are
+covered, the watchdog state machine being the primary one.
+Of the optional functionality, load balancing is left to the
+diameter user (since it's the one deciding who to send to) and
+there is no Congestion Manager.</p>
+
+
+
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 2011-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

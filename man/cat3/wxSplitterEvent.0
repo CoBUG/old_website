@@ -1,0 +1,78 @@
+wxSplitterEvent(3)         Erlang Module Definition         wxSplitterEvent(3)
+
+
+
+NNAAMMEE
+       wxSplitterEvent - See external documentation: wxSplitterEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSplitterEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_o_m_m_a_n_d___s_p_l_i_t_t_e_r___s_a_s_h___p_o_s___c_h_a_n_g_e_d,
+           _c_o_m_m_a_n_d___s_p_l_i_t_t_e_r___s_a_s_h___p_o_s___c_h_a_n_g_i_n_g, _c_o_m_m_a_n_d___s_p_l_i_t_t_e_r___d_o_u_b_l_e_c_l_i_c_k_e_d,
+           _c_o_m_m_a_n_d___s_p_l_i_t_t_e_r___u_n_s_p_l_i_t
+
+       See also the message variant ##wwxxSSpplliitttteerr{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxNNoottiiffyyEEvveenntt
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_p_l_i_t_t_e_r_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettSSaasshhPPoossiittiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplitterEvent()
+
+              See external documentation.
+
+       ggeettXX((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplitterEvent()
+
+              See external documentation.
+
+       ggeettYY((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplitterEvent()
+
+              See external documentation.
+
+       ggeettWWiinnddoowwBBeeiinnggRReemmoovveedd((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxSplitterEvent()
+
+              See external documentation.
+
+       sseettSSaasshhPPoossiittiioonn((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxSplitterEvent()
+                 Pos = integer()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxSplitterEvent(3)

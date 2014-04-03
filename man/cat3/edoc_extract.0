@@ -1,0 +1,165 @@
+edoc_extract(3)            Erlang Module Definition            edoc_extract(3)
+
+
+
+NNAAMMEE
+       edoc_extract - EDoc documentation extraction.
+
+DDEESSCCRRIIPPTTIIOONN
+       EDoc documentation extraction.
+
+DDAATTAA TTYYPPEESS
+         _e_d_o_c___e_n_v_(_) _= _e_d_o_c___e_n_v_(_) _(_s_e_e _m_o_d_u_l_e _e_d_o_c___l_i_b_):
+
+
+         _f_i_l_e_n_a_m_e_(_) _= _f_i_l_e_n_a_m_e_(_) _(_s_e_e _m_o_d_u_l_e _f_i_l_e_):
+
+
+         _p_r_o_p_l_i_s_t_(_) _= _p_r_o_p_e_r_t_y_(_) _(_s_e_e _m_o_d_u_l_e _p_r_o_p_l_i_s_t_s_):
+
+
+         _s_y_n_t_a_x_T_r_e_e_(_) _= _s_y_n_t_a_x_T_r_e_e_(_) _(_s_e_e _m_o_d_u_l_e _e_r_l___s_y_n_t_a_x_):
+
+
+         _t_(_) _= _t_1_(_):
+
+
+           Some docs of t/0; Further docs of t/0. The same thing using -type:
+           -type t() :: t1(). % Some docs of t/0; Further docs of t/0.
+
+EEXXPPOORRTTSS
+       ffiillee((FFiillee::::ffiilleennaammee(()),, CCoonntteexxtt,, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(())))
+       -->> {{ookk,, TTaaggss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Context = overview | package
+                 Tags = [term()]
+                 Reason = term()
+
+              Reads a text file and returns the list of tags in the file. Any
+              lines of text before the first tag are ignored. _E_n_v is an
+              environment created by eeddoocc__lliibb::ggeett__ddoocc__eennvv//44. Upon error,
+              _R_e_a_s_o_n is an atom returned from the call to ffiillee::rreeaadd__ffiillee//11.
+
+              See tteexxtt//44 for options.
+
+       hheeaaddeerr((FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> {{ookk,,
+       TTaaggss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Tags = [term()]
+                 Reason = term()
+
+              Similar to hheeaaddeerr//55, but reads the syntax tree and the comments
+              from the specified file.
+
+              _S_e_e _a_l_s_o_: hheeaaddeerr//44, eeddoocc::rreeaadd__ccoommmmeennttss//22, eeddoocc::rreeaadd__ssoouurrccee//22.
+
+       hheeaaddeerr((FFoorrmmss,, FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(())))
+       -->> {{ookk,, TTaaggss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+                 Tags = [term()]
+                 Reason = term()
+
+              Extracts EDoc documentation from commented header file syntax
+              trees. Similar to ssoouurrccee//55, but ignores any documentation that
+              occurs before a module declaration or a function definition.
+              (Warning messages are printed if content may be ignored.) _E_n_v is
+              assumed to already be set up with a suitable module context.
+
+              _S_e_e _a_l_s_o_: eerrll__rreeccoommmmeenntt((33)), hheeaaddeerr//55.
+
+       hheeaaddeerr((FFoorrmmss,, CCoommmmeennttss::::[[ccoommmmeenntt(()) ((sseeee mmoodduullee eeddoocc))]],,
+       FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> {{ookk,, TTaaggss}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+                 Tags = [term()]
+                 Reason = term()
+
+              Similar to hheeaaddeerr//44, but first inserts the given comments in the
+              syntax trees. The syntax trees must contain valid position
+              information. (Cf. eeddoocc::rreeaadd__ccoommmmeennttss//22.)
+
+              _S_e_e _a_l_s_o_: eerrll__rreeccoommmmeenntt((33)), hheeaaddeerr//33, hheeaaddeerr//44.
+
+       ssoouurrccee((FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->>
+       {{MMoodduulleeNNaammee,, eeddoocc__mmoodduullee(()) ((sseeee mmoodduullee eeddoocc))}}
+
+              Types:
+
+                 ModuleName = atom()
+                 [term()]
+
+              Like ssoouurrccee//55, but reads the syntax tree and the comments from
+              the specified file.
+
+              _S_e_e _a_l_s_o_: ssoouurrccee//44, eeddoocc::rreeaadd__ccoommmmeennttss//22, eeddoocc::rreeaadd__ssoouurrccee//22.
+
+       ssoouurrccee((FFoorrmmss,, FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(())))
+       -->> {{MMoodduulleeNNaammee,, eeddoocc__mmoodduullee(()) ((sseeee mmoodduullee eeddoocc))}}
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+                 ModuleName = atom()
+
+              Extracts EDoc documentation from commented source code syntax
+              trees. The given _F_o_r_m_s must be a single syntax tree of type
+              _f_o_r_m___l_i_s_t, or a list of syntax trees representing "program
+              forms" (cf. eeddoocc::rreeaadd__ssoouurrccee//22. _E_n_v is an environment created by
+              eeddoocc__lliibb::ggeett__ddoocc__eennvv//44. The _F_i_l_e argument is used for error
+              reporting and output file name generation only.
+
+              See eeddoocc::ggeett__ddoocc//22 for descriptions of the _d_e_f, _h_i_d_d_e_n, _p_r_i_v_a_t_e,
+              and _t_o_d_o options.
+
+              _S_e_e _a_l_s_o_: eerrll__rreeccoommmmeenntt((33)), ssoouurrccee//55, eeddoocc::rreeaadd__ccoommmmeennttss//22,
+              eeddoocc::rreeaadd__ssoouurrccee//22.
+
+       ssoouurrccee((FFoorrmmss,, CCoommmmeennttss::::[[ccoommmmeenntt(()) ((sseeee mmoodduullee eeddoocc))]],,
+       FFiillee::::ffiilleennaammee(()),, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->> {{MMoodduulleeNNaammee,,
+       eeddoocc__mmoodduullee(()) ((sseeee mmoodduullee eeddoocc))}}
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+                 ModuleName = atom()
+
+              Like ssoouurrccee//44, but first inserts the given comments in the
+              syntax trees. The syntax trees must contain valid position
+              information. (Cf. eeddoocc::rreeaadd__ccoommmmeennttss//22.)
+
+              _S_e_e _a_l_s_o_: eerrll__rreeccoommmmeenntt((33)), ssoouurrccee//33, ssoouurrccee//44,
+              eeddoocc::rreeaadd__ccoommmmeennttss//22, eeddoocc::rreeaadd__ssoouurrccee//22.
+
+       tteexxtt((TTeexxtt::::ssttrriinngg(()),, CCoonntteexxtt,, EEnnvv::::eeddoocc__eennvv(()),, OOppttiioonnss::::pprroopplliisstt(()))) -->>
+       TTaaggss
+
+              Types:
+
+                 Context = overview | package
+                 Tags = [term()]
+
+              Returns the list of tags in the text. Any lines of text before
+              the first tag are ignored. _E_n_v is an environment created by
+              eeddoocc__lliibb::ggeett__ddoocc__eennvv//44.
+
+              See ssoouurrccee//44 for a description of the _d_e_f option.
+
+SSEEEE AALLSSOO
+       eeddoocc
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                                  edoc 0.7.10                  edoc_extract(3)

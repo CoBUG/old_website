@@ -1,0 +1,49 @@
+base64(3)                  Erlang Module Definition                  base64(3)
+
+
+
+NNAAMMEE
+       base64 - Implements base 64 encode and decode, see RFC2045.
+
+DDEESSCCRRIIPPTTIIOONN
+       Implements base 64 encode and decode, see RFC2045.
+
+DDAATTAA TTYYPPEESS
+       aasscciiii__ssttrriinngg(()) = [1..255]
+
+EEXXPPOORRTTSS
+       eennccooddee((DDaattaa)) -->> BBaassee6644
+
+       eennccooddee__ttoo__ssttrriinngg((DDaattaa)) -->> BBaassee6644SSttrriinngg
+
+              Types:
+
+                 Data = string() | binary()
+                 Base64 = binary()
+                 Base64String = aasscciiii__ssttrriinngg(())
+
+              Encodes a plain ASCII string into base64. The result will be 33%
+              larger than the data.
+
+       ddeeccooddee((BBaassee6644)) -->> DDaattaa
+
+       ddeeccooddee__ttoo__ssttrriinngg((BBaassee6644)) -->> DDaattaaSSttrriinngg
+
+       mmiimmee__ddeeccooddee((BBaassee6644)) -->> DDaattaa
+
+       mmiimmee__ddeeccooddee__ttoo__ssttrriinngg((BBaassee6644)) -->> DDaattaaSSttrriinngg
+
+              Types:
+
+                 Base64 = string() | binary()
+                 Data = binary()
+                 DataString = string()
+
+              Decodes a base64 encoded string to plain ASCII. See RFC4648.
+              _m_i_m_e___d_e_c_o_d_e_/_1 and _m_i_m_e___d_e_c_o_d_e___t_o___s_t_r_i_n_g_/_1 strips away illegal
+              characters, while _d_e_c_o_d_e_/_1 and _d_e_c_o_d_e___t_o___s_t_r_i_n_g_/_1 only strips
+              away whitespace characters.
+
+
+
+Ericsson AB                      stdlib 1.18.2                       base64(3)

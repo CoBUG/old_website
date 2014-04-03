@@ -1,0 +1,91 @@
+snmp_standard_mib(3)       Erlang Module Definition       snmp_standard_mib(3)
+
+
+
+NNAAMMEE
+       snmp_standard_mib - Instrumentation Functions for STANDARD-MIB and
+       SNMPv2-MIB
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p___s_t_a_n_d_a_r_d___m_i_b implements the instrumentation functions
+       for the STANDARD-MIB and SNMPv2-MIB, and functions for configuring the
+       database.
+
+       The configuration files are described in the SNMP User's Manual.
+
+EEXXPPOORRTTSS
+       ccoonnffiigguurree((CCoonnffDDiirr)) -->> vvooiidd(())
+
+              Types:
+
+                 ConfDir = string()
+
+              This function is called from the supervisor at system start-up.
+
+              Inserts all data in the configuration files into the database
+              and destroys all old rows with StorageType _v_o_l_a_t_i_l_e. The rows
+              created from the configuration file will have StorageType
+              _n_o_n_V_o_l_a_t_i_l_e.
+
+              All _s_n_m_p counters are set to zero.
+
+              If an error is found in the configuration file, it is reported
+              using the function _c_o_n_f_i_g___e_r_r_/_2 of the error report module, and
+              the function fails with the reason _c_o_n_f_i_g_u_r_a_t_i_o_n___e_r_r_o_r.
+
+              _C_o_n_f_D_i_r is a string which points to the directory where the
+              configuration files are found.
+
+              The configuration file read is: _s_t_a_n_d_a_r_d_._c_o_n_f.
+
+       iinncc((NNaammee)) -->> vvooiidd(())
+       iinncc((NNaammee,, NN)) -->> vvooiidd(())
+
+              Types:
+
+                 Name = atom()
+                 N = integer()
+
+              Increments a variable in the MIB with _N, or one if _N is not
+              specified.
+
+       rreeccoonnffiigguurree((CCoonnffDDiirr)) -->> vvooiidd(())
+
+              Types:
+
+                 ConfDir = string()
+
+              Inserts all data in the configuration files into the database
+              and destroys all old data, including the rows with StorageType
+              _n_o_n_V_o_l_a_t_i_l_e. The rows created from the configuration file will
+              have StorageType _n_o_n_V_o_l_a_t_i_l_e.
+
+              Thus, the data in the SNMP-STANDARD-MIB and SNMPv2-MIB, after
+              this function has been called, is from the configuration files.
+
+              All _s_n_m_p counters are set to zero.
+
+              If an error is found in the configuration file, it is reported
+              using the function _c_o_n_f_i_g___e_r_r_/_2 of the error report module, and
+              the function fails with the reason _c_o_n_f_i_g_u_r_a_t_i_o_n___e_r_r_o_r.
+
+              _C_o_n_f_D_i_r is a string which points to the directory where the
+              configuration files are found.
+
+              The configuration file read is: _s_t_a_n_d_a_r_d_._c_o_n_f.
+
+       rreesseett(()) -->> vvooiidd(())
+
+              Resets all _s_n_m_p counters to 0.
+
+       ssyyss__uupp__ttiimmee(()) -->> TTiimmee
+
+              Types:
+
+                 Time = int()
+
+              Gets the system up time in hundredth of a second.
+
+
+
+Ericsson AB                       snmp 4.22.1             snmp_standard_mib(3)

@@ -1,0 +1,107 @@
+ic_c_protocol(3)              C Library Functions             ic_c_protocol(3)
+
+
+
+NNAAMMEE
+       ic_c_protocol - IC C Protocol Functions
+
+DDEESSCCRRIIPPTTIIOONN
+       This manual page lists some of the functions of the IC C runtime
+       library that are used internally for the IC protocol.
+
+       The listed functions are used internally by generated C client and
+       server code. They are documented here for _t_h_e _a_d_v_a_n_c_e_d _u_s_e_r that want
+       to replace the default protocol (Erlang distribution + gen_server) by
+       his own protocol, For each set of client or sever functions below with
+       prefix _o_e, the user has to implement his own set of functions, the
+       names of which are obtained by replacing the _o_e prefix by _P_r_e_f_i_x. The
+       _P_r_e_f_i_x has to be set with the option _{_u_s_e_r___p_r_o_t_o_c_o_l_, _P_r_e_f_i_x_} at compile
+       time.
+
+       The following terminology is used (reflected in names of functions): a
+       _n_o_t_i_f_i_c_a_t_i_o_n is a message send from client to server, without any reply
+       back (i.e. a _o_n_e_w_a_y operation); a _r_e_q_u_e_s_t is a message sent from client
+       to server, and where a _r_e_p_l_y message is sent back from the server to
+       the client.
+
+       In order to understand how the functions work and what they do the user
+       _m_u_s_t study their implementation in the IC C library (source file is
+       _i_c_._c), and also consider how they are used in the C code of ordinary
+       generated client stubs or server skeletons.
+
+CCLLIIEENNTT PPRROOTTOOCCOOLL FFUUNNCCTTIIOONNSS
+       The following functions are used internally by generated C client code.
+
+EEXXPPOORRTTSS
+       iinntt ooee__pprreeppaarree__nnoottiiffiiccaattiioonn__eennccooddiinngg((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              The result of this function is the beginning of a binary of in
+              external format of the tuple _{_'_$_g_e_n___c_a_s_t_'_, _X_} where _X is not yet
+              filled in.
+
+              In generated client code this function is the first to be called
+              in the encoding function for each oneway operation.
+
+       iinntt ooee__sseenndd__nnoottiiffiiccaattiioonn((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+       iinntt ooee__sseenndd__nnoottiiffiiccaattiioonn__ttmmoo((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv,,  uunnssiiggnneedd iinntt
+       sseenndd__mmss))
+
+              Sends a client notification to a server according to the Erlang
+              distribution + gen_server protocol.
+
+              The _s_e_n_d___m_s parameter specified a timeout in milliseconds.
+
+       iinntt ooee__pprreeppaarree__rreeqquueesstt__eennccooddiinngg((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              The result of this function is the beginning of a binary in the
+              external format of the tuple _{_'_$_g_e_n___c_a_l_l_'_, _{_P_i_d_, _R_e_f_}_, _X_} where
+              _X is not yet filled in.
+
+              In generated client code this function is the first to be called
+              in the encoding function for each twoway operation.
+
+       iinntt ooee__sseenndd__rreeqquueesstt__aanndd__rreecceeiivvee__rreeppllyy((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+       iinntt ooee__sseenndd__rreeqquueesstt__aanndd__rreecceeiivvee__rreeppllyy__ttmmoo((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv,,
+       uunnssiiggnneedd iinntt sseenndd__mmss,, uunnssiiggnneedd iinntt rreeccvv__mmss))
+
+              Sends a client request and receives the reply according to the
+              Erlang distribution + gen_server protocol. This function calls
+              the _o_e___p_r_e_p_a_r_e___r_e_p_l_y___d_e_c_o_d_i_n_g function in order to obtain the
+              gen_server reply.
+
+              _s_e_n_d___m_s and _r_e_c_v___m_s specify timeouts for send and receive,
+              respectively, in milliseconds.
+
+       iinntt ooee__pprreeppaarree__rreeppllyy__ddeeccooddiinngg((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              Decodes the binary version of the tuple _{_R_e_f_, _X_}, where _X is to
+              be decoded later by the specific client decoding function.
+
+SSEERRVVEERR PPRROOTTOOCCOOLL FFUUNNCCTTIIOONNSS
+       The following functions are used internally by generated C server code.
+
+EEXXPPOORRTTSS
+       iinntt ooee__pprreeppaarree__rreeqquueesstt__ddeeccooddiinngg((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              Decodes the binary version of the tuple _{_'_$_g_e_n___c_a_s_t_'_, _O_p_} (_O_p an
+              atom), or the tuple _{_'_$_g_e_n___c_a_s_t_'_, _{_O_p_, _X_}_}, where _O_p is the
+              operation name, and where _X is to be decoded later by the
+              specific operation decoding function; or
+
+              decodes the binary version of the tuple _{_'_$_g_e_n___c_a_l_l_'_, _{_P_i_d_,
+              _R_e_f_}_, _O_p_} (_O_p an atom), or the tuple _{_'_$_g_e_n___c_a_l_l_'_, _{_P_i_d_, _R_e_f_}_,
+              _{_O_p_, _X_}_}, where _O_p_> is the operation name, and _X is to be decode
+              later by the specific operation decoding function.
+
+       iinntt ooee__pprreeppaarree__rreeppllyy__eennccooddiinngg((CCOORRBBAA__EEnnvviirroonnmmeenntt **eennvv))
+
+              Encodes the beginning of the binary version of the tuple
+              _{_{_R_e_f_,_X_}, where _X is to be filled in by the specific server
+              encoding function.
+
+SSEEEE AALLSSOO
+       ic(3), ic_clib(3), IICC PPrroottooccooll
+
+
+
+Ericsson AB                        ic 4.2.31                  ic_c_protocol(3)

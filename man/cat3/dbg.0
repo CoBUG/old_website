@@ -1,0 +1,1013 @@
+dbg(3)                     Erlang Module Definition                     dbg(3)
+
+
+
+NNAAMMEE
+       dbg - The Text Based Trace Facility
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements a text based interface to the _t_r_a_c_e_/_3 and the
+       _t_r_a_c_e___p_a_t_t_e_r_n_/_2 BIFs. It makes it possible to trace functions,
+       processes and messages on text based terminals. It can be used instead
+       of, or as complement to, the _p_m_a_n module.
+
+       For some examples of how to use _d_b_g from the Erlang shell, see the
+       ssiimmppllee eexxaammppllee section.
+
+       The utilities are also suitable to use in system testing on large
+       systems, where other tools have too much impact on the system
+       performance. Some primitive support for sequential tracing is also
+       included, see the aaddvvaanncceedd ttooppiiccss section.
+
+EEXXPPOORRTTSS
+       ffuunn22mmss((LLiitteerraallFFuunn)) -->> MMaattcchhSSppeecc
+
+              Types:
+
+                 LiteralFun = fun() literal
+                 MatchSpec = term()
+
+              Pseudo function that by means of a _p_a_r_s_e___t_r_a_n_s_f_o_r_m translates
+              the _l_i_t_e_r_a_l_f_u_n_(_) typed as parameter in the function call to a
+              match specification as described in the _m_a_t_c_h___s_p_e_c manual of
+              _E_R_T_S users guide. (with literal I mean that the _f_u_n_(_) needs to
+              textually be written as the parameter of the function, it cannot
+              be held in a variable which in turn is passed to the function).
+
+              The parse transform is implemented in the module _m_s___t_r_a_n_s_f_o_r_m
+              and the source _m_u_s_t include the file _m_s___t_r_a_n_s_f_o_r_m_._h_r_l in STDLIB
+              for this pseudo function to work. Failing to include the hrl
+              file in the source will result in a runtime error, not a compile
+              time ditto. The include file is easiest included by adding the
+              line _-_i_n_c_l_u_d_e___l_i_b_(_"_s_t_d_l_i_b_/_i_n_c_l_u_d_e_/_m_s___t_r_a_n_s_f_o_r_m_._h_r_l_"_)_. to the
+              source file.
+
+              The _f_u_n_(_) is very restricted, it can take only a single
+              parameter (the parameter list to match), a sole variable or a
+              list. It needs to use the _i_s__XXX guard tests and one cannot use
+              language constructs that have no representation in a match_spec
+              (like _i_f, _c_a_s_e, _r_e_c_e_i_v_e etc). The return value from the fun will
+              be the return value of the resulting match_spec.
+
+              Example:
+
+              1> dbg:fun2ms(fun([M,N]) when N > 3 -> return_trace() end).
+              [{['$1','$2'],[{'>','$2',3}],[{return_trace}]}]
+
+              Variables from the environment can be imported, so that this
+              works:
+
+              2> X=3.
+              3
+              3> dbg:fun2ms(fun([M,N]) when N > X -> return_trace() end).
+              [{['$1','$2'],[{'>','$2',{const,3}}],[{return_trace}]}]
+
+              The imported variables will be replaced by match_spec _c_o_n_s_t
+              expressions, which is consistent with the static scoping for
+              Erlang _f_u_n_(_)s. Local or global function calls can not be in the
+              guard or body of the fun however. Calls to builtin match_spec
+              functions of course is allowed:
+
+              4> dbg:fun2ms(fun([M,N]) when N > X, is_atomm(M) -> return_trace() end).
+              Error: fun containing local erlang function calls ('is_atomm' called in guard) cannot be translated into match_spec
+              {error,transform_error}
+              5> dbg:fun2ms(fun([M,N]) when N > X, is_atom(M) -> return_trace() end).
+              [{['$1','$2'],[{'>','$2',{const,3}},{is_atom,'$1'}],[{return_trace}]}]
+
+              As you can see by the example, the function can be called from
+              the shell too. The _f_u_n_(_) needs to be literally in the call when
+              used from the shell as well. Other means than the
+              parse_transform are used in the shell case, but more or less the
+              same restrictions apply (the exception being records, as they
+              are not handled by the shell).
+
+          WWaarrnniinngg::
+              If the parse_transform is not applied to a module which calls
+              this pseudo function, the call will fail in runtime (with a
+              _b_a_d_a_r_g). The module _d_b_g actually exports a function with this
+              name, but it should never really be called except for when using
+              the function in the shell. If the _p_a_r_s_e___t_r_a_n_s_f_o_r_m is properly
+              applied by including the _m_s___t_r_a_n_s_f_o_r_m_._h_r_l header file, compiled
+              code will never call the function, but the function call is
+              replaced by a literal match_spec.
+
+
+              More information is provided by the _m_s___t_r_a_n_s_f_o_r_m manual page in
+              STDLIB.
+
+       hh(()) -->> ookk
+
+              Gives a list of items for brief online help.
+
+       hh((IItteemm)) -->> ookk
+
+              Types:
+
+                 Item = atom()
+
+              Gives a brief help text for functions in the dbg module. The
+              available items can be listed with _d_b_g_:_h_/_0
+
+       pp((IItteemm)) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,, tteerrmm(())}}
+
+              Equivalent to _p_(_I_t_e_m_, _[_m_]_).
+
+       pp((IItteemm,, FFllaaggss)) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,, tteerrmm(())}}
+
+              Types:
+
+                 MatchDesc = [MatchNum]
+                 MatchNum = {matched, node(), integer()} | {matched, node(),
+                 0, RPCError}
+                 RPCError = term()
+
+              Traces _I_t_e_m in accordance to the value specified by _F_l_a_g_s. The
+              variation of _I_t_e_m is listed below:
+
+                * If the _I_t_e_m is a _p_i_d_(_), the corresponding process is traced.
+                  The process may be a remote process (on another Erlang
+                  node). The node must be in the list of traced nodes (sseeee_n_/_1
+                  and _t_r_a_c_e_r_/_0_/_2_/_3).
+
+                * If the _I_t_e_m is the atom _a_l_l, all processes in the system as
+                  well as all processes created hereafter are to be traced.
+                  This also affects all nodes added with the _n_/_1 or
+                  _t_r_a_c_e_r_/_0_/_2_/_3 function.
+
+                * If the _I_t_e_m is the atom _n_e_w, no currently existing processes
+                  are affected, but every process created after the call
+                  is.This also affects all nodes added with the _n_/_1 or
+                  _t_r_a_c_e_r_/_0_/_2_/_3 function.
+
+                * If the _I_t_e_m is the atom _e_x_i_s_t_i_n_g, all existing processes are
+                  traced, but new processes will not be affected.This also
+                  affects all nodes added with the _n_/_1 or _t_r_a_c_e_r_/_0_/_2_/_3
+                  function.
+
+                * If the _I_t_e_m is an atom other than _a_l_l, _n_e_w or _e_x_i_s_t_i_n_g, the
+                  process with the corresponding registered name is traced.The
+                  process may be a remote process (on another Erlang node).
+                  The node must be added with the _n_/_1 or _t_r_a_c_e_r_/_0_/_2_/_3
+                  function.
+
+                * If the _I_t_e_m is an integer, the process _<_0_._I_t_e_m_._0_> is traced.
+
+                * If the _I_t_e_m is a tuple _{_X_, _Y_, _Z_}, the process _<_X_._Y_._Z_> is
+                  traced.
+
+                * If the _I_t_e_m is a string "<X.Y.Z>" as returned from
+                  _p_i_d___t_o___l_i_s_t_/_1, the process _<_X_._Y_._Z_> is traced.
+
+              _F_l_a_g_s can be a single atom, or a list of flags. The available
+              flags are:
+
+                _s _(_s_e_n_d_):
+                  Traces the messages the process sends.
+
+                _r _(_r_e_c_e_i_v_e_):
+                  Traces the messages the process receives.
+
+                _m _(_m_e_s_s_a_g_e_s_):
+                  Traces the messages the process receives and sends.
+
+                _c _(_c_a_l_l_):
+                  Traces global function calls for the process according to
+                  the trace patterns set in the system (see tp/2).
+
+                _p _(_p_r_o_c_s_):
+                  Traces process related events to the process.
+
+                _s_o_s _(_s_e_t _o_n _s_p_a_w_n_):
+                  Lets all processes created by the traced process inherit the
+                  trace flags of the traced process.
+
+                _s_o_l _(_s_e_t _o_n _l_i_n_k_):
+                  Lets another process, _P_2, inherit the trace flags of the
+                  traced process whenever the traced process links to _P_2.
+
+                _s_o_f_s _(_s_e_t _o_n _f_i_r_s_t _s_p_a_w_n_):
+                  This is the same as _s_o_s, but only for the first process
+                  spawned by the traced process.
+
+                _s_o_f_l _(_s_e_t _o_n _f_i_r_s_t _l_i_n_k_):
+                  This is the same as _s_o_l, but only for the first call to
+                  _l_i_n_k_/_1 by the traced process.
+
+                _a_l_l:
+                  Sets all flags.
+
+                _c_l_e_a_r:
+                  Clears all flags.
+
+              The list can also include any of the flags allowed in
+              _e_r_l_a_n_g_:_t_r_a_c_e_/_3
+
+              The function returns either an error tuple or a tuple _{_o_k_,
+              _L_i_s_t_}. The _L_i_s_t consists of specifications of how many processes
+              that matched (in the case of a pure pid() exactly 1). The
+              specification of matched processes is _{_m_a_t_c_h_e_d_, _N_o_d_e_, _N_}. If the
+              remote processor call,_r_p_c, to a remote node fails, the _r_p_c error
+              message is delivered as a fourth argument and the number of
+              matched processes are 0. Note that the result {ok, List} may
+              contain a list where _r_p_c calls to one, several or even all nodes
+              failed.
+
+       cc((MMoodd,, FFuunn,, AArrggss))
+
+              Equivalent to _c_(_M_o_d_, _F_u_n_, _A_r_g_s_, _a_l_l_).
+
+       cc((MMoodd,, FFuunn,, AArrggss,, FFllaaggss))
+
+              Evaluates the expression _a_p_p_l_y_(_M_o_d_, _F_u_n_, _A_r_g_s_) with the trace
+              flags in _F_l_a_g_s set. This is a convenient way to trace processes
+              from the Erlang shell.
+
+       ii(()) -->> ookk
+
+              Displays information about all traced processes.
+
+       ttpp((MMoodduullee,,MMaattcchhSSppeecc))
+
+              Same as tp({Module, '_', '_'}, MatchSpec)
+
+       ttpp((MMoodduullee,,FFuunnccttiioonn,,MMaattcchhSSppeecc))
+
+              Same as tp({Module, Function, '_'}, MatchSpec)
+
+       ttpp((MMoodduullee,, FFuunnccttiioonn,, AArriittyy,, MMaattcchhSSppeecc))
+
+              Same as tp({Module, Function, Arity}, MatchSpec)
+
+       ttpp(({{MMoodduullee,, FFuunnccttiioonn,, AArriittyy}},, MMaattcchhSSppeecc)) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,,
+       tteerrmm(())}}
+
+              Types:
+
+                 Module = atom() | '_'
+                 Function = atom() | '_'
+                 Arity = integer() |'_'
+                 MatchSpec = integer() | Built-inAlias | [] | match_spec()
+                 Built-inAlias = x | c | cx
+                 MatchDesc = [MatchInfo]
+                 MatchInfo = {saved, integer()} | MatchNum
+                 MatchNum = {matched, node(), integer()} | {matched, node(),
+                 0, RPCError}
+
+              This function enables call trace for one or more functions. All
+              exported functions matching the _{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_, _A_r_i_t_y_}
+              argument will be concerned, but the _m_a_t_c_h___s_p_e_c_(_) may further
+              narrow down the set of function calls generating trace messages.
+
+              For a description of the _m_a_t_c_h___s_p_e_c_(_) syntax, please turn to the
+              _U_s_e_r_'_s _g_u_i_d_e part of the online documentation for the runtime
+              system (_e_r_t_s). The chapter _M_a_t_c_h _S_p_e_c_i_f_i_c_a_t_i_o_n _i_n _E_r_l_a_n_g
+              explains the general match specification "language".
+
+              The Module, Function and/or Arity parts of the tuple may be
+              specified as the atom _'___' which is a "wild-card" matching all
+              modules/functions/arities. Note, if the Module is specified as
+              _'___', the Function and Arity parts have to be specified as '_'
+              too. The same holds for the Functions relation to the Arity.
+
+              All nodes added with _n_/_1 or _t_r_a_c_e_r_/_0_/_2_/_3 will be affected by
+              this call, and if Module is not _'___' the module will be loaded on
+              all nodes.
+
+              The function returns either an error tuple or a tuple _{_o_k_,
+              _L_i_s_t_}. The _L_i_s_t consists of specifications of how many functions
+              that matched, in the same way as the processes are presented in
+              the return value of _p_/_2.
+
+              There may be a tuple _{_s_a_v_e_d_, _N_} in the return value, if the
+              MatchSpec is other than []. The integer _N may then be used in
+              subsequent calls to this function and will stand as an "alias"
+              for the given expression. There are also a couple of built-in
+              aliases for common expressions, see _l_t_p_/_0 below for details.
+
+              If an error is returned, it can be due to errors in compilation
+              of the match specification. Such errors are presented as a list
+              of tuples _{_e_r_r_o_r_, _s_t_r_i_n_g_(_)_} where the string is a textual
+              explanation of the compilation error. An example:
+
+              (x@y)4> dbg:tp({dbg,ltp,0},[{[],[],[{message, two, arguments}, {noexist}]}]).
+              {error,
+               [{error,"Special form 'message' called with wrong number of
+                        arguments in {message,two,arguments}."},
+                {error,"Function noexist/1 does_not_exist."}]}
+
+       ttppll((MMoodduullee,,MMaattcchhSSppeecc))
+
+              Same as tpl({Module, '_', '_'}, MatchSpec)
+
+       ttppll((MMoodduullee,,FFuunnccttiioonn,,MMaattcchhSSppeecc))
+
+              Same as tpl({Module, Function, '_'}, MatchSpec)
+
+       ttppll((MMoodduullee,, FFuunnccttiioonn,, AArriittyy,, MMaattcchhSSppeecc))
+
+              Same as tpl({Module, Function, Arity}, MatchSpec)
+
+       ttppll(({{MMoodduullee,, FFuunnccttiioonn,, AArriittyy}},, MMaattcchhSSppeecc)) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,,
+       tteerrmm(())}}
+
+              This function works as _t_p_/_2, but enables tracing for local calls
+              (and local functions) as well as for global calls (and
+              functions).
+
+       ccttpp(())
+
+              Same as ctp({'_', '_', '_'})
+
+       ccttpp((MMoodduullee))
+
+              Same as ctp({Module, '_', '_'})
+
+       ccttpp((MMoodduullee,, FFuunnccttiioonn))
+
+              Same as ctp({Module, Function, '_'})
+
+       ccttpp((MMoodduullee,, FFuunnccttiioonn,, AArriittyy))
+
+              Same as ctp({Module, Function, Arity})
+
+       ccttpp(({{MMoodduullee,, FFuunnccttiioonn,, AArriittyy}})) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,, tteerrmm(())}}
+
+              Types:
+
+                 Module = atom() | '_'
+                 Function = atom() | '_'
+                 Arity = integer() | '_'
+                 MatchDesc = [MatchNum]
+                 MatchNum = {matched, node(), integer()} | {matched, node(),
+                 0, RPCError}
+
+              This function disables call tracing on the specified functions.
+              The semantics of the parameter is the same as for the
+              corresponding function specification in _t_p_/_2 or _t_p_l_/_2. Both
+              local and global call trace is disabled.
+
+              The return value reflects how many functions that matched, and
+              is constructed as described in _t_p_/_2. No tuple _{_s_a_v_e_d_, _N_} is
+              however ever returned (for obvious reasons).
+
+       ccttppll(())
+
+              Same as ctpl({'_', '_', '_'})
+
+       ccttppll((MMoodduullee))
+
+              Same as ctpl({Module, '_', '_'})
+
+       ccttppll((MMoodduullee,, FFuunnccttiioonn))
+
+              Same as ctpl({Module, Function, '_'})
+
+       ccttppll((MMoodduullee,, FFuunnccttiioonn,, AArriittyy))
+
+              Same as ctpl({Module, Function, Arity})
+
+       ccttppll(({{MMoodduullee,, FFuunnccttiioonn,, AArriittyy}})) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,, tteerrmm(())}}
+
+              This function works as _c_t_p_/_1, but only disables tracing set up
+              with _t_p_l_/_2 (not with _t_p_/_2).
+
+       ccttppgg(())
+
+              Same as ctpg({'_', '_', '_'})
+
+       ccttppgg((MMoodduullee))
+
+              Same as ctpg({Module, '_', '_'})
+
+       ccttppgg((MMoodduullee,, FFuunnccttiioonn))
+
+              Same as ctpg({Module, Function, '_'})
+
+       ccttppgg((MMoodduullee,, FFuunnccttiioonn,, AArriittyy))
+
+              Same as ctpg({Module, Function, Arity})
+
+       ccttppgg(({{MMoodduullee,, FFuunnccttiioonn,, AArriittyy}})) -->> {{ookk,, MMaattcchhDDeesscc}} || {{eerrrroorr,, tteerrmm(())}}
+
+              This function works as _c_t_p_/_1, but only disables tracing set up
+              with _t_p_/_2 (not with _t_p_l_/_2).
+
+       llttpp(()) -->> ookk
+
+              Use this function to recall all match specifications previously
+              used in the session (i. e. previously saved during calls to
+              _t_p_/_2, and built-in match specifications. This is very useful, as
+              a complicated match_spec can be quite awkward to write. Note
+              that the match specifications are lost if _s_t_o_p_/_0 is called.
+
+              Match specifications used can be saved in a file (if a read-
+              write file system is present) for use in later debugging
+              sessions, see _w_t_p_/_1 and _r_t_p_/_1
+
+              There are three built-in trace patterns: _e_x_c_e_p_t_i_o_n___t_r_a_c_e,
+              _c_a_l_l_e_r___t_r_a_c_e and _c_a_l_l_e_r___e_x_c_e_p_t_i_o_n___t_r_a_c_e (or _x, _c and _c_x
+              respectively). Exception trace sets a trace which will show
+              function names, parameters, return values and exceptions thrown
+              from functions. Caller traces display function names, parameters
+              and information about which function called it. An example using
+              a built-in alias:
+
+              (x@y)4> dbg:tp(lists,sort,cx).
+              {ok,[{matched,nonode@nohost,2},{saved,cx}]}
+              (x@y)4> lists:sort([2,1]).
+              (<0.32.0>) call lists:sort([2,1]) ({erl_eval,do_apply,5})
+              (<0.32.0>) returned from lists:sort/1 -> [1,2]
+              [1,2]
+
+       ddttpp(()) -->> ookk
+
+              Use this function to "forget" all match specifications saved
+              during calls to _t_p_/_2. This is useful when one wants to restore
+              other match specifications from a file with _r_t_p_/_1. Use _d_t_p_/_1 to
+              delete specific saved match specifications.
+
+       ddttpp((NN)) -->> ookk
+
+              Types:
+
+                 N = integer()
+
+              Use this function to "forget" a specific match specification
+              saved during calls to _t_p_/_2.
+
+       wwttpp((NNaammee)) -->> ookk || {{eerrrroorr,, IIOOEErrrroorr}}
+
+              Types:
+
+                 Name = string()
+                 IOError = term()
+
+              This function will save all match specifications saved during
+              the session (during calls to _t_p_/_2) and built-in match
+              specifications in a text file with the name designated by _N_a_m_e.
+              The format of the file is textual, why it can be edited with an
+              ordinary text editor, and then restored with _r_t_p_/_1.
+
+              Each match spec in the file ends with a full stop (_.) and new
+              (syntactically correct) match specifications can be added to the
+              file manually.
+
+              The function returns _o_k or an error tuple where the second
+              element contains the I/O error that made the writing impossible.
+
+       rrttpp((NNaammee)) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Name = string()
+                 Error = term()
+
+              This function reads match specifications from a file (possibly)
+              generated by the _w_t_p_/_1 function. It checks the syntax of all
+              match specifications and verifies that they are correct. The
+              error handling principle is "all or nothing", i. e. if some of
+              the match specifications are wrong, none of the specifications
+              are added to the list of saved match specifications for the
+              running system.
+
+              The match specifications in the file are _m_e_r_g_e_d with the current
+              match specifications, so that no duplicates are generated. Use
+              _l_t_p_/_0 to see what numbers were assigned to the specifications
+              from the file.
+
+              The function will return an error, either due to I/O problems
+              (like a non existing or non readable file) or due to file format
+              problems. The errors from a bad format file are in a more or
+              less textual format, which will give a hint to what's causing
+              the problem.
+
+       nn((NNooddeennaammee)) -->> {{ookk,, NNooddeennaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Nodename = atom()
+                 Reason = term()
+
+              The _d_b_g server keeps a list of nodes where tracing should be
+              performed. Whenever a _t_p_/_2 call or a _p_/_2 call is made, it is
+              executed for all nodes in this list including the local node
+              (except for _p_/_2 with a specific _p_i_d_(_) as first argument, in
+              which case the command is executed only on the node where the
+              designated process resides).
+
+              This function adds a remote node (_N_o_d_e_n_a_m_e) to the list of nodes
+              where tracing is performed. It starts a tracer process on the
+              remote node, which will send all trace messages to the tracer
+              process on the local node (via the Erlang distribution). If no
+              tracer process is running on the local node, the error reason
+              _n_o___l_o_c_a_l___t_r_a_c_e_r is returned. The tracer process on the local
+              node must be started with the _t_r_a_c_e_r_/_0_/_2 function.
+
+              If _N_o_d_e_n_a_m_e is the local node, the error reason
+              _c_a_n_t___a_d_d___l_o_c_a_l___n_o_d_e is returned.
+
+              If a trace port (sseeee_t_r_a_c_e___p_o_r_t_/_2) is running on the local node,
+              remote nodes can not be traced with a tracer process. The error
+              reason _c_a_n_t___t_r_a_c_e___r_e_m_o_t_e___p_i_d___t_o___l_o_c_a_l___p_o_r_t is returned. A trace
+              port can however be started on the remote node with the _t_r_a_c_e_r_/_3
+              function.
+
+              The function will also return an error if the node _N_o_d_e_n_a_m_e is
+              not reachable.
+
+       ccnn((NNooddeennaammee)) -->> ookk
+
+              Types:
+
+                 Nodename = atom()
+
+              Clears a node from the list of traced nodes. Subsequent calls to
+              _t_p_/_2 and _p_/_2 will not consider that node, but tracing already
+              activated on the node will continue to be in effect.
+
+              Returns _o_k, cannot fail.
+
+       llnn(()) -->> ookk
+
+              Shows the list of traced nodes on the console.
+
+       ttrraacceerr(()) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,, aallrreeaaddyy__ssttaarrtteedd}}
+
+              This function starts a server on the local node that will be the
+              recipient of all trace messages. All subsequent calls to _p_/_2
+              will result in messages sent to the newly started trace server.
+
+              A trace server started in this way will simply display the trace
+              messages in a formatted way in the Erlang shell (i. e. use
+              io:format). See _t_r_a_c_e_r_/_2 for a description of how the trace
+              message handler can be customized.
+
+              To start a similar tracer on a remote node, use _n_/_1.
+
+       ttrraacceerr((TTyyppee,, DDaattaa)) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Type = port | process
+                 Data = PortGenerator | HandlerSpec
+                 HandlerSpec = {HandlerFun, InitialData}
+                 HandlerFun = fun() (two arguments)
+                 InitialData = term()
+                 PortGenerator = fun() (no arguments)
+                 Error = term()
+
+              This function starts a tracer server with additional parameters
+              on the local node. The first parameter, the _T_y_p_e, indicates if
+              trace messages should be handled by a receiving process
+              (_p_r_o_c_e_s_s) or by a tracer port (_p_o_r_t). For a description about
+              tracer ports see _t_r_a_c_e___p_o_r_t_/_2.
+
+              If _T_y_p_e is a process, a message handler function can be
+              specified (_H_a_n_d_l_e_r_S_p_e_c). The handler function, which should be a
+              _f_u_n taking two arguments, will be called for each trace message,
+              with the first argument containing the message as it is and the
+              second argument containing the return value from the last
+              invocation of the fun. The initial value of the second parameter
+              is specified in the _I_n_i_t_i_a_l_D_a_t_a part of the _H_a_n_d_l_e_r_S_p_e_c. The
+              _H_a_n_d_l_e_r_F_u_n may choose any appropriate action to take when
+              invoked, and can save a state for the next invocation by
+              returning it.
+
+              If _T_y_p_e is a port, then the second parameter should be a _f_u_n
+              which takes no arguments and returns a newly opened trace port
+              when called. Such a _f_u_n is preferably generated by calling
+              _t_r_a_c_e___p_o_r_t_/_2.
+
+              If an error is returned, it can either be due to a tracer server
+              already running (_{_e_r_r_o_r_,_a_l_r_e_a_d_y___s_t_a_r_t_e_d_}) or due to the
+              _H_a_n_d_l_e_r_F_u_n throwing an exception.
+
+              To start a similar tracer on a remote node, use _t_r_a_c_e_r_/_3.
+
+       ttrraacceerr((NNooddeennaammee,, TTyyppee,, DDaattaa)) -->> {{ookk,, NNooddeennaammee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Nodename = atom()
+
+              This function is equivalent to _t_r_a_c_e_r_/_2, but acts on the given
+              node. A tracer is started on the node (_N_o_d_e_n_a_m_e) and the node is
+              added to the list of traced nodes.
+
+          NNoottee::
+              This function is not equivalent to _n_/_1. While _n_/_1 starts a
+              process tracer which redirects all trace information to a
+              process tracer on the local node (i.e. the trace control node),
+              _t_r_a_c_e_r_/_3 starts a tracer of any type which is independent of the
+              tracer on the trace control node.
+
+
+              For details, sseeee_t_r_a_c_e_r_/_2.
+
+       ttrraaccee__ppoorrtt((TTyyppee,, PPaarraammeetteerrss)) -->> ffuunn(())
+
+              Types:
+
+                 Type = ip | file
+                 Parameters = Filename | WrapFilesSpec | IPPortSpec
+                 Filename = string() | [string()] | atom()
+                 WrapFilesSpec = {Filename, wrap, Suffix} | {Filename, wrap,
+                 Suffix, WrapSize} | {Filename, wrap, Suffix, WrapSize,
+                 WrapCnt}
+                 Suffix = string()
+                 WrapSize = integer() >= 0 | {time, WrapTime}
+                 WrapTime = integer() >= 1
+                 WrapCnt = integer() >= 1
+                 IpPortSpec = PortNumber | {PortNumber, QueSize}
+                 PortNumber = integer()
+                 QueSize = integer()
+
+              This function creates a trace port generating _f_u_n. The _f_u_n takes
+              no arguments and returns a newly opened trace port. The return
+              value from this function is suitable as a second parameter to
+              tracer/2, i.e. _d_b_g_:_t_r_a_c_e_r_(_p_o_r_t_, _d_b_g_:_t_r_a_c_e___p_o_r_t_(_i_p_, _4_7_1_1_)_).
+
+              A trace port is an Erlang port to a dynamically linked in driver
+              that handles trace messages directly, without the overhead of
+              sending them as messages in the Erlang virtual machine.
+
+              Two trace drivers are currently implemented, the _f_i_l_e and the _i_p
+              trace drivers. The file driver sends all trace messages into one
+              or several binary files, from where they later can be fetched
+              and processed with the _t_r_a_c_e___c_l_i_e_n_t_/_2 function. The ip driver
+              opens a TCP/IP port where it listens for connections. When a
+              client (preferably started by calling _t_r_a_c_e___c_l_i_e_n_t_/_2 on another
+              Erlang node) connects, all trace messages are sent over the IP
+              network for further processing by the remote client.
+
+              Using a trace port significantly lowers the overhead imposed by
+              using tracing.
+
+              The file trace driver expects a filename or a wrap files
+              specification as parameter. A file is written with a high degree
+              of buffering, why all trace messages are _n_o_t guaranteed to be
+              saved in the file in case of a system crash. That is the price
+              to pay for low tracing overhead.
+
+              A wrap files specification is used to limit the disk space
+              consumed by the trace. The trace is written to a limited number
+              of files each with a limited size. The actual filenames are
+              _F_i_l_e_n_a_m_e _+_+ _S_e_q_C_n_t _+_+ _S_u_f_f_i_x, where _S_e_q_C_n_t counts as a decimal
+              string from _0 to _W_r_a_p_C_n_t and then around again from _0. When a
+              trace term written to the current file makes it longer than
+              _W_r_a_p_S_i_z_e, that file is closed, if the number of files in this
+              wrap trace is as many as _W_r_a_p_C_n_t the oldest file is deleted then
+              a new file is opened to become the current. Thus, when a wrap
+              trace has been stopped, there are at most _W_r_a_p_C_n_t trace files
+              saved with a size of at least _W_r_a_p_S_i_z_e (but not much bigger),
+              except for the last file that might even be empty. The default
+              values are _W_r_a_p_S_i_z_e _= _1_2_8_*_1_0_2_4 and _W_r_a_p_C_n_t _= _8.
+
+              The _S_e_q_C_n_t values in the filenames are all in the range _0
+              through _W_r_a_p_C_n_t with a gap in the circular sequence. The gap is
+              needed to find the end of the trace.
+
+              If the _W_r_a_p_S_i_z_e is specified as _{_t_i_m_e_, _W_r_a_p_T_i_m_e_}, the current
+              file is closed when it has been open more than _W_r_a_p_T_i_m_e
+              milliseconds, regardless of it being empty or not.
+
+              The ip trace driver has a queue of _Q_u_e_S_i_z_e messages waiting to
+              be delivered. If the driver cannot deliver messages as fast as
+              they are produced by the runtime system, a special message is
+              sent, which indicates how many messages that are dropped. That
+              message will arrive at the handler function specified in
+              _t_r_a_c_e___c_l_i_e_n_t_/_3 as the tuple _{_d_r_o_p_, _N_} where _N is the number of
+              consecutive messages dropped. In case of heavy tracing, drop's
+              are likely to occur, and they surely occur if no client is
+              reading the trace messages.
+
+       fflluusshh__ttrraaccee__ppoorrtt(())
+
+              Equivalent to _f_l_u_s_h___t_r_a_c_e___p_o_r_t_(_n_o_d_e_(_)_).
+
+       fflluusshh__ttrraaccee__ppoorrtt((NNooddeennaammee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Equivalent to _t_r_a_c_e___p_o_r_t___c_o_n_t_r_o_l_(_N_o_d_e_n_a_m_e_,_f_l_u_s_h_).
+
+       ttrraaccee__ppoorrtt__ccoonnttrrooll((OOppeerraattiioonn))
+
+              Equivalent to _t_r_a_c_e___p_o_r_t___c_o_n_t_r_o_l_(_n_o_d_e_(_)_,_O_p_e_r_a_t_i_o_n_).
+
+       ttrraaccee__ppoorrtt__ccoonnttrrooll((NNooddeennaammee,,OOppeerraattiioonn)) -->> ookk || {{ookk,, RReessuulltt}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Nodename = atom()
+
+              This function is used to do a control operation on the active
+              trace port driver on the given node (_N_o_d_e_n_a_m_e). Which operations
+              are allowed as well as their return values depend on which trace
+              driver is used.
+
+              Returns either _o_k or _{_o_k_, _R_e_s_u_l_t_} if the operation was
+              successful, or _{_e_r_r_o_r_, _R_e_a_s_o_n_} if the current tracer is a
+              process or if it is a port not supporting the operation.
+
+              The allowed values for _O_p_e_r_a_t_i_o_n are:
+
+                _f_l_u_s_h:
+                  This function is used to flush the internal buffers held by
+                  a trace port driver. Currently only the file trace driver
+                  supports this operation. Returns _o_k.
+
+                _g_e_t___l_i_s_t_e_n___p_o_r_t:
+                  Returns _{_o_k_, _I_p_P_o_r_t_} where _I_p_P_o_r_tis the IP port number used
+                  by the driver listen socket. Only the ip trace driver
+                  supports this operation.
+
+       ttrraaccee__cclliieenntt((TTyyppee,, PPaarraammeetteerrss)) -->> ppiidd(())
+
+              Types:
+
+                 Type = ip | file | follow_file
+                 Parameters = Filename | WrapFilesSpec | IPClientPortSpec
+                 Filename = string() | [string()] | atom()
+                 WrapFilesSpec = see trace_port/2
+                 Suffix = string()
+                 IpClientPortSpec = PortNumber | {Hostname, PortNumber}
+                 PortNumber = integer()
+                 Hostname = string()
+
+              This function starts a trace client that reads the output
+              created by a trace port driver and handles it in mostly the same
+              way as a tracer process created by the _t_r_a_c_e_r_/_0 function.
+
+              If _T_y_p_e is _f_i_l_e, the client reads all trace messages stored in
+              the file named _F_i_l_e_n_a_m_e or specified by _W_r_a_p_F_i_l_e_s_S_p_e_c (must be
+              the same as used when creating the trace, see trace_port/2) and
+              let's the default handler function format the messages on the
+              console. This is one way to interpret the data stored in a file
+              by the file trace port driver.
+
+              If _T_y_p_e is _f_o_l_l_o_w___f_i_l_e, the client behaves as in the _f_i_l_e case,
+              but keeps trying to read (and process) more data from the file
+              until stopped by _s_t_o_p___t_r_a_c_e___c_l_i_e_n_t_/_1. _W_r_a_p_F_i_l_e_s_S_p_e_c is not
+              allowed as second argument for this _T_y_p_e.
+
+              If _T_y_p_e is _i_p, the client connects to the TCP/IP port _P_o_r_t_N_u_m_b_e_r
+              on the host _H_o_s_t_n_a_m_e, from where it reads trace messages until
+              the TCP/IP connection is closed. If no _H_o_s_t_n_a_m_e is specified,
+              the local host is assumed.
+
+              As an example, one can let trace messages be sent over the
+              network to another Erlang node (preferably _n_o_t distributed),
+              where the formatting occurs:
+
+              On the node _s_t_a_c_k there's an Erlang node _a_n_t_@_s_t_a_c_k, in the
+              shell, type the following:
+
+              ant@stack> dbg:tracer(port, dbg:trace_port(ip,4711)).
+              <0.17.0>
+              ant@stack> dbg:p(self(), send).
+              {ok,1}
+
+              All trace messages are now sent to the trace port driver, which
+              in turn listens for connections on the TCP/IP port 4711. If we
+              want to see the messages on another node, preferably on another
+              host, we do like this:
+
+              -> dbg:trace_client(ip, {"stack", 4711}).
+              <0.42.0>
+
+              If we now send a message from the shell on the node _a_n_t_@_s_t_a_c_k,
+              where all sends from the shell are traced:
+
+              ant@stack> self() ! hello.
+              hello
+
+              The following will appear at the console on the node that
+              started the trace client:
+
+              (<0.23.0>) <0.23.0> ! hello
+              (<0.23.0>) <0.22.0> ! {shell_rep,<0.23.0>,{value,hello,[],[]}}
+
+              The last line is generated due to internal message passing in
+              the Erlang shell. The process id's will vary.
+
+       ttrraaccee__cclliieenntt((TTyyppee,, PPaarraammeetteerrss,, HHaannddlleerrSSppeecc)) -->> ppiidd(())
+
+              Types:
+
+                 Type = ip | file | follow_file
+                 Parameters = Filename | WrapFilesSpec | IPClientPortSpec
+                 Filename = string() | [string()] | atom()
+                 WrapFilesSpec = see trace_port/2
+                 Suffix = string()
+                 IpClientPortSpec = PortNumber | {Hostname, PortNumber}
+                 PortNumber = integer()
+                 Hostname = string()
+                 HandlerSpec = {HandlerFun, InitialData}
+                 HandlerFun = fun() (two arguments)
+                 InitialData = term()
+
+              This function works exactly as _t_r_a_c_e___c_l_i_e_n_t_/_2, but allows you to
+              write your own handler function. The handler function works
+              mostly as the one described in _t_r_a_c_e_r_/_2, but will also have to
+              be prepared to handle trace messages of the form _{_d_r_o_p_, _N_},
+              where _N is the number of dropped messages. This pseudo trace
+              message will only occur if the ip trace driver is used.
+
+              For trace type _f_i_l_e, the pseudo trace message _e_n_d___o_f___t_r_a_c_e will
+              appear at the end of the trace. The return value from the
+              handler function is in this case ignored.
+
+       ssttoopp__ttrraaccee__cclliieenntt((PPiidd)) -->> ookk
+
+              Types:
+
+                 Pid = pid()
+
+              This function shuts down a previously started trace client. The
+              _P_i_d argument is the process id returned from the _t_r_a_c_e___c_l_i_e_n_t_/_2
+              or _t_r_a_c_e___c_l_i_e_n_t_/_3 call.
+
+       ggeett__ttrraacceerr(())
+
+              Equivalent to _g_e_t___t_r_a_c_e_r_(_n_o_d_e_(_)_).
+
+       ggeett__ttrraacceerr((NNooddeennaammee)) -->> {{ookk,, TTrraacceerr}}
+
+              Types:
+
+                 Nodename = atom()
+                 Tracer = port() | pid()
+
+              Returns the process or port to which all trace messages are
+              sent.
+
+       ssttoopp(()) -->> ssttooppppeedd
+
+              Stops the _d_b_g server and clears all trace flags for all
+              processes and all trace patterns for all functions. Also shuts
+              down all trace clients and closes all trace ports.
+
+              Note that no trace patterns are affected by this function.
+
+       ssttoopp__cclleeaarr(()) -->> ssttooppppeedd
+
+              Same as stop/0, but also clears all trace patterns on local and
+              global functions calls.
+
+SSIIMMPPLLEE EEXXAAMMPPLLEESS -- TTRRAACCIINNGG FFRROOMM TTHHEE SSHHEELLLL
+       The simplest way of tracing from the Erlang shell is to use _d_b_g_:_c_/_3 or
+       _d_b_g_:_c_/_4, e.g. tracing the function _d_b_g_:_g_e_t___t_r_a_c_e_r_/_0:
+
+       (tiger@durin)84> dbg:c(dbg,get_tracer,[]).
+       (<0.154.0>) <0.152.0> ! {<0.154.0>,{get_tracer,tiger@durin}}
+       (<0.154.0>) out {dbg,req,1}
+       (<0.154.0>) << {dbg,{ok,<0.153.0>}}
+       (<0.154.0>) in {dbg,req,1}
+       (<0.154.0>) << timeout
+       {ok,<0.153.0>}
+       (tiger@durin)85>
+
+       Another way of tracing from the shell is to explicitly start a _t_r_a_c_e_r
+       and then set the _t_r_a_c_e _f_l_a_g_s of your choice on the processes you want
+       to trace, e.g. trace messages and process events:
+
+       (tiger@durin)66> Pid = spawn(fun() -> receive {From,Msg} -> From ! Msg end end).
+       <0.126.0>
+       (tiger@durin)67> dbg:tracer().
+       {ok,<0.128.0>}
+       (tiger@durin)68> dbg:p(Pid,[m,procs]).
+       {ok,[{matched,tiger@durin,1}]}
+       (tiger@durin)69> Pid ! {self(),hello}.
+       (<0.126.0>) << {<0.116.0>,hello}
+       {<0.116.0>,hello}
+       (<0.126.0>) << timeout
+       (<0.126.0>) <0.116.0> ! hello
+       (<0.126.0>) exit normal
+       (tiger@durin)70> flush().
+       Shell got hello
+       ok
+       (tiger@durin)71>
+
+       If you set the _c_a_l_l trace flag, you also have to set a _t_r_a_c_e _p_a_t_t_e_r_n
+       for the functions you want to trace:
+
+       (tiger@durin)77> dbg:tracer().
+       {ok,<0.142.0>}
+       (tiger@durin)78> dbg:p(all,call).
+       {ok,[{matched,tiger@durin,3}]}
+       (tiger@durin)79> dbg:tp(dbg,get_tracer,0,[]).
+       {ok,[{matched,tiger@durin,1}]}
+       (tiger@durin)80> dbg:get_tracer().
+       (<0.116.0>) call dbg:get_tracer()
+       {ok,<0.143.0>}
+       (tiger@durin)81> dbg:tp(dbg,get_tracer,0,[{'_',[],[{return_trace}]}]).
+       {ok,[{matched,tiger@durin,1},{saved,1}]}
+       (tiger@durin)82> dbg:get_tracer().
+       (<0.116.0>) call dbg:get_tracer()
+       (<0.116.0>) returned from dbg:get_tracer/0 -> {ok,<0.143.0>}
+       {ok,<0.143.0>}
+       (tiger@durin)83>
+
+AADDVVAANNCCEEDD TTOOPPIICCSS -- CCOOMMBBIINNIINNGG WWIITTHH SSEEQQ__TTRRAACCEE
+       The _d_b_g module is primarily targeted towards tracing through the
+       _e_r_l_a_n_g_:_t_r_a_c_e_/_3 function. It is sometimes desired to trace messages in a
+       more delicate way, which can be done with the help of the _s_e_q___t_r_a_c_e
+       module.
+
+       _s_e_q___t_r_a_c_e implements sequential tracing (known in the AXE10 world, and
+       sometimes called "forlopp tracing"). _d_b_g can interpret messages
+       generated from _s_e_q___t_r_a_c_e and the same tracer function for both types of
+       tracing can be used. The _s_e_q___t_r_a_c_e messages can even be sent to a trace
+       port for further analysis.
+
+       As a match specification can turn on sequential tracing, the
+       combination of _d_b_g and _s_e_q___t_r_a_c_e can be quite powerful. This brief
+       example shows a session where sequential tracing is used:
+
+       1> dbg:tracer().
+       {ok,<0.30.0>}
+       2> {ok, Tracer} = dbg:get_tracer().
+       {ok,<0.31.0>}
+       3> seq_trace:set_system_tracer(Tracer).
+       false
+       4> dbg:tp(dbg, get_tracer, 0, [{[],[],[{set_seq_token, send, true}]}]).
+       {ok,[{matched,nonode@nohost,1},{saved,1}]}
+       5> dbg:p(all,call).
+       {ok,[{matched,nonode@nohost,22}]}
+       6> dbg:get_tracer(), seq_trace:set_token([]).
+       (<0.25.0>) call dbg:get_tracer()
+       SeqTrace [0]: (<0.25.0>) <0.30.0> ! {<0.25.0>,get_tracer} [Serial: {2,4}]
+       SeqTrace [0]: (<0.30.0>) <0.25.0> ! {dbg,{ok,<0.31.0>}} [Serial: {4,5}]
+       {1,0,5,<0.30.0>,4}
+
+       This session sets the system_tracer to the same process as the ordinary
+       tracer process (i. e. <0.31.0>) and sets the trace pattern for the
+       function _d_b_g_:_g_e_t___t_r_a_c_e_r to one that has the action of setting a
+       sequential token. When the function is called by a traced process (all
+       processes are traced in this case), the process gets "contaminated" by
+       the token and _s_e_q___t_r_a_c_e messages are sent both for the server request
+       and the response. The _s_e_q___t_r_a_c_e_:_s_e_t___t_o_k_e_n_(_[_]_) after the call clears the
+       _s_e_q___t_r_a_c_e token, why no messages are sent when the answer propagates
+       via the shell to the console port. The output would otherwise have been
+       more noisy.
+
+NNOOTTEE OOFF CCAAUUTTIIOONN
+       When tracing function calls on a group leader process (an IO process),
+       there is risk of causing a deadlock. This will happen if a group leader
+       process generates a trace message and the tracer process, by calling
+       the trace handler function, sends an IO request to the same group
+       leader. The problem can only occur if the trace handler prints to tty
+       using an _i_o function such as _f_o_r_m_a_t_/_2. Note that when _d_b_g_:_p_(_a_l_l_,_c_a_l_l_)
+       is called, IO processes are also traced. Here's an example:
+
+       %% Using a default line editing shell
+       1> dbg:tracer(process, {fun(Msg,_) -> io:format("~p~n", [Msg]), 0 end, 0}).
+       {ok,<0.37.0>}
+       2> dbg:p(all, [call]).
+       {ok,[{matched,nonode@nohost,25}]}
+       3> dbg:tp(mymod,[{'_',[],[]}]).
+       {ok,[{matched,nonode@nohost,0},{saved,1}]}
+       4> mymod: % TAB pressed here
+       %% -- Deadlock --
+
+       Here's another example:
+
+       %% Using a shell without line editing (oldshell)
+       1> dbg:tracer(process).
+       {ok,<0.31.0>}
+       2> dbg:p(all, [call]).
+       {ok,[{matched,nonode@nohost,25}]}
+       3> dbg:tp(lists,[{'_',[],[]}]).
+       {ok,[{matched,nonode@nohost,0},{saved,1}]}
+       % -- Deadlock --
+
+       The reason we get a deadlock in the first example is because when TAB
+       is pressed to expand the function name, the group leader (which handles
+       character input) calls _m_y_m_o_d_:_m_o_d_u_l_e___i_n_f_o_(_). This generates a trace
+       message which, in turn, causes the tracer process to send an IO request
+       to the group leader (by calling _i_o_:_f_o_r_m_a_t_/_2). We end up in a deadlock.
+
+       In the second example we use the default trace handler function. This
+       handler prints to tty by sending IO requests to the _u_s_e_r process. When
+       Erlang is started in oldshell mode, the shell process will have _u_s_e_r as
+       its group leader and so will the tracer process in this example. Since
+       _u_s_e_r calls functions in _l_i_s_t_s we end up in a deadlock as soon as the
+       first IO request is sent.
+
+       Here are a few suggestions for how to avoid deadlock:
+
+         * Don't trace the group leader of the tracer process. If tracing has
+           been switched on for all processes, call _d_b_g_:_p_(_T_r_a_c_e_r_G_L_P_i_d_,_c_l_e_a_r_)
+           to stop tracing the group leader (_T_r_a_c_e_r_G_L_P_i_d).
+           _p_r_o_c_e_s_s___i_n_f_o_(_T_r_a_c_e_r_P_i_d_,_g_r_o_u_p___l_e_a_d_e_r_) tells you which process this
+           is (_T_r_a_c_e_r_P_i_d is returned from _d_b_g_:_g_e_t___t_r_a_c_e_r_/_0).
+
+         * Don't trace the _u_s_e_r process if using the default trace handler
+           function.
+
+         * In your own trace handler function, call _e_r_l_a_n_g_:_d_i_s_p_l_a_y_/_1 instead
+           of an _i_o function or, if _u_s_e_r is not used as group leader, print to
+           _u_s_e_r instead of the default group leader. Example:
+           _i_o_:_f_o_r_m_a_t_(_u_s_e_r_,_S_t_r_,_A_r_g_s_).
+
+Ericsson AB                   runtime_tools 1.8.9                       dbg(3)

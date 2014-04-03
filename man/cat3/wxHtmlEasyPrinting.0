@@ -1,0 +1,182 @@
+wxHtmlEasyPrinting(3)      Erlang Module Definition      wxHtmlEasyPrinting(3)
+
+
+
+NNAAMMEE
+       wxHtmlEasyPrinting - See external documentation: wxHtmlEasyPrinting.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxHtmlEasyPrinting.
+
+DDAATTAA TTYYPPEESS
+         _w_x_H_t_m_l_E_a_s_y_P_r_i_n_t_i_n_g_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxHHttmmllEEaassyyPPrriinnttiinngg(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxHHttmmllEEaassyyPPrriinnttiinngg(())
+
+              Types:
+
+                 Option = {name, chardata() (see module unicode)} |
+                 {parentWindow, wxWindow() (see module wxWindow)}
+
+              See external documentation.
+
+       ggeettPPrriinnttDDaattaa((TThhiiss)) -->> wwxxPPrriinnttDDaattaa(()) ((sseeee mmoodduullee wwxxPPrriinnttDDaattaa))
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+
+              See external documentation.
+
+       ggeettPPaaggeeSSeettuuppDDaattaa((TThhiiss)) -->> wwxxPPaaggeeSSeettuuppDDiiaallooggDDaattaa(()) ((sseeee mmoodduullee
+       wwxxPPaaggeeSSeettuuppDDiiaallooggDDaattaa))
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+
+              See external documentation.
+
+       pprreevviieewwFFiillee((TThhiiss,, HHttmmllffiillee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Htmlfile = chardata() (see module unicode)
+
+              See external documentation.
+
+       pprreevviieewwTTeexxtt((TThhiiss,, HHttmmlltteexxtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Htmltext = chardata() (see module unicode)
+
+              Equivalent to pprreevviieewwTTeexxtt((TThhiiss,, HHttmmlltteexxtt,, [[]])).
+
+       pprreevviieewwTTeexxtt((TThhiiss,, HHttmmlltteexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Htmltext = chardata() (see module unicode)
+                 Option = {basepath, chardata() (see module unicode)}
+
+              See external documentation.
+
+       pprriinnttFFiillee((TThhiiss,, HHttmmllffiillee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Htmlfile = chardata() (see module unicode)
+
+              See external documentation.
+
+       pprriinnttTTeexxtt((TThhiiss,, HHttmmlltteexxtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Htmltext = chardata() (see module unicode)
+
+              Equivalent to pprriinnttTTeexxtt((TThhiiss,, HHttmmlltteexxtt,, [[]])).
+
+       pprriinnttTTeexxtt((TThhiiss,, HHttmmlltteexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Htmltext = chardata() (see module unicode)
+                 Option = {basepath, chardata() (see module unicode)}
+
+              See external documentation.
+
+       ppaaggeeSSeettuupp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+
+              See external documentation.
+
+       sseettFFoonnttss((TThhiiss,, NNoorrmmaall__ffaaccee,, FFiixxeedd__ffaaccee)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Normal_face = chardata() (see module unicode)
+                 Fixed_face = chardata() (see module unicode)
+
+              Equivalent to sseettFFoonnttss((TThhiiss,, NNoorrmmaall__ffaaccee,, FFiixxeedd__ffaaccee,, [[]])).
+
+       sseettFFoonnttss((TThhiiss,, NNoorrmmaall__ffaaccee,, FFiixxeedd__ffaaccee,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Normal_face = chardata() (see module unicode)
+                 Fixed_face = chardata() (see module unicode)
+                 Option = {sizes, [integer()]}
+
+              See external documentation.
+
+       sseettHHeeaaddeerr((TThhiiss,, HHeeaaddeerr)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Header = chardata() (see module unicode)
+
+              Equivalent to sseettHHeeaaddeerr((TThhiiss,, HHeeaaddeerr,, [[]])).
+
+       sseettHHeeaaddeerr((TThhiiss,, HHeeaaddeerr,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Header = chardata() (see module unicode)
+                 Option = {pg, integer()}
+
+              See external documentation.
+
+       sseettFFooootteerr((TThhiiss,, FFooootteerr)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Footer = chardata() (see module unicode)
+
+              Equivalent to sseettFFooootteerr((TThhiiss,, FFooootteerr,, [[]])).
+
+       sseettFFooootteerr((TThhiiss,, FFooootteerr,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxHtmlEasyPrinting()
+                 Footer = chardata() (see module unicode)
+                 Option = {pg, integer()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxHHttmmllEEaassyyPPrriinnttiinngg(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxHtmlEasyPrinting(3)

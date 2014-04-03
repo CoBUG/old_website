@@ -1,0 +1,38 @@
+otp_mib(3)                 Erlang Module Definition                 otp_mib(3)
+
+
+
+NNAAMMEE
+       otp_mib - Handles the OTP-MIB
+
+DDEESSCCRRIIPPTTIIOONN
+       The SNMP application should be used to start an SNMP agent. Then the
+       API functions below can be used to load/unload the OTP-MIB into/from
+       the agent. The instrumentation of the OTP-MIB uses Mnesia, hence Mnesia
+       must be started prior to loading the OTP-MIB.
+
+EEXXPPOORRTTSS
+       llooaadd((AAggeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Reason = term()
+
+              Loads the OTP-MIB.
+
+       uunnllooaadd((AAggeenntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Agent = pid() | atom()
+                 Reason = term()
+
+              Unloads the OTP-MIB.
+
+SSEEEE AALLSSOO
+       snmp(3)
+
+
+
+Ericsson AB                     otp_mibs 1.0.7                      otp_mib(3)

@@ -1,0 +1,631 @@
+snmp(7)                  Erlang Application Definition                 snmp(7)
+
+
+
+NNAAMMEE
+       snmp - The SNMP Application
+
+DDEESSCCRRIIPPTTIIOONN
+       This chapter describes the _s_n_m_p application in OTP. The SNMP
+       application provides the following services:
+
+         * a multilingual extensible SNMP agent
+
+         * a SNMP manager
+
+         * a MIB compiler
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following configuration parameters are defined for the SNMP
+       application. Refer to application(3) for more information about
+       configuration parameters.
+
+       The snmp part of the config file specifying the configuration
+       parameters is basically the following tuple:
+
+             {snmp, snmp_components_config()}
+
+
+       A minimal config file for starting a node with both a manager and an
+       agent:
+
+             [{snmp,
+               [{agent, [{db_dir, "/tmp/snmp/agent/db"},
+                         {config, [{dir, "/tmp/snmp/agent/conf"}]}]},
+                {manager, [{config, [{dir, "/tmp/snmp/manager/conf"},
+                                     {db_dir, "/tmp/snmp/manager/db"}]}]}]}
+               ]
+              }
+             ].
+
+
+       Each snmp component has its own set of configuration parameters, even
+       though some of the types are common to both components.
+
+             snmp_components_config() -> [snmp_component_config()]
+             snmp_component_config() -> {agent, agent_options()} | {manager, manager_options()}
+             agent_options() = [agent_option()]
+             agent_option() = {restart_type,     restart_type()}     |
+                              {agent_type,       agent_type()}       |
+                              {agent_verbosity,  verbosity()}        |
+                              {discovery,        agent_discovery()}  |
+                              {versions,         versions()}         |
+                              {gb_max_vbs,       gb_max_vbs()}       |
+                              {priority,         priority()}         |
+                              {multi_threaded,   multi_threaded()}   |
+                              {db_dir,           db_dir()}           |
+                              {db_init_error,    db_init_error()}    |
+                              {local_db,         local_db()}         |
+                              {net_if,           agent_net_if()}     |
+                              {mibs,             mibs()}             |
+                              {mib_storage,      mib_storage()}      |
+                              {mib_server,       mib_server()}       |
+                              {audit_trail_log,  audit_trail_log()}  |
+                              {error_report_mod, error_report_mod()} |
+                              {note_store,       note_store()}       |
+                              {symbolic_store,   symbolic_store()}   |
+                              {target_cache,     target_cache()}     |
+                              {config,           agent_config()}
+             manager_options() = [manager_option()]
+             manager_option() = {restart_type,             restart_type()}    |
+                                {net_if,                   manager_net_if()}  |
+                                {server,                   server()}          |
+                                {note_store,               note_store()}      |
+                                {config,                   manager_config()}  |
+                                {inform_request_behaviour, manager_irb()}     |
+                                {mibs,                     manager_mibs()}    |
+                                {priority,                 priority()}        |
+                                {audit_trail_log,          audit_trail_log()} |
+                                {versions,                 versions()}        |
+                                {def_user_mod,             def_user_module()  |
+                                {def_user_data,            def_user_data()}
+
+
+       Agent specific config options and types:
+
+         _a_g_e_n_t___t_y_p_e_(_) _= _m_a_s_t_e_r _| _s_u_b _<_o_p_t_i_o_n_a_l_>:
+           If _m_a_s_t_e_r, one master agent is started. Otherwise, no agents are
+           started.
+
+           Default is _m_a_s_t_e_r.
+
+         _a_g_e_n_t___d_i_s_c_o_v_e_r_y_(_) _= _[_a_g_e_n_t___d_i_s_c_o_v_e_r_y___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _a_g_e_n_t___d_i_s_c_o_v_e_r_y___o_p_t_(_) _= _{_t_e_r_m_i_n_a_t_i_n_g_,
+           _a_g_e_n_t___t_e_r_m_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_s_(_)_} _| _{_o_r_i_g_i_n_a_t_i_n_g_,
+           _a_g_e_n_t___o_r_i_g_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_s_(_)_}
+
+           The _t_e_r_m_i_n_a_t_i_n_g options effects discovery initiated by a manager.
+
+           The _o_r_i_g_i_n_a_t_i_n_g options effects discovery initiated by this agent.
+
+           For defaults see the options in _a_g_e_n_t___d_i_s_c_o_v_e_r_y___o_p_t_(_).
+
+         _a_g_e_n_t___t_e_r_m_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_s_(_) _=
+         _[_a_g_e_n_t___t_e_r_m_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _a_g_e_n_t___t_e_r_m_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_(_) _= _{_e_n_a_b_l_e_, _b_o_o_l_e_a_n_(_)_} _| _{_s_t_a_g_e_2_,
+           _d_i_s_c_o_v_e_r_y _| _p_l_a_i_n_} _| _{_t_r_i_g_g_e_r___u_s_e_r_n_a_m_e_, _s_t_r_i_n_g_(_)_}
+
+           These are options effecting discovery _t_e_r_m_i_n_a_t_i_n_g in this agent
+           (i.e. initiated by a manager).
+
+           The default values for the _t_e_r_m_i_n_a_t_i_n_g discovery options are:
+
+           * enable: _t_r_u_e
+
+           * stage2: _d_i_s_c_o_v_e_r_y
+
+           * trigger_username: _"_"
+
+         _a_g_e_n_t___o_r_i_g_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_s_(_) _=
+         _[_a_g_e_n_t___o_r_i_g_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _a_g_e_n_t___o_r_i_g_i_n_a_t_i_n_g___d_i_s_c_o_v_e_r_y___o_p_t_(_) _= _{_e_n_a_b_l_e_, _b_o_o_l_e_a_n_(_)_}
+
+           These are options effecting discovery _o_r_i_g_i_n_a_t_i_n_g in this agent.
+
+           The default values for the _o_r_i_g_i_n_a_t_i_n_g discovery options are:
+
+           * enable: _t_r_u_e
+
+         _m_u_l_t_i___t_h_r_e_a_d_e_d_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           If _t_r_u_e, the agent is multi-threaded, with one thread for each get
+           request.
+
+           Default is _f_a_l_s_e.
+
+         _d_b___d_i_r_(_) _= _s_t_r_i_n_g_(_) _<_m_a_n_d_a_t_o_r_y_>:
+           Defines where the SNMP agent internal db files are stored.
+
+         _g_b___m_a_x___v_b_s_(_) _= _p_o_s___i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y _<_o_p_t_i_o_n_a_l_>:
+           Defines the maximum number of varbinds allowed in a Get-BULK
+           response.
+
+           Default is _1_0_0_0.
+
+         _l_o_c_a_l___d_b_(_) _= _[_l_o_c_a_l___d_b___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _l_o_c_a_l___d_b___o_p_t_(_) _= _{_r_e_p_a_i_r_, _a_g_e_n_t___r_e_p_a_i_r_(_)_} _| _{_a_u_t_o___s_a_v_e_,
+           _a_g_e_n_t___a_u_t_o___s_a_v_e_(_)_} _| _{_v_e_r_b_o_s_i_t_y_, _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Defines options specific for the SNMP agent local database.
+
+           For defaults see the options in _l_o_c_a_l___d_b___o_p_t_(_).
+
+         _a_g_e_n_t___r_e_p_a_i_r_(_) _= _f_a_l_s_e _| _t_r_u_e _| _f_o_r_c_e _<_o_p_t_i_o_n_a_l_>:
+           When starting snmpa_local_db it always tries to open an existing
+           database. If _f_a_l_s_e, and some errors occur, a new database is
+           created instead. If _t_r_u_e, an existing file will be repaired. If
+           _f_o_r_c_e, the table will be repaired even if it was properly closed.
+
+           Default is _t_r_u_e.
+
+         _a_g_e_n_t___a_u_t_o___s_a_v_e_(_) _= _i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y _<_o_p_t_i_o_n_a_l_>:
+           The auto save interval. The table is flushed to disk whenever not
+           accessed for this amount of time.
+
+           Default is _5_0_0_0.
+
+         _a_g_e_n_t___n_e_t___i_f_(_) _= _[_a_g_e_n_t___n_e_t___i_f___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _a_g_e_n_t___n_e_t___i_f___o_p_t_(_) _= _{_m_o_d_u_l_e_, _a_g_e_n_t___n_e_t___i_f___m_o_d_u_l_e_(_)_} _| _{_v_e_r_b_o_s_i_t_y_,
+           _v_e_r_b_o_s_i_t_y_(_)_} _| _{_o_p_t_i_o_n_s_, _a_g_e_n_t___n_e_t___i_f___o_p_t_i_o_n_s_(_)_}
+
+           Defines options specific for the SNMP agent network interface
+           entity.
+
+           For defaults see the options in _a_g_e_n_t___n_e_t___i_f___o_p_t_(_).
+
+         _a_g_e_n_t___n_e_t___i_f___m_o_d_u_l_e_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Module which handles the network interface part for the SNMP agent.
+           Must implement the ssnnmmppaa__nneettwwoorrkk__iinntteerrffaaccee behaviour.
+
+           Default is _s_n_m_p_a___n_e_t___i_f.
+
+         _a_g_e_n_t___n_e_t___i_f___o_p_t_i_o_n_s_(_) _= _[_a_g_e_n_t___n_e_t___i_f___o_p_t_i_o_n_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _a_g_e_n_t___n_e_t___i_f___o_p_t_i_o_n_(_) _= _{_b_i_n_d___t_o_, _b_i_n_d___t_o_(_)_} _| _{_s_n_d_b_u_f_, _s_n_d_b_u_f_(_)_} _|
+           _{_r_e_c_b_u_f_, _r_e_c_b_u_f_(_)_} _| _{_n_o___r_e_u_s_e_, _n_o___r_e_u_s_e_(_)_} _| _{_r_e_q___l_i_m_i_t_,
+           _r_e_q___l_i_m_i_t_(_)_} _| _{_f_i_l_t_e_r_, _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_s_(_)_}
+
+           These options are actually specific to the used module. The ones
+           shown here are applicable to the default _a_g_e_n_t___n_e_t___i_f___m_o_d_u_l_e_(_).
+
+           For defaults see the options in _a_g_e_n_t___n_e_t___i_f___o_p_t_i_o_n_(_).
+
+         _r_e_q___l_i_m_i_t_(_) _= _i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y _<_o_p_t_i_o_n_a_l_>:
+           Max number of simultaneous requests handled by the agent.
+
+           Default is _i_n_f_i_n_i_t_y.
+
+         _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_s_(_) _= _[_a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_(_)_]
+         _<_o_p_t_i_o_n_a_l_>:
+           _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_(_) _= _{_m_o_d_u_l_e_,
+           _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___m_o_d_u_l_e_(_)_}
+
+           These options are actually specific to the used module. The ones
+           shown here are applicable to the default
+           _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___m_o_d_u_l_e_(_).
+
+           For defaults see the options in _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_(_).
+
+         _a_g_e_n_t___n_e_t___i_f___f_i_l_t_e_r___m_o_d_u_l_e_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Module which handles the network interface filter part for the SNMP
+           agent. Must implement the ssnnmmppaa__nneettwwoorrkk__iinntteerrffaaccee__ffiilltteerr behaviour.
+
+           Default is _s_n_m_p_a___n_e_t___i_f___f_i_l_t_e_r.
+
+         _a_g_e_n_t___m_i_b_s_(_) _= _[_s_t_r_i_n_g_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           Specifies a list of MIBs (including path) that defines which MIBs
+           are initially loaded into the SNMP master agent.
+
+           Note that the following mibs will always be loaded:
+
+           * version v1: _S_T_A_N_D_A_R_D_-_M_I_B
+
+           * version v2: _S_N_M_P_v_2
+
+           * version v3: _S_N_M_P_v_2, _S_N_M_P_-_F_R_A_M_E_W_O_R_K_-_M_I_B and _S_N_M_P_-_M_P_D_-_M_I_B
+
+           Default is _[_].
+
+         _m_i_b___s_t_o_r_a_g_e_(_) _= _e_t_s _| _{_e_t_s_, _D_i_r_} _| _{_e_t_s_, _D_i_r_, _A_c_t_i_o_n_} _| _d_e_t_s _| _{_d_e_t_s_,
+         _D_i_r_} _| _{_d_e_t_s_, _D_i_r_, _A_c_t_i_o_n_} _| _m_n_e_s_i_a _| _{_m_n_e_s_i_a_, _N_o_d_e_s_} _| _{_m_n_e_s_i_a_,
+         _N_o_d_e_s_, _A_c_t_i_o_n_} _<_o_p_t_i_o_n_a_l_>:
+           Specifies how info retrieved from the mibs will be stored.
+
+           If _m_i_b___s_t_o_r_a_g_e is _{_e_t_s_, _D_i_r_}, the table will also be stored on
+           file. If _D_i_r is _d_e_f_a_u_l_t, then _d_b___d_i_r will be used.
+
+           If _m_i_b___s_t_o_r_a_g_e is _d_e_t_s or if _D_i_r is _d_e_f_a_u_l_t, then _d_b___d_i_r will be
+           used for _D_i_r.
+
+           If _m_i_b___s_t_o_r_a_g_e is _m_n_e_s_i_a then _e_r_l_a_n_g_:_n_o_d_e_s_(_) will be used for
+           _N_o_d_e_s.
+
+           Default is _e_t_s.
+
+           _D_i_r _= _d_e_f_a_u_l_t _| _s_t_r_i_n_g_(_). Dir is the directory where the files will
+           be stored. If _d_e_f_a_u_l_t, then _d_b___d_i_r will be used.
+
+           _N_o_d_e_s _= _v_i_s_i_b_l_e _| _c_o_n_n_e_c_t_e_d _| _[_n_o_d_e_(_)_]. _N_o_d_e_s _= _v_i_s_i_b_l_e is
+           translated to _e_r_l_a_n_g_:_n_o_d_e_s_(_v_i_s_i_b_l_e_). _N_o_d_e_s _= _c_o_n_n_e_c_t_e_d is
+           translated to _e_r_l_a_n_g_:_n_o_d_e_s_(_c_o_n_n_e_c_t_e_d_). If _N_o_d_e_s _= _[_] then the own
+           node is assumed.
+
+           _A_c_t_i_o_n _= _c_l_e_a_r _| _k_e_e_p. Default is _k_e_e_p. _A_c_t_i_o_n is used to specify
+           what shall be done if the mnesia/dets table already exist.
+
+         _m_i_b___s_e_r_v_e_r_(_) _= _[_m_i_b___s_e_r_v_e_r___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _m_i_b___s_e_r_v_e_r___o_p_t_(_) _= _{_m_i_b_e_n_t_r_y___o_v_e_r_r_i_d_e_, _m_i_b_e_n_t_r_y___o_v_e_r_r_i_d_e_(_)_} _|
+           _{_t_r_a_p_e_n_t_r_y___o_v_e_r_r_i_d_e_, _t_r_a_p_e_n_t_r_y___o_v_e_r_r_i_d_e_(_)_} _| _{_v_e_r_b_o_s_i_t_y_,
+           _v_e_r_b_o_s_i_t_y_(_)_} _| _{_c_a_c_h_e_, _m_i_b_s___c_a_c_h_e_(_)_}
+
+           Defines options specific for the SNMP agent mib server.
+
+           For defaults see the options in _m_i_b___s_e_r_v_e_r___o_p_t_(_).
+
+         _m_i_b_e_n_t_r_y___o_v_e_r_r_i_d_e_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           If this value is false, then when loading a mib each mib- entry is
+           checked prior to installation of the mib. The purpose of the check
+           is to prevent that the same symbolic mibentry name is used for
+           different oid's.
+
+           Default is _f_a_l_s_e.
+
+         _t_r_a_p_e_n_t_r_y___o_v_e_r_r_i_d_e_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           If this value is false, then when loading a mib each trap is
+           checked prior to installation of the mib. The purpose of the check
+           is to prevent that the same symbolic trap name is used for
+           different trap's.
+
+           Default is _f_a_l_s_e.
+
+         _m_i_b_s___c_a_c_h_e_(_) _= _b_o_o_l_(_) _| _m_i_b_s___c_a_c_h_e___o_p_t_s_(_) _<_o_p_t_i_o_n_a_l_>:
+           Shall the agent utilize the mib server lookup cache or not.
+
+           Default is _t_r_u_e (in which case the _m_i_b_s___c_a_c_h_e___o_p_t_s_(_) default values
+           apply).
+
+         _m_i_b_s___c_a_c_h_e___o_p_t_s_(_) _= _[_m_i_b_s___c_a_c_h_e___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _m_i_b_s___c_a_c_h_e___o_p_t_(_) _= _{_a_u_t_o_g_c_, _m_i_b_s___c_a_c_h_e___a_u_t_o_g_c_(_)_} _| _{_g_c_l_i_m_i_t_,
+           _m_i_b_s___c_a_c_h_e___g_c_l_i_m_i_t_(_)_} _| _{_a_g_e_, _m_i_b_s___c_a_c_h_e___a_g_e_(_)_}
+
+           Defines options specific for the SNMP agent mib server cache.
+
+           For defaults see the options in _m_i_b_s___c_a_c_h_e___o_p_t_(_).
+
+         _m_i_b_s___c_a_c_h_e___a_u_t_o_g_c_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           Defines if the mib server shall perform cache gc automatically or
+           leave it to the user (see ggcc__mmiibbss__ccaacchhee//00,,11,,22,,33).
+
+           Default is _t_r_u_e.
+
+         _m_i_b_s___c_a_c_h_e___a_g_e_(_) _= _i_n_t_e_g_e_r_(_) _> _0 _<_o_p_t_i_o_n_a_l_>:
+           Defines how old the entries in the cache will be allowed before
+           they are GC'ed (assuming GC is performed). Each entry in the cache
+           is "touched" whenever it is accessed.
+
+           The age is defined in milliseconds.
+
+           Default is _1_0 _t_i_m_u_t_e_s.
+
+         _m_i_b_s___c_a_c_h_e___g_c_l_i_m_i_t_(_) _= _i_n_t_e_g_e_r_(_) _> _0 _| _i_n_f_i_n_i_t_y _<_o_p_t_i_o_n_a_l_>:
+           When performing a GC, this is the max number of cache entries that
+           will be deleted from the cache.
+
+           The reason for having this limit is that if the cache is large, the
+           GC can potentially take a long time, during which the agent is
+           locked.
+
+           Default is _1_0_0.
+
+         _e_r_r_o_r___r_e_p_o_r_t___m_o_d_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Defines an error report module, implementing the ssnnmmppaa__eerrrroorr__rreeppoorrtt
+           behaviour. Two modules are provided with the toolkit:
+           _s_n_m_p_a___e_r_r_o_r___l_o_g_g_e_r and _s_n_m_p_a___e_r_r_o_r___i_o.
+
+           Default is _s_n_m_p_a___e_r_r_o_r___l_o_g_g_e_r.
+
+         _s_y_m_b_o_l_i_c___s_t_o_r_e_(_) _= _[_s_y_m_b_o_l_i_c___s_t_o_r_e___o_p_t_(_)_]:
+           _s_y_m_b_o_l_i_c___s_t_o_r_e___o_p_t_(_) _= _{_v_e_r_b_o_s_i_t_y_, _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Defines options specific for the SNMP agent symbolic store.
+
+           For defaults see the options in _s_y_m_b_o_l_i_c___s_t_o_r_e___o_p_t_(_).
+
+         _t_a_r_g_e_t___c_a_c_h_e_(_) _= _[_t_a_r_g_e_t___c_a_c_h_e___o_p_t_(_)_]:
+           _t_a_r_g_e_t___c_a_c_h_e___o_p_t_(_) _= _{_v_e_r_b_o_s_i_t_y_, _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Defines options specific for the SNMP agent target cache.
+
+           For defaults see the options in _t_a_r_g_e_t___c_a_c_h_e___o_p_t_(_).
+
+         _a_g_e_n_t___c_o_n_f_i_g_(_) _= _[_a_g_e_n_t___c_o_n_f_i_g___o_p_t_(_)_] _<_m_a_n_d_a_t_o_r_y_>:
+           _a_g_e_n_t___c_o_n_f_i_g___o_p_t_(_) _= _{_d_i_r_, _a_g_e_n_t___c_o_n_f_i_g___d_i_r_(_)_} _| _{_f_o_r_c_e___l_o_a_d_,
+           _f_o_r_c_e___l_o_a_d_(_)_} _| _{_v_e_r_b_o_s_i_t_y_, _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Defines specific config related options for the SNMP agent.
+
+           For defaults see the options in _a_g_e_n_t___c_o_n_f_i_g___o_p_t_(_).
+
+         _a_g_e_n_t___c_o_n_f_i_g___d_i_r _= _d_i_r_(_) _<_m_a_n_d_a_t_o_r_y_>:
+           Defines where the SNMP agent configuration files are stored.
+
+         _f_o_r_c_e___l_o_a_d_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           If _t_r_u_e the configuration files are re-read during start-up, and
+           the contents of the configuration database ignored. Thus, if _t_r_u_e,
+           changes to the configuration database are lost upon reboot of the
+           agent.
+
+           Default is _f_a_l_s_e.
+
+       Manager specific config options and types:
+
+         _s_e_r_v_e_r_(_) _= _[_s_e_r_v_e_r___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _s_e_r_v_e_r___o_p_t_(_) _= _{_t_i_m_e_o_u_t_, _s_e_r_v_e_r___t_i_m_e_o_u_t_(_)_} _| _{_v_e_r_b_o_s_i_t_y_,
+           _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Specifies the options for the manager server process.
+
+           Default is _s_i_l_e_n_c_e.
+
+         _s_e_r_v_e_r___t_i_m_e_o_u_t_(_) _= _i_n_t_e_g_e_r_(_) _<_o_p_t_i_o_n_a_l_>:
+           Asynchroneous request cleanup time. For every requests, some info
+           is stored internally, in order to be able to deliver the reply
+           (when it arrives) to the proper destination. If the reply arrives,
+           this info will be deleted. But if there is no reply (in time), the
+           info has to be deleted after the _b_e_s_t _b_e_f_o_r_e time has been passed.
+           This cleanup will be performed at regular intervals, defined by the
+           _s_e_r_v_e_r___t_i_m_e_o_u_t_(_) time. The information will have an _b_e_s_t _b_e_f_o_r_e
+           time, defined by the _E_x_p_i_r_e time given when calling the request
+           function (see aassyynncc__ggeett, aassyynncc__ggeett__nneexxtt and aassyynncc__sseett).
+
+           Time in milli-seconds.
+
+           Default is _3_0_0_0_0.
+
+         _m_a_n_a_g_e_r___c_o_n_f_i_g_(_) _= _[_m_a_n_a_g_e_r___c_o_n_f_i_g___o_p_t_(_)_] _<_m_a_n_d_a_t_o_r_y_>:
+           _m_a_n_a_g_e_r___c_o_n_f_i_g___o_p_t_(_) _= _{_d_i_r_, _m_a_n_a_g_e_r___c_o_n_f_i_g___d_i_r_(_)_} _| _{_d_b___d_i_r_,
+           _m_a_n_a_g_e_r___d_b___d_i_r_(_)_} _| _{_d_b___i_n_i_t___e_r_r_o_r_, _d_b___i_n_i_t___e_r_r_o_r_(_)_} _| _{_r_e_p_a_i_r_,
+           _m_a_n_a_g_e_r___r_e_p_a_i_r_(_)_} _| _{_a_u_t_o___s_a_v_e_, _m_a_n_a_g_e_r___a_u_t_o___s_a_v_e_(_)_} _| _{_v_e_r_b_o_s_i_t_y_,
+           _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Defines specific config related options for the SNMP manager.
+
+           For defaults see the options in _m_a_n_a_g_e_r___c_o_n_f_i_g___o_p_t_(_).
+
+         _m_a_n_a_g_e_r___c_o_n_f_i_g___d_i_r _= _d_i_r_(_) _<_m_a_n_d_a_t_o_r_y_>:
+           Defines where the SNMP manager configuration files are stored.
+
+         _m_a_n_a_g_e_r___d_b___d_i_r _= _d_i_r_(_) _<_m_a_n_d_a_t_o_r_y_>:
+           Defines where the SNMP manager store persistent data.
+
+         _m_a_n_a_g_e_r___r_e_p_a_i_r_(_) _= _f_a_l_s_e _| _t_r_u_e _| _f_o_r_c_e _<_o_p_t_i_o_n_a_l_>:
+           Defines the repair option for the persistent database (if and how
+           the table is repaired when opened).
+
+           Default is _t_r_u_e.
+
+         _m_a_n_a_g_e_r___a_u_t_o___s_a_v_e_(_) _= _i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y _<_o_p_t_i_o_n_a_l_>:
+           The auto save interval. The table is flushed to disk whenever not
+           accessed for this amount of time.
+
+           Default is _5_0_0_0.
+
+         _m_a_n_a_g_e_r___i_r_b_(_) _= _a_u_t_o _| _u_s_e_r _| _{_u_s_e_r_, _i_n_t_e_g_e_r_(_)_} _<_o_p_t_i_o_n_a_l_>:
+           This option defines how the manager will handle the sending of
+           response (acknowledgment) to received inform-requests.
+
+           * _a_u_t_o - The manager will autonomously send response
+             (acknowledgment> to inform-request messages.
+
+           * _{_u_s_e_r_, _i_n_t_e_g_e_r_(_)_} - The manager will send response
+             (acknowledgment) to inform-request messages when the
+             hhaannddllee__iinnffoorrmm function completes. The integer is the time, in
+             milli-seconds, that the manager will consider the stored inform-
+             request info valid.
+
+           * _u_s_e_r - Same as _{_u_s_e_r_, _i_n_t_e_g_e_r_(_)_}, except that the default time,
+             15 seconds (15000), is used.
+
+           See ssnnmmppmm__nneettwwoorrkk__iinntteerrffaaccee, hhaannddllee__iinnffoorrmm and ddeeffiinniittiioonn ooff tthhee
+           mmaannaaggeerr nneett iiff for more info.
+
+           Default is _a_u_t_o.
+
+         _m_a_n_a_g_e_r___m_i_b_s_(_) _= _[_s_t_r_i_n_g_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           Specifies a list of MIBs (including path) and defines which MIBs
+           are initially loaded into the SNMP manager.
+
+           Default is _[_].
+
+         _m_a_n_a_g_e_r___n_e_t___i_f_(_) _= _[_m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_(_) _= _{_m_o_d_u_l_e_, _m_a_n_a_g_e_r___n_e_t___i_f___m_o_d_u_l_e_(_)_} _|
+           _{_v_e_r_b_o_s_i_t_y_, _v_e_r_b_o_s_i_t_y_(_)_} _| _{_o_p_t_i_o_n_s_, _m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_i_o_n_s_(_)_}
+
+           Defines options specific for the SNMP manager network interface
+           entity.
+
+           For defaults see the options in _m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_(_).
+
+         _m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_i_o_n_s_(_) _= _[_m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_i_o_n_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_i_o_n_(_) _= _{_b_i_n_d___t_o_, _b_i_n_d___t_o_(_)_} _| _{_s_n_d_b_u_f_, _s_n_d_b_u_f_(_)_}
+           _| _{_r_e_c_b_u_f_, _r_e_c_b_u_f_(_)_} _| _{_n_o___r_e_u_s_e_, _n_o___r_e_u_s_e_(_)_} _| _{_f_i_l_t_e_r_,
+           _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_s_(_)_}
+
+           These options are actually specific to the used module. The ones
+           shown here are applicable to the default _m_a_n_a_g_e_r___n_e_t___i_f___m_o_d_u_l_e_(_).
+
+           For defaults see the options in _m_a_n_a_g_e_r___n_e_t___i_f___o_p_t_i_o_n_(_).
+
+         _m_a_n_a_g_e_r___n_e_t___i_f___m_o_d_u_l_e_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           The module which handles the network interface part for the SNMP
+           manager. It must implement the ssnnmmppmm__nneettwwoorrkk__iinntteerrffaaccee behaviour.
+
+           Default is _s_n_m_p_m___n_e_t___i_f.
+
+         _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_s_(_) _= _[_m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_(_)_]
+         _<_o_p_t_i_o_n_a_l_>:
+           _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_(_) _= _{_m_o_d_u_l_e_,
+           _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___m_o_d_u_l_e_(_)_}
+
+           These options are actually specific to the used module. The ones
+           shown here are applicable to the default
+           _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___m_o_d_u_l_e_(_).
+
+           For defaults see the options in _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___o_p_t_i_o_n_(_).
+
+         _m_a_n_a_g_e_r___n_e_t___i_f___f_i_l_t_e_r___m_o_d_u_l_e_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Module which handles the network interface filter part for the SNMP
+           manager. Must implement the ssnnmmppmm__nneettwwoorrkk__iinntteerrffaaccee__ffiilltteerr
+           behaviour.
+
+           Default is _s_n_m_p_m___n_e_t___i_f___f_i_l_t_e_r.
+
+         _d_e_f___u_s_e_r___m_o_d_u_l_e_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           The module implementing the default user. See the ssnnmmppmm__uusseerr
+           behaviour.
+
+           Default is _s_n_m_p_m___u_s_e_r___d_e_f_a_u_l_t.
+
+         _d_e_f___u_s_e_r___d_a_t_a_(_) _= _t_e_r_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Data for the default user. Passed to the user module when calling
+           the callback functions.
+
+           Default is _u_n_d_e_f_i_n_e_d.
+
+       Common config types:
+
+         _r_e_s_t_a_r_t___t_y_p_e_(_) _= _p_e_r_m_a_n_e_n_t _| _t_r_a_n_s_i_e_n_t _| _t_e_m_p_o_r_a_r_y:
+           See ssuuppeerrvviissoorr documentation for more info.
+
+           Default is _p_e_r_m_a_n_e_n_t for the agent and _t_r_a_n_s_i_e_n_t for the manager.
+
+         _d_b___i_n_i_t___e_r_r_o_r_(_) _= _t_e_r_m_i_n_a_t_e _| _c_r_e_a_t_e:
+           Defines what to do if the agent or manager is unable to open an
+           existing database file. _t_e_r_m_i_n_a_t_e means that the agent/manager will
+           terminate and _c_r_e_a_t_e means that the agent/manager will remove the
+           faulty file(s) and create new ones.
+
+           Default is _t_e_r_m_i_n_a_t_e.
+
+         _p_r_i_o_r_i_t_y_(_) _= _a_t_o_m_(_) _<_o_p_t_i_o_n_a_l_>:
+           Defines the Erlang priority for all SNMP processes.
+
+           Default is _n_o_r_m_a_l.
+
+         _v_e_r_s_i_o_n_s_(_) _= _[_v_e_r_s_i_o_n_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _v_e_r_s_i_o_n_(_) _= _v_1 _| _v_2 _| _v_3
+
+           Which SNMP versions shall be accepted/used.
+
+           Default is _[_v_1_,_v_2_,_v_3_].
+
+         _v_e_r_b_o_s_i_t_y_(_) _= _s_i_l_e_n_c_e _| _i_n_f_o _| _l_o_g _| _d_e_b_u_g _| _t_r_a_c_e _<_o_p_t_i_o_n_a_l_>:
+           Verbosity for a SNMP process. This specifies now much debug info is
+           printed.
+
+           Default is _s_i_l_e_n_c_e.
+
+         _b_i_n_d___t_o_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           If _t_r_u_e, net_if binds to the IP address. If _f_a_l_s_e, net_if listens
+           on any IP address on the host where it is running.
+
+           Default is _f_a_l_s_e.
+
+         _n_o___r_e_u_s_e_(_) _= _b_o_o_l_(_) _<_o_p_t_i_o_n_a_l_>:
+           If _t_r_u_e, net_if does not specify that the IP and port address
+           should be reusable. If _f_a_l_s_e, the address is set to reusable.
+
+           Default is _f_a_l_s_e.
+
+         _r_e_c_b_u_f_(_) _= _i_n_t_e_g_e_r_(_) _<_o_p_t_i_o_n_a_l_>:
+           Receive buffer size.
+
+           Default value is defined by _g_e_n___u_d_p.
+
+         _s_n_d_b_u_f_(_) _= _i_n_t_e_g_e_r_(_) _<_o_p_t_i_o_n_a_l_>:
+           Send buffer size.
+
+           Default value is defined by _g_e_n___u_d_p.
+
+         _n_o_t_e___s_t_o_r_e_(_) _= _[_n_o_t_e___s_t_o_r_e___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _n_o_t_e___s_t_o_r_e___o_p_t_(_) _= _{_t_i_m_e_o_u_t_, _n_o_t_e___s_t_o_r_e___t_i_m_e_o_u_t_(_)_} _| _{_v_e_r_b_o_s_i_t_y_,
+           _v_e_r_b_o_s_i_t_y_(_)_}
+
+           Specifies the start-up verbosity for the SNMP note store.
+
+           For defaults see the options in _n_o_t_e___s_t_o_r_e___o_p_t_(_).
+
+         _n_o_t_e___s_t_o_r_e___t_i_m_e_o_u_t_(_) _= _i_n_t_e_g_e_r_(_) _<_o_p_t_i_o_n_a_l_>:
+           Note cleanup time. When storing a note in the note store, each note
+           is given lifetime. Every _t_i_m_e_o_u_t the note_store process performs a
+           GC to remove the expired note's. Time in milli-seconds.
+
+           Default is _3_0_0_0_0.
+
+         _a_u_d_i_t___t_r_a_i_l___l_o_g_(_) _= _[_a_u_d_i_t___t_r_a_i_l___l_o_g___o_p_t_(_)_] _<_o_p_t_i_o_n_a_l_>:
+           _a_u_d_i_t___t_r_a_i_l___l_o_g___o_p_t_(_) _= _{_t_y_p_e_, _a_t_l___t_y_p_e_(_)_} _| _{_d_i_r_, _a_t_l___d_i_r_(_)_} _|
+           _{_s_i_z_e_, _a_t_l___s_i_z_e_(_)_} _| _{_r_e_p_a_i_r_, _a_t_l___r_e_p_a_i_r_(_)_} _| _{_s_e_q_n_o_, _a_t_l___s_e_q_n_o_(_)_}
+
+           If present, this option specifies the options for the audit trail
+           logging. The _d_i_s_k___l_o_g module is used to maintain a wrap log. If
+           present, the _d_i_r and _s_i_z_e options are mandatory.
+
+           If not present, audit trail logging is not used.
+
+         _a_t_l___t_y_p_e_(_) _= _r_e_a_d _| _w_r_i_t_e _| _r_e_a_d___w_r_i_t_e _<_o_p_t_i_o_n_a_l_>:
+           Specifies what type of an audit trail log should be used. The
+           effect of the type is actually different for the the agent and the
+           manager.
+
+           For the agent:
+
+           * If _w_r_i_t_e is specified, only set requests are logged.
+
+           * If _r_e_a_d is specified, only get requests are logged.
+
+           * If _r_e_a_d___w_r_i_t_e, all requests are logged.
+
+           For the manager:
+
+           * If _w_r_i_t_e is specified, only sent messages are logged.
+
+           * If _r_e_a_d is specified, only received messages are logged.
+
+           * If _r_e_a_d___w_r_i_t_e, both outgoing and incoming messages are logged.
+
+           Default is _r_e_a_d___w_r_i_t_e.
+
+         _a_t_l___d_i_r _= _d_i_r_(_) _<_m_a_n_d_a_t_o_r_y_>:
+           Specifies where the audit trail log should be stored.
+
+           If _a_u_d_i_t___t_r_a_i_l___l_o_g specifies that logging should take place, this
+           parameter _m_u_s_t be defined.
+
+         _a_t_l___s_i_z_e_(_) _= _{_i_n_t_e_g_e_r_(_)_, _i_n_t_e_g_e_r_(_)_} _<_m_a_n_d_a_t_o_r_y_>:
+           Specifies the size of the audit trail log. This parameter is sent
+           to _d_i_s_k___l_o_g.
+
+           If _a_u_d_i_t___t_r_a_i_l___l_o_g specifies that logging should take place, this
+           parameter _m_u_s_t be defined.
+
+         _a_t_l___r_e_p_a_i_r_(_) _= _t_r_u_e _| _f_a_l_s_e _| _t_r_u_n_c_a_t_e _| _s_n_m_p___r_e_p_a_i_r _<_o_p_t_i_o_n_a_l_>:
+           Specifies if and how the audit trail log shall be repaired when
+           opened. Unless this parameter has the value _s_n_m_p___r_e_p_a_i_r it is sent
+           to _d_i_s_k___l_o_g. If, on the other hand, the value is _s_n_m_p___r_e_p_a_i_r, snmp
+           attempts to handle certain faults on its own. And even if it cannot
+           repair the file, it does not truncate it directly, but instead
+           _m_o_v_e_s _i_t _a_s_i_d_e for later off-line analysis.
+
+           Default is _t_r_u_e.
+
+         _a_t_l___s_e_q_n_o_(_) _= _t_r_u_e _| _f_a_l_s_e _<_o_p_t_i_o_n_a_l_>:
+           Specifies if the audit trail log entries will be (sequence)
+           numbered or not. The range of the sequence numbers are according to
+           RFC 5424, i.e. 1 through 2147483647.
+
+           Default is _f_a_l_s_e.
+
+SSEEEE AALLSSOO
+       application(3), disk_log(3)
+
+
+
+Ericsson AB                       snmp 4.22.1                          snmp(7)

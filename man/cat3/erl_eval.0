@@ -1,0 +1,278 @@
+erl_eval(3)                Erlang Module Definition                erl_eval(3)
+
+
+
+NNAAMMEE
+       erl_eval - The Erlang Meta Interpreter
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides an interpreter for Erlang expressions. The
+       expressions are in the abstract syntax as returned by _e_r_l___p_a_r_s_e, the
+       Erlang parser, or _i_o.
+
+DDAATTAA TTYYPPEESS
+       bbiinnddiinnggss(()) = [{nnaammee(()), vvaalluuee(())}]
+
+       bbiinnddiinngg__ssttrruucctt(()) = oorrddddiicctt::oorrddddiicctt(())
+
+              A binding structure.
+
+       eexxpprreessssiioonn(()) = eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())
+
+       eexxpprreessssiioonnss(()) = [eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())]
+
+              As returned by _e_r_l___p_a_r_s_e_:_p_a_r_s_e___e_x_p_r_s_/_1 or _i_o_:_p_a_r_s_e___e_r_l___e_x_p_r_s_/_2.
+
+       eexxpprreessssiioonn__lliisstt(()) = [eexxpprreessssiioonn(())]
+
+       ffuunncc__ssppeecc(()) = {Module :: module(), Function :: atom()}
+                   | function()
+
+       llffuunn__eevvaall__hhaannddlleerr(()) =
+           fun((Name :: atom(),
+                Arguments :: eexxpprreessssiioonn__lliisstt(()),
+                Bindings :: bbiinnddiinngg__ssttrruucctt(())) ->
+                   {value,
+                    Value :: vvaalluuee(()),
+                    NewBindings :: bbiinnddiinngg__ssttrruucctt(())})
+
+       llffuunn__vvaalluuee__hhaannddlleerr(()) =
+           fun((Name :: atom(), Arguments :: [term()]) ->
+                   Value :: vvaalluuee(()))
+
+       llooccaall__ffuunnccttiioonn__hhaannddlleerr(()) = {value, llffuunn__vvaalluuee__hhaannddlleerr(())}
+                                | {eval, llffuunn__eevvaall__hhaannddlleerr(())}
+                                | none
+
+              Further described bbeellooww..
+
+       nnaammee(()) = term()
+
+       nnllffuunn__hhaannddlleerr(()) =
+           fun((FuncSpec :: ffuunncc__ssppeecc(()), Arguments :: [term()]) -> term())
+
+       nnoonn__llooccaall__ffuunnccttiioonn__hhaannddlleerr(()) = {value, nnllffuunn__hhaannddlleerr(())} | none
+
+              Further described bbeellooww..
+
+       vvaalluuee(()) = term()
+
+EEXXPPOORRTTSS
+       eexxpprrss((EExxpprreessssiioonnss,, BBiinnddiinnggss)) -->> {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprrss((EExxpprreessssiioonnss,, BBiinnddiinnggss,, LLooccaallFFuunnccttiioonnHHaannddlleerr)) -->>
+                {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprrss((EExxpprreessssiioonnss,,
+             BBiinnddiinnggss,,
+             LLooccaallFFuunnccttiioonnHHaannddlleerr,,
+             NNoonnLLooccaallFFuunnccttiioonnHHaannddlleerr)) -->>
+                {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}}
+
+              Types:
+
+                 Expressions = eexxpprreessssiioonnss(())
+                 Bindings = bbiinnddiinngg__ssttrruucctt(())
+                 LocalFunctionHandler = llooccaall__ffuunnccttiioonn__hhaannddlleerr(())
+                 NonLocalFunctionHandler = nnoonn__llooccaall__ffuunnccttiioonn__hhaannddlleerr(())
+                 Value = vvaalluuee(())
+                 NewBindings = bbiinnddiinngg__ssttrruucctt(())
+
+              Evaluates _E_x_p_r_e_s_s_i_o_n_s with the set of bindings _B_i_n_d_i_n_g_s, where
+              _E_x_p_r_e_s_s_i_o_n_s is a sequence of expressions (in abstract syntax) of
+              a type which may be returned by _i_o_:_p_a_r_s_e___e_r_l___e_x_p_r_s_/_2. See below
+              for an explanation of how and when to use the arguments
+              _L_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r and _N_o_n_L_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r.
+
+              Returns _{_v_a_l_u_e_, _V_a_l_u_e_, _N_e_w_B_i_n_d_i_n_g_s_}
+
+       eexxpprr((EExxpprreessssiioonn,, BBiinnddiinnggss)) -->> {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprr((EExxpprreessssiioonn,, BBiinnddiinnggss,, LLooccaallFFuunnccttiioonnHHaannddlleerr)) -->>
+               {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprr((EExxpprreessssiioonn,,
+            BBiinnddiinnggss,,
+            LLooccaallFFuunnccttiioonnHHaannddlleerr,,
+            NNoonnLLooccaallFFuunnccttiioonnHHaannddlleerr)) -->>
+               {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprr((EExxpprreessssiioonn,,
+            BBiinnddiinnggss,,
+            LLooccaallFFuunnccttiioonnHHaannddlleerr,,
+            NNoonnLLooccaallFFuunnccttiioonnHHaannddlleerr,,
+            RReettuurrnnFFoorrmmaatt)) -->>
+               {{vvaalluuee,, VVaalluuee,, NNeewwBBiinnddiinnggss}} || VVaalluuee
+
+              Types:
+
+                 Expression = eexxpprreessssiioonn(())
+                 Bindings = bbiinnddiinngg__ssttrruucctt(())
+                 LocalFunctionHandler = llooccaall__ffuunnccttiioonn__hhaannddlleerr(())
+                 NonLocalFunctionHandler = nnoonn__llooccaall__ffuunnccttiioonn__hhaannddlleerr(())
+                 ReturnFormat = none | value
+                 Value = vvaalluuee(())
+                 NewBindings = bbiinnddiinngg__ssttrruucctt(())
+
+              Evaluates _E_x_p_r_e_s_s_i_o_n with the set of bindings _B_i_n_d_i_n_g_s.
+              _E_x_p_r_e_s_s_i_o_n is an expression in abstract syntax. See below for an
+              explanation of how and when to use the arguments
+              _L_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r and _N_o_n_L_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r.
+
+              Returns _{_v_a_l_u_e_, _V_a_l_u_e_, _N_e_w_B_i_n_d_i_n_g_s_} by default. But if the
+              _R_e_t_u_r_n_F_o_r_m_a_t is _v_a_l_u_e only the _V_a_l_u_e is returned.
+
+       eexxpprr__lliisstt((EExxpprreessssiioonnLLiisstt,, BBiinnddiinnggss)) -->> {{VVaalluueeLLiisstt,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprr__lliisstt((EExxpprreessssiioonnLLiisstt,, BBiinnddiinnggss,, LLooccaallFFuunnccttiioonnHHaannddlleerr)) -->>
+                    {{VVaalluueeLLiisstt,, NNeewwBBiinnddiinnggss}}
+
+       eexxpprr__lliisstt((EExxpprreessssiioonnLLiisstt,,
+                 BBiinnddiinnggss,,
+                 LLooccaallFFuunnccttiioonnHHaannddlleerr,,
+                 NNoonnLLooccaallFFuunnccttiioonnHHaannddlleerr)) -->>
+                    {{VVaalluueeLLiisstt,, NNeewwBBiinnddiinnggss}}
+
+              Types:
+
+                 ExpressionList = eexxpprreessssiioonn__lliisstt(())
+                 Bindings = bbiinnddiinngg__ssttrruucctt(())
+                 LocalFunctionHandler = llooccaall__ffuunnccttiioonn__hhaannddlleerr(())
+                 NonLocalFunctionHandler = nnoonn__llooccaall__ffuunnccttiioonn__hhaannddlleerr(())
+                 ValueList = [vvaalluuee(())]
+                 NewBindings = bbiinnddiinngg__ssttrruucctt(())
+
+              Evaluates a list of expressions in parallel, using the same
+              initial bindings for each expression. Attempts are made to merge
+              the bindings returned from each evaluation. This function is
+              useful in the _L_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r. See below.
+
+              Returns _{_V_a_l_u_e_L_i_s_t_, _N_e_w_B_i_n_d_i_n_g_s_}.
+
+       nneeww__bbiinnddiinnggss(()) -->> bbiinnddiinngg__ssttrruucctt(())
+
+              Returns an empty binding structure.
+
+       bbiinnddiinnggss((BBiinnddiinnggSSttrruucctt :::: bbiinnddiinngg__ssttrruucctt(()))) -->> bbiinnddiinnggss(())
+
+              Returns the list of bindings contained in the binding structure.
+
+       bbiinnddiinngg((NNaammee,, BBiinnddiinnggSSttrruucctt)) -->> {{vvaalluuee,, vvaalluuee(())}} || uunnbboouunndd
+
+              Types:
+
+                 Name = nnaammee(())
+                 BindingStruct = bbiinnddiinngg__ssttrruucctt(())
+
+              Returns the binding of _N_a_m_e in _B_i_n_d_i_n_g_S_t_r_u_c_t.
+
+       aadddd__bbiinnddiinngg((NNaammee,, VVaalluuee,, BBiinnddiinnggSSttrruucctt)) -->> bbiinnddiinngg__ssttrruucctt(())
+
+              Types:
+
+                 Name = nnaammee(())
+                 Value = vvaalluuee(())
+                 BindingStruct = bbiinnddiinngg__ssttrruucctt(())
+
+              Adds the binding _N_a_m_e _= _V_a_l_u_e to _B_i_n_d_i_n_g_S_t_r_u_c_t. Returns an
+              updated binding structure.
+
+       ddeell__bbiinnddiinngg((NNaammee,, BBiinnddiinnggSSttrruucctt)) -->> bbiinnddiinngg__ssttrruucctt(())
+
+              Types:
+
+                 Name = nnaammee(())
+                 BindingStruct = bbiinnddiinngg__ssttrruucctt(())
+
+              Removes the binding of _N_a_m_e in _B_i_n_d_i_n_g_S_t_r_u_c_t. Returns an updated
+              binding structure.
+
+LLOOCCAALL FFUUNNCCTTIIOONN HHAANNDDLLEERR
+       During evaluation of a function, no calls can be made to local
+       functions. An undefined function error would be generated. However, the
+       optional argument _L_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r may be used to define a function
+       which is called when there is a call to a local function. The argument
+       can have the following formats:
+
+         _{_v_a_l_u_e_,_F_u_n_c_}:
+           This defines a local function handler which is called with:
+
+         Func(Name, Arguments)
+
+           _N_a_m_e is the name of the local function (an atom) and _A_r_g_u_m_e_n_t_s is a
+           list of the _e_v_a_l_u_a_t_e_d arguments. The function handler returns the
+           value of the local function. In this case, it is not possible to
+           access the current bindings. To signal an error, the function
+           handler just calls _e_x_i_t_/_1 with a suitable exit value.
+
+         _{_e_v_a_l_,_F_u_n_c_}:
+           This defines a local function handler which is called with:
+
+         Func(Name, Arguments, Bindings)
+
+           _N_a_m_e is the name of the local function (an atom), _A_r_g_u_m_e_n_t_s is a
+           list of the _u_n_e_v_a_l_u_a_t_e_d arguments, and _B_i_n_d_i_n_g_s are the current
+           variable bindings. The function handler returns:
+
+         {value,Value,NewBindings}
+
+           _V_a_l_u_e is the value of the local function and _N_e_w_B_i_n_d_i_n_g_s are the
+           updated variable bindings. In this case, the function handler must
+           itself evaluate all the function arguments and manage the bindings.
+           To signal an error, the function handler just calls _e_x_i_t_/_1 with a
+           suitable exit value.
+
+         _n_o_n_e:
+           There is no local function handler.
+
+NNOONN--LLOOCCAALL FFUUNNCCTTIIOONN HHAANNDDLLEERR
+       The optional argument _N_o_n_l_o_c_a_l_F_u_n_c_t_i_o_n_H_a_n_d_l_e_r may be used to define a
+       function which is called in the following cases: a functional object
+       (fun) is called; a built-in function is called; a function is called
+       using the M:F syntax, where M and F are atoms or expressions; an
+       operator Op/A is called (this is handled as a call to the function
+       _e_r_l_a_n_g_:_O_p_/_A). Exceptions are calls to _e_r_l_a_n_g_:_a_p_p_l_y_/_2_,_3; neither of the
+       function handlers will be called for such calls. The argument can have
+       the following formats:
+
+         _{_v_a_l_u_e_,_F_u_n_c_}:
+           This defines an nonlocal function handler which is called with:
+
+         Func(FuncSpec, Arguments)
+
+           _F_u_n_c_S_p_e_c is the name of the function on the form _{_M_o_d_u_l_e_,_F_u_n_c_t_i_o_n_}
+           or a fun, and _A_r_g_u_m_e_n_t_s is a list of the _e_v_a_l_u_a_t_e_d arguments. The
+           function handler returns the value of the function. To signal an
+           error, the function handler just calls _e_x_i_t_/_1 with a suitable exit
+           value.
+
+         _n_o_n_e:
+           There is no nonlocal function handler.
+
+   NNoottee::
+       For calls such as _e_r_l_a_n_g_:_a_p_p_l_y_(_F_u_n_, _A_r_g_s_) or _e_r_l_a_n_g_:_a_p_p_l_y_(_M_o_d_u_l_e_,
+       _F_u_n_c_t_i_o_n_, _A_r_g_s_) the call of the non-local function handler
+       corresponding to the call to _e_r_l_a_n_g_:_a_p_p_l_y_/_2_,_3 itself--_F_u_n_c_(_{_e_r_l_a_n_g_,
+       _a_p_p_l_y_}_, _[_F_u_n_, _A_r_g_s_]_) or _F_u_n_c_(_{_e_r_l_a_n_g_, _a_p_p_l_y_}_, _[_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_,
+       _A_r_g_s_]_)--will never take place. The non-local function handler _w_i_l_l
+       however be called with the evaluated arguments of the call to
+       _e_r_l_a_n_g_:_a_p_p_l_y_/_2_,_3: _F_u_n_c_(_F_u_n_, _A_r_g_s_) or _F_u_n_c_(_{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_}_, _A_r_g_s_)
+       (assuming that _{_M_o_d_u_l_e_, _F_u_n_c_t_i_o_n_} is not _{_e_r_l_a_n_g_, _a_p_p_l_y_}).
+
+       Calls to functions defined by evaluating fun expressions _"_f_u_n _._._. _e_n_d_"
+       are also hidden from non-local function handlers.
+
+
+       The nonlocal function handler argument is probably not used as
+       frequently as the local function handler argument. A possible use is to
+       call _e_x_i_t_/_1 on calls to functions that for some reason are not allowed
+       to be called.
+
+BBUUGGSS
+       The evaluator is not complete. _r_e_c_e_i_v_e cannot be handled properly.
+
+       Any undocumented functions in _e_r_l___e_v_a_l should not be used.
+
+
+
+Ericsson AB                      stdlib 1.18.2                     erl_eval(3)

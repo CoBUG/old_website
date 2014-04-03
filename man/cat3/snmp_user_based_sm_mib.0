@@ -1,0 +1,105 @@
+snmp_user_based_sm_mib(3)  Erlang Module Definition  snmp_user_based_sm_mib(3)
+
+
+
+NNAAMMEE
+       snmp_user_based_sm_mib - Instrumentation Functions for SNMP-USER-BASED-
+       SM-MIB
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p___u_s_e_r___b_a_s_e_d___s_m___m_i_b implements the instrumentation
+       functions for the SNMP-USER-BASED-SM-MIB, and functions for configuring
+       the database.
+
+       The configuration files are described in the SNMP User's Manual.
+
+EEXXPPOORRTTSS
+       ccoonnffiigguurree((CCoonnffDDiirr)) -->> vvooiidd(())
+
+              Types:
+
+                 ConfDir = string()
+
+              This function is called from the supervisor at system start-up.
+
+              Inserts all data in the configuration files into the database
+              and destroys all old rows with StorageType _v_o_l_a_t_i_l_e. The rows
+              created from the configuration file will have StorageType
+              _n_o_n_V_o_l_a_t_i_l_e.
+
+              All _s_n_m_p counters are set to zero.
+
+              If an error is found in the configuration file, it is reported
+              using the function _c_o_n_f_i_g___e_r_r_/_2 of the error report module, and
+              the function fails with the reason _c_o_n_f_i_g_u_r_a_t_i_o_n___e_r_r_o_r.
+
+              _C_o_n_f_D_i_r is a string which points to the directory where the
+              configuration files are found.
+
+              The configuration file read is: _u_s_m_._c_o_n_f.
+
+       rreeccoonnffiigguurree((CCoonnffDDiirr)) -->> vvooiidd(())
+
+              Types:
+
+                 ConfDir = string()
+
+              Inserts all data in the configuration files into the database
+              and destroys all old data, including the rows with StorageType
+              _n_o_n_V_o_l_a_t_i_l_e. The rows created from the configuration file will
+              have StorageType _n_o_n_V_o_l_a_t_i_l_e.
+
+              Thus, the data in the SNMP-USER-BASED-SM-MIB, after this
+              function has been called, is the data from the configuration
+              files.
+
+              All _s_n_m_p counters are set to zero.
+
+              If an error is found in the configuration file, it is reported
+              using the function _c_o_n_f_i_g___e_r_r_/_2 of the error report module, and
+              the function fails with the reason _c_o_n_f_i_g_u_r_a_t_i_o_n___e_r_r_o_r.
+
+              _C_o_n_f_D_i_r is a string which points to the directory where the
+              configuration files are found.
+
+              The configuration file read is: _u_s_m_._c_o_n_f.
+
+       aadddd__uusseerr((EEnnggiinneeIIDD,, NNaammee,, SSeeccNNaammee,, CClloonnee,, AAuutthhPP,, AAuutthhKKeeyyCC,, OOwwnnAAuutthhKKeeyyCC,,
+       PPrriivvPP,, PPrriivvKKeeyyCC,, OOwwnnPPrriivvKKeeyyCC,, PPuubblliicc,, AAuutthhKKeeyy,, PPrriivvKKeeyy)) -->> RReett
+
+              Types:
+
+                 EngineID = string()
+                 Name = string()
+                 SecName = string()
+                 Clone = zeroDotZero | [integer()]
+                 AuthP = usmNoAuthProtocol | usmHMACMD5AuthProtocol |
+                 usmHMACSHAAuthProtocol
+                 AuthKeyC = string()
+                 OwnAuthKeyC = string()
+                 PrivP = usmNoPrivProtocol | usmDESPrivProtocol
+                 PrivKeyC = string()
+                 OwnPrivKeyC = string()
+                 Public = string()
+                 AuthKey = string()
+                 PrivKey = string()
+                 Ret = {ok, Key} | {error, Reason}
+                 Key = term()
+                 Reason = term()
+
+              Adds a USM security data (user) to the agent config. Equivalent
+              to one line in the _u_s_m_._c_o_n_f file.
+
+       ddeelleettee__uusseerr((KKeeyy)) -->> RReett
+
+              Types:
+
+                 Key = term()
+                 Ret = ok | {error, Reason}
+                 Reason = term()
+
+              Delete a USM security data (user) from the agent config.
+
+
+
+Ericsson AB                       snmp 4.22.1        snmp_user_based_sm_mib(3)

@@ -1,0 +1,141 @@
+CosNotifyChannelAdmin_ProxySEurplpalnigerM(o3d)uleCDoesfNiontiitfiyoCnhannelAdmin_ProxySupplier(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_ProxySupplier - This module implements the OMG
+       CosNotifyChannelAdmin::ProxySupplier interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+EEXXPPOORRTTSS
+       __ggeett__MMyyTTyyppee((PPrrooxxyySSuupppplliieerr)) -->> PPrrooxxyyTTyyppee
+
+              Types:
+
+                 ProxySupplier = #objref
+                 ProxyType = 'PUSH_ANY' | 'PULL_ANY' | 'PUSH_STRUCTURED' |
+                 'PULL_STRUCTURED' | 'PUSH_SEQUENCE' | 'PULL_SEQUENCE'
+
+              This readonly attribute maintains the enumerant describing the
+              which type the target object is.
+
+       __ggeett__MMyyAAddmmiinn((PPrrooxxyySSuupppplliieerr)) -->> AAddmmiinnOObbjjeecctt
+
+              Types:
+
+                 ProxySupplier = #objref
+                 AdminObject = #objref
+
+              This readonly attribute maintains the admin's reference which
+              created the target object.
+
+       __ggeett__pprriioorriittyy__ffiilltteerr((PPrrooxxyySSuupppplliieerr)) -->> MMaappppiinnggFFiilltteerr
+
+              Types:
+
+                 ProxySupplier = #objref
+                 MappingFilter = #objref
+
+              This operation returns the associated priority MappingFilter. If
+              no such object exist a _N_I_L reference is returned.
+
+       __sseett__pprriioorriittyy__ffiilltteerr((PPrrooxxyySSuupppplliieerr,, MMaappppiinnggFFiilltteerr)) -->> ookk
+
+              Types:
+
+                 ProxySupplier = #objref
+                 MappingFilter = #objref
+
+              This operation associate a new priority MappingFilter with the
+              target object.
+
+       __ggeett__lliiffeettiimmee__ffiilltteerr((PPrrooxxyySSuupppplliieerr)) -->> MMaappppiinnggFFiilltteerr
+
+              Types:
+
+                 ProxySupplier = #objref
+                 MappingFilter = #objref
+
+              This operation returns the associated lifetime MappingFilter. If
+              no such object exist a _N_I_L reference is returned.
+
+       __sseett__lliiffeettiimmee__ffiilltteerr((PPrrooxxyySSuupppplliieerr,, MMaappppiinnggFFiilltteerr)) -->> ookk
+
+              Types:
+
+                 ProxySupplier = #objref
+                 MappingFilter = #objref
+
+              This operation associate a new lifetime MappingFilter with the
+              target object.
+
+       oobbttaaiinn__ooffffeerreedd__ttyyppeess((PPrrooxxyySSuupppplliieerr,, OObbttaaiinnIInnffooMMooddee)) -->> EEvveennttTTyyppeeSSeeqq
+
+              Types:
+
+                 ProxySupplier = #objref
+                 ObtainInfoMode = 'ALL_NOW_UPDATES_OFF' | 'ALL_NOW_UPDATES_ON'
+                 | 'NONE_NOW_UPDATES_OFF' | 'NONE_NOW_UPDATES_ON'
+                 EventTypeSeq = [EventType]
+                 EventType = #'CosNotification_EventType'{domain_name,
+                 type_name}
+                 domain_name = type_name = string()
+
+              Depending on the input parameter _O_b_t_a_i_n_I_n_f_o_M_o_d_e, this operation
+              may return a sequence of the _E_v_e_n_t_T_y_p_e_s the target object is
+              interested in receiving. If _'_A_L_L___N_O_W___U_P_D_A_T_E_S___O_F_F_' or
+              _'_A_L_L___N_O_W___U_P_D_A_T_E_S___O_N_' is given a sequence will be returned,
+              otherwise not. If _'_A_L_L___N_O_W___U_P_D_A_T_E_S___O_F_F_' or
+              _'_N_O_N_E___N_O_W___U_P_D_A_T_E_S___O_F_F_' are issued the target object will not
+              inform the associated _N_o_t_i_f_y_S_u_b_s_c_r_i_b_e object when an update
+              occurs. _'_A_L_L___N_O_W___U_P_D_A_T_E_S___O_N_' or _'_N_O_N_E___N_O_W___U_P_D_A_T_E_S___O_N_' will
+              result in that update information will be sent.
+
+       vvaalliiddaattee__eevveenntt__qqooss((PPrrooxxyySSuupppplliieerr,, QQooSSPPrrooppeerrttiieess)) -->> RReeppllyy
+
+              Types:
+
+                 ProxySupplier = #objref
+                 QoSProperties = [QoSProperty]
+                 QoSProperty = #'CosNotification_Property'{name, value}
+                 name = string()
+                 value = #any
+                 Reply = {ok, NamedPropertyRangeSeq} | {'EXCEPTION',
+                 CosNotification_UnsupportedQoS{qos_err}}
+                 NamedPropertyRangeSeq = [NamedPropertyRange]
+                 NamedPropertyRange =
+                 #CosNotification_NamedPropertyRange{name, range}
+                 name = string()
+                 range = #CosNotification_PropertyRange{low_val, high_val}
+                 low_val = #any
+                 high_val = #any
+                 qos_err = PropertyErrorSeq
+                 PropertyErrorSeq = [PropertyError]
+                 PropertyError = #'CosNotification_PropertyError'{code, name,
+                 available_range}
+                 code = 'UNSUPPORTED_PROPERTY' | 'UNAVAILABLE_PROPERTY' |
+                 'UNSUPPORTED_VALUE' | 'UNAVAILABLE_VALUE' | 'BAD_PROPERTY' |
+                 'BAD_TYPE' | 'BAD_VALUE'
+                 name = string()
+                 available_range = PropertyRange
+                 PropertyRange = #CosNotification_PropertyRange{low_val,
+                 high_val}
+                 low_val = high_val = #any
+
+              To check if certain Quality of Service properties can be added
+              to events in the current context of the target object this
+              operation should be used. If we cannot support the required
+              settings an exception describing why will be raised.
+
+
+
+Ericsson AB                 cosNotificatiCoonsN1o.t1i.f1y8ChannelAdmin_ProxySupplier(3)

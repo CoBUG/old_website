@@ -1,0 +1,124 @@
+wrap_log_reader(3)         Erlang Module Definition         wrap_log_reader(3)
+
+
+
+NNAAMMEE
+       wrap_log_reader - A function to read internally formatted wrap disk
+       logs
+
+DDEESSCCRRIIPPTTIIOONN
+       _w_r_a_p___l_o_g___r_e_a_d_e_r is a function to read internally formatted wrap disk
+       logs, refer to disk_log(3). _w_r_a_p___l_o_g___r_e_a_d_e_r does not interfere with
+       disk_log activities; there is however a known bug in this version of
+       the _w_r_a_p___l_o_g___r_e_a_d_e_r, see chapter _b_u_g_s below.
+
+       A wrap disk log file consists of several files, called index files. A
+       log file can be opened and closed. It is also possible to open just one
+       index file separately. If an non-existent or a non-internally formatted
+       file is opened, an error message is returned. If the file is corrupt,
+       no attempt to repair it will be done but an error message is returned.
+
+       If a log is configured to be distributed, there is a possibility that
+       all items are not loggen on all nodes. _w_r_a_p___l_o_g___r_e_a_d_e_r does only read
+       the log on the called node, it is entirely up to the user to be sure
+       that all items are read.
+
+DDAATTAA TTYYPPEESS
+       ccoonnttiinnuuaattiioonn(())
+
+              Continuation returned by _o_p_e_n_/_1_,_2 or _c_h_u_n_k_/_1_,_2.
+
+EEXXPPOORRTTSS
+       cchhuunnkk((CCoonnttiinnuuaattiioonn)) -->> cchhuunnkk__rreett(())
+
+       cchhuunnkk((CCoonnttiinnuuaattiioonn,, NN)) -->> cchhuunnkk__rreett(())
+
+              Types:
+
+                 Continuation = ccoonnttiinnuuaattiioonn(())
+                 N = infinity | integer() >= 1
+                 cchhuunnkk__rreett(()) = {Continuation2, Terms :: [term()]}
+                             | {Continuation2,
+                                Terms :: [term()],
+                                Badbytes :: integer() >= 0}
+                             | {Continuation2, eof}
+                             | {error, Reason :: term()}
+
+              This function makes it possible to efficiently read the terms
+              which have been appended to a log. It minimises disk I/O by
+              reading large 8K chunks from the file.
+
+              The first time _c_h_u_n_k is called an initial continuation returned
+              from the _o_p_e_n_/_1, _o_p_e_n_/_2 must be provided.
+
+              When _c_h_u_n_k_/_3 is called, _N controls the maximum number of terms
+              that are read from the log in each chunk. Default is _i_n_f_i_n_i_t_y,
+              which means that all the terms contained in the 8K chunk are
+              read. If less than _N terms are returned, this does not
+              necessarily mean that end of file is reached.
+
+              The _c_h_u_n_k function returns a tuple _{_C_o_n_t_i_n_u_a_t_i_o_n_2_, _T_e_r_m_s_}, where
+              _T_e_r_m_s is a list of terms found in the log. _C_o_n_t_i_n_u_a_t_i_o_n_2 is yet
+              another continuation which must be passed on into any subsequent
+              calls to _c_h_u_n_k. With a series of calls to _c_h_u_n_k it is then
+              possible to extract all terms from a log.
+
+              The _c_h_u_n_k function returns a tuple _{_C_o_n_t_i_n_u_a_t_i_o_n_2_, _T_e_r_m_s_,
+              _B_a_d_b_y_t_e_s_} if the log is opened in read only mode and the read
+              chunk is corrupt. _B_a_d_b_y_t_e_s indicates the number of non-Erlang
+              terms found in the chunk. Note also that the log is not
+              repaired.
+
+              _c_h_u_n_k returns _{_C_o_n_t_i_n_u_a_t_i_o_n_2_, _e_o_f_} when the end of the log is
+              reached, and _{_e_r_r_o_r_, _R_e_a_s_o_n_} if an error occurs.
+
+              The returned continuation may or may not be valid in the next
+              call to _c_h_u_n_k. This is because the log may wrap and delete the
+              file into which the continuation points. To make sure this does
+              not happen, the log can be blocked during the search.
+
+       cclloossee((CCoonnttiinnuuaattiioonn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Continuation = ccoonnttiinnuuaattiioonn(())
+                 Reason = ffiillee::ppoossiixx(())
+
+              This function closes a log file properly.
+
+       ooppeenn((FFiilleennaammee)) -->> ooppeenn__rreett(())
+
+       ooppeenn((FFiilleennaammee,, NN)) -->> ooppeenn__rreett(())
+
+              Types:
+
+                 Filename = string() | atom()
+                 N = integer()
+                 ooppeenn__rreett(()) = {ok, Continuation :: ccoonnttiinnuuaattiioonn(())}
+                            | {error, Reason :: tuple()}
+
+              _F_i_l_e_n_a_m_e specifies the name of the file which is to be read.
+
+              _N specifies the index of the file which is to be read. If _N is
+              omitted the whole wrap log file will be read; if it is specified
+              only the specified index file will be read.
+
+              The _o_p_e_n function returns _{_o_k_, _C_o_n_t_i_n_u_a_t_i_o_n_} if the log/index
+              file was successfully opened. The _C_o_n_t_i_n_u_a_t_i_o_n is to be used
+              when chunking or closing the file.
+
+              The function returns _{_e_r_r_o_r_, _R_e_a_s_o_n_} for all errors.
+
+BBUUGGSS
+       This version of the _w_r_a_p___l_o_g___r_e_a_d_e_r does not detect if the _d_i_s_k___l_o_g
+       wraps to a new index file between a _w_r_a_p___l_o_g___r_e_a_d_e_r_:_o_p_e_n and the first
+       _w_r_a_p___l_o_g___r_e_a_d_e_r_:_c_h_u_n_k. In this case the chuck will actually read the
+       last logged items in the log file, because the opened index file was
+       truncated by the _d_i_s_k___l_o_g.
+
+SSEEEE AALLSSOO
+       ddiisskk__lloogg((33))
+
+
+
+Ericsson AB                      kernel 2.15.2              wrap_log_reader(3)

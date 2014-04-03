@@ -1,0 +1,118 @@
+snmpa_local_db(3)          Erlang Module Definition          snmpa_local_db(3)
+
+
+
+NNAAMMEE
+       snmpa_local_db - The SNMP built-in database
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_a___l_o_c_a_l___d_b contains functions for implementing tables
+       (and variables) using the SNMP built-in database. The database exists
+       in two instances, one volatile and one persistent. The volatile
+       database is implemented with ets. The persistent database is
+       implemented with dets.
+
+       There is a scaling problem with this database.
+
+         * Insertions and deletions are inefficient for large tables.
+
+       This problem is best solved by using Mnesia instead.
+
+       The following functions describe the interface to _s_n_m_p_a___l_o_c_a_l___d_b. Each
+       function has a Mnesia equivalent. The argument _N_a_m_e_D_b is a tuple _{_N_a_m_e_,
+       _D_b_} where _N_a_m_e is the symbolic name of the managed object (as defined
+       in the MIB), and _D_b is either _v_o_l_a_t_i_l_e or _p_e_r_s_i_s_t_e_n_t. _m_n_e_s_i_a is not
+       possible since all these functions are _s_n_m_p_a___l_o_c_a_l___d_b specific.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       In the functions defined below, the following types are used:
+
+         * _N_a_m_e_D_b _= _{_N_a_m_e_, _D_b_}
+
+         * _N_a_m_e _= _a_t_o_m_(_)_, _D_b _= _v_o_l_a_t_i_l_e _| _p_e_r_s_i_s_t_e_n_t
+
+         * _R_o_w_I_n_d_e_x _= _[_i_n_t_(_)_]
+
+         * _C_o_l_s _= _[_C_o_l_] _| _[_{_C_o_l_, _V_a_l_u_e_}_]_, _C_o_l _= _i_n_t_(_)_, _V_a_l_u_e _= _t_e_r_m_(_)
+
+       where _R_o_w_I_n_d_e_x denotes the last part of the OID, that specifies the
+       index of the row in the table. _C_o_l_s is a list of column numbers in case
+       of a get operation, and a list of column numbers and values in case of
+       a set operation.
+
+EEXXPPOORRTTSS
+       dduummpp(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              This function can be used to manually dump the database to file.
+
+       mmaattcchh((NNaammeeDDbb,, PPaatttteerrnn))
+
+              Performs an ets/dets matching on the table. See Stdlib
+              documentation, module ets, for a description of _P_a_t_t_e_r_n and the
+              return values.
+
+       pprriinntt(())
+       pprriinntt((TTaabblleeNNaammee))
+       pprriinntt((TTaabblleeNNaammee,, DDbb))
+
+              Types:
+
+                 TableName = atom()
+
+              Prints the contents of the database on screen. This is useful
+              for debugging since the _S_T_A_N_D_A_R_D_-_M_I_B and _O_T_P_-_S_N_M_P_E_A_-_M_I_B (and
+              maybe your own MIBs) are stored in _s_n_m_p_a___l_o_c_a_l___d_b.
+
+              _T_a_b_l_e_N_a_m_e is an atom for a table in the database. When no name
+              is supplied, the whole database is shown.
+
+       ttaabbllee__ccrreeaattee((NNaammeeDDbb)) -->> bbooooll(())
+
+              Creates a table. If the table already exist, the old copy is
+              destroyed.
+
+              Returns _f_a_l_s_e if the _N_a_m_e_D_b argument is incorrectly specified,
+              _t_r_u_e otherwise.
+
+       ttaabbllee__ccrreeaattee__rrooww((NNaammeeDDbb,, RRoowwIInnddeexx,, RRooww)) -->> bbooooll(())
+
+              Types:
+
+                 Row = {Val1, Val2, ..., ValN}
+                 Val1 = Val2 = ... = ValN = term()
+
+              Creates a row in a table. _R_o_w is a tuple with values for all
+              columns, including the index columns.
+
+       ttaabbllee__ddeelleettee((NNaammeeDDbb)) -->> vvooiidd(())
+
+              Deletes a table.
+
+       ttaabbllee__ddeelleettee__rrooww((NNaammeeDDbb,, RRoowwIInnddeexx)) -->> bbooooll(())
+
+              Deletes the row in the table.
+
+       ttaabbllee__eexxiissttss((NNaammeeDDbb)) -->> bbooooll(())
+
+              Checks if a table exists.
+
+       ttaabbllee__ggeett__rrooww((NNaammeeDDbb,, RRoowwIInnddeexx)) -->> RRooww || uunnddeeffiinneedd
+
+              Types:
+
+                 Row = {Val1, Val2, ..., ValN}
+                 Val1 = Val2 = ... = ValN = term()
+
+              _R_o_w is a tuple with values for all columns, including the index
+              columns.
+
+SSEEEE AALLSSOO
+       ets(3), dets(3), snmp_generic(3)
+
+
+
+Ericsson AB                       snmp 4.22.1                snmpa_local_db(3)

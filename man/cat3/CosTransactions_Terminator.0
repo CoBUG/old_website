@@ -1,0 +1,43 @@
+CosTransactions_Terminator(3E)rlang Module DefinitioCnosTransactions_Terminator(3)
+
+
+
+NNAAMMEE
+       CosTransactions_Terminator - This module implements the OMG
+       CosTransactions::Terminator interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccoommmmiitt((TTeerrmmiinnaattoorr,, RReeppoorrttHHeeuurriissttiiccss)) -->> RReettuurrnn
+
+              Types:
+
+                 Terminator = #objref
+                 ReportHeuristics = boolean()
+                 Return = ok | {'EXCEPTION', E}
+                 E = #'CosTransactions_HeuristicMixed'{} |
+                 #'CosTransactions_HeuristicHazrd'{} |
+                 #'CosTransactions_TransactionRolledBack'{}
+
+              This operation initiates the two-phase commit protocol. If the
+              transaction has not been marked _'_r_o_l_l_b_a_c_k _o_n_l_y_' and all the
+              participants agree to commit, the operation terminates normally.
+              Otherwise, the TransactionRolledBack is raised. If the parameter
+              _R_e_p_o_r_t_H_e_u_r_i_s_t_i_c_s is true and inconsistent outcomes by raising an
+              Heuristic Exception.
+
+       rroollllbbaacckk((TTeerrmmiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Terminator = #objref
+                 Return = ok
+
+              This operation roles back the transaction.
+
+
+
+Ericsson AB                 cosTransactions 1.2.12CosTransactions_Terminator(3)

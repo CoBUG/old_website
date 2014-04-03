@@ -1,0 +1,70 @@
+auth(3)                    Erlang Module Definition                    auth(3)
+
+
+
+NNAAMMEE
+       auth - Erlang Network Authentication Server
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is deprecated. For a description of the Magic Cookie
+       system, refer to DDiissttrriibbuutteedd EErrllaanngg in the Erlang Reference Manual.
+
+DDAATTAA TTYYPPEESS
+       ccooookkiiee(()) = atom()
+
+EEXXPPOORRTTSS
+       iiss__aauutthh((NNooddee)) -->> yyeess || nnoo
+
+              Types:
+
+                 Node = node()
+
+              Returns _y_e_s if communication with _N_o_d_e is authorized. Note that
+              a connection to _N_o_d_e will be established in this case. Returns
+              _n_o if _N_o_d_e does not exist or communication is not authorized (it
+              has another cookie than _a_u_t_h thinks it has).
+
+              Use nneett__aaddmm::ppiinngg((NNooddee)) instead.
+
+       ccooookkiiee(()) -->> CCooookkiiee
+
+              Types:
+
+                 Cookie = ccooookkiiee(())
+
+              Use eerrllaanngg::ggeett__ccooookkiiee(()) instead.
+
+       ccooookkiiee((TThheeCCooookkiiee)) -->> ttrruuee
+
+              Types:
+
+                 TheCookie = Cookie | [Cookie]
+                    The cookie may also be given as a list with a single atom
+                   element.
+                 Cookie = ccooookkiiee(())
+
+              Use eerrllaanngg::sseett__ccooookkiiee((nnooddee(()),, CCooookkiiee)) instead.
+
+       nnooddee__ccooookkiiee(([[NNooddee,, CCooookkiiee]])) -->> yyeess || nnoo
+
+              Types:
+
+                 Node = node()
+                 Cookie = ccooookkiiee(())
+
+              Equivalent to nnooddee__ccooookkiiee((NNooddee,, CCooookkiiee)).
+
+       nnooddee__ccooookkiiee((NNooddee,, CCooookkiiee)) -->> yyeess || nnoo
+
+              Types:
+
+                 Node = node()
+                 Cookie = ccooookkiiee(())
+
+              Sets the magic cookie of _N_o_d_e to _C_o_o_k_i_e, and verifies the status
+              of the authorization. Equivalent to calling
+              eerrllaanngg::sseett__ccooookkiiee((NNooddee,, CCooookkiiee)), followed by aauutthh::iiss__aauutthh((NNooddee)).
+
+
+
+Ericsson AB                      kernel 2.15.2                         auth(3)

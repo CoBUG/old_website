@@ -1,0 +1,103 @@
+overload(3)                Erlang Module Definition                overload(3)
+
+
+
+NNAAMMEE
+       overload - An Overload Regulation Process
+
+DDEESSCCRRIIPPTTIIOONN
+       _o_v_e_r_l_o_a_d is a process which indirectly regulates CPU usage in the
+       system. The idea is that a main application calls the _r_e_q_u_e_s_t_/_0
+       function before starting a major job, and proceeds with the job if the
+       return value is positive; otherwise the job must not be started.
+
+       _o_v_e_r_l_o_a_d is part of the _s_a_s_l application, and all configuration
+       parameters are defined there.
+
+       A set of two intensities are maintained, the _t_o_t_a_l _i_n_t_e_n_s_i_t_y and the
+       _a_c_c_e_p_t _i_n_t_e_n_s_i_t_y. For that purpose there are two configuration
+       parameters, the _M_a_x_I_n_t_e_n_s_i_t_y and the _W_e_i_g_h_t value (both are measured in
+       1/second).
+
+       Then total and accept intensities are calculated as follows. Assume
+       that the time of the current call to _r_e_q_u_e_s_t_/_0 is _T_(_n_), and that the
+       time of the previous call was _T_(_n_-_1_).
+
+         * The current _t_o_t_a_l _i_n_t_e_n_s_i_t_y, denoted _T_I_(_n_), is calculated according
+           to the formula,
+
+           _T_I_(_n_) _= _e_x_p_(_-_W_e_i_g_h_t_*_(_T_(_n_) _- _T_(_n_-_1_)_) _* _T_I_(_n_-_1_) _+ _W_e_i_g_h_t,
+
+           where _T_I_(_n_-_1_) is the previous total intensity.
+
+         * The current _a_c_c_e_p_t _i_n_t_e_n_s_i_t_y, denoted _A_I_(_n_), is determined by the
+           formula,
+
+           _A_I_(_n_) _= _e_x_p_(_-_W_e_i_g_h_t_*_(_T_(_n_) _- _T_(_n_-_1_)_) _* _A_I_(_n_-_1_) _+ _W_e_i_g_h_t,
+
+           where _A_I_(_n_-_1_) is the previous accept intensity, provided that the
+           value of _e_x_p_(_-_W_e_i_g_h_t_*_(_T_(_n_) _- _T_(_n_-_1_)_) _* _A_I_(_n_-_1_) is less than
+           _M_a_x_I_n_t_e_n_s_i_t_y; otherwise the value is
+
+           _A_I_(_n_) _= _e_x_p_(_-_W_e_i_g_h_t_*_(_T_(_n_) _- _T_(_n_-_1_)_) _* _A_I_(_n_-_1_).
+
+       The value of configuration parameter _W_e_i_g_h_t controls the speed with
+       which the calculations of intensities will react to changes in the
+       underlying input intensity. The inverted value of _W_e_i_g_h_t,
+
+       _T _= _1_/_W_e_i_g_h_t
+
+       can be thought of as the "time constant" of the intensity calculation
+       formulas. For example, if _W_e_i_g_h_t _= _0_._1, then a change in the underlying
+       input intensity will be reflected in the _t_o_t_a_l and _a_c_c_e_p_t _i_n_t_e_n_s_i_t_i_e_s
+       within approximately 10 seconds.
+
+       The overload process defines one alarm, which it sets using
+       _a_l_a_r_m___h_a_n_d_l_e_r_:_s_e_t___a_l_a_r_m_(_A_l_a_r_m_). _A_l_a_r_m is defined as:
+
+         _{_o_v_e_r_l_o_a_d_, _[_]_}:
+           This alarm is set when the current accept intensity exceeds
+           _M_a_x_I_n_t_e_n_s_i_t_y.
+
+       A new overload alarm is not set until the current accept intensity has
+       fallen below _M_a_x_I_n_t_e_n_s_i_t_y. To prevent the overload process from
+       generating a lot of set/reset alarms, the alarm is not reset until the
+       current accept intensity has fallen below 75% of _M_a_x_I_n_t_e_n_s_i_t_y, and it
+       is not until then that the alarm can be set again.
+
+EEXXPPOORRTTSS
+       rreeqquueesstt(()) -->> aacccceepptt || rreejjeecctt
+
+              Returns _a_c_c_e_p_t or _r_e_j_e_c_t depending on the current value of the
+              accept intensity.
+
+              The application calling this function should be processed with
+              the job in question if the return value is _a_c_c_e_p_t; otherwise it
+              should not continue with that job.
+
+       ggeett__oovveerrllooaadd__iinnffoo(()) -->> OOvveerrllooaaddIInnffoo
+
+              Types:
+
+                 OverloadInfo = [{total_intensity, TotalIntensity},
+                 {accept_intensity, AcceptIntensity}, {max_intensity,
+                 MaxIntensity}, {weight, Weight}, {total_requests,
+                 TotalRequests}, {accepted_requests, AcceptedRequests}].
+                 TotalIntensity = float() > 0
+                 AcceptIntensity = float() > 0
+                 MaxIntensity = float() > 0
+                 Weight = float() > 0
+                 TotalRequests = integer()
+                 AcceptedRequests = integer()
+
+              Returns the current total and accept intensities, the
+              configuration parameters, and absolute counts of the total
+              number of requests, and accepted number of requests (since the
+              overload process was started).
+
+SSEEEE AALLSSOO
+       alarm_handler(3), sasl(3)
+
+
+
+Ericsson AB                       sasl 2.2.1                       overload(3)

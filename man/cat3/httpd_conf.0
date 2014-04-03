@@ -1,0 +1,91 @@
+httpd_conf(3)              Erlang Module Definition              httpd_conf(3)
+
+
+
+NNAAMMEE
+       httpd_conf - Configuration utility functions to be used by the Erlang
+           Web server API programmer.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides the Erlang Webserver API programmer with utility
+       functions for adding run-time configuration directives.
+
+EEXXPPOORRTTSS
+       cchheecckk__eennuumm((EEnnuummSSttrriinngg,, VVaalliiddEEnnuummSSttrriinnggss)) -->> RReessuulltt
+
+              Types:
+
+                 EnumString = string()
+                 ValidEnumStrings = [string()]
+                 Result = {ok,atom()} | {error,not_valid}
+
+              _c_h_e_c_k___e_n_u_m_/_2 checks if _E_n_u_m_S_t_r_i_n_g is a valid enumeration of
+              _V_a_l_i_d_E_n_u_m_S_t_r_i_n_g_s in which case it is returned as an atom.
+
+       cclleeaann((SSttrriinngg)) -->> SSttrriippppeedd
+
+              Types:
+
+                 String = Stripped = string()
+
+              _c_l_e_a_n_/_1 removes leading and/or trailing white spaces from
+              _S_t_r_i_n_g.
+
+       ccuussttoomm__cclleeaann((SSttrriinngg,,BBeeffoorree,,AAfftteerr)) -->> SSttrriippppeedd
+
+              Types:
+
+                 Before = After = regexp()
+                 String = Stripped = string()
+
+              _c_u_s_t_o_m___c_l_e_a_n_/_3 removes leading and/or trailing white spaces and
+              custom characters from _S_t_r_i_n_g. _B_e_f_o_r_e and _A_f_t_e_r are regular
+              expressions, as defined in _r_e_g_e_x_p_(_3_), describing the custom
+              characters.
+
+       iiss__ddiirreeccttoorryy((FFiilleePPaatthh)) -->> RReessuulltt
+
+              Types:
+
+                 FilePath = string()
+                 Result = {ok,Directory} | {error,Reason}
+                 Directory = string()
+                 Reason = string() | enoent | eaccess | enotdir | FileInfo
+                 FileInfo = File info record
+
+              _i_s___d_i_r_e_c_t_o_r_y_/_1 checks if _F_i_l_e_P_a_t_h is a directory in which case
+              it is returned. Please read _f_i_l_e_(_3_) for a description of _e_n_o_e_n_t,
+              _e_a_c_c_e_s_s and _e_n_o_t_d_i_r. The definition of the file info record can
+              be found by including _f_i_l_e_._h_r_l from the kernel application, see
+              file(3).
+
+       iiss__ffiillee((FFiilleePPaatthh)) -->> RReessuulltt
+
+              Types:
+
+                 FilePath = string()
+                 Result = {ok,File} | {error,Reason}
+                 File = string()
+                 Reason = string() | enoent | eaccess | enotdir | FileInfo
+                 FileInfo = File info record
+
+              _i_s___f_i_l_e_/_1 checks if _F_i_l_e_P_a_t_h is a regular file in which case it
+              is returned. Read _f_i_l_e_(_3_) for a description of _e_n_o_e_n_t, _e_a_c_c_e_s_s
+              and _e_n_o_t_d_i_r. The definition of the file info record can be found
+              by including _f_i_l_e_._h_r_l from the kernel application, see file(3).
+
+       mmaakkee__iinntteeggeerr((SSttrriinngg)) -->> RReessuulltt
+
+              Types:
+
+                 String = string()
+                 Result = {ok,integer()} | {error,nomatch}
+
+              _m_a_k_e___i_n_t_e_g_e_r_/_1 returns an integer representation of _S_t_r_i_n_g.
+
+SSEEEE AALLSSOO
+       hhttttppdd((33))
+
+
+
+Ericsson AB                       inets 5.9.1                    httpd_conf(3)

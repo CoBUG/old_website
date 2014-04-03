@@ -1,0 +1,82 @@
+snmpa_supervisor(3)        Erlang Module Definition        snmpa_supervisor(3)
+
+
+
+NNAAMMEE
+       snmpa_supervisor - A supervisor for the SNMP agent Processes
+
+DDEESSCCRRIIPPTTIIOONN
+       This is the top supervisor for the agent part of the SNMP application.
+       There is always one supervisor at each node with an SNMP agent (master
+       agent or sub-agent).
+
+EEXXPPOORRTTSS
+       ssttaarrtt__ssuubb__ssuupp((OOppttss)) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,, {{aallrreeaaddyy__ssttaarrtteedd,, ppiidd(())}}}}
+       || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Opts = [opt()]
+                 opt() = {db_dir, string()} | ...
+
+              Starts a supervisor for the SNMP agent system without a master
+              agent. The supervisor starts all involved SNMP processes, but no
+              agent processes. Sub-agents should be started by calling
+              _s_t_a_r_t___s_u_b___a_g_e_n_t_/_3.
+
+              _d_b___d_i_r is mandatory.
+
+              See ccoonnffiigguurraattiioonn ppaarraammeetteerrss for a description of the options.
+
+       ssttaarrtt__mmaasstteerr__ssuupp((OOppttss)) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,, {{aallrreeaaddyy__ssttaarrtteedd,,
+       ppiidd(())}}}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Opts = [opt()]
+                 opt() = {db_dir, string()} | {config, ConfOpts()} | ...
+                 ConfOpts = [conf_opts()]
+                 conf_opts() = {dir, string()} | ...
+                 Reason = term()
+
+              Starts a supervisor for the SNMP agent system. The supervisor
+              starts all involved SNMP processes, including the master agent.
+              Sub-agents should be started by calling _s_t_a_r_t___s_u_b_a_g_e_n_t_/_3.
+
+              _d_b___d_i_r is mandatory.
+
+              _d_i_r in config is mandatory.
+
+              See ssnnmmpp ccoonnffiigg for a description of the options.
+
+       ssttaarrtt__ssuubb__aaggeenntt((PPaarreennttAAggeenntt,,SSuubbttrreeee,,MMiibbss)) -->> {{ookk,, ppiidd(())}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 ParentAgent = pid()
+                 SubTree = oid()
+                 Mibs = [MibName]
+                 MibName = [string()]
+
+              Starts a sub-agent on the node where the function is called. The
+              _s_n_m_p_a___s_u_p_e_r_v_i_s_o_r must be running.
+
+              If the supervisor is not running, the function fails with the
+              reason _b_a_d_a_r_g.
+
+       ssttoopp__ssuubb__aaggeenntt((SSuubbAAggeenntt)) -->> ookk || nnoo__ssuucchh__cchhiilldd
+
+              Types:
+
+                 SubAgent = pid()
+
+              Stops the sub-agent on the node where the function is called.
+              The _s_n_m_p_a___s_u_p_e_r_v_i_s_o_r must be running.
+
+              If the supervisor is not running, the function fails with the
+              reason _b_a_d_a_r_g.
+
+
+
+Ericsson AB                       snmp 4.22.1              snmpa_supervisor(3)

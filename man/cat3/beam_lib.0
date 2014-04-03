@@ -1,0 +1,478 @@
+beam_lib(3)                Erlang Module Definition                beam_lib(3)
+
+
+
+NNAAMMEE
+       beam_lib - An Interface To the BEAM File Format
+
+DDEESSCCRRIIPPTTIIOONN
+       _b_e_a_m___l_i_b provides an interface to files created by the BEAM compiler
+       ("BEAM files"). The format used, a variant of "EA IFF 1985" Standard
+       for Interchange Format Files, divides data into chunks.
+
+       Chunk data can be returned as binaries or as compound terms. Compound
+       terms are returned when chunks are referenced by names (atoms) rather
+       than identifiers (strings). The names recognized and the corresponding
+       identifiers are:
+
+         * _a_b_s_t_r_a_c_t___c_o_d_e _(_"_A_b_s_t_"_)
+
+         * _a_t_t_r_i_b_u_t_e_s _(_"_A_t_t_r_"_)
+
+         * _c_o_m_p_i_l_e___i_n_f_o _(_"_C_I_n_f_"_)
+
+         * _e_x_p_o_r_t_s _(_"_E_x_p_T_"_)
+
+         * _l_a_b_e_l_e_d___e_x_p_o_r_t_s _(_"_E_x_p_T_"_)
+
+         * _i_m_p_o_r_t_s _(_"_I_m_p_T_"_)
+
+         * _i_n_d_e_x_e_d___i_m_p_o_r_t_s _(_"_I_m_p_T_"_)
+
+         * _l_o_c_a_l_s _(_"_L_o_c_T_"_)
+
+         * _l_a_b_e_l_e_d___l_o_c_a_l_s _(_"_L_o_c_T_"_)
+
+         * _a_t_o_m_s _(_"_A_t_o_m_"_)
+
+DDEEBBUUGG IINNFFOORRMMAATTIIOONN//AABBSSTTRRAACCTT CCOODDEE
+       The option _d_e_b_u_g___i_n_f_o can be given to the compiler (see ccoommppiillee((33))) in
+       order to have debug information in the form of abstract code (see TThhee
+       AAbbssttrraacctt FFoorrmmaatt in ERTS User's Guide) stored in the _a_b_s_t_r_a_c_t___c_o_d_e
+       chunk. Tools such as Debugger and Xref require the debug information to
+       be included.
+
+   WWaarrnniinngg::
+       Source code can be reconstructed from the debug information. Use
+       encrypted debug information (see below) to prevent this.
+
+
+       The debug information can also be removed from BEAM files using
+       ssttrriipp//11, ssttrriipp__ffiilleess//11 and/or ssttrriipp__rreelleeaassee//11.
+
+   RReeccoonnssttrruuccttiinngg ssoouurrccee ccooddee
+       Here is an example of how to reconstruct source code from the debug
+       information in a BEAM file _B_e_a_m:
+
+             {ok,{_,[{abstract_code,{_,AC}}]}} = beam_lib:chunks(Beam,[abstract_code]).
+             io:fwrite("~s~n", [erl_prettypr:format(erl_syntax:form_list(AC))]).
+
+   EEnnccrryypptteedd ddeebbuugg iinnffoorrmmaattiioonn
+       The debug information can be encrypted in order to keep the source code
+       secret, but still being able to use tools such as Xref or Debugger.
+
+       To use encrypted debug information, a key must be provided to the
+       compiler and _b_e_a_m___l_i_b. The key is given as a string and it is
+       recommended that it contains at least 32 characters and that both upper
+       and lower case letters as well as digits and special characters are
+       used.
+
+       The default type -- and currently the only type -- of crypto algorithm
+       is _d_e_s_3___c_b_c, three rounds of DES. The key string will be scrambled
+       using _e_r_l_a_n_g_:_m_d_5_/_1 to generate the actual keys used for _d_e_s_3___c_b_c.
+
+   NNoottee::
+       As far as we know by the time of writing, it is infeasible to break
+       _d_e_s_3___c_b_c encryption without any knowledge of the key. Therefore, as
+       long as the key is kept safe and is unguessable, the encrypted debug
+       information _s_h_o_u_l_d be safe from intruders.
+
+
+       There are two ways to provide the key:
+
+         * Use the compiler option _{_d_e_b_u_g___i_n_f_o_,_K_e_y_}, see ccoommppiillee((33)), and the
+           function ccrryyppttoo__kkeeyy__ffuunn//11 to register a fun which returns the key
+           whenever _b_e_a_m___l_i_b needs to decrypt the debug information.
+
+           If no such fun is registered, _b_e_a_m___l_i_b will instead search for a
+           _._e_r_l_a_n_g_._c_r_y_p_t file, see below.
+
+         * Store the key in a text file named _._e_r_l_a_n_g_._c_r_y_p_t.
+
+           In this case, the compiler option _e_n_c_r_y_p_t___d_e_b_u_g___i_n_f_o can be used,
+           see ccoommppiillee((33)).
+
+   ..eerrllaanngg..ccrryypptt
+       _b_e_a_m___l_i_b searches for _._e_r_l_a_n_g_._c_r_y_p_t in the current directory and then
+       the home directory for the current user. If the file is found and
+       contains a key, _b_e_a_m___l_i_b will implicitly create a crypto key fun and
+       register it.
+
+       The _._e_r_l_a_n_g_._c_r_y_p_t file should contain a single list of tuples:
+
+             {debug_info, Mode, Module, Key}
+
+       _M_o_d_e is the type of crypto algorithm; currently, the only allowed value
+       thus is _d_e_s_3___c_b_c. _M_o_d_u_l_e is either an atom, in which case _K_e_y will only
+       be used for the module _M_o_d_u_l_e, or _[_], in which case _K_e_y will be used
+       for all modules. _K_e_y is the non-empty key string.
+
+       The _K_e_y in the first tuple where both _M_o_d_e and _M_o_d_u_l_e matches will be
+       used.
+
+       Here is an example of an _._e_r_l_a_n_g_._c_r_y_p_t file that returns the same key
+       for all modules:
+
+       [{debug_info, des3_cbc, [], "%>7}|pc/DM6Cga*68$Mw]L#&_Gejr]G^"}].
+
+       And here is a slightly more complicated example of an _._e_r_l_a_n_g_._c_r_y_p_t
+       which provides one key for the module _t, and another key for all other
+       modules:
+
+       [{debug_info, des3_cbc, t, "My KEY"},
+        {debug_info, des3_cbc, [], "%>7}|pc/DM6Cga*68$Mw]L#&_Gejr]G^"}].
+
+   NNoottee::
+       Do not use any of the keys in these examples. Use your own keys.
+
+
+DDAATTAA TTYYPPEESS
+       bbeeaamm(()) = module() | ffiillee::ffiilleennaammee(()) | binary()
+
+              Each of the functions described below accept either the module
+              name, the filename, or a binary containing the beam module.
+
+       cchhuunnkkddaattaa(()) = {cchhuunnkkiidd(()), ddaattaaBB(())}
+                   | {abstract_code, aabbsstt__ccooddee(())}
+                   | {attributes, [aattttrriibb__eennttrryy(())]}
+                   | {compile_info, [ccoommppiinnffoo__eennttrryy(())]}
+                   | {exports, [{atom(), arity()}]}
+                   | {labeled_exports, [llaabbeelleedd__eennttrryy(())]}
+                   | {imports, [mfa()]}
+                   | {indexed_imports,
+                      [{iinnddeexx(()),
+                        module(),
+                        Function :: atom(),
+                        arity()}]}
+                   | {locals, [{atom(), arity()}]}
+                   | {labeled_locals, [llaabbeelleedd__eennttrryy(())]}
+                   | {atoms, [{integer(), atom()}]}
+
+              The list of attributes is sorted on _A_t_t_r_i_b_u_t_e (in
+              attrib_entry()), and each attribute name occurs once in the
+              list. The attribute values occur in the same order as in the
+              file. The lists of functions are also sorted.
+
+       cchhuunnkkiidd(()) = nonempty_string()
+
+              "Abst" | "Attr" | "CInf" | "ExpT" | "ImpT" | "LocT" | "Atom"
+
+       ddaattaaBB(()) = binary()
+
+       aabbsstt__ccooddee(()) = {AbstVersion :: atom(), ffoorrmmss(())}
+                   | no_abstract_code
+
+              It is not checked that the forms conform to the abstract format
+              indicated by _A_b_s_t_V_e_r_s_i_o_n. _n_o___a_b_s_t_r_a_c_t___c_o_d_e means that the _"_A_b_s_t_"
+              chunk is present, but empty.
+
+       ffoorrmmss(()) = [eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())]
+
+       ccoommppiinnffoo__eennttrryy(()) = {InfoKey :: atom(), term()}
+
+       aattttrriibb__eennttrryy(()) =
+           {Attribute :: atom(), [AttributeValue :: term()]}
+
+       llaabbeelleedd__eennttrryy(()) = {Function :: atom(), arity(), llaabbeell(())}
+
+       iinnddeexx(()) = integer() >= 0
+
+       llaabbeell(()) = integer()
+
+       cchhuunnkkrreeff(()) = cchhuunnkknnaammee(()) | cchhuunnkkiidd(())
+
+       cchhuunnkknnaammee(()) = abstract_code
+                   | attributes
+                   | compile_info
+                   | exports
+                   | labeled_exports
+                   | imports
+                   | indexed_imports
+                   | locals
+                   | labeled_locals
+                   | atoms
+
+       cchhnnkk__rrssnn(()) = {unknown_chunk, ffiillee::ffiilleennaammee(()), atom()}
+                  | {key_missing_or_invalid,
+                     ffiillee::ffiilleennaammee(()),
+                     abstract_code}
+                  | iinnffoo__rrssnn(())
+
+       iinnffoo__rrssnn(()) = {chunk_too_big,
+                     ffiillee::ffiilleennaammee(()),
+                     cchhuunnkkiidd(()),
+                     ChunkSize :: integer() >= 0,
+                     FileSize :: integer() >= 0}
+                  | {invalid_beam_file,
+                     ffiillee::ffiilleennaammee(()),
+                     Position :: integer() >= 0}
+                  | {invalid_chunk, ffiillee::ffiilleennaammee(()), cchhuunnkkiidd(())}
+                  | {missing_chunk, ffiillee::ffiilleennaammee(()), cchhuunnkkiidd(())}
+                  | {not_a_beam_file, ffiillee::ffiilleennaammee(())}
+                  | {file_error, ffiillee::ffiilleennaammee(()), ffiillee::ppoossiixx(())}
+
+EEXXPPOORRTTSS
+       cchhuunnkkss((BBeeaamm,, CChhuunnkkRReeffss)) -->>
+                 {{ookk,, {{mmoodduullee(()),, [[cchhuunnkkddaattaa(())]]}}}} ||
+                 {{eerrrroorr,, bbeeaamm__lliibb,, cchhnnkk__rrssnn(())}}
+
+              Types:
+
+                 Beam = bbeeaamm(())
+                 ChunkRefs = [cchhuunnkkrreeff(())]
+
+              Reads chunk data for selected chunks refs. The order of the
+              returned list of chunk data is determined by the order of the
+              list of chunks references.
+
+       cchhuunnkkss((BBeeaamm,, CChhuunnkkRReeffss,, OOppttiioonnss)) -->>
+                 {{ookk,, {{mmoodduullee(()),, [[CChhuunnkkRReessuulltt]]}}}} ||
+                 {{eerrrroorr,, bbeeaamm__lliibb,, cchhnnkk__rrssnn(())}}
+
+              Types:
+
+                 Beam = bbeeaamm(())
+                 ChunkRefs = [cchhuunnkkrreeff(())]
+                 Options = [allow_missing_chunks]
+                 ChunkResult = cchhuunnkkddaattaa(())
+                             | {ChunkRef :: cchhuunnkkrreeff(()), missing_chunk}
+
+              Reads chunk data for selected chunks refs. The order of the
+              returned list of chunk data is determined by the order of the
+              list of chunks references.
+
+              By default, if any requested chunk is missing in _B_e_a_m, an _e_r_r_o_r
+              tuple is returned. However, if the option _a_l_l_o_w___m_i_s_s_i_n_g___c_h_u_n_k_s
+              has been given, a result will be returned even if chunks are
+              missing. In the result list, any missing chunks will be
+              represented as _{_C_h_u_n_k_R_e_f_,_m_i_s_s_i_n_g___c_h_u_n_k_}. Note, however, that if
+              the _"_A_t_o_m_" chunk if missing, that is considered a fatal error
+              and the return value will be an _e_r_r_o_r tuple.
+
+       vveerrssiioonn((BBeeaamm)) -->>
+                  {{ookk,, {{mmoodduullee(()),, [[VVeerrssiioonn :::: tteerrmm(())]]}}}} ||
+                  {{eerrrroorr,, bbeeaamm__lliibb,, cchhnnkk__rrssnn(())}}
+
+              Types:
+
+                 Beam = bbeeaamm(())
+
+              Returns the module version(s). A version is defined by the
+              module attribute _-_v_s_n_(_V_s_n_). If this attribute is not specified,
+              the version defaults to the checksum of the module. Note that if
+              the version _V_s_n is not a list, it is made into one, that is
+              _{_o_k_,_{_M_o_d_u_l_e_,_[_V_s_n_]_}_} is returned. If there are several _-_v_s_n
+              module attributes, the result is the concatenated list of
+              versions. Examples:
+
+              1> beam_lib:version(a). % -vsn(1).
+              {ok,{a,[1]}}
+              2> beam_lib:version(b). % -vsn([1]).
+              {ok,{b,[1]}}
+              3> beam_lib:version(c). % -vsn([1]). -vsn(2).
+              {ok,{c,[1,2]}}
+              4> beam_lib:version(d). % no -vsn attribute
+              {ok,{d,[275613208176997377698094100858909383631]}}
+
+       mmdd55((BBeeaamm)) -->> {{ookk,, {{mmoodduullee(()),, MMDD55}}}} || {{eerrrroorr,, bbeeaamm__lliibb,, cchhnnkk__rrssnn(())}}
+
+              Types:
+
+                 Beam = bbeeaamm(())
+                 MD5 = binary()
+
+              Calculates an MD5 redundancy check for the code of the module
+              (compilation date and other attributes are not included).
+
+       iinnffoo((BBeeaamm)) -->> [[IInnffooPPaaiirr]] || {{eerrrroorr,, bbeeaamm__lliibb,, iinnffoo__rrssnn(())}}
+
+              Types:
+
+                 Beam = bbeeaamm(())
+                 InfoPair = {file, Filename :: ffiillee::ffiilleennaammee(())}
+                          | {binary, Binary :: binary()}
+                          | {module, Module :: module()}
+                          | {chunks,
+                             [{ChunkId :: cchhuunnkkiidd(()),
+                               Pos :: integer() >= 0,
+                               Size :: integer() >= 0}]}
+
+              Returns a list containing some information about a BEAM file as
+              tuples _{_I_t_e_m_, _I_n_f_o_}:
+
+                _{_f_i_l_e_, _F_i_l_e_n_a_m_e_} _| _{_b_i_n_a_r_y_, _B_i_n_a_r_y_}:
+                  The name (string) of the BEAM file, or the binary from which
+                  the information was extracted.
+
+                _{_m_o_d_u_l_e_, _M_o_d_u_l_e_}:
+                  The name (atom) of the module.
+
+                _{_c_h_u_n_k_s_, _[_{_C_h_u_n_k_I_d_, _P_o_s_, _S_i_z_e_}_]_}:
+                  For each chunk, the identifier (string) and the position and
+                  size of the chunk data, in bytes.
+
+       ccmmpp((BBeeaamm11,, BBeeaamm22)) -->> ookk || {{eerrrroorr,, bbeeaamm__lliibb,, ccmmpp__rrssnn(())}}
+
+              Types:
+
+                 Beam1 = Beam2 = bbeeaamm(())
+                 ccmmpp__rrssnn(()) = {modules_different, module(), module()}
+                           | {chunks_different, cchhuunnkkiidd(())}
+                           | different_chunks
+                           | iinnffoo__rrssnn(())
+
+              Compares the contents of two BEAM files. If the module names are
+              the same, and all chunks except for the _"_C_I_n_f_" chunk (the chunk
+              containing the compilation information which is returned by
+              _M_o_d_u_l_e_:_m_o_d_u_l_e___i_n_f_o_(_c_o_m_p_i_l_e_)) have the same contents in both
+              files, _o_k is returned. Otherwise an error message is returned.
+
+       ccmmpp__ddiirrss((DDiirr11,, DDiirr22)) -->>
+                   {{OOnnllyy11,, OOnnllyy22,, DDiiffffeerreenntt}} || {{eerrrroorr,, bbeeaamm__lliibb,, RReeaassoonn}}
+
+              Types:
+
+                 Dir1 = Dir2 = atom() | ffiillee::ffiilleennaammee(())
+                 Only1 = Only2 = [ffiillee::ffiilleennaammee(())]
+                 Different =
+                     [{Filename1 :: ffiillee::ffiilleennaammee(()), Filename2 ::
+                 ffiillee::ffiilleennaammee(())}]
+                 Reason = {not_a_directory, term()} | iinnffoo__rrssnn(())
+
+              The _c_m_p___d_i_r_s_/_2 function compares the BEAM files in two
+              directories. Only files with extension _"_._b_e_a_m_" are compared.
+              BEAM files that exist in directory _D_i_r_1 (_D_i_r_2) only are returned
+              in _O_n_l_y_1 (_O_n_l_y_2). BEAM files that exist on both directories but
+              are considered different by _c_m_p_/_2 are returned as pairs
+              {_F_i_l_e_n_a_m_e_1, _F_i_l_e_n_a_m_e_2} where _F_i_l_e_n_a_m_e_1 (_F_i_l_e_n_a_m_e_2) exists in
+              directory _D_i_r_1 (_D_i_r_2).
+
+       ddiiffff__ddiirrss((DDiirr11,, DDiirr22)) -->> ookk || {{eerrrroorr,, bbeeaamm__lliibb,, RReeaassoonn}}
+
+              Types:
+
+                 Dir1 = Dir2 = atom() | ffiillee::ffiilleennaammee(())
+                 Reason = {not_a_directory, term()} | iinnffoo__rrssnn(())
+
+              The _d_i_f_f___d_i_r_s_/_2 function compares the BEAM files in two
+              directories the way _c_m_p___d_i_r_s_/_2 does, but names of files that
+              exist in only one directory or are different are presented on
+              standard output.
+
+       ssttrriipp((BBeeaamm11)) -->>
+                {{ookk,, {{mmoodduullee(()),, BBeeaamm22}}}} || {{eerrrroorr,, bbeeaamm__lliibb,, iinnffoo__rrssnn(())}}
+
+              Types:
+
+                 Beam1 = Beam2 = bbeeaamm(())
+
+              The _s_t_r_i_p_/_1 function removes all chunks from a BEAM file except
+              those needed by the loader. In particular, the debug information
+              (_a_b_s_t_r_a_c_t___c_o_d_e chunk) is removed.
+
+       ssttrriipp__ffiilleess((FFiilleess)) -->>
+                      {{ookk,, [[{{mmoodduullee(()),, BBeeaamm}}]]}} ||
+                      {{eerrrroorr,, bbeeaamm__lliibb,, iinnffoo__rrssnn(())}}
+
+              Types:
+
+                 Files = [bbeeaamm(())]
+                 Beam = bbeeaamm(())
+
+              The _s_t_r_i_p___f_i_l_e_s_/_1 function removes all chunks except those
+              needed by the loader from BEAM files. In particular, the debug
+              information (_a_b_s_t_r_a_c_t___c_o_d_e chunk) is removed. The returned list
+              contains one element for each given file name, in the same order
+              as in _F_i_l_e_s.
+
+       ssttrriipp__rreelleeaassee((DDiirr)) -->>
+                        {{ookk,, [[{{mmoodduullee(()),, ffiillee::ffiilleennaammee(())}}]]}} ||
+                        {{eerrrroorr,, bbeeaamm__lliibb,, RReeaassoonn}}
+
+              Types:
+
+                 Dir = atom() | ffiillee::ffiilleennaammee(())
+                 Reason = {not_a_directory, term()} | iinnffoo__rrssnn(())
+
+              The _s_t_r_i_p___r_e_l_e_a_s_e_/_1 function removes all chunks except those
+              needed by the loader from the BEAM files of a release. _D_i_r
+              should be the installation root directory. For example, the
+              current OTP release can be stripped with the call
+              _b_e_a_m___l_i_b_:_s_t_r_i_p___r_e_l_e_a_s_e_(_c_o_d_e_:_r_o_o_t___d_i_r_(_)_).
+
+       ffoorrmmaatt__eerrrroorr((RReeaassoonn)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 Reason = term()
+
+              Given the error returned by any function in this module, the
+              function _f_o_r_m_a_t___e_r_r_o_r returns a descriptive string of the error
+              in English. For file errors, the function
+              _f_i_l_e_:_f_o_r_m_a_t___e_r_r_o_r_(_P_o_s_i_x_) should be called.
+
+       ccrryyppttoo__kkeeyy__ffuunn((CCrryyppttooKKeeyyFFuunn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 CryptoKeyFun = ccrryyppttoo__ffuunn(())
+                 Reason = badfun | exists | term()
+                 ccrryyppttoo__ffuunn(()) = fun((ccrryyppttoo__ffuunn__aarrgg(())) -> term())
+                 ccrryyppttoo__ffuunn__aarrgg(()) = init
+                                  | clear
+                                  | {debug_info,
+                                     mmooddee(()),
+                                     module(),
+                                     ffiillee::ffiilleennaammee(())}
+                 mmooddee(()) = des3_cbc
+
+              The _c_r_y_p_t_o___k_e_y___f_u_n_/_1 function registers a unary fun that will be
+              called if _b_e_a_m___l_i_b needs to read an _a_b_s_t_r_a_c_t___c_o_d_e chunk that has
+              been encrypted. The fun is held in a process that is started by
+              the function.
+
+              If there already is a fun registered when attempting to register
+              a fun, _{_e_r_r_o_r_, _e_x_i_s_t_s_} is returned.
+
+              The fun must handle the following arguments:
+
+                        CryptoKeyFun(init) -> ok | {ok, NewCryptoKeyFun} | {error, Term}
+
+              Called when the fun is registered, in the process that holds the
+              fun. Here the crypto key fun can do any necessary
+              initializations. If _{_o_k_, _N_e_w_C_r_y_p_t_o_K_e_y_F_u_n_} is returned then
+              _N_e_w_C_r_y_p_t_o_K_e_y_F_u_n will be registered instead of _C_r_y_p_t_o_K_e_y_F_u_n. If
+              _{_e_r_r_o_r_, _T_e_r_m_} is returned, the registration is aborted and
+              _c_r_y_p_t_o___k_e_y___f_u_n_/_1 returns _{_e_r_r_o_r_, _T_e_r_m_} as well.
+
+                        CryptoKeyFun({debug_info, Mode, Module, Filename}) -> Key
+
+              Called when the key is needed for the module _M_o_d_u_l_e in the file
+              named _F_i_l_e_n_a_m_e. _M_o_d_e is the type of crypto algorithm; currently,
+              the only possible value thus is _d_e_s_3___c_b_c. The call should fail
+              (raise an exception) if there is no key available.
+
+                        CryptoKeyFun(clear) -> term()
+
+              Called before the fun is unregistered. Here any cleaning up can
+              be done. The return value is not important, but is passed back
+              to the caller of _c_l_e_a_r___c_r_y_p_t_o___k_e_y___f_u_n_/_0 as part of its return
+              value.
+
+       cclleeaarr__ccrryyppttoo__kkeeyy__ffuunn(()) -->> uunnddeeffiinneedd || {{ookk,, RReessuulltt}}
+
+              Types:
+
+                 Result = undefined | term()
+
+              Unregisters the crypto key fun and terminates the process
+              holding it, started by _c_r_y_p_t_o___k_e_y___f_u_n_/_1.
+
+              The _c_l_e_a_r___c_r_y_p_t_o___k_e_y___f_u_n_/_1 either returns _{_o_k_, _u_n_d_e_f_i_n_e_d_} if
+              there was no crypto key fun registered, or _{_o_k_, _T_e_r_m_}, where
+              _T_e_r_m is the return value from _C_r_y_p_t_o_K_e_y_F_u_n_(_c_l_e_a_r_), see
+              _c_r_y_p_t_o___k_e_y___f_u_n_/_1.
+
+
+
+Ericsson AB                      stdlib 1.18.2                     beam_lib(3)

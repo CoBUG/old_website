@@ -1,0 +1,212 @@
+wxControlWithItems(3)      Erlang Module Definition      wxControlWithItems(3)
+
+
+
+NNAAMMEE
+       wxControlWithItems - See external documentation: wxControlWithItems.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxControlWithItems.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_o_n_t_r_o_l_W_i_t_h_I_t_e_m_s_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       aappppeenndd((TThhiiss,, IItteemm)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 Item = chardata() (see module unicode)
+
+              See external documentation.
+
+       aappppeenndd((TThhiiss,, IItteemm,, CClliieennttDDaattaa)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 Item = chardata() (see module unicode)
+                 ClientData = term()
+
+              See external documentation.
+
+       aappppeennddSSttrriinnggss((TThhiiss,, SSttrriinnggss)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+                 Strings = [chardata() (see module unicode)]
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+
+              See external documentation.
+
+       ddeelleettee((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+
+              See external documentation.
+
+       ffiinnddSSttrriinngg((TThhiiss,, SS)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 S = chardata() (see module unicode)
+
+              Equivalent to ffiinnddSSttrriinngg((TThhiiss,, SS,, [[]])).
+
+       ffiinnddSSttrriinngg((TThhiiss,, SS,, OOppttiioonn::::[[OOppttiioonn]])) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 S = chardata() (see module unicode)
+                 Option = {bCase, boolean()}
+
+              See external documentation.
+
+       ggeettCClliieennttDDaattaa((TThhiiss,, NN)) -->> tteerrmm(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+
+              See external documentation.
+
+       sseettCClliieennttDDaattaa((TThhiiss,, NN,, CClliieennttDDaattaa)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+                 ClientData = term()
+
+              See external documentation.
+
+       ggeettCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+
+              See external documentation.
+
+       ggeettSSttrriinngg((TThhiiss,, NN)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettSSttrriinnggSSeelleeccttiioonn((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxControlWithItems()
+
+              See external documentation.
+
+       iinnsseerrtt((TThhiiss,, IItteemm,, PPooss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 Item = chardata() (see module unicode)
+                 Pos = integer()
+
+              See external documentation.
+
+       iinnsseerrtt((TThhiiss,, IItteemm,, PPooss,, CClliieennttDDaattaa)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 Item = chardata() (see module unicode)
+                 Pos = integer()
+                 ClientData = term()
+
+              See external documentation.
+
+       iissEEmmppttyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxControlWithItems()
+
+              See external documentation.
+
+       sseelleecctt((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+
+              See external documentation.
+
+       sseettSSttrriinngg((TThhiiss,, NN,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxControlWithItems()
+                 N = integer()
+                 S = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettSSttrriinnggSSeelleeccttiioonn((TThhiiss,, SS)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxControlWithItems()
+                 S = chardata() (see module unicode)
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxControlWithItems(3)

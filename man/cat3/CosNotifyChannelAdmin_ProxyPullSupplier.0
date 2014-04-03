@@ -1,0 +1,74 @@
+CosNotifyChannelAdmin_ProxyPEurlllaSnugppMloidCeuorls(eN3o)DteiffiynCihtainonnelAdmin_ProxyPullSupplier(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_ProxyPullSupplier - This module implements the
+       OMG  CosNotifyChannelAdmin::ProxyPullSupplier interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyySSuubbssccrriibbee
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+         * CCoossNNoottiiffyyCChhaannnneellAAddmmiinn__PPrrooxxyySSuupppplliieerr
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt__aannyy__ppuullll__ccoonnssuummeerr((PPrrooxxyyPPuullllSSuupppplliieerr,, PPuullllCCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 ProxyPullSupplier = #objref
+                 PullConsumer = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_AlreadyConnected'{}}
+
+              This operation connects the given _P_u_l_l_C_o_n_s_u_m_e_r to the target
+              object. If a connection already exists the _A_l_r_e_a_d_y_C_o_n_n_e_c_t_e_d
+              exception is raised.
+
+       ppuullll((PPrrooxxyyPPuullllSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 ProxyPullSupplier = #objref
+                 Reply = #any | {'EXCEPTION',
+                 #'CosEventChannelAdmin_Disconnected'{}}
+
+              This operation pulls next _#_a_n_y_{_} event, and blocks, if the
+              target object have no events to forward, until an event can be
+              delivered. If no client have been connected the _D_i_s_c_o_n_n_e_c_t_e_d
+              exception is raised.
+
+       ttrryy__ppuullll((PPrrooxxyyPPuullllSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 ProxyPullSupplier = #objref
+                 Reply = {#any, HasEvent} | {'EXCEPTION',
+                 #'CosEventChannelAdmin_Disconnected'{}}
+                 HasEvent = boolean()
+
+              This operation pulls next event, but do not block if the target
+              object have no event to forward. If no client have been
+              connected the _D_i_s_c_o_n_n_e_c_t_e_d exception is raised.
+
+       ddiissccoonnnneecctt__ppuullll__ssuupppplliieerr((PPrrooxxyyPPuullllSSuupppplliieerr)) -->> ookk
+
+              Types:
+
+                 ProxyPullSupplier = #objref
+
+              Invoking this operation will cause the target object to close
+              the connection and terminate.
+
+
+
+Ericsson AB                 cosNotifiCcoastNiootnif1y.C1h.a1n8nelAdmin_ProxyPullSupplier(3)

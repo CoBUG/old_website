@@ -1,0 +1,111 @@
+mod_security(3)            Erlang Module Definition            mod_security(3)
+
+
+
+NNAAMMEE
+       mod_security - Security Audit and Trailing Functionality
+
+DDEESSCCRRIIPPTTIIOONN
+       Security Audit and Trailing Functionality
+
+EEXXPPOORRTTSS
+       lliisstt__aauutthh__uusseerrss((PPoorrtt)) -->> UUsseerrss || [[]]
+       lliisstt__aauutthh__uusseerrss((AAddddrreessss,, PPoorrtt)) -->> UUsseerrss || [[]]
+       lliisstt__aauutthh__uusseerrss((PPoorrtt,, DDiirr)) -->> UUsseerrss || [[]]
+       lliisstt__aauutthh__uusseerrss((AAddddrreessss,, PPoorrtt,, DDiirr)) -->> UUsseerrss || [[]]
+
+              Types:
+
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Users = list() = [string()]
+
+              _l_i_s_t___a_u_t_h___u_s_e_r_s_/_1, _l_i_s_t___a_u_t_h___u_s_e_r_s_/_2 and _l_i_s_t___a_u_t_h___u_s_e_r_s_/_3
+              returns a list of users that are currently authenticated.
+              Authentications are stored for SecurityAuthTimeout seconds, and
+              are then discarded.
+
+       lliisstt__bblloocckkeedd__uusseerrss((PPoorrtt)) -->> UUsseerrss || [[]]
+       lliisstt__bblloocckkeedd__uusseerrss((AAddddrreessss,, PPoorrtt)) -->> UUsseerrss || [[]]
+       lliisstt__bblloocckkeedd__uusseerrss((PPoorrtt,, DDiirr)) -->> UUsseerrss || [[]]
+       lliisstt__bblloocckkeedd__uusseerrss((AAddddrreessss,, PPoorrtt,, DDiirr)) -->> UUsseerrss || [[]]
+
+              Types:
+
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Users = list() = [string()]
+
+              _l_i_s_t___b_l_o_c_k_e_d___u_s_e_r_s_/_1, _l_i_s_t___b_l_o_c_k_e_d___u_s_e_r_s_/_2 and
+              _l_i_s_t___b_l_o_c_k_e_d___u_s_e_r_s_/_3 returns a list of users that are currently
+              blocked from access.
+
+       bblloocckk__uusseerr((UUsseerr,, PPoorrtt,, DDiirr,, SSeeccoonnddss)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       bblloocckk__uusseerr((UUsseerr,, AAddddrreessss,, PPoorrtt,, DDiirr,, SSeeccoonnddss)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 User = string()
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Seconds = integer() | infinity
+                 Reason = no_such_directory
+
+              _b_l_o_c_k___u_s_e_r_/_4 and _b_l_o_c_k___u_s_e_r_/_5 blocks the user _U_s_e_r from the
+              directory _D_i_r for a specified amount of time.
+
+       uunnbblloocckk__uusseerr((UUsseerr,, PPoorrtt)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       uunnbblloocckk__uusseerr((UUsseerr,, AAddddrreessss,, PPoorrtt)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       uunnbblloocckk__uusseerr((UUsseerr,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+       uunnbblloocckk__uusseerr((UUsseerr,, AAddddrreessss,, PPoorrtt,, DDiirr)) -->> ttrruuee || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 User = string()
+                 Port = integer()
+                 Address = {A,B,C,D} | string() | undefined
+                 Dir = string()
+                 Reason = term()
+
+              _u_n_b_l_o_c_k___u_s_e_r_/_2, _u_n_b_l_o_c_k___u_s_e_r_/_3 and _u_n_b_l_o_c_k___u_s_e_r_/_4 removes the
+              user _U_s_e_r from the list of blocked users for the Port (and Dir)
+              specified.
+
+TTHHEE SSEECCUURRIITTYYCCAALLLLBBAACCKKMMOODDUULLEE
+       The SecurityCallbackModule is a user written module that can receive
+       events from the mod_security Erlang Webserver API module. This module
+       only exports the function(s), eevveenntt//44,,55, which are described below.
+
+EEXXPPOORRTTSS
+       eevveenntt((WWhhaatt,, PPoorrtt,, DDiirr,, DDaattaa)) -->> iiggnnoorreedd
+       eevveenntt((WWhhaatt,, AAddddrreessss,, PPoorrtt,, DDiirr,, DDaattaa)) -->> iiggnnoorreedd
+
+              Types:
+
+                 What = atom()
+                 Port = integer()
+                 Address = {A,B,C,D} | string() <v>Dir = string()
+                 Data = [Info]
+                 Info = {Name, Value}
+
+              _e_v_e_n_t_/_4 or _e_v_e_n_t_/_4 is called whenever an event occurs in the
+              mod_security Erlang Webserver API module (_e_v_e_n_t_/_4 is called if
+              Address is undefined and _e_v_e_n_t_/_5 otherwise). The _W_h_a_t argument
+              specifies the type of event that has occurred, and should be one
+              of the following reasons; _a_u_t_h___f_a_i_l (a failed user
+              authentication), _u_s_e_r___b_l_o_c_k (a user is being blocked from
+              access) or _u_s_e_r___u_n_b_l_o_c_k (a user is being removed from the block
+              list).
+
+          NNoottee::
+              Note that the _u_s_e_r___u_n_b_l_o_c_k event is not triggered when a user is
+              removed from the block list explicitly using the _u_n_b_l_o_c_k___u_s_e_r
+              function.
+
+
+
+
+Ericsson AB                       inets 5.9.1                  mod_security(3)

@@ -1,0 +1,59 @@
+CosEventChannelAdmin_EventChEarnlnaenlg(3M)odule DeCfoisnEivteinotnChannelAdmin_EventChannel(3)
+
+
+
+NNAAMMEE
+       CosEventChannelAdmin_EventChannel - This module implements an Event
+       Channel interface, which plays the role of a  mediator between
+       consumers and suppliers.
+
+DDEESSCCRRIIPPTTIIOONN
+       An event channel is an object that allows multiple suppliers to
+       communicate with multiple consumers in a highly decoupled, asynchronous
+       manner. The event channel is built up incrementally. When an event
+       channel is created no suppliers or consumers are connected to it. Event
+       Channel can implement group communication by serving as a replicator,
+       broadcaster, or multicaster that forward events from one or more
+       suppliers to multiple consumers.
+
+       It is up to the user to decide when an event channel is created and how
+       references to the event channel are obtained. By representing the event
+       channel as an object, it has all of the properties that apply to
+       objects. One way to manage an event channel is to register it in a
+       naming context, or export it through an operation on an object.
+
+       To get access to all definitions include necessary _h_r_l files by using:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       Any object that possesses an object reference that supports the
+       ProxyPullConsumer interface can perform the following operations:
+
+EEXXPPOORRTTSS
+       ffoorr__ccoonnssuummeerrss((OObbjjeecctt)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Return = #objref
+
+              This operation returns a ConsumerAdmin object reference. If
+              ConsumerAdmin object does not exist already it creates one.
+
+       ffoorr__ssuupppplliieerrss((OObbjjeecctt)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Return = #objref
+
+              This operation returns a SupplierAdmin object reference. If
+              SupplierAdmin object does not exist already it creates one.
+
+       ddeessttrrooyy((OObbjjeecctt)) -->> RReettuurrnn
+
+              Types:
+
+                 Object = #objref
+                 Return = #objref
+
+Ericsson AB                     cosEvent 2.C1o.s1E2ventChannelAdmin_EventChannel(3)

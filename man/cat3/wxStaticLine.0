@@ -1,0 +1,90 @@
+wxStaticLine(3)            Erlang Module Definition            wxStaticLine(3)
+
+
+
+NNAAMMEE
+       wxStaticLine - See external documentation: wxStaticLine.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxStaticLine.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_t_a_t_i_c_L_i_n_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSttaattiiccLLiinnee(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxSSttaattiiccLLiinnee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSttaattiiccLLiinnee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStaticLine()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStaticLine()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       iissVVeerrttiiccaall((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStaticLine()
+
+              See external documentation.
+
+       ggeettDDeeffaauullttSSiizzee(()) -->> iinntteeggeerr(())
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSttaattiiccLLiinnee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxStaticLine(3)

@@ -1,0 +1,518 @@
+tftp(3)                    Erlang Module Definition                    tftp(3)
+
+
+
+NNAAMMEE
+       tftp - Trivial FTP
+
+DDEESSCCRRIIPPTTIIOONN
+       This is a complete implementation of the following IETF standards:
+
+         * RFC 1350, The TFTP Protocol (revision 2).
+
+         * RFC 2347, TFTP Option Extension.
+
+         * RFC 2348, TFTP Blocksize Option.
+
+         * RFC 2349, TFTP Timeout Interval and Transfer Size Options.
+
+       The only feature that not is implemented in this release is the
+       "netascii" transfer mode.
+
+       The ssttaarrtt//11 function starts a daemon process which listens for UDP
+       packets on a port. When it receives a request for read or write it
+       spawns a temporary server process which handles the actual transfer of
+       the file.
+
+       On the client side the rreeaadd__ffiillee//33 and wwrriittee__ffiillee//33 functions spawns a
+       temporary client process which establishes contact with a TFTP daemon
+       and performs the actual transfer of the file.
+
+       _t_f_t_p uses a callback module to handle the actual file transfer. Two
+       such callback modules are provided, _t_f_t_p___b_i_n_a_r_y and _t_f_t_p___f_i_l_e. See
+       rreeaadd__ffiillee//33 and wwrriittee__ffiillee//33 for more information about these. The user
+       can also implement own callback modules, see CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS below.
+       A callback module provided by the user is registered using the _c_a_l_l_b_a_c_k
+       option, see DDAATTAA TTYYPPEESS below.
+
+TTFFTTPP SSEERRVVEERR SSEERRVVIICCEE SSTTAARRTT//SSTTOOPP
+       A TFTP server can be configured to start statically when starting the
+       Inets application. Alternatively it can be started dynamically (when
+       Inets already is started) by calling the Inets application API
+       _i_n_e_t_s_:_s_t_a_r_t_(_t_f_t_p_d_, _S_e_r_v_i_c_e_C_o_n_f_i_g_), or _i_n_e_t_s_:_s_t_a_r_t_(_t_f_t_p_d_, _S_e_r_v_i_c_e_C_o_n_f_i_g_,
+       _H_o_w_), see iinneettss((33)) for details. The _S_e_r_v_i_c_e_C_o_n_f_i_g for TFTP is described
+       below in the CCOOMMMMOONN DDAATTAA TTYYPPEESS section.
+
+       The TFTP server can be stopped using _i_n_e_t_s_:_s_t_o_p_(_t_f_t_p_d_, _P_i_d_), see
+       iinneettss((33)) for details.
+
+       The TPFT client is of such a temporary nature that it is not handled as
+       a service in the Inets service framework.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+             ServiceConfig = Options
+             Options = [option()]
+             option() -- see below
+
+
+       Most of the options are common for both the client and the server side,
+       but some of them differs a little. Here are the available options:
+
+         _{_d_e_b_u_g_, _L_e_v_e_l_}:
+           _L_e_v_e_l _= _n_o_n_e _| _e_r_r_o_r _| _w_a_r_n_i_n_g _| _b_r_i_e_f _| _n_o_r_m_a_l _| _v_e_r_b_o_s_e _| _a_l_l
+
+           Controls the level of debug printouts. The default is _n_o_n_e.
+
+         _{_h_o_s_t_, _H_o_s_t_}:
+           _H_o_s_t _= _h_o_s_t_n_a_m_e_(_) see iinneett((33))
+
+           The name or IP address of the host where the TFTP daemon resides.
+           This option is only used by the client.
+
+         _{_p_o_r_t_, _P_o_r_t_}:
+           _P_o_r_t _= _i_n_t_(_)
+
+           The TFTP port where the daemon listens. It defaults to the
+           standardized number 69. On the server side it may sometimes make
+           sense to set it to 0, which means that the daemon just will pick a
+           free port (which one is returned by the _i_n_f_o_/_1 function).
+
+           If a socket has somehow already has been connected, the {udp, [{fd,
+           integer()}]} option can be used to pass the open file descriptor to
+           gen_udp. This can be automated a bit by using a command line
+           argument stating the prebound file descriptor number. For example,
+           if the Port is 69 and the file descriptor 22 has been opened by
+           setuid_socket_wrap. Then the command line argument "-tftpd_69 22"
+           will trigger the prebound file descriptor 22 to be used instead of
+           opening port 69. The UDP option {udp, [{fd, 22}]} automatically be
+           added. See init:get_argument/ about command line arguments and
+           gen_udp:open/2 about UDP options.
+
+         _{_p_o_r_t___p_o_l_i_c_y_, _P_o_l_i_c_y_}:
+           _P_o_l_i_c_y _= _r_a_n_d_o_m _| _P_o_r_t _| _{_r_a_n_g_e_, _M_i_n_P_o_r_t_, _M_a_x_P_o_r_t_}
+           _P_o_r_t _= _M_i_n_P_o_r_t _= _M_a_x_P_o_r_t _= _i_n_t_(_)
+
+           Policy for the selection of the temporary port which is used by the
+           server/client during the file transfer. It defaults to _r_a_n_d_o_m which
+           is the standardized policy. With this policy a randomized free port
+           used. A single port or a range of ports can be useful if the
+           protocol should pass through a firewall.
+
+         _{_u_d_p_, _O_p_t_i_o_n_s_}:
+           _O_p_t_i_o_n_s _= _[_O_p_t_] see ggeenn__uuddpp::ooppeenn//22
+
+         _{_u_s_e___t_s_i_z_e_, _B_o_o_l_}:
+           _B_o_o_l _= _b_o_o_l_(_)
+
+           Flag for automated usage of the _t_s_i_z_e option. With this set to
+           true, the _w_r_i_t_e___f_i_l_e_/_3 client will determine the filesize and send
+           it to the server as the standardized _t_s_i_z_e option. A _r_e_a_d___f_i_l_e_/_3
+           client will just acquire filesize from the server by sending a zero
+           _t_s_i_z_e.
+
+         _{_m_a_x___t_s_i_z_e_, _M_a_x_T_s_i_z_e_}:
+           _M_a_x_T_s_i_z_e _= _i_n_t_(_) _| _i_n_f_i_n_i_t_y
+
+           Threshold for the maximal filesize in bytes. The transfer will be
+           aborted if the limit is exceeded. It defaults to _i_n_f_i_n_i_t_y.
+
+         _{_m_a_x___c_o_n_n_, _M_a_x_C_o_n_n_}:
+           _M_a_x_C_o_n_n _= _i_n_t_(_) _| _i_n_f_i_n_i_t_y
+
+           Threshold for the maximal number of active connections. The daemon
+           will reject the setup of new connections if the limit is exceeded.
+           It defaults to _i_n_f_i_n_i_t_y.
+
+         _{_T_f_t_p_K_e_y_, _T_f_t_p_V_a_l_}:
+           _T_f_t_p_K_e_y _= _s_t_r_i_n_g_(_)
+           _T_f_t_p_V_a_l _= _s_t_r_i_n_g_(_)
+
+           The name and value of a TFTP option.
+
+         _{_r_e_j_e_c_t_, _F_e_a_t_u_r_e_}:
+           _F_e_a_t_u_r_e _= _M_o_d_e _| _T_f_t_p_K_e_y
+            _M_o_d_e _= _r_e_a_d _| _w_r_i_t_e
+            _T_f_t_p_K_e_y _= _s_t_r_i_n_g_(_)
+
+           Control which features that should be rejected. This is mostly
+           useful for the server as it may restrict usage of certain TFTP
+           options or read/write access.
+
+         _{_c_a_l_l_b_a_c_k_, _{_R_e_g_E_x_p_, _M_o_d_u_l_e_, _S_t_a_t_e_}_}:
+           _R_e_g_E_x_p _= _s_t_r_i_n_g_(_)
+           _M_o_d_u_l_e _= _a_t_o_m_(_)
+           _S_t_a_t_e _= _t_e_r_m_(_)
+
+           Registration of a callback module. When a file is to be
+           transferred, its local filename will be matched to the regular
+           expressions of the registered callbacks. The first matching
+           callback will be used the during the transfer. See rreeaadd__ffiillee//33 and
+           wwrriittee__ffiillee//33.
+
+           The callback module must implement the _t_f_t_p behavior, CCAALLLLBBAACCKK
+           FFUUNNCCTTIIOONNSS.
+
+         _{_l_o_g_g_e_r_, _M_o_d_u_l_e_}:
+           _M_o_d_u_l_e _= _m_o_d_u_l_e_(_)_(_)
+
+           Callback module for customized logging of error, warning and info
+           messages. >The callback module must implement the _t_f_t_p___l_o_g_g_e_r
+           behavior, LLOOGGGGEERR FFUUNNCCTTIIOONNSS. The default module is _t_f_t_p___l_o_g_g_e_r.
+
+         _{_m_a_x___r_e_t_r_i_e_s_, _M_a_x_R_e_t_r_i_e_s_}:
+           _M_a_x_R_e_t_r_i_e_s _= _i_n_t_(_)
+
+           Threshold for the maximal number of retries. By default the
+           server/client will try to resend a message up to _5 times when the
+           timeout expires.
+
+EEXXPPOORRTTSS
+       ssttaarrtt((OOppttiioonnss)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [option()]
+                 Pid = pid()
+                 Reason = term()
+
+              Starts a daemon process which listens for udp packets on a port.
+              When it receives a request for read or write it spawns a
+              temporary server process which handles the actual transfer of
+              the (virtual) file.
+
+       rreeaadd__ffiillee((RReemmootteeFFiilleennaammee,, LLooccaallFFiilleennaammee,, OOppttiioonnss)) -->> {{ookk,,
+       LLaassttCCaallllbbaacckkSSttaattee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 RemoteFilename = string()
+                 LocalFilename = binary | string()
+                 Options = [option()]
+                 LastCallbackState = term()
+                 Reason = term()
+
+              Reads a (virtual) file _R_e_m_o_t_e_F_i_l_e_n_a_m_e from a TFTP server.
+
+              If _L_o_c_a_l_F_i_l_e_n_a_m_e is the atom _b_i_n_a_r_y, _t_f_t_p___b_i_n_a_r_y is used as
+              callback module. It concatenates all transferred blocks and
+              returns them as one single binary in _L_a_s_t_C_a_l_l_b_a_c_k_S_t_a_t_e.
+
+              If _L_o_c_a_l_F_i_l_e_n_a_m_e is a string and there are no registered
+              callback modules, _t_f_t_p___f_i_l_e is used as callback module. It
+              writes each transferred block to the file named _L_o_c_a_l_F_i_l_e_n_a_m_e
+              and returns the number of transferred bytes in
+              _L_a_s_t_C_a_l_l_b_a_c_k_S_t_a_t_e.
+
+              If _L_o_c_a_l_F_i_l_e_n_a_m_e is a string and there are registered callback
+              modules, _L_o_c_a_l_F_i_l_e_n_a_m_e is tested against the regexps of these
+              and the callback module corresponding to the first match is
+              used, or an error tuple is returned if no matching regexp is
+              found.
+
+       wwrriittee__ffiillee((RReemmootteeFFiilleennaammee,, LLooccaallFFiilleennaammee,, OOppttiioonnss)) -->> {{ookk,,
+       LLaassttCCaallllbbaacckkSSttaattee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 RemoteFilename = string()
+                 LocalFilename = binary() | string()
+                 Options = [option()]
+                 LastCallbackState = term()
+                 Reason = term()
+
+              Writes a (virtual) file _R_e_m_o_t_e_F_i_l_e_n_a_m_e to a TFTP server.
+
+              If _L_o_c_a_l_F_i_l_e_n_a_m_e is a binary, _t_f_t_p___b_i_n_a_r_y is used as callback
+              module. The binary is transferred block by block and the number
+              of transferred bytes is returned in _L_a_s_t_C_a_l_l_b_a_c_k_S_t_a_t_e.
+
+              If _L_o_c_a_l_F_i_l_e_n_a_m_e is a string and there are no registered
+              callback modules, _t_f_t_p___f_i_l_e is used as callback module. It reads
+              the file named _L_o_c_a_l_F_i_l_e_n_a_m_e block by block and returns the
+              number of transferred bytes in _L_a_s_t_C_a_l_l_b_a_c_k_S_t_a_t_e.
+
+              If _L_o_c_a_l_F_i_l_e_n_a_m_e is a string and there are registered callback
+              modules, _L_o_c_a_l_F_i_l_e_n_a_m_e is tested against the regexps of these
+              and the callback module corresponding to the first match is
+              used, or an error tuple is returned if no matching regexp is
+              found.
+
+       iinnffoo((ddaaeemmoonnss)) -->> [[{{PPiidd,, OOppttiioonnss}}]]
+
+              Types:
+
+                 Pid = [pid()()]
+                 Options = [option()]
+                 Reason = term()
+
+              Returns info about all TFTP daemon processes.
+
+       iinnffoo((sseerrvveerrss)) -->> [[{{PPiidd,, OOppttiioonnss}}]]
+
+              Types:
+
+                 Pid = [pid()()]
+                 Options = [option()]
+                 Reason = term()
+
+              Returns info about all TFTP server processes.
+
+       iinnffoo((PPiidd)) -->> {{ookk,, OOppttiioonnss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Options = [option()]
+                 Reason = term()
+
+              Returns info about a TFTP daemon, server or client process.
+
+       cchhaannggee__ccoonnffiigg((ddaaeemmoonnss,, OOppttiioonnss)) -->> [[{{PPiidd,, RReessuulltt}}]]
+
+              Types:
+
+                 Options = [option()]
+                 Pid = pid()
+                 Result = ok | {error, Reason}
+                 Reason = term()
+
+              Changes config for all TFTP daemon processes.
+
+       cchhaannggee__ccoonnffiigg((sseerrvveerrss,, OOppttiioonnss)) -->> [[{{PPiidd,, RReessuulltt}}]]
+
+              Types:
+
+                 Options = [option()]
+                 Pid = pid()
+                 Result = ok | {error, Reason}
+                 Reason = term()
+
+              Changes config for all TFTP server processes.
+
+       cchhaannggee__ccoonnffiigg((PPiidd,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 Pid = pid()
+                 Options = [option()]
+                 Result = ok | {error, Reason}
+                 Reason = term()
+
+              Changes config for a TFTP daemon, server or client process
+
+       ssttaarrtt(()) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Reason = term()
+
+              Starts the Inets application.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       A _t_f_t_p callback module should be implemented as a _t_f_t_p behavior and
+       export the functions listed below.
+
+       On the server side the callback interaction starts with a call to
+       _o_p_e_n_/_5 with the registered initial callback state. _o_p_e_n_/_5 is expected
+       to open the (virtual) file. Then either the _r_e_a_d_/_1 or _w_r_i_t_e_/_2 functions
+       are invoked repeatedly, once per transferred block. At each function
+       call the state returned from the previous call is obtained. When the
+       last block has been encountered the _r_e_a_d_/_1 or _w_r_i_t_e_/_2 functions is
+       expected to close the (virtual) file and return its last state. The
+       _a_b_o_r_t_/_3 function is only used in error situations. _p_r_e_p_a_r_e_/_5 is not
+       used on the server side.
+
+       On the client side the callback interaction is the same, but it starts
+       and ends a bit differently. It starts with a call to _p_r_e_p_a_r_e_/_5 with the
+       same arguments as _o_p_e_n_/_5 takes. _p_r_e_p_a_r_e_/_5 is expected to validate the
+       TFTP options, suggested by the user and return the subset of them that
+       it accepts. Then the options is sent to the server which will perform
+       the same TFTP option negotiation procedure. The options that are
+       accepted by the server are forwarded to the _o_p_e_n_/_5 function on the
+       client side. On the client side the _o_p_e_n_/_5 function must accept all
+       option as is or reject the transfer. Then the callback interaction
+       follows the same pattern as described above for the server side. When
+       the last block is encountered in _r_e_a_d_/_1 or _w_r_i_t_e_/_2 the returned state
+       is forwarded to the user and returned from _r_e_a_d___f_i_l_e/3 or _w_r_i_t_e___f_i_l_e_/_3.
+
+       If a callback (which performs the file access in the TFTP server) takes
+       too long time (more than the double TFTP timeout), the server will
+       abort the connection and send an error reply to the client. This
+       implies that the server will release resources attached to the
+       connection faster than before. The server simply assumes that the
+       client has given up.
+
+       If the TFTP server receives yet another request from the same client
+       (same host and port) while it already has an active connection to the
+       client, it will simply ignore the new request if the request is equal
+       with the first one (same filename and options). This implies that the
+       (new) client will be served by the already ongoing connection on the
+       server side. By not setting up yet another connection, in parallel with
+       the ongoing one, the server will consumer lesser resources.
+
+EEXXPPOORRTTSS
+       pprreeppaarree((PPeeeerr,, AAcccceessss,, FFiilleennaammee,, MMooddee,, SSuuggggeesstteeddOOppttiioonnss,, IInniittiiaallSSttaattee))
+       -->> {{ookk,, AAcccceepptteeddOOppttiioonnss,, NNeewwSSttaattee}} || {{eerrrroorr,, {{CCooddee,, TTeexxtt}}}}
+
+              Types:
+
+                 Peer = {PeerType, PeerHost, PeerPort}
+                 PeerType = inet | inet6
+                 PeerHost = ip_address()
+                 PeerPort = integer()
+                 Access = read | write
+                 Filename = string()
+                 Mode = string()
+                 SuggestedOptions = AcceptedOptions = [{Key, Value}]
+                  Key = Value = string()
+                 InitialState = [] | [{root_dir, string()}]
+                 NewState = term()
+                 Code = undef | enoent | eacces | enospc
+                  | badop | eexist | baduser | badopt
+                  | int()
+                 Text = string()
+
+              Prepares to open a file on the client side.
+
+              No new options may be added, but the ones that are present in
+              _S_u_g_g_e_s_t_e_d_O_p_t_i_o_n_s may be omitted or replaced with new values in
+              _A_c_c_e_p_t_e_d_O_p_t_i_o_n_s.
+
+              Will be followed by a call to _o_p_e_n_/_4 before any read/write
+              access is performed. _A_c_c_e_p_t_e_d_O_p_t_i_o_n_s is sent to the server which
+              replies with those options that it accepts. These will be
+              forwarded to _o_p_e_n_/_4 as _S_u_g_g_e_s_t_e_d_O_p_t_i_o_n_s.
+
+       ooppeenn((PPeeeerr,, AAcccceessss,, FFiilleennaammee,, MMooddee,, SSuuggggeesstteeddOOppttiioonnss,, SSttaattee)) -->> {{ookk,,
+       AAcccceepptteeddOOppttiioonnss,, NNeewwSSttaattee}} || {{eerrrroorr,, {{CCooddee,, TTeexxtt}}}}
+
+              Types:
+
+                 Peer = {PeerType, PeerHost, PeerPort}
+                 PeerType = inet | inet6
+                 PeerHost = ip_address()
+                 PeerPort = integer()
+                 Access = read | write
+                 Filename = string()
+                 Mode = string()
+                 SuggestedOptions = AcceptedOptions = [{Key, Value}]
+                  Key = Value = string()
+                 State = InitialState | term()
+                  InitialState = [] | [{root_dir, string()}]
+                 NewState = term()
+                 Code = undef | enoent | eacces | enospc
+                  | badop | eexist | baduser | badopt
+                  | int()
+                 Text = string()
+
+              Opens a file for read or write access.
+
+              On the client side where the _o_p_e_n_/_5 call has been preceded by a
+              call to _p_r_e_p_a_r_e_/_5, all options must be accepted or rejected.
+
+              On the server side, where there is no preceding _p_r_e_p_a_r_e_/_5 call,
+              no new options may be added, but the ones that are present in
+              _S_u_g_g_e_s_t_e_d_O_p_t_i_o_n_s may be omitted or replaced with new values in
+              _A_c_c_e_p_t_e_d_O_p_t_i_o_n_s.
+
+       rreeaadd((SSttaattee)) -->> {{mmoorree,, BBiinn,, NNeewwSSttaattee}} || {{llaasstt,, BBiinn,, FFiilleeSSiizzee}} || {{eerrrroorr,,
+       {{CCooddee,, TTeexxtt}}}}
+
+              Types:
+
+                 State = NewState = term()
+                 Bin = binary()
+                 FileSize = int()
+                 Code = undef | enoent | eacces | enospc
+                  | badop | eexist | baduser | badopt
+                  | int()
+                 Text = string()
+
+              Read a chunk from the file.
+
+              The callback function is expected to close the file when the
+              last file chunk is encountered. When an error is encountered the
+              callback function is expected to clean up after the aborted file
+              transfer, such as closing open file descriptors etc. In both
+              cases there will be no more calls to any of the callback
+              functions.
+
+       wwrriittee((BBiinn,, SSttaattee)) -->> {{mmoorree,, NNeewwSSttaattee}} || {{llaasstt,, FFiilleeSSiizzee}} || {{eerrrroorr,,
+       {{CCooddee,, TTeexxtt}}}}
+
+              Types:
+
+                 Bin = binary()
+                 State = NewState = term()
+                 FileSize = int()
+                 Code = undef | enoent | eacces | enospc
+                  | badop | eexist | baduser | badopt
+                  | int()
+                 Text = string()
+
+              Write a chunk to the file.
+
+              The callback function is expected to close the file when the
+              last file chunk is encountered. When an error is encountered the
+              callback function is expected to clean up after the aborted file
+              transfer, such as closing open file descriptors etc. In both
+              cases there will be no more calls to any of the callback
+              functions.
+
+       aabboorrtt((CCooddee,, TTeexxtt,, SSttaattee)) -->> ookk
+
+              Types:
+
+                 Code = undef | enoent | eacces | enospc
+                  | badop | eexist | baduser | badopt
+                  | int()
+                 Text = string()
+                 State = term()
+
+              Invoked when the file transfer is aborted.
+
+              The callback function is expected to clean up its used resources
+              after the aborted file transfer, such as closing open file
+              descriptors etc. The function will not be invoked if any of the
+              other callback functions returns an error, as it is expected
+              that they already have cleaned up the necessary resources. It
+              will however be invoked if the functions fails (crashes).
+
+LLOOGGGGEERR FFUUNNCCTTIIOONNSS
+       A _t_f_t_p___l_o_g_g_e_r callback module should be implemented as a _t_f_t_p___l_o_g_g_e_r
+       behavior and export the functions listed below.
+
+EEXXPPOORRTTSS
+       eerrrroorr__mmssgg((FFoorrmmaatt,, DDaattaa)) -->> ookk || eexxiitt((RReeaassoonn))
+
+              Types:
+
+                 Format = string()
+                 Data = [term()]
+                 Reason = term()
+
+              Log an error message. See _e_r_r_o_r___l_o_g_g_e_r_:_e_r_r_o_r___m_s_g_/_2 _f_o_r _d_e_t_a_i_l_s_.
+
+       wwaarrnniinngg__mmssgg((FFoorrmmaatt,, DDaattaa)) -->> ookk || eexxiitt((RReeaassoonn))
+
+              Types:
+
+                 Format = string()
+                 Data = [term()]
+                 Reason = term()
+
+              Log a warning message. See _e_r_r_o_r___l_o_g_g_e_r_:_w_a_r_n_i_n_g___m_s_g_/_2 _f_o_r
+              _d_e_t_a_i_l_s_.
+
+       iinnffoo__mmssgg((FFoorrmmaatt,, DDaattaa)) -->> ookk || eexxiitt((RReeaassoonn))
+
+              Types:
+
+                 Format = string()
+                 Data = [term()]
+                 Reason = term()
+
+              Log an info message. See _e_r_r_o_r___l_o_g_g_e_r_:_i_n_f_o___m_s_g_/_2 _f_o_r _d_e_t_a_i_l_s_.
+
+
+
+Ericsson AB                       inets 5.9.1                          tftp(3)

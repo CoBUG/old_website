@@ -1,0 +1,126 @@
+erl_lint(3)                Erlang Module Definition                erl_lint(3)
+
+
+
+NNAAMMEE
+       erl_lint - The Erlang Code Linter
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is used to check Erlang code for illegal syntax and other
+       bugs. It also warns against coding practices which are not recommended.
+
+       The errors detected include:
+
+         * redefined and undefined functions
+
+         * unbound and unsafe variables
+
+         * illegal record usage.
+
+       Warnings include:
+
+         * unused functions and imports
+
+         * unused variables
+
+         * variables imported into matches
+
+         * variables exported from _i_f/_c_a_s_e/_r_e_c_e_i_v_e
+
+         * variables shadowed in lambdas and list comprehensions.
+
+       Some of the warnings are optional, and can be turned on by giving the
+       appropriate option, described below.
+
+       The functions in this module are invoked automatically by the Erlang
+       compiler and there is no reason to invoke these functions separately
+       unless you have written your own Erlang compiler.
+
+DDAATTAA TTYYPPEESS
+       eerrrroorr__iinnffoo(()) = {eerrll__ssccaann::lliinnee(()), module(), eerrrroorr__ddeessccrriippttiioonn(())}
+
+       eerrrroorr__ddeessccrriippttiioonn(()) = term()
+
+EEXXPPOORRTTSS
+       mmoodduullee((AAbbssFFoorrmmss)) -->> {{ookk,, WWaarrnniinnggss}} || {{eerrrroorr,, EErrrroorrss,, WWaarrnniinnggss}}
+
+       mmoodduullee((AAbbssFFoorrmmss,, FFiilleeNNaammee)) -->>
+                 {{ookk,, WWaarrnniinnggss}} || {{eerrrroorr,, EErrrroorrss,, WWaarrnniinnggss}}
+
+       mmoodduullee((AAbbssFFoorrmmss,, FFiilleeNNaammee,, CCoommppiilleeOOppttiioonnss)) -->>
+                 {{ookk,, WWaarrnniinnggss}} || {{eerrrroorr,, EErrrroorrss,, WWaarrnniinnggss}}
+
+              Types:
+
+                 AbsForms = [eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())]
+                 FileName = atom() | string()
+                 CompileOptions = [ccoommppiillee::ooppttiioonn(())]
+                 Warnings = [{ffiillee::ffiilleennaammee(()), [ErrorInfo]}]
+                 Errors = [{FileName2 :: ffiillee::ffiilleennaammee(()), [ErrorInfo]}]
+                 ErrorInfo = eerrrroorr__iinnffoo(())
+
+              This function checks all the forms in a module for errors. It
+              returns:
+
+                _{_o_k_,_W_a_r_n_i_n_g_s_}:
+                  There were no errors in the module.
+
+                _{_e_r_r_o_r_,_E_r_r_o_r_s_,_W_a_r_n_i_n_g_s_}:
+                  There were errors in the module.
+
+              Since this module is of interest only to the maintainers of the
+              compiler, and to avoid having the same description in two places
+              to avoid the usual maintenance nightmare, the elements of
+              _O_p_t_i_o_n_s that control the warnings are only described in
+              ccoommppiillee((33)).
+
+              The _A_b_s_F_o_r_m_s of a module which comes from a file that is read
+              through _e_p_p, the Erlang pre-processor, can come from many files.
+              This means that any references to errors must include the file
+              name (see eepppp((33)), or parser eerrll__ppaarrssee((33))). The warnings and
+              errors returned have the following format:
+
+                  [{FileName2,[ErrorInfo]}]
+
+              The errors and warnings are listed in the order in which they
+              are encountered in the forms. This means that the errors from
+              one file may be split into different entries in the list of
+              errors.
+
+       iiss__gguuaarrdd__tteesstt((EExxpprr)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Expr = eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())
+
+              This function tests if _E_x_p_r is a legal guard test. _E_x_p_r is an
+              Erlang term representing the abstract form for the expression.
+              _e_r_l___p_a_r_s_e_:_p_a_r_s_e___e_x_p_r_s_(_T_o_k_e_n_s_) can be used to generate a list of
+              _E_x_p_r.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrDDeessccrriippttoorr)) -->> iioo__lliibb::cchhaarrss(())
+
+              Types:
+
+                 ErrorDescriptor = eerrrroorr__ddeessccrriippttiioonn(())
+
+              Takes an _E_r_r_o_r_D_e_s_c_r_i_p_t_o_r and returns a string which describes
+              the error or warning. This function is usually called implicitly
+              when processing an _E_r_r_o_r_I_n_f_o structure (see below).
+
+EERRRROORR IINNFFOORRMMAATTIIOONN
+       The _E_r_r_o_r_I_n_f_o mentioned above is the standard _E_r_r_o_r_I_n_f_o structure which
+       is returned from all IO modules. It has the following format:
+
+           {ErrorLine, Module, ErrorDescriptor}
+
+       A string which describes the error is obtained with the following call:
+
+           Module:format_error(ErrorDescriptor)
+
+SSEEEE AALLSSOO
+       eerrll__ppaarrssee((33)), eepppp((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                     erl_lint(3)

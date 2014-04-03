@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- Toolbar Release Notes</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/toolbar-1.4.2.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Toolbar</strong><br><strong>Release Notes</strong><br><small>Version 1.4.2.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Chapters</strong></small></p>
+<ul class="flipMenu" imagepath="../../../../doc/js/flipmenu"><li id="loadscrollpos" title="Toolbar Release Notes" expanded="true">Toolbar Release Notes<ul>
+<li><a href="notes.html">
+              Top of chapter
+            </a></li>
+<li title="Toolbar 1.4.2.2"><a href="notes.html#id57739">Toolbar 1.4.2.2</a></li>
+<li title="Toolbar 1.4.2.1"><a href="notes.html#id57772">Toolbar 1.4.2.1</a></li>
+<li title="Toolbar 1.4.2"><a href="notes.html#id57800">Toolbar 1.4.2</a></li>
+<li title="Toolbar 1.4.1"><a href="notes.html#id56571">Toolbar 1.4.1</a></li>
+<li title="Toolbar 1.4"><a href="notes.html#id56600">Toolbar 1.4</a></li>
+<li title="Toolbar 1.3.0.1"><a href="notes.html#id62531">Toolbar 1.3.0.1</a></li>
+<li title="Toolbar 1.3"><a href="notes.html#id62575">Toolbar 1.3</a></li>
+<li title="Toolbar 1.2.1"><a href="notes.html#id62244">Toolbar 1.2.1</a></li>
+</ul>
+</li></ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<h1>1 Toolbar Release Notes</h1>
+  
+  <p>This document describes the changes made to the Toolbar
+    application.</p>
+
+<h3><a name="id57739">1.1 
+        Toolbar 1.4.2.2</a></h3>
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+	    <p>The GS applications is now deprecated and will be
+	    removed in the R16 release. The following GS-based
+	    applications have been superseded by the Observer
+	    application and will removed in R16: Appmon, Pman,
+	    Tv.</p>
+          <p>
+	    *** POTENTIAL INCOMPATIBILITY ***</p>
+          <p>
+	    Own Id: OTP-9907</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id57772">1.2 
+        Toolbar 1.4.2.1</a></h3>
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+          <p>
+	    Miscellaneous documentation build updates</p>
+          <p>
+	    Own Id: OTP-9813</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id57800">1.3 
+        Toolbar 1.4.2</a></h3>
+
+    <h4>Fixed Bugs and Malfunctions</h4>
+      <ul>
+        <li>
+          <p>
+	    Improve spelling throughout documentation, code comments
+	    and error messages</p>
+          <p>
+	    Own Id: OTP-9555</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id56571">1.4 
+        Toolbar 1.4.1</a></h3>
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+          <p>
+	    The documentation is now built with open source tools
+	    (xsltproc and fop) that exists on most platforms. One
+	    visible change is that the frames are removed.</p>
+          <p>
+	    Own Id: OTP-8201</p>
+        </li>
+      </ul>
+    
+
+
+
+<h3><a name="id56600">1.5 
+        Toolbar 1.4</a></h3>
+
+    <h4>Improvements and New Features</h4>
+      <ul>
+        <li>
+	    <p>The copyright notices have been updated.</p>
+          <p>
+	    Own Id: OTP-7851</p>
+        </li>
+      </ul>
+    
+
+
+
+  <h3><a name="id62531">1.6 
+        Toolbar 1.3.0.1</a></h3>
+    
+
+    <h4>Improvements and New Features</h4>
+      
+      <ul>
+        <li>
+          <p>Minor Makefile changes.</p>
+          <p>Own Id: OTP-6689</p>
+        </li>
+        <li>
+          <p>Obsolete guard tests (such as list()) have been replaced
+            with the modern guard tests (such as is_list()).</p>
+          <p>Own Id: OTP-6725</p>
+        </li>
+      </ul>
+    
+  
+
+  <h3><a name="id62575">1.7 
+        Toolbar 1.3</a></h3>
+    
+
+    <h4>Improvements and New Features</h4>
+      
+      <ul>
+        <li>
+          <p>Notification windows are now centered over a parent
+            window.</p>
+          <p>Own Id: OTP-6013 Aux Id: OTP-5987 </p>
+        </li>
+      </ul>
+    
+  
+
+  <h3><a name="id62244">1.8 
+        Toolbar 1.2.1</a></h3>
+    
+
+    <h4>Fixed Bugs and Malfunctions</h4>
+      
+      <ul>
+        <li>
+          <p>The graphic applications now search for HTML
+            documentation in the correct place.</p>
+          <p>Own Id: OTP-5381</p>
+        </li>
+      </ul>
+    
+  
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 1997-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

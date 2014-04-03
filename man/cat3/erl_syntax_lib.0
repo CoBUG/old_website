@@ -1,0 +1,767 @@
+erl_syntax_lib(3)          Erlang Module Definition          erl_syntax_lib(3)
+
+
+
+NNAAMMEE
+       erl_syntax_lib - Support library for abstract Erlang syntax trees.
+
+DDEESSCCRRIIPPTTIIOONN
+       Support library for abstract Erlang syntax trees.
+
+       This module contains utility functions for working with the abstract
+       data type defined in the module eerrll__ssyynnttaaxx.
+
+DDAATTAA TTYYPPEESS
+         _i_n_f_o___p_a_i_r_(_) _= _{_k_e_y_(_)_, _t_e_r_m_(_)_}:
+
+
+         _k_e_y_(_) _= _a_t_t_r_i_b_u_t_e_s _| _e_r_r_o_r_s _| _e_x_p_o_r_t_s _| _f_u_n_c_t_i_o_n_s _| _i_m_p_o_r_t_s _| _m_o_d_u_l_e
+         _| _r_e_c_o_r_d_s _| _r_u_l_e_s _| _w_a_r_n_i_n_g_s:
+
+
+         _o_r_d_s_e_t_(_T_) _= _o_r_d_s_e_t_(_T_) _(_s_e_e _m_o_d_u_l_e _/_/_s_t_d_l_i_b_/_o_r_d_s_e_t_s_):
+
+
+         _s_y_n_t_a_x_T_r_e_e_(_) _= _s_y_n_t_a_x_T_r_e_e_(_) _(_s_e_e _m_o_d_u_l_e _e_r_l___s_y_n_t_a_x_):
+
+
+           An abstract syntax tree. See the eerrll__ssyynnttaaxx module for details.
+
+EEXXPPOORRTTSS
+       aannaallyyzzee__aapppplliiccaattiioonn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> FFuunnccttiioonnNNaammee || AArriittyy
+
+              Types:
+
+                 FunctionName = {atom(), Arity} | {ModuleName, FunctionName}
+                 Arity = integer()
+                 ModuleName = atom()
+
+              Returns the name of a called function. The result is a
+              representation of the name of the applied function _F_/_A, if _N_o_d_e
+              represents a function application "_<_e_m_>_F_<_/_e_m_>_(_<_e_m_>_X___1_<_/_e_m_>_, _._._._,
+              _<_e_m_>_X___A_<_/_e_m_>_)". If the function is not explicitly named (i.e., _F
+              is given by some expression), only the arity _A is returned.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed application expression.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__ffuunnccttiioonn__nnaammee//11.
+
+       aannaallyyzzee__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> pprreepprroocceessssoorr || {{aattoomm(()),,
+       aattoomm(())}}
+
+              Analyzes an attribute node. If _N_o_d_e represents a preprocessor
+              directive, the atom _p_r_e_p_r_o_c_e_s_s_o_r is returned. Otherwise, if _N_o_d_e
+              represents a module attribute "_-_<_e_m_>_N_a_m_e_<_/_e_m_>_._._.", a tuple
+              _{_N_a_m_e_, _I_n_f_o_} is returned, where _I_n_f_o depends on _N_a_m_e, as
+              follows:
+
+                _{_m_o_d_u_l_e_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___m_o_d_u_l_e___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+                _{_e_x_p_o_r_t_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___e_x_p_o_r_t___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+                _{_i_m_p_o_r_t_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___i_m_p_o_r_t___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+                _{_f_i_l_e_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___f_i_l_e___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+                _{_r_e_c_o_r_d_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___r_e_c_o_r_d___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+                _{_N_a_m_e_, _I_n_f_o_}:
+                  where _{_N_a_m_e_, _I_n_f_o_} _= _a_n_a_l_y_z_e___w_i_l_d___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed module attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__eexxppoorrtt__aattttrriibbuuttee//11, aannaallyyzzee__ffiillee__aattttrriibbuuttee//11,
+              aannaallyyzzee__iimmppoorrtt__aattttrriibbuuttee//11, aannaallyyzzee__mmoodduullee__aattttrriibbuuttee//11,
+              aannaallyyzzee__rreeccoorrdd__aattttrriibbuuttee//11, aannaallyyzzee__wwiilldd__aattttrriibbuuttee//11.
+
+       aannaallyyzzee__eexxppoorrtt__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> [[FFuunnccttiioonnNNaammee]]
+
+              Types:
+
+                 FunctionName = atom() | {atom(), integer()} | {ModuleName,
+                 FunctionName}
+                 ModuleName = atom()
+
+              Returns the list of function names declared by an export
+              attribute. We do not guarantee that each name occurs at most
+              once in the list. The order of listing is not defined.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed export attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11.
+
+       aannaallyyzzee__ffiillee__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{ssttrriinngg(()),, iinntteeggeerr(())}}
+
+              Returns the file name and line number of a _f_i_l_e attribute. The
+              result is the pair _{_F_i_l_e_, _L_i_n_e_} if _N_o_d_e represents "_-_f_i_l_e_(_F_i_l_e_,
+              _L_i_n_e_)_.".
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed _f_i_l_e attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11.
+
+       aannaallyyzzee__ffoorrmm((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, tteerrmm(())}} || aattoomm(())
+
+              Analyzes a "source code form" node. If _N_o_d_e is a "form" type
+              (cf. _e_r_l___s_y_n_t_a_x_:_i_s___f_o_r_m_/_1), the returned value is a tuple _{_T_y_p_e_,
+              _I_n_f_o_} where _T_y_p_e is the node type and _I_n_f_o depends on _T_y_p_e, as
+              follows:
+
+                _{_a_t_t_r_i_b_u_t_e_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___a_t_t_r_i_b_u_t_e_(_N_o_d_e_).
+
+                _{_e_r_r_o_r___m_a_r_k_e_r_, _I_n_f_o_}:
+                  where _I_n_f_o _= _e_r_l___s_y_n_t_a_x_:_e_r_r_o_r___m_a_r_k_e_r___i_n_f_o_(_N_o_d_e_).
+
+                _{_f_u_n_c_t_i_o_n_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___f_u_n_c_t_i_o_n_(_N_o_d_e_).
+
+                _{_r_u_l_e_, _I_n_f_o_}:
+                  where _I_n_f_o _= _a_n_a_l_y_z_e___r_u_l_e_(_N_o_d_e_).
+
+                _{_w_a_r_n_i_n_g___m_a_r_k_e_r_, _I_n_f_o_}:
+                  where _I_n_f_o _= _e_r_l___s_y_n_t_a_x_:_w_a_r_n_i_n_g___m_a_r_k_e_r___i_n_f_o_(_N_o_d_e_).
+
+              For other types of forms, only the node type is returned.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e is not well-formed.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11, aannaallyyzzee__ffuunnccttiioonn//11,
+              aannaallyyzzee__rruullee//11, eerrll__ssyynnttaaxx::eerrrroorr__mmaarrkkeerr__iinnffoo//11,
+              eerrll__ssyynnttaaxx::iiss__ffoorrmm//11, eerrll__ssyynnttaaxx::wwaarrnniinngg__mmaarrkkeerr__iinnffoo//11.
+
+       aannaallyyzzee__ffoorrmmss((FFoorrmmss)) -->> [[{{KKeeyy,, tteerrmm(())}}]]
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+                 Key = attributes | errors | exports | functions | imports |
+                 module | records | rules | warnings
+
+              Analyzes a sequence of "program forms". The given _F_o_r_m_s may be a
+              single syntax tree of type _f_o_r_m___l_i_s_t, or a list of "program
+              form" syntax trees. The returned value is a list of pairs _{_K_e_y_,
+              _I_n_f_o_}, where each value of _K_e_y occurs at most once in the list;
+              the absence of a particular key indicates that there is no well-
+              defined value for that key.
+
+              Each entry in the resulting list contains the following
+              corresponding information about the program forms:
+
+                _{_a_t_t_r_i_b_u_t_e_s_, _A_t_t_r_i_b_u_t_e_s_}:
+
+
+                  * _A_t_t_r_i_b_u_t_e_s _= _[_{_a_t_o_m_(_)_, _t_e_r_m_(_)_}_]
+
+                  _A_t_t_r_i_b_u_t_e_s is a list of pairs representing the names and
+                  corresponding values of all so-called "wild" attributes (as
+                  e.g. "_-_c_o_m_p_i_l_e_(_._._._)") occurring in _F_o_r_m_s (cf.
+                  _a_n_a_l_y_z_e___w_i_l_d___a_t_t_r_i_b_u_t_e_/_1). We do not guarantee that each
+                  name occurs at most once in the list. The order of listing
+                  is not defined.
+
+                _{_e_r_r_o_r_s_, _E_r_r_o_r_s_}:
+
+
+                  * _E_r_r_o_r_s _= _[_t_e_r_m_(_)_]
+
+                  _E_r_r_o_r_s is the list of error descriptors of all _e_r_r_o_r___m_a_r_k_e_r
+                  nodes that occur in _F_o_r_m_s. The order of listing is not
+                  defined.
+
+                _{_e_x_p_o_r_t_s_, _E_x_p_o_r_t_s_}:
+
+
+                  * _E_x_p_o_r_t_s _= _[_F_u_n_c_t_i_o_n_N_a_m_e_]
+
+                  * _F_u_n_c_t_i_o_n_N_a_m_e _= _a_t_o_m_(_) _| _{_a_t_o_m_(_)_, _i_n_t_e_g_e_r_(_)_} _| _{_M_o_d_u_l_e_N_a_m_e_,
+                    _F_u_n_c_t_i_o_n_N_a_m_e_}
+
+                  * _M_o_d_u_l_e_N_a_m_e _= _a_t_o_m_(_)
+
+                  _E_x_p_o_r_t_s is a list of representations of those function names
+                  that are listed by export declaration attributes in _F_o_r_m_s
+                  (cf. _a_n_a_l_y_z_e___e_x_p_o_r_t___a_t_t_r_i_b_u_t_e_/_1). We do not guarantee that
+                  each name occurs at most once in the list. The order of
+                  listing is not defined.
+
+                _{_f_u_n_c_t_i_o_n_s_, _F_u_n_c_t_i_o_n_s_}:
+
+
+                  * _F_u_n_c_t_i_o_n_s _= _[_{_a_t_o_m_(_)_, _i_n_t_e_g_e_r_(_)_}_]
+
+                  _F_u_n_c_t_i_o_n_s is a list of the names of the functions that are
+                  defined in _F_o_r_m_s (cf. _a_n_a_l_y_z_e___f_u_n_c_t_i_o_n_/_1). We do not
+                  guarantee that each name occurs at most once in the list.
+                  The order of listing is not defined.
+
+                _{_i_m_p_o_r_t_s_, _I_m_p_o_r_t_s_}:
+
+
+                  * _I_m_p_o_r_t_s _= _[_{_M_o_d_u_l_e_, _N_a_m_e_s_}_]
+
+                  * _M_o_d_u_l_e _= _a_t_o_m_(_)
+
+                  * _N_a_m_e_s _= _[_F_u_n_c_t_i_o_n_N_a_m_e_]
+
+                  * _F_u_n_c_t_i_o_n_N_a_m_e _= _a_t_o_m_(_) _| _{_a_t_o_m_(_)_, _i_n_t_e_g_e_r_(_)_} _| _{_M_o_d_u_l_e_N_a_m_e_,
+                    _F_u_n_c_t_i_o_n_N_a_m_e_}
+
+                  * _M_o_d_u_l_e_N_a_m_e _= _a_t_o_m_(_)
+
+                  _I_m_p_o_r_t_s is a list of pairs representing those module names
+                  and corresponding function names that are listed by import
+                  declaration attributes in _F_o_r_m_s (cf.
+                  _a_n_a_l_y_z_e___i_m_p_o_r_t___a_t_t_r_i_b_u_t_e_/_1), where each _M_o_d_u_l_e occurs at
+                  most once in _I_m_p_o_r_t_s. We do not guarantee that each name
+                  occurs at most once in the lists of function names. The
+                  order of listing is not defined.
+
+                _{_m_o_d_u_l_e_, _M_o_d_u_l_e_N_a_m_e_}:
+
+
+                  * _M_o_d_u_l_e_N_a_m_e _= _a_t_o_m_(_)
+
+                  _M_o_d_u_l_e_N_a_m_e is the name declared by a module attribute in
+                  _F_o_r_m_s. If no module name is defined in _F_o_r_m_s, the result
+                  will contain no entry for the _m_o_d_u_l_e key. If multiple module
+                  name declarations should occur, all but the first will be
+                  ignored.
+
+                _{_r_e_c_o_r_d_s_, _R_e_c_o_r_d_s_}:
+
+
+                  * _R_e_c_o_r_d_s _= _[_{_a_t_o_m_(_)_, _F_i_e_l_d_s_}_]
+
+                  * _F_i_e_l_d_s _= _[_{_a_t_o_m_(_)_, _D_e_f_a_u_l_t_}_]
+
+                  * _D_e_f_a_u_l_t _= _n_o_n_e _| _s_y_n_t_a_x_T_r_e_e_(_)
+
+                  _R_e_c_o_r_d_s is a list of pairs representing the names and
+                  corresponding field declarations of all record declaration
+                  attributes occurring in _F_o_r_m_s. For fields declared without a
+                  default value, the corresponding value for _D_e_f_a_u_l_t is the
+                  atom _n_o_n_e (cf. _a_n_a_l_y_z_e___r_e_c_o_r_d___a_t_t_r_i_b_u_t_e_/_1). We do not
+                  guarantee that each record name occurs at most once in the
+                  list. The order of listing is not defined.
+
+                _{_r_u_l_e_s_, _R_u_l_e_s_}:
+
+
+                  * _R_u_l_e_s _= _[_{_a_t_o_m_(_)_, _i_n_t_e_g_e_r_(_)_}_]
+
+                  _R_u_l_e_s is a list of the names of the rules that are defined
+                  in _F_o_r_m_s (cf. _a_n_a_l_y_z_e___r_u_l_e_/_1). We do not guarantee that each
+                  name occurs at most once in the list. The order of listing
+                  is not defined.
+
+                _{_w_a_r_n_i_n_g_s_, _W_a_r_n_i_n_g_s_}:
+
+
+                  * _W_a_r_n_i_n_g_s _= _[_t_e_r_m_(_)_]
+
+                  _W_a_r_n_i_n_g_s is the list of error descriptors of all
+                  _w_a_r_n_i_n_g___m_a_r_k_e_r nodes that occur in _F_o_r_m_s. The order of
+                  listing is not defined.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if an ill-formed Erlang
+              construct is encountered.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__eexxppoorrtt__aattttrriibbuuttee//11, aannaallyyzzee__ffuunnccttiioonn//11,
+              aannaallyyzzee__iimmppoorrtt__aattttrriibbuuttee//11, aannaallyyzzee__rreeccoorrdd__aattttrriibbuuttee//11,
+              aannaallyyzzee__rruullee//11, aannaallyyzzee__wwiilldd__aattttrriibbuuttee//11,
+              eerrll__ssyynnttaaxx::eerrrroorr__mmaarrkkeerr__iinnffoo//11,
+              eerrll__ssyynnttaaxx::wwaarrnniinngg__mmaarrkkeerr__iinnffoo//11.
+
+       aannaallyyzzee__ffuunnccttiioonn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, iinntteeggeerr(())}}
+
+              Returns the name and arity of a function definition. The result
+              is a pair _{_N_a_m_e_, _A_} if _N_o_d_e represents a function definition
+              "_N_a_m_e_(_<_e_m_>_P___1_<_/_e_m_>_, _._._._, _<_e_m_>_P___A_<_/_e_m_>_) _-_> _._._.".
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed function definition.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__rruullee//11.
+
+       aannaallyyzzee__ffuunnccttiioonn__nnaammee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> FFuunnccttiioonnNNaammee
+
+              Types:
+
+                 FunctionName = atom() | {atom(), integer()} | {ModuleName,
+                 FunctionName}
+                 ModuleName = atom()
+
+              Returns the function name represented by a syntax tree. If _N_o_d_e
+              represents a function name, such as "_f_o_o_/_1" or "_b_l_o_g_g_s_:_f_r_e_d_/_2",
+              a uniform representation of that name is returned. Different
+              nestings of arity and module name qualifiers in the syntax tree
+              does not affect the result.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed function name.
+
+       aannaallyyzzee__iimmpplliicciitt__ffuunn((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> FFuunnccttiioonnNNaammee
+
+              Types:
+
+                 FunctionName = atom() | {atom(), integer()} | {ModuleName,
+                 FunctionName}
+                 ModuleName = atom()
+
+              Returns the name of an implicit fun expression "_f_u_n _<_e_m_>_F_<_/_e_m_>".
+              The result is a representation of the function name _F. (Cf.
+              _a_n_a_l_y_z_e___f_u_n_c_t_i_o_n___n_a_m_e_/_1.)
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed implicit fun.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__ffuunnccttiioonn__nnaammee//11.
+
+       aannaallyyzzee__iimmppoorrtt__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),,
+       [[FFuunnccttiioonnNNaammee]]}} || aattoomm(())
+
+              Types:
+
+                 FunctionName = atom() | {atom(), integer()} | {ModuleName,
+                 FunctionName}
+                 ModuleName = atom()
+
+              Returns the module name and (if present) list of function names
+              declared by an import attribute. The returned value is an atom
+              _M_o_d_u_l_e or a pair _{_M_o_d_u_l_e_, _N_a_m_e_s_}, where _N_a_m_e_s is a list of
+              function names declared as imported from the module named by
+              _M_o_d_u_l_e. We do not guarantee that each name occurs at most once
+              in _N_a_m_e_s. The order of listing is not defined.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed import attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11.
+
+       aannaallyyzzee__mmoodduullee__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> NNaammee::::aattoomm(()) ||
+       {{NNaammee::::aattoomm(()),, VVaarriiaabblleess::::[[aattoomm(())]]}}
+
+              Returns the module name and possible parameters declared by a
+              module attribute. If the attribute is a plain module declaration
+              such as _-_m_o_d_u_l_e_(_n_a_m_e_), the result is the module name. If the
+              attribute is a parameterized module declaration, the result is a
+              tuple containing the module name and a list of the parameter
+              variable names.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed module attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11.
+
+       aannaallyyzzee__rreeccoorrdd__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, FFiieellddss}}
+
+              Types:
+
+                 Fields = [{atom(), none | syntaxTree()}]
+
+              Returns the name and the list of fields of a record declaration
+              attribute. The result is a pair _{_N_a_m_e_, _F_i_e_l_d_s_}, if _N_o_d_e
+              represents "_-_r_e_c_o_r_d_(_N_a_m_e_, _{_._._._}_)_.", where _F_i_e_l_d_s is a list of
+              pairs _{_L_a_b_e_l_, _D_e_f_a_u_l_t_} for each field "_L_a_b_e_l" or "_L_a_b_e_l _=
+              _<_e_m_>_D_e_f_a_u_l_t_<_/_e_m_>" in the declaration, listed in left-to-right
+              order. If the field has no default-value declaration, the value
+              for _D_e_f_a_u_l_t will be the atom _n_o_n_e. We do not guarantee that each
+              label occurs at most one in the list.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed record declaration attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11, aannaallyyzzee__rreeccoorrdd__ffiieelldd//11.
+
+       aannaallyyzzee__rreeccoorrdd__eexxpprr((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, IInnffoo}} || aattoomm(())
+
+              Types:
+
+                 Info = {atom(), [{atom(), Value}]} | {atom(), atom()} |
+                 atom()
+                 Value = none | syntaxTree()
+
+              Returns the record name and field name/names of a record
+              expression. If _N_o_d_e has type _r_e_c_o_r_d___e_x_p_r, _r_e_c_o_r_d___i_n_d_e_x___e_x_p_r or
+              _r_e_c_o_r_d___a_c_c_e_s_s, a pair _{_T_y_p_e_, _I_n_f_o_} is returned, otherwise an
+              atom _T_y_p_e is returned. _T_y_p_e is the node type of _N_o_d_e, and _I_n_f_o
+              depends on _T_y_p_e, as follows:
+
+                _r_e_c_o_r_d___e_x_p_r::
+                  _{_a_t_o_m_(_)_, _[_{_a_t_o_m_(_)_, _V_a_l_u_e_}_]_}
+
+                _r_e_c_o_r_d___a_c_c_e_s_s::
+                  _{_a_t_o_m_(_)_, _a_t_o_m_(_)_} _| _a_t_o_m_(_)
+
+                _r_e_c_o_r_d___i_n_d_e_x___e_x_p_r::
+                  _{_a_t_o_m_(_)_, _a_t_o_m_(_)_}
+
+              For a _r_e_c_o_r_d___e_x_p_r node, _I_n_f_o represents the record name and the
+              list of descriptors for the involved fields, listed in the order
+              they appear. (See _a_n_a_l_y_z_e___r_e_c_o_r_d___f_i_e_l_d_/_1 for details on the
+              field descriptors). For a _r_e_c_o_r_d___a_c_c_e_s_s node, _I_n_f_o represents
+              the record name and the field name (or if the record name is not
+              included, only the field name; this is allowed only in
+              Mnemosyne-query syntax). For a _r_e_c_o_r_d___i_n_d_e_x___e_x_p_r node, _I_n_f_o
+              represents the record name and the name field name.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e represents a record
+              expression that is not well-formed.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__rreeccoorrdd__aattttrriibbuuttee//11, aannaallyyzzee__rreeccoorrdd__ffiieelldd//11.
+
+       aannaallyyzzee__rreeccoorrdd__ffiieelldd((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, VVaalluuee}}
+
+              Types:
+
+                 Value = none | syntaxTree()
+
+              Returns the label and value-expression of a record field
+              specifier. The result is a pair _{_L_a_b_e_l_, _V_a_l_u_e_}, if _N_o_d_e
+              represents "_L_a_b_e_l _= _<_e_m_>_V_a_l_u_e_<_/_e_m_>" or "_L_a_b_e_l", where in the
+              first case, _V_a_l_u_e is a syntax tree, and in the second case _V_a_l_u_e
+              is _n_o_n_e.
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed record field specifier.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__rreeccoorrdd__aattttrriibbuuttee//11, aannaallyyzzee__rreeccoorrdd__eexxpprr//11.
+
+       aannaallyyzzee__rruullee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, iinntteeggeerr(())}}
+
+              Returns the name and arity of a Mnemosyne rule. The result is a
+              pair _{_N_a_m_e_, _A_} if _N_o_d_e represents a rule "_N_a_m_e_(_<_e_m_>_P___1_<_/_e_m_>_,
+              _._._._, _<_e_m_>_P___A_<_/_e_m_>_) _:_- _._._.".
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed Mnemosyne rule.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__ffuunnccttiioonn//11.
+
+       aannaallyyzzee__wwiilldd__aattttrriibbuuttee((NNooddee::::ssyynnttaaxxTTrreeee(()))) -->> {{aattoomm(()),, tteerrmm(())}}
+
+              Returns the name and value of a "wild" attribute. The result is
+              the pair _{_N_a_m_e_, _V_a_l_u_e_}, if _N_o_d_e represents "_-_N_a_m_e_(_V_a_l_u_e_)".
+
+              Note that no checking is done whether _N_a_m_e is a reserved
+              attribute name such as _m_o_d_u_l_e or _e_x_p_o_r_t: it is assumed that the
+              attribute is "wild".
+
+              The evaluation throws _s_y_n_t_a_x___e_r_r_o_r if _N_o_d_e does not represent a
+              well-formed wild attribute.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__aattttrriibbuuttee//11.
+
+       aannnnoottaattee__bbiinnddiinnggss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Adds or updates annotations on nodes in a syntax tree.
+              Equivalent to _a_n_n_o_t_a_t_e___b_i_n_d_i_n_g_s_(_T_r_e_e_, _B_i_n_d_i_n_g_s_) where the top-
+              level environment _B_i_n_d_i_n_g_s is taken from the annotation _{_e_n_v_,
+              _B_i_n_d_i_n_g_s_} on the root node of _T_r_e_e. An exception is thrown if no
+              such annotation should exist.
+
+              _S_e_e _a_l_s_o_: aannnnoottaattee__bbiinnddiinnggss//22.
+
+       aannnnoottaattee__bbiinnddiinnggss((TTrreeee::::ssyynnttaaxxTTrreeee(()),, BBiinnddiinnggss::::oorrddsseett((aattoomm(()))))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Adds or updates annotations on nodes in a syntax tree. _B_i_n_d_i_n_g_s
+              specifies the set of bound variables in the environment of the
+              top level node. The following annotations are affected:
+
+                * _{_e_n_v_, _V_a_r_s_}, representing the input environment of the
+                  subtree.
+
+                * _{_b_o_u_n_d_, _V_a_r_s_}, representing the variables that are bound in
+                  the subtree.
+
+                * _{_f_r_e_e_, _V_a_r_s_}, representing the free variables in the
+                  subtree.
+
+              _B_i_n_d_i_n_g_s and _V_a_r_s are ordered-set lists (cf. module _o_r_d_s_e_t_s) of
+              atoms representing variable names.
+
+              _S_e_e _a_l_s_o_: oorrddsseettss((33)), aannnnoottaattee__bbiinnddiinnggss//11.
+
+       ffoolldd((FF::::FFuunnccttiioonn,, SSttaarrtt::::tteerrmm(()),, TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              Types:
+
+                 Function = (syntaxTree(), term()) -> term()
+
+              Folds a function over all nodes of a syntax tree. The result is
+              the value of _F_u_n_c_t_i_o_n_(_X_1_, _F_u_n_c_t_i_o_n_(_X_2_, _._._. _F_u_n_c_t_i_o_n_(_X_n_, _S_t_a_r_t_)
+              _._._. _)_), where _[_X_1_, _X_2_, _._._._, _X_n_] are the nodes of _T_r_e_e in a post-
+              order traversal.
+
+              _S_e_e _a_l_s_o_: ffoolldd__ssuubbttrreeeess//33, ffoollddll__lliissttlliisstt//33.
+
+       ffoolldd__ssuubbttrreeeess((FF::::FFuunnccttiioonn,, SSttaarrtt::::tteerrmm(()),, TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> tteerrmm(())
+
+              Types:
+
+                 Function = (syntaxTree(), term()) -> term()
+
+              Folds a function over the immediate subtrees of a syntax tree.
+              This is similar to _f_o_l_d_/_3, but only on the immediate subtrees of
+              _T_r_e_e, in left-to-right order; it does not include the root node
+              of _T_r_e_e.
+
+              _S_e_e _a_l_s_o_: ffoolldd//33.
+
+       ffoollddll__lliissttlliisstt((FF::::FFuunnccttiioonn,, SSttaarrtt::::tteerrmm(()),, LLss::::[[[[tteerrmm(())]]]])) -->> tteerrmm(())
+
+              Types:
+
+                 Function = (term(), term()) -> term()
+
+              Like _l_i_s_t_s_:_f_o_l_d_l_/_3, but over a list of lists.
+
+              _S_e_e _a_l_s_o_: lliissttss::ffoollddll//33, ffoolldd//33.
+
+       ffuunnccttiioonn__nnaammee__eexxppaannssiioonnss((NNaammeess::::[[NNaammee]])) -->> [[{{SShhoorrttNNaammee,, NNaammee}}]]
+
+              Types:
+
+                 Name = ShortName | {atom(), Name}
+                 ShortName = atom() | {atom(), integer()}
+
+              Creates a mapping from corresponding short names to full
+              function names. Names are represented by nested tuples of atoms
+              and integers (cf. _a_n_a_l_y_z_e___f_u_n_c_t_i_o_n___n_a_m_e_/_1). The result is a list
+              containing a pair _{_S_h_o_r_t_N_a_m_e_, _N_a_m_e_} for each element _N_a_m_e in the
+              given list, where the corresponding _S_h_o_r_t_N_a_m_e is the rightmost-
+              innermost part of _N_a_m_e. The list thus represents a finite
+              mapping from unqualified names to the corresponding qualified
+              names.
+
+              Note: the resulting list can contain more than one tuple
+              _{_S_h_o_r_t_N_a_m_e_, _N_a_m_e_} for the same _S_h_o_r_t_N_a_m_e, possibly with
+              different values for _N_a_m_e, depending on the given list.
+
+              _S_e_e _a_l_s_o_: aannaallyyzzee__ffuunnccttiioonn__nnaammee//11.
+
+       iiss__ffaaiill__eexxpprr((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _T_r_e_e represents an expression which never
+              terminates normally. Note that the reverse does not apply.
+              Currently, the detected cases are calls to _e_x_i_t_/_1, _t_h_r_o_w_/_1,
+              _e_r_l_a_n_g_:_e_r_r_o_r_/_1 and _e_r_l_a_n_g_:_e_r_r_o_r_/_2.
+
+              _S_e_e _a_l_s_o_: eerrllaanngg::eerrrroorr//11, eerrllaanngg::eerrrroorr//22, eerrllaanngg::eexxiitt//11,
+              eerrllaanngg::tthhrrooww//11.
+
+       lliimmiitt((TTrreeee,, DDeepptthh)) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to _l_i_m_i_t_(_T_r_e_e_, _D_e_p_t_h_, _T_e_x_t_) using the text _"_._._._" as
+              default replacement.
+
+              _S_e_e _a_l_s_o_: lliimmiitt//33, eerrll__ssyynnttaaxx::tteexxtt//11.
+
+       lliimmiitt((TTrreeee::::ssyynnttaaxxTTrreeee(()),, DDeepptthh::::iinntteeggeerr(()),, NNooddee::::ssyynnttaaxxTTrreeee(()))) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Limits a syntax tree to a specified depth. Replaces all non-leaf
+              subtrees in _T_r_e_e at the given _D_e_p_t_h by _N_o_d_e. If _D_e_p_t_h is
+              negative, the result is always _N_o_d_e, even if _T_r_e_e has no
+              subtrees.
+
+              When a group of subtrees (as e.g., the argument list of an
+              _a_p_p_l_i_c_a_t_i_o_n node) is at the specified depth, and there are two
+              or more subtrees in the group, these will be collectively
+              replaced by _N_o_d_e even if they are leaf nodes. Groups of subtrees
+              that are above the specified depth will be limited in size, as
+              if each subsequent tree in the group were one level deeper than
+              the previous. E.g., if _T_r_e_e represents a list of integers "_[_1_,
+              _2_, _3_, _4_, _5_, _6_, _7_, _8_, _9_, _1_0_]", the result of _l_i_m_i_t_(_T_r_e_e_, _5_) will
+              represent _[_1_, _2_, _3_, _4_, _._._._].
+
+              The resulting syntax tree is typically only useful for pretty-
+              printing or similar visual formatting.
+
+              _S_e_e _a_l_s_o_: lliimmiitt//22.
+
+       mmaapp((FF::::FFuunnccttiioonn,, TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Types:
+
+                 Function = (syntaxTree()) -> syntaxTree()
+
+              Applies a function to each node of a syntax tree. The result of
+              each application replaces the corresponding original node. The
+              order of traversal is bottom-up.
+
+              _S_e_e _a_l_s_o_: mmaapp__ssuubbttrreeeess//22.
+
+       mmaapp__ssuubbttrreeeess((FF::::FFuunnccttiioonn,, TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Types:
+
+                 Function = (Tree) -> Tree1
+
+              Applies a function to each immediate subtree of a syntax tree.
+              The result of each application replaces the corresponding
+              original node.
+
+              _S_e_e _a_l_s_o_: mmaapp//22.
+
+       mmaappffoolldd((FF::::FFuunnccttiioonn,, SSttaarrtt::::tteerrmm(()),, TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->>
+       {{ssyynnttaaxxTTrreeee(()),, tteerrmm(())}}
+
+              Types:
+
+                 Function = (syntaxTree(), term()) -> {syntaxTree(), term()}
+
+              Combines map and fold in a single operation. This is similar to
+              _m_a_p_/_2, but also propagates an extra value from each application
+              of the _F_u_n_c_t_i_o_n to the next, while doing a post-order traversal
+              of the tree like _f_o_l_d_/_3. The value _S_t_a_r_t is passed to the first
+              function application, and the final result is the result of the
+              last application.
+
+              _S_e_e _a_l_s_o_: ffoolldd//33, mmaapp//22.
+
+       mmaappffoolldd__ssuubbttrreeeess((FF::::FFuunnccttiioonn,, SSttaarrtt::::tteerrmm(()),, TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->>
+       {{ssyynnttaaxxTTrreeee(()),, tteerrmm(())}}
+
+              Types:
+
+                 Function = (syntaxTree(), term()) -> {syntaxTree(), term()}
+
+              Does a mapfold operation over the immediate subtrees of a syntax
+              tree. This is similar to _m_a_p_f_o_l_d_/_3, but only on the immediate
+              subtrees of _T_r_e_e, in left-to-right order; it does not include
+              the root node of _T_r_e_e.
+
+              _S_e_e _a_l_s_o_: mmaappffoolldd//33.
+
+       mmaappffoollddll__lliissttlliisstt((FF::::FFuunnccttiioonn,, SS::::SSttaattee,, LLss::::[[[[tteerrmm(())]]]])) -->>
+       {{[[[[tteerrmm(())]]]],, tteerrmm(())}}
+
+              Types:
+
+                 Function = (term(), term()) -> {term(), term()}
+
+              Like _l_i_s_t_s_:_m_a_p_f_o_l_d_l_/_3, but over a list of lists. The list of
+              lists in the result has the same structure as the given list of
+              lists.
+
+       nneeww__vvaarriiaabbllee__nnaammee((UUsseedd::::sseett((aattoomm(()))))) -->> aattoomm(())
+
+              Returns an atom which is not already in the set _U_s_e_d. This is
+              equivalent to _n_e_w___v_a_r_i_a_b_l_e___n_a_m_e_(_F_u_n_c_t_i_o_n_, _U_s_e_d_), where _F_u_n_c_t_i_o_n
+              maps a given integer _N to the atom whose name consists of "_V"
+              followed by the numeral for _N.
+
+              _S_e_e _a_l_s_o_: nneeww__vvaarriiaabbllee__nnaammee//22.
+
+       nneeww__vvaarriiaabbllee__nnaammee((FF::::FFuunnccttiioonn,, UUsseedd::::sseett((aattoomm(()))))) -->> aattoomm(())
+
+              Types:
+
+                 Function = (integer()) -> atom()
+
+              Returns a user-named atom which is not already in the set _U_s_e_d.
+              The atom is generated by applying the given _F_u_n_c_t_i_o_n to a
+              generated integer. Integers are generated using an algorithm
+              which tries to keep the names randomly distributed within a
+              reasonably small range relative to the number of elements in the
+              set.
+
+              This function uses the module _r_a_n_d_o_m to generate new keys. The
+              seed it uses may be initialized by calling _r_a_n_d_o_m_:_s_e_e_d_/_0 or
+              _r_a_n_d_o_m_:_s_e_e_d_/_3 before this function is first called.
+
+              _S_e_e _a_l_s_o_: rraannddoomm((33)), sseettss((33)), nneeww__vvaarriiaabbllee__nnaammee//11.
+
+       nneeww__vvaarriiaabbllee__nnaammeess((NN::::iinntteeggeerr(()),, UUsseedd::::sseett((aattoomm(()))))) -->> [[aattoomm(())]]
+
+              Like _n_e_w___v_a_r_i_a_b_l_e___n_a_m_e_/_1, but generates a list of _N new names.
+
+              _S_e_e _a_l_s_o_: nneeww__vvaarriiaabbllee__nnaammee//11.
+
+       nneeww__vvaarriiaabbllee__nnaammeess((NN::::iinntteeggeerr(()),, FF::::FFuunnccttiioonn,, UUsseedd::::sseett((aattoomm(()))))) -->>
+       [[aattoomm(())]]
+
+              Types:
+
+                 Function = (integer()) -> atom()
+
+              Like _n_e_w___v_a_r_i_a_b_l_e___n_a_m_e_/_2, but generates a list of _N new names.
+
+              _S_e_e _a_l_s_o_: nneeww__vvaarriiaabbllee__nnaammee//22.
+
+       ssttrriipp__ccoommmmeennttss((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Removes all comments from all nodes of a syntax tree. All other
+              attributes (such as position information) remain unchanged.
+              Standalone comments in form lists are removed; any other
+              standalone comments are changed into null-comments (no text, no
+              indentation).
+
+       ttoo__ccoommmmeenntt((TTrreeee)) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to ttoo__ccoommmmeenntt((TTrreeee,, ""%% "")).
+
+       ttoo__ccoommmmeenntt((TTrreeee::::ssyynnttaaxxTTrreeee(()),, PPrreeffiixx::::ssttrriinngg(()))) -->> ssyynnttaaxxTTrreeee(())
+
+              Equivalent to _t_o___c_o_m_m_e_n_t_(_T_r_e_e_, _P_r_e_f_i_x_, _F_) for a default
+              formatting function _F. The default _F simply calls
+              _e_r_l___p_r_e_t_t_y_p_r_:_f_o_r_m_a_t_/_1.
+
+              _S_e_e _a_l_s_o_: ttoo__ccoommmmeenntt//33, eerrll__pprreettttyypprr::ffoorrmmaatt//11.
+
+       ttoo__ccoommmmeenntt((TTrreeee::::ssyynnttaaxxTTrreeee(()),, PPrreeffiixx::::ssttrriinngg(()),, FF::::PPrriinntteerr)) -->>
+       ssyynnttaaxxTTrreeee(())
+
+              Types:
+
+                 Printer = (syntaxTree()) -> string()
+
+              Transforms a syntax tree into an abstract comment. The lines of
+              the comment contain the text for _N_o_d_e, as produced by the given
+              _P_r_i_n_t_e_r function. Each line of the comment is prefixed by the
+              string _P_r_e_f_i_x (this does not include the initial "_%" character
+              of the comment line).
+
+              For example, the result of
+              _t_o___c_o_m_m_e_n_t_(_e_r_l___s_y_n_t_a_x_:_a_b_s_t_r_a_c_t_(_[_a_,_b_,_c_]_)_) represents
+
+                        %% [a,b,c]
+
+              (cf. _t_o___c_o_m_m_e_n_t_/_1).
+
+              Note: the text returned by the formatting function will be split
+              automatically into separate comment lines at each line break. No
+              extra work is needed.
+
+              _S_e_e _a_l_s_o_: ttoo__ccoommmmeenntt//11, ttoo__ccoommmmeenntt//22.
+
+       vvaarriiaabblleess((TTrreeee::::ssyynnttaaxxTTrreeee(()))) -->> sseett((aattoomm(())))
+
+              Types:
+
+                 set(T) (see module //stdlib/sets)
+
+              Returns the names of variables occurring in a syntax tree, The
+              result is a set of variable names represented by atoms. Macro
+              names are not included.
+
+              _S_e_e _a_l_s_o_: sseettss((33)).
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                              syntax_tools 1.6.9             erl_syntax_lib(3)

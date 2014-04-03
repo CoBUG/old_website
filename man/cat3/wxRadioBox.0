@@ -1,0 +1,266 @@
+wxRadioBox(3)              Erlang Module Definition              wxRadioBox(3)
+
+
+
+NNAAMMEE
+       wxRadioBox - See external documentation: wxRadioBox.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxRadioBox.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_R_a_d_i_o_B_o_x_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee,, PPooss,, SSiizzee,, CChhooiicceess)) -->> wwxxRRaaddiiooBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+                 Choices = [chardata() (see module unicode)]
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, TTiittllee,, PPooss,, SSiizzee,, CChhooiicceess,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee,, PPooss,, SSiizzee,, CChhooiicceess,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxxRRaaddiiooBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+                 Choices = [chardata() (see module unicode)]
+                 Option = {majorDim, integer()} | {style, integer()} | {val,
+                 wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, PPooss,, SSiizzee,, CChhooiicceess)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+                 Choices = [chardata() (see module unicode)]
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, PPooss,, SSiizzee,,
+              CChhooiicceess,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, PPooss,, SSiizzee,, CChhooiicceess,, OOppttiioonn::::[[OOppttiioonn]]))
+       -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Pos = {X::integer(), Y::integer()}
+                 Size = {W::integer(), H::integer()}
+                 Choices = [chardata() (see module unicode)]
+                 Option = {majorDim, integer()} | {style, integer()} | {val,
+                 wx_object() (see module wx)}
+
+              See external documentation.
+
+       eennaabbllee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+
+              Equivalent to eennaabbllee((TThhiiss,, [[]])).
+
+       eennaabbllee((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+              Also:
+              enable(This, [Option]) -> boolean() when
+              This::wxRadioBox(),
+              Option :: {enable, boolean()}.
+
+
+       eennaabbllee((TThhiiss,, NN,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxRadioBox()
+
+              See external documentation.
+
+       ggeettSSttrriinngg((TThhiiss,, NN)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+
+       sshhooww((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+
+              Equivalent to sshhooww((TThhiiss,, [[]])).
+
+       sshhooww((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+              Also:
+              show(This, [Option]) -> boolean() when
+              This::wxRadioBox(),
+              Option :: {show, boolean()}.
+
+
+       sshhooww((TThhiiss,, NN,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+                 Option = {show, boolean()}
+
+              See external documentation.
+
+       ggeettCCoolluummnnCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxRadioBox()
+
+              See external documentation.
+
+       ggeettIItteemmHHeellppTTeexxtt((TThhiiss,, NN)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+
+       ggeettIItteemmTToooollTTiipp((TThhiiss,, IItteemm)) -->> wwxxTToooollTTiipp(()) ((sseeee mmoodduullee wwxxTToooollTTiipp))
+
+              Types:
+
+                 This = wxRadioBox()
+                 Item = integer()
+
+              See external documentation.
+
+       ggeettIItteemmFFrroommPPooiinntt((TThhiiss,, PPtt)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ggeettRRoowwCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxRadioBox()
+
+              See external documentation.
+
+       iissIItteemmEEnnaabblleedd((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+
+       iissIItteemmSShhoowwnn((TThhiiss,, NN)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+
+              See external documentation.
+
+       sseettIItteemmHHeellppTTeexxtt((TThhiiss,, NN,, HHeellppTTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxRadioBox()
+                 N = integer()
+                 HelpText = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettIItteemmTToooollTTiipp((TThhiiss,, IItteemm,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxRadioBox()
+                 Item = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxRRaaddiiooBBooxx(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxRadioBox(3)

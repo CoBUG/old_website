@@ -1,0 +1,742 @@
+gen_fsm(3)                 Erlang Module Definition                 gen_fsm(3)
+
+
+
+NNAAMMEE
+       gen_fsm - Generic Finite State Machine Behaviour
+
+DDEESSCCRRIIPPTTIIOONN
+       A behaviour module for implementing a finite state machine. A generic
+       finite state machine process (gen_fsm) implemented using this module
+       will have a standard set of interface functions and include
+       functionality for tracing and error reporting. It will also fit into an
+       OTP supervision tree. Refer to OOTTPP DDeessiiggnn PPrriinncciipplleess for more
+       information.
+
+       A gen_fsm assumes all specific parts to be located in a callback module
+       exporting a pre-defined set of functions. The relationship between the
+       behaviour functions and the callback functions can be illustrated as
+       follows:
+
+       gen_fsm module                    Callback module
+       --------------                    ---------------
+       gen_fsm:start_link                -----> Module:init/1
+
+       gen_fsm:send_event                -----> Module:StateName/2
+
+       gen_fsm:send_all_state_event      -----> Module:handle_event/3
+
+       gen_fsm:sync_send_event           -----> Module:StateName/3
+
+       gen_fsm:sync_send_all_state_event -----> Module:handle_sync_event/4
+
+       -                                 -----> Module:handle_info/3
+
+       -                                 -----> Module:terminate/3
+
+       -                                 -----> Module:code_change/4
+
+       If a callback function fails or returns a bad value, the gen_fsm will
+       terminate.
+
+       A gen_fsm handles system messages as documented in ssyyss((33)). The _s_y_s
+       module can be used for debugging a gen_fsm.
+
+       Note that a gen_fsm does not trap exit signals automatically, this must
+       be explicitly initiated in the callback module.
+
+       Unless otherwise stated, all functions in this module fail if the
+       specified gen_fsm does not exist or if bad arguments are given.
+
+       The gen_fsm process can go into hibernation (see eerrllaanngg((33))) if a
+       callback function specifies _'_h_i_b_e_r_n_a_t_e_' instead of a timeout value.
+       This might be useful if the server is expected to be idle for a long
+       time. However this feature should be used with care as hibernation
+       implies at least two garbage collections (when hibernating and shortly
+       after waking up) and is not something you'd want to do between each
+       call to a busy state machine.
+
+EEXXPPOORRTTSS
+       ssttaarrtt__lliinnkk((MMoodduullee,, AArrggss,, OOppttiioonnss)) -->> RReessuulltt
+       ssttaarrtt__lliinnkk((FFssmmNNaammee,, MMoodduullee,, AArrggss,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 FsmName = {local,Name} | {global,GlobalName} |
+                 {via,Module,ViaName}
+                  Name = atom()
+                  GlobalName = ViaName = term()
+                 Module = atom()
+                 Args = term()
+                 Options = [Option]
+                  Option = {debug,Dbgs} | {timeout,Time} | {spawn_opt,SOpts}
+                  Dbgs = [Dbg]
+                  Dbg = trace | log | statistics
+                  | {log_to_file,FileName} | {install,{Func,FuncState}}
+                  SOpts = [SOpt]
+                  SOpt - see erlang:spawn_opt/2,3,4,5
+                 Result = {ok,Pid} | ignore | {error,Error}
+                  Pid = pid()
+                  Error = {already_started,Pid} | term()
+
+              Creates a gen_fsm process as part of a supervision tree. The
+              function should be called, directly or indirectly, by the
+              supervisor. It will, among other things, ensure that the gen_fsm
+              is linked to the supervisor.
+
+              The gen_fsm process calls _M_o_d_u_l_e_:_i_n_i_t_/_1 to initialize. To ensure
+              a synchronized start-up procedure, _s_t_a_r_t___l_i_n_k_/_3_,_4 does not
+              return until _M_o_d_u_l_e_:_i_n_i_t_/_1 has returned.
+
+              If _F_s_m_N_a_m_e_=_{_l_o_c_a_l_,_N_a_m_e_}, the gen_fsm is registered locally as
+              _N_a_m_e using _r_e_g_i_s_t_e_r_/_2. If _F_s_m_N_a_m_e_=_{_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_}, the
+              gen_fsm is registered globally as _G_l_o_b_a_l_N_a_m_e using
+              _g_l_o_b_a_l_:_r_e_g_i_s_t_e_r___n_a_m_e_/_2. If _E_v_e_n_t_M_g_r_N_a_m_e_=_{_v_i_a_,_M_o_d_u_l_e_,_V_i_a_N_a_m_e_},
+              the event manager will register with the registry represented by
+              _M_o_d_u_l_e. The _M_o_d_u_l_e callback should export the functions
+              _r_e_g_i_s_t_e_r___n_a_m_e_/_2, _u_n_r_e_g_i_s_t_e_r___n_a_m_e_/_1, _w_h_e_r_e_i_s___n_a_m_e_/_1 and _s_e_n_d_/_2,
+              which should behave like the corresponding functions in _g_l_o_b_a_l.
+              Thus, _{_v_i_a_,_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_} is a valid reference.
+
+              If no name is provided, the gen_fsm is not registered.
+
+              _M_o_d_u_l_e is the name of the callback module.
+
+              _A_r_g_s is an arbitrary term which is passed as the argument to
+              _M_o_d_u_l_e_:_i_n_i_t_/_1.
+
+              If the option _{_t_i_m_e_o_u_t_,_T_i_m_e_} is present, the gen_fsm is allowed
+              to spend _T_i_m_e milliseconds initializing or it will be terminated
+              and the start function will return _{_e_r_r_o_r_,_t_i_m_e_o_u_t_}.
+
+              If the option _{_d_e_b_u_g_,_D_b_g_s_} is present, the corresponding _s_y_s
+              function will be called for each item in _D_b_g_s. See ssyyss((33)).
+
+              If the option _{_s_p_a_w_n___o_p_t_,_S_O_p_t_s_} is present, _S_O_p_t_s will be passed
+              as option list to the _s_p_a_w_n___o_p_t BIF which is used to spawn the
+              gen_fsm process. See eerrllaanngg((33)).
+
+          NNoottee::
+              Using the spawn option _m_o_n_i_t_o_r is currently not allowed, but
+              will cause the function to fail with reason _b_a_d_a_r_g.
+
+
+              If the gen_fsm is successfully created and initialized the
+              function returns _{_o_k_,_P_i_d_}, where _P_i_d is the pid of the gen_fsm.
+              If there already exists a process with the specified _F_s_m_N_a_m_e,
+              the function returns _{_e_r_r_o_r_,_{_a_l_r_e_a_d_y___s_t_a_r_t_e_d_,_P_i_d_}_} where _P_i_d is
+              the pid of that process.
+
+              If _M_o_d_u_l_e_:_i_n_i_t_/_1 fails with _R_e_a_s_o_n, the function returns
+              _{_e_r_r_o_r_,_R_e_a_s_o_n_}. If _M_o_d_u_l_e_:_i_n_i_t_/_1 returns _{_s_t_o_p_,_R_e_a_s_o_n_} or
+              _i_g_n_o_r_e, the process is terminated and the function returns
+              _{_e_r_r_o_r_,_R_e_a_s_o_n_} or _i_g_n_o_r_e, respectively.
+
+       ssttaarrtt((MMoodduullee,, AArrggss,, OOppttiioonnss)) -->> RReessuulltt
+       ssttaarrtt((FFssmmNNaammee,, MMoodduullee,, AArrggss,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 FsmName = {local,Name} | {global,GlobalName} |
+                 {via,Module,ViaName}
+                  Name = atom()
+                  GlobalName = ViaName = term()
+                 Module = atom()
+                 Args = term()
+                 Options = [Option]
+                  Option = {debug,Dbgs} | {timeout,Time} | {spawn_opt,SOpts}
+                  Dbgs = [Dbg]
+                  Dbg = trace | log | statistics
+                  | {log_to_file,FileName} | {install,{Func,FuncState}}
+                  SOpts = [term()]
+                 Result = {ok,Pid} | ignore | {error,Error}
+                  Pid = pid()
+                  Error = {already_started,Pid} | term()
+
+              Creates a stand-alone gen_fsm process, i.e. a gen_fsm which is
+              not part of a supervision tree and thus has no supervisor.
+
+              See ssttaarrtt__lliinnkk//33,,44 for a description of arguments and return
+              values.
+
+       sseenndd__eevveenntt((FFssmmRReeff,, EEvveenntt)) -->> ookk
+
+              Types:
+
+                 FsmRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Event = term()
+
+              Sends an event asynchronously to the gen_fsm _F_s_m_R_e_f and returns
+              _o_k immediately. The gen_fsm will call _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2 to
+              handle the event, where _S_t_a_t_e_N_a_m_e is the name of the current
+              state of the gen_fsm.
+
+              _F_s_m_R_e_f can be:
+
+                * the pid,
+
+                * _N_a_m_e, if the gen_fsm is locally registered,
+
+                * _{_N_a_m_e_,_N_o_d_e_}, if the gen_fsm is locally registered at another
+                  node, or
+
+                * _{_g_l_o_b_a_l_,_G_l_o_b_a_l_N_a_m_e_}, if the gen_fsm is globally registered.
+
+                * _{_v_i_a_,_M_o_d_u_l_e_,_V_i_a_N_a_m_e_}, if the event manager is registered
+                  through an alternative process registry.
+
+              _E_v_e_n_t is an arbitrary term which is passed as one of the
+              arguments to _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2.
+
+       sseenndd__aallll__ssttaattee__eevveenntt((FFssmmRReeff,, EEvveenntt)) -->> ookk
+
+              Types:
+
+                 FsmRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Event = term()
+
+              Sends an event asynchronously to the gen_fsm _F_s_m_R_e_f and returns
+              _o_k immediately. The gen_fsm will call _M_o_d_u_l_e_:_h_a_n_d_l_e___e_v_e_n_t_/_3 to
+              handle the event.
+
+              See sseenndd__eevveenntt//22 for a description of the arguments.
+
+              The difference between _s_e_n_d___e_v_e_n_t and _s_e_n_d___a_l_l___s_t_a_t_e___e_v_e_n_t is
+              which callback function is used to handle the event. This
+              function is useful when sending events that are handled the same
+              way in every state, as only one _h_a_n_d_l_e___e_v_e_n_t clause is needed to
+              handle the event instead of one clause in each state name
+              function.
+
+       ssyynncc__sseenndd__eevveenntt((FFssmmRReeff,, EEvveenntt)) -->> RReeppllyy
+       ssyynncc__sseenndd__eevveenntt((FFssmmRReeff,, EEvveenntt,, TTiimmeeoouutt)) -->> RReeppllyy
+
+              Types:
+
+                 FsmRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Event = term()
+                 Timeout = int()>0 | infinity
+                 Reply = term()
+
+              Sends an event to the gen_fsm _F_s_m_R_e_f and waits until a reply
+              arrives or a timeout occurs. The gen_fsm will call
+              _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_3 to handle the event, where _S_t_a_t_e_N_a_m_e is the
+              name of the current state of the gen_fsm.
+
+              See sseenndd__eevveenntt//22 for a description of _F_s_m_R_e_f and _E_v_e_n_t.
+
+              _T_i_m_e_o_u_t is an integer greater than zero which specifies how many
+              milliseconds to wait for a reply, or the atom _i_n_f_i_n_i_t_y to wait
+              indefinitely. Default value is 5000. If no reply is received
+              within the specified time, the function call fails.
+
+              The return value _R_e_p_l_y is defined in the return value of
+              _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_3.
+
+              The ancient behaviour of sometimes consuming the server exit
+              message if the server died during the call while linked to the
+              client has been removed in OTP R12B/Erlang 5.6.
+
+       ssyynncc__sseenndd__aallll__ssttaattee__eevveenntt((FFssmmRReeff,, EEvveenntt)) -->> RReeppllyy
+       ssyynncc__sseenndd__aallll__ssttaattee__eevveenntt((FFssmmRReeff,, EEvveenntt,, TTiimmeeoouutt)) -->> RReeppllyy
+
+              Types:
+
+                 FsmRef = Name | {Name,Node} | {global,GlobalName} |
+                 {via,Module,ViaName} | pid()
+                  Name = Node = atom()
+                  GlobalName = ViaName = term()
+                 Event = term()
+                 Timeout = int()>0 | infinity
+                 Reply = term()
+
+              Sends an event to the gen_fsm _F_s_m_R_e_f and waits until a reply
+              arrives or a timeout occurs. The gen_fsm will call
+              _M_o_d_u_l_e_:_h_a_n_d_l_e___s_y_n_c___e_v_e_n_t_/_4 to handle the event.
+
+              See sseenndd__eevveenntt//22 for a description of _F_s_m_R_e_f and _E_v_e_n_t. See
+              ssyynncc__sseenndd__eevveenntt//33 for a description of _T_i_m_e_o_u_t and _R_e_p_l_y.
+
+              See sseenndd__aallll__ssttaattee__eevveenntt//22 for a discussion about the difference
+              between _s_y_n_c___s_e_n_d___e_v_e_n_t and _s_y_n_c___s_e_n_d___a_l_l___s_t_a_t_e___e_v_e_n_t.
+
+       rreeppllyy((CCaalllleerr,, RReeppllyy)) -->> ttrruuee
+
+              Types:
+
+                 Caller - see below
+                 Reply = term()
+
+              This function can be used by a gen_fsm to explicitly send a
+              reply to a client process that called ssyynncc__sseenndd__eevveenntt//22,,33 or
+              ssyynncc__sseenndd__aallll__ssttaattee__eevveenntt//22,,33, when the reply cannot be defined
+              in the return value of _M_o_d_u_l_e_:_S_t_a_t_e_/_3 or
+              _M_o_d_u_l_e_:_h_a_n_d_l_e___s_y_n_c___e_v_e_n_t_/_4.
+
+              _C_a_l_l_e_r must be the _F_r_o_m argument provided to the callback
+              function. _R_e_p_l_y is an arbitrary term, which will be given back
+              to the client as the return value of _s_y_n_c___s_e_n_d___e_v_e_n_t_/_2_,_3 or
+              _s_y_n_c___s_e_n_d___a_l_l___s_t_a_t_e___e_v_e_n_t_/_2_,_3.
+
+       sseenndd__eevveenntt__aafftteerr((TTiimmee,, EEvveenntt)) -->> RReeff
+
+              Types:
+
+                 Time = integer()
+                 Event = term()
+                 Ref = reference()
+
+              Sends a delayed event internally in the gen_fsm that calls this
+              function after _T_i_m_e ms. Returns immediately a reference that can
+              be used to cancel the delayed send using ccaanncceell__ttiimmeerr//11.
+
+              The gen_fsm will call _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2 to handle the event,
+              where _S_t_a_t_e_N_a_m_e is the name of the current state of the gen_fsm
+              at the time the delayed event is delivered.
+
+              _E_v_e_n_t is an arbitrary term which is passed as one of the
+              arguments to _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2.
+
+       ssttaarrtt__ttiimmeerr((TTiimmee,, MMssgg)) -->> RReeff
+
+              Types:
+
+                 Time = integer()
+                 Msg = term()
+                 Ref = reference()
+
+              Sends a timeout event internally in the gen_fsm that calls this
+              function after _T_i_m_e ms. Returns immediately a reference that can
+              be used to cancel the timer using ccaanncceell__ttiimmeerr//11.
+
+              The gen_fsm will call _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2 to handle the event,
+              where _S_t_a_t_e_N_a_m_e is the name of the current state of the gen_fsm
+              at the time the timeout message is delivered.
+
+              _M_s_g is an arbitrary term which is passed in the timeout message,
+              _{_t_i_m_e_o_u_t_, _R_e_f_, _M_s_g_}, as one of the arguments to
+              _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2.
+
+       ccaanncceell__ttiimmeerr((RReeff)) -->> RReemmaaiinniinnggTTiimmee || ffaallssee
+
+              Types:
+
+                 Ref = reference()
+                 RemainingTime = integer()
+
+              Cancels an internal timer referred by _R_e_f in the gen_fsm that
+              calls this function.
+
+              _R_e_f is a reference returned from sseenndd__eevveenntt__aafftteerr//22 or
+              ssttaarrtt__ttiimmeerr//22.
+
+              If the timer has already timed out, but the event not yet been
+              delivered, it is cancelled as if it had _n_o_t timed out, so there
+              will be no false timer event after returning from this function.
+
+              Returns the remaining time in ms until the timer would have
+              expired if _R_e_f referred to an active timer, _f_a_l_s_e otherwise.
+
+       eenntteerr__lloooopp((MMoodduullee,, OOppttiioonnss,, SSttaatteeNNaammee,, SSttaatteeDDaattaa))
+       eenntteerr__lloooopp((MMoodduullee,, OOppttiioonnss,, SSttaatteeNNaammee,, SSttaatteeDDaattaa,, FFssmmNNaammee))
+       eenntteerr__lloooopp((MMoodduullee,, OOppttiioonnss,, SSttaatteeNNaammee,, SSttaatteeDDaattaa,, TTiimmeeoouutt))
+       eenntteerr__lloooopp((MMoodduullee,, OOppttiioonnss,, SSttaatteeNNaammee,, SSttaatteeDDaattaa,, FFssmmNNaammee,, TTiimmeeoouutt))
+
+              Types:
+
+                 Module = atom()
+                 Options = [Option]
+                  Option = {debug,Dbgs}
+                  Dbgs = [Dbg]
+                  Dbg = trace | log | statistics
+                  | {log_to_file,FileName} | {install,{Func,FuncState}}
+                 StateName = atom()
+                 StateData = term()
+                 FsmName = {local,Name} | {global,GlobalName} |
+                 {via,Module,ViaName}
+                  Name = atom()
+                  GlobalName = ViaName = term()
+                 Timeout = int() | infinity
+
+              Makes an existing process into a gen_fsm. Does not return,
+              instead the calling process will enter the gen_fsm receive loop
+              and become a gen_fsm process. The process _m_u_s_t have been started
+              using one of the start functions in _p_r_o_c___l_i_b, see pprroocc__lliibb((33)).
+              The user is responsible for any initialization of the process,
+              including registering a name for it.
+
+              This function is useful when a more complex initialization
+              procedure is needed than the gen_fsm behaviour provides.
+
+              _M_o_d_u_l_e, _O_p_t_i_o_n_s and _F_s_m_N_a_m_e have the same meanings as when
+              calling ssttaarrtt[[__lliinnkk]]//33,,44. However, if _F_s_m_N_a_m_e is specified, the
+              process must have been registered accordingly _b_e_f_o_r_e this
+              function is called.
+
+              _S_t_a_t_e_N_a_m_e, _S_t_a_t_e_D_a_t_a and _T_i_m_e_o_u_t have the same meanings as in
+              the return value of MMoodduullee::iinniitt//11. Also, the callback module
+              _M_o_d_u_l_e does not need to export an _i_n_i_t_/_1 function.
+
+              Failure: If the calling process was not started by a _p_r_o_c___l_i_b
+              start function, or if it is not registered according to _F_s_m_N_a_m_e.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following functions should be exported from a _g_e_n___f_s_m callback
+       module.
+
+       In the description, the expression _s_t_a_t_e _n_a_m_e is used to denote a state
+       of the state machine. _s_t_a_t_e _d_a_t_a is used to denote the internal state
+       of the Erlang process which implements the state machine.
+
+EEXXPPOORRTTSS
+       MMoodduullee::iinniitt((AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 Args = term()
+                 Result = {ok,StateName,StateData} |
+                 {ok,StateName,StateData,Timeout}
+                  | {ok,StateName,StateData,hibernate}
+                  | {stop,Reason} | ignore
+                  StateName = atom()
+                  StateData = term()
+                  Timeout = int()>0 | infinity
+                  Reason = term()
+
+              Whenever a gen_fsm is started using ggeenn__ffssmm::ssttaarrtt//33,,44 or
+              ggeenn__ffssmm::ssttaarrtt__lliinnkk//33,,44, this function is called by the new
+              process to initialize.
+
+              _A_r_g_s is the _A_r_g_s argument provided to the start function.
+
+              If initialization is successful, the function should return
+              _{_o_k_,_S_t_a_t_e_N_a_m_e_,_S_t_a_t_e_D_a_t_a_}, _{_o_k_,_S_t_a_t_e_N_a_m_e_,_S_t_a_t_e_D_a_t_a_,_T_i_m_e_o_u_t_} or
+              _{_o_k_,_S_t_a_t_e_N_a_m_e_,_S_t_a_t_e_D_a_t_a_,_h_i_b_e_r_n_a_t_e_}, where _S_t_a_t_e_N_a_m_e is the
+              initial state name and _S_t_a_t_e_D_a_t_a the initial state data of the
+              gen_fsm.
+
+              If an integer timeout value is provided, a timeout will occur
+              unless an event or a message is received within _T_i_m_e_o_u_t
+              milliseconds. A timeout is represented by the atom _t_i_m_e_o_u_t and
+              should be handled by the _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2 callback functions.
+              The atom _i_n_f_i_n_i_t_y can be used to wait indefinitely, this is the
+              default value.
+
+              If _h_i_b_e_r_n_a_t_e is specified instead of a timeout value, the
+              process will go into hibernation when waiting for the next
+              message to arrive (by calling pprroocc__lliibb::hhiibbeerrnnaattee//33).
+
+              If something goes wrong during the initialization the function
+              should return _{_s_t_o_p_,_R_e_a_s_o_n_}, where _R_e_a_s_o_n is any term, or
+              _i_g_n_o_r_e.
+
+       MMoodduullee::SSttaatteeNNaammee((EEvveenntt,, SSttaatteeDDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Event = timeout | term()
+                 StateData = term()
+                 Result = {next_state,NextStateName,NewStateData}
+                  | {next_state,NextStateName,NewStateData,Timeout}
+                  | {next_state,NextStateName,NewStateData,hibernate}
+                  | {stop,Reason,NewStateData}
+                  NextStateName = atom()
+                  NewStateData = term()
+                  Timeout = int()>0 | infinity
+                  Reason = term()
+
+              There should be one instance of this function for each possible
+              state name. Whenever a gen_fsm receives an event sent using
+              ggeenn__ffssmm::sseenndd__eevveenntt//22, the instance of this function with the
+              same name as the current state name _S_t_a_t_e_N_a_m_e is called to
+              handle the event. It is also called if a timeout occurs.
+
+              _E_v_e_n_t is either the atom _t_i_m_e_o_u_t, if a timeout has occurred, or
+              the _E_v_e_n_t argument provided to _s_e_n_d___e_v_e_n_t_/_2.
+
+              _S_t_a_t_e_D_a_t_a is the state data of the gen_fsm.
+
+              If the function returns _{_n_e_x_t___s_t_a_t_e_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_},
+              _{_n_e_x_t___s_t_a_t_e_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_,_T_i_m_e_o_u_t_} or
+              _{_n_e_x_t___s_t_a_t_e_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_,_h_i_b_e_r_n_a_t_e_}, the gen_fsm
+              will continue executing with the current state name set to
+              _N_e_x_t_S_t_a_t_e_N_a_m_e and with the possibly updated state data
+              _N_e_w_S_t_a_t_e_D_a_t_a. See _M_o_d_u_l_e_:_i_n_i_t_/_1 for a description of _T_i_m_e_o_u_t and
+              _h_i_b_e_r_n_a_t_e.
+
+              If the function returns _{_s_t_o_p_,_R_e_a_s_o_n_,_N_e_w_S_t_a_t_e_D_a_t_a_}, the gen_fsm
+              will call _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_(_R_e_a_s_o_n_,_N_e_w_S_t_a_t_e_D_a_t_a_) and terminate.
+
+       MMoodduullee::hhaannddllee__eevveenntt((EEvveenntt,, SSttaatteeNNaammee,, SSttaatteeDDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Event = term()
+                 StateName = atom()
+                 StateData = term()
+                 Result = {next_state,NextStateName,NewStateData}
+                  | {next_state,NextStateName,NewStateData,Timeout}
+                  | {next_state,NextStateName,NewStateData,hibernate}
+                  | {stop,Reason,NewStateData}
+                  NextStateName = atom()
+                  NewStateData = term()
+                  Timeout = int()>0 | infinity
+                  Reason = term()
+
+              Whenever a gen_fsm receives an event sent using
+              ggeenn__ffssmm::sseenndd__aallll__ssttaattee__eevveenntt//22, this function is called to
+              handle the event.
+
+              _S_t_a_t_e_N_a_m_e is the current state name of the gen_fsm.
+
+              See _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2 for a description of the other arguments
+              and possible return values.
+
+       MMoodduullee::SSttaatteeNNaammee((EEvveenntt,, FFrroomm,, SSttaatteeDDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Event = term()
+                 From = {pid(),Tag}
+                 StateData = term()
+                 Result = {reply,Reply,NextStateName,NewStateData}
+                  | {reply,Reply,NextStateName,NewStateData,Timeout}
+                  | {reply,Reply,NextStateName,NewStateData,hibernate}
+                  | {next_state,NextStateName,NewStateData}
+                  | {next_state,NextStateName,NewStateData,Timeout}
+                  | {next_state,NextStateName,NewStateData,hibernate}
+                  | {stop,Reason,Reply,NewStateData} |
+                 {stop,Reason,NewStateData}
+                  Reply = term()
+                  NextStateName = atom()
+                  NewStateData = term()
+                  Timeout = int()>0 | infinity
+                  Reason = normal | term()
+
+              There should be one instance of this function for each possible
+              state name. Whenever a gen_fsm receives an event sent using
+              ggeenn__ffssmm::ssyynncc__sseenndd__eevveenntt//22,,33, the instance of this function with
+              the same name as the current state name _S_t_a_t_e_N_a_m_e is called to
+              handle the event.
+
+              _E_v_e_n_t is the _E_v_e_n_t argument provided to _s_y_n_c___s_e_n_d___e_v_e_n_t.
+
+              _F_r_o_m is a tuple _{_P_i_d_,_T_a_g_} where _P_i_d is the pid of the process
+              which called _s_y_n_c___s_e_n_d___e_v_e_n_t_/_2_,_3 and _T_a_g is a unique tag.
+
+              _S_t_a_t_e_D_a_t_a is the state data of the gen_fsm.
+
+              If the function returns
+              _{_r_e_p_l_y_,_R_e_p_l_y_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_},
+              _{_r_e_p_l_y_,_R_e_p_l_y_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_,_T_i_m_e_o_u_t_} or
+              _{_r_e_p_l_y_,_R_e_p_l_y_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_,_h_i_b_e_r_n_a_t_e_}, _R_e_p_l_y will
+              be given back to _F_r_o_m as the return value of
+              _s_y_n_c___s_e_n_d___e_v_e_n_t_/_2_,_3. The gen_fsm then continues executing with
+              the current state name set to _N_e_x_t_S_t_a_t_e_N_a_m_e and with the
+              possibly updated state data _N_e_w_S_t_a_t_e_D_a_t_a. See _M_o_d_u_l_e_:_i_n_i_t_/_1 for
+              a description of _T_i_m_e_o_u_t and _h_i_b_e_r_n_a_t_e.
+
+              If the function returns _{_n_e_x_t___s_t_a_t_e_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_},
+              _{_n_e_x_t___s_t_a_t_e_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_,_T_i_m_e_o_u_t_} or
+              _{_n_e_x_t___s_t_a_t_e_,_N_e_x_t_S_t_a_t_e_N_a_m_e_,_N_e_w_S_t_a_t_e_D_a_t_a_,_h_i_b_e_r_n_a_t_e_}, the gen_fsm
+              will continue executing in _N_e_x_t_S_t_a_t_e_N_a_m_e with _N_e_w_S_t_a_t_e_D_a_t_a. Any
+              reply to _F_r_o_m must be given explicitly using ggeenn__ffssmm::rreeppllyy//22.
+
+              If the function returns _{_s_t_o_p_,_R_e_a_s_o_n_,_R_e_p_l_y_,_N_e_w_S_t_a_t_e_D_a_t_a_}, _R_e_p_l_y
+              will be given back to _F_r_o_m. If the function returns
+              _{_s_t_o_p_,_R_e_a_s_o_n_,_N_e_w_S_t_a_t_e_D_a_t_a_}, any reply to _F_r_o_m must be given
+              explicitly using _g_e_n___f_s_m_:_r_e_p_l_y_/_2. The gen_fsm will then call
+              _M_o_d_u_l_e_:_t_e_r_m_i_n_a_t_e_(_R_e_a_s_o_n_,_N_e_w_S_t_a_t_e_D_a_t_a_) and terminate.
+
+       MMoodduullee::hhaannddllee__ssyynncc__eevveenntt((EEvveenntt,, FFrroomm,, SSttaatteeNNaammee,, SSttaatteeDDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Event = term()
+                 From = {pid(),Tag}
+                 StateName = atom()
+                 StateData = term()
+                 Result = {reply,Reply,NextStateName,NewStateData}
+                  | {reply,Reply,NextStateName,NewStateData,Timeout}
+                  | {reply,Reply,NextStateName,NewStateData,hibernate}
+                  | {next_state,NextStateName,NewStateData}
+                  | {next_state,NextStateName,NewStateData,Timeout}
+                  | {next_state,NextStateName,NewStateData,hibernate}
+                  | {stop,Reason,Reply,NewStateData} |
+                 {stop,Reason,NewStateData}
+                  Reply = term()
+                  NextStateName = atom()
+                  NewStateData = term()
+                  Timeout = int()>0 | infinity
+                  Reason = term()
+
+              Whenever a gen_fsm receives an event sent using
+              ggeenn__ffssmm::ssyynncc__sseenndd__aallll__ssttaattee__eevveenntt//22,,33, this function is called
+              to handle the event.
+
+              _S_t_a_t_e_N_a_m_e is the current state name of the gen_fsm.
+
+              See _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_3 for a description of the other arguments
+              and possible return values.
+
+       MMoodduullee::hhaannddllee__iinnffoo((IInnffoo,, SSttaatteeNNaammee,, SSttaatteeDDaattaa)) -->> RReessuulltt
+
+              Types:
+
+                 Info = term()
+                 StateName = atom()
+                 StateData = term()
+                 Result = {next_state,NextStateName,NewStateData}
+                  | {next_state,NextStateName,NewStateData,Timeout}
+                  | {next_state,NextStateName,NewStateData,hibernate}
+                  | {stop,Reason,NewStateData}
+                  NextStateName = atom()
+                  NewStateData = term()
+                  Timeout = int()>0 | infinity
+                  Reason = normal | term()
+
+              This function is called by a gen_fsm when it receives any other
+              message than a synchronous or asynchronous event (or a system
+              message).
+
+              _I_n_f_o is the received message.
+
+              See _M_o_d_u_l_e_:_S_t_a_t_e_N_a_m_e_/_2 for a description of the other arguments
+              and possible return values.
+
+       MMoodduullee::tteerrmmiinnaattee((RReeaassoonn,, SSttaatteeNNaammee,, SSttaatteeDDaattaa))
+
+              Types:
+
+                 Reason = normal | shutdown | {shutdown,term()} | term()
+                 StateName = atom()
+                 StateData = term()
+
+              This function is called by a gen_fsm when it is about to
+              terminate. It should be the opposite of _M_o_d_u_l_e_:_i_n_i_t_/_1 and do any
+              necessary cleaning up. When it returns, the gen_fsm terminates
+              with _R_e_a_s_o_n. The return value is ignored.
+
+              _R_e_a_s_o_n is a term denoting the stop reason, _S_t_a_t_e_N_a_m_e is the
+              current state name, and _S_t_a_t_e_D_a_t_a is the state data of the
+              gen_fsm.
+
+              _R_e_a_s_o_n depends on why the gen_fsm is terminating. If it is
+              because another callback function has returned a stop tuple
+              _{_s_t_o_p_,_._._}, _R_e_a_s_o_n will have the value specified in that tuple.
+              If it is due to a failure, _R_e_a_s_o_n is the error reason.
+
+              If the gen_fsm is part of a supervision tree and is ordered by
+              its supervisor to terminate, this function will be called with
+              _R_e_a_s_o_n_=_s_h_u_t_d_o_w_n if the following conditions apply:
+
+                * the gen_fsm has been set to trap exit signals, and
+
+                * the shutdown strategy as defined in the supervisor's child
+                  specification is an integer timeout value, not _b_r_u_t_a_l___k_i_l_l.
+
+              Even if the gen_fsm is _n_o_t part of a supervision tree, this
+              function will be called if it receives an _'_E_X_I_T_' message from
+              its parent. _R_e_a_s_o_n will be the same as in the _'_E_X_I_T_' message.
+
+              Otherwise, the gen_fsm will be immediately terminated.
+
+              Note that for any other reason than _n_o_r_m_a_l, _s_h_u_t_d_o_w_n, or
+              _{_s_h_u_t_d_o_w_n_,_T_e_r_m_} the gen_fsm is assumed to terminate due to an
+              error and an error report is issued using eerrrroorr__llooggggeerr::ffoorrmmaatt//22.
+
+       MMoodduullee::ccooddee__cchhaannggee((OOllddVVssnn,, SSttaatteeNNaammee,, SSttaatteeDDaattaa,, EExxttrraa)) -->> {{ookk,,
+       NNeexxttSSttaatteeNNaammee,, NNeewwSSttaatteeDDaattaa}}
+
+              Types:
+
+                 OldVsn = Vsn | {down, Vsn}
+                  Vsn = term()
+                 StateName = NextStateName = atom()
+                 StateData = NewStateData = term()
+                 Extra = term()
+
+              This function is called by a gen_fsm when it should update its
+              internal state data during a release upgrade/downgrade, i.e.
+              when the instruction _{_u_p_d_a_t_e_,_M_o_d_u_l_e_,_C_h_a_n_g_e_,_._._._} where
+              _C_h_a_n_g_e_=_{_a_d_v_a_n_c_e_d_,_E_x_t_r_a_} is given in the _a_p_p_u_p file. See OOTTPP
+              DDeessiiggnn PPrriinncciipplleess.
+
+              In the case of an upgrade, _O_l_d_V_s_n is _V_s_n, and in the case of a
+              downgrade, _O_l_d_V_s_n is _{_d_o_w_n_,_V_s_n_}. _V_s_n is defined by the _v_s_n
+              attribute(s) of the old version of the callback module _M_o_d_u_l_e.
+              If no such attribute is defined, the version is the checksum of
+              the BEAM file.
+
+              _S_t_a_t_e_N_a_m_e is the current state name and _S_t_a_t_e_D_a_t_a the internal
+              state data of the gen_fsm.
+
+              _E_x_t_r_a is passed as-is from the _{_a_d_v_a_n_c_e_d_,_E_x_t_r_a_} part of the
+              update instruction.
+
+              The function should return the new current state name and
+              updated internal data.
+
+       MMoodduullee::ffoorrmmaatt__ssttaattuuss((OOpptt,, [[PPDDiicctt,, SSttaatteeDDaattaa]])) -->> SSttaattuuss
+
+              Types:
+
+                 Opt = normal | terminate
+                 PDict = [{Key, Value}]
+                 StateData = term()
+                 Status = term()
+
+          NNoottee::
+              This callback is optional, so callback modules need not export
+              it. The gen_fsm module provides a default implementation of this
+              function that returns the callback module state data.
+
+
+              This function is called by a gen_fsm process when:
+
+                * One of ssyyss::ggeett__ssttaattuuss//11,,22 is invoked to get the gen_fsm
+                  status. _O_p_t is set to the atom _n_o_r_m_a_l for this case.
+
+                * The gen_fsm terminates abnormally and logs an error. _O_p_t is
+                  set to the atom _t_e_r_m_i_n_a_t_e for this case.
+
+              This function is useful for customising the form and appearance
+              of the gen_fsm status for these cases. A callback module wishing
+              to customise the _s_y_s_:_g_e_t___s_t_a_t_u_s_/_1_,_2 return value as well as how
+              its status appears in termination error logs exports an instance
+              of _f_o_r_m_a_t___s_t_a_t_u_s_/_2 that returns a term describing the current
+              status of the gen_fsm.
+
+              _P_D_i_c_t is the current value of the gen_fsm's process dictionary.
+
+              _S_t_a_t_e_D_a_t_a is the internal state data of the gen_fsm.
+
+              The function should return _S_t_a_t_u_s, a term that customises the
+              details of the current state and status of the gen_fsm. There
+              are no restrictions on the form _S_t_a_t_u_s can take, but for the
+              _s_y_s_:_g_e_t___s_t_a_t_u_s_/_1_,_2 case (when _O_p_t is _n_o_r_m_a_l), the recommended
+              form for the _S_t_a_t_u_s value is _[_{_d_a_t_a_, _[_{_"_S_t_a_t_e_D_a_t_a_"_, _T_e_r_m_}_]_}_]
+              where _T_e_r_m provides relevant details of the gen_fsm state data.
+              Following this recommendation isn't required, but doing so will
+              make the callback module status consistent with the rest of the
+              _s_y_s_:_g_e_t___s_t_a_t_u_s_/_1_,_2 return value.
+
+              One use for this function is to return compact alternative state
+              data representations to avoid having large state terms printed
+              in logfiles.
+
+SSEEEE AALLSSOO
+       ggeenn__eevveenntt((33)), ggeenn__sseerrvveerr((33)), ssuuppeerrvviissoorr((33)), pprroocc__lliibb((33)), ssyyss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                      gen_fsm(3)

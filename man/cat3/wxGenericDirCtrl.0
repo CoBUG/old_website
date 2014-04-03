@@ -1,0 +1,205 @@
+wxGenericDirCtrl(3)        Erlang Module Definition        wxGenericDirCtrl(3)
+
+
+
+NNAAMMEE
+       wxGenericDirCtrl - See external documentation: wxGenericDirCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGenericDirCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_e_n_e_r_i_c_D_i_r_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxGGeenneerriiccDDiirrCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxGGeenneerriiccDDiirrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxGGeenneerriiccDDiirrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {dir, chardata() (see module
+                 unicode)} | {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} | {filter,
+                 chardata() (see module unicode)} | {defaultFilter, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {dir, chardata() (see module
+                 unicode)} | {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} | {filter,
+                 chardata() (see module unicode)} | {defaultFilter, integer()}
+
+              See external documentation.
+
+       iinniitt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ccoollllaappsseeTTrreeee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       eexxppaannddPPaatthh((TThhiiss,, PPaatthh)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 Path = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettDDeeffaauullttPPaatthh((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ggeettPPaatthh((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ggeettFFiilleePPaatthh((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ggeettFFiilltteerr((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ggeettFFiilltteerrIInnddeexx((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ggeettRRoooottIIdd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       ggeettTTrreeeeCCttrrll((TThhiiss)) -->> wwxxTTrreeeeCCttrrll(()) ((sseeee mmoodduullee wwxxTTrreeeeCCttrrll))
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       rreeCCrreeaatteeTTrreeee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+
+              See external documentation.
+
+       sseettDDeeffaauullttPPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 Path = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettFFiilltteerr((TThhiiss,, FFiilltteerr)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 Filter = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettFFiilltteerrIInnddeexx((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 N = integer()
+
+              See external documentation.
+
+       sseettPPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxGenericDirCtrl()
+                 Path = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxGGeenneerriiccDDiirrCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxGenericDirCtrl(3)

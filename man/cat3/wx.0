@@ -1,0 +1,210 @@
+wx(3)                      Erlang Module Definition                      wx(3)
+
+
+
+NNAAMMEE
+       wx - A port of wxWidgets.
+
+DDEESSCCRRIIPPTTIIOONN
+       A port of wxWidgets.
+
+       This is the base api of wxWidgets. This module contains functions for
+       starting and stopping the wx-server, as well as other utility
+       functions.
+
+       wxWidgets is object oriented, and not functional. Thus, in wxErlang a
+       module represents a class, and the object created by this class has an
+       own type, wxCLASS(). This module represents the base class, and all
+       other wxMODULE's are sub-classes of this class.
+
+       Objects of a class are created with wxCLASS:new(...) and destroyed with
+       wxCLASS:destroy(). Member functions are called with
+       wxCLASS:member(Object, ...) instead of as in C++ Object.member(...).
+
+       Sub class modules inherit (non static) functions from their parents.
+       The inherited functions are not documented in the sub-classes.
+
+       This erlang port of wxWidgets tries to be a one-to-one mapping with the
+       original wxWidgets library. Some things are different though, as the
+       optional arguments use property lists and can be in any order. The main
+       difference is the event handling which is different from the original
+       library. See wwxxEEvvttHHaannddlleerr.
+
+       The following classes are implemented directly as erlang types:
+       wxPoint={x,y},wxSize={w,h},wxRect={x,y,w,h},wxColour={r,g,b [,a]},
+       wxString=uunniiccooddee::cchhaarrddaattaa(()),
+       wxGBPosition={r,c},wxGBSpan={rs,cs},wxGridCellCoords={r,c}.
+
+       wxWidgets uses a process specific environment, which is created by
+       wwxx::nneeww//00. To be able to use the environment from other processes, call
+       ggeett__eennvv//00 to retrieve the environment and sseett__eennvv//11 to assign the
+       environment in the other process.
+
+       Global (classless) functions are located in the wx_misc module.
+
+DDAATTAA TTYYPPEESS
+         _w_x___c_o_l_o_u_r_(_) _= _{_R_:_:_b_y_t_e_(_)_, _G_:_:_b_y_t_e_(_)_, _B_:_:_b_y_t_e_(_)_} _| _w_x___c_o_l_o_u_r_4_(_):
+
+
+         _w_x___c_o_l_o_u_r_4_(_) _= _{_R_:_:_b_y_t_e_(_)_, _G_:_:_b_y_t_e_(_)_, _B_:_:_b_y_t_e_(_)_, _A_:_:_b_y_t_e_(_)_}:
+
+
+         _w_x___d_a_t_e_t_i_m_e_(_) _= _{_{_Y_e_a_r_:_:_i_n_t_e_g_e_r_(_)_, _M_o_n_t_h_:_:_i_n_t_e_g_e_r_(_)_, _D_a_y_:_:_i_n_t_e_g_e_r_(_)_}_,
+         _{_H_o_u_r_:_:_i_n_t_e_g_e_r_(_)_, _M_i_n_u_t_e_:_:_i_n_t_e_g_e_r_(_)_, _S_e_c_o_n_d_:_:_i_n_t_e_g_e_r_(_)_}_}:
+
+
+           In Local Timezone
+
+         _w_x___e_n_u_m_(_) _= _i_n_t_e_g_e_r_(_):
+
+
+           Constant defined in wx.hrl
+
+         _w_x___e_n_v_(_) _= _#_w_x___e_n_v_{_}:
+
+
+           Opaque process environment
+
+         _w_x___m_e_m_o_r_y_(_) _= _b_i_n_a_r_y_(_) _| _#_w_x___m_e_m_{_}:
+
+
+           Opaque memory reference
+
+         _w_x___o_b_j_e_c_t_(_) _= _#_w_x___r_e_f_{_}:
+
+
+           Opaque object reference
+
+         _w_x___w_x_H_t_m_l_L_i_n_k_I_n_f_o_(_) _= _#_w_x_H_t_m_l_L_i_n_k_I_n_f_o_{_h_r_e_f_=_u_n_d_e_f_i_n_e_d _| _c_h_a_r_d_a_t_a_(_)
+         _(_s_e_e _m_o_d_u_l_e _u_n_i_c_o_d_e_)_, _t_a_r_g_e_t_=_u_n_d_e_f_i_n_e_d _| _c_h_a_r_d_a_t_a_(_) _(_s_e_e _m_o_d_u_l_e
+         _u_n_i_c_o_d_e_)_}:
+
+
+         _w_x___w_x_M_o_u_s_e_S_t_a_t_e_(_) _= _#_w_x_M_o_u_s_e_S_t_a_t_e_{_x_=_u_n_d_e_f_i_n_e_d _| _i_n_t_e_g_e_r_(_)_,
+         _y_=_u_n_d_e_f_i_n_e_d _| _i_n_t_e_g_e_r_(_)_, _l_e_f_t_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_(_)_,
+         _m_i_d_d_l_e_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_, _r_i_g_h_t_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_,
+         _c_o_n_t_r_o_l_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_(_)_, _s_h_i_f_t_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_(_)_,
+         _a_l_t_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_(_)_, _m_e_t_a_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_(_)_,
+         _c_m_d_D_o_w_n_=_u_n_d_e_f_i_n_e_d _| _b_o_o_l_e_a_n_(_)_}:
+
+
+           See #wxMouseState{} defined in wx.hrl
+
+EEXXPPOORRTTSS
+       ppaarreenntt__ccllaassss((XX11)) -->> tteerrmm(())
+
+       nneeww(()) -->> wwxx__oobbjjeecctt(())
+
+              Starts a wx server.
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxx__oobbjjeecctt(())
+
+              Types:
+
+                 Option = {debug, list() | atom()}
+
+              Starts a wx server. Option may be {debug, Level}, see debug/1.
+
+       ddeessttrrooyy(()) -->> ookk
+
+              Stops a wx server.
+
+       ggeett__eennvv(()) -->> wwxx__eennvv(())
+
+              Gets this process's current wx environment. Can be sent to other
+              processes to allow them use this process wx environment.
+
+              _S_e_e _a_l_s_o_: sseett__eennvv//11.
+
+       sseett__eennvv((WWxx__eennvv::::wwxx__eennvv(()))) -->> ookk
+
+              Sets the process wx environment, allows this process to use
+              another process wx environment.
+
+       nnuullll(()) -->> wwxx__oobbjjeecctt(())
+
+              Returns the null object
+
+       iiss__nnuullll((WWxx__rreeff::::wwxx__oobbjjeecctt(()))) -->> bboooolleeaann(())
+
+              Returns true if object is null, false otherwise
+
+       ggeettOObbjjeeccttTTyyppee((WWxx__rreeff::::wwxx__oobbjjeecctt(()))) -->> aattoomm(())
+
+              Returns the object type
+
+       ttyyppeeCCaasstt((OOlldd::::wwxx__oobbjjeecctt(()),, NNeewwTTyyppee::::aattoomm(()))) -->> wwxx__oobbjjeecctt(())
+
+              Casts the object to class NewType. It is needed when using
+              functions like wxWindow:findWindow/2, which returns a generic
+              wxObject type.
+
+       bbaattcchh((FFuunn::::ffuunnccttiioonn(()))) -->> tteerrmm(())
+
+              Batches all _w_x commands used in the fun. Improves performance of
+              the command processing by grabbing the wxWidgets thread so that
+              no event processing will be done before the complete batch of
+              commands is invoked.
+
+              _S_e_e _a_l_s_o_: ffoollddll//33, ffoollddrr//33, ffoorreeaacchh//22, mmaapp//22.
+
+       ffoorreeaacchh((FFuunn::::ffuunnccttiioonn(()),, LLiisstt::::lliisstt(()))) -->> ookk
+
+              Behaves like lliissttss::ffoorreeaacchh//22 but batches wx commands. See
+              bbaattcchh//11.
+
+       mmaapp((FFuunn::::ffuunnccttiioonn(()),, LLiisstt::::lliisstt(()))) -->> lliisstt(())
+
+              Behaves like lliissttss::mmaapp//22 but batches wx commands. See bbaattcchh//11.
+
+       ffoollddll((FFuunn::::ffuunnccttiioonn(()),, AAcccc::::tteerrmm(()),, LLiisstt::::lliisstt(()))) -->> tteerrmm(())
+
+              Behaves like lliissttss::ffoollddll//33 but batches wx commands. See bbaattcchh//11.
+
+       ffoollddrr((FFuunn::::ffuunnccttiioonn(()),, AAcccc::::tteerrmm(()),, LLiisstt::::lliisstt(()))) -->> tteerrmm(())
+
+              Behaves like lliissttss::ffoollddrr//33 but batches wx commands. See bbaattcchh//11.
+
+       ccrreeaattee__mmeemmoorryy((SSiizzee::::iinntteeggeerr(()))) -->> wwxx__mmeemmoorryy(())
+
+              Creates a memory area (of Size in bytes) which can be used by an
+              external library (i.e. opengl). It is up to the client to keep a
+              reference to this object so it does not get garbage collected by
+              erlang while still in use by the external library.
+
+              This is far from erlang's intentional usage and can crash the
+              erlang emulator. Use it carefully.
+
+       ggeett__mmeemmoorryy__bbiinn((WWxx__mmeemm::::wwxx__mmeemmoorryy(()))) -->> bbiinnaarryy(())
+
+              Returns the memory area as a binary.
+
+       rreettaaiinn__mmeemmoorryy((WWxx__mmeemm::::wwxx__mmeemmoorryy(()))) -->> ookk
+
+              Saves the memory from deletion until release_memory/1 is called.
+              If release_memory/1 is not called the memory will not be garbage
+              collected.
+
+       rreelleeaassee__mmeemmoorryy((WWxx__mmeemm::::wwxx__mmeemmoorryy(()))) -->> ookk
+
+       ddeebbuugg((LLiisstt::::LLeevveell || [[LLeevveell]])) -->> ookk
+
+              Types:
+
+                 Level = none | verbose | trace | driver | integer()
+
+              Sets debug level. If debug level is 'verbose' or 'trace' each
+              call is printed on console. If Level is 'driver' each allocated
+              object and deletion is printed on the console.
+
+       ddeemmoo(()) -->> ookk || {{eerrrroorr,, aattoomm(())}}
+
+              Starts a wxErlang demo if examples directory exists and is
+              compiled
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                             wx(3)

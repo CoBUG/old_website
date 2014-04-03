@@ -1,0 +1,91 @@
+config(5)                            Files                           config(5)
+
+
+
+NNAAMMEE
+       config - Configuration file.
+
+DDEESSCCRRIIPPTTIIOONN
+       A _c_o_n_f_i_g_u_r_a_t_i_o_n _f_i_l_e contains values for configuration parameters for
+       the applications in the system. The _e_r_l command line argument _-_c_o_n_f_i_g
+       _N_a_m_e tells the system to use data in the system configuration file
+       _N_a_m_e_._c_o_n_f_i_g.
+
+       Configuration parameter values in the configuration file will override
+       the values in the application resource files (see _a_p_p_(_4_)). The values
+       in the configuration file can be overridden by command line flags (see
+       _e_r_l_(_1_)).
+
+       The value of a configuration parameter is retrieved by calling
+       _a_p_p_l_i_c_a_t_i_o_n_:_g_e_t___e_n_v_/_1_,_2.
+
+FFIILLEE SSYYNNTTAAXX
+       The configuration file should be called _N_a_m_e_._c_o_n_f_i_g where _N_a_m_e is an
+       arbitrary name.
+
+       The _._c_o_n_f_i_g file contains one single Erlang term. The file has the
+       following syntax:
+
+       [{Application1, [{Par11, Val11}, ..]},
+        ..
+        {ApplicationN, [{ParN1, ValN1}, ..]}].
+
+         * _A_p_p_l_i_c_a_t_i_o_n _= _a_t_o_m_(_) is the name of the application.
+
+         * _P_a_r _= _a_t_o_m_(_) is the name of a configuration parameter.
+
+         * _V_a_l _= _t_e_r_m_(_) is the value of a configuration parameter.
+
+SSYYSS..CCOONNFFIIGG
+       When starting Erlang in embedded mode, it is assumed that exactly one
+       system configuration file is used, named _s_y_s_._c_o_n_f_i_g. This file should
+       be located in _$_R_O_O_T_/_r_e_l_e_a_s_e_s_/_V_s_n, where _$_R_O_O_T is the Erlang/OTP root
+       installation directory and _V_s_n is the release version.
+
+       Release handling relies on this assumption. When installing a new
+       release version, the new _s_y_s_._c_o_n_f_i_g is read and used to update the
+       application configurations.
+
+       This means that specifying another, or additional, _._c_o_n_f_i_g files would
+       lead to inconsistent update of application configurations. Therefore,
+       in Erlang 5.4/OTP R10B, the syntax of _s_y_s_._c_o_n_f_i_g was extended to allow
+       pointing out other _._c_o_n_f_i_g files:
+
+       [{Application, [{Par, Val}]} | File].
+
+         * _F_i_l_e _= _s_t_r_i_n_g_(_) is the name of another _._c_o_n_f_i_g file. The extension
+           _._c_o_n_f_i_g may be omitted. It is recommended to use absolute paths. A
+           relative path is relative the current working directory of the
+           emulator.
+
+       When traversing the contents of _s_y_s_._c_o_n_f_i_g and a filename is
+       encountered, its contents are read and merged with the result so far.
+       When an application configuration tuple _{_A_p_p_l_i_c_a_t_i_o_n_, _E_n_v_} is found, it
+       is merged with the result so far. Merging means that new parameters are
+       added and existing parameter values overwritten. Example:
+
+       sys.config:
+
+       [{myapp,[{par1,val1},{par2,val2}]},
+        "/home/user/myconfig"].
+
+
+       myconfig.config:
+
+       [{myapp,[{par2,val3},{par3,val4}]}].
+
+       This will yield the following environment for _m_y_a_p_p:
+
+       [{par1,val1},{par2,val3},{par3,val4}]
+
+       The behaviour if a file specified in _s_y_s_._c_o_n_f_i_g does not exist or is
+       erroneous in some other way, is backwards compatible. Starting the
+       runtime system will fail. Installing a new release version will not
+       fail, but an error message is given and the erroneous file is ignored.
+
+SSEEEE AALLSSOO
+       _a_p_p_(_4_), _e_r_l_(_1_), _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s
+
+
+
+Ericsson AB                      kernel 2.15.2                       config(5)

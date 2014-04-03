@@ -1,0 +1,246 @@
+queue(3)                   Erlang Module Definition                   queue(3)
+
+
+
+NNAAMMEE
+       queue - Abstract Data Type for FIFO Queues
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements (double ended) FIFO queues in an efficient
+       manner.
+
+       All functions fail with reason _b_a_d_a_r_g if arguments are of wrong type,
+       for example queue arguments are not queues, indexes are not integers,
+       list arguments are not lists. Improper lists cause internal crashes. An
+       index out of range for a queue also causes a failure with reason
+       _b_a_d_a_r_g.
+
+       Some functions, where noted, fail with reason _e_m_p_t_y for an empty queue.
+
+       The data representing a queue as used by this module should be regarded
+       as opaque by other modules. Any code assuming knowledge of the format
+       is running on thin ice.
+
+       All operations has an amortized O(1) running time, except _l_e_n_/_1,
+       _j_o_i_n_/_2, _s_p_l_i_t_/_2, _f_i_l_t_e_r_/_2 and _m_e_m_b_e_r_/_2 that have O(n). To minimize the
+       size of a queue minimizing the amount of garbage built by queue
+       operations, the queues do not contain explicit length information, and
+       that is why _l_e_n_/_1 is O(n). If better performance for this particular
+       operation is essential, it is easy for the caller to keep track of the
+       length.
+
+       Queues are double ended. The mental picture of a queue is a line of
+       people (items) waiting for their turn. The queue front is the end with
+       the item that has waited the longest. The queue rear is the end an item
+       enters when it starts to wait. If instead using the mental picture of a
+       list, the front is called head and the rear is called tail.
+
+       Entering at the front and exiting at the rear are reverse operations on
+       the queue.
+
+       The module has several sets of interface functions. The "Original API",
+       the "Extended API" and the "Okasaki API".
+
+       The "Original API" and the "Extended API" both use the mental picture
+       of a waiting line of items. Both also have reverse operations suffixed
+       "_r".
+
+       The "Original API" item removal functions return compound terms with
+       both the removed item and the resulting queue. The "Extended API"
+       contain alternative functions that build less garbage as well as
+       functions for just inspecting the queue ends. Also the "Okasaki API"
+       functions build less garbage.
+
+       The "Okasaki API" is inspired by "Purely Functional Data structures" by
+       Chris Okasaki. It regards queues as lists. The API is by many regarded
+       as strange and avoidable. For example many reverse operations have
+       lexically reversed names, some with more readable but perhaps less
+       understandable aliases.
+
+OORRIIGGIINNAALL AAPPII
+DDAATTAA TTYYPPEESS
+       qquueeuuee(())
+
+              As returned by _n_e_w_/_0.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> qquueeuuee(())
+
+              Returns an empty queue.
+
+       iiss__qquueeuuee((TTeerrmm :::: tteerrmm(()))) -->> bboooolleeaann(())
+
+              Tests if _T_e_r_m is a queue and returns _t_r_u_e if so and _f_a_l_s_e
+              otherwise.
+
+       iiss__eemmppttyy((QQ :::: qquueeuuee(()))) -->> bboooolleeaann(())
+
+              Tests if _Q is empty and returns _t_r_u_e if so and _f_a_l_s_e otherwise.
+
+       lleenn((QQ :::: qquueeuuee(()))) -->> iinntteeggeerr(()) >>== 00
+
+              Calculates and returns the length of queue _Q.
+
+       iinn((IItteemm :::: tteerrmm(()),, QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Inserts _I_t_e_m at the rear of queue _Q_1. Returns the resulting
+              queue _Q_2.
+
+       iinn__rr((IItteemm :::: tteerrmm(()),, QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Inserts _I_t_e_m at the front of queue _Q_1. Returns the resulting
+              queue _Q_2.
+
+       oouutt((QQ11 :::: qquueeuuee(()))) -->>
+              {{{{vvaalluuee,, IItteemm :::: tteerrmm(())}},, QQ22 :::: qquueeuuee(())}} ||
+              {{eemmppttyy,, QQ11 :::: qquueeuuee(())}}
+
+              Removes the item at the front of queue _Q_1. Returns the tuple
+              _{_{_v_a_l_u_e_, _I_t_e_m_}_, _Q_2_}, where _I_t_e_m is the item removed and _Q_2 is
+              the resulting queue. If _Q_1 is empty, the tuple _{_e_m_p_t_y_, _Q_1_} is
+              returned.
+
+       oouutt__rr((QQ11 :::: qquueeuuee(()))) -->>
+                {{{{vvaalluuee,, IItteemm :::: tteerrmm(())}},, QQ22 :::: qquueeuuee(())}} ||
+                {{eemmppttyy,, QQ11 :::: qquueeuuee(())}}
+
+              Removes the item at the rear of the queue _Q_1. Returns the tuple
+              _{_{_v_a_l_u_e_, _I_t_e_m_}_, _Q_2_}, where _I_t_e_m is the item removed and _Q_2 is
+              the new queue. If _Q_1 is empty, the tuple _{_e_m_p_t_y_, _Q_1_} is
+              returned.
+
+       ffrroomm__lliisstt((LL :::: lliisstt(()))) -->> qquueeuuee(())
+
+              Returns a queue containing the items in _L in the same order; the
+              head item of the list will become the front item of the queue.
+
+       ttoo__lliisstt((QQ :::: qquueeuuee(()))) -->> lliisstt(())
+
+              Returns a list of the items in the queue in the same order; the
+              front item of the queue will become the head of the list.
+
+       rreevveerrssee((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Returns a queue _Q_2 that contains the items of _Q_1 in the reverse
+              order.
+
+       sspplliitt((NN :::: iinntteeggeerr(()) >>== 00,, QQ11 :::: qquueeuuee(()))) -->>
+                {{QQ22 :::: qquueeuuee(()),, QQ33 :::: qquueeuuee(())}}
+
+              Splits _Q_1 in two. The _N front items are put in _Q_2 and the rest
+              in _Q_3
+
+       jjooiinn((QQ11 :::: qquueeuuee(()),, QQ22 :::: qquueeuuee(()))) -->> QQ33 :::: qquueeuuee(())
+
+              Returns a queue _Q_3 that is the result of joining _Q_1 and _Q_2 with
+              _Q_1 in front of _Q_2.
+
+       ffiilltteerr((FFuunn,, QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Types:
+
+                 Fun = fun((Item :: term()) -> boolean() | list())
+
+              Returns a queue _Q_2 that is the result of calling _F_u_n_(_I_t_e_m_) on
+              all items in _Q_1, in order from front to rear.
+
+              If _F_u_n_(_I_t_e_m_) returns _t_r_u_e, _I_t_e_m is copied to the result queue.
+              If it returns _f_a_l_s_e, _I_t_e_m is not copied. If it returns a list
+              the list elements are inserted instead of _I_t_e_m in the result
+              queue.
+
+              So, _F_u_n_(_I_t_e_m_) returning _[_I_t_e_m_] is thereby semantically
+              equivalent to returning _t_r_u_e, just as returning _[_] is
+              semantically equivalent to returning _f_a_l_s_e. But returning a list
+              builds more garbage than returning an atom.
+
+       mmeemmbbeerr((IItteemm :::: tteerrmm(()),, QQ :::: qquueeuuee(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _I_t_e_m matches some element in _Q, otherwise _f_a_l_s_e.
+
+EEXXTTEENNDDEEDD AAPPII
+EEXXPPOORRTTSS
+       ggeett((QQ :::: qquueeuuee(()))) -->> IItteemm :::: tteerrmm(())
+
+              Returns _I_t_e_m at the front of queue _Q.
+
+              Fails with reason _e_m_p_t_y if _Q is empty.
+
+       ggeett__rr((QQ :::: qquueeuuee(()))) -->> IItteemm :::: tteerrmm(())
+
+              Returns _I_t_e_m at the rear of queue _Q.
+
+              Fails with reason _e_m_p_t_y if _Q is empty.
+
+       ddrroopp((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Returns a queue _Q_2 that is the result of removing the front item
+              from _Q_1.
+
+              Fails with reason _e_m_p_t_y if _Q_1 is empty.
+
+       ddrroopp__rr((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Returns a queue _Q_2 that is the result of removing the rear item
+              from _Q_1.
+
+              Fails with reason _e_m_p_t_y if _Q_1 is empty.
+
+       ppeeeekk((QQ :::: qquueeuuee(()))) -->> eemmppttyy || {{vvaalluuee,, IItteemm :::: tteerrmm(())}}
+
+              Returns the tuple _{_v_a_l_u_e_, _I_t_e_m_} where _I_t_e_m is the front item of
+              _Q, or _e_m_p_t_y if _Q is empty.
+
+       ppeeeekk__rr((QQ :::: qquueeuuee(()))) -->> eemmppttyy || {{vvaalluuee,, IItteemm :::: tteerrmm(())}}
+
+              Returns the tuple _{_v_a_l_u_e_, _I_t_e_m_} where _I_t_e_m is the rear item of
+              _Q, or _e_m_p_t_y if _Q is empty.
+
+OOKKAASSAAKKII AAPPII
+EEXXPPOORRTTSS
+       ccoonnss((IItteemm :::: tteerrmm(()),, QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Inserts _I_t_e_m at the head of queue _Q_1. Returns the new queue _Q_2.
+
+       hheeaadd((QQ :::: qquueeuuee(()))) -->> IItteemm :::: tteerrmm(())
+
+              Returns _I_t_e_m from the head of queue _Q.
+
+              Fails with reason _e_m_p_t_y if _Q is empty.
+
+       ttaaiill((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Returns a queue _Q_2 that is the result of removing the head item
+              from _Q_1.
+
+              Fails with reason _e_m_p_t_y if _Q_1 is empty.
+
+       ssnnoocc((QQ11 :::: qquueeuuee(()),, IItteemm :::: tteerrmm(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Inserts _I_t_e_m as the tail item of queue _Q_1. Returns the new queue
+              _Q_2.
+
+       ddaaeehh((QQ :::: qquueeuuee(()))) -->> IItteemm :::: tteerrmm(())
+
+       llaasstt((QQ :::: qquueeuuee(()))) -->> IItteemm :::: tteerrmm(())
+
+              Returns the tail item of queue _Q.
+
+              Fails with reason _e_m_p_t_y if _Q is empty.
+
+       lliiaatt((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+       iinniitt((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+       llaaiitt((QQ11 :::: qquueeuuee(()))) -->> QQ22 :::: qquueeuuee(())
+
+              Returns a queue _Q_2 that is the result of removing the tail item
+              from _Q_1.
+
+              Fails with reason _e_m_p_t_y if _Q_1 is empty.
+
+              The name _l_a_i_t_/_1 is a misspelling - do not use it anymore.
+
+
+
+Ericsson AB                      stdlib 1.18.2                        queue(3)

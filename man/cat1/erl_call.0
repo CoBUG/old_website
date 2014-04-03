@@ -1,0 +1,193 @@
+erl_call(1)                      User Commands                     erl_call(1)
+
+
+
+NNAAMMEE
+       erl_call - Call/Start a Distributed Erlang Node
+
+DDEESSCCRRIIPPTTIIOONN
+       _e_r_l___c_a_l_l makes it possible to start and/or communicate with a
+       distributed Erlang node. It is built upon the _e_r_l___i_n_t_e_r_f_a_c_e library as
+       an example application. Its purpose is to use an Unix shell script to
+       interact with a distributed Erlang node. It performs all communication
+       with the Erlang _r_e_x _s_e_r_v_e_r, using the standard Erlang RPC facility. It
+       does not require any special software to be run at the Erlang target
+       node.
+
+       The main use is to either start a distributed Erlang node or to make an
+       ordinary function call. However, it is also possible to pipe an Erlang
+       module to _e_r_l___c_a_l_l and have it compiled, or to pipe a sequence of
+       Erlang expressions to be evaluated (similar to the Erlang shell).
+
+       Options, which cause _s_t_d_i_n to be read, can be used with advantage as
+       scripts from within (Unix) shell scripts. Another nice use of _e_r_l___c_a_l_l
+       could be from (http) CGI-bin scripts.
+
+EEXXPPOORRTTSS
+       eerrll__ccaallll <<ooppttiioonnss>>
+
+              Each option flag is described below with its name, type and
+              meaning.
+
+                --aa [[MMoodd [[FFuunn [[AArrggss]]]]]]]]::
+                  (_o_p_t_i_o_n_a_l): Applies the specified function and returns the
+                  result. _M_o_d must be specified, however _s_t_a_r_t and _[_] are
+                  assumed for unspecified _F_u_n and _A_r_g_s, respectively. _A_r_g_s
+                  should be in the same format as for _e_r_l_a_n_g_:_a_p_p_l_y_/_3. Note
+                  that this flag takes exactly one argument, so quoting may be
+                  necessary in order to group _M_o_d, _F_u_n and _A_r_g_s, in a manner
+                  dependent on the behavior of your command shell.
+
+                --cc CCooookkiiee::
+                  (_o_p_t_i_o_n_a_l): Use this option to specify a certain cookie. If
+                  no cookie is specified, the _~_/_._e_r_l_a_n_g_._c_o_o_k_i_e file is read
+                  and its content are used as cookie. The Erlang node we want
+                  to communicate with must have the same cookie.
+
+                --dd::
+                  (_o_p_t_i_o_n_a_l): Debug mode. This causes all IO to be output to
+                  the file _~_/_._e_r_l___c_a_l_l_._o_u_t_._N_o_d_e_n_a_m_e, where _N_o_d_e_n_a_m_e is the
+                  node name of the Erlang node in question.
+
+                --ee::
+                  (_o_p_t_i_o_n_a_l): Reads a sequence of Erlang expressions,
+                  separated by '_,' and ended with a '_.', from _s_t_d_i_n until EOF
+                  (Control-D). Evaluates the expressions and returns the
+                  result from the last expression. Returns _{_o_k_,_R_e_s_u_l_t_} if
+                  successful.
+
+                --hh HHiiddddeennNNaammee::
+                  (_o_p_t_i_o_n_a_l): Specifies the name of the hidden node that
+                  _e_r_l___c_a_l_l represents.
+
+                --mm::
+                  (_o_p_t_i_o_n_a_l): Reads an Erlang module from _s_t_d_i_n and compiles
+                  it.
+
+                --nn NNooddee::
+                  (one of _-_n_, _-_n_a_m_e_, _-_s_n_a_m_e is required): Has the same meaning
+                  as _-_n_a_m_e and can still be used for backwards compatibility
+                  reasons.
+
+                --nnaammee NNooddee::
+                  (one of _-_n_, _-_n_a_m_e_, _-_s_n_a_m_e is required): _N_o_d_e is the name of
+                  the node to be started or communicated with. It is assumed
+                  that _N_o_d_e is started with _e_r_l _-_n_a_m_e, which means that fully
+                  qualified long node names are used. If the _-_s option is
+                  given, an Erlang node will (if necessary) be started with
+                  _e_r_l _-_n_a_m_e.
+
+                --qq::
+                  (_o_p_t_i_o_n_a_l): Halts the Erlang node specified with the -n
+                  switch. This switch overrides the -s switch.
+
+                --rr::
+                  (_o_p_t_i_o_n_a_l): Generates a random name of the hidden node that
+                  _e_r_l___c_a_l_l represents.
+
+                --ss::
+                  (_o_p_t_i_o_n_a_l): Starts a distributed Erlang node if necessary.
+                  This means that in a sequence of calls, where the '_-_s' and
+                  '_-_n _N_o_d_e' are constant, only the first call will start the
+                  Erlang node. This makes the rest of the communication very
+                  fast. This flag is currently only available on the Unix
+                  platform.
+
+                --ssnnaammee NNooddee::
+                  (one of _-_n_, _-_n_a_m_e_, _-_s_n_a_m_e is required): _N_o_d_e is the name of
+                  the node to be started or communicated with. It is assumed
+                  that _N_o_d_e is started with _e_r_l _-_s_n_a_m_e which means that short
+                  node names are used. If _-_s option is given, an Erlang node
+                  will be started (if necessary) with _e_r_l _-_s_n_a_m_e.
+
+                --vv::
+                  (_o_p_t_i_o_n_a_l): Prints a lot of _v_e_r_b_o_s_e information. This is
+                  only useful for the developer and maintainer of _e_r_l___c_a_l_l.
+
+                --xx EErrllSSccrriipptt::
+                  (_o_p_t_i_o_n_a_l): Specifies another name of the Erlang start-up
+                  script to be used. If not specified, the standard _e_r_l start-
+                  up script is used.
+
+EEXXAAMMPPLLEESS
+       Starts an Erlang node and calls _e_r_l_a_n_g_:_t_i_m_e_/_0.
+
+       erl_call -s -a 'erlang time' -n madonna
+       {18,27,34}
+
+
+       Terminates an Erlang node by calling _e_r_l_a_n_g_:_h_a_l_t_/_0.
+
+       erl_call -s -a 'erlang halt' -n madonna
+
+
+       An apply with several arguments.
+
+       erl_call -s -a 'lists map [{math,sqrt},[1,4,9,16,25]]' -n madonna
+
+
+       Evaluates a couple of expressions. TThhee iinnppuutt eennddss wwiitthh EEOOFF ((CCoonnttrrooll--DD))
+       .
+
+       erl_call -s -e -n madonna
+       statistics(runtime),
+       X=1,
+       Y=2,
+       {_,T}=statistics(runtime),
+       {X+Y,T}.
+       ^D
+       {ok,{3,0}}
+
+
+       Compiles a module and runs it. AAggaaiinn,, tthhee iinnppuutt eennddss wwiitthh EEOOFF ((CCoonnttrrooll--
+       DD)) . (In the example shown, the output has been formatted afterwards).
+
+       erl_call -s -m -a lolita -n madonna
+       -module(lolita).
+       -compile(export_all).
+       start() ->
+               P = processes(),
+               F = fun(X) -> {X,process_info(X,registered_name)} end,
+               lists:map(F,[],P).
+       ^D
+       [{<madonna@chivas.du.etx.ericsson.se,0,0>,
+                         {registered_name,init}},
+        {<madonna@chivas.du.etx.ericsson.se,2,0>,
+                         {registered_name,erl_prim_loader}},
+        {<madonna@chivas.du.etx.ericsson.se,4,0>,
+                         {registered_name,error_logger}},
+        {<madonna@chivas.du.etx.ericsson.se,5,0>,
+                         {registered_name,application_controller}},
+        {<madonna@chivas.du.etx.ericsson.se,6,0>,
+                         {registered_name,kernel}},
+        {<madonna@chivas.du.etx.ericsson.se,7,0>,
+                         []},
+        {<madonna@chivas.du.etx.ericsson.se,8,0>,
+                         {registered_name,kernel_sup}},
+        {<madonna@chivas.du.etx.ericsson.se,9,0>,
+                         {registered_name,net_sup}},
+        {<madonna@chivas.du.etx.ericsson.se,10,0>,
+                         {registered_name,net_kernel}},
+        {<madonna@chivas.du.etx.ericsson.se,11,0>,
+                         []},
+        {<madonna@chivas.du.etx.ericsson.se,12,0>,
+                         {registered_name,global_name_server}},
+        {<madonna@chivas.du.etx.ericsson.se,13,0>,
+                         {registered_name,auth}},
+        {<madonna@chivas.du.etx.ericsson.se,14,0>,
+                         {registered_name,rex}},
+        {<madonna@chivas.du.etx.ericsson.se,15,0>,
+                         []},
+        {<madonna@chivas.du.etx.ericsson.se,16,0>,
+                         {registered_name,file_server}},
+        {<madonna@chivas.du.etx.ericsson.se,17,0>,
+                         {registered_name,code_server}},
+        {<madonna@chivas.du.etx.ericsson.se,20,0>,
+                         {registered_name,user}},
+        {<madonna@chivas.du.etx.ericsson.se,38,0>,
+                         []}]
+
+
+
+
+Ericsson AB                   erl_interface 3.7.8                  erl_call(1)

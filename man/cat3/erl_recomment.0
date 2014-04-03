@@ -1,0 +1,125 @@
+erl_recomment(3)           Erlang Module Definition           erl_recomment(3)
+
+
+
+NNAAMMEE
+       erl_recomment - Inserting comments into abstract Erlang syntax trees.
+
+DDEESSCCRRIIPPTTIIOONN
+       Inserting comments into abstract Erlang syntax trees
+
+       This module contains functions for inserting comments, described by
+       position, indentation and text, as attachments on an abstract syntax
+       tree, at the correct places.
+
+EEXXPPOORRTTSS
+       qquuiicckk__rreeccoommmmeenntt__ffoorrmmss((TTrreeee::::FFoorrmmss,, CCoommmmeennttss::::[[CCoommmmeenntt]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Types:
+
+                 Forms = syntaxTree() | [syntaxTree()]
+                 Comment = {Line, Column, Indentation, Text}
+                 Line = integer()
+                 Column = integer()
+                 Indentation = integer()
+                 Text = [string()]
+
+              Like rreeccoommmmeenntt__ffoorrmmss//22, but only inserts top-level comments.
+              Comments within function definitions or declarations ("forms")
+              are simply ignored.
+
+       rreeccoommmmeenntt__ffoorrmmss((TTrreeee::::FFoorrmmss,, CCoommmmeennttss::::[[CCoommmmeenntt]])) -->> ssyynnttaaxxTTrreeee(())
+
+              Types:
+
+                 syntaxTree() (see module erl_syntax)
+                 Forms = syntaxTree() | [syntaxTree()]
+                 Comment = {Line, Column, Indentation, Text}
+                 Line = integer()
+                 Column = integer()
+                 Indentation = integer()
+                 Text = [string()]
+
+              Attaches comments to the syntax tree/trees representing a
+              program. The given _F_o_r_m_s should be a single syntax tree of type
+              _f_o_r_m___l_i_s_t, or a list of syntax trees representing "program
+              forms". The syntax trees must contain valid position information
+              (for details, see _r_e_c_o_m_m_e_n_t___t_r_e_e_/_2). The result is a
+              corresponding syntax tree of type _f_o_r_m___l_i_s_t in which all
+              comments in the list _C_o_m_m_e_n_t_s have been attached at the proper
+              places.
+
+              Assuming _F_o_r_m_s represents a program (or any sequence of "program
+              forms"), any comments whose first lines are not directly
+              associated with a specific program form will become standalone
+              comments inserted between the neighbouring program forms.
+              Furthermore, comments whose column position is less than or
+              equal to one will not be attached to a program form that begins
+              at a conflicting line number (this can happen with preprocessor-
+              generated _l_i_n_e-attributes).
+
+              If _F_o_r_m_s is a syntax tree of some other type than _f_o_r_m___l_i_s_t, the
+              comments will be inserted directly using _r_e_c_o_m_m_e_n_t___t_r_e_e_/_2, and
+              any comments left over from that process are added as
+              postcomments on the result.
+
+              Entries in _C_o_m_m_e_n_t_s represent multi-line comments. For each
+              entry, _L_i_n_e is the line number and _C_o_l_u_m_n the left column of the
+              comment (the column of the first comment-introducing "_%"
+              character). _I_n_d_e_n_t_a_t_i_o_n is the number of character positions
+              between the last non-whitespace character before the comment (or
+              the left margin) and the left column of the comment. _T_e_x_t is a
+              list of strings representing the consecutive comment lines in
+              top-down order, where each string contains all characters
+              following (but not including) the comment-introducing "_%" and up
+              to (but not including) the terminating newline. (Cf. module
+              _e_r_l___c_o_m_m_e_n_t___s_c_a_n.)
+
+              Evaluation exits with reason _{_b_a_d___p_o_s_i_t_i_o_n_, _P_o_s_} if the
+              associated position information _P_o_s of some subtree in the input
+              does not have a recognizable format, or with reason _{_b_a_d___t_r_e_e_,
+              _L_, _C_} if insertion of a comment at line _L, column _C, fails
+              because the tree structure is ill-formed.
+
+              _S_e_e _a_l_s_o_: eerrll__ccoommmmeenntt__ssccaann, qquuiicckk__rreeccoommmmeenntt__ffoorrmmss//22,
+              rreeccoommmmeenntt__ttrreeee//22.
+
+       rreeccoommmmeenntt__ttrreeee((TTrreeee::::ssyynnttaaxxTTrreeee(()),, CCoommmmeennttss::::[[CCoommmmeenntt]])) -->>
+       {{ssyynnttaaxxTTrreeee(()),, [[CCoommmmeenntt]]}}
+
+              Types:
+
+                 Comment = {Line, Column, Indentation, Text}
+                 Line = integer()
+                 Column = integer()
+                 Indentation = integer()
+                 Text = [string()]
+
+              Attaches comments to a syntax tree. The result is a pair
+              _{_N_e_w_T_r_e_e_, _R_e_m_a_i_n_d_e_r_} where _N_e_w_T_r_e_e is the given _T_r_e_e where
+              comments from the list _C_o_m_m_e_n_t_s have been attached at the proper
+              places. _R_e_m_a_i_n_d_e_r is the list of entries in _C_o_m_m_e_n_t_s which have
+              not been inserted, because their line numbers are greater than
+              those of any node in the tree. The entries in _C_o_m_m_e_n_t_s are
+              inserted in order; if two comments become attached to the same
+              node, they will appear in the same order in the program text.
+
+              The nodes of the syntax tree must contain valid position
+              information. This can be single integers, assumed to represent a
+              line number, or 2- or 3-tuples where the first or second element
+              is an integer, in which case the leftmost integer element is
+              assumed to represent the line number. Line numbers less than one
+              are ignored (usually, the default line number for newly created
+              nodes is zero).
+
+              For details on the _L_i_n_e, _C_o_l_u_m_n and _I_n_d_e_n_t_a_t_i_o_n fields, and the
+              behaviour in case of errors, see _r_e_c_o_m_m_e_n_t___f_o_r_m_s_/_2.
+
+              _S_e_e _a_l_s_o_: rreeccoommmmeenntt__ffoorrmmss//22.
+
+AAUUTTHHOORRSS
+       Richard Carlsson _<_c_a_r_l_s_s_o_n_._r_i_c_h_a_r_d_@_g_m_a_i_l_._c_o_m_>
+
+
+
+                              syntax_tools 1.6.9              erl_recomment(3)

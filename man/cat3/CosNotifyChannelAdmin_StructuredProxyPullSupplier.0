@@ -1,0 +1,116 @@
+CosNotifyChannelAdmin_StrucCtEoursrlNeaodntPgirfoMyxoCydhPuaulnlenleSDlueApfdpimlniiinet_riS(ot3nr)ucturedProxyPullSupplier(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_StructuredProxyPullSupplier - This module
+       implements the OMG  CosNotifyChannelAdmin::StructuredProxyPullSupplier
+       interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffyyCCoommmm__NNoottiiffyySSuubbssccrriibbee
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffyyFFiilltteerr__FFiilltteerrAAddmmiinn
+
+         * CCoossNNoottiiffyyCChhaannnneellAAddmmiinn__PPrrooxxyySSuupppplliieerr
+
+EEXXPPOORRTTSS
+       ccoonnnneecctt__ssttrruuccttuurreedd__ppuullll__ccoonnssuummeerr((SSttrruuccttuurreeddPPrrooxxyyPPuullllSSuupppplliieerr,,
+       PPuullllCCoonnssuummeerr)) -->> RReeppllyy
+
+              Types:
+
+                 StructuredProxyPullSupplier = #objref
+                 PullConsumer = #objref
+                 Reply = ok | {'EXCEPTION',
+                 #'CosEventChannelAdmin_AlreadyConnected'{}}
+
+              This operation connects a _P_u_l_l_C_o_n_s_u_m_e_r to the target object. If
+              a connection already exists the _A_l_r_e_a_d_y_C_o_n_n_e_c_t_e_d exception is
+              raised.
+
+       ppuullll__ssttrruuccttuurreedd__eevveenntt((SSttrruuccttuurreeddPPrrooxxyyPPuullllSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 StructuredProxyPullSupplier = #objref
+                 Reply = StructuredEvent | {'EXCEPTION',
+                 #'CosEventChannelAdmin_Disconnected'{}}
+                 StructuredEvent = #'CosNotification_StructuredEvent'{header,
+                 filterable_data, remainder_of_body}
+                 header = EventHeader
+                 filterable_data = [#'CosNotification_Property'{name, value}]
+                 name = string()
+                 value = #any
+                 remainder_of_body = #any
+                 EventHeader = #'CosNotification_EventHeader'{fixed_header,
+                 variable_header}
+                 fixed_header = FixedEventHeader
+                 variable_header = OptionalHeaderFields
+                 FixedEventHeader =
+                 #'CosNotification_FixedEventHeader'{event_type, event_name}
+                 event_type = EventType
+                 event_name = string()
+                 EventType = #'CosNotification_EventType'{domain_name,
+                 type_name}
+                 domain_name = type_name = string()
+                 OptionalHeaderFields = [#'CosNotification_Property'{name,
+                 value}]
+
+              This operation pulls next event from the target object; if an
+              event cannot be delivered this function blocks until an event
+              arrives.
+
+       ttrryy__ppuullll__ssttrruuccttuurreedd__eevveenntt((SSttrruuccttuurreeddPPrrooxxyyPPuullllSSuupppplliieerr)) -->> RReeppllyy
+
+              Types:
+
+                 StructuredProxyPullSupplier = #objref
+                 Reply = {StructuredEvent, HasEvent} | {'EXCEPTION',
+                 #'CosEventChannelAdmin_Disconnected'{}}
+                 HasEvent = boolean()
+                 StructuredEvent = #'CosNotification_StructuredEvent'{header,
+                 filterable_data, remainder_of_body}
+                 header = EventHeader
+                 filterable_data = [#'CosNotification_Property'{name, value}]
+                 name = string()
+                 value = #any
+                 remainder_of_body = #any
+                 EventHeader = #'CosNotification_EventHeader'{fixed_header,
+                 variable_header}
+                 fixed_header = FixedEventHeader
+                 variable_header = OptionalHeaderFields
+                 FixedEventHeader =
+                 #'CosNotification_FixedEventHeader'{event_type, event_name}
+                 event_type = EventType
+                 event_name = string()
+                 EventType = #'CosNotification_EventType'{domain_name,
+                 type_name}
+                 domain_name = type_name = string()
+                 OptionalHeaderFields = [#'CosNotification_Property'{name,
+                 value}]
+
+              This operation try to pull next event from the target object. If
+              no event have arrived an empty event is returned and the out
+              parameter _H_a_s_E_v_e_n_t is set to false. Otherwise, the boolean flag
+              is set to true and an valid event is returned.
+
+       ddiissccoonnnneecctt__ssttrruuccttuurreedd__ppuullll__ssuupppplliieerr((SSttrruuccttuurreeddPPrrooxxyyPPuullllSSuupppplliieerr)) -->> ookk
+
+              Types:
+
+                 StructuredProxyPullSupplier = #objref
+
+              This operation cause the target object to close the connection
+              and terminate.
+
+
+
+Ericsson AB               CocsoNsoNtoitfiyfCihcaantnieolnAd1m.i1n._1S8tructuredProxyPullSupplier(3)

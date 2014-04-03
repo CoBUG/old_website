@@ -1,0 +1,57 @@
+diameterc(1)                     User Commands                    diameterc(1)
+
+
+
+NNAAMMEE
+       diameterc - diameterc [<options>] <file>
+
+DDEESSCCRRIIPPTTIIOONN
+       The diameterc utility is used to compile diameter ddiiccttiioonnaarryy ffiilleess into
+       Erlang source. The resulting source implements the interface diameter
+       requires to encode and decode the dictionary's messages and AVP's.
+
+UUSSAAGGEE
+         ddiiaammeetteerrcc [[<<ooppttiioonnss>>]] <<ffiillee>>::
+           Compiles a single dictionary file. Valid options are as follows.
+
+           --oo <<ddiirr>>::
+             Specifies the directory into which the generated source should be
+             written. Defaults to the current working directory.
+
+           --ii <<ddiirr>>::
+             Specifies a directory to add to the code path. Use to point at
+             beam files compiled from inherited dictionaries, _@_i_n_h_e_r_i_t_s in a
+             dictionary file creating a beam dependency, not an erl/hrl
+             dependency.
+
+             Multiple _-_i options can be specified.
+
+           --EE::
+
+
+           --HH::
+             Supresses erl and hrl generation, respectively.
+
+           ----nnaammee <<nnaammee>>::
+
+
+           ----pprreeffiixx <<pprreeffiixx>>::
+             Set _@_n_a_m_e and _@_p_r_e_f_i_x in the dictionary, respectively. Overrides
+             any setting in the file itself.
+
+           ----iinnhheerriittss <<ddiicctt>>::
+             Append an _@_i_n_h_e_r_i_t_s to the dictionary before compiling.
+             Specifying _'_-_' as the dictionary has the effect of clearing any
+             previous inherits, causing them to be ignored.
+
+             Multiple _-_-_i_n_h_e_r_i_t_s options can be specified.
+
+EEXXIITT SSTTAATTUUSS
+       Returns 0 on success, non-zero on failure.
+
+SSEEEE AALLSSOO
+       ddiiaammeetteerr__ddiicctt((44))
+
+
+
+Ericsson AB                      diameter 1.2                     diameterc(1)

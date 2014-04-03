@@ -1,0 +1,195 @@
+wxPrintPreview(3)          Erlang Module Definition          wxPrintPreview(3)
+
+
+
+NNAAMMEE
+       wxPrintPreview - See external documentation: wxPrintPreview.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPrintPreview.
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_r_i_n_t_P_r_e_v_i_e_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPrriinnttoouutt)) -->> wwxxPPrriinnttPPrreevviieeww(())
+
+              Types:
+
+                 Printout = wxPrintout() (see module wxPrintout)
+
+              Equivalent to nneeww((PPrriinnttoouutt,, [[]])).
+
+       nneeww((PPrriinnttoouutt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxPPrriinnttPPrreevviieeww(())
+
+              Types:
+
+                 Printout = wxPrintout() (see module wxPrintout)
+                 Option = {printoutForPrinting, wxPrintout() (see module
+                 wxPrintout)} | {data, wxPrintDialogData() (see module
+                 wxPrintDialogData)}
+
+              See external documentation.
+
+       nneeww((PPrriinnttoouutt,, PPrriinnttoouuttFFoorrPPrriinnttiinngg,, DDaattaa)) -->> wwxxPPrriinnttPPrreevviieeww(())
+
+              Types:
+
+                 Printout = wxPrintout() (see module wxPrintout)
+                 PrintoutForPrinting = wxPrintout() (see module wxPrintout)
+                 Data = wxPrintData() (see module wxPrintData)
+
+              See external documentation.
+
+       ggeettCCaannvvaass((TThhiiss)) -->> wwxxPPrreevviieewwCCaannvvaass(()) ((sseeee mmoodduullee wwxxPPrreevviieewwCCaannvvaass))
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ggeettCCuurrrreennttPPaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ggeettFFrraammee((TThhiiss)) -->> wwxxFFrraammee(()) ((sseeee mmoodduullee wwxxFFrraammee))
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ggeettMMaaxxPPaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ggeettMMiinnPPaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ggeettPPrriinnttoouutt((TThhiiss)) -->> wwxxPPrriinnttoouutt(()) ((sseeee mmoodduullee wwxxPPrriinnttoouutt))
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ggeettPPrriinnttoouuttFFoorrPPrriinnttiinngg((TThhiiss)) -->> wwxxPPrriinnttoouutt(()) ((sseeee mmoodduullee wwxxPPrriinnttoouutt))
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintPreview()
+
+              See external documentation.
+
+       ppaaiinnttPPaaggee((TThhiiss,, CCaannvvaass,, DDcc)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintPreview()
+                 Canvas = wxPreviewCanvas() (see module wxPreviewCanvas)
+                 Dc = wxDC() (see module wxDC)
+
+              See external documentation.
+
+       pprriinntt((TThhiiss,, IInntteerraaccttiivvee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintPreview()
+                 Interactive = boolean()
+
+              See external documentation.
+
+       rreennddeerrPPaaggee((TThhiiss,, PPaaggeeNNuumm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintPreview()
+                 PageNum = integer()
+
+              See external documentation.
+
+       sseettCCaannvvaass((TThhiiss,, CCaannvvaass)) -->> ookk
+
+              Types:
+
+                 This = wxPrintPreview()
+                 Canvas = wxPreviewCanvas() (see module wxPreviewCanvas)
+
+              See external documentation.
+
+       sseettCCuurrrreennttPPaaggee((TThhiiss,, PPaaggeeNNuumm)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintPreview()
+                 PageNum = integer()
+
+              See external documentation.
+
+       sseettFFrraammee((TThhiiss,, FFrraammee)) -->> ookk
+
+              Types:
+
+                 This = wxPrintPreview()
+                 Frame = wxFrame() (see module wxFrame)
+
+              See external documentation.
+
+       sseettPPrriinnttoouutt((TThhiiss,, PPrriinnttoouutt)) -->> ookk
+
+              Types:
+
+                 This = wxPrintPreview()
+                 Printout = wxPrintout() (see module wxPrintout)
+
+              See external documentation.
+
+       sseettZZoooomm((TThhiiss,, PPeerrcceenntt)) -->> ookk
+
+              Types:
+
+                 This = wxPrintPreview()
+                 Percent = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPrriinnttPPrreevviieeww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxPrintPreview(3)

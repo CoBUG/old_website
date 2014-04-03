@@ -1,0 +1,153 @@
+app(5)                               Files                              app(5)
+
+
+
+NNAAMMEE
+       app - Application resource file.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _a_p_p_l_i_c_a_t_i_o_n _r_e_s_o_u_r_c_e _f_i_l_e specifies the resources an application
+       uses, and how the application is started. There must always be one
+       application resource file called _A_p_p_l_i_c_a_t_i_o_n_._a_p_p for each application
+       _A_p_p_l_i_c_a_t_i_o_n in the system.
+
+       The file is read by the application controller when an application is
+       loaded/started. It is also used by the functions in _s_y_s_t_o_o_l_s, for
+       example when generating start scripts.
+
+FFIILLEE SSYYNNTTAAXX
+       The application resource file should be called _A_p_p_l_i_c_a_t_i_o_n_._a_p_p where
+       _A_p_p_l_i_c_a_t_i_o_n is the name of the application. The file should be located
+       in the _e_b_i_n directory for the application.
+
+       It must contain one single Erlang term, which is called an _a_p_p_l_i_c_a_t_i_o_n
+       _s_p_e_c_i_f_i_c_a_t_i_o_n:
+
+       {application, Application,
+         [{description,  Description},
+          {id,           Id},
+          {vsn,          Vsn},
+          {modules,      Modules},
+          {maxP,         MaxP},
+          {maxT,         MaxT},
+          {registered,   Names},
+          {included_applications, Apps},
+          {applications, Apps},
+          {env,          Env},
+          {mod,          Start},
+          {start_phases, Phases}]}.
+
+                    Value                Default
+                    -----                -------
+       Application  atom()               -
+       Description  string()             ""
+       Id           string()             ""
+       Vsn          string()             ""
+       Modules      [Module]             []
+       MaxP         int()                infinity
+       MaxT         int()                infinity
+       Names        [Name]               []
+       Apps         [App]                []
+       Env          [{Par,Val}]          []
+       Start        {Module,StartArgs}   []
+       Phases       [{Phase,PhaseArgs}]  undefined
+         Module = Name = App = Par = Phase = atom()
+         Val = StartArgs = PhaseArgs = term()
+
+       _A_p_p_l_i_c_a_t_i_o_n is the name of the application.
+
+       For the application controller, all keys are optional. The respective
+       default values are used for any omitted keys.
+
+       The functions in _s_y_s_t_o_o_l_s require more information. If they are used,
+       the following keys are mandatory: _d_e_s_c_r_i_p_t_i_o_n, _v_s_n, _m_o_d_u_l_e_s, _r_e_g_i_s_t_e_r_e_d
+       and _a_p_p_l_i_c_a_t_i_o_n_s. The other keys are ignored by _s_y_s_t_o_o_l_s.
+
+         _d_e_s_c_r_i_p_t_i_o_n:
+           A one-line description of the application.
+
+         _i_d:
+           Product identification, or similar.
+
+         _v_s_n:
+           The version of the application.
+
+         _m_o_d_u_l_e_s:
+           All modules introduced by this application. _s_y_s_t_o_o_l_s uses this list
+           when generating start scripts and tar files. A module can only be
+           defined in one application.
+
+         _m_a_x_P:
+           _D_e_p_r_e_c_a_t_e_d _- _w_i_l_l _b_e _i_g_n_o_r_e_d
+           The maximum number of processes allowed in the application.
+
+         _m_a_x_T:
+           The maximum time in milliseconds that the application is allowed to
+           run. After the specified time the application will automatically
+           terminate.
+
+         _r_e_g_i_s_t_e_r_e_d:
+           All names of registered processes started in this application.
+           _s_y_s_t_o_o_l_s uses this list to detect name clashes between different
+           applications.
+
+         _i_n_c_l_u_d_e_d___a_p_p_l_i_c_a_t_i_o_n_s:
+           All applications which are included by this application. When this
+           application is started, all included application will automatically
+           be loaded, but not started, by the application controller. It is
+           assumed that the topmost supervisor of the included application is
+           started by a supervisor of this application.
+
+         _a_p_p_l_i_c_a_t_i_o_n_s:
+           All applications which must be started before this application is
+           allowed to be started. _s_y_s_t_o_o_l_s uses this list to generate correct
+           start scripts. Defaults to the empty list, but note that all
+           applications have dependencies to (at least) _k_e_r_n_e_l and _s_t_d_l_i_b.
+
+         _e_n_v:
+           Configuration parameters used by the application. The value of a
+           configuration parameter is retrieved by calling
+           _a_p_p_l_i_c_a_t_i_o_n_:_g_e_t___e_n_v_/_1_,_2. The values in the application resource
+           file can be overridden by values in a configuration file (see
+           _c_o_n_f_i_g_(_4_)) or by command line flags (see _e_r_l_(_1_)).
+
+         _m_o_d:
+           Specifies the application callback module and a start argument, see
+           _a_p_p_l_i_c_a_t_i_o_n_(_3_).
+
+           The _m_o_d key is necessary for an application implemented as a
+           supervision tree, or the application controller will not know how
+           to start it. The _m_o_d key can be omitted for applications without
+           processes, typically code libraries such as the application STDLIB.
+
+         _s_t_a_r_t___p_h_a_s_e_s:
+           A list of start phases and corresponding start arguments for the
+           application. If this key is present, the application master will -
+           in addition to the usual call to _M_o_d_u_l_e_:_s_t_a_r_t_/_2 - also call
+           _M_o_d_u_l_e_:_s_t_a_r_t___p_h_a_s_e_(_P_h_a_s_e_,_T_y_p_e_,_P_h_a_s_e_A_r_g_s_) for each start phase
+           defined by the _s_t_a_r_t___p_h_a_s_e_s key, and only after this extended start
+           procedure will _a_p_p_l_i_c_a_t_i_o_n_:_s_t_a_r_t_(_A_p_p_l_i_c_a_t_i_o_n_) return.
+
+           Start phases may be used to synchronize startup of an application
+           and its included applications. In this case, the _m_o_d key must be
+           specified as:
+
+         {mod, {application_starter,[Module,StartArgs]}}
+
+           The application master will then call _M_o_d_u_l_e_:_s_t_a_r_t_/_2 for the
+           primary application, followed by calls to _M_o_d_u_l_e_:_s_t_a_r_t___p_h_a_s_e_/_3 for
+           each start phase (as defined for the primary application) both for
+           the primary application and for each of its included application,
+           for which the start phase is defined.
+
+           This implies that for an included application, the set of start
+           phases must be a subset of the set of phases defined for the
+           primary application. Refer to _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s for more
+           information.
+
+SSEEEE AALLSSOO
+       aapppplliiccaattiioonn((33)), systools(3)
+
+
+
+Ericsson AB                      kernel 2.15.2                          app(5)

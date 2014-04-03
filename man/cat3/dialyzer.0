@@ -1,0 +1,341 @@
+dialyzer(3)                Erlang Module Definition                dialyzer(3)
+
+
+
+NNAAMMEE
+       dialyzer - The Dialyzer, a DIscrepancy AnalYZer for ERlang programs
+
+DDEESSCCRRIIPPTTIIOONN
+       The Dialyzer is a static analysis tool that identifies software
+       discrepancies such as definite type errors, code which has become dead
+       or unreachable due to some programming error, unnecessary tests, etc.
+       in single Erlang modules or entire (sets of) applications. Dialyzer
+       starts its analysis from either debug-compiled BEAM bytecode or from
+       Erlang source code. The file and line number of a discrepancy is
+       reported along with an indication of what the discrepancy is about.
+       Dialyzer bases its analysis on the concept of success typings which
+       allows for sound warnings (no false positives).
+
+       Read more about Dialyzer and about how to use it from the GUI in
+       DDiiaallyyzzeerr UUsseerr''ss GGuuiiddee.
+
+UUSSIINNGG TTHHEE DDIIAALLYYZZEERR FFRROOMM TTHHEE CCOOMMMMAANNDD LLIINNEE
+       Dialyzer also has a command line version for automated use. Below is a
+       brief description of the list of its options. The same information can
+       be obtained by writing
+
+             dialyzer --help
+
+
+       in a shell. Please refer to the GUI description for more details on the
+       operation of Dialyzer.
+
+       The exit status of the command line version is:
+
+             0 - No problems were encountered during the analysis and no
+                 warnings were emitted.
+             1 - Problems were encountered during the analysis.
+             2 - No problems were encountered, but warnings were emitted.
+
+
+       Usage:
+
+              dialyzer [--help] [--version] [--shell] [--quiet] [--verbose]
+                 [-pa dir]* [--plt plt] [--plts plt*] [-Ddefine]*
+                       [-I include_dir]* [--output_plt file] [-Wwarn]*
+                       [--src] [--gui | --wx] [files_or_dirs] [-r dirs]
+                       [--apps applications] [-o outfile]
+                 [--build_plt] [--add_to_plt] [--remove_from_plt]
+                 [--check_plt] [--no_check_plt] [--plt_info] [--get_warnings]
+                       [--no_native] [--fullpath]
+
+
+       Options:
+
+         _f_i_l_e_s___o_r___d_i_r_s (for backwards compatibility also as: _-_c _f_i_l_e_s___o_r___d_i_r_s:
+           Use Dialyzer from the command line to detect defects in the
+           specified files or directories containing _._e_r_l or _._b_e_a_m files,
+           depending on the type of the analysis.
+
+         _-_r _d_i_r_s:
+           Same as the previous but the specified directories are searched
+           recursively for subdirectories containing _._e_r_l or _._b_e_a_m files in
+           them, depending on the type of analysis.
+
+         _-_-_a_p_p_s _a_p_p_l_i_c_a_t_i_o_n_s:
+           Option typically used when building or modifying a plt as in:
+
+                    dialyzer --build_plt --apps erts kernel stdlib mnesia ...
+
+
+                    dialyzer --apps inets ssl ./ebin ../other_lib/ebin/my_module.beam
+
+
+         _-_o _o_u_t_f_i_l_e (or _-_-_o_u_t_p_u_t _o_u_t_f_i_l_e):
+           When using Dialyzer from the command line, send the analysis
+           results to the specified outfile rather than to stdout.
+
+         _-_-_r_a_w:
+           When using Dialyzer from the command line, output the raw analysis
+           results (Erlang terms) instead of the formatted result. The raw
+           format is easier to post-process (for instance, to filter warnings
+           or to output HTML pages).
+
+         _-_-_s_r_c:
+           Override the default, which is to analyze BEAM files, and analyze
+           starting from Erlang source code instead.
+
+         _-_D_n_a_m_e (or _-_D_n_a_m_e_=_v_a_l_u_e):
+           When analyzing from source, pass the define to Dialyzer. (**)
+
+         _-_I _i_n_c_l_u_d_e___d_i_r:
+           When analyzing from source, pass the _i_n_c_l_u_d_e___d_i_r to Dialyzer. (**)
+
+         _-_p_a _d_i_r:
+           Include _d_i_r in the path for Erlang (useful when analyzing files
+           that have _'_-_i_n_c_l_u_d_e___l_i_b_(_)_' directives).
+
+         _-_-_o_u_t_p_u_t___p_l_t _f_i_l_e:
+           Store the plt at the specified file after building it.
+
+         _-_-_p_l_t _p_l_t:
+           Use the specified plt as the initial plt (if the plt was built
+           during setup the files will be checked for consistency).
+
+         _-_-_p_l_t_s _p_l_t_*:
+           Merge the specified plts to create the initial plt -- requires that
+           the plts are disjoint (i.e., do not have any module appearing in
+           more than one plt). The plts are created in the usual way:
+
+                    dialyzer --build_plt --output_plt plt_1 files_to_include
+                    ...
+                    dialyzer --build_plt --output_plt plt_n files_to_include
+
+
+                    dialyzer files_to_analyze --plts plt_1 ... plt_n
+
+
+                    dialyzer --plts plt_1 ... plt_n -- files_to_analyze
+
+
+         _-_W_w_a_r_n:
+           A family of options which selectively turn on/off warnings (for
+           help on the names of warnings use _d_i_a_l_y_z_e_r _-_W_h_e_l_p).
+
+         _-_-_s_h_e_l_l:
+           Do not disable the Erlang shell while running the GUI.
+
+         _-_-_v_e_r_s_i_o_n (or _-_v):
+           Print the Dialyzer version and some more information and exit.
+
+         _-_-_h_e_l_p (or _-_h):
+           Print this message and exit.
+
+         _-_-_q_u_i_e_t (or _-_q):
+           Make Dialyzer a bit more quiet.
+
+         _-_-_v_e_r_b_o_s_e:
+           Make Dialyzer a bit more verbose.
+
+         _-_-_b_u_i_l_d___p_l_t:
+           The analysis starts from an empty plt and creates a new one from
+           the files specified with _-_c and _-_r. Only works for beam files. Use
+           _-_-_p_l_t or _-_-_o_u_t_p_u_t___p_l_t to override the default plt location.
+
+         _-_-_a_d_d___t_o___p_l_t:
+           The plt is extended to also include the files specified with _-_c and
+           _-_r. Use _-_-_p_l_t to specify which plt to start from, and _-_-_o_u_t_p_u_t___p_l_t
+           to specify where to put the plt. Note that the analysis might
+           include files from the plt if they depend on the new files. This
+           option only works with beam files.
+
+         _-_-_r_e_m_o_v_e___f_r_o_m___p_l_t:
+           The information from the files specified with _-_c and _-_r is removed
+           from the plt. Note that this may cause a re-analysis of the
+           remaining dependent files.
+
+         _-_-_c_h_e_c_k___p_l_t:
+           Check the plt for consistency and rebuild it if it is not up-to-
+           date.
+
+         _-_-_n_o___c_h_e_c_k___p_l_t:
+           Skip the plt check when running Dialyzer. Useful when working with
+           installed plts that never change.
+
+         _-_-_p_l_t___i_n_f_o:
+           Make Dialyzer print information about the plt and then quit. The
+           plt can be specified with _-_-_p_l_t_(_s_).
+
+         _-_-_g_e_t___w_a_r_n_i_n_g_s:
+           Make Dialyzer emit warnings even when manipulating the plt.
+           Warnings are only emitted for files that are actually analyzed.
+
+         _-_-_d_u_m_p___c_a_l_l_g_r_a_p_h _f_i_l_e:
+           Dump the call graph into the specified file whose format is
+           determined by the file name extension. Supported extensions are:
+           raw, dot, and ps. If something else is used as file name extension,
+           default format '.raw' will be used.
+
+         _-_-_n_o___n_a_t_i_v_e (or _-_n_n):
+           Bypass the native code compilation of some key files that Dialyzer
+           heuristically performs when dialyzing many files; this avoids the
+           compilation time but it may result in (much) longer analysis time.
+
+         _-_-_f_u_l_l_p_a_t_h:
+           Display the full path names of files for which warnings are
+           emitted.
+
+         _-_-_g_u_i:
+           Use the gs-based GUI.
+
+         _-_-_w_x:
+           Use the wx-based GUI.
+
+   NNoottee::
+       * denotes that multiple occurrences of these options are possible.
+
+       ** options _-_D and _-_I work both from command-line and in the Dialyzer
+       GUI; the syntax of defines and includes is the same as that used by
+       _e_r_l_c.
+
+
+       Warning options:
+
+         _-_W_n_o___r_e_t_u_r_n:
+           Suppress warnings for functions that will never return a value.
+
+         _-_W_n_o___u_n_u_s_e_d:
+           Suppress warnings for unused functions.
+
+         _-_W_n_o___i_m_p_r_o_p_e_r___l_i_s_t_s:
+           Suppress warnings for construction of improper lists.
+
+         _-_W_n_o___t_u_p_l_e___a_s___f_u_n:
+           Suppress warnings for using tuples instead of funs.
+
+         _-_W_n_o___f_u_n___a_p_p:
+           Suppress warnings for fun applications that will fail.
+
+         _-_W_n_o___m_a_t_c_h:
+           Suppress warnings for patterns that are unused or cannot match.
+
+         _-_W_n_o___o_p_a_q_u_e:
+           Suppress warnings for violations of opaqueness of data types.
+
+         _-_W_u_n_m_a_t_c_h_e_d___r_e_t_u_r_n_s***:
+           Include warnings for function calls which ignore a structured
+           return value or do not match against one of many possible return
+           value(s).
+
+         _-_W_e_r_r_o_r___h_a_n_d_l_i_n_g***:
+           Include warnings for functions that only return by means of an
+           exception.
+
+         _-_W_r_a_c_e___c_o_n_d_i_t_i_o_n_s***:
+           Include warnings for possible race conditions.
+
+         _-_W_b_e_h_a_v_i_o_u_r_s***:
+           Include warnings about behaviour callbacks which drift from the
+           published recommended interfaces.
+
+         _-_W_u_n_d_e_r_s_p_e_c_s***:
+           Warn about underspecified functions (the -spec is strictly more
+           allowing than the success typing).
+
+       The following options are also available but their use is not
+       recommended: (they are mostly for Dialyzer developers and internal
+       debugging)
+
+         _-_W_o_v_e_r_s_p_e_c_s***:
+           Warn about overspecified functions (the -spec is strictly less
+           allowing than the success typing).
+
+         _-_W_s_p_e_c_d_i_f_f_s***:
+           Warn when the -spec is different than the success typing.
+
+   NNoottee::
+       *** Identifies options that turn on warnings rather than turning them
+       off.
+
+
+UUSSIINNGG TTHHEE DDIIAALLYYZZEERR FFRROOMM EERRLLAANNGG
+       You can also use Dialyzer directly from Erlang. Both the GUI and the
+       command line versions are available. The options are similar to the
+       ones given from the command line, so please refer to the sections above
+       for a description of these.
+
+EEXXPPOORRTTSS
+       gguuii(()) -->> ookk || {{eerrrroorr,, MMssgg}}
+       gguuii((OOppttLLiisstt)) -->> ookk || {{eerrrroorr,, MMssgg}}
+
+              Types:
+
+                 OptList -- see below
+
+              Dialyzer GUI version.
+
+              OptList  :: [Option]
+              Option   :: {files,          [Filename :: string()]}
+                        | {files_rec,      [DirName :: string()]}
+                        | {defines,        [{Macro: atom(), Value : term()}]}
+                        | {from,           src_code | byte_code} %% Defaults to byte_code
+                        | {init_plt,       FileName :: string()}  %% If changed from default
+                        | {plts,           [FileName :: string()]} %% If changed from default
+                        | {include_dirs,   [DirName :: string()]}
+                        | {output_file,    FileName :: string()}
+                        | {output_plt,     FileName :: string()}
+                        | {analysis_type,  'succ_typings' | 'plt_add' | 'plt_build' | 'plt_check' | 'plt_remove'}
+                        | {warnings,       [WarnOpts]}
+                        | {get_warnings,   bool()}
+
+              WarnOpts :: no_return
+                        | no_unused
+                        | no_improper_lists
+                        | no_fun_app
+                        | no_match
+                        | no_opaque
+                        | no_fail_call
+                        | error_handling
+                        | race_conditions
+                        | behaviours
+                        | unmatched_returns
+                        | overspecs
+                        | underspecs
+                        | specdiffs
+
+
+       rruunn((OOppttLLiisstt)) -->> WWaarrnniinnggss
+
+              Types:
+
+                 OptList -- see gui/0,1
+                 Warnings -- see below
+
+              Dialyzer command line version.
+
+              Warnings :: [{Tag, Id, Msg}]
+              Tag :: 'warn_return_no_exit' | 'warn_return_only_exit'
+                   | 'warn_not_called' | 'warn_non_proper_list'
+                   | 'warn_fun_app' | 'warn_matching'
+                   | 'warn_failing_call' | 'warn_contract_types'
+                   | 'warn_contract_syntax' | 'warn_contract_not_equal'
+                   | 'warn_contract_subtype' | 'warn_contract_supertype'
+              Id = {File :: string(), Line :: integer()}
+              Msg = msg() -- Undefined
+
+
+       ffoorrmmaatt__wwaarrnniinngg((MMssgg)) -->> ssttrriinngg(())
+
+              Types:
+
+                 Msg = {Tag, Id, msg()} -- See run/1
+
+              Get a string from warnings as returned by dialyzer:run/1.
+
+       pplltt__iinnffoo((ssttrriinngg(()))) -->> {{''ookk'',, [[{{aattoomm(()),, aannyy(())}}]]}} || {{''eerrrroorr'',, aattoomm(())}}
+
+              Returns information about the specified plt.
+
+
+
+Ericsson AB                     dialyzer 2.5.2                     dialyzer(3)

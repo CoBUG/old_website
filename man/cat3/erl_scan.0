@@ -1,0 +1,364 @@
+erl_scan(3)                Erlang Module Definition                erl_scan(3)
+
+
+
+NNAAMMEE
+       erl_scan - The Erlang Token Scanner
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for tokenizing characters into Erlang
+       tokens.
+
+DDAATTAA TTYYPPEESS
+       aattttrriibbuuttee__iinnffoo(()) = {column, ccoolluummnn(())}
+                        | {length, integer() >= 1}
+                        | {line, iinnffoo__lliinnee(())}
+                        | {location, iinnffoo__llooccaattiioonn(())}
+                        | {text, string()}
+
+       aattttrriibbuutteess(()) = lliinnee(()) | aattttrriibbuutteess__ddaattaa(())
+
+       aattttrriibbuutteess__ddaattaa(()) = [{column, ccoolluummnn(())} |
+                            {line, iinnffoo__lliinnee(())} |
+                            {text, string()}]
+                         | {lliinnee(()), ccoolluummnn(())}
+
+       ccaatteeggoorryy(()) = atom()
+
+       ccoolluummnn(()) = integer() >= 1
+
+       eerrrroorr__ddeessccrriippttiioonn(()) = term()
+
+       eerrrroorr__iinnffoo(()) = {llooccaattiioonn(()), module(), eerrrroorr__ddeessccrriippttiioonn(())}
+
+       iinnffoo__lliinnee(()) = integer() | term()
+
+       iinnffoo__llooccaattiioonn(()) = llooccaattiioonn(()) | term()
+
+       lliinnee(()) = integer()
+
+       llooccaattiioonn(()) = lliinnee(()) | {lliinnee(()), ccoolluummnn(())}
+
+       ooppttiioonn(()) = return
+                | return_white_spaces
+                | return_comments
+                | text
+                | {reserved_word_fun, rreesswwoorrdd__ffuunn(())}
+
+       ooppttiioonnss(()) = ooppttiioonn(()) | [ooppttiioonn(())]
+
+       ssyymmbbooll(()) = atom() | float() | integer() | string()
+
+       rreesswwoorrdd__ffuunn(()) = fun((atom()) -> boolean())
+
+       ttookkeenn(()) = {ccaatteeggoorryy(()), aattttrriibbuutteess(()), ssyymmbbooll(())}
+               | {ccaatteeggoorryy(()), aattttrriibbuutteess(())}
+
+       ttookkeenn__iinnffoo(()) = {category, ccaatteeggoorryy(())}
+                    | {symbol, ssyymmbbooll(())}
+                    | aattttrriibbuuttee__iinnffoo(())
+
+       ttookkeennss(()) = [ttookkeenn(())]
+
+       ttookkeennss__rreessuulltt(()) = {ok,
+                          Tokens :: ttookkeennss(()),
+                          EndLocation :: llooccaattiioonn(())}
+                       | {eof, EndLocation :: llooccaattiioonn(())}
+                       | {error,
+                          ErrorInfo :: eerrrroorr__iinnffoo(()),
+                          EndLocation :: llooccaattiioonn(())}
+
+EEXXPPOORRTTSS
+       ssttrriinngg((SSttrriinngg)) -->> RReettuurrnn
+
+       ssttrriinngg((SSttrriinngg,, SSttaarrttLLooccaattiioonn)) -->> RReettuurrnn
+
+       ssttrriinngg((SSttrriinngg,, SSttaarrttLLooccaattiioonn,, OOppttiioonnss)) -->> RReettuurrnn
+
+              Types:
+
+                 String = string()
+                 Options = ooppttiioonnss(())
+                 Return = {ok, Tokens :: ttookkeennss(()), EndLocation}
+                        | {error, ErrorInfo :: eerrrroorr__iinnffoo(()), ErrorLocation}
+                 StartLocation = EndLocation = ErrorLocation = llooccaattiioonn(())
+
+              Takes the list of characters _S_t_r_i_n_g and tries to scan (tokenize)
+              them. Returns _{_o_k_, _T_o_k_e_n_s_, _E_n_d_L_o_c_a_t_i_o_n_}, where _T_o_k_e_n_s are the
+              Erlang tokens from _S_t_r_i_n_g. _E_n_d_L_o_c_a_t_i_o_n is the first location
+              after the last token.
+
+              _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_, _E_r_r_o_r_L_o_c_a_t_i_o_n_} is returned if an error
+              occurs. _E_r_r_o_r_L_o_c_a_t_i_o_n is the first location after the erroneous
+              token.
+
+              _s_t_r_i_n_g_(_S_t_r_i_n_g_) is equivalent to _s_t_r_i_n_g_(_S_t_r_i_n_g_, _1_), and
+              _s_t_r_i_n_g_(_S_t_r_i_n_g_, _S_t_a_r_t_L_o_c_a_t_i_o_n_) is equivalent to _s_t_r_i_n_g_(_S_t_r_i_n_g_,
+              _S_t_a_r_t_L_o_c_a_t_i_o_n_, _[_]_).
+
+              _S_t_a_r_t_L_o_c_a_t_i_o_n indicates the initial location when scanning
+              starts. If _S_t_a_r_t_L_o_c_a_t_i_o_n is a line _a_t_t_r_i_b_u_t_e_s_(_) as well as
+              _E_n_d_L_o_c_a_t_i_o_n and _E_r_r_o_r_L_o_c_a_t_i_o_n will be lines. If _S_t_a_r_t_L_o_c_a_t_i_o_n is
+              a pair of a line and a column _a_t_t_r_i_b_u_t_e_s_(_) takes the form of an
+              opaque compound data type, and _E_n_d_L_o_c_a_t_i_o_n and _E_r_r_o_r_L_o_c_a_t_i_o_n
+              will be pairs of a line and a column. The _t_o_k_e_n _a_t_t_r_i_b_u_t_e_s
+              contain information about the column and the line where the
+              token begins, as well as the text of the token (if the _t_e_x_t
+              option is given), all of which can be accessed by calling
+              ttookkeenn__iinnffoo//11,,22 or aattttrriibbuutteess__iinnffoo//11,,22.
+
+              A _t_o_k_e_n is a tuple containing information about syntactic
+              category, the token attributes, and the actual terminal symbol.
+              For punctuation characters (e.g. _;, _|) and reserved words, the
+              category and the symbol coincide, and the token is represented
+              by a two-tuple. Three-tuples have one of the following forms:
+              _{_a_t_o_m_, _I_n_f_o_, _a_t_o_m_(_)_}, _{_c_h_a_r_, _I_n_f_o_, _i_n_t_e_g_e_r_(_)_}, _{_c_o_m_m_e_n_t_, _I_n_f_o_,
+              _s_t_r_i_n_g_(_)_}, _{_f_l_o_a_t_, _I_n_f_o_, _f_l_o_a_t_(_)_}, _{_i_n_t_e_g_e_r_, _I_n_f_o_, _i_n_t_e_g_e_r_(_)_},
+              _{_v_a_r_, _I_n_f_o_, _a_t_o_m_(_)_}, and _{_w_h_i_t_e___s_p_a_c_e_, _I_n_f_o_, _s_t_r_i_n_g_(_)_}.
+
+              The valid options are:
+
+                _{_r_e_s_e_r_v_e_d___w_o_r_d___f_u_n_, _r_e_s_e_r_v_e_d___w_o_r_d___f_u_n_(_)_}:
+                  A callback function that is called when the scanner has
+                  found an unquoted atom. If the function returns _t_r_u_e, the
+                  unquoted atom itself will be the category of the token; if
+                  the function returns _f_a_l_s_e, _a_t_o_m will be the category of the
+                  unquoted atom.
+
+                _r_e_t_u_r_n___c_o_m_m_e_n_t_s:
+                  Return comment tokens.
+
+                _r_e_t_u_r_n___w_h_i_t_e___s_p_a_c_e_s:
+                  Return white space tokens. By convention, if there is a
+                  newline character, it is always the first character of the
+                  text (there cannot be more than one newline in a white space
+                  token).
+
+                _r_e_t_u_r_n:
+                  Short for _[_r_e_t_u_r_n___c_o_m_m_e_n_t_s_, _r_e_t_u_r_n___w_h_i_t_e___s_p_a_c_e_s_].
+
+                _t_e_x_t:
+                  Include the token's text in the token attributes. The text
+                  is the part of the input corresponding to the token.
+
+       ttookkeennss((CCoonnttiinnuuaattiioonn,, CChhaarrSSppeecc,, SSttaarrttLLooccaattiioonn)) -->> RReettuurrnn
+
+       ttookkeennss((CCoonnttiinnuuaattiioonn,, CChhaarrSSppeecc,, SSttaarrttLLooccaattiioonn,, OOppttiioonnss)) -->> RReettuurrnn
+
+              Types:
+
+                 Continuation = rreettuurrnn__ccoonntt(()) | []
+                 CharSpec = cchhaarr__ssppeecc(())
+                 StartLocation = llooccaattiioonn(())
+                 Options = ooppttiioonnss(())
+                 Return = {done,
+                           Result :: ttookkeennss__rreessuulltt(()),
+                           LeftOverChars :: cchhaarr__ssppeecc(())}
+                        | {more, Continuation1 :: rreettuurrnn__ccoonntt(())}
+                 cchhaarr__ssppeecc(()) = string() | eof
+                 rreettuurrnn__ccoonntt(())
+                   An opaque continuation
+
+              This is the re-entrant scanner which scans characters until a
+              _d_o_t ('.' followed by a white space) or _e_o_f has been reached. It
+              returns:
+
+                _{_d_o_n_e_, _R_e_s_u_l_t_, _L_e_f_t_O_v_e_r_C_h_a_r_s_}:
+                  This return indicates that there is sufficient input data to
+                  get a result. _R_e_s_u_l_t is:
+
+                  _{_o_k_, _T_o_k_e_n_s_, _E_n_d_L_o_c_a_t_i_o_n_}:
+                    The scanning was successful. _T_o_k_e_n_s is the list of tokens
+                    including _d_o_t.
+
+                  _{_e_o_f_, _E_n_d_L_o_c_a_t_i_o_n_}:
+                    End of file was encountered before any more tokens.
+
+                  _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_, _E_n_d_L_o_c_a_t_i_o_n_}:
+                    An error occurred. _L_e_f_t_O_v_e_r_C_h_a_r_s is the remaining
+                    characters of the input data, starting from _E_n_d_L_o_c_a_t_i_o_n.
+
+                _{_m_o_r_e_, _C_o_n_t_i_n_u_a_t_i_o_n_1_}:
+                  More data is required for building a term. _C_o_n_t_i_n_u_a_t_i_o_n_1
+                  must be passed in a new call to _t_o_k_e_n_s_/_3_,_4 when more data is
+                  available.
+
+              The _C_h_a_r_S_p_e_c _e_o_f signals end of file. _L_e_f_t_O_v_e_r_C_h_a_r_s will then
+              take the value _e_o_f as well.
+
+              _t_o_k_e_n_s_(_C_o_n_t_i_n_u_a_t_i_o_n_, _C_h_a_r_S_p_e_c_, _S_t_a_r_t_L_o_c_a_t_i_o_n_) is equivalent to
+              _t_o_k_e_n_s_(_C_o_n_t_i_n_u_a_t_i_o_n_, _C_h_a_r_S_p_e_c_, _S_t_a_r_t_L_o_c_a_t_i_o_n_, _[_]_).
+
+              See ssttrriinngg//33 for a description of the various options.
+
+       rreesseerrvveedd__wwoorrdd((AAttoomm :::: aattoomm(()))) -->> bboooolleeaann(())
+
+              Returns _t_r_u_e if _A_t_o_m is an Erlang reserved word, otherwise
+              _f_a_l_s_e.
+
+       ttookkeenn__iinnffoo((TTookkeenn)) -->> TTookkeennIInnffoo
+
+              Types:
+
+                 Token = ttookkeenn(())
+                 TokenInfo = [TokenInfoTuple :: ttookkeenn__iinnffoo(())]
+
+              Returns a list containing information about the token _T_o_k_e_n. The
+              order of the _T_o_k_e_n_I_n_f_o_T_u_p_l_es is not defined. See ttookkeenn__iinnffoo//22
+              for information about specific _T_o_k_e_n_I_n_f_o_T_u_p_l_es.
+
+              Note that if _t_o_k_e_n___i_n_f_o_(_T_o_k_e_n_, _T_o_k_e_n_I_t_e_m_) returns _u_n_d_e_f_i_n_e_d for
+              some _T_o_k_e_n_I_t_e_m, the item is not included in _T_o_k_e_n_I_n_f_o.
+
+       ttookkeenn__iinnffoo((TTookkeenn,, TTookkeennIItteemm)) -->> TTookkeennIInnffoo || uunnddeeffiinneedd
+
+       ttookkeenn__iinnffoo((TTookkeenn,, TTookkeennIItteemmss)) -->> [[TTookkeennIInnffoo]]
+
+              Types:
+
+                 Token = ttookkeenn(())
+                 TokenItems = [TokenItem]
+                 TokenItem = ttookkeenn__iitteemm(())
+                 TokenInfo = [TokenInfoTuple :: ttookkeenn__iinnffoo(())]
+                 ttookkeenn__iitteemm(()) = category | symbol | aattttrriibbuuttee__iitteemm(())
+                 aattttrriibbuuttee__iitteemm(()) = column | length | line | location | text
+
+              Returns a list containing information about the token _T_o_k_e_n. If
+              one single _T_o_k_e_n_I_t_e_m is given the returned value is the
+              corresponding _T_o_k_e_n_I_n_f_o_T_u_p_l_e, or _u_n_d_e_f_i_n_e_d if the _T_o_k_e_n_I_t_e_m has
+              no value. If a list of _T_o_k_e_n_I_t_e_ms is given the result is a list
+              of _T_o_k_e_n_I_n_f_o_T_u_p_l_e. The _T_o_k_e_n_I_n_f_o_T_u_p_l_es will appear with the
+              corresponding _T_o_k_e_n_I_t_e_ms in the same order as the _T_o_k_e_n_I_t_e_ms
+              appear in the list of _T_o_k_e_n_I_t_e_ms. _T_o_k_e_n_I_t_e_ms with no value are
+              not included in the list of _T_o_k_e_n_I_n_f_o_T_u_p_l_e.
+
+              The following _T_o_k_e_n_I_n_f_o_T_u_p_l_es with corresponding _T_o_k_e_n_I_t_e_ms are
+              valid:
+
+                _{_c_a_t_e_g_o_r_y_,  ccaatteeggoorryy(())}:
+                  The category of the token.
+
+                _{_c_o_l_u_m_n_,  ccoolluummnn(())}:
+                  The column where the token begins.
+
+                _{_l_e_n_g_t_h_, _i_n_t_e_g_e_r_(_) _> _0_}:
+                  The length of the token's text.
+
+                _{_l_i_n_e_,  lliinnee(())}:
+                  The line where the token begins.
+
+                _{_l_o_c_a_t_i_o_n_,  llooccaattiioonn(())}:
+                  The line and column where the token begins, or just the line
+                  if the column unknown.
+
+                _{_s_y_m_b_o_l_,  ssyymmbbooll(())}:
+                  The token's symbol.
+
+                _{_t_e_x_t_, _s_t_r_i_n_g_(_)_}:
+                  The token's text.
+
+       aattttrriibbuutteess__iinnffoo((AAttttrriibbuutteess)) -->> AAttttrriibbuutteessIInnffoo
+
+              Types:
+
+                 Attributes = aattttrriibbuutteess(())
+                 AttributesInfo = [AttributeInfoTuple :: aattttrriibbuuttee__iinnffoo(())]
+
+              Returns a list containing information about the token attributes
+              _A_t_t_r_i_b_u_t_e_s. The order of the _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_es is not defined.
+              See aattttrriibbuutteess__iinnffoo//22 for information about specific
+              _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_es.
+
+              Note that if _a_t_t_r_i_b_u_t_e_s___i_n_f_o_(_T_o_k_e_n_, _A_t_t_r_i_b_u_t_e_I_t_e_m_) returns
+              _u_n_d_e_f_i_n_e_d for some _A_t_t_r_i_b_u_t_e_I_t_e_m in the list above, the item is
+              not included in _A_t_t_r_i_b_u_t_e_s_I_n_f_o.
+
+       aattttrriibbuutteess__iinnffoo((AAttttrriibbuutteess,, AAttttrriibbuutteeIItteemm)) -->>
+                          AAttttrriibbuutteeIInnffoo || uunnddeeffiinneedd
+
+       aattttrriibbuutteess__iinnffoo((AAttttrriibbuutteess,, AAttttrriibbuutteeIItteemmss)) -->> [[AAttttrriibbuutteeIInnffoo]]
+
+              Types:
+
+                 Attributes = aattttrriibbuutteess(())
+                 AttributeItems = [AttributeItem]
+                 AttributeItem = aattttrriibbuuttee__iitteemm(())
+                 AttributeInfo = [AttributeInfoTuple :: aattttrriibbuuttee__iinnffoo(())]
+                 aattttrriibbuuttee__iitteemm(()) = column | length | line | location | text
+
+              Returns a list containing information about the token attributes
+              _A_t_t_r_i_b_u_t_e_s. If one single _A_t_t_r_i_b_u_t_e_I_t_e_m is given the returned
+              value is the corresponding _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_e, or _u_n_d_e_f_i_n_e_d if
+              the _A_t_t_r_i_b_u_t_e_I_t_e_m has no value. If a list of _A_t_t_r_i_b_u_t_e_I_t_e_m is
+              given the result is a list of _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_e. The
+              _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_es will appear with the corresponding
+              _A_t_t_r_i_b_u_t_e_I_t_e_ms in the same order as the _A_t_t_r_i_b_u_t_e_I_t_e_ms appear in
+              the list of _A_t_t_r_i_b_u_t_e_I_t_e_ms. _A_t_t_r_i_b_u_t_e_I_t_e_ms with no value are not
+              included in the list of _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_e.
+
+              The following _A_t_t_r_i_b_u_t_e_I_n_f_o_T_u_p_l_es with corresponding
+              _A_t_t_r_i_b_u_t_e_I_t_e_ms are valid:
+
+                _{_c_o_l_u_m_n_,  ccoolluummnn(())}:
+                  The column where the token begins.
+
+                _{_l_e_n_g_t_h_, _i_n_t_e_g_e_r_(_) _> _0_}:
+                  The length of the token's text.
+
+                _{_l_i_n_e_,  lliinnee(())}:
+                  The line where the token begins.
+
+                _{_l_o_c_a_t_i_o_n_,  llooccaattiioonn(())}:
+                  The line and column where the token begins, or just the line
+                  if the column unknown.
+
+                _{_t_e_x_t_, _s_t_r_i_n_g_(_)_}:
+                  The token's text.
+
+       sseett__aattttrriibbuuttee((AAttttrriibbuutteeIItteemm,, AAttttrriibbuutteess,, SSeettAAttttrriibbuutteeFFuunn)) -->>
+                        AAttttrriibbuutteess
+
+              Types:
+
+                 AttributeItem = line
+                 Attributes = aattttrriibbuutteess(())
+                 SetAttributeFun = fun((iinnffoo__lliinnee(())) -> iinnffoo__lliinnee(()))
+
+              Sets the value of the _l_i_n_e attribute of the token attributes
+              _A_t_t_r_i_b_u_t_e_s.
+
+              The _S_e_t_A_t_t_r_i_b_u_t_e_F_u_n is called with the value of the _l_i_n_e
+              attribute, and is to return the new value of the _l_i_n_e attribute.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrDDeessccrriippttoorr)) -->> ssttrriinngg(())
+
+              Types:
+
+                 ErrorDescriptor = eerrrroorr__ddeessccrriippttiioonn(())
+
+              Takes an _E_r_r_o_r_D_e_s_c_r_i_p_t_o_r and returns a string which describes
+              the error or warning. This function is usually called implicitly
+              when processing an _E_r_r_o_r_I_n_f_o structure (see below).
+
+EERRRROORR IINNFFOORRMMAATTIIOONN
+       The _E_r_r_o_r_I_n_f_o mentioned above is the standard _E_r_r_o_r_I_n_f_o structure which
+       is returned from all IO modules. It has the following format:
+
+       {ErrorLocation, Module, ErrorDescriptor}
+
+       A string which describes the error is obtained with the following call:
+
+       Module:format_error(ErrorDescriptor)
+
+NNOOTTEESS
+       The continuation of the first call to the re-entrant input functions
+       must be _[_]. Refer to Armstrong, Virding and Williams, 'Concurrent
+       Programming in Erlang', Chapter 13, for a complete description of how
+       the re-entrant input scheme works.
+
+SSEEEE AALLSSOO
+       iioo((33)), eerrll__ppaarrssee((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                     erl_scan(3)

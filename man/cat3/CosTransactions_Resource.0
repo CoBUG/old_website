@@ -1,0 +1,110 @@
+CosTransactions_Resource(3)Erlang Module DefinitionCosTransactions_Resource(3)
+
+
+
+NNAAMMEE
+       CosTransactions_Resource - This module implements the OMG
+       CosTransactions::Resource interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccoommmmiitt((RReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 Resource = #objref
+                 Return = ok | {'EXCEPTION', E}
+                 E = #'CosTransactions_NotPrepared'{} |
+                 #'CosTransactions_HeuristicRollback'{} |
+                 #'CosTransactions_HeuristicMixed'{} |
+                 #'CosTransactions_HeuristicHazard'{}
+
+              This operation instructs the Resource to commit all changes made
+              as a part of the transaction.
+
+              The Resource can raise:
+
+                * Heuristic Exception - if a Heuristic decision is made which
+                  differ from the true outcome of the transaction. The
+                  Resource must remember the Heuristic outcome until the
+                  _f_o_r_g_e_t operation is performed.
+
+       ccoommmmiitt__oonnee__pphhaassee((RReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 Resource = #objref
+                 Return = ok | {'EXCEPTION', E}
+                 E = #'CosTransactions_HeuristicHazard'{} |
+                 #'CosTransactions_TransactionRolledBack'{}
+
+              If possible, the Resource should commit all changes made as part
+              of the transaction, else it should raise the
+              TRANSACTION_ROLLEDBACK exception. This operation can only be
+              used if the Resource is the only child of its parent.
+
+       ffoorrggeett((RReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 Resource = #objref
+                 Return = ok
+
+              This operation informs the Resource that it is safe to forget
+              any Heuristic decisions and the knowledge of the transaction.
+
+       pprreeppaarree((RReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 Resource = #objref
+                 Return = Vote | {'EXCEPTION', E}
+                 Vote = 'VoteReadOnly' | 'VoteCommit' | 'VoteRollback'
+                 E = #'CosTransactions_HeuristicMixed'{} |
+                 #'CosTransactions_HeuristicHazard'{}
+
+              This operation is invoked on the Resource to begin the two-phase
+              commit protocol.
+
+              The Resource can reply:
+
+                * 'VoteReadOnly' - if no persistent data has been modified by
+                  the transaction. The Resource can forget all knowledge of
+                  the transaction.
+
+                * 'VoteCommit' - if the Resource has been prepared and is able
+                  to write all the data needed to commit the transaction to
+                  stable storage.
+
+                * 'VoteRollback' - under any circumstances but must do so if
+                  none of the alternatives above are applicable.
+
+                * Heuristic Exception - if a Heuristic decision is made which
+                  differ from the true outcome of the transaction. The
+                  Resource must remember the Heuristic outcome until the
+                  _f_o_r_g_e_t operation is performed.
+
+       rroollllbbaacckk((RReessoouurrccee)) -->> RReettuurrnn
+
+              Types:
+
+                 Resource = #objref
+                 Return = ok | {'EXCEPTION', E}
+                 E = #'CosTransactions_HeuristicCommit'{} |
+                 #'CosTransactions_HeuristicMixed'{} |
+                 #'CosTransactions_HeuristicHazard'{}
+
+              This operation instructs the Resource to rollback all changes
+              made as a part of the transaction.
+
+              The Resource can raise:
+
+                * Heuristic Exception - if a Heuristic decision is made which
+                  differ from the true outcome of the transaction. The
+                  Resource must remember the Heuristic outcome until the
+                  _f_o_r_g_e_t operation is performed.
+
+Ericsson AB                 cosTransactions 1.2.12 CosTransactions_Resource(3)

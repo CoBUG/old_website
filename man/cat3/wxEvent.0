@@ -1,0 +1,99 @@
+wxEvent(3)                 Erlang Module Definition                 wxEvent(3)
+
+
+
+NNAAMMEE
+       wxEvent - See external documentation: wxEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxEvent.
+
+DDAATTAA TTYYPPEESS
+         _w_x_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettIIdd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxEvent()
+
+              See external documentation.
+
+       ggeettSSkkiippppeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxEvent()
+
+              See external documentation.
+
+       ggeettTTiimmeessttaammpp((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxEvent()
+
+              See external documentation.
+
+       iissCCoommmmaannddEEvveenntt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxEvent()
+
+              See external documentation.
+
+       rreessuummeePPrrooppaaggaattiioonn((TThhiiss,, PPrrooppaaggaattiioonnLLeevveell)) -->> ookk
+
+              Types:
+
+                 This = wxEvent()
+                 PropagationLevel = integer()
+
+              See external documentation.
+
+       sshhoouullddPPrrooppaaggaattee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxEvent()
+
+              See external documentation.
+
+       sskkiipp((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxEvent()
+
+              Equivalent to sskkiipp((TThhiiss,, [[]])).
+
+       sskkiipp((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxEvent()
+                 Option = {skip, boolean()}
+
+              See external documentation.
+
+       ssttooppPPrrooppaaggaattiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxEvent(3)

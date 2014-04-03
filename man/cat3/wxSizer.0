@@ -1,0 +1,561 @@
+wxSizer(3)                 Erlang Module Definition                 wxSizer(3)
+
+
+
+NNAAMMEE
+       wxSizer - See external documentation: wxSizer.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSizer.
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_i_z_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       aadddd((TThhiiss,, WWiinnddooww)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow) | wxSizer()
+
+              Equivalent to aadddd((TThhiiss,, WWiinnddooww,, [[]])).
+
+       aadddd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              add(This, Window, [Option]) -> wxSizerItem:wxSizerItem() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Option :: {proportion, integer()}
+              | {flag, integer()}
+              | {border, integer()}
+              | {userData, wx:wx_object()};
+              (This, Window, Flags) -> wxSizerItem:wxSizerItem() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Flags::wxSizerFlags:wxSizerFlags().
+
+
+       aadddd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Width = integer()
+                 Height = integer()
+                 Option = {proportion, integer()} | {flag, integer()} |
+                 {border, integer()} | {userData, wx_object() (see module wx)}
+
+              See external documentation.
+
+       aaddddSSppaacceerr((TThhiiss,, SSiizzee)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Size = integer()
+
+              See external documentation.
+
+       aaddddSSttrreettcchhSSppaacceerr((TThhiiss)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+
+              Equivalent to aaddddSSttrreettcchhSSppaacceerr((TThhiiss,, [[]])).
+
+       aaddddSSttrreettcchhSSppaacceerr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Option = {prop, integer()}
+
+              See external documentation.
+
+       ccaallccMMiinn((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+
+              Equivalent to cclleeaarr((TThhiiss,, [[]])).
+
+       cclleeaarr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 Option = {delete_windows, boolean()}
+
+              See external documentation.
+
+       ddeettaacchh((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+
+              See external documentation.
+              Also:
+              detach(This, Window) -> boolean() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer().
+
+
+       ffiitt((TThhiiss,, WWiinnddooww)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ffiittIInnssiiddee((TThhiiss,, WWiinnddooww)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ggeettCChhiillddrreenn((TThhiiss)) -->> [[wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))]]
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       ggeettIItteemm((TThhiiss,, WWiinnddooww)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow) | wxSizer()
+
+              See external documentation.
+              Also:
+              getItem(This, Index) -> wxSizerItem:wxSizerItem() when
+              This::wxSizer(), Index::integer().
+
+
+       ggeettIItteemm((TThhiiss,, WWiinnddooww,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow) | wxSizer()
+                 Option = {recursive, boolean()}
+
+              See external documentation.
+
+       ggeettSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       ggeettMMiinnSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       hhiiddee((TThhiiss,, WWiinnddooww)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow) | wxSizer()
+
+              See external documentation.
+              Also:
+              hide(This, Index) -> boolean() when
+              This::wxSizer(), Index::integer().
+
+
+       hhiiddee((TThhiiss,, WWiinnddooww,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow) | wxSizer()
+                 Option = {recursive, boolean()}
+
+              See external documentation.
+
+       iinnsseerrtt((TThhiiss,, IInnddeexx,, IItteemm)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Item = wxSizerItem() (see module wxSizerItem)
+
+              See external documentation.
+
+       iinnsseerrtt((TThhiiss,, IInnddeexx,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              insert(This, Index, Window, [Option]) ->
+              wxSizerItem:wxSizerItem() when
+              This::wxSizer(), Index::integer(), Window::wxWindow:wxWindow() |
+              wxSizer(),
+              Option :: {proportion, integer()}
+              | {flag, integer()}
+              | {border, integer()}
+              | {userData, wx:wx_object()};
+              (This, Index, Window, Flags) -> wxSizerItem:wxSizerItem() when
+              This::wxSizer(), Index::integer(), Window::wxWindow:wxWindow() |
+              wxSizer(), Flags::wxSizerFlags:wxSizerFlags().
+
+
+       iinnsseerrtt((TThhiiss,, IInnddeexx,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(())
+       ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Width = integer()
+                 Height = integer()
+                 Option = {proportion, integer()} | {flag, integer()} |
+                 {border, integer()} | {userData, wx_object() (see module wx)}
+
+              See external documentation.
+
+       iinnsseerrttSSppaacceerr((TThhiiss,, IInnddeexx,, SSiizzee)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Size = integer()
+
+              See external documentation.
+
+       iinnsseerrttSSttrreettcchhSSppaacceerr((TThhiiss,, IInnddeexx)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee
+       wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+
+              Equivalent to iinnsseerrttSSttrreettcchhSSppaacceerr((TThhiiss,, IInnddeexx,, [[]])).
+
+       iinnsseerrttSSttrreettcchhSSppaacceerr((TThhiiss,, IInnddeexx,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(())
+       ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Option = {prop, integer()}
+
+              See external documentation.
+
+       iissSShhoowwnn((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+
+              See external documentation.
+              Also:
+              isShown(This, Window) -> boolean() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer().
+
+
+       llaayyoouutt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       pprreeppeenndd((TThhiiss,, IItteemm)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Item = wxSizerItem() (see module wxSizerItem)
+
+              See external documentation.
+
+       pprreeppeenndd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              prepend(This, Window, [Option]) -> wxSizerItem:wxSizerItem()
+              when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Option :: {proportion, integer()}
+              | {flag, integer()}
+              | {border, integer()}
+              | {userData, wx:wx_object()};
+              (This, Window, Flags) -> wxSizerItem:wxSizerItem() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Flags::wxSizerFlags:wxSizerFlags().
+
+
+       pprreeppeenndd((TThhiiss,, WWiiddtthh,, HHeeiigghhtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee
+       mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Width = integer()
+                 Height = integer()
+                 Option = {proportion, integer()} | {flag, integer()} |
+                 {border, integer()} | {userData, wx_object() (see module wx)}
+
+              See external documentation.
+
+       pprreeppeennddSSppaacceerr((TThhiiss,, SSiizzee)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Size = integer()
+
+              See external documentation.
+
+       pprreeppeennddSSttrreettcchhSSppaacceerr((TThhiiss)) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+
+              Equivalent to pprreeppeennddSSttrreettcchhSSppaacceerr((TThhiiss,, [[]])).
+
+       pprreeppeennddSSttrreettcchhSSppaacceerr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSiizzeerrIItteemm(()) ((sseeee
+       mmoodduullee wwxxSSiizzeerrIItteemm))
+
+              Types:
+
+                 This = wxSizer()
+                 Option = {prop, integer()}
+
+              See external documentation.
+
+       rreeccaallccSSiizzeess((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+
+              See external documentation.
+
+       rreemmoovvee((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+
+              See external documentation.
+              Also:
+              remove(This, Sizer) -> boolean() when
+              This::wxSizer(), Sizer::wxSizer().
+
+
+       rreeppllaaccee((TThhiiss,, OOllddwwiinn,, NNeewwwwiinn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Oldwin = wxWindow() (see module wxWindow) | wxSizer()
+                 Newwin = wxWindow() (see module wxWindow) | wxSizer()
+
+              See external documentation.
+              Also:
+              replace(This, Index, Newitem) -> boolean() when
+              This::wxSizer(), Index::integer(),
+              Newitem::wxSizerItem:wxSizerItem().
+
+
+       rreeppllaaccee((TThhiiss,, OOllddwwiinn,, NNeewwwwiinn,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Oldwin = wxWindow() (see module wxWindow) | wxSizer()
+                 Newwin = wxWindow() (see module wxWindow) | wxSizer()
+                 Option = {recursive, boolean()}
+
+              See external documentation.
+
+       sseettDDiimmeennssiioonn((TThhiiss,, XX,, YY,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 X = integer()
+                 Y = integer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettMMiinnSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettMMiinnSSiizzee((TThhiiss,, WWiiddtthh,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettIItteemmMMiinnSSiizzee((TThhiiss,, IInnddeexx,, SSiizzee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+              Also:
+              setItemMinSize(This, Window, Size) -> boolean() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Size::{W::integer(), H::integer()}.
+
+
+       sseettIItteemmMMiinnSSiizzee((TThhiiss,, IInnddeexx,, WWiiddtthh,, HHeeiigghhtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Width = integer()
+                 Height = integer()
+
+              See external documentation.
+              Also:
+              setItemMinSize(This, Window, Width, Height) -> boolean() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Width::integer(), Height::integer().
+
+
+       sseettSSiizzeeHHiinnttss((TThhiiss,, WWiinnddooww)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       sseettVViirrttuuaallSSiizzeeHHiinnttss((TThhiiss,, WWiinnddooww)) -->> ookk
+
+              Types:
+
+                 This = wxSizer()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       sshhooww((TThhiiss,, IInnddeexx)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+
+              See external documentation.
+              Also:
+              show(This, Window) -> boolean() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer();
+              (This, Show) -> ok when
+              This::wxSizer(), Show::boolean().
+
+
+       sshhooww((TThhiiss,, IInnddeexx,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSizer()
+                 Index = integer()
+                 Option = {show, boolean()}
+
+              See external documentation.
+              Also:
+              show(This, Window, [Option]) -> boolean() when
+              This::wxSizer(), Window::wxWindow:wxWindow() | wxSizer(),
+              Option :: {show, boolean()}
+              | {recursive, boolean()}.
+
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxSizer(3)

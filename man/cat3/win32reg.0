@@ -1,0 +1,260 @@
+win32reg(3)                Erlang Module Definition                win32reg(3)
+
+
+
+NNAAMMEE
+       win32reg - win32reg provides access to the registry on Windows
+
+DDEESSCCRRIIPPTTIIOONN
+       _w_i_n_3_2_r_e_g provides read and write access to the registry on Windows. It
+       is essentially a port driver wrapped around the Win32 API calls for
+       accessing the registry.
+
+       The registry is a hierarchical database, used to store various system
+       and software information in Windows. It is available in Windows 95 and
+       Windows NT. It contains installation data, and is updated by installers
+       and system programs. The Erlang installer updates the registry by
+       adding data that Erlang needs.
+
+       The registry contains keys and values. Keys are like the directories in
+       a file system, they form a hierarchy. Values are like files, they have
+       a name and a value, and also a type.
+
+       Paths to keys are left to right, with sub-keys to the right and
+       backslash between keys. (Remember that backslashes must be doubled in
+       Erlang strings.) Case is preserved but not significant. Example:
+       _"_\_\_h_k_e_y___l_o_c_a_l___m_a_c_h_i_n_e_\_\_s_o_f_t_w_a_r_e_\_\_E_r_i_c_s_s_o_n_\_\_E_r_l_a_n_g_\_\_5_._0_" is the key for
+       the installation data for the latest Erlang release.
+
+       There are six entry points in the Windows registry, top level keys.
+       They can be abbreviated in the _w_i_n_3_2_r_e_g module as:
+
+       Abbrev.          Registry key
+       =======          ============
+       hkcr             HKEY_CLASSES_ROOT
+       current_user     HKEY_CURRENT_USER
+       hkcu             HKEY_CURRENT_USER
+       local_machine    HKEY_LOCAL_MACHINE
+       hklm             HKEY_LOCAL_MACHINE
+       users            HKEY_USERS
+       hku              HKEY_USERS
+       current_config   HKEY_CURRENT_CONFIG
+       hkcc             HKEY_CURRENT_CONFIG
+       dyn_data         HKEY_DYN_DATA
+       hkdd             HKEY_DYN_DATA
+
+       The key above could be written as
+       _"_\_\_h_k_l_m_\_\_s_o_f_t_w_a_r_e_\_\_e_r_i_c_s_s_o_n_\_\_e_r_l_a_n_g_\_\_5_._0_".
+
+       The _w_i_n_3_2_r_e_g module uses a current key. It works much like the current
+       directory. From the current key, values can be fetched, sub-keys can be
+       listed, and so on.
+
+       Under a key, any number of named values can be stored. They have name,
+       and types, and data.
+
+       Currently, the _w_i_n_3_2_r_e_g module supports storing only the following
+       types: REG_DWORD, which is an integer, REG_SZ which is a string and
+       REG_BINARY which is a binary. Other types can be read, and will be
+       returned as binaries.
+
+       There is also a "default" value, which has the empty string as name. It
+       is read and written with the atom _d_e_f_a_u_l_t instead of the name.
+
+       Some registry values are stored as strings with references to
+       environment variables, e.g. _"_%_S_y_s_t_e_m_R_o_o_t_%_W_i_n_d_o_w_s_". _S_y_s_t_e_m_R_o_o_t is an
+       environment variable, and should be replaced with its value. A function
+       _e_x_p_a_n_d_/_1 is provided, so that environment variables surrounded in % can
+       be expanded to their values.
+
+       For additional information on the Windows registry consult the Win32
+       Programmer's Reference.
+
+DDAATTAA TTYYPPEESS
+       rreegg__hhaannddllee(())
+
+              As returned by ooppeenn//11.
+
+       nnaammee(()) = string() | default
+
+       vvaalluuee(()) = string() | integer() | binary()
+
+EEXXPPOORRTTSS
+       cchhaannggee__kkeeyy((RReeggHHaannddllee,, KKeeyy)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 Key = string()
+                 ReturnValue = ok | {error, ErrorId :: atom()}
+
+              Changes the current key to another key. Works like cd. The key
+              can be specified as a relative path or as an absolute path,
+              starting with \.
+
+       cchhaannggee__kkeeyy__ccrreeaattee((RReeggHHaannddllee,, KKeeyy)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 Key = string()
+                 ReturnValue = ok | {error, ErrorId :: atom()}
+
+              Creates a key, or just changes to it, if it is already there.
+              Works like a combination of _m_k_d_i_r and _c_d. Calls the Win32 API
+              function _R_e_g_C_r_e_a_t_e_K_e_y_E_x_(_).
+
+              The registry must have been opened in write-mode.
+
+       cclloossee((RReeggHHaannddllee)) -->> ookk
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+
+              Closes the registry. After that, the _R_e_g_H_a_n_d_l_e cannot be used.
+
+       ccuurrrreenntt__kkeeyy((RReeggHHaannddllee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 ReturnValue = {ok, string()}
+
+              Returns the path to the current key. This is the equivalent of
+              _p_w_d.
+
+              Note that the current key is stored in the driver, and might be
+              invalid (e.g. if the key has been removed).
+
+       ddeelleettee__kkeeyy((RReeggHHaannddllee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 ReturnValue = ok | {error, ErrorId :: atom()}
+
+              Deletes the current key, if it is valid. Calls the Win32 API
+              function _R_e_g_D_e_l_e_t_e_K_e_y_(_). Note that this call does not change the
+              current key, (unlike _c_h_a_n_g_e___k_e_y___c_r_e_a_t_e_/_2.) This means that after
+              the call, the current key is invalid.
+
+       ddeelleettee__vvaalluuee((RReeggHHaannddllee,, NNaammee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 Name = nnaammee(())
+                 ReturnValue = ok | {error, ErrorId :: atom()}
+
+              Deletes a named value on the current key. The atom _d_e_f_a_u_l_t is
+              used for the the default value.
+
+              The registry must have been opened in write-mode.
+
+       eexxppaanndd((SSttrriinngg)) -->> EExxppaannddeeddSSttrriinngg
+
+              Types:
+
+                 String = ExpandedString = string()
+
+              Expands a string containing environment variables between
+              percent characters. Anything between two % is taken for a
+              environment variable, and is replaced by the value. Two
+              consecutive % is replaced by one %.
+
+              A variable name that is not in the environment, will result in
+              an error.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrIIdd)) -->> EErrrroorrSSttrriinngg
+
+              Types:
+
+                 ErrorId = atom()
+                 ErrorString = string()
+
+              Convert an POSIX errorcode to a string (by calling
+              _e_r_l___p_o_s_i_x___m_s_g_:_m_e_s_s_a_g_e).
+
+       ooppeenn((OOppeennMMooddeeLLiisstt)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 OpenModeList = [OpenMode]
+                 OpenMode = read | write
+                 ReturnValue = {ok, RegHandle} | {error, ErrorId :: enotsup}
+                 RegHandle = rreegg__hhaannddllee(())
+
+              Opens the registry for reading or writing. The current key will
+              be the root (_H_K_E_Y___C_L_A_S_S_E_S___R_O_O_T). The _r_e_a_d flag in the mode list
+              can be omitted.
+
+              Use _c_h_a_n_g_e___k_e_y_/_2 with an absolute path after _o_p_e_n.
+
+       sseett__vvaalluuee((RReeggHHaannddllee,, NNaammee,, VVaalluuee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 Name = nnaammee(())
+                 Value = vvaalluuee(())
+                 ReturnValue = ok | {error, ErrorId :: atom()}
+
+              Sets the named (or default) value to value. Calls the Win32 API
+              function _R_e_g_S_e_t_V_a_l_u_e_E_x_(_). The value can be of three types, and
+              the corresponding registry type will be used. Currently the
+              types supported are: _R_E_G___D_W_O_R_D for integers, _R_E_G___S_Z for strings
+              and _R_E_G___B_I_N_A_R_Y for binaries. Other types cannot currently be
+              added or changed.
+
+              The registry must have been opened in write-mode.
+
+       ssuubb__kkeeyyss((RReeggHHaannddllee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 ReturnValue = {ok, [SubKey]} | {error, ErrorId :: atom()}
+                 SubKey = string()
+
+              Returns a list of subkeys to the current key. Calls the Win32
+              API function _E_n_u_m_R_e_g_K_e_y_s_E_x_(_).
+
+              Avoid calling this on the root keys, it can be slow.
+
+       vvaalluuee((RReeggHHaannddllee,, NNaammee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 Name = nnaammee(())
+                 ReturnValue = {ok, Value :: vvaalluuee(())}
+                             | {error, ErrorId :: atom()}
+
+              Retrieves the named value (or default) on the current key.
+              Registry values of type _R_E_G___S_Z, are returned as strings. Type
+              _R_E_G___D_W_O_R_D values are returned as integers. All other types are
+              returned as binaries.
+
+       vvaalluueess((RReeggHHaannddllee)) -->> RReettuurrnnVVaalluuee
+
+              Types:
+
+                 RegHandle = rreegg__hhaannddllee(())
+                 ReturnValue = {ok, [ValuePair]} | {error, ErrorId :: atom()}
+                 ValuePair = {Name :: nnaammee(()), Value :: vvaalluuee(())}
+
+              Retrieves a list of all values on the current key. The values
+              have types corresponding to the registry types, see _v_a_l_u_e. Calls
+              the Win32 API function _E_n_u_m_R_e_g_V_a_l_u_e_s_E_x_(_).
+
+SSEEEE AALLSSOO
+       Win32 Programmer's Reference (from Microsoft)
+
+       _e_r_l___p_o_s_i_x___m_s_g
+
+       The Windows 95 Registry (book from O'Reilly)
+
+
+
+Ericsson AB                      stdlib 1.18.2                     win32reg(3)

@@ -1,0 +1,48 @@
+CosNaming(3)               Erlang Module Definition               CosNaming(3)
+
+
+
+NNAAMMEE
+       CosNaming - The CosNaming service is a collection of interfaces that
+       together define the naming service.
+
+DDEESSCCRRIIPPTTIIOONN
+       The naming service provides the principal mechanism for clients to find
+       objects in an ORB based world. The naming service provides an initial
+       naming context that functions as the root context for all names. Given
+       this context clients can navigate in the name space.
+
+       Types that are declared on the CosNaming level are:
+
+       typedef string Istring;
+       struct NameComponent {
+             Istring id;
+             Istring kind;
+       };
+
+       typedef sequence <NameComponent> Name;
+
+       enum BindingType {nobject, ncontext};
+
+       struct Binding {
+             Name    binding_name;
+             BindingType binding_type;
+       };
+
+       typedef sequence <Binding> BindingList;
+
+
+       To get access to the record definitions for the structs use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_o_r_b_e_r_/_C_O_S_S_/_C_o_s_N_a_m_i_n_g_._h_r_l_"_)_..
+
+       Names are not an ORB object but the can be structured in components as
+       seen by the definition above. There are no requirements on names so the
+       service can support many different conventions and standards.
+
+       There are two different interfaces supported in the service:
+
+         * NamingContext
+
+         * BindingIterator
+
+Ericsson AB                      orber 3.6.24                     CosNaming(3)

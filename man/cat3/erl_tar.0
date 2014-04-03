@@ -1,0 +1,344 @@
+erl_tar(3)                 Erlang Module Definition                 erl_tar(3)
+
+
+
+NNAAMMEE
+       erl_tar - Unix 'tar' utility for reading and writing tar archives
+
+DDEESSCCRRIIPPTTIIOONN
+       The _e_r_l___t_a_r module archives and extract files to and from a tar file.
+       The tar file format is the POSIX extended tar file format specified in
+       IEEE Std 1003.1 and ISO/IEC 9945-1. That is the same format as used by
+       _t_a_r program on Solaris, but is not the same as used by the GNU tar
+       program.
+
+       By convention, the name of a tar file should end in "_._t_a_r". To abide to
+       the convention, you'll need to add "_._t_a_r" yourself to the name.
+
+       Tar files can be created in one operation using the ccrreeaattee//22 or
+       ccrreeaattee//33 function.
+
+       Alternatively, for more control, the ooppeenn, aadddd//33,,44, and cclloossee//11
+       functions can be used.
+
+       To extract all files from a tar file, use the eexxttrraacctt//11 function. To
+       extract only some files or to be able to specify some more options, use
+       the eexxttrraacctt//22 function.
+
+       To return a list of the files in a tar file, use either the ttaabbllee//11 or
+       ttaabbllee//22 function. To print a list of files to the Erlang shell, use
+       either the tt//11 or tttt//11 function.
+
+       To convert an error term returned from one of the functions above to a
+       readable message, use the ffoorrmmaatt__eerrrroorr//11 function.
+
+LLIIMMIITTAATTIIOONNSS
+       For maximum compatibility, it is safe to archive files with names up to
+       100 characters in length. Such tar files can generally be extracted by
+       any _t_a_r program.
+
+       If filenames exceed 100 characters in length, the resulting tar file
+       can only be correctly extracted by a POSIX-compatible _t_a_r program (such
+       as Solaris _t_a_r), not by GNU tar.
+
+       File have longer names than 256 bytes cannot be stored at all.
+
+       The filename of the file a symbolic link points is always limited to
+       100 characters.
+
+EEXXPPOORRTTSS
+       aadddd((TTaarrDDeessccrriippttoorr,, FFiilleennaammee,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+              Types:
+
+                 TarDescriptor = term()
+                 Filename = filename()
+                 Options = [Option]
+                 Option = dereference|verbose
+                 RetValue = ok|{error,{Filename,Reason}}
+                 Reason = term()
+
+              The _a_d_d_/_3 function adds a file to a tar file that has been
+              opened for writing by ooppeenn//11.
+
+                _d_e_r_e_f_e_r_e_n_c_e:
+                  By default, symbolic links will be stored as symbolic links
+                  in the tar file. Use the _d_e_r_e_f_e_r_e_n_c_e option to override the
+                  default and store the file that the symbolic link points to
+                  into the tar file.
+
+                _v_e_r_b_o_s_e:
+                  Print an informational message about the file being added.
+
+       aadddd((TTaarrDDeessccrriippttoorr,, FFiilleennaammeeOOrrBBiinn,, NNaammeeIInnAArrcchhiivvee,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+              Types:
+
+                 TarDescriptor = term()
+                 FilenameOrBin = Filename()|binary()
+                 Filename = filename()()
+                 NameInArchive = filename()
+                 Options = [Option]
+                 Option = dereference|verbose
+                 RetValue = ok|{error,{Filename,Reason}}
+                 Reason = term()
+
+              The _a_d_d_/_4 function adds a file to a tar file that has been
+              opened for writing by ooppeenn//11. It accepts the same options as
+              aadddd//33.
+
+              _N_a_m_e_I_n_A_r_c_h_i_v_e is the name under which the file will be stored in
+              the tar file. That is the name that the file will get when it
+              will be extracted from the tar file.
+
+       cclloossee((TTaarrDDeessccrriippttoorr))
+
+              Types:
+
+                 TarDescriptor = term()
+
+              The _c_l_o_s_e_/_1 function closes a tar file opened by ooppeenn//11.
+
+       ccrreeaattee((NNaammee,, FFiilleeLLiisstt)) -->>RReettVVaalluuee
+
+              Types:
+
+                 Name = filename()
+                 FileList = [Filename|{NameInArchive,
+                 binary()},{NameInArchive, Filename}]
+                 Filename = filename()
+                 NameInArchive = filename()
+                 RetValue = ok|{error,{Name,Reason}}
+                 Reason = term()
+
+              The _c_r_e_a_t_e_/_2 function creates a tar file and archives the files
+              whose names are given in _F_i_l_e_L_i_s_t into it. The files may either
+              be read from disk or given as binaries.
+
+       ccrreeaattee((NNaammee,, FFiilleeLLiisstt,, OOppttiioonnLLiisstt))
+
+              Types:
+
+                 Name = filename()
+                 FileList = [Filename|{NameInArchive,
+                 binary()},{NameInArchive, Filename}]
+                 Filename = filename()
+                 NameInArchive = filename()
+                 OptionList = [Option]
+                 Option = compressed|cooked|dereference|verbose
+                 RetValue = ok|{error,{Name,Reason}}
+                 Reason = term()
+
+              The _c_r_e_a_t_e_/_3 function creates a tar file and archives the files
+              whose names are given in _F_i_l_e_L_i_s_t into it. The files may either
+              be read from disk or given as binaries.
+
+              The options in _O_p_t_i_o_n_L_i_s_t modify the defaults as follows.
+
+                _c_o_m_p_r_e_s_s_e_d:
+                  The entire tar file will be compressed, as if it has been
+                  run through the _g_z_i_p program. To abide to the convention
+                  that a compressed tar file should end in "_._t_a_r_._g_z" or
+                  "_._t_g_z", you'll need to add the appropriate extension
+                  yourself.
+
+                _c_o_o_k_e_d:
+                  By default, the _o_p_e_n_/_2 function will open the tar file in
+                  _r_a_w mode, which is faster but does not allow a remote
+                  (erlang) file server to be used. Adding _c_o_o_k_e_d to the mode
+                  list will override the default and open the tar file without
+                  the _r_a_w option.
+
+                _d_e_r_e_f_e_r_e_n_c_e:
+                  By default, symbolic links will be stored as symbolic links
+                  in the tar file. Use the _d_e_r_e_f_e_r_e_n_c_e option to override the
+                  default and store the file that the symbolic link points to
+                  into the tar file.
+
+                _v_e_r_b_o_s_e:
+                  Print an informational message about each file being added.
+
+       eexxttrraacctt((NNaammee)) -->> RReettVVaalluuee
+
+              Types:
+
+                 Name = filename()
+                 RetValue = ok|{error,{Name,Reason}}
+                 Reason = term()
+
+              The _e_x_t_r_a_c_t_/_1 function extracts all files from a tar archive.
+
+              If the _N_a_m_e argument is given as "_{_b_i_n_a_r_y_,_B_i_n_a_r_y_}", the contents
+              of the binary is assumed to be a tar archive.
+
+              If the _N_a_m_e argument is given as "_{_f_i_l_e_,_F_d_}", _F_d is assumed to
+              be a file descriptor returned from the _f_i_l_e_:_o_p_e_n_/_2 function.
+
+              Otherwise, _N_a_m_e should be a filename.
+
+       eexxttrraacctt((NNaammee,, OOppttiioonnLLiisstt))
+
+              Types:
+
+                 Name = filename() | {binary,Binary} | {file,Fd}
+                 Binary = binary()
+                 Fd = file_descriptor()
+                 OptionList = [Option]
+                 Option =
+                 {cwd,Cwd}|{files,FileList}|keep_old_files|verbose|memory
+                 Cwd = [dirname()]
+                 FileList = [filename()]
+                 RetValue = ok|MemoryRetValue|{error,{Name,Reason}}
+                 MemoryRetValue = {ok, [{NameInArchive,binary()}]}
+                 NameInArchive = filename()
+                 Reason = term()
+
+              The _e_x_t_r_a_c_t_/_2 function extracts files from a tar archive.
+
+              If the _N_a_m_e argument is given as "_{_b_i_n_a_r_y_,_B_i_n_a_r_y_}", the contents
+              of the binary is assumed to be a tar archive.
+
+              If the _N_a_m_e argument is given as "_{_f_i_l_e_,_F_d_}", _F_d is assumed to
+              be a file descriptor returned from the _f_i_l_e_:_o_p_e_n_/_2 function.
+
+              Otherwise, _N_a_m_e should be a filename.
+
+              The following options modify the defaults for the extraction as
+              follows.
+
+                _{_c_w_d_,_C_w_d_}:
+                  Files with relative filenames will by default be extracted
+                  to the current working directory. Given the _{_c_w_d_,_C_w_d_}
+                  option, the _e_x_t_r_a_c_t_/_2 function will extract into the
+                  directory _C_w_d instead of to the current working directory.
+
+                _{_f_i_l_e_s_,_F_i_l_e_L_i_s_t_}:
+                  By default, all files will be extracted from the tar file.
+                  Given the _{_f_i_l_e_s_,_F_i_l_e_s_} option, the _e_x_t_r_a_c_t_/_2 function will
+                  only extract the files whose names are included in _F_i_l_e_L_i_s_t.
+
+                _c_o_m_p_r_e_s_s_e_d:
+                  Given the _c_o_m_p_r_e_s_s_e_d option, the _e_x_t_r_a_c_t_/_2 function will
+                  uncompress the file while extracting If the tar file is not
+                  actually compressed, the _c_o_m_p_r_e_s_s_e_d will effectively be
+                  ignored.
+
+                _c_o_o_k_e_d:
+                  By default, the _o_p_e_n_/_2 function will open the tar file in
+                  _r_a_w mode, which is faster but does not allow a remote
+                  (erlang) file server to be used. Adding _c_o_o_k_e_d to the mode
+                  list will override the default and open the tar file without
+                  the _r_a_w option.
+
+                _m_e_m_o_r_y:
+                  Instead of extracting to a directory, the memory option will
+                  give the result as a list of tuples {Filename, Binary},
+                  where Binary is a binary containing the extracted data of
+                  the file named Filename in the tar file.
+
+                _k_e_e_p___o_l_d___f_i_l_e_s:
+                  By default, all existing files with the same name as file in
+                  the tar file will be overwritten Given the _k_e_e_p___o_l_d___f_i_l_e_s
+                  option, the _e_x_t_r_a_c_t_/_2 function will not overwrite any
+                  existing files.
+
+                _v_e_r_b_o_s_e:
+                  Print an informational message as each file is being
+                  extracted.
+
+       ffoorrmmaatt__eerrrroorr((RReeaassoonn)) -->> ssttrriinngg(())
+
+              Types:
+
+                 Reason = term()
+
+              The _f_o_r_m_a_t___e_r_r_o_r_/_1 function converts an error reason term to a
+              human-readable error message string.
+
+       ooppeenn((NNaammee,, OOppeennMMooddeeLLiisstt)) -->> RReettVVaalluuee
+
+              Types:
+
+                 Name = filename()
+                 OpenModeList = [OpenMode]
+                 Mode = write|compressed|cooked
+                 RetValue = {ok,TarDescriptor}|{error,{Name,Reason}}
+                 TarDescriptor = term()
+                 Reason = term()
+
+              The _o_p_e_n_/_2 function creates a tar file for writing. (Any
+              existing file with the same name will be truncated.)
+
+              By convention, the name of a tar file should end in "_._t_a_r". To
+              abide to the convention, you'll need to add "_._t_a_r" yourself to
+              the name.
+
+              Except for the _w_r_i_t_e atom the following atoms may be added to
+              _O_p_e_n_M_o_d_e_L_i_s_t:
+
+                _c_o_m_p_r_e_s_s_e_d:
+                  The entire tar file will be compressed, as if it has been
+                  run through the _g_z_i_p program. To abide to the convention
+                  that a compressed tar file should end in "_._t_a_r_._g_z" or
+                  "_._t_g_z", you'll need to add the appropriate extension
+                  yourself.
+
+                _c_o_o_k_e_d:
+                  By default, the _o_p_e_n_/_2 function will open the tar file in
+                  _r_a_w mode, which is faster but does not allow a remote
+                  (erlang) file server to be used. Adding _c_o_o_k_e_d to the mode
+                  list will override the default and open the tar file without
+                  the _r_a_w option.
+
+              Use the aadddd//33,,44 functions to add one file at the time into an
+              opened tar file. When you are finished adding files, use the
+              cclloossee function to close the tar file.
+
+          WWaarrnniinngg::
+              The _T_a_r_D_e_s_c_r_i_p_t_o_r term is not a file descriptor. You should not
+              rely on the specific contents of the _T_a_r_D_e_s_c_r_i_p_t_o_r term, as it
+              may change in future versions as more features are added to the
+              _e_r_l___t_a_r module.
+
+
+       ttaabbllee((NNaammee)) -->> RReettVVaalluuee
+
+              Types:
+
+                 Name = filename()
+                 RetValue = {ok,[string()]}|{error,{Name,Reason}}
+                 Reason = term()
+
+              The _t_a_b_l_e_/_1 function retrieves the names of all files in the tar
+              file _N_a_m_e.
+
+       ttaabbllee((NNaammee,, OOppttiioonnss))
+
+              Types:
+
+                 Name = filename()
+
+              The _t_a_b_l_e_/_2 function retrieves the names of all files in the tar
+              file _N_a_m_e.
+
+       tt((NNaammee))
+
+              Types:
+
+                 Name = filename()
+
+              The _t_/_1 function prints the names of all files in the tar file
+              _N_a_m_e to the Erlang shell. (Similar to "_t_a_r _t".)
+
+       tttt((NNaammee))
+
+              Types:
+
+                 Name = filename()
+
+              The _t_t_/_1 function prints names and information about all files
+              in the tar file _N_a_m_e to the Erlang shell. (Similar to "_t_a_r _t_v".)
+
+
+
+Ericsson AB                      stdlib 1.18.2                      erl_tar(3)

@@ -1,0 +1,876 @@
+orber_ifr(3)               Erlang Module Definition               orber_ifr(3)
+
+
+
+NNAAMMEE
+       orber_ifr - The Interface Repository stores representations of IDL
+       information
+
+DDEESSCCRRIIPPTTIIOONN
+       This module contains functions for managing the Interface Repository
+       (IFR). This documentation should be used in conjunction with the
+       documentation in chapter 6 of 2.3. Whenever the term IFR object is used
+       in this manual page, it refers to a pseudo object used only for
+       interaction with the IFR rather than a CORBA object.
+
+IINNIITTIIAALLIIZZAATTIIOONN OOFF TTHHEE IIFFRR
+       The following functions are used to initialize the Interface Repository
+       and to obtain the initial reference to the repository.
+
+EEXXPPOORRTTSS
+       iinniitt((NNooddeess,,TTiimmeeoouutt)) -->> ookk
+
+              Types:
+
+                 Nodes = list()
+                 Timeout = integer() | infinity
+
+              This function should be called to initialize the IFR. It creates
+              the necessary mnesia-tables. A mnesia schema should exist, and
+              mnesia must be running.
+
+       ffiinndd__rreeppoossiittoorryy(()) -->> ##IIFFRR__RReeppoossiittoorryy__oobbjjrreeff
+
+              Find the IFR object reference for the Repository. This reference
+              should be used when adding objects to the IFR, and when
+              extracting information from the IFR. The first time this
+              function is called, it will create the repository and all the
+              primitive definitions.
+
+GGEENNEERRAALL MMEETTHHOODDSS
+       The following functions are the methods of the IFR. The first argument
+       is always an #IFR_objref, i.e. the IFR (pseudo)object on which to apply
+       this method. These functions are useful when the type of IFR object is
+       not know, but they are somewhat slower than the specific functions
+       listed below which only accept a particular type of IFR object as the
+       first argument.
+
+EEXXPPOORRTTSS
+       ggeett__ddeeff__kkiinndd((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = atom() (one of dk_none, dk_all, dk_Attribute,
+                 dk_Constant, dk_Exception, dk_Interface, dk_Module,
+                 dk_Operation, dk_Typedef, dk_Alias, dk_Struct, dk_Union,
+                 dk_Enum, dk_Primitive, dk_String, dk_Wstring, dk_Fixed,
+                 dk_Sequence, dk_Array, dk_Repository)
+
+              Objref is an IFR object of any kind. Returns the definition kind
+              of the IFR object.
+
+       ddeessttrrooyy((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = tuple()
+
+              Objref is an IFR object of any kind except IRObject, Contained
+              and Container. Destroys that object and its contents (if any).
+              Returns whatever mnesia:transaction returns.
+
+       ggeett__iidd((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns the repository id of that object.
+
+       sseett__iidd((OObbjjrreeff,,IIdd)) -->> ookk
+
+              Types:
+
+                 Objref = #IFR_object
+                 Id = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Sets the repository id of that object.
+
+       ggeett__nnaammee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns the name of that object.
+
+       sseett__nnaammee((OObbjjrreeff,,NNaammee)) -->> ookk
+
+              Types:
+
+                 Objref = #IFR_object
+                 Name = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Sets the name of that object.
+
+       ggeett__vveerrssiioonn((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns the version of that object.
+
+       sseett__vveerrssiioonn((OObbjjrreeff,,VVeerrssiioonn)) -->> ookk
+
+              Types:
+
+                 Objref = #IFR_object
+                 Version = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Sets the version of that object.
+
+       ggeett__ddeeffiinneedd__iinn((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = #IFR_Container_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns the Container object that the object is
+              defined in.
+
+       ggeett__aabbssoolluuttee__nnaammee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = string()
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns the absolute (scoped) name of that object.
+
+       ggeett__ccoonnttaaiinniinngg__rreeppoossiittoorryy((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = #IFR_Repository_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns the Repository that is eventually reached by
+              recursively following the object's defined_in attribute.
+
+       ddeessccrriibbee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_object
+                 Return = tuple() (a contained_description record) |
+                 {exception, _}
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. Returns a tuple describing the object.
+
+       mmoovvee((OObbjjrreeff,,NNeeww__ccoonnttaaiinneerr,,NNeeww__nnaammee,,NNeeww__vveerrssiioonn)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 New_container = #IFR_Container_objref
+                 New_name = string()
+                 New_version = string()
+                 Return = ok | {exception, _}
+
+              Objref is an IFR object of any kind that inherits from
+              Contained. New_container is an IFR object of any kind that
+              inherits from Container. Removes Objref from its current
+              Container, and adds it to New_container. The name attribute is
+              changed to New_name and the version attribute is changed to
+              New_version.
+
+       llooookkuupp((OObbjjrreeff,,SSeeaarrcchh__nnaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Search_name = string()
+                 Return = #IFR_object
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Returns an IFR object identified by search_name (a
+              scoped name).
+
+       ccoonntteennttss((OObbjjrreeff,,LLiimmiitt__ttyyppee,,EExxcclluuddee__iinnhheerriitteedd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Limit_type = atom() (one of dk_none, dk_all, dk_Attribute,
+                 dk_Constant, dk_Exception, dk_Interface, dk_Module,
+                 dk_Operation, dk_Typedef, dk_Alias, dk_Struct, dk_Union,
+                 dk_Enum, dk_Primitive, dk_String, dk_Wstring, dk_Fixed,
+                 dk_Sequence, dk_Array, dk_Repository)
+                 Exclude_inherited = atom() (true or false)
+                 Return = list() (a list of IFR#_objects)
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Returns the contents of that IFR object.
+
+       llooookkuupp__nnaammee((OObbjjrreeff,,SSeeaarrcchh__nnaammee,,LLeevveellss__ttoo__sseeaarrcchh,, LLiimmiitt__ttyyppee,,
+       EExxcclluuddee__iinnhheerriitteedd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Search_name = string()
+                 Levels_to_search = integer()
+                 Limit_type = atom() (one of dk_none, dk_all, dk_Attribute,
+                 dk_Constant, dk_Exception, dk_Interface, dk_Module,
+                 dk_Operation, dk_Typedef, dk_Alias, dk_Struct, dk_Union,
+                 dk_Enum, dk_Primitive, dk_String, dk_Wstring, dk_Fixed,
+                 dk_Sequence, dk_Array, dk_Repository)
+                 Exclude_inherited = atom() (true or false)
+                 Return = list() (a list of #IFR_objects)
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Returns a list of #IFR_objects with an id matching
+              Search_name.
+
+       ddeessccrriibbee__ccoonntteennttss((OObbjjrreeff,, LLiimmiitt__ttyyppee,, EExxcclluuddee__iinnhheerriitteedd,,
+       MMaaxx__rreettuurrnneedd__oobbjjss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Limit_type = atom() (one of dk_none, dk_all, dk_Attribute,
+                 dk_Constant, dk_Exception, dk_Interface, dk_Module,
+                 dk_Operation, dk_Typedef, dk_Alias, dk_Struct, dk_Union,
+                 dk_Enum, dk_Primitive, dk_String, dk_Wstring, dk_Fixed,
+                 dk_Sequence, dk_Array, dk_Repository)
+                 Exclude_inherited = atom() (true or false)
+                 Return = list() (a list of tuples (contained_description
+                 records) | {exception, _}
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Returns a list of descriptions of the IFR objects in
+              this Container's contents.
+
+       ccrreeaattee__mmoodduullee((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Return = #IFR_ModuleDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type ModuleDef.
+
+       ccrreeaattee__ccoonnssttaanntt((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,TTyyppee,,VVaalluuee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Type = #IFR_IDLType_objref
+                 Value = any()
+                 Return = #IFR_ConstantDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type ConstantDef.
+
+       ccrreeaattee__ssttrruucctt((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,MMeemmbbeerrss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Members = list() (list of structmember records)
+                 Return = #IFR_StructDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type StructDef.
+
+       ccrreeaattee__uunniioonn((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,DDiissccrriimmiinnaattoorr__ttyyppee,,MMeemmbbeerrss)) -->>
+       RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Discriminator_type = #IFR_IDLType_Objref
+                 Members = list() (list of unionmember records)
+                 Return = #IFR_UnionDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type UnionDef.
+
+       ccrreeaattee__eennuumm((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,MMeemmbbeerrss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Members = list() (list of strings)
+                 Return = #IFR_EnumDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type EnumDef.
+
+       ccrreeaattee__aalliiaass((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,OOrriiggiinnaall__ttyyppee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Original_type = #IFR_IDLType_Objref
+                 Return = #IFR_AliasDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type AliasDef.
+
+       ccrreeaattee__iinntteerrffaaccee((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,BBaassee__iinntteerrffaacceess)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Base_interfaces = list() (a list of IFR_InterfaceDef_objrefs
+                 that this interface inherits from
+                 Return = #IFR_InterfaceDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type InterfaceDef.
+
+       ccrreeaattee__eexxcceeppttiioonn((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,MMeemmbbeerrss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Members = list() (list of structmember records)
+                 Return = #IFR_ExceptionDef_objref
+
+              Objref is an IFR object of any kind that inherits from
+              Container. Creates an IFR object of the type ExceptionDef.
+
+       ggeett__ttyyppee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = tuple() (a typecode tuple)
+
+              Objref is an IFR object of any kind that inherits from IDLType
+              or an IFR object of the kind ConstantDef, ExceptionDef or
+              AttributeDef. Returns the typecode of the IFR object.
+
+       llooookkuupp__iidd((OObbjjrreeff,,SSeeaarrcchh__iidd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Search_id = string()
+                 Return = #IFR_objref
+
+              Returns an IFR object matching the Search_id.
+
+       ggeett__pprriimmiittiivvee((OObbjjrreeff,,KKiinndd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Kind = atom() (one of pk_null, pk_void, pk_short, pk_long,
+                 pk_ushort, pk_ulong, pk_float, pk_double, pk_boolean,
+                 pk_char, pk_octet, pk_any, pk_TypeCode, pk_Principal,
+                 pk_string, pk_wstring, pk_fixed, pk_objref)
+                 Return = #IFR_PrimitiveDef_objref
+
+              Returns a PrimitiveDef of the specified kind.
+
+       ccrreeaattee__ssttrriinngg((OObbjjrreeff,,BBoouunndd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Bound = integer() (unsigned long /= 0)
+                 Return = #IFR_StringDef_objref
+
+              Creates an IFR objref of the type StringDef.
+
+       ccrreeaattee__wwssttrriinngg((OObbjjrreeff,,BBoouunndd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Bound = integer() (unsigned long /= 0)
+                 Return = #IFR_WstringDef_objref
+
+              Creates an IFR objref of the type WstringDef.
+
+       ccrreeaattee__ffiixxeedd((OObbjjrreeff,,DDiiggiittss,,SSccaallee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Digits = Scale = integer()
+                 Return = #IFR_FixedDef_objref
+
+              Creates an IFR objref of the type FixedDef.
+
+       ccrreeaattee__sseeqquueennccee((OObbjjrreeff,,BBoouunndd,,EElleemmeenntt__ttyyppee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Bound = integer() (unsigned long)
+                 Element_type = #IFR_IDLType_objref
+                 Return = #IFR_SequenceDef_objref
+
+              Creates an IFR objref of the type SequenceDef.
+
+       ccrreeaattee__aarrrraayy((OObbjjrreeff,,LLeennggtthh,,EElleemmeenntt__ttyyppee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Bound = integer() (unsigned long)
+                 Element_type = #IFR_IDLType_objref
+                 Return = #IFR_ArrayDef_objref
+
+              Creates an IFR objref of the type ArrayDef.
+
+       ccrreeaattee__iiddllttyyppee((OObbjjrreeff,,TTyyppeeccooddee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_Repository_objref
+                 Typecode = tuple() (a typecode tuple)
+                 Return = #IFR_IDLType_objref
+
+              Creates an IFR objref of the type IDLType.
+
+       ggeett__ttyyppee__ddeeff((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = #IFR_IDLType_objref
+
+              Objref is an IFR object of the kind ConstantDef or AttributeDef.
+              Returns an IFR object of the type IDLType describing the type of
+              the IFR object.
+
+       sseett__ttyyppee__ddeeff((OObbjjrreeff,,TTyyppeeDDeeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 TypeDef = #IFR_IDLType_objref
+                 Return = ok | {exception, _}
+
+              Objref is an IFR object of the kind ConstantDef or AttributeDef.
+              Sets the type_def of the IFR Object.
+
+       ggeett__vvaalluuee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_ConstantDef_objref
+                 Return = any()
+
+              Returns the value attribute of an IFR Object of the type
+              ConstantDef.
+
+       sseett__vvaalluuee((OObbjjrreeff,,VVaalluuee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_ConstantDef_objref
+                 Value = any()
+                 Return = ok | {exception, _}
+
+              Sets the value attribute of an IFR Object of the type
+              ConstantDef.
+
+       ggeett__mmeemmbbeerrss((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = list()
+
+              Objref is an IFR object the kind StructDef, UnionDef, EnumDef or
+              ExceptionDef. For StructDef, UnionDef and ExceptionDef: Returns
+              a list of structmember records that are the constituent parts of
+              the object. For EnumDef: Returns a list of strings describing
+              the enumerations.
+
+       sseett__mmeemmbbeerrss((OObbjjrreeff,,MMeemmbbeerrss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Members = list()
+                 Return = ok | {exception, _}
+
+              Objref is an IFR object the kind StructDef, UnionDef, EnumDef or
+              ExceptionDef. For StructDef, UnionDef and ExceptionDef: Members
+              is a list of structmember records. For EnumDef: Members is a
+              list of strings describing the enumerations. Sets the members
+              attribute, which are the constituent parts of the exception.
+
+       ggeett__ddiissccrriimmiinnaattoorr__ttyyppee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_UnionDef_objref
+                 Return = tuple() (a typecode tuple)
+
+              Returns the discriminator typecode of an IFR object of the type
+              UnionDef.
+
+       ggeett__ddiissccrriimmiinnaattoorr__ttyyppee__ddeeff((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_UnionDef_objref
+                 Return = #IFR_IDLType_objref
+
+              Returns an IFR object of the type IDLType describing the
+              discriminator type of an IFR object of the type UnionDef.
+
+       sseett__ddiissccrriimmiinnaattoorr__ttyyppee__ddeeff((OObbjjrreeff,,TTyyppeeDDeeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_UnionDef_objref
+                 Return = #IFR_IDLType_objref
+
+              Sets the attribute discriminator_type_def, an IFR object of the
+              type IDLType describing the discriminator type of an IFR object
+              of the type UnionDef.
+
+       ggeett__oorriiggiinnaall__ttyyppee__ddeeff((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_AliasDef_objref
+                 Return = #IFR_IDLType_objref
+
+              Returns an IFR object of the type IDLType describing the
+              original type.
+
+       sseett__oorriiggiinnaall__ttyyppee__ddeeff((OObbjjrreeff,,TTyyppeeDDeeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_AliasDef_objref
+                 Typedef = #IFR_IDLType_objref
+                 Return = ok | {exception, _}
+
+              Sets the original_type_def attribute which describes the
+              original type.
+
+       ggeett__kkiinndd((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_PrimitiveDef_objref
+                 Return = atom()
+
+              Returns an atom describing the primitive type (See CORBA 2.0 p
+              6-21).
+
+       ggeett__bboouunndd((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = integer (unsigned long)
+
+              Objref is an IFR object the kind StringDef or SequenceDef. For
+              StringDef: returns the maximum number of characters in the
+              string. For SequenceDef: Returns the maximum number of elements
+              in the sequence. Zero indicates an unbounded sequence.
+
+       sseett__bboouunndd((OObbjjrreeff,,BBoouunndd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Bound = integer (unsigned long)
+                 Return = ok | {exception, _}
+
+              Objref is an IFR object the kind StringDef or SequenceDef. For
+              StringDef: Sets the maximum number of characters in the string.
+              Bound must not be zero. For SequenceDef: Sets the maximum number
+              of elements in the sequence. Zero indicates an unbounded
+              sequence.
+
+       ggeett__eelleemmeenntt__ttyyppee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = tuple() (a typecode tuple)
+
+              Objref is an IFR object the kind SequenceDef or ArrayDef.
+              Returns the typecode of the elements in the IFR object.
+
+       ggeett__eelleemmeenntt__ttyyppee__ddeeff((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = #IFR_IDLType_objref
+
+              Objref is an IFR object the kind SequenceDef or ArrayDef.
+              Returns an IFR object of the type IDLType describing the type of
+              the elements in Objref.
+
+       sseett__eelleemmeenntt__ttyyppee__ddeeff((OObbjjrreeff,,TTyyppeeDDeeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 TypeDef = #IFR_IDLType_objref
+                 Return = ok | {exception, _}
+
+              Objref is an IFR object the kind SequenceDef or ArrayDef. Sets
+              the element_type_def attribute, an IFR object of the type
+              IDLType describing the type of the elements in Objref.
+
+       ggeett__lleennggtthh((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_ArrayDef_objref
+                 Return = integer() (unsigned long)
+
+              Returns the number of elements in the array.
+
+       sseett__lleennggtthh((OObbjjrreeff,,LLeennggtthh)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_ArrayDef_objref
+                 Length = integer() (unsigned long)
+
+              Sets the number of elements in the array.
+
+       ggeett__mmooddee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Return = atom()
+
+              Objref is an IFR object the kind AttributeDef or OperationDef.
+              For AttributeDef: Return is an atom ('ATTR_NORMAL' or
+              'ATTR_READONLY') specifying the read/write access for this
+              attribute. For OperationDef: Return is an atom ('OP_NORMAL' or
+              'OP_ONEWAY') specifying the mode of the operation.
+
+       sseett__mmooddee((OObbjjrreeff,,MMooddee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_objref
+                 Mode = atom()
+                 Return = ok | {exception, _}
+
+              Objref is an IFR object the kind AttributeDef or OperationDef.
+              For AttributeDef: Sets the read/write access for this attribute.
+              Mode is an atom ('ATTR_NORMAL' or 'ATTR_READONLY'). For
+              OperationDef: Sets the mode of the operation. Mode is an atom
+              ('OP_NORMAL' or 'OP_ONEWAY').
+
+       ggeett__rreessuulltt((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Return = tuple() (a typecode tuple)
+
+              Returns a typecode describing the type of the value returned by
+              the operation.
+
+       ggeett__rreessuulltt__ddeeff((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Return = #IFR_IDLType_objref
+
+              Returns an IFR object of the type IDLType describing the type of
+              the result.
+
+       sseett__rreessuulltt__ddeeff((OObbjjrreeff,,RReessuullttDDeeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 ResultDef = #IFR_IDLType_objref
+                 Return = ok | {exception, _}
+
+              Sets the type_def attribute, an IFR Object of the type IDLType
+              describing the result.
+
+       ggeett__ppaarraammss((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Return = list() (list of parameter description records)
+
+              Returns a list of parameter description records, which describes
+              the parameters of the OperationDef.
+
+       sseett__ppaarraammss((OObbjjrreeff,,PPaarraammss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Params = list() (list of parameter description records)
+                 Return = ok | {exception, _}
+
+              Sets the params attribute, a list of parameter description
+              records.
+
+       ggeett__ccoonntteexxttss((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Return = list() (list of strings)
+
+              Returns a list of context identifiers for the operation.
+
+       sseett__ccoonntteexxttss((OObbjjrreeff,,CCoonntteexxttss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Contexts = list() (list of strings)
+                 Return = ok | {exception, _}
+
+              Sets the context attribute for the operation.
+
+       ggeett__eexxcceeppttiioonnss((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Return = list() (list of #IFR_ExceptionDef_objrefs)
+
+              Returns a list of exception types that can be raised by this
+              operation.
+
+       sseett__eexxcceeppttiioonnss((OObbjjrreeff,,EExxcceeppttiioonnss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_OperationDef_objref
+                 Exceptions = list() (list of #IFR_ExceptionDef_objrefs)
+                 Return = ok | {exception, _}
+
+              Sets the exceptions attribute for this operation.
+
+       ggeett__bbaassee__iinntteerrffaacceess((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_InterfaceDef_objref
+                 Return = list() (list of #IFR_InterfaceDef_objrefs)
+
+              Returns a list of InterfaceDefs from which this InterfaceDef
+              inherits.
+
+       sseett__bbaassee__iinntteerrffaacceess((OObbjjrreeff,,BBaasseeIInntteerrffaacceess)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_InterfaceDef_objref
+                 BaseInterfaces = list() (list of #IFR_InterfaceDef_objrefs)
+                 Return = ok | {exception, _}
+
+              Sets the BaseInterfaces attribute.
+
+       iiss__aa((OObbjjrreeff,,IInntteerrffaaccee__iidd)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_InterfaceDef_objref
+                 Interface_id = #IFR_InterfaceDef_objref
+                 Return = atom() (true or false)
+
+              Returns true if the InterfaceDef either is identical to or
+              inherits from Interface_id.
+
+       ddeessccrriibbee__iinntteerrffaaccee((OObbjjrreeff)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_InterfaceDef_objref
+                 Return = tuple() (a fullinterfacedescription record)
+
+              Returns a full inter face description record describing the
+              InterfaceDef.
+
+       ccrreeaattee__aattttrriibbuuttee((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,TTyyppee,,MMooddee)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_InterfaceDef_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Type = #IFR_IDLType_objref
+                 Mode = atom() ('ATTR_NORMAL' or 'ATTR_READONLY')
+                 Return = #IFR_AttributeDef_objref
+
+              Creates an IFR object of the type AttributeDef contained in this
+              InterfaceDef.
+
+       ccrreeaattee__ooppeerraattiioonn((OObbjjrreeff,,IIdd,,NNaammee,,VVeerrssiioonn,,RReessuulltt,,MMooddee,,PPaarraammss,,
+       EExxcceeppttiioonnss,,CCoonntteexxttss)) -->> RReettuurrnn
+
+              Types:
+
+                 Objref = #IFR_InterfaceDef_objref
+                 Id = string()
+                 Name = string()
+                 Version = string()
+                 Result = #IFR_IDLType_objref
+                 Mode = atom() ('OP_NORMAL' or 'OP_ONEWAY')
+                 Params = list() (list of parameter description records)
+                 Exceptions = list() (list of #IFR_ExceptionDef_objrefs)
+                 Contexts = list() (list of strings)
+                 Return = #IFR_OperationDef_objref
+
+              Creates an IFR object of the type OperationDef contained in this
+              InterfaceDef.
+
+
+
+Ericsson AB                      orber 3.6.24                     orber_ifr(3)

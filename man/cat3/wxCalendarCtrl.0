@@ -1,0 +1,283 @@
+wxCalendarCtrl(3)          Erlang Module Definition          wxCalendarCtrl(3)
+
+
+
+NNAAMMEE
+       wxCalendarCtrl - See external documentation: wxCalendarCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCalendarCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_a_l_e_n_d_a_r_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCCaalleennddaarrCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxCCaalleennddaarrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxCCaalleennddaarrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {date, wx_datetime() (see module wx)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {date, wx_datetime() (see module wx)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       sseettDDaattee((TThhiiss,, DDaattee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Date = wx_datetime() (see module wx)
+
+              See external documentation.
+
+       ggeettDDaattee((TThhiiss)) -->> wwxx__ddaatteettiimmee(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       eennaabblleeYYeeaarrCChhaannggee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              Equivalent to eennaabblleeYYeeaarrCChhaannggee((TThhiiss,, [[]])).
+
+       eennaabblleeYYeeaarrCChhaannggee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabblleeMMoonntthhCChhaannggee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              Equivalent to eennaabblleeMMoonntthhCChhaannggee((TThhiiss,, [[]])).
+
+       eennaabblleeMMoonntthhCChhaannggee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Option = {enable, boolean()}
+
+              See external documentation.
+
+       eennaabblleeHHoolliiddaayyDDiissppllaayy((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              Equivalent to eennaabblleeHHoolliiddaayyDDiissppllaayy((TThhiiss,, [[]])).
+
+       eennaabblleeHHoolliiddaayyDDiissppllaayy((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Option = {display, boolean()}
+
+              See external documentation.
+
+       sseettHHeeaaddeerrCCoolloouurrss((TThhiiss,, CCoollFFgg,, CCoollBBgg)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 ColFg = wx_colour() (see module wx)
+                 ColBg = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ggeettHHeeaaddeerrCCoolloouurrFFgg((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       ggeettHHeeaaddeerrCCoolloouurrBBgg((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       sseettHHiigghhlliigghhttCCoolloouurrss((TThhiiss,, CCoollFFgg,, CCoollBBgg)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 ColFg = wx_colour() (see module wx)
+                 ColBg = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ggeettHHiigghhlliigghhttCCoolloouurrFFgg((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       ggeettHHiigghhlliigghhttCCoolloouurrBBgg((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       sseettHHoolliiddaayyCCoolloouurrss((TThhiiss,, CCoollFFgg,, CCoollBBgg)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 ColFg = wx_colour() (see module wx)
+                 ColBg = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ggeettHHoolliiddaayyCCoolloouurrFFgg((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       ggeettHHoolliiddaayyCCoolloouurrBBgg((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+
+              See external documentation.
+
+       ggeettAAttttrr((TThhiiss,, DDaayy)) -->> wwxxCCaalleennddaarrDDaatteeAAttttrr(()) ((sseeee mmoodduullee
+       wwxxCCaalleennddaarrDDaatteeAAttttrr))
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Day = integer()
+
+              See external documentation.
+
+       sseettAAttttrr((TThhiiss,, DDaayy,, AAttttrr)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Day = integer()
+                 Attr = wxCalendarDateAttr() (see module wxCalendarDateAttr)
+
+              See external documentation.
+
+       sseettHHoolliiddaayy((TThhiiss,, DDaayy)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Day = integer()
+
+              See external documentation.
+
+       rreesseettAAttttrr((TThhiiss,, DDaayy)) -->> ookk
+
+              Types:
+
+                 This = wxCalendarCtrl()
+                 Day = integer()
+
+              See external documentation.
+
+       hhiittTTeesstt((TThhiiss,, PPooss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::wx_enum() (see module wx), Date::wx_datetime()
+                 (see module wx), Wd::wx_enum() (see module wx)}
+                 This = wxCalendarCtrl()
+                 Pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+              Wd = ?wxDateTime_Sun | ?wxDateTime_Mon | ?wxDateTime_Tue |
+              ?wxDateTime_Wed | ?wxDateTime_Thu | ?wxDateTime_Fri |
+              ?wxDateTime_Sat | ?wxDateTime_Inv_WeekDay
+              Res = ?wxCAL_HITTEST_NOWHERE | ?wxCAL_HITTEST_HEADER |
+              ?wxCAL_HITTEST_DAY | ?wxCAL_HITTEST_INCMONTH |
+              ?wxCAL_HITTEST_DECMONTH | ?wxCAL_HITTEST_SURROUNDING_WEEK
+
+       ddeessttrrooyy((TThhiiss::::wwxxCCaalleennddaarrCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxCalendarCtrl(3)

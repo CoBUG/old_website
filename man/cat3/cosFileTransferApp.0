@@ -1,0 +1,124 @@
+cosFileTransferApp(3)      Erlang Module Definition      cosFileTransferApp(3)
+
+
+
+NNAAMMEE
+       cosFileTransferApp - The main module of the cosFileTransfer
+       application.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_F_i_l_e_T_r_a_n_s_f_e_r_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application.
+
+EEXXPPOORRTTSS
+       iinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation installs the cosFileTransfer application. Note,
+              the _c_o_s_P_r_o_p_e_r_t_y application must be installed prior to invoking
+              this operation.
+
+       uunniinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXIT', Reason}
+
+              This operation uninstalls the cosFileTransfer application.
+
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosFileTransfer application.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosFileTransfer application.
+
+       ccrreeaattee__VVFFSS((TTyyppee,, CCoonntteenntt,, HHoosstt,, PPoorrtt [[,,OOppttiioonnss]])) -->> RReettuurrnn
+
+              Types:
+
+                 Type = 'FTP' | {'NATIVE', 'cosFileTransferNATIVE_file'} |
+                 {'NATIVE', MyModule}
+                 Content = []
+                 Host = string(), e.g. "myHost@myServer" or "012.345.678.910"
+                 Port = integer()
+                 Options = [Option]
+                 Option = {protocol, Protocol} | {connect_timeout, Seconds}
+                 Protocol = tcp | ssl
+                 Return = VFS | {'EXCEPTION, E}
+                 VFS = #objref
+
+              This operation creates a new instance of a Virtual File System.
+              The _T_y_p_e parameter determines which type we want the VFS to
+              represent. 'FTP' maps to the _I_N_E_T_S ftp implementation, while
+              {'NATIVE', 'cosFileTransferNATIVE_file'} uses the _f_i_l_e module.
+              It is also possible to implement own mappings which are
+              activated by supplying {'NATIVE', MyModule}. The MyModule module
+              must export the same functions and behave in the same way as the
+              INETS ftp module, and an operation named _o_p_e_n_(_H_o_s_t_, _P_o_r_t_), which
+              shall return _{_o_k_, _P_i_d_} or _{_e_r_r_o_r_, _R_e_a_s_o_n_}.
+
+              If no _O_p_t_i_o_n_s are supplied the default setting will be used,
+              i.e., tcp and 60 seconds.
+
+              The _C_o_n_t_e_n_t parameter is currently ignored by must be supplied
+              as an empty list.
+
+       ssssll__sseerrvveerr__cceerrttffiillee(()) -->> ssttrriinngg(())
+
+              This function returns a path to a file containing a chain of PEM
+              encoded certificates for the cosFileTransfer as target. This is
+              configured by setting the application variable
+              _s_s_l___s_e_r_v_e_r___c_e_r_t_f_i_l_e.
+
+       ssssll__cclliieenntt__cceerrttffiillee(()) -->> ssttrriinngg(())
+
+              This function returns a path to a file containing a chain of PEM
+              encoded certificates used in outgoing calls. The default value
+              is configured by setting the application variable
+              _s_s_l___c_l_i_e_n_t___c_e_r_t_f_i_l_e.
+
+       ssssll__sseerrvveerr__vveerriiffyy(()) -->> 00 || 11 || 22
+
+              This function returns the type of verification used by SSL
+              during authentication of the other peer for incoming calls. It
+              is configured by setting the application variable
+              _s_s_l___s_e_r_v_e_r___v_e_r_i_f_y.
+
+       ssssll__cclliieenntt__vveerriiffyy(()) -->> 00 || 11 || 22
+
+              This function returns the type of verification used by SSL
+              during authentication of the other peer for outgoing calls. The
+              default value is configured by setting the application variable
+              _s_s_l___c_l_i_e_n_t___v_e_r_i_f_y.
+
+       ssssll__sseerrvveerr__ddeepptthh(()) -->> iinntt(())
+
+              This function returns the SSL verification depth for incoming
+              calls. It is configured by setting the application variable
+              _s_s_l___s_e_r_v_e_r___d_e_p_t_h.
+
+       ssssll__cclliieenntt__ddeepptthh(()) -->> iinntt(())
+
+              This function returns the SSL verification depth for outgoing
+              calls. The default value is configured by setting the
+              application variable _s_s_l___c_l_i_e_n_t___d_e_p_t_h.
+
+
+
+Ericsson AB                 cosFileTransfer 1.1.13       cosFileTransferApp(3)

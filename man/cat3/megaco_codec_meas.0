@@ -1,0 +1,32 @@
+megaco_codec_meas(3)       Erlang Module Definition       megaco_codec_meas(3)
+
+
+
+NNAAMMEE
+       megaco_codec_meas - This module implements a simple megaco codec
+       measurement tool.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements a simple megaco codec measurement tool.
+
+       Results are written to file (excel compatible text files) and on
+       stdout.
+
+       _N_o_t_e that this module is _n_o_t included in the runtime part of the
+       application.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> vvooiidd(())
+       ssttaarrtt((MMeessssaaggeePPaacckkaaggee)) -->> vvooiidd(())
+
+              Types:
+
+                 MessagePackageRaw = message_package()
+                 message_package() = atom()
+
+              This function runs the measurement on all the _o_f_f_i_c_i_a_l codecs;
+              pretty, compact, ber, per and erlang.
+
+
+
+Ericsson AB                     megaco 3.16.0.2           megaco_codec_meas(3)

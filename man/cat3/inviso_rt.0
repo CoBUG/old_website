@@ -1,0 +1,207 @@
+inviso_rt(3)               Erlang Module Definition               inviso_rt(3)
+
+
+
+NNAAMMEE
+       inviso_rt - Direct API to the Inviso Runtime Component
+
+DDEESSCCRRIIPPTTIIOONN
+       The _i_n_v_i_s_o___r_t API is normally only used when programming autostart
+       scripts or similar mechanisms. The reason is that the runtime component
+       is part of the Runtime_tools application and will therefore always be
+       available. But the regular inviso API is part of the Inviso application
+       not necessarily available on the node doing an autostart. It is of
+       course possible to runt a "lean" tracer only using the runtime
+       component manually (i.e not through autostart). The runtime component
+       shall otherwise be controlled through the control component, which is
+       accessed with the _i_n_v_i_s_o API.
+
+EEXXPPOORRTTSS
+       iinniitt__ttrraacciinngg((TTrraacceerrDDaattaa)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See iinnvviissoo::iinniitt__ttrraacciinngg//22 for details.
+
+       ttpp((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc,,OOppttss)) -->>
+       ttpp((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttpp((PPaatttteerrnnLLiisstt)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Mod,Func = atom() | '_' | ModRegExp | {DirRegExp,ModRegExp}
+                  ModRegExp = regexp_string()
+                  DirRegExp = regexp_string()
+                 Arity = int() | '_'
+                 MatchSpec = true | false | [] | matchspec()
+                 PatternList = [Pattern],
+                  Pattern = {Mod,Func,Arity,MatchSpec,Opts}
+                 Opts = [Opt]
+                  Opt = only_loaded
+                 NodeResult = {ok,[Ans]} | {error,Reason}
+                  Ans = int() | {error,Reason}
+
+              Set global trace patterns. The integer replied if the call was
+              successfull describes the number of matched functions. Using
+              wildcards follows the rules for wildcards of
+              _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n. It is for instance illegal to specify
+              _M_=_=_'___' while _F is not _'___'.
+
+              Modules can also be specified using Erlang regular expressions
+              as described in the _r_e_g_e_x_p module. If _{_D_i_r_R_e_g_E_x_p_,_M_o_d_R_e_g_E_x_p_} is
+              used, module selection will further be restricted by that the
+              module must be loaded from a location containing _D_i_r_R_e_g_E_x_p
+              somewhere in the path. This can be used to for instance trace on
+              all modules belonging to a certain application.
+
+       ttppll((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc)) -->>
+       ttppll((MMoodd,,FFuunncc,,AArriittyy,,MMaattcchhSSppeecc,,OOppttss)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttppll((PPaatttteerrnnLLiisstt)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttpp//NN function above for details on arguments and return
+              values.
+
+              Set local trace pattern on specified functions.
+
+       ccttpp((MMoodd,,FFuunncc,,AArriittyy)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttpp//NN for argument descriptions.
+
+              Clear global trace patterns.
+
+       ccttppll((MMoodd,,FFuunncc,,AArriittyy)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttpp//NN for argument description.
+
+              Clear local trace patterns.
+
+       ttff((PPiiddSSppeecc,,FFllaaggLLiisstt)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttff((TTrraacceeCCoonnffLLiisstt)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 TraceConfList = [{PidSpec,FlagList}]
+                 FlagList = [Flag]
+                 PidSpec = all | new| existing | pid() |
+                 locally_registered_name()
+                 Flag = all process trace flags allowed.
+                 NodeResult = {ok,[Ans]} | {error,Reason}
+                 Ans = int() | {error,Reason}
+
+              Set process trace flags. The integer returned if the call was
+              successful describes the matched number of processes.
+
+       ccttff((PPiiddSSppeecc,,FFllaaggLLiisstt)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ccttff((TTrraacceeCCoonnffLLiisstt)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See ttff//11,,22 for arguments and return value description.
+
+              Clear process trace flags.
+
+       iinniitt__ttppmm((MMoodd,,FFuunncc,,AArriittyy,,CCaallllFFuunncc)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       iinniitt__ttppmm((MMoodd,,FFuunncc,,AArriittyy,,IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc)) -->>
+       NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Mod = Func = atom()
+                 Arity = int()
+                 NodeResult = ok | {error,Reason}
+                 InitFunc = RemoveFunc = {Module,Function} | function()/4 |
+                 void
+
+              See iinnvviissoo::iinniitt__ttppmm//55,,77 for details.
+
+       ttppmm((MMoodd,,FFuunncc,,AArriittyy,,MMSS)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,CCaallllFFuunncc)) -->> NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc)) -->>
+       NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Mod = Func = atom() =/= '_'
+                 Arity = int()
+                 MS = match_spec()
+                 InitFunc = CallFunc = ReturnFunc = RemoveFunc =
+                 {Module,Function} | function()
+                 NodeResult = {ok,1} | {ok,0} | {error,Reason}
+
+              See iinnvviissoo::ttppmm//44,,55,,88 for details.
+
+       ttppmm__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSS)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,CCaallllFFuunncc)) -->> NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+       ttppmm__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSS,,IInniittFFuunncc,,CCaallllFFuunncc,,RReettuurrnnFFuunncc,,RReemmoovveeFFuunncc))
+       -->> NNooddeeRReessuullttss || {{eerrrroorr,,RReeaassoonn}}
+
+              See inviso:tpm_tracer/4,5,8 for details.
+
+       ttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->>dd NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Mod = Func = atom()
+                 Arity = int()
+                 MSname = term()
+                 MatchSpec = [match_spec()]
+                 NodeResult = {ok,1} | {ok,0} | {error,Reason}
+
+              See iinnvviissoo::ttppmm__mmss//55 for details.
+
+       ttppmm__mmss__ttrraacceerr((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee,,MMSS)) -->>dd NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              See inviso:tpm_ms_tracer/5 for details.
+
+       ccttppmm__mmss((MMoodd,,FFuunncc,,AArriittyy,,MMSSnnaammee)) -->> NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResult = ok | {error,Reason}
+
+              See iinnvviissoo::ccttppmm__mmss//44 for details.
+
+       ccttppmm((MMoodd,,FFuunncc,,AArriittyy)) -->> {{ookk,,NNooddeeRReessuullttss}} || NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResults = [{Node,NodeResult}]
+                 NodeResult = ok | {error,Reason}
+
+              See iinnvviissoo::ccttppmm//33 for details.
+
+       llooccaall__rreeggiisstteerr(()) -->>NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResult = {R1,R2}
+                 R1 = R2 = {ok,0} | {ok,1} | {error,Reason}
+
+              See iinnvviissoo::ttppmm__llooccaallnnaammeess//00 for details.
+
+       rreemmoovvee__llooccaall__rreeggiisstteerr(()) -->>NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResult = {R1,R2} | {error,Reason}
+                 R1 = R2 = ok | {error,Reason}
+
+              See iinnvviissoo::ccttppmm__llooccaallnnaammeess//00 for details.
+
+       gglloobbaall__rreeggiisstteerr(()) -->>NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResult = {R1,R2} | {error,Reason}
+                 R1 = R2 = {ok,0} | {ok,1} | {error,Reason}
+
+              See iinnvviissoo::ttppmm__gglloobbaallnnaammeess//00 for details.
+
+       rreemmoovvee__gglloobbaall__rreeggiisstteerr(()) -->>NNooddeeRReessuulltt || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 NodeResult = {R1,R2} | {error,Reason}
+                 R1 = R2 = ok | {error,Reason}
+
+              See iinnvviissoo::ccttppmm__gglloobbaallnnaammeess//00 for details.
+
+
+
+Ericsson AB                      inviso 0.6.3                     inviso_rt(3)

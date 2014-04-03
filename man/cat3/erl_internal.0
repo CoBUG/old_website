@@ -1,0 +1,107 @@
+erl_internal(3)            Erlang Module Definition            erl_internal(3)
+
+
+
+NNAAMMEE
+       erl_internal - Internal Erlang Definitions
+
+DDEESSCCRRIIPPTTIIOONN
+       This module defines Erlang BIFs, guard tests and operators. This module
+       is only of interest to programmers who manipulate Erlang code.
+
+EEXXPPOORRTTSS
+       bbiiff((NNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _N_a_m_e_/_A_r_i_t_y is an Erlang BIF which is
+              automatically recognized by the compiler, otherwise _f_a_l_s_e.
+
+       gguuaarrdd__bbiiff((NNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _N_a_m_e_/_A_r_i_t_y is an Erlang BIF which is allowed in
+              guards, otherwise _f_a_l_s_e.
+
+       ttyyppee__tteesstt((NNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Name = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _N_a_m_e_/_A_r_i_t_y is a valid Erlang type test,
+              otherwise _f_a_l_s_e.
+
+       aarriitthh__oopp((OOppNNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 OpName = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _O_p_N_a_m_e_/_A_r_i_t_y is an arithmetic operator,
+              otherwise _f_a_l_s_e.
+
+       bbooooll__oopp((OOppNNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 OpName = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _O_p_N_a_m_e_/_A_r_i_t_y is a Boolean operator, otherwise
+              _f_a_l_s_e.
+
+       ccoommpp__oopp((OOppNNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 OpName = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _O_p_N_a_m_e_/_A_r_i_t_y is a comparison operator, otherwise
+              _f_a_l_s_e.
+
+       lliisstt__oopp((OOppNNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 OpName = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _O_p_N_a_m_e_/_A_r_i_t_y is a list operator, otherwise
+              _f_a_l_s_e.
+
+       sseenndd__oopp((OOppNNaammee,, AArriittyy)) -->> bboooolleeaann(())
+
+              Types:
+
+                 OpName = atom()
+                 Arity = arity()
+
+              Returns _t_r_u_e if _O_p_N_a_m_e_/_A_r_i_t_y is a send operator, otherwise
+              _f_a_l_s_e.
+
+       oopp__ttyyppee((OOppNNaammee,, AArriittyy)) -->> TTyyppee
+
+              Types:
+
+                 OpName = atom()
+                 Arity = arity()
+                 Type = arith | bool | comp | list | send
+
+              Returns the _T_y_p_e of operator that _O_p_N_a_m_e_/_A_r_i_t_y belongs to, or
+              generates a _f_u_n_c_t_i_o_n___c_l_a_u_s_e error if it is not an operator at
+              all.
+
+
+
+Ericsson AB                      stdlib 1.18.2                 erl_internal(3)

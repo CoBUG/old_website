@@ -1,0 +1,128 @@
+diameter_transport(3)      Erlang Module Definition      diameter_transport(3)
+
+
+
+NNAAMMEE
+       diameter_transport - Diameter transport interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       A module specified as a _t_r_a_n_s_p_o_r_t___m_o_d_u_l_e to ddiiaammeetteerr::aadddd__ttrraannssppoorrtt//22
+       must implement the interface documented here. The interface consists of
+       a function with which diameter starts a transport process and a message
+       interface with which the transport process communicates with the
+       process that starts it (aka its parent).
+
+EEXXPPOORRTTSS
+       MMoodd::ssttaarrtt(({{TTyyppee,, RReeff}},, SSvvcc,, OOppttss)) -->> {{ookk,, PPiidd}} || {{ookk,, PPiidd,, LLAAddddrrss}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = connect | accept
+                 Ref = ddiiaammeetteerr::ttrraannssppoorrtt__rreeff(())
+                 Svc = #diameter_service{}
+                 Opts = term()
+                 Pid = pid()
+                 LAddrs = [iinneett::iipp__aaddddrreessss(())]
+                 Reason = term()
+
+              Start a transport process. Called by diameter as a consequence
+              of a call to ddiiaammeetteerr::aadddd__ttrraannssppoorrtt//22 in order to establish or
+              accept a transport connection respectively. A transport process
+              maintains a connection with a single remote peer.
+
+              The first argument indicates whether the transport process in
+              question is being started for a connecting (_c_o_n_n_e_c_t) or
+              listening (_a_c_c_e_p_t) transport. In the latter case, transport
+              processes are started as required to accept connections from
+              multiple peers. Ref is in each case the same value that was
+              returned from the call to ddiiaammeetteerr::aadddd__ttrraannssppoorrtt//22 that has lead
+              to starting of a transport process.
+
+              A transport process must implement the message interface
+              documented below. It should retain the pid of its parent,
+              monitor the parent and terminate if it dies. It should not link
+              to the parent. It should exit if its transport connection with
+              its peer is lost.
+
+              The capabilities in the _#_d_i_a_m_e_t_e_r___s_e_r_v_i_c_e_{_} record are as passed
+              to ddiiaammeetteerr::ssttaarrtt__sseerrvviiccee//22 and ddiiaammeetteerr::aadddd__ttrraannssppoorrtt//22, values
+              passed to the latter overriding those passed to the former. The
+              start function should use the _H_o_s_t_-_I_P_-_A_d_d_r_e_s_s list and/or _O_p_t_s
+              to select an appropriate list of local IP addresses, and should
+              return this list if different from the _#_d_i_a_m_e_t_e_r___s_e_r_v_i_c_e_{_}
+              addresses. The returned list is used to populate _H_o_s_t_-_I_P_-_A_d_d_r_e_s_s
+              AVPs in outgoing capabilities exchange messages, the
+              _#_d_i_a_m_e_t_e_r___s_e_r_v_i_c_e_{_} addresses being used otherwise.
+
+MMEESSSSAAGGEESS
+       All messages sent over the transport interface are of the form
+       _{_d_i_a_m_e_t_e_r_, _t_e_r_m_(_)_}.
+
+       A transport process can expect the following messages from diameter.
+
+         _{_d_i_a_m_e_t_e_r_, _{_s_e_n_d_, _P_a_c_k_e_t_}_}:
+           An outbound Diameter message. _P_a_c_k_e_t can be either binary() (the
+           message to be sent) or a _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_} record whose
+           _t_r_a_n_s_p_o_r_t___d_a_t_a field contains a value other than undefined and
+           whose _b_i_n field contains the binary to send.
+
+         _{_d_i_a_m_e_t_e_r_, _{_c_l_o_s_e_, _P_i_d_}_}:
+           A request to close the transport connection. The transport process
+           should terminate after closing the connection. _P_i_d is the pid() of
+           the parent process.
+
+         _{_d_i_a_m_e_t_e_r_, _{_t_l_s_, _R_e_f_, _T_y_p_e_, _B_o_o_l_}_}:
+           Indication of whether or not capabilities exchange has selected
+           inband security using TLS. _R_e_f is a reference() that must be
+           included in the _{_d_i_a_m_e_t_e_r_, _{_t_l_s_, _R_e_f_}_} reply message to the
+           transport's parent process (see below). _T_y_p_e is either _c_o_n_n_e_c_t or
+           _a_c_c_e_p_t depending on whether the process has been started for a
+           connecting or listening transport respectively. _B_o_o_l is a boolean()
+           indicating whether or not the transport connection should be
+           upgraded to TLS.
+
+           If TLS is requested (_B_o_o_l_=_t_r_u_e) then a connecting process should
+           initiate a TLS handshake with the peer and an accepting process
+           should prepare to accept a handshake. A successful handshake should
+           be followed by a _{_d_i_a_m_e_t_e_r_, _{_t_l_s_, _R_e_f_}_} message to the parent
+           process. A failed handshake should cause the process to exit.
+
+           This message is only sent to a transport process over whose _I_n_b_a_n_d_-
+           _S_e_c_u_r_i_t_y_-_I_d configuration has indicated support for TLS.
+
+       A transport process should send the following messages to its parent.
+
+         _{_d_i_a_m_e_t_e_r_, _{_s_e_l_f_(_)_, _c_o_n_n_e_c_t_e_d_}_}:
+           Inform the parent that the transport process with _T_y_p_e_=_a_c_c_e_p_t has
+           established a connection with the peer. Not sent if the transport
+           process has _T_y_p_e_=_c_o_n_n_e_c_t.
+
+         _{_d_i_a_m_e_t_e_r_, _{_s_e_l_f_(_)_, _c_o_n_n_e_c_t_e_d_, _R_e_m_o_t_e_}_}:
+           Inform the parent that the transport process with _T_y_p_e_=_c_o_n_n_e_c_t has
+           established a connection with a peer. Not sent if the transport
+           process has _T_y_p_e_=_a_c_c_e_p_t. _R_e_m_o_t_e is an arbitrary term that uniquely
+           identifies the remote endpoint to which the transport has
+           connected.
+
+         _{_d_i_a_m_e_t_e_r_, _{_r_e_c_v_, _P_a_c_k_e_t_}_}:
+           An inbound Diameter message. _P_a_c_k_e_t can be either binary() (the
+           received message) or a _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_} record whose _b_i_n field
+           contains the received binary(). Any value (other than _u_n_d_e_f_i_n_e_d)
+           set in the _t_r_a_n_s_p_o_r_t___d_a_t_a field will be passed back with a
+           corresponding answer message in the case that the inbound message
+           is a request unless the sender sets another value. How
+           _t_r_a_n_s_p_o_r_t___d_a_t_a is used/interpreted is up to the transport module.
+
+         _{_d_i_a_m_e_t_e_r_, _{_t_l_s_, _R_e_f_}_}:
+           Acknowledgment of a successful TLS handshake. _R_e_f is the
+           reference() received in the _{_d_i_a_m_e_t_e_r_, _{_t_l_s_, _R_e_f_, _T_y_p_e_, _B_o_o_l_}_}
+           message in response to which the reply is sent. A transport must
+           exit if a handshake is not successful.
+
+SSEEEE AALLSSOO
+       ddiiaammeetteerr__ttccpp((33)), ddiiaammeetteerr__ssccttpp((33))
+
+
+
+Ericsson AB                      diameter 1.2            diameter_transport(3)

@@ -1,0 +1,461 @@
+zip(3)                     Erlang Module Definition                     zip(3)
+
+
+
+NNAAMMEE
+       zip - Utility for reading and creating 'zip' archives.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _z_i_p module archives and extracts files to and from a zip archive.
+       The zip format is specified by the "ZIP Appnote.txt" file available on
+       PKWare's website www.pkware.com.
+
+       The zip module supports zip archive versions up to 6.1. However,
+       password-protection and Zip64 are not supported.
+
+       By convention, the name of a zip file should end in "_._z_i_p". To abide to
+       the convention, you'll need to add "_._z_i_p" yourself to the name.
+
+       Zip archives are created with the zziipp//22 or the zziipp//33 function. (They
+       are also available as _c_r_e_a_t_e, to resemble the _e_r_l___t_a_r module.)
+
+       To extract files from a zip archive, use the uunnzziipp//11 or the uunnzziipp//22
+       function. (They are also available as _e_x_t_r_a_c_t.)
+
+       To fold a function over all files in a zip archive, use the ffoollddll__33
+       function.
+
+       To return a list of the files in a zip archive, use the lliisstt__ddiirr//11 or
+       the lliisstt__ddiirr//22 function. (They are also available as _t_a_b_l_e.)
+
+       To print a list of files to the Erlang shell, use either the tt//11 or
+       tttt//11 function.
+
+       In some cases, it is desirable to open a zip archive, and to unzip
+       files from it file by file, without having to reopen the archive. The
+       functions zziipp__ooppeenn, zziipp__ggeett, zziipp__lliisstt__ddiirr and zziipp__cclloossee do this.
+
+LLIIMMIITTAATTIIOONNSS
+       Zip64 archives are not currently supported.
+
+       Password-protected and encrypted archives are not currently supported
+
+       Only the DEFLATE (zlib-compression) and the STORE (uncompressed data)
+       zip methods are supported.
+
+       The size of the archive is limited to 2 G-byte (32 bits).
+
+       Comments for individual files is not supported when creating zip
+       archives. The zip archive comment for the whole zip archive is
+       supported.
+
+       There is currently no support for altering an existing zip archive. To
+       add or remove a file from an archive, the whole archive must be
+       recreated.
+
+DDAATTAA TTYYPPEESS
+       zziipp__ccoommmmeenntt(()) = #zip_comment{comment = undefined | string()}
+
+              The record _z_i_p___c_o_m_m_e_n_t just contains the archive comment for a
+              zip archive
+
+       zziipp__ffiillee(()) =
+           #zip_file{name = undefined | string(),
+                     info = undefined | ffiillee::ffiillee__iinnffoo(()),
+                     comment = undefined | string(),
+                     offset = undefined | integer() >= 0,
+                     comp_size = undefined | integer() >= 0}
+
+              The record _z_i_p___f_i_l_e contains the following fields.
+
+                _n_a_m_e:
+                  the name of the file
+
+                _i_n_f_o:
+                  file info as in ffiillee::rreeaadd__ffiillee__iinnffoo//11
+
+                _c_o_m_m_e_n_t:
+                  the comment for the file in the zip archive
+
+                _o_f_f_s_e_t:
+                  the offset of the file in the zip archive (used internally)
+
+                _c_o_m_p___s_i_z_e:
+                  the compressed size of the file (the uncompressed size is
+                  found in _i_n_f_o)
+
+EEXXPPOORRTTSS
+       zziipp((NNaammee,, FFiilleeLLiisstt)) -->> RReettVVaalluuee
+
+       zziipp((NNaammee,, FFiilleeLLiisstt,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+       ccrreeaattee((NNaammee,, FFiilleeLLiisstt)) -->> RReettVVaalluuee
+
+       ccrreeaattee((NNaammee,, FFiilleeLLiisstt,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+              Types:
+
+                 Name = ffiillee::nnaammee(())
+                 FileList = [FileSpec]
+                 FileSpec = ffiillee::nnaammee(())
+                          | {ffiillee::nnaammee(()), binary()}
+                          | {ffiillee::nnaammee(()), binary(), ffiillee::ffiillee__iinnffoo(())}
+                 Options = [Option]
+                 Option = memory
+                        | cooked
+                        | verbose
+                        | {comment, Comment}
+                        | {cwd, CWD}
+                        | {compress, What}
+                        | {uncompress, What}
+                 What = all
+                      | [Extension]
+                      | {add, [Extension]}
+                      | {del, [Extension]}
+                 Extension = Comment = CWD = string()
+                 RetValue = {ok, FileName :: ffiillee::nnaammee(())}
+                          | {ok, {FileName :: ffiillee::nnaammee(()), binary()}}
+                          | {error, Reason :: term()}
+
+              The _z_i_p function creates a zip archive containing the files
+              specified in _F_i_l_e_L_i_s_t.
+
+              As synonyms, the functions _c_r_e_a_t_e_/_2 and _c_r_e_a_t_e_/_3 are provided,
+              to make it resemble the _e_r_l___t_a_r module.
+
+              The file-list is a list of files, with paths relative to the
+              current directory, they will be stored with this path in the
+              archive. Files may also be specified with data in binaries, to
+              create an archive directly from data.
+
+              Files will be compressed using the DEFLATE compression, as
+              described in the Appnote.txt file. However, files will be stored
+              without compression if they already are compressed. The _z_i_p_/_2
+              and _z_i_p_/_3 functions check the file extension to see whether the
+              file should be stored without compression. Files with the
+              following extensions are not compressed: _._Z, _._z_i_p, _._z_o_o, _._a_r_c,
+              _._l_z_h, _._a_r_j.
+
+              It is possible to override the default behavior and explicitly
+              control what types of files that should be compressed by using
+              the _{_c_o_m_p_r_e_s_s_, _W_h_a_t_} and _{_u_n_c_o_m_p_r_e_s_s_, _W_h_a_t_} options. It is
+              possible to have several _c_o_m_p_r_e_s_s and _u_n_c_o_m_p_r_e_s_s options. In
+              order to trigger compression of a file, its extension must match
+              with the _c_o_m_p_r_e_s_s condition and must not match the _u_n_c_o_m_p_r_e_s_s
+              condition. For example if _c_o_m_p_r_e_s_s is set to _[_"_g_i_f_"_, _"_j_p_g_"_] and
+              _u_n_c_o_m_p_r_e_s_s is set to _[_"_j_p_g_"_], only files with _"_g_i_f_" as extension
+              will be compressed. No other files will be compressed.
+
+              The following options are available:
+
+                _c_o_o_k_e_d:
+                  By default, the _o_p_e_n_/_2 function will open the zip file in
+                  _r_a_w mode, which is faster but does not allow a remote
+                  (erlang) file server to be used. Adding _c_o_o_k_e_d to the mode
+                  list will override the default and open the zip file without
+                  the _r_a_w option. The same goes for the files added.
+
+                _v_e_r_b_o_s_e:
+                  Print an informational message about each file being added.
+
+                _m_e_m_o_r_y:
+                  The output will not be to a file, but instead as a tuple
+                  _{_F_i_l_e_N_a_m_e_, _b_i_n_a_r_y_(_)_}. The binary will be a full zip archive
+                  with header, and can be extracted with for instance _u_n_z_i_p_/_2.
+
+                _{_c_o_m_m_e_n_t_, _C_o_m_m_e_n_t_}:
+                  Add a comment to the zip-archive.
+
+                _{_c_w_d_, _C_W_D_}:
+                  Use the given directory as current directory, it will be
+                  prepended to file names when adding them, although it will
+                  not be in the zip-archive. (Acting like a file:set_cwd/1,
+                  but without changing the global cwd property.)
+
+                _{_c_o_m_p_r_e_s_s_, _W_h_a_t_}:
+                  Controls what types of files will be compressed. It is by
+                  default set to _a_l_l. The following values of _W_h_a_t are
+                  allowed:
+
+                  _a_l_l:
+                    means that all files will be compressed (as long as they
+                    pass the _u_n_c_o_m_p_r_e_s_s condition).
+
+                  _[_E_x_t_e_n_s_i_o_n_]:
+                    means that only files with exactly these extensions will
+                    be compressed.
+
+                  _{_a_d_d_,_[_E_x_t_e_n_s_i_o_n_]_}:
+                    adds these extensions to the list of compress extensions.
+
+                  _{_d_e_l_,_[_E_x_t_e_n_s_i_o_n_]_}:
+                    deletes these extensions from the list of compress
+                    extensions.
+
+                _{_u_n_c_o_m_p_r_e_s_s_, _W_h_a_t_}:
+                  Controls what types of files will be uncompressed. It is by
+                  default set to _[_"_._Z_"_,_"_._z_i_p_"_,_"_._z_o_o_"_,_"_._a_r_c_"_,_"_._l_z_h_"_,_"_._a_r_j_"_].
+                  The following values of _W_h_a_t are allowed:
+
+                  _a_l_l:
+                    means that no files will be compressed.
+
+                  _[_E_x_t_e_n_s_i_o_n_]:
+                    means that files with these extensions will be
+                    uncompressed.
+
+                  _{_a_d_d_,_[_E_x_t_e_n_s_i_o_n_]_}:
+                    adds these extensions to the list of uncompress
+                    extensions.
+
+                  _{_d_e_l_,_[_E_x_t_e_n_s_i_o_n_]_}:
+                    deletes these extensions from the list of uncompress
+                    extensions.
+
+       uunnzziipp((AArrcchhiivvee)) -->> RReettVVaalluuee
+
+       uunnzziipp((AArrcchhiivvee,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+       eexxttrraacctt((AArrcchhiivvee)) -->> RReettVVaalluuee
+
+       eexxttrraacctt((AArrcchhiivvee,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+              Types:
+
+                 Archive = ffiillee::nnaammee(()) | binary()
+                 Options = [Option]
+                 Option = {file_list, FileList}
+                        | keep_old_files
+                        | verbose
+                        | memory
+                        | {file_filter, FileFilter}
+                        | {cwd, CWD}
+                 FileList = [ffiillee::nnaammee(())]
+                 FileBinList = [{ffiillee::nnaammee(()), binary()}]
+                 FileFilter = fun((ZipFile) -> boolean())
+                 CWD = string()
+                 ZipFile = zziipp__ffiillee(())
+                 RetValue = {ok, FileList}
+                          | {ok, FileBinList}
+                          | {error, Reason :: term()}
+                          | {error, {Name :: ffiillee::nnaammee(()), Reason :: term()}}
+
+              The _u_n_z_i_p_/_1 function extracts all files from a zip archive. The
+              _u_n_z_i_p_/_2 function provides options to extract some files, and
+              more.
+
+              If the _A_r_c_h_i_v_e argument is given as a binary, the contents of
+              the binary is assumed to be a zip archive, otherwise it should
+              be a filename.
+
+              The following options are available:
+
+                _{_f_i_l_e___l_i_s_t_, _F_i_l_e_L_i_s_t_}:
+                  By default, all files will be extracted from the zip
+                  archive. With the _{_f_i_l_e___l_i_s_t_, _F_i_l_e_L_i_s_t_} option, the _u_n_z_i_p_/_2
+                  function will only extract the files whose names are
+                  included in _F_i_l_e_L_i_s_t. The full paths, including the names of
+                  all sub directories within the zip archive, must be
+                  specified.
+
+                _c_o_o_k_e_d:
+                  By default, the _o_p_e_n_/_2 function will open the zip file in
+                  _r_a_w mode, which is faster but does not allow a remote
+                  (erlang) file server to be used. Adding _c_o_o_k_e_d to the mode
+                  list will override the default and open the zip file without
+                  the _r_a_w option. The same goes for the files extracted.
+
+                _k_e_e_p___o_l_d___f_i_l_e_s:
+                  By default, all existing files with the same name as file in
+                  the zip archive will be overwritten. With the _k_e_e_p___o_l_d___f_i_l_e_s
+                  option, the _u_n_z_i_p_/_2 function will not overwrite any existing
+                  files. Note that even with the _m_e_m_o_r_y option given, which
+                  means that no files will be overwritten, files existing will
+                  be excluded from the result.
+
+                _v_e_r_b_o_s_e:
+                  Print an informational message as each file is being
+                  extracted.
+
+                _m_e_m_o_r_y:
+                  Instead of extracting to the current directory, the _m_e_m_o_r_y
+                  option will give the result as a list of tuples _{_F_i_l_e_n_a_m_e_,
+                  _B_i_n_a_r_y_}, where _B_i_n_a_r_y is a binary containing the extracted
+                  data of the file named _F_i_l_e_n_a_m_e in the zip archive.
+
+                _{_c_w_d_, _C_W_D_}:
+                  Use the given directory as current directory, it will be
+                  prepended to file names when extracting them from the zip-
+                  archive. (Acting like a file:set_cwd/1, but without changing
+                  the global cwd property.)
+
+       ffoollddll((FFuunn,, AAcccc00,, AArrcchhiivvee)) -->> {{ookk,, AAcccc11}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Fun = fun((FileInArchive, GetInfo, GetBin, AccIn) -> AccOut)
+                 FileInArchive = ffiillee::nnaammee(())
+                 GetInfo = fun(() -> ffiillee::ffiillee__iinnffoo(()))
+                 GetBin = fun(() -> binary())
+                 Acc0 = Acc1 = AccIn = AccOut = term()
+                 Archive = ffiillee::nnaammee(()) | {ffiillee::nnaammee(()), binary()}
+                 Reason = term()
+
+              The _f_o_l_d_l_/_3 function calls _F_u_n_(_F_i_l_e_I_n_A_r_c_h_i_v_e_, _G_e_t_I_n_f_o_, _G_e_t_B_i_n_,
+              _A_c_c_I_n_) on successive files in the _A_r_c_h_i_v_e, starting with _A_c_c_I_n
+              _=_= _A_c_c_0. _F_i_l_e_I_n_A_r_c_h_i_v_e is the name that the file has in the
+              archive. _G_e_t_I_n_f_o is a fun that returns info about the the file.
+              _G_e_t_B_i_n returns the contents of the file. Both _G_e_t_I_n_f_o and _G_e_t_B_i_n
+              must be called within the _F_u_n. Their behavior is undefined if
+              they are called outside the context of the _F_u_n. The _F_u_n must
+              return a new accumulator which is passed to the next call.
+              _f_o_l_d_l_/_3 returns the final value of the accumulator. _A_c_c_0 is
+              returned if the archive is empty. It is not necessary to iterate
+              over all files in the archive. The iteration may be ended
+              prematurely in a controlled manner by throwing an exception.
+
+              For example:
+
+              > Name = "dummy.zip".
+              "dummy.zip"
+              > {ok, {Name, Bin}} = zip:create(Name, [{"foo", <<"FOO">>}, {"bar", <<"BAR">>}], [memory]).
+              {ok,{"dummy.zip",
+                   <<80,75,3,4,20,0,0,0,0,0,74,152,97,60,171,39,212,26,3,0,
+                     0,0,3,0,0,...>>}}
+              > {ok, FileSpec} = zip:foldl(fun(N, I, B, Acc) -> [{N, B(), I()} | Acc] end, [], {Name, Bin}).
+              {ok,[{"bar",<<"BAR">>,
+                    {file_info,3,regular,read_write,
+                               {{2010,3,1},{19,2,10}},
+                               {{2010,3,1},{19,2,10}},
+                               {{2010,3,1},{19,2,10}},
+                               54,1,0,0,0,0,0}},
+                   {"foo",<<"FOO">>,
+                    {file_info,3,regular,read_write,
+                               {{2010,3,1},{19,2,10}},
+                               {{2010,3,1},{19,2,10}},
+                               {{2010,3,1},{19,2,10}},
+                               54,1,0,0,0,0,0}}]}
+              > {ok, {Name, Bin}} = zip:create(Name, lists:reverse(FileSpec), [memory]).
+              {ok,{"dummy.zip",
+                   <<80,75,3,4,20,0,0,0,0,0,74,152,97,60,171,39,212,26,3,0,
+                     0,0,3,0,0,...>>}}
+              > catch zip:foldl(fun("foo", _, B, _) -> throw(B()); (_, _, _, Acc) -> Acc end, [], {Name, Bin}).
+              <<"FOO">>
+
+
+       lliisstt__ddiirr((AArrcchhiivvee)) -->> RReettVVaalluuee
+
+       lliisstt__ddiirr((AArrcchhiivvee,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+       ttaabbllee((AArrcchhiivvee)) -->> RReettVVaalluuee
+
+       ttaabbllee((AArrcchhiivvee,, OOppttiioonnss)) -->> RReettVVaalluuee
+
+              Types:
+
+                 Archive = ffiillee::nnaammee(()) | binary()
+                 RetValue = {ok, CommentAndFiles} | {error, Reason :: term()}
+                 CommentAndFiles = [zziipp__ccoommmmeenntt(()) | zziipp__ffiillee(())]
+                 Options = [Option]
+                 Option = cooked
+
+              The _l_i_s_t___d_i_r_/_1 function retrieves the names of all files in the
+              zip archive _A_r_c_h_i_v_e. The _l_i_s_t___d_i_r_/_2 function provides options.
+
+              As synonyms, the functions _t_a_b_l_e_/_2 and _t_a_b_l_e_/_3 are provided, to
+              make it resemble the _e_r_l___t_a_r module.
+
+              The result value is the tuple _{_o_k_, _L_i_s_t_}, where _L_i_s_t contains
+              the zip archive comment as the first element.
+
+              The following options are available:
+
+                _c_o_o_k_e_d:
+                  By default, the _o_p_e_n_/_2 function will open the zip file in
+                  _r_a_w mode, which is faster but does not allow a remote
+                  (erlang) file server to be used. Adding _c_o_o_k_e_d to the mode
+                  list will override the default and open the zip file without
+                  the _r_a_w option.
+
+       tt((AArrcchhiivvee)) -->> ookk
+
+              Types:
+
+                 Archive = ffiillee::nnaammee(()) | binary() | ZipHandle
+                 ZipHandle = pid()
+
+              The _t_/_1 function prints the names of all files in the zip
+              archive _A_r_c_h_i_v_e to the Erlang shell. (Similar to "_t_a_r _t".)
+
+       tttt((AArrcchhiivvee)) -->> ookk
+
+              Types:
+
+                 Archive = ffiillee::nnaammee(()) | binary() | ZipHandle
+                 ZipHandle = pid()
+
+              The _t_t_/_1 function prints names and information about all files
+              in the zip archive _A_r_c_h_i_v_e to the Erlang shell. (Similar to "_t_a_r
+              _t_v".)
+
+       zziipp__ooppeenn((AArrcchhiivvee)) -->> {{ookk,, ZZiippHHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+       zziipp__ooppeenn((AArrcchhiivvee,, OOppttiioonnss)) -->> {{ookk,, ZZiippHHaannddllee}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Archive = ffiillee::nnaammee(()) | binary()
+                 ZipHandle = pid()
+                 Options = [Option]
+                 Option = cooked | memory | {cwd, CWD :: string()}
+                 Reason = term()
+
+              The _z_i_p___o_p_e_n function opens a zip archive, and reads and saves
+              its directory. This means that subsequently reading files from
+              the archive will be faster than unzipping files one at a time
+              with _u_n_z_i_p.
+
+              The archive must be closed with _z_i_p___c_l_o_s_e_/_1.
+
+       zziipp__lliisstt__ddiirr((ZZiippHHaannddllee)) -->> {{ookk,, RReessuulltt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Result = [zziipp__ccoommmmeenntt(()) | zziipp__ffiillee(())]
+                 ZipHandle = pid()
+                 Reason = term()
+
+              The _z_i_p___l_i_s_t___d_i_r_/_1 function returns the file list of an open zip
+              archive. The first returned element is the zip archive comment.
+
+       zziipp__ggeett((ZZiippHHaannddllee)) -->> {{ookk,, [[RReessuulltt]]}} || {{eerrrroorr,, RReeaassoonn}}
+
+       zziipp__ggeett((FFiilleeNNaammee,, ZZiippHHaannddllee)) -->> {{ookk,, RReessuulltt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 FileName = ffiillee::nnaammee(())
+                 ZipHandle = pid()
+                 Result = ffiillee::nnaammee(()) | {ffiillee::nnaammee(()), binary()}
+                 Reason = term()
+
+              The _z_i_p___g_e_t function extracts one or all files from an open
+              archive.
+
+              The files will be unzipped to memory or to file, depending on
+              the options given to the _z_i_p___o_p_e_n function when the archive was
+              opened.
+
+       zziipp__cclloossee((ZZiippHHaannddllee)) -->> ookk || {{eerrrroorr,, eeiinnvvaall}}
+
+              Types:
+
+                 ZipHandle = pid()
+
+              The _z_i_p___c_l_o_s_e_/_1 function closes a zip archive, previously opened
+              with _z_i_p___o_p_e_n. All resources are closed, and the handle should
+              not be used after closing.
+
+
+
+Ericsson AB                      stdlib 1.18.2                          zip(3)

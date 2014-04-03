@@ -1,0 +1,53 @@
+STDLIB(7)                Erlang Application Definition               STDLIB(7)
+
+
+
+NNAAMMEE
+       STDLIB - The STDLIB Application
+
+DDEESSCCRRIIPPTTIIOONN
+       The STDLIB is mandatory in the sense that the minimal system based on
+       Erlang/OTP consists of Kernel and STDLIB. The STDLIB application
+       contains no services.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       The following configuration parameters are defined for the STDLIB
+       application. See _a_p_p_(_4_) for more information about configuration
+       parameters.
+
+         _s_h_e_l_l___e_s_c _= _i_c_l _| _a_b_o_r_t:
+           This parameter can be used to alter the behaviour of the Erlang
+           shell when ^G is pressed.
+
+         _r_e_s_t_r_i_c_t_e_d___s_h_e_l_l _= _m_o_d_u_l_e_(_):
+           This parameter can be used to run the Erlang shell in restricted
+           mode.
+
+         _s_h_e_l_l___c_a_t_c_h___e_x_c_e_p_t_i_o_n _= _b_o_o_l_(_):
+           This parameter can be used to set the exception handling of the
+           Erlang shell's evaluator process.
+
+         _s_h_e_l_l___h_i_s_t_o_r_y___l_e_n_g_t_h _= _i_n_t_e_g_e_r_(_) _>_= _0:
+           This parameter can be used to determine how many commands are saved
+           by the Erlang shell.
+
+         _s_h_e_l_l___p_r_o_m_p_t___f_u_n_c _= _{_M_o_d_, _F_u_n_c_} _| _d_e_f_a_u_l_t:
+           where
+
+           * _M_o_d _= _a_t_o_m_(_)
+
+           * _F_u_n_c _= _a_t_o_m_(_)
+
+           This parameter can be used to set a customized Erlang shell prompt
+           function.
+
+         _s_h_e_l_l___s_a_v_e_d___r_e_s_u_l_t_s _= _i_n_t_e_g_e_r_(_) _>_= _0:
+           This parameter can be used to determine how many results are saved
+           by the Erlang shell.
+
+SSEEEE AALLSSOO
+       aapppp((44)), aapppplliiccaattiioonn((33)), sshheellll((33)),
+
+
+
+Ericsson AB                      stdlib 1.18.2                       STDLIB(7)

@@ -1,0 +1,68 @@
+CosTime_TimeService(3)     Erlang Module Definition     CosTime_TimeService(3)
+
+
+
+NNAAMMEE
+       CosTime_TimeService - This module implements the OMG
+       CosTime::TimeService interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_i_m_e_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       uunniivveerrssaall__ttiimmee((TTiimmeeSSeerrvviiccee)) -->> RReeppllyy
+
+              Types:
+
+                 TimeService = #objref
+                 Reply = UTO | {'EXCEPTION",
+                 #'TimerService_TimeUnavailable'{}}
+                 UTO = #objref
+
+              This operation returns the current time and the Inaccuracy given
+              when starting this application in a UTO. The time base is _1_5
+              _o_c_t_o_b_e_r _1_5_8_2 _0_0_:_0_0. Comparing two time objects which use
+              different time base is, by obvious reasons, pointless.
+
+       nneeww__uunniivveerrssaall__ttiimmee((TTiimmeeSSeerrvviiccee,, TTiimmee,, IInnaaccccuurraaccyy,, TTddff)) -->> UUTTOO
+
+              Types:
+
+                 TimeService = UTO = #objref
+                 Time = Inaccuracy = ulonglong()
+                 Tdf = short()
+
+              This operation creates a new UTO object representing the time
+              parameters given. This is the only way to create a UTO with an
+              arbitrary time from its components. This is useful when using
+              the Timer Event Service.
+
+       uuttoo__ffrroomm__uuttcc((TTiimmeeSSeerrvviiccee,, UUttcc)) -->> UUTTOO
+
+              Types:
+
+                 TimeService = UTO = #objref
+                 Utc = #'TimeBase_UtcT'{time, inacclo, inacchi, tdf}
+                 time = ulonglong()
+                 inacclo = ulong()
+                 inacchi = ushort()
+                 tdf = short()
+
+              This operation is used to create a UTO given a time in the Utc
+              form.
+
+       nneeww__iinntteerrvvaall((TTiimmeeSSeerrvviiccee,, LLoowweerr,, UUppppeerr)) -->> TTIIOO
+
+              Types:
+
+                 TimeService = TIO = #objref
+                 Lower = Upper = ulonglong()
+
+              This operation is used to create a new TIO object, representing
+              the input parameters. If _L_o_w_e_r is greater than Upper BAD_PARAM
+              is raised.
+
+
+
+Ericsson AB                     cosTime 1.1.12          CosTime_TimeService(3)

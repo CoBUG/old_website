@@ -1,0 +1,211 @@
+cprof(3)                   Erlang Module Definition                   cprof(3)
+
+
+
+NNAAMMEE
+       cprof - A simple Call Count Profiling Tool using breakpoints for
+       minimal runtime performance impact.
+
+DDEESSCCRRIIPPTTIIOONN
+       The _c_p_r_o_f module is used to profile a program to find out how many
+       times different functions are called. Breakpoints similar to local call
+       trace, but containing a counter, are used to minimise runtime
+       performance impact.
+
+       Since breakpoints are used there is no need for special compilation of
+       any module to be profiled. For now these breakpoints can only be set on
+       BEAM code so s cannot be call count traced.
+
+       The size of the call counters is the host machine word size. One bit is
+       used when pausing the counter, so the maximum counter value for a
+       32-bit host is 2147483647.
+
+       The profiling result is delivered as a term containing a sorted list of
+       entries, one per module. Each module entry contains a sorted list of
+       functions. The sorting order in both cases is of decreasing call count.
+
+       Call count tracing is very lightweight compared to other forms of
+       tracing since no trace message has to be generated. Some measurements
+       indicates performance degradation in the vicinity of 10 percent.
+
+EEXXPPOORRTTSS
+       aannaallyyssee(()) -->> {{AAllllCCaallllCCoouunntt,, MMooddAAnnaallyyssiissLLiisstt}}
+       aannaallyyssee((LLiimmiitt)) -->> {{AAllllCCaallllCCoouunntt,, MMooddAAnnaallyyssiissLLiisstt}}
+       aannaallyyssee((MMoodd)) -->> MMooddAAnnllyyssiiss
+       aannaallyyssee((MMoodd,, LLiimmiitt)) -->> MMooddAAnnaallyyssiiss
+
+              Types:
+
+                 Limit = integer()
+                 Mod = atom()
+                 AllCallCount = integer()
+                 ModAnalysisList = [ModAnalysis]
+                 ModAnalysis = {Mod, ModCallCount, FuncAnalysisList}
+                 ModCallCount = integer()
+                 FuncAnalysisList = [{{Mod, Func, Arity}, FuncCallCount}]
+                 Func = atom()
+                 Arity = integer()
+                 FuncCallCount = integer()
+
+              Collects and analyses the call counters presently in the node
+              for either module _M_o_d, or for all modules (except _c_p_r_o_f itself),
+              and returns:
+
+                _F_u_n_c_A_n_a_l_y_s_i_s_L_i_s_t:
+                  A list of tuples, one for each function in a module, in
+                  decreasing _F_u_n_c_C_a_l_l_C_o_u_n_t order.
+
+                _M_o_d_C_a_l_l_C_o_u_n_t:
+                  The sum of _F_u_n_c_C_a_l_l_C_o_u_n_t values for all functions in module
+                  _M_o_d.
+
+                _A_l_l_C_a_l_l_C_o_u_n_t:
+                  The sum of _M_o_d_C_a_l_l_C_o_u_n_t values for all modules concerned in
+                  _M_o_d_A_n_a_l_y_s_i_s_L_i_s_t.
+
+                _M_o_d_A_n_a_l_y_s_i_s_L_i_s_t:
+                  A list of tuples, one for each module except _c_p_r_o_f, in
+                  decreasing _M_o_d_C_a_l_l_C_o_u_n_t order.
+
+              If call counters are still running while _a_n_a_l_y_s_e_/_0_._._2 is
+              executing, you might get an inconsistent result. This happens if
+              the process executing _a_n_a_l_y_s_e_/_0_._._2 gets scheduled out so some
+              other process can increment the counters that are being
+              analysed, Calling _p_a_u_s_e_(_) before analysing takes care of the
+              problem.
+
+              If the _M_o_d argument is given, the result contains a _M_o_d_A_n_a_l_y_s_i_s
+              tuple for module _M_o_d only, otherwise the result contains one
+              _M_o_d_A_n_a_l_y_s_i_s tuple for all modules returned from
+              _c_o_d_e_:_a_l_l___l_o_a_d_e_d_(_) except _c_p_r_o_f itself.
+
+              All functions with a _F_u_n_c_C_a_l_l_C_o_u_n_t lower than _L_i_m_i_t are excluded
+              from _F_u_n_c_A_n_a_l_y_s_i_s_L_i_s_t. They are still included in _M_o_d_C_a_l_l_C_o_u_n_t,
+              though. The default value for _L_i_m_i_t is _1.
+
+       ppaauussee(()) -->> iinntteeggeerr(())
+
+              Pause call count tracing for all functions in all modules and
+              stop it for all functions in modules to be loaded. This is the
+              same as _(_p_a_u_s_e_(_{_'___'_,_'___'_,_'___'_}_)_+_s_t_o_p_(_{_o_n___l_o_a_d_}_)_).
+
+              See also ppaauussee//11....33 below.
+
+       ppaauussee((FFuunnccSSppeecc)) -->> iinntteeggeerr(())
+       ppaauussee((MMoodd,, FFuunncc)) -->> iinntteeggeerr(())
+       ppaauussee((MMoodd,, FFuunncc,, AArriittyy)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 FuncSpec = Mod | {Mod,Func,Arity}, {FS}
+                 Mod = atom()
+                 Func = atom()
+                 Arity = integer()
+                 FS = term()
+
+              Pause call counters for matching functions in matching modules.
+              The _F_S argument can be used to specify the first argument to
+              _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_3. See erlang(3).
+
+              The call counters for all matching functions that has got call
+              count breakpoints are paused at their current count.
+
+              Return the number of matching functions that can have call count
+              breakpoints, the same as _s_t_a_r_t_/_0_._._3 with the same arguments
+              would have returned.
+
+       rreessttaarrtt(()) -->> iinntteeggeerr(())
+       rreessttaarrtt((FFuunnccSSppeecc)) -->> iinntteeggeerr(())
+       rreessttaarrtt((MMoodd,, FFuunncc)) -->> iinntteeggeerr(())
+       rreessttaarrtt((MMoodd,, FFuunncc,, AArriittyy)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 FuncSpec = Mod | {Mod,Func,Arity}, {FS}
+                 Mod = atom()
+                 Func = atom()
+                 Arity = integer()
+                 FS = term()
+
+              Restart call counters for the matching functions in matching
+              modules that are call count traced. The _F_S argument can be used
+              to specify the first argument to _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_3. See
+              erlang(3).
+
+              The call counters for all matching functions that has got call
+              count breakpoints are set to zero and running.
+
+              Return the number of matching functions that can have call count
+              breakpoints, the same as _s_t_a_r_t_/_0_._._3 with the same arguments
+              would have returned.
+
+       ssttaarrtt(()) -->> iinntteeggeerr(())
+
+              Start call count tracing for all functions in all modules, and
+              also for all functions in modules to be loaded. This is the same
+              as _(_s_t_a_r_t_(_{_'___'_,_'___'_,_'___'_}_)_+_s_t_a_r_t_(_{_o_n___l_o_a_d_}_)_).
+
+              See also ssttaarrtt//11....33 below.
+
+       ssttaarrtt((FFuunnccSSppeecc)) -->> iinntteeggeerr(())
+       ssttaarrtt((MMoodd,, FFuunncc)) -->> iinntteeggeerr(())
+       ssttaarrtt((MMoodd,, FFuunncc,, AArriittyy)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 FuncSpec = Mod | {Mod,Func,Arity}, {FS}
+                 Mod = atom()
+                 Func = atom()
+                 Arity = integer()
+                 FS = term()
+
+              Start call count tracing for matching functions in matching
+              modules. The _F_S argument can be used to specify the first
+              argument to _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_3, for example _o_n___l_o_a_d. See
+              erlang(3).
+
+              Set call count breakpoints on the matching functions that has no
+              call count breakpoints. Call counters are set to zero and
+              running for all matching functions.
+
+              Return the number of matching functions that has got call count
+              breakpoints.
+
+       ssttoopp(()) -->> iinntteeggeerr(())
+
+              Stop call count tracing for all functions in all modules, and
+              also for all functions in modules to be loaded. This is the same
+              as _(_s_t_o_p_(_{_'___'_,_'___'_,_'___'_}_)_+_s_t_o_p_(_{_o_n___l_o_a_d_}_)_).
+
+              See also ssttoopp//11....33 below.
+
+       ssttoopp((FFuunnccSSppeecc)) -->> iinntteeggeerr(())
+       ssttoopp((MMoodd,, FFuunncc)) -->> iinntteeggeerr(())
+       ssttoopp((MMoodd,, FFuunncc,, AArriittyy)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 FuncSpec = Mod | {Mod,Func,Arity}, {FS}
+                 Mod = atom()
+                 Func = atom()
+                 Arity = integer()
+                 FS = term()
+
+              Stop call count tracing for matching functions in matching
+              modules. The _F_S argument can be used to specify the first
+              argument to _e_r_l_a_n_g_:_t_r_a_c_e___p_a_t_t_e_r_n_/_3, for example _o_n___l_o_a_d. See
+              erlang(3).
+
+              Remove call count breakpoints from the matching functions that
+              has call count breakpoints.
+
+              Return the number of matching functions that can have call count
+              breakpoints, the same as _s_t_a_r_t_/_0_._._3 with the same arguments
+              would have returned.
+
+SSEEEE AALLSSOO
+       eepprrooff(3), ffpprrooff(3), erlang(3), UUsseerr''ss GGuuiiddee
+
+
+
+Ericsson AB                       tools 2.6.8                         cprof(3)

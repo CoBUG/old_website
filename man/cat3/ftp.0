@@ -1,0 +1,698 @@
+ftp(3)                     Erlang Module Definition                     ftp(3)
+
+
+
+NNAAMMEE
+       ftp - A File Transfer Protocol client
+
+DDEESSCCRRIIPPTTIIOONN
+       The _f_t_p module implements a client for file transfer according to a
+       subset of the File Transfer Protocol (see 959).
+
+       Starting from inets version 4.4.1 the ftp client will always try to use
+       passive ftp mode and only resort to active ftp mode if this fails.
+       There is a start option mmooddee where this default behavior may be
+       changed.
+
+       There are two ways to start an ftp client. One is using the IInneettss
+       sseerrvviiccee ffrraammeewwoorrkk and the other is to start it directy as a standalone
+       process using the ooppeenn function.
+
+       For a simple example of an ftp session see IInneettss UUsseerr''ss GGuuiiddee..
+
+       In addition to the ordinary functions for receiving and sending files
+       (see _r_e_c_v_/_2, _r_e_c_v_/_3, _s_e_n_d_/_2 and _s_e_n_d_/_3) there are functions for
+       receiving remote files as binaries (see _r_e_c_v___b_i_n_/_2) and for sending
+       binaries to to be stored as remote files (see _s_e_n_d___b_i_n_/_3).
+
+       There is also a set of functions for sending and receiving contiguous
+       parts of a file to be stored in a remote file (for send see
+       _s_e_n_d___c_h_u_n_k___s_t_a_r_t_/_2, _s_e_n_d___c_h_u_n_k_/_2 and _s_e_n_d___c_h_u_n_k___e_n_d_/_1 and for receive
+       see _r_e_c_v___c_h_u_n_k___s_t_a_r_t_/_2 and _r_e_c_v___c_h_u_n_k_/).
+
+       The particular return values of the functions below depend very much on
+       the implementation of the FTP server at the remote host. In particular
+       the results from _l_s and _n_l_i_s_t varies. Often real errors are not
+       reported as errors by _l_s, even if for instance a file or directory does
+       not exist. _n_l_i_s_t is usually more strict, but some implementations have
+       the peculiar behaviour of responding with an error, if the request is a
+       listing of the contents of directory which exists but is empty.
+
+FFTTPP CCLLIIEENNTT SSEERRVVIICCEE SSTTAARRTT//SSTTOOPP
+       The FTP client can be started and stopped dynamically in runtime by
+       calling the Inets application API _i_n_e_t_s_:_s_t_a_r_t_(_f_t_p_c_, _S_e_r_v_i_c_e_C_o_n_f_i_g_), or
+       _i_n_e_t_s_:_s_t_a_r_t_(_f_t_p_c_, _S_e_r_v_i_c_e_C_o_n_f_i_g_, _H_o_w_), and _i_n_e_t_s_:_s_t_o_p_(_f_t_p_c_, _P_i_d_). See
+       iinneettss((33)) for more info.
+
+       Below follows a description of the available configuration options.
+
+         {{hhoosstt,, HHoosstt}}::
+
+
+           Host = _s_t_r_i_n_g_(_) _| _i_p___a_d_d_r_e_s_s_(_)
+
+         {{ppoorrtt,, PPoorrtt}}::
+
+
+           Port = _i_n_t_e_g_e_r_(_) _> _0
+
+           Default is 21.
+
+         {{mmooddee,, MMooddee}}::
+
+
+           Mode = _a_c_t_i_v_e _| _p_a_s_s_i_v_e
+
+           Default is _p_a_s_s_i_v_e.
+
+         {{vveerrbboossee,, VVeerrbboossee}}::
+
+
+           Verbose = _b_o_o_l_e_a_n_(_)
+
+           This determines if the FTP communication should be verbose or not.
+
+           Default is _f_a_l_s_e.
+
+         {{ddeebbuugg,, DDeebbuugg}}::
+
+
+           Debug = _t_r_a_c_e _| _d_e_b_u_g _| _d_i_s_a_b_l_e
+
+           Debugging using the dbg toolkit.
+
+           Default is _d_i_s_a_b_l_e.
+
+         {{iippffaammiillyy,, IIppFFaammiillyy}}::
+
+
+           IpFamily = _i_n_e_t _| _i_n_e_t_6 _| _i_n_e_t_6_f_b_4
+
+           With _i_n_e_t_6_f_b_4 the client behaves as before (it tries to use IPv6
+           and only if that does not work, it uses IPv4).
+
+           Default is _i_n_e_t (IPv4).
+
+         {{ttiimmeeoouutt,, TTiimmeeoouutt}}::
+
+
+           Timeout = _n_o_n___n_e_g___i_n_t_e_g_e_r_(_)
+
+           Connection timeout.
+
+           Default is 60000 (milliseconds).
+
+         {{ddttiimmeeoouutt,, DDTTiimmeeoouutt}}::
+
+
+           DTimeout = _n_o_n___n_e_g___i_n_t_e_g_e_r_(_) _| _i_n_f_i_n_i_t_y
+
+           Data Connect timeout. The time the client will wait for the server
+           to connect to the data socket.
+
+           Default is infinity.
+
+         {{pprrooggrreessss,, PPrrooggrreessss}}::
+
+
+           Progress = _i_g_n_o_r_e _| _{_C_B_M_o_d_u_l_e_, _C_B_F_u_n_c_t_i_o_n_, _I_n_i_t_P_r_o_g_r_e_s_s_}
+
+           CBModule = _a_t_o_m_(_), CBFunction = _a_t_o_m_(_)
+
+           InitProgress = _t_e_r_m_(_)
+
+           Default is _i_g_n_o_r_e.
+
+       The progress option is intended to be used by applications that want to
+       create some type of progress report such as a progress bar in a GUI.
+       The default value for the progress option is ignore e.i. the option is
+       not used. When the progress option is specified the following will
+       happen when ftp:send/[3,4] or ftp:recv/[3,4] are called.
+
+         * Before a file is transfered the following call will be made to
+           indicate the start of the file transfer and how big the file is.
+           The return value of the callback function should be a new value for
+           the UserProgressTerm that will bu used as input next time the
+           callback function is called.
+
+
+            _C_B_M_o_d_u_l_e_:_C_B_F_u_n_c_t_i_o_n_(_I_n_i_t_P_r_o_g_r_e_s_s_, _F_i_l_e_, _{_f_i_l_e___s_i_z_e_, _F_i_l_e_S_i_z_e_}_)
+
+
+         * Every time a chunk of bytes is transfered the following call will
+           be made:
+
+
+            _C_B_M_o_d_u_l_e_:_C_B_F_u_n_c_t_i_o_n_(_U_s_e_r_P_r_o_g_r_e_s_s_T_e_r_m_, _F_i_l_e_, _{_t_r_a_n_s_f_e_r___s_i_z_e_,
+           _T_r_a_n_s_f_e_r_S_i_z_e_}_)
+
+
+         * At the end of the file the following call will be made to indicate
+           the end of the transfer.
+
+
+            _C_B_M_o_d_u_l_e_:_C_B_F_u_n_c_t_i_o_n_(_U_s_e_r_P_r_o_g_r_e_s_s_T_e_r_m_, _F_i_l_e_, _{_t_r_a_n_s_f_e_r___s_i_z_e_, _0_}_)
+
+
+       The callback function should be defined as
+
+        _C_B_M_o_d_u_l_e_:_C_B_F_u_n_c_t_i_o_n_(_U_s_e_r_P_r_o_g_r_e_s_s_T_e_r_m_, _F_i_l_e_, _S_i_z_e_) _-_> _U_s_e_r_P_r_o_g_r_e_s_s_T_e_r_m
+
+        _C_B_M_o_d_u_l_e _= _C_B_F_u_n_c_t_i_o_n _= _a_t_o_m_(_)
+
+        _U_s_e_r_P_r_o_g_r_e_s_s_T_e_r_m _= _t_e_r_m_(_)
+
+        _F_i_l_e _= _s_t_r_i_n_g_(_)
+
+        _S_i_z_e _= _{_t_r_a_n_s_f_e_r___s_i_z_e_, _i_n_t_e_g_e_r_(_)_} _| _{_f_i_l_e___s_i_z_e_, _i_n_t_e_g_e_r_(_)_} _|
+       _{_f_i_l_e___s_i_z_e_, _u_n_k_n_o_w_n_}
+
+       Alas for remote files it is not possible for ftp to determine the file
+       size in a platform independent way. In this case the size will be
+       _u_n_k_n_o_w_n and it is left to the application to find out the size.
+
+   NNoottee::
+       The callback is made by a middleman process, hence the file transfer
+       will not be affected by the code in the progress callback function. If
+       the callback should crash this will be detected by the ftp connection
+       process that will print an info-report and then go one as if the
+       progress option was set to ignore.
+
+
+       The file transfer type is set to the default of the FTP server when the
+       session is opened. This is usually ASCCI-mode.
+
+       The current local working directory (cf. _l_p_w_d_/_1) is set to the value
+       reported by _f_i_l_e_:_g_e_t___c_w_d_/_1. the wanted local directory.
+
+       The return value _P_i_d is used as a reference to the newly created ftp
+       client in all other functions, and they should be called by the process
+       that created the connection. The ftp client process monitors the
+       process that created it and will terminate if that process terminates.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Here follows type definitions that are used by more than one function
+       in the FTP client API.
+
+        _p_i_d_(_) _- _i_d_e_n_t_i_f_i_e_r _o_f _a_n _f_t_p _c_o_n_n_e_c_t_i_o_n_.
+
+        _s_t_r_i_n_g_(_) _= _l_i_s_t _o_f _A_S_C_I_I _c_h_a_r_a_c_t_e_r_s_.
+
+        _s_h_o_r_t_a_g_e___r_e_a_s_o_n_(_) _= _e_t_n_o_s_p_c _| _e_p_n_o_s_p_c
+
+        _r_e_s_t_r_i_c_t_i_o_n___r_e_a_s_o_n_(_) _= _e_p_a_t_h _| _e_f_n_a_m_e_n_a _| _e_l_o_g_i_n _| _e_n_o_t_b_i_n_a_r_y _- _n_o_t_e
+       _n_o_t _a_l_l _r_e_s_t_r_i_c_t_i_o_n_s _m_a_y _a_l_w_a_y_s _r_e_l_e_v_a_n_t _t_o _a_l_l _f_u_n_c_t_i_o_n_s
+
+       _c_o_m_m_o_n___r_e_a_s_o_n_(_) _= _e_c_o_n_n _| _e_c_l_o_s_e_d _| _t_e_r_m_(_) _- _s_o_m_e _k_i_n_d _o_f _e_x_p_l_a_n_a_t_i_o_n
+       _o_f _w_h_a_t _w_e_n_t _w_r_o_n_g_.
+
+EEXXPPOORRTTSS
+       aaccccoouunntt((PPiidd,, AAccccoouunntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Account = string()
+                 Reason = eacct | common_reason()
+
+              If an account is needed for an operation set the account with
+              this operation.
+
+       aappppeenndd((PPiidd,, LLooccaallFFiillee)) -->>
+       aappppeenndd((PPiidd,, LLooccaallFFiillee,, RReemmootteeFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 LocalFile = RemoteFile = string()
+                 Reason = epath | elogin | etnospc | epnospc | efnamena |
+                 common_reason
+
+              Transfers the file _L_o_c_a_l_F_i_l_e to the remote server. If _R_e_m_o_t_e_F_i_l_e
+              is specified, the name of the remote file that the file will be
+              appended to is set to _R_e_m_o_t_e_F_i_l_e; otherwise the name is set to
+              _L_o_c_a_l_F_i_l_e If the file does not exists the file will be created.
+
+       aappppeenndd__bbiinn((PPiidd,, BBiinn,, RReemmootteeFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Bin = binary()()
+                 RemoteFile = string()
+                 Reason = restriction_reason()| shortage_reason() |
+                 common_reason()
+
+              Transfers the binary _B_i_n to the remote server and append it to
+              the file _R_e_m_o_t_e_F_i_l_e. If the file does not exists it will be
+              created.
+
+       aappppeenndd__cchhuunnkk((PPiidd,, BBiinn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Bin = binary()
+                 Reason = echunk | restriction_reason() | common_reason()
+
+              Transfer the chunk _B_i_n to the remote server, which append it
+              into the file specified in the call to _a_p_p_e_n_d___c_h_u_n_k___s_t_a_r_t_/_2.
+
+              Note that for some errors, e.g. file system full, it is
+              necessary to to call _a_p_p_e_n_d___c_h_u_n_k___e_n_d to get the proper reason.
+
+       aappppeenndd__cchhuunnkk__ssttaarrtt((PPiidd,, FFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 File = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Start the transfer of chunks for appending to the file _F_i_l_e at
+              the remote server. If the file does not exists it will be
+              created.
+
+       aappppeenndd__cchhuunnkk__eenndd((PPiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Reason = echunk | restriction_reason() | shortage_reason()
+
+              Stops transfer of chunks for appending to the remote server. The
+              file at the remote server, specified in the call to
+              _a_p_p_e_n_d___c_h_u_n_k___s_t_a_r_t_/_2 is closed by the server.
+
+       ccdd((PPiidd,, DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Dir = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Changes the working directory at the remote server to _D_i_r.
+
+       cclloossee((PPiidd)) -->> ookk
+
+              Types:
+
+                 Pid = pid()
+
+              Ends an ftp session, created using the ooppeenn function.
+
+       ddeelleettee((PPiidd,, FFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 File = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Deletes the file _F_i_l_e at the remote server.
+
+       ffoorrmmaatteerrrroorr((TTaagg)) -->> ssttrriinngg(())
+
+              Types:
+
+                 Tag = {error, atom()} | atom()
+
+              Given an error return value _{_e_r_r_o_r_, _A_t_o_m_R_e_a_s_o_n_}, this function
+              returns a readable string describing the error.
+
+       llccdd((PPiidd,, DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Dir = string()
+                 Reason = restriction_reason()
+
+              Changes the working directory to _D_i_r for the local client.
+
+       llppwwdd((PPiidd)) -->> {{ookk,, DDiirr}}
+
+              Types:
+
+                 Pid = pid()
+
+              Returns the current working directory at the local client.
+
+       llss((PPiidd)) -->>
+       llss((PPiidd,, PPaatthhnnaammee)) -->> {{ookk,, LLiissttiinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Pathname = string()
+                 Listing = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Returns a list of files in long format.
+
+              _P_a_t_h_n_a_m_e can be a directory, a group of files or even a file.
+              The _P_a_t_h_n_a_m_e string can contain wildcard(s).
+
+              _l_s_/_1 implies the user's current remote directory.
+
+              The format of _L_i_s_t_i_n_g is operating system dependent (on UNIX it
+              is typically produced from the output of the _l_s _-_l shell
+              command).
+
+       mmkkddiirr((PPiidd,, DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Dir = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Creates the directory _D_i_r at the remote server.
+
+       nnlliisstt((PPiidd)) -->>
+       nnlliisstt((PPiidd,, PPaatthhnnaammee)) -->> {{ookk,, LLiissttiinngg}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Pathname = string()
+                 Listing = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Returns a list of files in short format.
+
+              _P_a_t_h_n_a_m_e can be a directory, a group of files or even a file.
+              The _P_a_t_h_n_a_m_e string can contain wildcard(s).
+
+              _n_l_i_s_t_/_1 implies the user's current remote directory.
+
+              The format of _L_i_s_t_i_n_g is a stream of file names, where each name
+              is separated by <CRLF> or <NL>. Contrary to the _l_s function, the
+              purpose of _n_l_i_s_t is to make it possible for a program to
+              automatically process file name information.
+
+       ooppeenn((HHoosstt)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+       ooppeenn((HHoosstt,, OOppttss)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Host = string() | ip_address()
+                 Opts = options()
+                 options() = [option()]
+                 option() = start_option() | open_option()
+                 start_option() = {verbose, verbose()} | {debug, debug()}
+                 verbose() = boolean() (defaults to false)
+                 debug() = disable | debug | trace (defaults to disable)
+                 open_option() = {ipfamily, ipfamily()} | {port, port()} |
+                 {mode, mode()} | {timeout, timeout()} | {dtimeout,
+                 dtimeout()} | {progress, progress()}
+                 ipfamily() = inet | inet6 | inet6fb4 (defaults to inet)
+                 port() = integer() > 0 (defaults to 21)
+                 mode() = active | passive (defaults to passive)
+                 timeout() = integer() > 0 (defaults to 60000 milliseconds)
+                 dtimeout() = integer() > 0 | infinity (defaults to infinity)
+                 pogress() = ignore | {module(), function(), initial_data()}
+                 (defaults to ignore)
+                 module() = atom()
+                 function() = atom()
+                 initial_data() = term()
+                 Reason = ehost | term()
+
+              This function is used to start a standalone ftp client process
+              (without the inets service framework) and open a session with
+              the FTP server at _H_o_s_t.
+
+              A session opened in this way, is closed using the cclloossee
+              function.
+
+       ppwwdd((PPiidd)) -->> {{ookk,, DDiirr}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Reason = restriction_reason() | common_reason()
+
+              Returns the current working directory at the remote server.
+
+       ppwwdd((PPiidd)) -->> {{ookk,, DDiirr}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Reason = restriction_reason() | common_reason()
+
+              Returns the current working directory at the remote server.
+
+       rreeccvv((PPiidd,, RReemmootteeFFiillee)) -->>
+       rreeccvv((PPiidd,, RReemmootteeFFiillee,, LLooccaallFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 RemoteFile = LocalFile = string()
+                 Reason = restriction_reason() | common_reason() |
+                 file_write_error_reason()
+                 file_write_error_reason() = see file:write/2
+
+              Transfer the file _R_e_m_o_t_e_F_i_l_e from the remote server to the the
+              file system of the local client. If _L_o_c_a_l_F_i_l_e is specified, the
+              local file will be _L_o_c_a_l_F_i_l_e; otherwise it will be _R_e_m_o_t_e_F_i_l_e.
+
+              If the file write fails (e.g. enospc), then the command is
+              aborted and _{_e_r_r_o_r_, _f_i_l_e___w_r_i_t_e___e_r_r_o_r___r_e_a_s_o_n_(_)_} is returned. The
+              file is however _n_o_t removed.
+
+       rreeccvv__bbiinn((PPiidd,, RReemmootteeFFiillee)) -->> {{ookk,, BBiinn}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Bin = binary()
+                 RemoteFile = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Transfers the file _R_e_m_o_t_e_F_i_l_e from the remote server and
+              receives it as a binary.
+
+       rreeccvv__cchhuunnkk__ssttaarrtt((PPiidd,, RReemmootteeFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 RemoteFile = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Start transfer of the file _R_e_m_o_t_e_F_i_l_e from the remote server.
+
+       rreeccvv__cchhuunnkk((PPiidd)) -->> ookk || {{ookk,, BBiinn}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Bin = binary()
+                 Reason = restriction_reason() | common_reason()
+
+              Receive a chunk of the remote file (_R_e_m_o_t_e_F_i_l_e of
+              _r_e_c_v___c_h_u_n_k___s_t_a_r_t). The return values has the following meaning:
+
+                * _o_k the transfer is complete.
+
+                * _{_o_k_, _B_i_n_} just another chunk of the file.
+
+                * _{_e_r_r_o_r_, _R_e_a_s_o_n_} transfer failed.
+
+       rreennaammee((PPiidd,, OOlldd,, NNeeww)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 CurrFile = NewFile = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Renames _O_l_d to _N_e_w at the remote server.
+
+       rrmmddiirr((PPiidd,, DDiirr)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Dir = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Removes directory _D_i_r at the remote server.
+
+       sseenndd((PPiidd,, LLooccaallFFiillee)) -->>
+       sseenndd((PPiidd,, LLooccaallFFiillee,, RReemmootteeFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 LocalFile = RemoteFile = string()
+                 Reason = restriction_reason() | common_reason() |
+                 shortage_reason()
+
+              Transfers the file _L_o_c_a_l_F_i_l_e to the remote server. If _R_e_m_o_t_e_F_i_l_e
+              is specified, the name of the remote file is set to _R_e_m_o_t_e_F_i_l_e;
+              otherwise the name is set to _L_o_c_a_l_F_i_l_e.
+
+       sseenndd__bbiinn((PPiidd,, BBiinn,, RReemmootteeFFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Bin = binary()()
+                 RemoteFile = string()
+                 Reason = restriction_reason() | common_reason() |
+                 shortage_reason()
+
+              Transfers the binary _B_i_n into the file _R_e_m_o_t_e_F_i_l_e at the remote
+              server.
+
+       sseenndd__cchhuunnkk((PPiidd,, BBiinn)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Bin = binary()
+                 Reason = echunk | restriction_reason() | common_reason()
+
+              Transfer the chunk _B_i_n to the remote server, which writes it
+              into the file specified in the call to _s_e_n_d___c_h_u_n_k___s_t_a_r_t_/_2.
+
+              Note that for some errors, e.g. file system full, it is
+              necessary to to call _s_e_n_d___c_h_u_n_k___e_n_d to get the proper reason.
+
+       sseenndd__cchhuunnkk__ssttaarrtt((PPiidd,, FFiillee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 File = string()
+                 Reason = restriction_reason() | common_reason()
+
+              Start transfer of chunks into the file _F_i_l_e at the remote
+              server.
+
+       sseenndd__cchhuunnkk__eenndd((PPiidd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Reason = restriction_reason() | common_reason() |
+                 shortage_reason()
+
+              Stops transfer of chunks to the remote server. The file at the
+              remote server, specified in the call to _s_e_n_d___c_h_u_n_k___s_t_a_r_t_/_2 is
+              closed by the server.
+
+       ttyyppee((PPiidd,, TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Type = ascii | binary
+                 Reason = etype | restriction_reason() | common_reason()
+
+              Sets the file transfer type to _a_s_c_i_i or _b_i_n_a_r_y. When an ftp
+              session is opened, the default transfer type of the server is
+              used, most often _a_s_c_i_i, which is the default according to RFC
+              959.
+
+       uusseerr((PPiidd,, UUsseerr,, PPaasssswwoorrdd)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 User = Password = string()
+                 Reason = euser | common_reason()
+
+              Performs login of _U_s_e_r with _P_a_s_s_w_o_r_d.
+
+       uusseerr((PPiidd,, UUsseerr,, PPaasssswwoorrdd,, AAccccoouunntt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 User = Password = string()
+                 Reason = euser | common_reason()
+
+              Performs login of _U_s_e_r with _P_a_s_s_w_o_r_d to the account specified by
+              _A_c_c_o_u_n_t.
+
+       qquuoottee((PPiidd,, CCoommmmaanndd)) -->> [[FFTTPPLLiinnee]]
+
+              Types:
+
+                 Pid = pid()
+                 Command = string()
+                 FTPLine = string() - Note the telnet end of line characters,
+                 from the ftp protocol definition, CRLF e.g. "\\r\\n" has been
+                 removed.
+
+              Sends an arbitrary FTP command and returns verbatimly a list of
+              the lines sent back by the FTP server. This functions is
+              intended to give an application accesses to FTP commands that
+              are server specific or that may not be provided by this FTP
+              client.
+
+          NNoottee::
+              FTP commands that require a data connection can not be
+              successfully issued with this function.
+
+
+EERRRROORRSS
+       The possible error reasons and the corresponding diagnostic strings
+       returned by _f_o_r_m_a_t_e_r_r_o_r_/_1 are as follows:
+
+         _e_c_h_u_n_k:
+           Synchronisation error during chunk sending.
+
+           A call has been made to _s_e_n_d___c_h_u_n_k_/_2 or _s_e_n_d___c_h_u_n_k___e_n_d_/_1, before a
+           call to _s_e_n_d___c_h_u_n_k___s_t_a_r_t_/_2; or a call has been made to another
+           transfer function during chunk sending, i.e. before a call to
+           _s_e_n_d___c_h_u_n_k___e_n_d_/_1.
+
+         _e_c_l_o_s_e_d:
+           The session has been closed.
+
+         _e_c_o_n_n:
+           Connection to remote server prematurely closed.
+
+         _e_h_o_s_t:
+           Host not found, FTP server not found, or connection rejected by FTP
+           server.
+
+         _e_l_o_g_i_n:
+           User not logged in.
+
+         _e_n_o_t_b_i_n_a_r_y:
+           Term is not a binary.
+
+         _e_p_a_t_h:
+           No such file or directory, or directory already exists, or
+           permission denied.
+
+         _e_t_y_p_e:
+           No such type.
+
+         _e_u_s_e_r:
+           User name or password not valid.
+
+         _e_t_n_o_s_p_c:
+           Insufficient storage space in system [452].
+
+         _e_p_n_o_s_p_c:
+           Exceeded storage allocation (for current directory or dataset)
+           [552].
+
+         _e_f_n_a_m_e_n_a:
+           File name not allowed [553].
+
+SSEEEE AALLSSOO
+       file, filename, J. Postel and J. Reynolds: File Transfer Protocol (RFC
+       959).
+
+
+
+Ericsson AB                       inets 5.9.1                           ftp(3)

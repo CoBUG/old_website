@@ -1,0 +1,64 @@
+CosPropertyService_PropertieEsrIltaenrgatMoord(u3lC)eosDPerfoipneirttiyoSnervice_PropertiesIterator(3)
+
+
+
+NNAAMMEE
+       CosPropertyService_PropertiesIterator - This module implements the OMG
+       CosPropertyService::PropertiesIterator interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_P_r_o_p_e_r_t_y_/_i_n_c_l_u_d_e_/_C_o_s_P_r_o_p_e_r_t_y_S_e_r_v_i_c_e_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       rreesseett((IItteerraattoorr)) -->> ookk
+
+              Types:
+
+                 Iterator = #objref
+
+              This operation resets the position to the first property.
+
+       nneexxtt__oonnee((IItteerraattoorr)) -->> RReeppllyy
+
+              Types:
+
+                 Iterator = #objref
+                 Reply = {boolean(),
+                 #'CosPropertyService_Property'{property_name = Name,
+                 property_value = Value}}
+                 Name = string()
+                 Value = #any
+
+              This operation returns true . If false is returned the out
+              parameter is a non-valid Property.
+
+       nneexxtt__nn((IItteerraattoorr,, HHoowwMMaannyy)) -->> RReeppllyy
+
+              Types:
+
+                 Iterator = #objref
+                 HowMany = long()
+                 Reply = {boolean(), Properties}
+                 Properties = [#'CosPropertyService_Property'{property_name =
+                 Name, property_value = Value}]
+                 Name = string()
+                 Value = #any
+
+              This operation returns true if the requested number of
+              properties can be delivered and there are additional properties.
+              If false is returned and a sequence of max _H_o_w_M_a_n_y properties
+              will be returned and no more properties can be delivered.
+
+       ddeessttrrooyy((IItteerraattoorr)) -->> ookk
+
+              Types:
+
+                 Iterator = #objref
+
+              This operation will terminate the Iterator and all subsequent
+              calls will fail.
+
+
+
+Ericsson AB                   cosProperCtoysP1r.o1p.e1r5tyService_PropertiesIterator(3)

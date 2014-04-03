@@ -1,0 +1,84 @@
+mod_alias(3)               Erlang Module Definition               mod_alias(3)
+
+
+
+NNAAMMEE
+       mod_alias - URL aliasing.
+
+DDEESSCCRRIIPPTTIIOONN
+       Erlang Webserver Server internal API for handling of things such as
+       interaction data exported by the mod_alias module.
+
+EEXXPPOORRTTSS
+       ddeeffaauulltt__iinnddeexx((CCoonnffiiggDDBB,, PPaatthh)) -->> NNeewwPPaatthh
+
+              Types:
+
+                 ConfigDB = config_db()
+                 Path = NewPath = string()
+
+              If _P_a_t_h is a directory, _d_e_f_a_u_l_t___i_n_d_e_x_/_2, it starts searching for
+              resources or files that are specified in the config directive
+              DirectoryIndex. If an appropriate resource or file is found, it
+              is appended to the end of _P_a_t_h and then returned. _P_a_t_h is
+              returned unaltered, if no appropriate file is found, or if _P_a_t_h
+              is not a directory. _c_o_n_f_i_g___d_b_(_) is the server config file in ETS
+              table format as described in IInneettss UUsseerrss GGuuiiddee...
+
+       ppaatthh((PPaatthhDDaattaa,, CCoonnffiiggDDBB,, RReeqquueessttUURRII)) -->> PPaatthh
+
+              Types:
+
+                 PathData = interaction_data()
+                 ConfigDB = config_db()
+                 RequestURI = Path = string()
+
+              _p_a_t_h_/_3 returns the actual file _P_a_t_h in the _R_e_q_u_e_s_t_U_R_I (See RFC
+              1945). If the interaction data _{_r_e_a_l___n_a_m_e_,_{_P_a_t_h_,_A_f_t_e_r_P_a_t_h_}_} has
+              been exported by mod_alias; _P_a_t_h is returned. If no interaction
+              data has been exported, ServerRoot is used to generate a file
+              _P_a_t_h. _c_o_n_f_i_g___d_b_(_) and _i_n_t_e_r_a_c_t_i_o_n___d_a_t_a_(_) are as defined in IInneettss
+              UUsseerrss GGuuiiddee.
+
+       rreeaall__nnaammee((CCoonnffiiggDDBB,, RReeqquueessttUURRII,, AAlliiaasseess)) -->> RReett
+
+              Types:
+
+                 ConfigDB = config_db()
+                 RequestURI = string()
+                 Aliases = [{FakeName,RealName}]
+                 Ret = {ShortPath,Path,AfterPath}
+                 ShortPath = Path = AfterPath = string()
+
+              _r_e_a_l___n_a_m_e_/_3 traverses _A_l_i_a_s_e_s, typically extracted from
+              _C_o_n_f_i_g_D_B, and matches each _F_a_k_e_N_a_m_e with _R_e_q_u_e_s_t_U_R_I. If a match
+              is found _F_a_k_e_N_a_m_e is replaced with _R_e_a_l_N_a_m_e in the match. The
+              resulting path is split into two parts, that is _S_h_o_r_t_P_a_t_h and
+              _A_f_t_e_r_P_a_t_h as defined in hhttttppdd__uuttiill::sspplliitt__ppaatthh//11. _P_a_t_h is
+              generated from _S_h_o_r_t_P_a_t_h, that is the result from
+              ddeeffaauulltt__iinnddeexx//22 with _S_h_o_r_t_P_a_t_h as an argument. _c_o_n_f_i_g___d_b_(_) is
+              the server config file in ETS table format as described in IInneettss
+              UUsseerr GGuuiiddee...
+
+       rreeaall__ssccrriipptt__nnaammee((CCoonnffiiggDDBB,,RReeqquueessttUURRII,,SSccrriippttAAlliiaasseess)) -->> RReett
+
+              Types:
+
+                 ConfigDB = config_db()
+                 RequestURI = string()
+                 ScriptAliases = [{FakeName,RealName}]
+                 Ret = {ShortPath,AfterPath} | not_a_script
+                 ShortPath = AfterPath = string()
+
+              _r_e_a_l___n_a_m_e_/_3 traverses _S_c_r_i_p_t_A_l_i_a_s_e_s, typically extracted from
+              _C_o_n_f_i_g_D_B, and matches each _F_a_k_e_N_a_m_e with _R_e_q_u_e_s_t_U_R_I. If a match
+              is found _F_a_k_e_N_a_m_e is replaced with _R_e_a_l_N_a_m_e in the match. If the
+              resulting match is not an executable script _n_o_t___a___s_c_r_i_p_t is
+              returned. If it is a script the resulting script path is in two
+              parts, that is _S_h_o_r_t_P_a_t_h and _A_f_t_e_r_P_a_t_h as defined in
+              hhttttppdd__uuttiill::sspplliitt__ssccrriipptt__ppaatthh//11. _c_o_n_f_i_g___d_b_(_) is the server config
+              file in ETS table format as described in IInneettss UUsseerrss GGuuiiddee...
+
+
+
+Ericsson AB                       inets 5.9.1                     mod_alias(3)

@@ -1,0 +1,380 @@
+diameter_app(3)            Erlang Module Definition            diameter_app(3)
+
+
+
+NNAAMMEE
+       diameter_app - Callback module of a Diameter application.
+
+DDEESSCCRRIIPPTTIIOONN
+       A diameter service as started by ddiiaammeetteerr::ssttaarrtt__sseerrvviiccee//22 configures
+       one of more Diameter applications, each of whose configuration
+       specifies a callback that handles messages specific to the application.
+       The messages and AVPs of the application are defined in a dictionary
+       file whose format is documented in ddiiaammeetteerr__ddiicctt((44)) while the callback
+       module is documented here. The callback module implements the Diameter
+       application-specific functionality of a service.
+
+       A callback module must export all of the functions documented below.
+       The functions themselves are of three distinct flavours:
+
+         * ppeeeerr__uupp//33 and ppeeeerr__ddoowwnn//33 signal the attainment or loss of
+           connectivity with a Diameter peer.
+
+         * ppiicckk__ppeeeerr//44, pprreeppaarree__rreeqquueesstt//33, pprreeppaarree__rreettrraannssmmiitt//33,
+           hhaannddllee__aannsswweerr//44 and hhaannddllee__eerrrroorr//44 are (or may be) called as a
+           consequence of a call to ddiiaammeetteerr::ccaallll//44 to send an outgoing
+           Diameter request message.
+
+         * hhaannddllee__rreeqquueesstt//33 is called in response to an incoming Diameter
+           request message.
+
+   NNoottee::
+       The arities given for the the callback functions here assume no extra
+       arguments. All functions will also be passed any extra arguments
+       configured with the callback module itself when calling
+       ddiiaammeetteerr::ssttaarrtt__sseerrvviiccee//22 and, for the call-specific callbacks, any
+       extra arguments passed to ddiiaammeetteerr::ccaallll//44.
+
+
+DDAATTAA TTYYPPEESS
+         _c_a_p_a_b_i_l_i_t_i_e_s_(_) _= _#_d_i_a_m_e_t_e_r___c_a_p_s_{_}:
+           A record containing the identities of the local Diameter node and
+           the remote Diameter peer having an established transport
+           connection, as well as the capabilities as determined by
+           capabilities exchange. Each field of the record is a 2-tuple
+           consisting of values for the (local) host and (remote) peer.
+           Optional or possibly multiple values are encoded as lists of
+           values, mandatory values as the bare value.
+
+         _m_e_s_s_a_g_e_(_) _= _r_e_c_o_r_d_(_) _| _l_i_s_t_(_):
+           The representation of a Diameter message as passed to
+           ddiiaammeetteerr::ccaallll//44. The record representation is as outlined in
+           ddiiaammeetteerr__ddiicctt((44)): a message as defined in a dictionary file is
+           encoded as a record with one field for each component AVP.
+           Equivalently, a message can also be encoded as a list whose head is
+           the atom-valued message name (the record name minus any prefix
+           specified in the relevant dictionary file) and whose tail is a list
+           of _{_F_i_e_l_d_N_a_m_e_, _F_i_e_l_d_V_a_l_u_e_} pairs.
+
+           A third representation allows a message to be specified as a list
+           whose head is a _#_d_i_a_m_e_t_e_r___h_e_a_d_e_r_{_} record and whose tail is a list
+           of _#_d_i_a_m_e_t_e_r___a_v_p_{_} records. This representation is used by diameter
+           itself when relaying requests as directed by the return value of a
+           hhaannddllee__rreeqquueesstt//33 callback. It differs from the other other two in
+           that it bypasses the checks for messages that do not agree with
+           their definitions in the dictionary in question (since relays
+           agents must handle arbitrary request): messages are sent exactly as
+           specified.
+
+         _p_a_c_k_e_t_(_) _= _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_}:
+           A container for incoming and outgoing Diameter messages that's
+           passed through encode/decode and transport. Fields should not be
+           set in return values except as documented.
+
+         _p_e_e_r___r_e_f_(_) _= _t_e_r_m_(_):
+           A term identifying a transport connection with a Diameter peer.
+           Should be treated opaquely.
+
+         _p_e_e_r_(_) _= _{ppeeeerr__rreeff(()), ccaappaabbiilliittiieess(())}:
+           A tuple representing a Diameter peer connection.
+
+         _s_t_a_t_e_(_) _= _t_e_r_m_(_):
+           The state maintained by the application callback functions
+           ppeeeerr__uupp//33, ppeeeerr__ddoowwnn//33 and (optionally) ppiicckk__ppeeeerr//44. The initial
+           state is configured in the call to ddiiaammeetteerr::ssttaarrtt__sseerrvviiccee//22 that
+           configures the application on a service. Callback functions
+           returning a state are evaluated in a common service-specific
+           process while those not returning state are evaluated in a request-
+           specific process.
+
+EEXXPPOORRTTSS
+       MMoodd::ppeeeerr__uupp((SSvvccNNaammee,, PPeeeerr,, SSttaattee)) -->> NNeewwSSttaattee
+
+              Types:
+
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 Peer = ppeeeerr(())
+                 State = NewState = ssttaattee(())
+
+              Invoked when a transport connection has been established and a
+              successful capabilities exchange has indicated that the peer
+              supports the Diameter application of the application on which
+              the callback module in question has been configured.
+
+       MMoodd::ppeeeerr__ddoowwnn((SSvvccNNaammee,, PPeeeerr,, SSttaattee)) -->> NNeewwSSttaattee
+
+              Types:
+
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 Peer = ppeeeerr(())
+                 State = NewState = ssttaattee(())
+
+              Invoked when a transport connection has been lost following a
+              previous call to ppeeeerr__uupp//33.
+
+       MMoodd::ppiicckk__ppeeeerr((CCaannddiiddaatteess,, RReesseerrvveedd,, SSvvccNNaammee,, SSttaattee)) -->> {{ookk,, PPeeeerr}} ||
+       {{PPeeeerr,, NNeewwSSttaattee}} || ffaallssee
+
+              Types:
+
+                 Candidates = [ppeeeerr(())]
+                 Peer = ppeeeerr(()) | false
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 State = NewState = ssttaattee(())
+
+              Invoked as a consequence of a call to ddiiaammeetteerr::ccaallll//44 to select
+              a destination peer for an outgoing request, the return value
+              indicating the selected peer.
+
+              The candidate peers list will only include those which are
+              selected by any _f_i_l_t_e_r option specified in the call to
+              ddiiaammeetteerr::ccaallll//44, and only those which have indicated support for
+              the Diameter application in question. The order of the elements
+              is unspecified except that any peers whose Origin-Host and
+              Origin-Realm matches that of the outgoing request (in the sense
+              of a _{_f_i_l_t_e_r_, _{_a_l_l_, _[_h_o_s_t_, _r_e_a_l_m_]_}_} option to ddiiaammeetteerr::ccaallll//44)
+              will be placed at the head of the list.
+
+              The return values _f_a_l_s_e and _{_f_a_l_s_e_, _S_t_a_t_e_} are equivalent when
+              callback state is mutable, as are _{_o_k_, _P_e_e_r_} and _{_P_e_e_r_, _S_t_a_t_e_}.
+              Returning a peer as _f_a_l_s_e causes _{_e_r_r_o_r_, _n_o___c_o_n_n_e_c_t_i_o_n_} to be
+              returned from ddiiaammeetteerr::ccaallll//44. Returning a ppeeeerr(()) from an
+              initial pick_peer/4 callback will result in a pprreeppaarree__rreeqquueesstt//33
+              callback followed by either hhaannddllee__aannsswweerr//44 or hhaannddllee__eerrrroorr//44
+              depending on whether or not an answer message is received from
+              the peer. If transport with the peer is lost before this then a
+              new ppiicckk__ppeeeerr//44 callback takes place to select an alternate
+              peer.
+
+              Note that there is no guarantee that a ppiicckk__ppeeeerr//44 callback to
+              select an alternate peer will be followed by any additional
+              callbacks, only that the initial ppiicckk__ppeeeerr//44 will be, since a
+              retransmission to an alternate peer is abandoned if an answer is
+              received from a previously selected peer.
+
+          NNoottee::
+              _{_P_e_e_r_, _N_e_w_S_t_a_t_e_} and its equivalents can only be returned if the
+              Diameter application in question was configured with the
+              ddiiaammeetteerr::aapppplliiccaattiioonn__oopptt(()) _{_c_a_l_l___m_u_t_a_t_e_s___s_t_a_t_e_, _t_r_u_e_}.
+              Otherwise, the _S_t_a_t_e argument is always the intial value as
+              configured on the application, not any subsequent value returned
+              by a ppeeeerr__uupp//33 or ppeeeerr__ddoowwnn//33 callback.
+
+
+       MMoodd::pprreeppaarree__rreeqquueesstt((PPaacckkeett,, SSvvccNNaammee,, PPeeeerr)) -->> AAccttiioonn
+
+              Types:
+
+                 Packet = ppaacckkeett(())
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 Peer = ppeeeerr(())
+                 Action = {send, ppaacckkeett(()) | mmeessssaaggee(())} | {discard, Reason} |
+                 discard
+
+              Invoked to return a request for encoding and transport. Allows
+              the sender to access the selected peer's capabilities in order
+              to set (for example) _D_e_s_t_i_n_a_t_i_o_n_-_H_o_s_t and/or _D_e_s_t_i_n_a_t_i_o_n_-_R_e_a_l_m
+              in the outgoing request, although the callback need not be
+              limited to this usage. Many implementations may simply want to
+              return _{_s_e_n_d_, _P_a_c_k_e_t_}
+
+              A returned ppaacckkeett(()) should set the request to be encoded in its
+              _m_s_g field and can set the _t_r_a_n_s_p_o_r_t___d_a_t_a field in order to pass
+              information to the transport module. Extra arguments passed to
+              ddiiaammeetteerr::ccaallll//44 can be used to communicate transport data to the
+              callback. A returned ppaacckkeett(()) can also set the _h_e_a_d_e_r field to a
+              _#_d_i_a_m_e_t_e_r___h_e_a_d_e_r_{_} record in order to specify values that should
+              be preserved in the outgoing request, although this should
+              typically not be necessary and allows the callback to set header
+              values inappropriately. A returned _l_e_n_g_t_h, _c_m_d___c_o_d_e or
+              _a_p_p_l_i_c_a_t_i_o_n___i_d is ignored.
+
+              Returning _{_d_i_s_c_a_r_d_, _R_e_a_s_o_n_} causes the request to be aborted and
+              the ddiiaammeetteerr::ccaallll//44 for which the callback has taken place to
+              return _{_e_r_r_o_r_, _R_e_a_s_o_n_}. Returning _d_i_s_c_a_r_d is equivalent to
+              returning _{_d_i_s_c_a_r_d_, _d_i_s_c_a_r_d_e_d_}.
+
+       MMoodd::pprreeppaarree__rreettrraannssmmiitt((PPaacckkeett,, SSvvccNNaammee,, PPeeeerr)) -->> RReessuulltt
+
+              Types:
+
+                 Packet = ppaacckkeett(())
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 Peer = ppeeeerr(())
+                 Result = {send, ppaacckkeett(()) | mmeessssaaggee(())} | {discard, Reason} |
+                 discard
+
+              Invoked to return a request for encoding and retransmission. Has
+              the same role as pprreeppaarree__rreeqquueesstt//33 in the case that a peer
+              connection is lost an an alternate peer selected but the
+              argument ppaacckkeett(()) is as returned by the initial
+              _p_r_e_p_a_r_e___r_e_q_u_e_s_t_/_3.
+
+              Returning _{_d_i_s_c_a_r_d_, _R_e_a_s_o_n_} causes the request to be aborted and
+              a hhaannddllee__eerrrroorr//44 callback to take place with _R_e_a_s_o_n as initial
+              argument. Returning _d_i_s_c_a_r_d is equivalent to returning _{_d_i_s_c_a_r_d_,
+              _d_i_s_c_a_r_d_e_d_}.
+
+       MMoodd::hhaannddllee__aannsswweerr((PPaacckkeett,, RReeqquueesstt,, SSvvccNNaammee,, PPeeeerr)) -->> RReessuulltt
+
+              Types:
+
+                 Packet = ppaacckkeett(())
+                 Request = mmeessssaaggee(())
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 Peer = ppeeeerr(())
+                 Result = term()
+
+              Invoked when an answer message is received from a peer. The
+              return value is returned from the call to ddiiaammeetteerr::ccaallll//44 for
+              which the callback takes place unless the _d_e_t_a_c_h option was
+              specified.
+
+              The decoded answer record is in the _m_s_g field of the argument
+              ppaacckkeett(()), the undecoded binary in the _p_a_c_k_e_t field. _R_e_q_u_e_s_t is
+              the outgoing request message as was returned from
+              pprreeppaarree__rreeqquueesstt//33 or pprreeppaarree__rreettrraannssmmiitt//33 before the request was
+              passed to the transport.
+
+              For any given call to ddiiaammeetteerr::ccaallll//44 there is at most one call
+              to the handle_answer callback of the application in question:
+              any duplicate answer (due to retransmission or otherwise) is
+              discarded. Similarly, only one of _h_a_n_d_l_e___a_n_s_w_e_r_/_4 or
+              _h_a_n_d_l_e___e_r_r_o_r_/_4 is called for any given request.
+
+              By default, an incoming answer message that cannot be
+              successfully decoded causes the request process in question to
+              fail, causing the relevant call to ddiiaammeetteerr::ccaallll//44 to return
+              _{_e_r_r_o_r_, _f_a_i_l_u_r_e_} _(_u_n_l_e_s_s _t_h_e _d_e_t_a_c_h option was specified). In
+              particular, there is no _h_a_n_d_l_e___e_r_r_o_r_/_4 callback in this case.
+              Application configuration may change this behaviour as described
+              for ddiiaammeetteerr::ssttaarrtt__sseerrvviiccee//22.
+
+       MMoodd::hhaannddllee__eerrrroorr((RReeaassoonn,, RReeqquueesstt,, SSvvccNNaammee,, PPeeeerr)) -->> RReessuulltt
+
+              Types:
+
+                 Reason = timeout | failover | term()
+                 Request = mmeessssaaggee(())
+                 SvcName = ddiiaammeetteerr::sseerrvviiccee__nnaammee(())
+                 Peer = ppeeeerr(())
+                 Result = term()
+
+              Invoked when an error occurs before an answer message is
+              received from a peer in response to an outgoing request. The
+              return value is returned from the call to ddiiaammeetteerr::ccaallll//44 for
+              which the callback takes place (unless the _d_e_t_a_c_h option was
+              specified).
+
+              Reason _t_i_m_e_o_u_t indicates that an answer message has not been
+              received within the required time. Reason _f_a_i_l_o_v_e_r indicates
+              that the transport connection to the peer to which the request
+              has been sent has been lost but that not alternate node was
+              available, possibly because a ppiicckk__ppeeeerr//44 callback returned
+              false.
+
+       MMoodd::hhaannddllee__rreeqquueesstt((PPaacckkeett,, SSvvccNNaammee,, PPeeeerr)) -->> AAccttiioonn
+
+              Types:
+
+                 Packet = ppaacckkeett(())
+                 SvcName = term()
+                 Peer = ppeeeerr(())
+                 Action = Reply | {relay, [Opt]} | discard | {eval, Action,
+                 PostF}
+                 Reply = {reply, mmeessssaaggee(())} | {protocol_error, 3000..3999}
+                 Opt = ddiiaammeetteerr::ccaallll__oopptt(())
+                 PostF = ddiiaammeetteerr::eevvaalluuaabbllee(())
+
+              Invoked when a request message is received from a peer. The
+              application in which the callback takes place (that is, the
+              callback module as configured with ddiiaammeetteerr::ssttaarrtt__sseerrvviiccee//22) is
+              determined by the Application Identifier in the header of the
+              incoming request message, the selected module being the one
+              whose corresponding ddiiccttiioonnaarryy declares itself as defining
+              either the application in question or the Relay application.
+
+              The argument ppaacckkeett(()) has the following signature.
+
+              #diameter_packet{header = #diameter_header{},
+                               avps   = [#diameter_avp{}],
+                               msg    = record() | undefined,
+                               errors = [UUnnssiiggnneedd3322(()) | {UUnnssiiggnneedd3322(()), #diameter_avp{}}],
+                               bin    = binary(),
+                               transport_data = term()}
+
+
+              The _m_s_g field will be _u_n_d_e_f_i_n_e_d only in case the request has
+              been received in the relay application. Otherwise it contains
+              the record representing the request as outlined in
+              ddiiaammeetteerr__ddiicctt((44)).
+
+              The _e_r_r_o_r_s field specifies any Result-Code's identifying errors
+              that were encountered in decoding the request. In this case
+              diameter will set both Result-Code and Failed-AVP AVP's in a
+              returned answer mmeessssaaggee(()) before sending it to the peer: the
+              returned mmeessssaaggee(()) need only set any other required AVP's. Note
+              that the errors detected by diameter are all of the 5xxx series
+              (Permanent Failures). The _e_r_r_o_r_s list is empty if the request
+              has been received in the relay application.
+
+              The _t_r_a_n_s_p_o_r_t___d_a_t_a field contains an arbitrary term passed into
+              diameter from the transport module in question, or the atom
+              _u_n_d_e_f_i_n_e_d if the transport specified no data. The term is
+              preserved in the ppaacckkeett(()) containing any answer message sent
+              back to the transport process unless another value is explicitly
+              specified.
+
+              The semantics of each of the possible return values are as
+              follows.
+
+                _{_r_e_p_l_y_, mmeessssaaggee(())}:
+                  Send the specified answer message to the peer.
+
+                _{_p_r_o_t_o_c_o_l___e_r_r_o_r_, _3_0_0_0_._._3_9_9_9_}:
+                  Send an answer message to the peer containing the specified
+                  protocol error. Equivalent to
+
+                {reply, ['answer-message' | Avps]
+
+
+                  where _A_v_p_s sets the Origin-Host, Origin-Realm, the specified
+                  Result-Code and (if the request sent one) Session-Id AVP's.
+
+                  Note that RFC 3588 mandates that only answers with a 3xxx
+                  series Result-Code (protocol errors) may set the E bit.
+                  Returning a non-3xxx value in a _p_r_o_t_o_c_o_l___e_r_r_o_r tuple will
+                  cause the request process in question to fail.
+
+                _{_r_e_l_a_y_, _O_p_t_s_}:
+                  Relay a request to another peer in the role of a Diameter
+                  relay agent. If a routing loop is detected then the request
+                  is answered with 3005 (DIAMETER_LOOP_DETECTED). Otherwise a
+                  Route-Record AVP (containing the sending peer's Origin-Host)
+                  is added to the request and ppiicckk__ppeeeerr//44 and subsequent
+                  callbacks take place just as if ddiiaammeetteerr::ccaallll//44 had been
+                  called explicitly. The End-to-End Identifier of the incoming
+                  request is preserved in the header of the relayed request.
+
+                  The returned _O_p_t_s should not specify _d_e_t_a_c_h. A subsequent
+                  hhaannddllee__aannsswweerr//44 callback for the relayed request must return
+                  its first argument, the _#_d_i_a_m_e_t_e_r___p_a_c_k_e_t_{_} record containing
+                  the answer message. Note that the _e_x_t_r_a option can be
+                  specified to supply arguments that can distinguish the relay
+                  case from others if so desired. Any other return value (for
+                  example, from a hhaannddllee__eerrrroorr//44 callback) causes the request
+                  to be answered with 3002 (DIAMETER_UNABLE_TO_DELIVER).
+
+                _d_i_s_c_a_r_d:
+                  Discard the request.
+
+                _{_e_v_a_l_, _A_c_t_i_o_n_, _P_o_s_t_F_}:
+                  Handle the request as if _A_c_t_i_o_n has been returned and then
+                  evaluate _P_o_s_t_F in the request process.
+
+              Note that protocol errors detected by diameter will result in an
+              answer message without _h_a_n_d_l_e___r_e_q_u_e_s_t_/_3 being invoked.
+
+
+
+Ericsson AB                      diameter 1.2                  diameter_app(3)

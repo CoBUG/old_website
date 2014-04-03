@@ -1,0 +1,117 @@
+inets(3)                   Erlang Module Definition                   inets(3)
+
+
+
+NNAAMMEE
+       inets - The inets services API
+
+DDEESSCCRRIIPPTTIIOONN
+       This module provides the most basic API to the clients and servers,
+       that are part of the Inets application, such as start and stop.
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Type definitions that are used more than once in this module:
+
+        _s_e_r_v_i_c_e_(_) _= _f_t_p_c _| _t_f_t_p _| _h_t_t_p_c _| _h_t_t_p_d
+
+        _p_r_o_p_e_r_t_y_(_) _= _a_t_o_m_(_)
+
+EEXXPPOORRTTSS
+       sseerrvviicceess(()) -->> [[{{SSeerrvviiccee,, PPiidd}}]]
+
+              Types:
+
+                 Service = service()
+                 Pid = pid()
+
+              Returns a list of currently running services.
+
+          NNoottee::
+              Services started as _s_t_a_n_d___a_l_o_n_e will not be listed.
+
+
+       sseerrvviicceess__iinnffoo(()) -->> [[{{SSeerrvviiccee,, PPiidd,, IInnffoo}}]]
+
+              Types:
+
+                 Service = service()
+                 Pid = pid()
+                 Info = [{Option, Value}]
+                 Option = property()
+                 Value = term()
+
+              Returns a list of currently running services where each service
+              is described by a [{Option, Value}] list. The information given
+              in the list is specific for each service and it is probable that
+              each service will have its own info function that gives you even
+              more details about the service.
+
+       sseerrvviiccee__nnaammeess(()) -->> [[SSeerrvviiccee]]
+
+              Types:
+
+                 Service = service()
+
+              Returns a list of available service names.
+
+       ssttaarrtt(()) -->>
+       ssttaarrtt((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = permanent | transient | temporary
+
+              Starts the Inets application. Default type is temporary. See
+              also aapppplliiccaattiioonn((33)).
+
+       ssttoopp(()) -->> ookk
+
+              Stops the inets application. See also aapppplliiccaattiioonn((33)).
+
+       ssttaarrtt((SSeerrvviiccee,, SSeerrvviicceeCCoonnffiigg)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+       ssttaarrtt((SSeerrvviiccee,, SSeerrvviicceeCCoonnffiigg,, HHooww)) -->> {{ookk,, PPiidd}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Service = service()
+                 ServiceConfig = [{Option, Value}]
+                 Option = property()
+                 Value = term()
+                 How = inets | stand_alone - default is inets
+
+              Dynamically starts an inets service after the inets application
+              has been started.
+
+          NNoottee::
+              Dynamically started services will not be handled by application
+              takeover and failover behavior when inets is run as a
+              distributed application. Nor will they be automatically
+              restarted when the inets application is restarted, but as long
+              as the inets application is up and running they will be
+              supervised and may be soft code upgraded. Services started as
+              _s_t_a_n_d___a_l_o_n_e, e.i. the service is not started as part of the
+              inets application, will lose all OTP application benefits such
+              as soft upgrade. The "stand_alone-service" will be linked to the
+              process that started it. In most cases some of the supervision
+              functionality will still be in place and in some sense the
+              calling process has now become the top supervisor.
+
+
+       ssttoopp((SSeerrvviiccee,, RReeffeerreennccee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Service = service() | stand_alone
+                 Reference = pid() | term() - service specified reference
+                 Reason = term()
+
+              Stops a started service of the inets application or takes down a
+              "stand_alone-service" gracefully. When the _s_t_a_n_d___a_l_o_n_e option is
+              used in start, only the pid is a valid argument to stop.
+
+SSEEEE AALLSSOO
+       ffttpp((33)), hhttttppcc((33)), hhttttppdd((33)), ttffttpp((33))
+
+
+
+Ericsson AB                       inets 5.9.1                         inets(3)

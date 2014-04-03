@@ -1,0 +1,1270 @@
+qlc(3)                     Erlang Module Definition                     qlc(3)
+
+
+
+NNAAMMEE
+       qlc - Query Interface to Mnesia, ETS, Dets, etc
+
+DDEESSCCRRIIPPTTIIOONN
+       The _q_l_c module provides a query interface to Mnesia, ETS, Dets and
+       other data structures that implement an iterator style traversal of
+       objects.
+
+OOVVEERRVVIIEEWW
+       The _q_l_c module implements a query interface to _Q_L_C _t_a_b_l_e_s. Typical QLC
+       tables are ETS, Dets, and Mnesia tables. There is also support for user
+       defined tables, see the IImmpplleemmeennttiinngg aa QQLLCC ttaabbllee section. A _q_u_e_r_y is
+       stated using _Q_u_e_r_y _L_i_s_t _C_o_m_p_r_e_h_e_n_s_i_o_n_s (QLCs). The answers to a query
+       are determined by data in QLC tables that fulfill the constraints
+       expressed by the QLCs of the query. QLCs are similar to ordinary list
+       comprehensions as described in the Erlang Reference Manual and
+       Programming Examples except that variables introduced in patterns
+       cannot be used in list expressions. In fact, in the absence of
+       optimizations and options such as _c_a_c_h_e and _u_n_i_q_u_e (see below), every
+       QLC free of QLC tables evaluates to the same list of answers as the
+       identical ordinary list comprehension.
+
+       While ordinary list comprehensions evaluate to lists, calling qqllcc::qq//11,,22
+       returns a  _Q_u_e_r_y _H_a_n_d_l_e. To obtain all the answers to a query,
+       qqllcc::eevvaall//11,,22 should be called with the query handle as first argument.
+       Query handles are essentially functional objects ("funs") created in
+       the module calling _q_/_1_,_2. As the funs refer to the module's code, one
+       should be careful not to keep query handles too long if the module's
+       code is to be replaced. Code replacement is described in the EErrllaanngg
+       RReeffeerreennccee MMaannuuaall. The list of answers can also be traversed in chunks
+       by use of a _Q_u_e_r_y _C_u_r_s_o_r. Query cursors are created by calling
+       qqllcc::ccuurrssoorr//11,,22 with a query handle as first argument. Query cursors are
+       essentially Erlang processes. One answer at a time is sent from the
+       query cursor process to the process that created the cursor.
+
+SSYYNNTTAAXX
+       Syntactically QLCs have the same parts as ordinary list comprehensions:
+
+       [Expression || Qualifier1, Qualifier2, ...]
+
+       _E_x_p_r_e_s_s_i_o_n (the _t_e_m_p_l_a_t_e) is an arbitrary Erlang expression. Qualifiers
+       are either _f_i_l_t_e_r_s or _g_e_n_e_r_a_t_o_r_s. Filters are Erlang expressions
+       returning _b_o_o_l_(_). Generators have the form _P_a_t_t_e_r_n _<_- _L_i_s_t_E_x_p_r_e_s_s_i_o_n,
+       where _L_i_s_t_E_x_p_r_e_s_s_i_o_n is an expression evaluating to a query handle or a
+       list. Query handles are returned from _q_l_c_:_t_a_b_l_e_/_2, _q_l_c_:_a_p_p_e_n_d_/_1_,_2,
+       _q_l_c_:_s_o_r_t_/_1_,_2, _q_l_c_:_k_e_y_s_o_r_t_/_2_,_3, _q_l_c_:_q_/_1_,_2, and
+       _q_l_c_:_s_t_r_i_n_g___t_o___h_a_n_d_l_e_/_1_,_2_,_3.
+
+EEVVAALLUUAATTIIOONN
+       The evaluation of a query handle begins by the inspection of options
+       and the collection of information about tables. As a result qualifiers
+       are modified during the optimization phase. Next all list expressions
+       are evaluated. If a cursor has been created evaluation takes place in
+       the cursor process. For those list expressions that are QLCs, the list
+       expressions of the QLCs' generators are evaluated as well. One has to
+       be careful if list expressions have side effects since the order in
+       which list expressions are evaluated is unspecified. Finally the
+       answers are found by evaluating the qualifiers from left to right,
+       backtracking when some filter returns _f_a_l_s_e, or collecting the template
+       when all filters return _t_r_u_e.
+
+       Filters that do not return _b_o_o_l_(_) but fail are handled differently
+       depending on their syntax: if the filter is a guard it returns _f_a_l_s_e,
+       otherwise the query evaluation fails. This behavior makes it possible
+       for the _q_l_c module to do some optimizations without affecting the
+       meaning of a query. For example, when testing some position of a table
+       and one or more constants for equality, only the objects with equal
+       values are candidates for further evaluation. The other objects are
+       guaranteed to make the filter return _f_a_l_s_e, but never fail. The (small)
+       set of candidate objects can often be found by looking up some key
+       values of the table or by traversing the table using a match
+       specification. It is necessary to place the guard filters immediately
+       after the table's generator, otherwise the candidate objects will not
+       be restricted to a small set. The reason is that objects that could
+       make the query evaluation fail must not be excluded by looking up a key
+       or running a match specification.
+
+JJOOIINN
+       The _q_l_c module supports fast join of two query handles. Fast join is
+       possible if some position _P_1 of one query handler and some position _P_2
+       of another query handler are tested for equality. Two fast join methods
+       have been implemented:
+
+         * Lookup join traverses all objects of one query handle and finds
+           objects of the other handle (a QLC table) such that the values at
+           _P_1 and _P_2 match or compare equal. The _q_l_c module does not create
+           any indices but looks up values using the key position and the
+           indexed positions of the QLC table.
+
+         * Merge join sorts the objects of each query handle if necessary and
+           filters out objects where the values at _P_1 and _P_2 do not compare
+           equal. If there are many objects with the same value of _P_2 a
+           temporary file will be used for the equivalence classes.
+
+       The _q_l_c module warns at compile time if a QLC combines query handles in
+       such a way that more than one join is possible. In other words, there
+       is no query planner that can choose a good order between possible join
+       operations. It is up to the user to order the joins by introducing
+       query handles.
+
+       The join is to be expressed as a guard filter. The filter must be
+       placed immediately after the two joined generators, possibly after
+       guard filters that use variables from no other generators but the two
+       joined generators. The _q_l_c module inspects the operands of _=_:_=_/_2, _=_=_/_2,
+       _i_s___r_e_c_o_r_d_/_2, _e_l_e_m_e_n_t_/_2, and logical operators (_a_n_d_/_2, _o_r_/_2, _a_n_d_a_l_s_o_/_2,
+       _o_r_e_l_s_e_/_2, _x_o_r_/_2) when determining which joins to consider.
+
+CCOOMMMMOONN OOPPTTIIOONNSS
+       The following options are accepted by _c_u_r_s_o_r_/_2, _e_v_a_l_/_2, _f_o_l_d_/_4, and
+       _i_n_f_o_/_2:
+
+         * _{_c_a_c_h_e___a_l_l_, _C_a_c_h_e_} where _C_a_c_h_e is equal to _e_t_s or _l_i_s_t adds a
+           _{_c_a_c_h_e_, _C_a_c_h_e_} option to every list expression of the query except
+           tables and lists. Default is _{_c_a_c_h_e___a_l_l_, _n_o_}. The option _c_a_c_h_e___a_l_l
+           is equivalent to _{_c_a_c_h_e___a_l_l_, _e_t_s_}.
+
+         * _{_m_a_x___l_i_s_t___s_i_z_e_, _M_a_x_L_i_s_t_S_i_z_e_} where _M_a_x_L_i_s_t_S_i_z_e is the size in bytes
+           of terms on the external format. If the accumulated size of
+           collected objects exceeds _M_a_x_L_i_s_t_S_i_z_e the objects are written onto
+           a temporary file. This option is used by the _{_c_a_c_h_e_, _l_i_s_t_} option
+           as well as by the merge join method. Default is 512*1024 bytes.
+
+         * _{_t_m_p_d_i_r___u_s_a_g_e_, _T_m_p_F_i_l_e_U_s_a_g_e_} determines the action taken when _q_l_c
+           is about to create temporary files on the directory set by the
+           _t_m_p_d_i_r option. If the value is _n_o_t___a_l_l_o_w_e_d an error tuple is
+           returned, otherwise temporary files are created as needed. Default
+           is _a_l_l_o_w_e_d which means that no further action is taken. The values
+           _i_n_f_o___m_s_g, _w_a_r_n_i_n_g___m_s_g, and _e_r_r_o_r___m_s_g mean that the function with
+           the corresponding name in the module _e_r_r_o_r___l_o_g_g_e_r is called for
+           printing some information (currently the stacktrace).
+
+         * _{_t_m_p_d_i_r_, _T_e_m_p_D_i_r_e_c_t_o_r_y_} sets the directory used by merge join for
+           temporary files and by the _{_c_a_c_h_e_, _l_i_s_t_} option. The option also
+           overrides the _t_m_p_d_i_r option of _k_e_y_s_o_r_t_/_3 and _s_o_r_t_/_2. The default
+           value is _"_" which means that the directory returned by
+           _f_i_l_e_:_g_e_t___c_w_d_(_) is used.
+
+         * _{_u_n_i_q_u_e___a_l_l_, _t_r_u_e_} adds a _{_u_n_i_q_u_e_, _t_r_u_e_} option to every list
+           expression of the query. Default is _{_u_n_i_q_u_e___a_l_l_, _f_a_l_s_e_}. The option
+           _u_n_i_q_u_e___a_l_l is equivalent to _{_u_n_i_q_u_e___a_l_l_, _t_r_u_e_}.
+
+GGEETTTTIINNGG SSTTAARRTTEEDD
+       As already mentioned queries are stated in the list comprehension
+       syntax as described in the EErrllaanngg RReeffeerreennccee MMaannuuaall. In the following
+       some familiarity with list comprehensions is assumed. There are
+       examples in PPrrooggrraammmmiinngg EExxaammpplleess that can get you started. It should be
+       stressed that list comprehensions do not add any computational power to
+       the language; anything that can be done with list comprehensions can
+       also be done without them. But they add a syntax for expressing simple
+       search problems which is compact and clear once you get used to it.
+
+       Many list comprehension expressions can be evaluated by the _q_l_c module.
+       Exceptions are expressions such that variables introduced in patterns
+       (or filters) are used in some generator later in the list
+       comprehension. As an example consider an implementation of
+       lists:append(L): _[_X _|_|_Y _<_- _L_, _X _<_- _Y_]. Y is introduced in the first
+       generator and used in the second. The ordinary list comprehension is
+       normally to be preferred when there is a choice as to which to use. One
+       difference is that _q_l_c_:_e_v_a_l_/_1_,_2 collects answers in a list which is
+       finally reversed, while list comprehensions collect answers on the
+       stack which is finally unwound.
+
+       What the _q_l_c module primarily adds to list comprehensions is that data
+       can be read from QLC tables in small chunks. A QLC table is created by
+       calling _q_l_c_:_t_a_b_l_e_/_2. Usually _q_l_c_:_t_a_b_l_e_/_2 is not called directly from
+       the query but via an interface function of some data structure. There
+       are a few examples of such functions in Erlang/OTP: _m_n_e_s_i_a_:_t_a_b_l_e_/_1_,_2,
+       _e_t_s_:_t_a_b_l_e_/_1_,_2, and _d_e_t_s_:_t_a_b_l_e_/_1_,_2. For a given data structure there can
+       be several functions that create QLC tables, but common for all these
+       functions is that they return a query handle created by _q_l_c_:_t_a_b_l_e_/_2.
+       Using the QLC tables provided by OTP is probably sufficient in most
+       cases, but for the more advanced user the section IImmpplleemmeennttiinngg aa QQLLCC
+       ttaabbllee describes the implementation of a function calling _q_l_c_:_t_a_b_l_e_/_2.
+
+       Besides _q_l_c_:_t_a_b_l_e_/_2 there are other functions that return query
+       handles. They might not be used as often as tables, but are useful from
+       time to time. _q_l_c_:_a_p_p_e_n_d traverses objects from several tables or lists
+       after each other. If, for instance, you want to traverse all answers to
+       a query QH and then finish off by a term _{_f_i_n_i_s_h_e_d_}, you can do that by
+       calling _q_l_c_:_a_p_p_e_n_d_(_Q_H_, _[_{_f_i_n_i_s_h_e_d_}_]_). _a_p_p_e_n_d first returns all objects
+       of QH, then _{_f_i_n_i_s_h_e_d_}. If there is one tuple _{_f_i_n_i_s_h_e_d_} among the
+       answers to QH it will be returned twice from _a_p_p_e_n_d.
+
+       As another example, consider concatenating the answers to two queries
+       QH1 and QH2 while removing all duplicates. The means to accomplish this
+       is to use the _u_n_i_q_u_e option:
+
+       qlc:q([X || X <- qlc:append(QH1, QH2)], {unique, true})
+
+       The cost is substantial: every returned answer will be stored in an ETS
+       table. Before returning an answer it is looked up in the ETS table to
+       check if it has already been returned. Without the _u_n_i_q_u_e options all
+       answers to QH1 would be returned followed by all answers to QH2. The
+       _u_n_i_q_u_e options keeps the order between the remaining answers.
+
+       If the order of the answers is not important there is the alternative
+       to sort the answers uniquely:
+
+       qlc:sort(qlc:q([X || X <- qlc:append(QH1, QH2)], {unique, true})).
+
+       This query also removes duplicates but the answers will be sorted. If
+       there are many answers temporary files will be used. Note that in order
+       to get the first unique answer all answers have to be found and sorted.
+       Both alternatives find duplicates by comparing answers, that is, if A1
+       and A2 are answers found in that order, then A2 is a removed if A1 ==
+       A2.
+
+       To return just a few answers cursors can be used. The following code
+       returns no more than five answers using an ETS table for storing the
+       unique answers:
+
+       C = qlc:cursor(qlc:q([X || X <- qlc:append(QH1, QH2)],{unique,true})),
+       R = qlc:next_answers(C, 5),
+       ok = qlc:delete_cursor(C),
+       R.
+
+       Query list comprehensions are convenient for stating constraints on
+       data from two or more tables. An example that does a natural join on
+       two query handles on position 2:
+
+       qlc:q([{X1,X2,X3,Y1} ||
+                 {X1,X2,X3} <- QH1,
+                 {Y1,Y2} <- QH2,
+                 X2 =:= Y2])
+
+       The _q_l_c module will evaluate this differently depending on the query
+       handles _Q_H_1 and _Q_H_2. If, for example, _X_2 is matched against the key of
+       a QLC table the lookup join method will traverse the objects of _Q_H_2
+       while looking up key values in the table. On the other hand, if neither
+       _X_2 nor _Y_2 is matched against the key or an indexed position of a QLC
+       table, the merge join method will make sure that _Q_H_1 and _Q_H_2 are both
+       sorted on position 2 and next do the join by traversing the objects one
+       by one.
+
+       The _j_o_i_n option can be used to force the _q_l_c module to use a certain
+       join method. For the rest of this section it is assumed that the
+       excessively slow join method called "nested loop" has been chosen:
+
+       qlc:q([{X1,X2,X3,Y1} ||
+                 {X1,X2,X3} <- QH1,
+                 {Y1,Y2} <- QH2,
+                 X2 =:= Y2],
+             {join, nested_loop})
+
+       In this case the filter will be applied to every possible pair of
+       answers to QH1 and QH2, one at a time. If there are M answers to QH1
+       and N answers to QH2 the filter will be run M*N times.
+
+       If QH2 is a call to the function for _g_b___t_r_e_e_s as defined in the
+       IImmpplleemmeennttiinngg aa QQLLCC ttaabbllee section, _g_b___t_a_b_l_e_:_t_a_b_l_e_/_1, the iterator for
+       the gb-tree will be initiated for each answer to QH1 after which the
+       objects of the gb-tree will be returned one by one. This is probably
+       the most efficient way of traversing the table in that case since it
+       takes minimal computational power to get the following object. But if
+       QH2 is not a table but a more complicated QLC, it can be more efficient
+       use some RAM memory for collecting the answers in a cache, particularly
+       if there are only a few answers. It must then be assumed that
+       evaluating QH2 has no side effects so that the meaning of the query
+       does not change if QH2 is evaluated only once. One way of caching the
+       answers is to evaluate QH2 first of all and substitute the list of
+       answers for QH2 in the query. Another way is to use the _c_a_c_h_e option.
+       It is stated like this:
+
+       QH2' = qlc:q([X || X <- QH2], {cache, ets})
+
+       or just
+
+       QH2' = qlc:q([X || X <- QH2], cache)
+
+       The effect of the _c_a_c_h_e option is that when the generator QH2' is run
+       the first time every answer is stored in an ETS table. When next answer
+       of QH1 is tried, answers to QH2' are copied from the ETS table which is
+       very fast. As for the _u_n_i_q_u_e option the cost is a possibly substantial
+       amount of RAM memory. The _{_c_a_c_h_e_, _l_i_s_t_} option offers the possibility
+       to store the answers in a list on the process heap. While this has the
+       potential of being faster than ETS tables since there is no need to
+       copy answers from the table it can often result in slower evaluation
+       due to more garbage collections of the process' heap as well as
+       increased RAM memory consumption due to larger heaps. Another drawback
+       with cache lists is that if the size of the list exceeds a limit a
+       temporary file will be used. Reading the answers from a file is very
+       much slower than copying them from an ETS table. But if the available
+       RAM memory is scarce setting the lliimmiitt to some low value is an
+       alternative.
+
+       There is an option _c_a_c_h_e___a_l_l that can be set to _e_t_s or _l_i_s_t when
+       evaluating a query. It adds a _c_a_c_h_e or _{_c_a_c_h_e_, _l_i_s_t_} option to every
+       list expression except QLC tables and lists on all levels of the query.
+       This can be used for testing if caching would improve efficiency at
+       all. If the answer is yes further testing is needed to pinpoint the
+       generators that should be cached.
+
+IIMMPPLLEEMMEENNTTIINNGG AA QQLLCC TTAABBLLEE
+       As an example of how to use the qqllcc::ttaabbllee//22 function the implementation
+       of a QLC table for the ggbb__ttrreeeess module is given:
+
+       -module(gb_table).
+
+       -export([table/1]).
+
+       table(T) ->
+           TF = fun() -> qlc_next(gb_trees:next(gb_trees:iterator(T))) end,
+           InfoFun = fun(num_of_objects) -> gb_trees:size(T);
+                        (keypos) -> 1;
+                        (is_sorted_key) -> true;
+                        (is_unique_objects) -> true;
+                        (_) -> undefined
+                     end,
+           LookupFun =
+               fun(1, Ks) ->
+                       lists:flatmap(fun(K) ->
+                                             case gb_trees:lookup(K, T) of
+                                                 {value, V} -> [{K,V}];
+                                                 none -> []
+                                             end
+                                     end, Ks)
+               end,
+           FormatFun =
+               fun({all, NElements, ElementFun}) ->
+                       ValsS = io_lib:format("gb_trees:from_orddict(~w)",
+                                             [gb_nodes(T, NElements, ElementFun)]),
+                       io_lib:format("gb_table:table(~s)", [ValsS]);
+                  ({lookup, 1, KeyValues, _NElements, ElementFun}) ->
+                       ValsS = io_lib:format("gb_trees:from_orddict(~w)",
+                                             [gb_nodes(T, infinity, ElementFun)]),
+                       io_lib:format("lists:flatmap(fun(K) -> "
+                                     "case gb_trees:lookup(K, ~s) of "
+                                     "{value, V} -> [{K,V}];none -> [] end "
+                                     "end, ~w)",
+                                     [ValsS, [ElementFun(KV) || KV <- KeyValues]])
+               end,
+           qlc:table(TF, [{info_fun, InfoFun}, {format_fun, FormatFun},
+                          {lookup_fun, LookupFun},{key_equality,'=='}]).
+
+       qlc_next({X, V, S}) ->
+           [{X,V} | fun() -> qlc_next(gb_trees:next(S)) end];
+       qlc_next(none) ->
+           [].
+
+       gb_nodes(T, infinity, ElementFun) ->
+           gb_nodes(T, -1, ElementFun);
+       gb_nodes(T, NElements, ElementFun) ->
+           gb_iter(gb_trees:iterator(T), NElements, ElementFun).
+
+       gb_iter(_I, 0, _EFun) ->
+           '...';
+       gb_iter(I0, N, EFun) ->
+           case gb_trees:next(I0) of
+               {X, V, I} ->
+                   [EFun({X,V}) | gb_iter(I, N-1, EFun)];
+               none ->
+                   []
+           end.
+
+       _T_F is the traversal function. The _q_l_c module requires that there is a
+       way of traversing all objects of the data structure; in _g_b___t_r_e_e_s there
+       is an iterator function suitable for that purpose. Note that for each
+       object returned a new fun is created. As long as the list is not
+       terminated by _[_] it is assumed that the tail of the list is a nullary
+       function and that calling the function returns further objects (and
+       functions).
+
+       The lookup function is optional. It is assumed that the lookup function
+       always finds values much faster than it would take to traverse the
+       table. The first argument is the position of the key. Since _q_l_c___n_e_x_t
+       returns the objects as {Key, Value} pairs the position is 1. Note that
+       the lookup function should return {Key, Value} pairs, just as the
+       traversal function does.
+
+       The format function is also optional. It is called by _q_l_c_:_i_n_f_o to give
+       feedback at runtime of how the query will be evaluated. One should try
+       to give as good feedback as possible without showing too much details.
+       In the example at most 7 objects of the table are shown. The format
+       function handles two cases: _a_l_l means that all objects of the table
+       will be traversed; _{_l_o_o_k_u_p_, _1_, _K_e_y_V_a_l_u_e_s_} means that the lookup
+       function will be used for looking up key values.
+
+       Whether the whole table will be traversed or just some keys looked up
+       depends on how the query is stated. If the query has the form
+
+       qlc:q([T || P <- LE, F])
+
+       and P is a tuple, the _q_l_c module analyzes P and F in compile time to
+       find positions of the tuple P that are tested for equality to
+       constants. If such a position at runtime turns out to be the key
+       position, the lookup function can be used, otherwise all objects of the
+       table have to be traversed. It is the info function _I_n_f_o_F_u_n that
+       returns the key position. There can be indexed positions as well, also
+       returned by the info function. An index is an extra table that makes
+       lookup on some position fast. Mnesia maintains indices upon request,
+       thereby introducing so called secondary keys. The _q_l_c module prefers to
+       look up objects using the key before secondary keys regardless of the
+       number of constants to look up.
+
+KKEEYY EEQQUUAALLIITTYY
+       In Erlang there are two operators for testing term equality, namely
+       _=_=_/_2 and _=_:_=_/_2. The difference between them is all about the integers
+       that can be represented by floats. For instance, _2 _=_= _2_._0 evaluates to
+       _t_r_u_e while _2 _=_:_= _2_._0 evaluates to _f_a_l_s_e. Normally this is a minor
+       issue, but the _q_l_c module cannot ignore the difference, which affects
+       the user's choice of operators in QLCs.
+
+       If the _q_l_c module can find out at compile time that some constant is
+       free of integers, it does not matter which one of _=_=_/_2 or _=_:_=_/_2 is
+       used:
+
+       1> E1 = ets:new(t, [set]), % uses =:=/2 for key equality
+       Q1 = qlc:q([K ||
+       {K} <- ets:table(E1),
+       K == 2.71 orelse K == a]),
+       io:format("~s~n", [qlc:info(Q1)]).
+       ets:match_spec_run(lists:flatmap(fun(V) ->
+                                               ets:lookup(20493, V)
+                                        end,
+                                        [a,2.71]),
+                          ets:match_spec_compile([{{'$1'},[],['$1']}]))
+
+       In the example the _=_=_/_2 operator has been handled exactly as _=_:_=_/_2
+       would have been handled. On the other hand, if it cannot be determined
+       at compile time that some constant is free of integers and the table
+       uses _=_:_=_/_2 when comparing keys for equality (see the option
+       kkeeyy__eeqquuaalliittyy), the _q_l_c module will not try to look up the constant. The
+       reason is that there is in the general case no upper limit on the
+       number of key values that can compare equal to such a constant; every
+       combination of integers and floats has to be looked up:
+
+       2> E2 = ets:new(t, [set]),
+       true = ets:insert(E2, [{{2,2},a},{{2,2.0},b},{{2.0,2},c}]),
+       F2 = fun(I) ->
+       qlc:q([V || {K,V} <- ets:table(E2), K == I])
+       end,
+       Q2 = F2({2,2}),
+       io:format("~s~n", [qlc:info(Q2)]).
+       ets:table(53264,
+                 [{traverse,
+                   {select,[{{'$1','$2'},[{'==','$1',{const,{2,2}}}],['$2']}]}}])
+       3> lists:sort(qlc:e(Q2)).
+       [a,b,c]
+
+       Looking up just _{_2_,_2_} would not return _b and _c.
+
+       If the table uses _=_=_/_2 when comparing keys for equality, the _q_l_c module
+       will look up the constant regardless of which operator is used in the
+       QLC. However, _=_=_/_2 is to be preferred:
+
+       4> E3 = ets:new(t, [ordered_set]), % uses ==/2 for key equality
+       true = ets:insert(E3, [{{2,2.0},b}]),
+       F3 = fun(I) ->
+       qlc:q([V || {K,V} <- ets:table(E3), K == I])
+       end,
+       Q3 = F3({2,2}),
+       io:format("~s~n", [qlc:info(Q3)]).
+       ets:match_spec_run(ets:lookup(86033, {2,2}),
+                          ets:match_spec_compile([{{'$1','$2'},[],['$2']}]))
+       5> qlc:e(Q3).
+       [b]
+
+       Lookup join is handled analogously to lookup of constants in a table:
+       if the join operator is _=_=_/_2 and the table where constants are to be
+       looked up uses _=_:_=_/_2 when testing keys for equality, the _q_l_c module
+       will not consider lookup join for that table.
+
+DDAATTAA TTYYPPEESS
+       aabbssttrraacctt__eexxpprr(()) = eerrll__ppaarrssee::aabbssttrraacctt__eexxpprr(())
+
+              Parse trees for Erlang expression, see the aabbssttrraacctt ffoorrmmaatt
+              documentation in the ERTS User's Guide.
+
+       aannsswweerr(()) = term()
+
+       aannsswweerrss(()) = [aannsswweerr(())]
+
+       ccaacchhee(()) = ets | list | no
+
+       mmaattcchh__eexxpprreessssiioonn(()) = eettss::mmaattcchh__ssppeecc(())
+
+              Match specification, see the mmaattcchh ssppeecciiffiiccaattiioonn documentation
+              in the ERTS User's Guide and mmss__ttrraannssffoorrmm((33))..
+
+       nnoo__ffiilleess(()) = integer() >= 1
+
+              Actually an integer > 1.
+
+       kkeeyy__ppooss(()) = integer() >= 1 | [integer() >= 1]
+
+       mmaaxx__lliisstt__ssiizzee(()) = integer() >= 0
+
+       oorrddeerr(()) = ascending | descending | oorrddeerr__ffuunn(())
+
+       oorrddeerr__ffuunn(()) = fun((term(), term()) -> boolean())
+
+       qquueerryy__ccuurrssoorr(())
+
+              A qquueerryy ccuurrssoorr.
+
+       qquueerryy__hhaannddllee(())
+
+              A qquueerryy hhaannddllee.
+
+       qquueerryy__hhaannddllee__oorr__lliisstt(()) = qquueerryy__hhaannddllee(()) | list()
+
+       qquueerryy__lliisstt__ccoommpprreehheennssiioonn(()) = term()
+
+              A literal qquueerryy lliisstt ccoommpprreehheennssiioonn.
+
+       ssppaawwnn__ooppttiioonnss(()) = default | [pprroocc__lliibb::ssppaawwnn__ooppttiioonn(())]
+
+       ssoorrtt__ooppttiioonnss(()) = [ssoorrtt__ooppttiioonn(())] | ssoorrtt__ooppttiioonn(())
+
+       ssoorrtt__ooppttiioonn(()) = {compressed, boolean()}
+                     | {no_files, nnoo__ffiilleess(())}
+                     | {order, oorrddeerr(())}
+                     | {size, integer() >= 1}
+                     | {tmpdir, ttmmpp__ddiirreeccttoorryy(())}
+                     | {unique, boolean()}
+
+              See ffiillee__ssoorrtteerr((33)).
+
+       ttmmpp__ddiirreeccttoorryy(()) = [] | ffiillee::nnaammee(())
+
+       ttmmpp__ffiillee__uussaaggee(()) = allowed
+                        | not_allowed
+                        | info_msg
+                        | warning_msg
+                        | error_msg
+
+EEXXPPOORRTTSS
+       aappppeenndd((QQHHLL)) -->> QQHH
+
+              Types:
+
+                 QHL = [qquueerryy__hhaannddllee__oorr__lliisstt(())]
+                 QH = qquueerryy__hhaannddllee(())
+
+              Returns a query handle. When evaluating the query handle _Q_H all
+              answers to the first query handle in _Q_H_L are returned followed
+              by all answers to the rest of the query handles in _Q_H_L.
+
+       aappppeenndd((QQHH11,, QQHH22)) -->> QQHH33
+
+              Types:
+
+                 QH1 = QH2 = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 QH3 = qquueerryy__hhaannddllee(())
+
+              Returns a query handle. When evaluating the query handle _Q_H_3 all
+              answers to _Q_H_1 are returned followed by all answers to _Q_H_2.
+
+              _a_p_p_e_n_d_(_Q_H_1_, _Q_H_2_) is equivalent to _a_p_p_e_n_d_(_[_Q_H_1_, _Q_H_2_]_).
+
+       ccuurrssoorr((QQHH)) -->> CCuurrssoorr
+
+       ccuurrssoorr((QQHH,, OOppttiioonnss)) -->> CCuurrssoorr
+
+              Types:
+
+                 QH = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 Options = [Option] | Option
+                 Option = {cache_all, ccaacchhee(())}
+                        | cache_all
+                        | {max_list_size, mmaaxx__lliisstt__ssiizzee(())}
+                        | {spawn_options, ssppaawwnn__ooppttiioonnss(())}
+                        | {tmpdir_usage, ttmmpp__ffiillee__uussaaggee(())}
+                        | {tmpdir, ttmmpp__ddiirreeccttoorryy(())}
+                        | {unique_all, boolean()}
+                        | unique_all
+                 Cursor = qquueerryy__ccuurrssoorr(())
+
+              Creates a query cursor and makes the calling process the owner
+              of the cursor. The cursor is to be used as argument to
+              _n_e_x_t___a_n_s_w_e_r_s_/_1_,_2 and (eventually) _d_e_l_e_t_e___c_u_r_s_o_r_/_1. Calls
+              _e_r_l_a_n_g_:_s_p_a_w_n___o_p_t to spawn and link a process which will evaluate
+              the query handle. The value of the option _s_p_a_w_n___o_p_t_i_o_n_s is used
+              as last argument when calling _s_p_a_w_n___o_p_t. The default value is
+              _[_l_i_n_k_].
+
+              1> QH = qlc:q([{X,Y} || X <- [a,b], Y <- [1,2]]),
+              QC = qlc:cursor(QH),
+              qlc:next_answers(QC, 1).
+              [{a,1}]
+              2> qlc:next_answers(QC, 1).
+              [{a,2}]
+              3> qlc:next_answers(QC, all_remaining).
+              [{b,1},{b,2}]
+              4> qlc:delete_cursor(QC).
+              ok
+
+              _c_u_r_s_o_r_(_Q_H_) is equivalent to _c_u_r_s_o_r_(_Q_H_, _[_]_).
+
+       ddeelleettee__ccuurrssoorr((QQuueerryyCCuurrssoorr)) -->> ookk
+
+              Types:
+
+                 QueryCursor = qquueerryy__ccuurrssoorr(())
+
+              Deletes a query cursor. Only the owner of the cursor can delete
+              the cursor.
+
+       eevvaall((QQHH)) -->> AAnnsswweerrss || EErrrroorr
+
+       eevvaall((QQHH,, OOppttiioonnss)) -->> AAnnsswweerrss || EErrrroorr
+
+       ee((QQHH)) -->> AAnnsswweerrss || EErrrroorr
+
+       ee((QQHH,, OOppttiioonnss)) -->> AAnnsswweerrss || EErrrroorr
+
+              Types:
+
+                 QH = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 Options = [Option] | Option
+                 Option = {cache_all, ccaacchhee(())}
+                        | cache_all
+                        | {max_list_size, mmaaxx__lliisstt__ssiizzee(())}
+                        | {tmpdir_usage, ttmmpp__ffiillee__uussaaggee(())}
+                        | {tmpdir, ttmmpp__ddiirreeccttoorryy(())}
+                        | {unique_all, boolean()}
+                        | unique_all
+                 Answers = aannsswweerrss(())
+                 Error = {error, module(), Reason}
+                 Reason = ffiillee__ssoorrtteerr::rreeaassoonn(())
+
+              Evaluates a query handle in the calling process and collects all
+              answers in a list.
+
+              1> QH = qlc:q([{X,Y} || X <- [a,b], Y <- [1,2]]),
+              qlc:eval(QH).
+              [{a,1},{a,2},{b,1},{b,2}]
+
+              _e_v_a_l_(_Q_H_) is equivalent to _e_v_a_l_(_Q_H_, _[_]_).
+
+       ffoolldd((FFuunnccttiioonn,, AAcccc00,, QQHH)) -->> AAcccc11 || EErrrroorr
+
+       ffoolldd((FFuunnccttiioonn,, AAcccc00,, QQHH,, OOppttiioonnss)) -->> AAcccc11 || EErrrroorr
+
+              Types:
+
+                 QH = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 Function = fun((aannsswweerr(()), AccIn) -> AccOut)
+                 Acc0 = Acc1 = AccIn = AccOut = term()
+                 Options = [Option] | Option
+                 Option = {cache_all, ccaacchhee(())}
+                        | cache_all
+                        | {max_list_size, mmaaxx__lliisstt__ssiizzee(())}
+                        | {tmpdir_usage, ttmmpp__ffiillee__uussaaggee(())}
+                        | {tmpdir, ttmmpp__ddiirreeccttoorryy(())}
+                        | {unique_all, boolean()}
+                        | unique_all
+                 Error = {error, module(), Reason}
+                 Reason = ffiillee__ssoorrtteerr::rreeaassoonn(())
+
+              Calls _F_u_n_c_t_i_o_n on successive answers to the query handle
+              together with an extra argument _A_c_c_I_n. The query handle and the
+              function are evaluated in the calling process. _F_u_n_c_t_i_o_n must
+              return a new accumulator which is passed to the next call. _A_c_c_0
+              is returned if there are no answers to the query handle.
+
+              1> QH = [1,2,3,4,5,6],
+              qlc:fold(fun(X, Sum) -> X + Sum end, 0, QH).
+              21
+
+              _f_o_l_d_(_F_u_n_c_t_i_o_n_, _A_c_c_0_, _Q_H_) is equivalent to _f_o_l_d_(_F_u_n_c_t_i_o_n_, _A_c_c_0_,
+              _Q_H_, _[_]_).
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorr)) -->> CChhaarrss
+
+              Types:
+
+                 Error = {error, module(), term()}
+                 Chars = iioo__lliibb::cchhaarrss(())
+
+              Returns a descriptive string in English of an error tuple
+              returned by some of the functions of the _q_l_c module or the parse
+              transform. This function is mainly used by the compiler invoking
+              the parse transform.
+
+       iinnffoo((QQHH)) -->> IInnffoo
+
+       iinnffoo((QQHH,, OOppttiioonnss)) -->> IInnffoo
+
+              Types:
+
+                 QH = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 Options = [Option] | Option
+                 Option = EvalOption | ReturnOption
+                 EvalOption = {cache_all, ccaacchhee(())}
+                            | cache_all
+                            | {max_list_size, mmaaxx__lliisstt__ssiizzee(())}
+                            | {tmpdir_usage, ttmmpp__ffiillee__uussaaggee(())}
+                            | {tmpdir, ttmmpp__ddiirreeccttoorryy(())}
+                            | {unique_all, boolean()}
+                            | unique_all
+                 ReturnOption = {depth, Depth}
+                              | {flat, boolean()}
+                              | {format, Format}
+                              | {n_elements, NElements}
+                 Depth = infinity | integer() >= 0
+                 Format = abstract_code | string
+                 NElements = infinity | integer() >= 1
+                 Info = aabbssttrraacctt__eexxpprr(()) | string()
+
+              Returns information about a query handle. The information
+              describes the simplifications and optimizations that are the
+              results of preparing the query for evaluation. This function is
+              probably useful mostly during debugging.
+
+              The information has the form of an Erlang expression where QLCs
+              most likely occur. Depending on the format functions of
+              mentioned QLC tables it may not be absolutely accurate.
+
+              The default is to return a sequence of QLCs in a block, but if
+              the option _{_f_l_a_t_, _f_a_l_s_e_} is given, one single QLC is returned.
+              The default is to return a string, but if the option _{_f_o_r_m_a_t_,
+              _a_b_s_t_r_a_c_t___c_o_d_e_} is given, abstract code is returned instead. In
+              the abstract code port identifiers, references, and pids are
+              represented by strings. The default is to return all elements in
+              lists, but if the _{_n___e_l_e_m_e_n_t_s_, _N_E_l_e_m_e_n_t_s_} option is given, only
+              a limited number of elements are returned. The default is to
+              show all of objects and match specifications, but if the _{_d_e_p_t_h_,
+              _D_e_p_t_h_} option is given, parts of terms below a certain depth are
+              replaced by _'_._._._'.
+
+              1> QH = qlc:q([{X,Y} || X <- [x,y], Y <- [a,b]]),
+              io:format("~s~n", [qlc:info(QH, unique_all)]).
+              begin
+                  V1 =
+                      qlc:q([
+                             SQV ||
+                                 SQV <- [x,y]
+                            ],
+                            [{unique,true}]),
+                  V2 =
+                      qlc:q([
+                             SQV ||
+                                 SQV <- [a,b]
+                            ],
+                            [{unique,true}]),
+                  qlc:q([
+                         {X,Y} ||
+                             X <- V1,
+                             Y <- V2
+                        ],
+                        [{unique,true}])
+              end
+
+              In this example two simple QLCs have been inserted just to hold
+              the _{_u_n_i_q_u_e_, _t_r_u_e_} option.
+
+              1> E1 = ets:new(e1, []),
+              E2 = ets:new(e2, []),
+              true = ets:insert(E1, [{1,a},{2,b}]),
+              true = ets:insert(E2, [{a,1},{b,2}]),
+              Q = qlc:q([{X,Z,W} ||
+              {X, Z} <- ets:table(E1),
+              {W, Y} <- ets:table(E2),
+              X =:= Y]),
+              io:format("~s~n", [qlc:info(Q)]).
+              begin
+                  V1 =
+                      qlc:q([
+                             P0 ||
+                                 P0 = {W,Y} <- ets:table(17)
+                            ]),
+                  V2 =
+                      qlc:q([
+                             [G1|G2] ||
+                                 G2 <- V1,
+                                 G1 <- ets:table(16),
+                                 element(2, G1) =:= element(1, G2)
+                            ],
+                            [{join,lookup}]),
+                  qlc:q([
+                         {X,Z,W} ||
+                             [{X,Z}|{W,Y}] <- V2
+                        ])
+              end
+
+              In this example the query list comprehension _V_2 has been
+              inserted to show the joined generators and the join method
+              chosen. A convention is used for lookup join: the first
+              generator (_G_2) is the one traversed, the second one (_G_1) is the
+              table where constants are looked up.
+
+              _i_n_f_o_(_Q_H_) is equivalent to _i_n_f_o_(_Q_H_, _[_]_).
+
+       kkeeyyssoorrtt((KKeeyyPPooss,, QQHH11)) -->> QQHH22
+
+       kkeeyyssoorrtt((KKeeyyPPooss,, QQHH11,, SSoorrttOOppttiioonnss)) -->> QQHH22
+
+              Types:
+
+                 KeyPos = kkeeyy__ppooss(())
+                 SortOptions = ssoorrtt__ooppttiioonnss(())
+                 QH1 = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 QH2 = qquueerryy__hhaannddllee(())
+
+              Returns a query handle. When evaluating the query handle _Q_H_2 the
+              answers to the query handle _Q_H_1 are sorted by
+              ffiillee__ssoorrtteerr::kkeeyyssoorrtt//44 according to the options.
+
+              The sorter will use temporary files only if _Q_H_1 does not
+              evaluate to a list and the size of the binary representation of
+              the answers exceeds _S_i_z_e bytes, where _S_i_z_e is the value of the
+              _s_i_z_e option.
+
+              _k_e_y_s_o_r_t_(_K_e_y_P_o_s_, _Q_H_1_) is equivalent to _k_e_y_s_o_r_t_(_K_e_y_P_o_s_, _Q_H_1_, _[_]_).
+
+       nneexxtt__aannsswweerrss((QQuueerryyCCuurrssoorr)) -->> AAnnsswweerrss || EErrrroorr
+
+       nneexxtt__aannsswweerrss((QQuueerryyCCuurrssoorr,, NNuummbbeerrOOffAAnnsswweerrss)) -->> AAnnsswweerrss || EErrrroorr
+
+              Types:
+
+                 QueryCursor = qquueerryy__ccuurrssoorr(())
+                 Answers = aannsswweerrss(())
+                 NumberOfAnswers = all_remaining | integer() >= 1
+                 Error = {error, module(), Reason}
+                 Reason = ffiillee__ssoorrtteerr::rreeaassoonn(())
+
+              Returns some or all of the remaining answers to a query cursor.
+              Only the owner of _Q_u_e_r_y_C_u_r_s_o_r can retrieve answers.
+
+              The optional argument _N_u_m_b_e_r_O_f_A_n_s_w_e_r_sdetermines the maximum
+              number of answers returned. The default value is _1_0. If less
+              than the requested number of answers is returned, subsequent
+              calls to _n_e_x_t___a_n_s_w_e_r_s will return _[_].
+
+       qq((QQLLCC)) -->> QQHH
+
+       qq((QQLLCC,, OOppttiioonnss)) -->> QQHH
+
+              Types:
+
+                 QH = qquueerryy__hhaannddllee(())
+                 Options = [Option] | Option
+                 Option = {max_lookup, MaxLookup}
+                        | {cache, ccaacchhee(())}
+                        | cache
+                        | {join, Join}
+                        | {lookup, Lookup}
+                        | {unique, boolean()}
+                        | unique
+                 MaxLookup = integer() >= 0 | infinity
+                 Join = any | lookup | merge | nested_loop
+                 Lookup = boolean() | any
+                 QLC = qquueerryy__lliisstt__ccoommpprreehheennssiioonn(())
+
+              Returns a query handle for a query list comprehension. The query
+              list comprehension must be the first argument to _q_l_c_:_q_/_1_,_2 or it
+              will be evaluated as an ordinary list comprehension. It is also
+              necessary to add the line
+
+              -include_lib("stdlib/include/qlc.hrl").
+
+              to the source file. This causes a parse transform to substitute
+              a fun for the query list comprehension. The (compiled) fun will
+              be called when the query handle is evaluated.
+
+              When calling _q_l_c_:_q_/_1_,_2 from the Erlang shell the parse transform
+              is automatically called. When this happens the fun substituted
+              for the query list comprehension is not compiled but will be
+              evaluated by _e_r_l___e_v_a_l_(_3_). This is also true when expressions are
+              evaluated by means of _f_i_l_e_:_e_v_a_l_/_1_,_2 or in the debugger.
+
+              To be very explicit, this will not work:
+
+              A = [X || {X} <- [{1},{2}]],
+              QH = qlc:q(A),
+
+              The variable _A will be bound to the evaluated value of the list
+              comprehension (_[_1_,_2_]). The compiler complains with an error
+              message ("argument is not a query list comprehension"); the
+              shell process stops with a _b_a_d_a_r_g reason.
+
+              _q_(_Q_L_C_) is equivalent to _q_(_Q_L_C_, _[_]_).
+
+              The _{_c_a_c_h_e_, _e_t_s_} option can be used to cache the answers to a
+              query list comprehension. The answers are stored in one ETS
+              table for each cached query list comprehension. When a cached
+              query list comprehension is evaluated again, answers are fetched
+              from the table without any further computations. As a
+              consequence, when all answers to a cached query list
+              comprehension have been found, the ETS tables used for caching
+              answers to the query list comprehension's qualifiers can be
+              emptied. The option _c_a_c_h_e is equivalent to _{_c_a_c_h_e_, _e_t_s_}.
+
+              The _{_c_a_c_h_e_, _l_i_s_t_} option can be used to cache the answers to a
+              query list comprehension just like _{_c_a_c_h_e_, _e_t_s_}. The difference
+              is that the answers are kept in a list (on the process heap). If
+              the answers would occupy more than a certain amount of RAM
+              memory a temporary file is used for storing the answers. The
+              option _m_a_x___l_i_s_t___s_i_z_e sets the limit in bytes and the temporary
+              file is put on the directory set by the _t_m_p_d_i_r option.
+
+              The _c_a_c_h_e option has no effect if it is known that the query
+              list comprehension will be evaluated at most once. This is
+              always true for the top-most query list comprehension and also
+              for the list expression of the first generator in a list of
+              qualifiers. Note that in the presence of side effects in filters
+              or callback functions the answers to query list comprehensions
+              can be affected by the _c_a_c_h_e option.
+
+              The _{_u_n_i_q_u_e_, _t_r_u_e_} option can be used to remove duplicate
+              answers to a query list comprehension. The unique answers are
+              stored in one ETS table for each query list comprehension. The
+              table is emptied every time it is known that there are no more
+              answers to the query list comprehension. The option _u_n_i_q_u_e is
+              equivalent to _{_u_n_i_q_u_e_, _t_r_u_e_}. If the _u_n_i_q_u_e option is combined
+              with the _{_c_a_c_h_e_, _e_t_s_} option, two ETS tables are used, but the
+              full answers are stored in one table only. If the _u_n_i_q_u_e option
+              is combined with the _{_c_a_c_h_e_, _l_i_s_t_} option the answers are sorted
+              twice using _k_e_y_s_o_r_t_/_3; once to remove duplicates, and once to
+              restore the order.
+
+              The _c_a_c_h_e and _u_n_i_q_u_e options apply not only to the query list
+              comprehension itself but also to the results of looking up
+              constants, running match specifications, and joining handles.
+
+              1> Q = qlc:q([{A,X,Z,W} ||
+              A <- [a,b,c],
+              {X,Z} <- [{a,1},{b,4},{c,6}],
+              {W,Y} <- [{2,a},{3,b},{4,c}],
+              X =:= Y],
+              {cache, list}),
+              io:format("~s~n", [qlc:info(Q)]).
+              begin
+                  V1 =
+                      qlc:q([
+                             P0 ||
+                                 P0 = {X,Z} <-
+                                     qlc:keysort(1, [{a,1},{b,4},{c,6}], [])
+                            ]),
+                  V2 =
+                      qlc:q([
+                             P0 ||
+                                 P0 = {W,Y} <-
+                                     qlc:keysort(2, [{2,a},{3,b},{4,c}], [])
+                            ]),
+                  V3 =
+                      qlc:q([
+                             [G1|G2] ||
+                                 G1 <- V1,
+                                 G2 <- V2,
+                                 element(1, G1) == element(2, G2)
+                            ],
+                            [{join,merge},{cache,list}]),
+                  qlc:q([
+                         {A,X,Z,W} ||
+                             A <- [a,b,c],
+                             [{X,Z}|{W,Y}] <- V3,
+                             X =:= Y
+                        ])
+              end
+
+              In this example the cached results of the merge join are
+              traversed for each value of _A. Note that without the _c_a_c_h_e
+              option the join would have been carried out three times, once
+              for each value of _A
+
+              _s_o_r_t_/_1_,_2 and _k_e_y_s_o_r_t_/_2_,_3 can also be used for caching answers
+              and for removing duplicates. When sorting answers are cached in
+              a list, possibly stored on a temporary file, and no ETS tables
+              are used.
+
+              Sometimes (see qqllcc::ttaabbllee//22 below) traversal of tables can be
+              done by looking up key values, which is assumed to be fast.
+              Under certain (rare) circumstances it could happen that there
+              are too many key values to look up. The _{_m_a_x___l_o_o_k_u_p_, _M_a_x_L_o_o_k_u_p_}
+              option can then be used to limit the number of lookups: if more
+              than _M_a_x_L_o_o_k_u_p lookups would be required no lookups are done but
+              the table traversed instead. The default value is _i_n_f_i_n_i_t_y which
+              means that there is no limit on the number of keys to look up.
+
+              1> T = gb_trees:empty(),
+              QH = qlc:q([X || {{X,Y},_} <- gb_table:table(T),
+              ((X == 1) or (X == 2)) andalso
+              ((Y == a) or (Y == b) or (Y == c))]),
+              io:format("~s~n", [qlc:info(QH)]).
+              ets:match_spec_run(
+                     lists:flatmap(fun(K) ->
+                                          case
+                                              gb_trees:lookup(K,
+                                                              gb_trees:from_orddict([]))
+                                          of
+                                              {value,V} ->
+                                                  [{K,V}];
+                                              none ->
+                                                  []
+                                          end
+                                   end,
+                                   [{1,a},{1,b},{1,c},{2,a},{2,b},{2,c}]),
+                     ets:match_spec_compile([{{{'$1','$2'},'_'},[],['$1']}]))
+
+              In this example using the _g_b___t_a_b_l_e module from the IImmpplleemmeennttiinngg
+              aa QQLLCC ttaabbllee section there are six keys to look up: _{_1_,_a_}, _{_1_,_b_},
+              _{_1_,_c_}, _{_2_,_a_}, _{_2_,_b_}, and _{_2_,_c_}. The reason is that the two
+              elements of the key {X, Y} are compared separately.
+
+              The _{_l_o_o_k_u_p_, _t_r_u_e_} option can be used to ensure that the _q_l_c
+              module will look up constants in some QLC table. If there are
+              more than one QLC table among the generators' list expressions,
+              constants have to be looked up in at least one of the tables.
+              The evaluation of the query fails if there are no constants to
+              look up. This option is useful in situations when it would be
+              unacceptable to traverse all objects in some table. Setting the
+              _l_o_o_k_u_p option to _f_a_l_s_e ensures that no constants will be looked
+              up (_{_m_a_x___l_o_o_k_u_p_, _0_} has the same effect). The default value is
+              _a_n_y which means that constants will be looked up whenever
+              possible.
+
+              The _{_j_o_i_n_, _J_o_i_n_} option can be used to ensure that a certain
+              join method will be used: _{_j_o_i_n_, _l_o_o_k_u_p_} invokes the lookup join
+              method; _{_j_o_i_n_, _m_e_r_g_e_} invokes the merge join method; and _{_j_o_i_n_,
+              _n_e_s_t_e_d___l_o_o_p_} invokes the method of matching every pair of
+              objects from two handles. The last method is mostly very slow.
+              The evaluation of the query fails if the _q_l_c module cannot carry
+              out the chosen join method. The default value is _a_n_y which means
+              that some fast join method will be used if possible.
+
+       ssoorrtt((QQHH11)) -->> QQHH22
+
+       ssoorrtt((QQHH11,, SSoorrttOOppttiioonnss)) -->> QQHH22
+
+              Types:
+
+                 SortOptions = ssoorrtt__ooppttiioonnss(())
+                 QH1 = qquueerryy__hhaannddllee__oorr__lliisstt(())
+                 QH2 = qquueerryy__hhaannddllee(())
+
+              Returns a query handle. When evaluating the query handle _Q_H_2 the
+              answers to the query handle _Q_H_1 are sorted by ffiillee__ssoorrtteerr::ssoorrtt//33
+              according to the options.
+
+              The sorter will use temporary files only if _Q_H_1 does not
+              evaluate to a list and the size of the binary representation of
+              the answers exceeds _S_i_z_e bytes, where _S_i_z_e is the value of the
+              _s_i_z_e option.
+
+              _s_o_r_t_(_Q_H_1_) is equivalent to _s_o_r_t_(_Q_H_1_, _[_]_).
+
+       ssttrriinngg__ttoo__hhaannddllee((QQuueerryySSttrriinngg)) -->> QQHH || EErrrroorr
+
+       ssttrriinngg__ttoo__hhaannddllee((QQuueerryySSttrriinngg,, OOppttiioonnss)) -->> QQHH || EErrrroorr
+
+       ssttrriinngg__ttoo__hhaannddllee((QQuueerryySSttrriinngg,, OOppttiioonnss,, BBiinnddiinnggss)) -->> QQHH || EErrrroorr
+
+              Types:
+
+                 QueryString = string()
+                 Options = [Option] | Option
+                 Option = {max_lookup, MaxLookup}
+                        | {cache, ccaacchhee(())}
+                        | cache
+                        | {join, Join}
+                        | {lookup, Lookup}
+                        | {unique, boolean()}
+                        | unique
+                 MaxLookup = integer() >= 0 | infinity
+                 Join = any | lookup | merge | nested_loop
+                 Lookup = boolean() | any
+                 Bindings = eerrll__eevvaall::bbiinnddiinngg__ssttrruucctt(())
+                 QH = qquueerryy__hhaannddllee(())
+                 Error = {error, module(), Reason}
+                 Reason = eerrll__ppaarrssee::eerrrroorr__iinnffoo(()) | eerrll__ssccaann::eerrrroorr__iinnffoo(())
+
+              A string version of _q_l_c_:_q_/_1_,_2. When the query handle is
+              evaluated the fun created by the parse transform is interpreted
+              by _e_r_l___e_v_a_l_(_3_). The query string is to be one single query list
+              comprehension terminated by a period.
+
+              1> L = [1,2,3],
+              Bs = erl_eval:add_binding('L', L, erl_eval:new_bindings()),
+              QH = qlc:string_to_handle("[X+1 || X <- L].", [], Bs),
+              qlc:eval(QH).
+              [2,3,4]
+
+              _s_t_r_i_n_g___t_o___h_a_n_d_l_e_(_Q_u_e_r_y_S_t_r_i_n_g_) is equivalent to
+              _s_t_r_i_n_g___t_o___h_a_n_d_l_e_(_Q_u_e_r_y_S_t_r_i_n_g_, _[_]_).
+
+              _s_t_r_i_n_g___t_o___h_a_n_d_l_e_(_Q_u_e_r_y_S_t_r_i_n_g_, _O_p_t_i_o_n_s_) is equivalent to
+              _s_t_r_i_n_g___t_o___h_a_n_d_l_e_(_Q_u_e_r_y_S_t_r_i_n_g_, _O_p_t_i_o_n_s_, _e_r_l___e_v_a_l_:_n_e_w___b_i_n_d_i_n_g_s_(_)_).
+
+              This function is probably useful mostly when called from outside
+              of Erlang, for instance from a driver written in C.
+
+       ttaabbllee((TTrraavveerrsseeFFuunn,, OOppttiioonnss)) -->> QQHH
+
+              Types:
+
+                 TraverseFun = TraverseFun0 | TraverseFun1
+                 TraverseFun0 = fun(() -> TraverseResult)
+                 TraverseFun1 = fun((mmaattcchh__eexxpprreessssiioonn(())) -> TraverseResult)
+                 TraverseResult = Objects | term()
+                 Objects = [] | [term() | ObjectList]
+                 ObjectList = TraverseFun0 | Objects
+                 Options = [Option] | Option
+                 Option = {format_fun, FormatFun}
+                        | {info_fun, InfoFun}
+                        | {lookup_fun, LookupFun}
+                        | {parent_fun, ParentFun}
+                        | {post_fun, PostFun}
+                        | {pre_fun, PreFun}
+                        | {key_equality, KeyComparison}
+                 FormatFun = undefined | fun((SelectedObjects) ->
+                 FormatedTable)
+                 SelectedObjects = all
+                                 | {all, NElements, DepthFun}
+                                 | {match_spec, mmaattcchh__eexxpprreessssiioonn(())}
+                                 | {lookup, Position, Keys}
+                                 | {lookup, Position, Keys, NElements,
+                 DepthFun}
+                 NElements = infinity | integer() >= 1
+                 DepthFun = fun((term()) -> term())
+                 FormatedTable = {Mod, Fun, Args} | aabbssttrraacctt__eexxpprr(()) | string()
+                 InfoFun = undefined | fun((InfoTag) -> InfoValue)
+                 InfoTag = indices | is_unique_objects | keypos |
+                 num_of_objects
+                 InfoValue = undefined | term()
+                 LookupFun = undefined | fun((Position, Keys) -> LookupResult)
+                 LookupResult = [term()] | term()
+                 ParentFun = undefined | fun(() -> ParentFunValue)
+                 PostFun = undefined | fun(() -> term())
+                 PreFun = undefined | fun((PreArgs) -> term())
+                 PreArgs = [PreArg]
+                 PreArg = {parent_value, ParentFunValue} | {stop_fun, StopFun}
+                 ParentFunValue = undefined | term()
+                 StopFun = undefined | fun(() -> term())
+                 KeyComparison = '=:=' | '=='
+                 Position = integer() >= 1
+                 Keys = [term()]
+                 Mod = Fun = atom()
+                 Args = [term()]
+                 QH = qquueerryy__hhaannddllee(())
+
+              Returns a query handle for a QLC table. In Erlang/OTP there is
+              support for ETS, Dets and Mnesia tables, but it is also possible
+              to turn many other data structures into QLC tables. The way to
+              accomplish this is to let function(s) in the module implementing
+              the data structure create a query handle by calling _q_l_c_:_t_a_b_l_e_/_2.
+              The different ways to traverse the table as well as properties
+              of the table are handled by callback functions provided as
+              options to _q_l_c_:_t_a_b_l_e_/_2.
+
+              The callback function _T_r_a_v_e_r_s_e_F_u_n is used for traversing the
+              table. It is to return a list of objects terminated by either _[_]
+              or a nullary fun to be used for traversing the not yet traversed
+              objects of the table. Any other return value is immediately
+              returned as value of the query evaluation. Unary _T_r_a_v_e_r_s_e_F_u_ns
+              are to accept a match specification as argument. The match
+              specification is created by the parse transform by analyzing the
+              pattern of the generator calling _q_l_c_:_t_a_b_l_e_/_2 and filters using
+              variables introduced in the pattern. If the parse transform
+              cannot find a match specification equivalent to the pattern and
+              filters, _T_r_a_v_e_r_s_e_F_u_n will be called with a match specification
+              returning every object. Modules that can utilize match
+              specifications for optimized traversal of tables should call
+              _q_l_c_:_t_a_b_l_e_/_2 with a unary _T_r_a_v_e_r_s_e_F_u_n while other modules can
+              provide a nullary _T_r_a_v_e_r_s_e_F_u_n. _e_t_s_:_t_a_b_l_e_/_2 is an example of the
+              former; _g_b___t_a_b_l_e_:_t_a_b_l_e_/_1 in the IImmpplleemmeennttiinngg aa QQLLCC ttaabbllee section
+              is an example of the latter.
+
+              _P_r_e_F_u_n is a unary callback function that is called once before
+              the table is read for the first time. If the call fails, the
+              query evaluation fails. Similarly, the nullary callback function
+              _P_o_s_t_F_u_n is called once after the table was last read. The return
+              value, which is caught, is ignored. If _P_r_e_F_u_n has been called
+              for a table, _P_o_s_t_F_u_n is guaranteed to be called for that table,
+              even if the evaluation of the query fails for some reason. The
+              order in which pre (post) functions for different tables are
+              evaluated is not specified. Other table access than reading,
+              such as calling _I_n_f_o_F_u_n, is assumed to be OK at any time. The
+              argument _P_r_e_A_r_g_s is a list of tagged values. Currently there are
+              two tags, _p_a_r_e_n_t___v_a_l_u_e and _s_t_o_p___f_u_n, used by Mnesia for managing
+              transactions. The value of _p_a_r_e_n_t___v_a_l_u_e is the value returned by
+              _P_a_r_e_n_t_F_u_n, or _u_n_d_e_f_i_n_e_d if there is no _P_a_r_e_n_t_F_u_n. _P_a_r_e_n_t_F_u_n is
+              called once just before the call of _P_r_e_F_u_n in the context of the
+              process calling _e_v_a_l, _f_o_l_d, or _c_u_r_s_o_r. The value of _s_t_o_p___f_u_n is
+              a nullary fun that deletes the cursor if called from the parent,
+              or _u_n_d_e_f_i_n_e_d if there is no cursor.
+
+              The binary callback function _L_o_o_k_u_p_F_u_n is used for looking up
+              objects in the table. The first argument _P_o_s_i_t_i_o_n is the key
+              position or an indexed position and the second argument _K_e_y_s is
+              a sorted list of unique values. The return value is to be a list
+              of all objects (tuples) such that the element at _P_o_s_i_t_i_o_n is a
+              member of _K_e_y_s. Any other return value is immediately returned
+              as value of the query evaluation. _L_o_o_k_u_p_F_u_n is called instead of
+              traversing the table if the parse transform at compile time can
+              find out that the filters match and compare the element at
+              _P_o_s_i_t_i_o_n in such a way that only _K_e_y_s need to be looked up in
+              order to find all potential answers. The key position is
+              obtained by calling _I_n_f_o_F_u_n_(_k_e_y_p_o_s_) and the indexed positions by
+              calling _I_n_f_o_F_u_n_(_i_n_d_i_c_e_s_). If the key position can be used for
+              lookup it is always chosen, otherwise the indexed position
+              requiring the least number of lookups is chosen. If there is a
+              tie between two indexed positions the one occurring first in the
+              list returned by _I_n_f_o_F_u_n is chosen. Positions requiring more
+              than mmaaxx__llooookkuupp lookups are ignored.
+
+              The unary callback function _I_n_f_o_F_u_n is to return information
+              about the table. _u_n_d_e_f_i_n_e_d should be returned if the value of
+              some tag is unknown:
+
+                * _i_n_d_i_c_e_s. Returns a list of indexed positions, a list of
+                  positive integers.
+
+                * _i_s___u_n_i_q_u_e___o_b_j_e_c_t_s. Returns _t_r_u_e if the objects returned by
+                  _T_r_a_v_e_r_s_e_F_u_n are unique.
+
+                * _k_e_y_p_o_s. Returns the position of the table's key, a positive
+                  integer.
+
+                * _i_s___s_o_r_t_e_d___k_e_y. Returns _t_r_u_e if the objects returned by
+                  _T_r_a_v_e_r_s_e_F_u_n are sorted on the key.
+
+                * _n_u_m___o_f___o_b_j_e_c_t_s. Returns the number of objects in the table,
+                  a non-negative integer.
+
+              The unary callback function _F_o_r_m_a_t_F_u_n is used by qqllcc::iinnffoo//11,,22
+              for displaying the call that created the table's query handle.
+              The default value, _u_n_d_e_f_i_n_e_d, means that _i_n_f_o_/_1_,_2 displays a
+              call to _'_$_M_O_D_'_:_'_$_F_U_N_'_/_0. It is up to _F_o_r_m_a_t_F_u_n to present the
+              selected objects of the table in a suitable way. However, if a
+              character list is chosen for presentation it must be an Erlang
+              expression that can be scanned and parsed (a trailing dot will
+              be added by _q_l_c_:_i_n_f_o though). _F_o_r_m_a_t_F_u_n is called with an
+              argument that describes the selected objects based on
+              optimizations done as a result of analyzing the filters of the
+              QLC where the call to _q_l_c_:_t_a_b_l_e_/_2 occurs. The possible values of
+              the argument are:
+
+                * _{_l_o_o_k_u_p_, _P_o_s_i_t_i_o_n_, _K_e_y_s_, _N_E_l_e_m_e_n_t_s_, _D_e_p_t_h_F_u_n_}. _L_o_o_k_u_p_F_u_n is
+                  used for looking up objects in the table.
+
+                * _{_m_a_t_c_h___s_p_e_c_, _M_a_t_c_h_E_x_p_r_e_s_s_i_o_n_}. No way of finding all
+                  possible answers by looking up keys was found, but the
+                  filters could be transformed into a match specification. All
+                  answers are found by calling _T_r_a_v_e_r_s_e_F_u_n_(_M_a_t_c_h_E_x_p_r_e_s_s_i_o_n_).
+
+                * _{_a_l_l_, _N_E_l_e_m_e_n_t_s_, _D_e_p_t_h_F_u_n_}. No optimization was found. A
+                  match specification matching all objects will be used if
+                  _T_r_a_v_e_r_s_e_F_u_n is unary.
+
+              _N_E_l_e_m_e_n_t_s is the value of the _i_n_f_o_/_1_,_2 option _n___e_l_e_m_e_n_t_s, and
+              _D_e_p_t_h_F_u_n is a function that can be used for limiting the size of
+              terms; calling _D_e_p_t_h_F_u_n_(_T_e_r_m_) substitutes _'_._._._' for parts of
+              _T_e_r_m below the depth specified by the _i_n_f_o_/_1_,_2 option _d_e_p_t_h. If
+              calling _F_o_r_m_a_t_F_u_n with an argument including _N_E_l_e_m_e_n_t_s and
+              _D_e_p_t_h_F_u_n fails, _F_o_r_m_a_t_F_u_n is called once again with an argument
+              excluding _N_E_l_e_m_e_n_t_s and _D_e_p_t_h_F_u_n (_{_l_o_o_k_u_p_, _P_o_s_i_t_i_o_n_, _K_e_y_s_} or
+              _a_l_l).
+
+              The value of _k_e_y___e_q_u_a_l_i_t_y is to be _'_=_:_=_' if the table considers
+              two keys equal if they match, and to be _'_=_=_' if two keys are
+              equal if they compare equal. The default is _'_=_:_=_'.
+
+              See eettss((33)), ddeettss((33)) and mmnneessiiaa((33)) for the various options
+              recognized by _t_a_b_l_e_/_1_,_2 in respective module.
+
+SSEEEE AALLSSOO
+       ddeettss((33)),  EErrllaanngg RReeffeerreennccee MMaannuuaall, eerrll__eevvaall((33)), eerrllaanngg((33)), eettss((33)),
+       ffiillee((33)), eerrrroorr__llooggggeerr((33)), ffiillee__ssoorrtteerr((33)), mmnneessiiaa((33)),  PPrrooggrraammmmiinngg
+       EExxaammpplleess, sshheellll((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                          qlc(3)

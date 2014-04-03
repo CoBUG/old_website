@@ -1,0 +1,385 @@
+ct_hooks(3)                Erlang Module Definition                ct_hooks(3)
+
+
+
+NNAAMMEE
+       ct_hooks - A callback interface on top of Common Test
+
+DDEESSCCRRIIPPTTIIOONN
+       The _C_o_m_m_o_n _T_e_s_t _H_o_o_k (henceforth called CTH) framework allows
+       extensions of the default behaviour of Common Test by means of
+       callbacks before and after all test suite calls. It is meant for
+       advanced users of Common Test which want to abstract out behaviour
+       which is common to multiple test suites.
+
+       In brief, Common Test Hooks allows you to:
+
+         * Manipulate the runtime config before each suite configuration call
+
+         * Manipulate the return of all suite configuration calls and in
+           extension the result of the test themselves.
+
+       The following sections describe the mandatory and optional CTH
+       functions Common Test will call during test execution. For more details
+       see CCoommmmoonn TTeesstt HHooookkss in the User's Guide.
+
+       For information about how to add a CTH to your suite see IInnssttaalllliinngg aa
+       CCTTHH  in the User's Guide.
+
+   NNoottee::
+       See the EExxaammppllee CCTTHH in the User's Guide for a minimal example of a CTH.
+
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following functions define the callback interface for a Common Test
+       Hook.
+
+EEXXPPOORRTTSS
+       MMoodduullee::iinniitt((IIdd,, OOppttss)) -->> {{ookk,, SSttaattee}} || {{ookk,, SSttaattee,, PPrriioorriittyy}}
+
+              Types:
+
+                 Id = reference() | term()
+                 Opts = term()
+                 State = term()
+                 Priority = integer()
+
+              MANDATORY
+
+              Always called before any other callback function. Use this to
+              initiate any common state. It should return a state for this
+              CTH.
+
+              _I_d is the return value of iidd//11, or a _r_e_f_e_r_e_n_c_e (created using
+              mmaakkee__rreeff//00) if iidd//11 is not implemented.
+
+              _P_r_i_o_r_i_t_y is the relative priority of this hook. Hooks with a
+              lower priority will be executed first. If no priority is given,
+              it will be set to 0.
+
+              For details about when init is called see ssccooppee in the User's
+              Guide.
+
+       MMoodduullee::pprree__iinniitt__ppeerr__ssuuiittee((SSuuiitteeNNaammee,, IInniittDDaattaa,, CCTTHHSSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 SuiteName = atom()
+                 InitData = Config | SkipOrFail
+                 Config = NewConfig = [{Key,Value}]
+                 CTHState = NewCTHState = term()
+                 Result = {Return, NewCTHState}
+                 Return = NewConfig | SkipOrFail
+                 SkipOrFail = {fail, Reason} | {skip, Reason}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called before  iinniitt__ppeerr__ssuuiittee if it exists. It
+              typically contains initialization/logging which needs to be done
+              before init_per_suite is called. If _{_s_k_i_p_,_R_e_a_s_o_n_} or
+              _{_f_a_i_l_,_R_e_a_s_o_n_} is returned, init_per_suite and all test cases of
+              the suite will be skipped and Reason printed in the overview log
+              of the suite.
+
+              _S_u_i_t_e_N_a_m_e is the name of the suite to be run.
+
+              _I_n_i_t_D_a_t_a is the original config list of the test suite, or a
+              _S_k_i_p_O_r_F_a_i_l tuple if a previous CTH has returned this.
+
+              _C_T_H_S_t_a_t_e is the current internal state of the CTH.
+
+              _R_e_t_u_r_n is the result of the init_per_suite function. If it is
+              _{_s_k_i_p_,_R_e_a_s_o_n_} or _{_f_a_i_l_,_R_e_a_s_o_n_} iinniitt__ppeerr__ssuuiittee  will never be
+              called, instead the initiation is considered to be
+              skipped/failed respectively. If a _N_e_w_C_o_n_f_i_g list is returned,
+              iinniitt__ppeerr__ssuuiittee will be called with that _N_e_w_C_o_n_f_i_g list. See  PPrree
+              HHooookkss in the User's Guide for more details.
+
+              Note that this function is only called if the CTH has been added
+              before init_per_suite is run, see CCTTHH SSccooppiinngg in the User's
+              Guide for details.
+
+       MMoodduullee::ppoosstt__iinniitt__ppeerr__ssuuiittee((SSuuiitteeNNaammee,, CCoonnffiigg,, RReettuurrnn,, CCTTHHSSttaattee)) -->>
+       RReessuulltt
+
+              Types:
+
+                 SuiteName = atom()
+                 Config = [{Key,Value}]
+                 Return = NewReturn = Config | SkipOrFail | term()
+                 SkipOrFail = {fail, Reason} | {skip, Reason} | term()
+                 CTHState = NewCTHState = term()
+                 Result = {NewReturn, NewCTHState}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called after  iinniitt__ppeerr__ssuuiittee if it exists. It
+              typically contains extra checks to make sure that all the
+              correct dependencies have been started correctly.
+
+              _R_e_t_u_r_n is what iinniitt__ppeerr__ssuuiittee  returned, i.e. {fail,Reason},
+              {skip,Reason}, a _C_o_n_f_i_g list or a term describing how
+              iinniitt__ppeerr__ssuuiittee  failed.
+
+              _N_e_w_R_e_t_u_r_n is the possibly modified return value of
+              iinniitt__ppeerr__ssuuiittee . It is here possible to recover from a failure
+              in iinniitt__ppeerr__ssuuiittee  by returning the _C_o_n_f_i_g_L_i_s_t with the
+              _t_c___s_t_a_t_u_s element removed. See  PPoosstt HHooookkss in the User's Guide
+              for more details.
+
+              _C_T_H_S_t_a_t_e is the current internal state of the CTH.
+
+              Note that this function is only called if the CTH has been added
+              before or in init_per_suite, see CCTTHH SSccooppiinngg in the User's Guide
+              for details.
+
+       MMoodduullee::pprree__iinniitt__ppeerr__ggrroouupp((GGrroouuppNNaammee,, IInniittDDaattaa,, CCTTHHSSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 GroupName = atom()
+                 InitData = Config | SkipOrFail
+                 Config = NewConfig = [{Key,Value}]
+                 CTHState = NewCTHState = term()
+                 Result = {NewConfig | SkipOrFail, NewCTHState}
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called before  iinniitt__ppeerr__ggrroouupp if it exists. It
+              behaves the same way as  pprree__iinniitt__ppeerr__ssuuiittee, but for the
+              iinniitt__ppeerr__ggrroouupp instead.
+
+       MMoodduullee::ppoosstt__iinniitt__ppeerr__ggrroouupp((GGrroouuppNNaammee,, CCoonnffiigg,, RReettuurrnn,, CCTTHHSSttaattee)) -->>
+       RReessuulltt
+
+              Types:
+
+                 GroupName = atom()
+                 Config = [{Key,Value}]
+                 Return = NewReturn = Config | SkipOrFail | term()
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 CTHState = NewCTHState = term()
+                 Result = {NewReturn, NewCTHState}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called after  iinniitt__ppeerr__ggrroouupp if it exists. It
+              behaves the same way as  ppoosstt__iinniitt__ppeerr__ssuuiittee, but for the
+              iinniitt__ppeerr__ggrroouupp instead.
+
+       MMoodduullee::pprree__iinniitt__ppeerr__tteessttccaassee((TTeessttccaasseeNNaammee,, IInniittDDaattaa,, CCTTHHSSttaattee)) -->>
+       RReessuulltt
+
+              Types:
+
+                 TestcaseName = atom()
+                 InitData = Config | SkipOrFail
+                 Config = NewConfig = [{Key,Value}]
+                 CTHState = NewCTHState = term()
+                 Result = {NewConfig | SkipOrFail, NewCTHState}
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called before  iinniitt__ppeerr__tteessttccaassee if it exists.
+              It behaves the same way as  pprree__iinniitt__ppeerr__ssuuiittee, but for the
+              iinniitt__ppeerr__tteessttccaassee function instead.
+
+              Note that it is not possible to add CTH's here right now, that
+              feature might be added later, but it would right now break
+              backwards compatibility.
+
+       MMoodduullee::ppoosstt__eenndd__ppeerr__tteessttccaassee((TTeessttccaasseeNNaammee,, CCoonnffiigg,, RReettuurrnn,, CCTTHHSSttaattee)) -->>
+       RReessuulltt
+
+              Types:
+
+                 TestcaseName = atom()
+                 Config = [{Key,Value}]
+                 Return = NewReturn = Config | SkipOrFail | term()
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 CTHState = NewCTHState = term()
+                 Result = {NewReturn, NewCTHState}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called after  eenndd__ppeerr__tteessttccaassee if it exists. It
+              behaves the same way as  ppoosstt__iinniitt__ppeerr__ssuuiittee, but for the
+              eenndd__ppeerr__tteessttccaassee function instead.
+
+       MMoodduullee::pprree__eenndd__ppeerr__ggrroouupp((GGrroouuppNNaammee,, EEnnddDDaattaa,, CCTTHHSSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 GroupName = atom()
+                 EndData = Config | SkipOrFail
+                 Config = NewConfig = [{Key,Value}]
+                 CTHState = NewCTHState = term()
+                 Result = {NewConfig | SkipOrFail, NewCTHState}
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called before  eenndd__ppeerr__ggrroouupp if it exists. It
+              behaves the same way as  pprree__iinniitt__ppeerr__ssuuiittee, but for the
+              eenndd__ppeerr__ggrroouupp function instead.
+
+       MMoodduullee::ppoosstt__eenndd__ppeerr__ggrroouupp((GGrroouuppNNaammee,, CCoonnffiigg,, RReettuurrnn,, CCTTHHSSttaattee)) -->>
+       RReessuulltt
+
+              Types:
+
+                 GroupName = atom()
+                 Config = [{Key,Value}]
+                 Return = NewReturn = Config | SkipOrFail | term()
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 CTHState = NewCTHState = term()
+                 Result = {NewReturn, NewCTHState}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called after  eenndd__ppeerr__ggrroouupp if it exists. It
+              behaves the same way as  ppoosstt__iinniitt__ppeerr__ssuuiittee, but for the
+              eenndd__ppeerr__ggrroouupp function instead.
+
+       MMoodduullee::pprree__eenndd__ppeerr__ssuuiittee((SSuuiitteeNNaammee,, EEnnddDDaattaa,, CCTTHHSSttaattee)) -->> RReessuulltt
+
+              Types:
+
+                 SuiteName = atom()
+                 EndData = Config | SkipOrFail
+                 Config = NewConfig = [{Key,Value}]
+                 CTHState = NewCTHState = term()
+                 Result = {NewConfig | SkipOrFail, NewCTHState}
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called before  eenndd__ppeerr__ssuuiittee if it exists. It
+              behaves the same way as  pprree__iinniitt__ppeerr__ssuuiittee, but for the
+              eenndd__ppeerr__ssuuiittee function instead.
+
+       MMoodduullee::ppoosstt__eenndd__ppeerr__ssuuiittee((SSuuiitteeNNaammee,, CCoonnffiigg,, RReettuurrnn,, CCTTHHSSttaattee)) -->>
+       RReessuulltt
+
+              Types:
+
+                 SuiteName = atom()
+                 Config = [{Key,Value}]
+                 Return = NewReturn = Config | SkipOrFail | term()
+                 SkipOrFail = {fail,Reason} | {skip, Reason}
+                 CTHState = NewCTHState = term()
+                 Result = {NewReturn, NewCTHState}
+                 Key = atom()
+                 Value = term()
+                 Reason = term()
+
+              OPTIONAL
+
+              This function is called after  eenndd__ppeerr__ssuuiittee if it exists. It
+              behaves the same way as  ppoosstt__iinniitt__ppeerr__ssuuiittee, but for the
+              eenndd__ppeerr__ssuuiittee function instead.
+
+       MMoodduullee::oonn__ttcc__ffaaiill((TTeessttccaasseeNNaammee,, RReeaassoonn,, CCTTHHSSttaattee)) -->> NNeewwCCTTHHSSttaattee
+
+              Types:
+
+                 TestcaseName = init_per_suite | end_per_suite |
+                 init_per_group | end_per_group | atom()
+                 Reason = term()
+                 CTHState = NewCTHState = term()
+
+              OPTIONAL
+
+              This function is called whenever a testcase fails. It is called
+              after the post function has been called for the testcase which
+              failed. i.e. if init_per_suite fails this function is called
+              after  ppoosstt__iinniitt__ppeerr__ssuuiittee, and if a testcase fails it is called
+              after  ppoosstt__eenndd__ppeerr__tteessttccaassee.
+
+              The data which comes with the Reason follows the same format as
+              the FFaaiillRReeaassoonn  in the ttcc__ddoonnee event. See EEvveenntt HHaannddlliinngg  in the
+              User's Guide for details.
+
+       MMoodduullee::oonn__ttcc__sskkiipp((TTeessttccaasseeNNaammee,, RReeaassoonn,, CCTTHHSSttaattee)) -->> NNeewwCCTTHHSSttaattee
+
+              Types:
+
+                 TestcaseName = end_per_suite | init_per_group | end_per_group
+                 | atom()
+                 Reason = {tc_auto_skip | tc_user_skip, term()}
+                 CTHState = NewCTHState = term()
+
+              OPTIONAL
+
+              This function is called whenever a testcase is skipped. It is
+              called after the post function has been called for the testcase
+              which was skipped. i.e. if init_per_group is skipped this
+              function is called after ppoosstt__iinniitt__ppeerr__ggrroouupp , and if a testcase
+              is skipped it is called after ppoosstt__eenndd__ppeerr__tteessttccaassee .
+
+              The data which comes with the Reason follows the same format as
+              ttcc__aauuttoo__sskkiipp  and  ttcc__uusseerr__sskkiipp events. See EEvveenntt HHaannddlliinngg  in
+              the User's Guide for details.
+
+       MMoodduullee::tteerrmmiinnaattee((CCTTHHSSttaattee))
+
+              Types:
+
+                 CTHState = term()
+
+              OPTIONAL
+
+              This function is called at the end of a CTH's ssccooppee.
+
+       MMoodduullee::iidd((OOppttss)) -->> IIdd
+
+              Types:
+
+                 Opts = term()
+                 Id = term()
+
+              OPTIONAL
+
+              The _I_d is used to uniquely identify a CTH instance, if two CTH's
+              return the same _I_d the second CTH is ignored and subsequent
+              calls to the CTH will only be made to the first instance. For
+              more information see IInnssttaalllliinngg aa CCTTHH  in the User's Guide.
+
+              This function should NOT have any side effects as it might be
+              called multiple times by Common Test.
+
+              If not implemented the CTH will act as if this function returned
+              a call to _m_a_k_e___r_e_f_/_0.
+
+
+
+Ericsson AB                    common_test 1.6.2                   ct_hooks(3)

@@ -1,0 +1,191 @@
+wxSlider(3)                Erlang Module Definition                wxSlider(3)
+
+
+
+NNAAMMEE
+       wxSlider - See external documentation: wxSlider.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSlider.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_l_i_d_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSlliiddeerr(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, VVaalluuee,, MMiinnVVaalluuee,, MMaaxxVVaalluuee)) -->> wwxxSSlliiddeerr(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Value = integer()
+                 MinValue = integer()
+                 MaxValue = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, VVaalluuee,, MMiinnVVaalluuee,, MMaaxxVVaalluuee,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, VVaalluuee,, MMiinnVVaalluuee,, MMaaxxVVaalluuee,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxxSSlliiddeerr(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Value = integer()
+                 MinValue = integer()
+                 MaxValue = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, VVaalluuee,, MMiinnVVaalluuee,, MMaaxxVVaalluuee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSlider()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Value = integer()
+                 MinValue = integer()
+                 MaxValue = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, VVaalluuee,, MMiinnVVaalluuee,,
+              MMaaxxVVaalluuee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, VVaalluuee,, MMiinnVVaalluuee,, MMaaxxVVaalluuee,, OOppttiioonn::::[[OOppttiioonn]]))
+       -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxSlider()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Value = integer()
+                 MinValue = integer()
+                 MaxValue = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ggeettLLiinneeSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSlider()
+
+              See external documentation.
+
+       ggeettMMaaxx((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSlider()
+
+              See external documentation.
+
+       ggeettMMiinn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSlider()
+
+              See external documentation.
+
+       ggeettPPaaggeeSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSlider()
+
+              See external documentation.
+
+       ggeettTThhuummbbLLeennggtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSlider()
+
+              See external documentation.
+
+       ggeettVVaalluuee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSlider()
+
+              See external documentation.
+
+       sseettLLiinneeSSiizzee((TThhiiss,, LLiinneeSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSlider()
+                 LineSize = integer()
+
+              See external documentation.
+
+       sseettPPaaggeeSSiizzee((TThhiiss,, PPaaggeeSSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxSlider()
+                 PageSize = integer()
+
+              See external documentation.
+
+       sseettRRaannggee((TThhiiss,, MMiinnVVaalluuee,, MMaaxxVVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxSlider()
+                 MinValue = integer()
+                 MaxValue = integer()
+
+              See external documentation.
+
+       sseettTThhuummbbLLeennggtthh((TThhiiss,, LLeennPPiixxeellss)) -->> ookk
+
+              Types:
+
+                 This = wxSlider()
+                 LenPixels = integer()
+
+              See external documentation.
+
+       sseettVVaalluuee((TThhiiss,, VVaalluuee)) -->> ookk
+
+              Types:
+
+                 This = wxSlider()
+                 Value = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSlliiddeerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                       wxSlider(3)

@@ -1,0 +1,218 @@
+wxPrintData(3)             Erlang Module Definition             wxPrintData(3)
+
+
+
+NNAAMMEE
+       wxPrintData - See external documentation: wxPrintData.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPrintData.
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_r_i_n_t_D_a_t_a_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxPPrriinnttDDaattaa(())
+
+              See external documentation.
+
+       nneeww((PPrriinnttDDaattaa)) -->> wwxxPPrriinnttDDaattaa(())
+
+              Types:
+
+                 PrintData = wxPrintData()
+
+              See external documentation.
+
+       ggeettCCoollllaattee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       ggeettBBiinn((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+              Res = ?wxPRINTBIN_DEFAULT | ?wxPRINTBIN_ONLYONE |
+              ?wxPRINTBIN_LOWER | ?wxPRINTBIN_MIDDLE | ?wxPRINTBIN_MANUAL |
+              ?wxPRINTBIN_ENVELOPE | ?wxPRINTBIN_ENVMANUAL | ?wxPRINTBIN_AUTO
+              | ?wxPRINTBIN_TRACTOR | ?wxPRINTBIN_SMALLFMT |
+              ?wxPRINTBIN_LARGEFMT | ?wxPRINTBIN_LARGECAPACITY |
+              ?wxPRINTBIN_CASSETTE | ?wxPRINTBIN_FORMSOURCE | ?wxPRINTBIN_USER
+
+       ggeettCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       ggeettDDuupplleexx((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+              Res = ?wxDUPLEX_SIMPLEX | ?wxDUPLEX_HORIZONTAL |
+              ?wxDUPLEX_VERTICAL
+
+       ggeettNNooCCooppiieess((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       ggeettOOrriieennttaattiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       ggeettPPaappeerrIIdd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       ggeettPPrriinntteerrNNaammee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       ggeettQQuuaalliittyy((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPrintData()
+
+              See external documentation.
+
+       sseettBBiinn((TThhiiss,, BBiinn)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Bin = wx_enum() (see module wx)
+
+              See external documentation.
+              Bin = ?wxPRINTBIN_DEFAULT | ?wxPRINTBIN_ONLYONE |
+              ?wxPRINTBIN_LOWER | ?wxPRINTBIN_MIDDLE | ?wxPRINTBIN_MANUAL |
+              ?wxPRINTBIN_ENVELOPE | ?wxPRINTBIN_ENVMANUAL | ?wxPRINTBIN_AUTO
+              | ?wxPRINTBIN_TRACTOR | ?wxPRINTBIN_SMALLFMT |
+              ?wxPRINTBIN_LARGEFMT | ?wxPRINTBIN_LARGECAPACITY |
+              ?wxPRINTBIN_CASSETTE | ?wxPRINTBIN_FORMSOURCE | ?wxPRINTBIN_USER
+
+       sseettCCoollllaattee((TThhiiss,, FFllaagg)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Flag = boolean()
+
+              See external documentation.
+
+       sseettCCoolloouurr((TThhiiss,, CCoolloouurr)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Colour = boolean()
+
+              See external documentation.
+
+       sseettDDuupplleexx((TThhiiss,, DDuupplleexx)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Duplex = wx_enum() (see module wx)
+
+              See external documentation.
+              Duplex = ?wxDUPLEX_SIMPLEX | ?wxDUPLEX_HORIZONTAL |
+              ?wxDUPLEX_VERTICAL
+
+       sseettNNooCCooppiieess((TThhiiss,, VV)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 V = integer()
+
+              See external documentation.
+
+       sseettOOrriieennttaattiioonn((TThhiiss,, OOrriieenntt)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Orient = integer()
+
+              See external documentation.
+
+       sseettPPaappeerrIIdd((TThhiiss,, SSiizzeeIIdd)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 SizeId = integer()
+
+              See external documentation.
+
+       sseettPPrriinntteerrNNaammee((TThhiiss,, NNaammee)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettQQuuaalliittyy((TThhiiss,, QQuuaalliittyy)) -->> ookk
+
+              Types:
+
+                 This = wxPrintData()
+                 Quality = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPrriinnttDDaattaa(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxPrintData(3)

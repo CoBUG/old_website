@@ -1,0 +1,89 @@
+wxDirDialog(3)             Erlang Module Definition             wxDirDialog(3)
+
+
+
+NNAAMMEE
+       wxDirDialog - See external documentation: wxDirDialog.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxDirDialog.
+
+       This class is derived (and can use functions) from:
+       wwxxDDiiaalloogg
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_D_i_r_D_i_a_l_o_g_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPaarreenntt)) -->> wwxxDDiirrDDiiaalloogg(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxDDiirrDDiiaalloogg(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {title, chardata() (see module unicode)} |
+                 {defaultPath, chardata() (see module unicode)} | {style,
+                 integer()} | {pos, {X::integer(), Y::integer()}} | {sz,
+                 {W::integer(), H::integer()}}
+
+              See external documentation.
+
+       ggeettPPaatthh((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxDirDialog()
+
+              See external documentation.
+
+       ggeettMMeessssaaggee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxDirDialog()
+
+              See external documentation.
+
+       sseettMMeessssaaggee((TThhiiss,, MMeessssaaggee)) -->> ookk
+
+              Types:
+
+                 This = wxDirDialog()
+                 Message = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettPPaatthh((TThhiiss,, PPaatthh)) -->> ookk
+
+              Types:
+
+                 This = wxDirDialog()
+                 Path = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxDDiirrDDiiaalloogg(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxDirDialog(3)

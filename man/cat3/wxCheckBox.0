@@ -1,0 +1,146 @@
+wxCheckBox(3)              Erlang Module Definition              wxCheckBox(3)
+
+
+
+NNAAMMEE
+       wxCheckBox - See external documentation: wxCheckBox.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCheckBox.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_h_e_c_k_B_o_x_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxCChheecckkBBooxx(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, LLaabbeell)) -->> wwxxCChheecckkBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, LLaabbeell,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, LLaabbeell,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxCChheecckkBBooxx(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, LLaabbeell)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckBox()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, LLaabbeell,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, LLaabbeell,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckBox()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Label = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()} |
+                 {validator, wx_object() (see module wx)}
+
+              See external documentation.
+
+       ggeettVVaalluuee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckBox()
+
+              See external documentation.
+
+       ggeett33SSttaatteeVVaalluuee((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCheckBox()
+
+              See external documentation.
+              Res = ?wxCHK_UNCHECKED | ?wxCHK_CHECKED | ?wxCHK_UNDETERMINED
+
+       iiss33rrddSSttaatteeAAlllloowweeddFFoorrUUsseerr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckBox()
+
+              See external documentation.
+
+       iiss33SSttaattee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckBox()
+
+              See external documentation.
+
+       iissCChheecckkeedd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxCheckBox()
+
+              See external documentation.
+
+       sseettVVaalluuee((TThhiiss,, SSttaattee)) -->> ookk
+
+              Types:
+
+                 This = wxCheckBox()
+                 State = boolean()
+
+              See external documentation.
+
+       sseett33SSttaatteeVVaalluuee((TThhiiss,, SSttaattee)) -->> ookk
+
+              Types:
+
+                 This = wxCheckBox()
+                 State = wx_enum() (see module wx)
+
+              See external documentation.
+              State = ?wxCHK_UNCHECKED | ?wxCHK_CHECKED | ?wxCHK_UNDETERMINED
+
+       ddeessttrrooyy((TThhiiss::::wwxxCChheecckkBBooxx(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                     wxCheckBox(3)

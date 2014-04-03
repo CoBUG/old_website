@@ -1,0 +1,408 @@
+int(3)                     Erlang Module Definition                     int(3)
+
+
+
+NNAAMMEE
+       int - Interpreter Interface
+
+DDEESSCCRRIIPPTTIIOONN
+       The Erlang interpreter provides mechanisms for breakpoints and stepwise
+       execution of code. It is mainly intended to be used by the _D_e_b_u_g_g_e_r,
+       see Debugger User's Guide and _d_e_b_u_g_g_e_r_(_3_).
+
+       From the shell, it is possible to:
+
+         * Specify which modules should be interpreted.
+
+         * Specify breakpoints.
+
+         * Monitor the current status of all processes executing code in
+           interpreted modules, also processes at other Erlang nodes.
+
+       By _a_t_t_a_c_h_i_n_g _t_o a process executing interpreted code, it is possible to
+       examine variable bindings and order stepwise execution. This is done by
+       sending and receiving information to/from the process via a third
+       process, called the meta process. It is possible to implement your own
+       attached process. See _i_n_t_._e_r_l for available functions and
+       _d_b_g___u_i___t_r_a_c_e_._e_r_l for possible messages.
+
+       The interpreter depends on the Kernel, STDLIB and GS applications,
+       which means modules belonging to any of these applications are not
+       allowed to be interpreted as it could lead to a deadlock or emulator
+       crash. This also applies to modules belonging to the Debugger
+       application itself.
+
+BBRREEAAKKPPOOIINNTTSS
+       Breakpoints are specified on a line basis. When a process executing
+       code in an interpreted module reaches a breakpoint, it will stop. This
+       means that that a breakpoint must be set at an executable line, that
+       is, a line of code containing an executable expression.
+
+       A breakpoint have a status, a trigger action and may have a condition
+       associated with it. The status is either _a_c_t_i_v_e or _i_n_a_c_t_i_v_e. An
+       inactive breakpoint is ignored. When a breakpoint is reached, the
+       trigger action specifies if the breakpoint should continue to be active
+       (_e_n_a_b_l_e), if it should become inactive (_d_i_s_a_b_l_e), or if it should be
+       removed (_d_e_l_e_t_e). A condition is a tuple _{_M_o_d_u_l_e_,_N_a_m_e_}. When the
+       breakpoint is reached, _M_o_d_u_l_e_:_N_a_m_e_(_B_i_n_d_i_n_g_s_) is called. If this
+       evaluates to _t_r_u_e, execution will stop. If this evaluates to _f_a_l_s_e, the
+       breakpoint is ignored. _B_i_n_d_i_n_g_s contains the current variable bindings,
+       use _g_e_t___b_i_n_d_i_n_g to retrieve the value for a given variable.
+
+       By default, a breakpoint is active, has trigger action _e_n_a_b_l_e and has
+       no condition associated with it. For more detailed information about
+       breakpoints, refer to Debugger User's Guide.
+
+EEXXPPOORRTTSS
+       ii((AAbbssMMoodduullee)) -->> {{mmoodduullee,,MMoodduullee}} || eerrrroorr
+       ii((AAbbssMMoodduulleess)) -->> ookk
+       nnii((AAbbssMMoodduullee)) -->> {{mmoodduullee,,MMoodduullee}} || eerrrroorr
+       nnii((AAbbssMMoodduulleess)) -->> ookk
+
+              Types:
+
+                 AbsModules = [AbsModule]
+                 AbsModule = Module | File | [Module | File]
+                  Module = atom()
+                  File = string()
+
+              Interprets the specified module(s). _i_/_1 interprets the module
+              only at the current node. _n_i_/_1 interprets the module at all
+              known nodes.
+
+              A module may be given by its module name (atom) or by its file
+              name. If given by its module name, the object code _M_o_d_u_l_e_._b_e_a_m
+              is searched for in the current path. The source code _M_o_d_u_l_e_._e_r_l
+              is searched for first in the same directory as the object code,
+              then in a _s_r_c directory next to it.
+
+              If given by its file name, the file name may include a path and
+              the _._e_r_l extension may be omitted. The object code _M_o_d_u_l_e_._b_e_a_m
+              is searched for first in the same directory as the source code,
+              then in an _e_b_i_n directory next to it, and then in the current
+              path.
+
+          NNoottee::
+              The interpreter needs both the source code and the object code,
+              and the object code _m_u_s_t include debug information. That is,
+              only modules compiled with the option _d_e_b_u_g___i_n_f_o set can be
+              interpreted.
+
+
+              The functions returns _{_m_o_d_u_l_e_,_M_o_d_u_l_e_} if the module was
+              interpreted, or _e_r_r_o_r if it was not.
+
+              The argument may also be a list of modules/file names, in which
+              case the function tries to interpret each module as specified
+              above. The function then always returns _o_k, but prints some
+              information to stdout if a module could not be interpreted.
+
+       nn((AAbbssMMoodduullee)) -->> ookk
+       nnnn((AAbbssMMoodduullee)) -->> ookk
+
+              Types:
+
+                 AbsModule = Module | File | [Module | File]
+                  Module = atom()
+                  File = string()
+
+              Stops interpreting the specified module. _n_/_1 stops interpreting
+              the module only at the current node. _n_n_/_1 stops interpreting the
+              module at all known nodes.
+
+              As for _i_/_1 and _n_i_/_1, a module may be given by either its module
+              name or its file name.
+
+       iinntteerrpprreetteedd(()) -->> [[MMoodduullee]]
+
+              Types:
+
+                 Module = atom()
+
+              Returns a list with all interpreted modules.
+
+       ffiillee((MMoodduullee)) -->> FFiillee || {{eerrrroorr,,nnoott__llooaaddeedd}}
+
+              Types:
+
+                 Module = atom()
+                 File = string()
+
+              Returns the source code file name _F_i_l_e for an interpreted module
+              _M_o_d_u_l_e.
+
+       iinntteerrpprreettaabbllee((AAbbssMMoodduullee)) -->> ttrruuee || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 AbsModule = Module | File
+                  Module = atom()
+                  File = string()
+                 Reason = no_src | no_beam | no_debug_info | badarg |
+                 {app,App}
+                  App = atom()
+
+              Checks if a module is possible to interpret. The module can be
+              given by its module name _M_o_d_u_l_e or its source file name _F_i_l_e. If
+              given by a module name, the module is searched for in the code
+              path.
+
+              The function returns _t_r_u_e if both source code and object code
+              for the module is found, the module has been compiled with the
+              option _d_e_b_u_g___i_n_f_o set and does not belong to any of the
+              applications Kernel, STDLIB, GS or Debugger itself.
+
+              The function returns _{_e_r_r_o_r_,_R_e_a_s_o_n_} if the module for some
+              reason is not possible to interpret.
+
+              _R_e_a_s_o_n is _n_o___s_r_c if no source code is found or _n_o___b_e_a_m if no
+              object code is found. It is assumed that the source- and object
+              code are located either in the same directory, or in _s_r_c and
+              _e_b_i_n directories next to each other.
+
+              _R_e_a_s_o_n is _n_o___d_e_b_u_g___i_n_f_o if the module has not been compiled with
+              the option _d_e_b_u_g___i_n_f_o set.
+
+              _R_e_a_s_o_n is _b_a_d_a_r_g if _A_b_s_M_o_d_u_l_e is not found. This could be
+              because the specified file does not exist, or because
+              _c_o_d_e_:_w_h_i_c_h_/_1 does not return a beam file name, which is the case
+              not only for non-existing modules but also for modules which are
+              preloaded or cover compiled.
+
+              _R_e_a_s_o_n is _{_a_p_p_,_A_p_p_} where _A_p_p is _k_e_r_n_e_l, _s_t_d_l_i_b, _g_s or _d_e_b_u_g_g_e_r
+              if _A_b_s_M_o_d_u_l_e belongs to one of these applications.
+
+              Note that the function can return _t_r_u_e for a module which in
+              fact is not interpretable in the case where the module is marked
+              as sticky or resides in a directory marked as sticky, as this is
+              not discovered until the interpreter actually tries to load the
+              module.
+
+       aauuttoo__aattttaacchh(()) -->> ffaallssee || {{FFllaaggss,,FFuunnccttiioonn}}
+       aauuttoo__aattttaacchh((ffaallssee))
+       aauuttoo__aattttaacchh((FFllaaggss,, FFuunnccttiioonn))
+
+              Types:
+
+                 Flags = [init | break | exit]
+                 Function = {Module,Name,Args}
+                  Module = Name = atom()
+                  Args = [term()]
+
+              Gets and sets when and how to automatically attach to a process
+              executing code in interpreted modules. _f_a_l_s_e means never
+              automatically attach, this is the default. Otherwise automatic
+              attach is defined by a list of flags and a function. The
+              following flags may be specified:
+
+                * _i_n_i_t - attach when a process for the very first time calls
+                  an interpreted function.
+
+                * _b_r_e_a_k - attach whenever a process reaches a breakpoint.
+
+                * _e_x_i_t - attach when a process terminates.
+
+              When the specified event occurs, the function _F_u_n_c_t_i_o_n will be
+              called as:
+
+              spawn(Module, Name, [Pid | Args])
+
+
+              _P_i_d is the pid of the process executing interpreted code.
+
+       ssttaacckk__ttrraaccee(()) -->> FFllaagg
+       ssttaacckk__ttrraaccee((FFllaagg))
+
+              Types:
+
+                 Flag = all | no_tail | false
+
+              Gets and sets how to save call frames in the stack. Saving call
+              frames makes it possible to inspect the call chain of a process,
+              and is also used to emulate the stack trace if an error (an
+              exception of class error) occurs.
+
+                * _a_l_l - save information about all current calls, that is,
+                  function calls that have not yet returned a value.
+
+                * _n_o___t_a_i_l - save information about current calls, but discard
+                  previous information when a tail recursive call is made.
+                  This option consumes less memory and may be necessary to use
+                  for processes with long lifetimes and many tail recursive
+                  calls. This is the default.
+
+                * _f_a_l_s_e - do not save any information about current calls.
+
+       bbrreeaakk((MMoodduullee,, LLiinnee)) -->> ookk || {{eerrrroorr,,bbrreeaakk__eexxiissttss}}
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Creates a breakpoint at _L_i_n_e in _M_o_d_u_l_e.
+
+       ddeelleettee__bbrreeaakk((MMoodduullee,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Deletes the breakpoint located at _L_i_n_e in _M_o_d_u_l_e.
+
+       bbrreeaakk__iinn((MMoodduullee,, NNaammee,, AArriittyy)) -->> ookk || {{eerrrroorr,,ffuunnccttiioonn__nnoott__ffoouunndd}}
+
+              Types:
+
+                 Module = Name = atom()
+                 Arity = int()
+
+              Creates a breakpoint at the first line of every clause of the
+              _M_o_d_u_l_e_:_N_a_m_e_/_A_r_i_t_y function.
+
+       ddeell__bbrreeaakk__iinn((MMoodduullee,, NNaammee,, AArriittyy)) -->> ookk || {{eerrrroorr,,ffuunnccttiioonn__nnoott__ffoouunndd}}
+
+              Types:
+
+                 Module = Name = atom()
+                 Arity = int()
+
+              Deletes the breakpoints at the first line of every clause of the
+              _M_o_d_u_l_e_:_N_a_m_e_/_A_r_i_t_y function.
+
+       nnoo__bbrreeaakk(()) -->> ookk
+       nnoo__bbrreeaakk((MMoodduullee)) -->> ookk
+
+              Deletes all breakpoints, or all breakpoints in _M_o_d_u_l_e.
+
+       ddiissaabbllee__bbrreeaakk((MMoodduullee,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Makes the breakpoint at _L_i_n_e in _M_o_d_u_l_e inactive.
+
+       eennaabbllee__bbrreeaakk((MMoodduullee,, LLiinnee)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+
+              Makes the breakpoint at _L_i_n_e in _M_o_d_u_l_e active.
+
+       aaccttiioonn__aatt__bbrreeaakk((MMoodduullee,, LLiinnee,, AAccttiioonn)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+                 Action = enable | disable | delete
+
+              Sets the trigger action of the breakpoint at _L_i_n_e in _M_o_d_u_l_e to
+              _A_c_t_i_o_n.
+
+       tteesstt__aatt__bbrreeaakk((MMoodduullee,, LLiinnee,, FFuunnccttiioonn)) -->> ookk
+
+              Types:
+
+                 Module = atom()
+                 Line = int()
+                 Function = {Module,Name}
+                  Name = atom()
+
+              Sets the conditional test of the breakpoint at _L_i_n_e in _M_o_d_u_l_e to
+              _F_u_n_c_t_i_o_n. The function must fulfill the requirements specified
+              in the section _B_r_e_a_k_p_o_i_n_t_s above.
+
+       ggeett__bbiinnddiinngg((VVaarr,, BBiinnddiinnggss)) -->> {{vvaalluuee,,VVaalluuee}} || uunnbboouunndd
+
+              Types:
+
+                 Var = atom()
+                 Bindings = term()
+                 Value = term()
+
+              Retrieves the binding of _V_a_r. This function is intended to be
+              used by the conditional function of a breakpoint.
+
+       aallll__bbrreeaakkss(()) -->> [[BBrreeaakk]]
+       aallll__bbrreeaakkss((MMoodduullee)) -->> [[BBrreeaakk]]
+
+              Types:
+
+                 Break = {Point,Options}
+                  Point = {Module,Line}
+                  Module = atom()
+                  Line = int()
+                  Options = [Status,Trigger,null,Cond|]
+                  Status = active | inactive
+                  Trigger = enable | disable | delete
+                  Cond = null | Function
+                  Function = {Module,Name}
+                  Name = atom()
+
+              Gets all breakpoints, or all breakpoints in _M_o_d_u_l_e.
+
+       ssnnaappsshhoott(()) -->> [[SSnnaappsshhoott]]
+
+              Types:
+
+                 Snapshot = {Pid, Function, Status, Info}
+                  Pid = pid()
+                  Function = {Module,Name,Args}
+                  Module = Name = atom()
+                  Args = [term()]
+                  Status = idle | running | waiting | break | exit | no_conn
+                  Info = {} | {Module,Line} | ExitReason
+                  Line = int()
+                  ExitReason = term()
+
+              Gets information about all processes executing interpreted code.
+
+                * _P_i_d - process identifier.
+
+                * _F_u_n_c_t_i_o_n - first interpreted function called by the process.
+
+                * _S_t_a_t_u_s - current status of the process.
+
+                * _I_n_f_o - additional information.
+
+              _S_t_a_t_u_s is one of:
+
+                * _i_d_l_e - the process is no longer executing interpreted code.
+                  _I_n_f_o_=_{_}.
+
+                * _r_u_n_n_i_n_g - the process is running. _I_n_f_o_=_{_}.
+
+                * _w_a_i_t_i_n_g - the process is waiting at a _r_e_c_e_i_v_e. _I_n_f_o_=_{_}.
+
+                * _b_r_e_a_k - process execution has been stopped, normally at a
+                  breakpoint. _I_n_f_o_=_{_M_o_d_u_l_e_,_L_i_n_e_}.
+
+                * _e_x_i_t - the process has terminated. _I_n_f_o_=_E_x_i_t_R_e_a_s_o_n.
+
+                * _n_o___c_o_n_n - the connection is down to the node where the
+                  process is running. _I_n_f_o_=_{_}.
+
+       cclleeaarr(()) -->> ookk
+
+              Clears information about processes executing interpreted code by
+              removing all information about terminated processes.
+
+       ccoonnttiinnuuee((PPiidd)) -->> ookk || {{eerrrroorr,,nnoott__iinntteerrpprreetteedd}}
+       ccoonnttiinnuuee((XX,,YY,,ZZ)) -->> ookk || {{eerrrroorr,,nnoott__iinntteerrpprreetteedd}}
+
+              Types:
+
+                 Pid = pid()
+                 X = Y = Z = int()
+
+              Resume process execution for _P_i_d, or for _c_:_p_i_d_(_X_,_Y_,_Z_).
+
+
+
+Ericsson AB                     debugger 3.2.8                          int(3)

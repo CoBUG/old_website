@@ -1,0 +1,65 @@
+wxBitmapDataObject(3)      Erlang Module Definition      wxBitmapDataObject(3)
+
+
+
+NNAAMMEE
+       wxBitmapDataObject - See external documentation: wxBitmapDataObject.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxBitmapDataObject.
+
+       This class is derived (and can use functions) from:
+       wwxxDDaattaaOObbjjeecctt
+
+DDAATTAA TTYYPPEESS
+         _w_x_B_i_t_m_a_p_D_a_t_a_O_b_j_e_c_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxBBiittmmaappDDaattaaOObbjjeecctt(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxBBiittmmaappDDaattaaOObbjjeecctt(())
+
+              Types:
+
+                 Option = {bitmap, wxBitmap() (see module wxBitmap)}
+
+              See external documentation.
+              Also:
+              new(Bitmap) -> wxBitmapDataObject() when
+              Bitmap::wxBitmap:wxBitmap().
+
+
+       ggeettBBiittmmaapp((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxBitmapDataObject()
+
+              See external documentation.
+
+       sseettBBiittmmaapp((TThhiiss,, BBiittmmaapp)) -->> ookk
+
+              Types:
+
+                 This = wxBitmapDataObject()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxBBiittmmaappDDaattaaOObbjjeecctt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxBitmapDataObject(3)

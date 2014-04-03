@@ -1,0 +1,70 @@
+CosNaming_BindingIterator(3)Erlang Module DefinitionCosNaming_BindingIterator(3)
+
+
+
+NNAAMMEE
+       CosNaming_BindingIterator - This interface supports iteration over a
+       name binding list.
+
+DDEESSCCRRIIPPTTIIOONN
+       This interface allows a client to iterate over the Bindinglist it has
+       been initiated with.
+
+       The type _N_a_m_e_C_o_m_p_o_n_e_n_t used below is defined as:
+
+             -record('CosNaming_NameComponent', {id, kind=""}).
+
+
+       _i_d and _k_i_n_d are strings.
+
+       The type _B_i_n_d_i_n_g used below is defined as:
+
+             -record('CosNaming_Binding', {binding_name, binding_type}).
+
+
+       _b_i_n_d_i_n_g___n_a_m_e is a _N_a_m_e _= _[_N_a_m_e_C_o_m_p_o_n_e_n_t_] and _b_i_n_d_i_n_g___t_y_p_e is an enum
+       which has the values _n_o_b_j_e_c_t and _n_c_o_n_t_e_x_t.
+
+       Both these records are defined in the file _C_o_s_N_a_m_i_n_g_._h_r_l and it is
+       included with:
+
+             -include_lib("orber/COSS/CosNaming/CosNaming.hrl").
+
+
+EEXXPPOORRTTSS
+       nneexxtt__oonnee((BBiinnddiinnIItteerraattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 BindingIterator = #objref
+                 Return = {bool(), Binding}
+
+              This operation returns the next binding and a boolean. The
+              latter is set to true if the binding is valid otherwise false.
+              If the boolean is false there are no more bindings to retrieve.
+
+       nneexxtt__nn((BBiinnddiinnIItteerraattoorr,, HHoowwMMaannyy)) -->> RReettuurrnn
+
+              Types:
+
+                 BindingIterator = #objref
+                 HowMany = int()
+                 BindingList = [Binding]
+                 Return = {bool(), BindingList}
+
+              This operation returns a binding list with at most HowMany
+              bindings. If there are no more bindings it returns false
+              otherwise true.
+
+       ddeessttrrooyy((BBiinnddiinnggIItteerraattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 BindingIterator = #objref
+                 Return = ok
+
+              This operation destroys the binding iterator.
+
+
+
+Ericsson AB                      orber 3.6.24     CosNaming_BindingIterator(3)

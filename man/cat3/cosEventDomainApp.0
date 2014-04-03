@@ -1,0 +1,101 @@
+cosEventDomainApp(3)       Erlang Module Definition       cosEventDomainApp(3)
+
+
+
+NNAAMMEE
+       cosEventDomainApp - The main module of the cosEventDomain application.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_D_o_m_a_i_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module contains the functions for starting and stopping the
+       application.
+
+EEXXPPOORRTTSS
+       iinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E} | {'EXIT', R}
+
+              This operation installs the cosEventDomain application.
+
+       uunniinnssttaallll(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {'EXCEPTION', E} | {'EXIT', R}
+
+              This operation uninstalls the cosEventDomain application.
+
+       ssttaarrtt(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation starts the cosEventDomain application.
+
+       ssttoopp(()) -->> RReettuurrnn
+
+              Types:
+
+                 Return = ok | {error, Reason}
+
+              This operation stops the cosEventDomain application.
+
+       ssttaarrtt__ffaaccttoorryy(()) -->> FFaaccttoorryy
+
+              Types:
+
+                 Factory = #objref
+
+              This operation creates a new instance of a EEvveenntt DDoommaaiinn FFaaccttoorryy
+              using the default settings.
+
+       ssttaarrtt__ffaaccttoorryy((OOppttiioonnss)) -->> FFaaccttoorryy
+
+              Types:
+
+                 Options = [Option]
+                 Option = currently no options defined.
+                 Factory = #objref
+
+              This operation creates a new instance of a EEvveenntt DDoommaaiinn FFaaccttoorryy
+
+       ssttaarrtt__ffaaccttoorryy__lliinnkk(()) -->> FFaaccttoorryy
+
+              Types:
+
+                 Factory = #objref
+
+              This operation creates a new instance of a EEvveenntt DDoommaaiinn FFaaccttoorryy,
+              which is linked to the invoking process, using the default
+              settings.
+
+       ssttaarrtt__ffaaccttoorryy__lliinnkk((OOppttiioonnss)) -->> FFaaccttoorryy
+
+              Types:
+
+                 Options = [Option]
+                 Option = currently no options defined.
+                 Factory = #objref
+
+              This operation creates a new instance of a EEvveenntt DDoommaaiinn FFaaccttoorryy,
+              which is linked to the invoking process, with settings defined
+              by the given options. Allowed options are the same as for
+              _c_o_s_E_v_e_n_t_D_o_m_a_i_n_A_p_p_:_s_t_a_r_t___f_a_c_t_o_r_y_/_1.
+
+       ssttoopp__ffaaccttoorryy((FFaaccttoorryy)) -->> RReeppllyy
+
+              Types:
+
+                 Factory = #objref
+                 Reply = ok | {'EXCEPTION', E}
+
+              This operation stop the target factory.
+
+
+
+Ericsson AB                  cosEventDomain 1.1.12        cosEventDomainApp(3)

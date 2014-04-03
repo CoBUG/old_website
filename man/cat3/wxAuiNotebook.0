@@ -1,0 +1,268 @@
+wxAuiNotebook(3)           Erlang Module Definition           wxAuiNotebook(3)
+
+
+
+NNAAMMEE
+       wxAuiNotebook - See external documentation: wxAuiNotebook.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxAuiNotebook.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_A_u_i_N_o_t_e_b_o_o_k_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxAAuuiiNNootteebbooookk(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxAAuuiiNNootteebbooookk(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiNNootteebbooookk(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       aaddddPPaaggee((TThhiiss,, PPaaggee,, CCaappttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page = wxWindow() (see module wxWindow)
+                 Caption = chardata() (see module unicode)
+
+              Equivalent to aaddddPPaaggee((TThhiiss,, PPaaggee,, CCaappttiioonn,, [[]])).
+
+       aaddddPPaaggee((TThhiiss,, PPaaggee,, CCaappttiioonn,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page = wxWindow() (see module wxWindow)
+                 Caption = chardata() (see module unicode)
+                 Option = {select, boolean()} | {bitmap, wxBitmap() (see
+                 module wxBitmap)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       ddeelleetteePPaaggee((TThhiiss,, PPaaggee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page = integer()
+
+              See external documentation.
+
+       ggeettAArrttPPrroovviiddeerr((TThhiiss)) -->> wwxxAAuuiiTTaabbAArrtt(()) ((sseeee mmoodduullee wwxxAAuuiiTTaabbAArrtt))
+
+              Types:
+
+                 This = wxAuiNotebook()
+
+              See external documentation.
+
+       ggeettPPaaggee((TThhiiss,, PPaaggee__iiddxx)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page_idx = integer()
+
+              See external documentation.
+
+       ggeettPPaaggeeBBiittmmaapp((TThhiiss,, PPaaggee__iiddxx)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page_idx = integer()
+
+              See external documentation.
+
+       ggeettPPaaggeeCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+
+              See external documentation.
+
+       ggeettPPaaggeeIInnddeexx((TThhiiss,, PPaaggee__wwnndd)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page_wnd = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ggeettPPaaggeeTTeexxtt((TThhiiss,, PPaaggee__iiddxx)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page_idx = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+
+              See external documentation.
+
+       iinnsseerrttPPaaggee((TThhiiss,, PPaaggee__iiddxx,, PPaaggee,, CCaappttiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page_idx = integer()
+                 Page = wxWindow() (see module wxWindow)
+                 Caption = chardata() (see module unicode)
+
+              Equivalent to iinnsseerrttPPaaggee((TThhiiss,, PPaaggee__iiddxx,, PPaaggee,, CCaappttiioonn,, [[]])).
+
+       iinnsseerrttPPaaggee((TThhiiss,, PPaaggee__iiddxx,, PPaaggee,, CCaappttiioonn,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page_idx = integer()
+                 Page = wxWindow() (see module wxWindow)
+                 Caption = chardata() (see module unicode)
+                 Option = {select, boolean()} | {bitmap, wxBitmap() (see
+                 module wxBitmap)}
+
+              See external documentation.
+
+       rreemmoovveePPaaggee((TThhiiss,, PPaaggee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page = integer()
+
+              See external documentation.
+
+       sseettAArrttPPrroovviiddeerr((TThhiiss,, AArrtt)) -->> ookk
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Art = wxAuiTabArt() (see module wxAuiTabArt)
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettPPaaggeeBBiittmmaapp((TThhiiss,, PPaaggee,, BBiittmmaapp)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+
+       sseettPPaaggeeTTeexxtt((TThhiiss,, PPaaggee,, TTeexxtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Page = integer()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettSSeelleeccttiioonn((TThhiiss,, NNeeww__ppaaggee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 New_page = integer()
+
+              See external documentation.
+
+       sseettTTaabbCCttrrllHHeeiigghhtt((TThhiiss,, HHeeiigghhtt)) -->> ookk
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Height = integer()
+
+              See external documentation.
+
+       sseettUUnniiffoorrmmBBiittmmaappSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxAuiNotebook()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxAAuuiiNNootteebbooookk(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                  wxAuiNotebook(3)

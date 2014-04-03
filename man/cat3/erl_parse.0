@@ -1,0 +1,147 @@
+erl_parse(3)               Erlang Module Definition               erl_parse(3)
+
+
+
+NNAAMMEE
+       erl_parse - The Erlang Parser
+
+DDEESSCCRRIIPPTTIIOONN
+       This module is the basic Erlang parser which converts tokens into the
+       abstract form of either forms (i.e., top-level constructs),
+       expressions, or terms. The Abstract Format is described in the EERRTTSS
+       UUsseerr''ss GGuuiiddee. Note that a token list must end with the _d_o_t token in
+       order to be acceptable to the parse functions (see eerrll__ssccaann((33))).
+
+DDAATTAA TTYYPPEESS
+       aabbssttrraacctt__ccllaauussee(()) = term()
+
+              Parse tree for Erlang clause.
+
+       aabbssttrraacctt__eexxpprr(()) = term()
+
+              Parse tree for Erlang expression.
+
+       aabbssttrraacctt__ffoorrmm(()) = term()
+
+              Parse tree for Erlang form.
+
+       eerrrroorr__ddeessccrriippttiioonn(()) = term()
+
+       eerrrroorr__iinnffoo(()) = {eerrll__ssccaann::lliinnee(()), module(), eerrrroorr__ddeessccrriippttiioonn(())}
+
+       ttookkeenn(()) = {Tag :: atom(), Line :: eerrll__ssccaann::lliinnee(())}
+
+EEXXPPOORRTTSS
+       ppaarrssee__ffoorrmm((TTookkeennss)) -->> {{ookk,, AAbbssFFoorrmm}} || {{eerrrroorr,, EErrrroorrIInnffoo}}
+
+              Types:
+
+                 Tokens = [ttookkeenn(())]
+                 AbsForm = aabbssttrraacctt__ffoorrmm(())
+                 ErrorInfo = eerrrroorr__iinnffoo(())
+
+              This function parses _T_o_k_e_n_s as if it were a form. It returns:
+
+                _{_o_k_, _A_b_s_F_o_r_m_}:
+                  The parsing was successful. _A_b_s_F_o_r_m is the abstract form of
+                  the parsed form.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_}:
+                  An error occurred.
+
+       ppaarrssee__eexxpprrss((TTookkeennss)) -->> {{ookk,, EExxpprrLLiisstt}} || {{eerrrroorr,, EErrrroorrIInnffoo}}
+
+              Types:
+
+                 Tokens = [ttookkeenn(())]
+                 ExprList = [aabbssttrraacctt__eexxpprr(())]
+                 ErrorInfo = eerrrroorr__iinnffoo(())
+
+              This function parses _T_o_k_e_n_s as if it were a list of expressions.
+              It returns:
+
+                _{_o_k_, _E_x_p_r_L_i_s_t_}:
+                  The parsing was successful. _E_x_p_r_L_i_s_t is a list of the
+                  abstract forms of the parsed expressions.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_}:
+                  An error occurred.
+
+       ppaarrssee__tteerrmm((TTookkeennss)) -->> {{ookk,, TTeerrmm}} || {{eerrrroorr,, EErrrroorrIInnffoo}}
+
+              Types:
+
+                 Tokens = [ttookkeenn(())]
+                 Term = term()
+                 ErrorInfo = eerrrroorr__iinnffoo(())
+
+              This function parses _T_o_k_e_n_s as if it were a term. It returns:
+
+                _{_o_k_, _T_e_r_m_}:
+                  The parsing was successful. _T_e_r_m is the Erlang term
+                  corresponding to the token list.
+
+                _{_e_r_r_o_r_, _E_r_r_o_r_I_n_f_o_}:
+                  An error occurred.
+
+       ffoorrmmaatt__eerrrroorr((EErrrroorrDDeessccrriippttoorr)) -->> CChhaarrss
+
+              Types:
+
+                 ErrorDescriptor = eerrrroorr__ddeessccrriippttiioonn(())
+                 Chars = [char() | Chars]
+
+              Uses an _E_r_r_o_r_D_e_s_c_r_i_p_t_o_r and returns a string which describes the
+              error. This function is usually called implicitly when an
+              _E_r_r_o_r_I_n_f_o structure is processed (see below).
+
+       ttookkeennss((AAbbssTTeerrmm)) -->> TTookkeennss
+
+       ttookkeennss((AAbbssTTeerrmm,, MMoorreeTTookkeennss)) -->> TTookkeennss
+
+              Types:
+
+                 AbsTerm = aabbssttrraacctt__eexxpprr(())
+                 MoreTokens = Tokens = [ttookkeenn(())]
+
+              This function generates a list of tokens representing the
+              abstract form _A_b_s_T_e_r_m of an expression. Optionally, it appends
+              _M_o_r_e_T_o_k_e_n_s.
+
+       nnoorrmmaalliissee((AAbbssTTeerrmm)) -->> DDaattaa
+
+              Types:
+
+                 AbsTerm = aabbssttrraacctt__eexxpprr(())
+                 Data = term()
+
+              Converts the abstract form _A_b_s_T_e_r_m of a term into a conventional
+              Erlang data structure (i.e., the term itself). This is the
+              inverse of _a_b_s_t_r_a_c_t_/_1.
+
+       aabbssttrraacctt((DDaattaa)) -->> AAbbssTTeerrmm
+
+              Types:
+
+                 Data = term()
+                 AbsTerm = aabbssttrraacctt__eexxpprr(())
+
+              Converts the Erlang data structure _D_a_t_a into an abstract form of
+              type _A_b_s_T_e_r_m. This is the inverse of _n_o_r_m_a_l_i_s_e_/_1.
+
+EERRRROORR IINNFFOORRMMAATTIIOONN
+       The _E_r_r_o_r_I_n_f_o mentioned above is the standard _E_r_r_o_r_I_n_f_o structure which
+       is returned from all IO modules. It has the format:
+
+           {ErrorLine, Module, ErrorDescriptor}
+
+       A string which describes the error is obtained with the following call:
+
+           Module:format_error(ErrorDescriptor)
+
+SSEEEE AALLSSOO
+       iioo((33)), eerrll__ssccaann((33)), ERTS User's Guide
+
+
+
+Ericsson AB                      stdlib 1.18.2                    erl_parse(3)

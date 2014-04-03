@@ -1,0 +1,418 @@
+odbc(3)                    Erlang Module Definition                    odbc(3)
+
+
+
+NNAAMMEE
+       odbc - Erlang ODBC application
+
+DDEESSCCRRIIPPTTIIOONN
+       This application provides an Erlang interface to communicate with
+       relational SQL-databases. It is built on top of Microsofts ODBC
+       interface and therefore requires that you have an ODBC driver to the
+       database that you want to connect to.
+
+   NNoottee::
+       The functions _f_i_r_s_t_/_[_1_,_2_], _l_a_s_t_/_[_1_,_2_], _n_e_x_t_/_[_1_,_2_], _p_r_e_v_[_1_,_2_] and
+       _s_e_l_e_c_t_/_[_3_,_4_] assumes there is a result set associated with the
+       connection to work on. Calling the function _s_e_l_e_c_t___c_o_u_n_t_/_[_2_,_3_]
+       associates such a result set with the connection. Calling select_count
+       again will remove the current result set association and create a new
+       one. Calling a function which dose not operate on an associated result
+       sets, such as _s_q_l___q_u_e_r_y_/_[_2_,_3_], will remove the current result set
+       association.
+
+       Alas some drivers only support sequential traversal of the result set,
+       e.i. they do not support what in the ODBC world is known as scrollable
+       cursors. This will have the effect that functions such as _f_i_r_s_t_/_[_1_,_2_],
+       _l_a_s_t_/_[_1_,_2_], _p_r_e_v_[_1_,_2_], etc will return _{_e_r_r_o_r_,
+       _d_r_i_v_e_r___d_o_e_s___n_o_t___s_u_p_p_o_r_t___f_u_n_c_t_i_o_n_}
+
+
+CCOOMMMMOONN DDAATTAA TTYYPPEESS
+       Here follows type definitions that are used by more than one function
+       in the ODBC API.
+
+   NNoottee::
+       The type _T_i_m_e_O_u_t has the default value _i_n_f_i_n_i_t_y, so for instance:
+       commit(Ref, CommitMode) is the same as commit(Ref, CommitMode,
+       infinity). If the timeout expires the client will exit with the reason
+       timeout.
+
+
+        connection_reference() - as returned by connect/2
+
+        time_out() = milliseconds() | infinity
+
+        milliseconds() = integer() >= 0
+
+        common_reason() = connection_closed | term() - some kind of
+                        explanation of what went wrong
+
+        string() = list of ASCII characters
+
+        col_name() = string() - Name of column in the result set
+
+        col_names() - [col_name()] - e.g. a list of the names of the
+                  selected columns in the result set.
+
+        row() = {value()} - Tuple of column values e.g. one row of the
+                  result set.
+
+        value() = null | term() - A column value.
+
+        rows() = [row()] - A list of rows from the result set.
+
+        result_tuple() =
+             {updated, n_rows()} | {selected, col_names(), rows()}
+
+        n_rows() = integer() - The number of affected rows for UPDATE,
+                  INSERT, or DELETE queries. For other query types the value
+                  is driver defined, and hence should be ignored.
+
+        odbc_data_type() = sql_integer | sql_smallint | sql_tinyint |
+             {sql_decimal, precision(), scale()} |
+             {sql_numeric, precision(), scale()} |
+             {sql_char, size()} | {sql_wchar, size()} | {sql_varchar, size()} | {sql_wvarchar, size()}| {sql_float, precision()} |
+             {sql_wlongvarchar, size()} | {sql_float, precision()} | sql_real | sql_double | sql_bit | atom()
+
+
+        precision() = integer()
+
+        scale() = integer()
+
+        size() = integer()
+
+EERRRROORR HHAANNDDLLIINNGG
+       The error handling strategy and possible errors sources are described
+       in the Erlang ODBC UUsseerr''ss GGuuiiddee..
+
+EEXXPPOORRTTSS
+       ccoommmmiitt((RReeff,, CCoommmmiittMMooddee)) -->>
+       ccoommmmiitt((RReeff,, CCoommmmiittMMooddee,, TTiimmeeOOuutt)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 CommitMode = commit | rollback
+                 TimeOut = time_out()
+                 Reason = not_an_explicit_commit_connection |
+                 process_not_owner_of_odbc_connection | common_reason()
+
+              Commits or rollbacks a transaction. Needed on connections where
+              automatic commit is turned off.
+
+       ccoonnnneecctt((CCoonnnneeccttSSttrr,, OOppttiioonnss)) -->> {{ookk,, RReeff}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 ConnectStr = string()
+                   An example of a connection string: _"_D_S_N_=_s_q_l_-
+                   _s_e_r_v_e_r_;_U_I_D_=_a_l_a_d_d_i_n_;_P_W_D_=_s_e_s_a_m_e_" where DSN is your ODBC Data
+                   Source Name, UID is a database user id and PWD is the
+                   password for that user. These are usually the attributes
+                   required in the connection string, but some drivers have
+                   other driver specific attributes, for example
+                   _"_D_S_N_=_O_r_a_c_l_e_8_;_D_B_Q_=_g_a_n_d_a_l_f_;_U_I_D_=_a_l_a_d_d_i_n_;_P_W_D_=_s_e_s_a_m_e_" where DBQ
+                   is your TNSNAMES.ORA entry name e.g. some Oracle specific
+                   configuration attribute.
+                 Options = [] | [option()]
+                   All options has default values.
+                 option() = {auto_commit, on | off} | {timeout,
+                 milliseconds()} | {binary_strings, on | off} | {tuple_row, on
+                 | off} | {scrollable_cursors, on | off} | {trace_driver, on |
+                 off}
+                 Ref = connection_reference() - should be used to access the
+                 connection.
+                 Reason = port_program_executable_not_found | common_reason()
+
+              Opens a connection to the database. The connection is associated
+              with the process that created it and can only be accessed
+              through it. This function may spawn new processes to handle the
+              connection. These processes will terminate if the process that
+              created the connection dies or if you call disconnect/1.
+
+              If automatic commit mode is turned on, each query will be
+              considered as an individual transaction and will be
+              automatically committed after it has been executed. If you want
+              more than one query to be part of the same transaction the
+              automatic commit mode should be turned off. Then you will have
+              to call commit/3 explicitly to end a transaction.
+
+              The default timeout is infinity
+
+              >If the option binary_strings is turned on all strings will be
+              returned as binaries and strings inputed to param_query will be
+              expected to be binaries. The user needs to ensure that the
+              binary is in an encoding that the database expects. By default
+              this option is turned off.
+
+              As default result sets are returned as a lists of tuples. The
+              _T_u_p_l_e_M_o_d_e option still exists to keep some degree of backwards
+              compatibility. If the option is set to off, result sets will be
+              returned as a lists of lists instead of a lists of tuples.
+
+              Scrollable cursors are nice but causes some overhead. For some
+              connections speed might be more important than flexible data
+              access and then you can disable scrollable cursor for a
+              connection, limiting the API but gaining speed.
+
+          NNoottee::
+              Turning the scrollable_cursors option off is noted to make old
+              odbc-drivers able to connect that will otherwhise fail.
+
+
+              If trace mode is turned on this tells the ODBC driver to write a
+              trace log to the file SQL.LOG that is placed in the current
+              directory of the erlang emulator. This information may be useful
+              if you suspect there might be a bug in the erlang ODBC
+              application, and it might be relevant for you to send this file
+              to our support. Otherwise you will probably not have much use of
+              this.
+
+          NNoottee::
+              For more information about the _C_o_n_n_e_c_t_S_t_r see description of the
+              function SQLDriverConnect in [1].
+
+
+       ddiissccoonnnneecctt((RReeff)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 Reason = process_not_owner_of_odbc_connection
+
+              Closes a connection to a database. This will also terminate all
+              processes that may have been spawned when the connection was
+              opened. This call will always succeed. If the connection can not
+              be disconnected gracefully it will be brutally killed. However
+              you may receive an error message as result if you try to
+              disconnect a connection started by another process.
+
+       ddeessccrriibbee__ttaabbllee((RReeff,, TTaabbllee)) -->>
+       ddeessccrriibbee__ttaabbllee((RReeff,, TTaabbllee,, TTiimmeeoouutt)) -->> {{ookk,, DDeessccrriippttiioonn}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 Table = string() - Name of databas table.
+                 TimeOut = time_out()
+                 Description = [{col_name(), odbc_data_type()}]
+                 Reason = common_reason()
+
+              Queries the database to find out the ODBC data types of the
+              columns of the table _T_a_b_l_e.
+
+       ffiirrsstt((RReeff)) -->>
+       ffiirrsstt((RReeff,, TTiimmeeoouutt)) -->> {{sseelleecctteedd,, CCoollNNaammeess,, RRoowwss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 TimeOut = time_out()
+                 ColNames = col_names()
+                 Rows = rows()
+                 Reason = result_set_does_not_exist |
+                 driver_does_not_support_function |
+                 scrollable_cursors_disabled |
+                 process_not_owner_of_odbc_connection | common_reason()
+
+              Returns the first row of the result set and positions a cursor
+              at this row.
+
+       llaasstt((RReeff)) -->>
+       llaasstt((RReeff,, TTiimmeeOOuutt)) -->> {{sseelleecctteedd,, CCoollNNaammeess,, RRoowwss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 TimeOut = time_out()
+                 ColNames = col_names()
+                 Rows = rows()
+                 Reason = result_set_does_not_exist |
+                 driver_does_not_support_function |
+                 scrollable_cursors_disabled |
+                 process_not_owner_of_odbc_connection | common_reason()
+
+              Returns the last row of the result set and positions a cursor at
+              this row.
+
+       nneexxtt((RReeff)) -->>
+       nneexxtt((RReeff,, TTiimmeeOOuutt)) -->> {{sseelleecctteedd,, CCoollNNaammeess,, RRoowwss}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 TimeOut = time_out()
+                 ColNames = col_names()
+                 Rows = rows()
+                 Reason = result_set_does_not_exist |
+                 process_not_owner_of_odbc_connection | common_reason()
+
+              Returns the next row of the result set relative the current
+              cursor position and positions the cursor at this row. If the
+              cursor is positioned at the last row of the result set when this
+              function is called the returned value will be _{_s_e_l_e_c_t_e_d_,
+              _C_o_l_N_a_m_e_s_,_[_]_} e.i. the list of row values is empty indicating
+              that there is no more data to fetch.
+
+       ppaarraamm__qquueerryy((RReeff,, SSQQLLQQuueerryy,, PPaarraammss)) -->>
+       ppaarraamm__qquueerryy((RReeff,, SSQQLLQQuueerryy,, PPaarraammss,, TTiimmeeOOuutt)) -->> RReessuullttTTuuppllee || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 SQLQuery = string() - a SQL query with parameter
+                 markers/place holders in form of question marks.
+                 Params = [{odbc_data_type(), [value()]}] |[{odbc_data_type(),
+                 in_or_out(), [value()]}]
+                 in_or_out = in | out | inout
+                   Defines IN, OUT, and IN OUT Parameter Modes for stored
+                   procedures.
+                 TimeOut = time_out()
+                 Values = term() - Must be consistent with the Erlang data
+                 type that corresponds to the ODBC data type ODBCDataType
+
+              Executes a parameterized SQL query. For an example see the
+              ""UUssiinngg tthhee EErrllaanngg AAPPII"" in the Erlang ODBC User's Guide.
+
+          NNoottee::
+              Use the function describe_table/[2,3] to find out which ODBC
+              data type that is expected for each column of that table. If a
+              column has a data type that is described with capital letters,
+              alas it is not currently supported by the param_query function.
+              Too know which Erlang data type corresponds to an ODBC data type
+              see the Erlang to ODBC data type mmaappppiinngg in the User's Guide.
+
+
+       pprreevv((RReeff)) -->>
+       pprreevv((CCoonnnneeccttiioonnRReeffeerreennccee,, TTiimmeeOOuutt)) -->> {{sseelleecctteedd,, CCoollNNaammeess,, RRoowwss}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 TimeOut = time_out()
+                 ColNames = col_names()
+                 Rows = rows()
+                 Reason = result_set_does_not_exist |
+                 driver_does_not_support_function |
+                 scrollable_cursors_disabled |
+                 process_not_owner_of_odbc_connection | common_reason()
+
+              Returns the previous row of the result set relative the current
+              cursor position and positions the cursor at this row.
+
+       ssttaarrtt(()) -->>
+       ssttaarrtt((TTyyppee)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Type = permanent | transient | temporary
+
+              Starts the odbc application. Default type is temporary. SSeeee
+              aapppplliiccaattiioonn((33))
+
+       ssttoopp(()) -->> ookk
+
+              Stops the odbc application. SSeeee aapppplliiccaattiioonn((33))
+
+       ssqqll__qquueerryy((RReeff,, SSQQLLQQuueerryy)) -->>
+       ssqqll__qquueerryy((RReeff,, SSQQLLQQuueerryy,, TTiimmeeOOuutt)) -->> RReessuullttTTuuppllee || [[RReessuullttTTuuppllee]]
+       ||{{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 SQLQuery = string() - The string may be composed by several
+                 SQL-queries separated by a ";", this is called a batch.
+                 TimeOut = time_out()
+                 ResultTuple = result_tuple()
+                 Reason = process_not_owner_of_odbc_connection |
+                 common_reason()
+
+              Executes a SQL query or a batch of SQL queries. If it is a
+              SELECT query the result set is returned, on the format
+              _{_s_e_l_e_c_t_e_d_, _C_o_l_N_a_m_e_s_, _R_o_w_s_}. For other query types the tuple
+              _{_u_p_d_a_t_e_d_, _N_R_o_w_s_} is returned, and for batched queries, if the
+              driver supports them, this function can also return a list of
+              result tuples.
+
+          NNoottee::
+              Some drivers may not have the information of the number of
+              affected rows available and then the return value may be
+              _{_u_p_d_a_t_e_d_, _u_n_d_e_f_i_n_e_d_} .
+
+              The list of column names is ordered in the same way as the list
+              of values of a row, e.g. the first _C_o_l_N_a_m_e is associated with
+              the first _V_a_l_u_e in a _R_o_w.
+
+
+
+       sseelleecctt__ccoouunntt((RReeff,, SSeelleeccttQQuueerryy)) -->>
+       sseelleecctt__ccoouunntt((RReeff,, SSeelleeccttQQuueerryy,, TTiimmeeOOuutt)) -->> {{ookk,, NNrrRRoowwss}} || {{eerrrroorr,,
+       RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 SelectQuery = string()
+                   SQL SELECT query.
+                 TimeOut = time_out()
+                 NrRows = n_rows()
+                 Reason = process_not_owner_of_odbc_connection |
+                 common_reason()
+
+              Executes a SQL SELECT query and associates the result set with
+              the connection. A cursor is positioned before the first row in
+              the result set and the tuple _{_o_k_, _N_r_R_o_w_s_} is returned.
+
+          NNoottee::
+              Some drivers may not have the information of the number of rows
+              in the result set, then _N_r_R_o_w_s will have the value _u_n_d_e_f_i_n_e_d.
+
+
+       sseelleecctt((RReeff,, PPoossiittiioonn,, NN)) -->>
+       sseelleecctt((RReeff,, PPoossiittiioonn,, NN,, TTiimmeeOOuutt)) -->> {{sseelleecctteedd,, CCoollNNaammeess,, RRoowwss}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Ref = connection_reference()
+                 Position = next | {relative, Pos} | {absolute, Pos}
+                   Selection strategy, determines at which row in the result
+                   set to start the selection.
+                 Pos = integer()
+                   Should indicate a row number in the result set. When used
+                   together with the option _r_e_l_a_t_i_v_eit will be used as an
+                   offset from the current cursor position, when used together
+                   with the option _a_b_s_o_l_u_t_eit will be interpreted as a row
+                   number.
+                 N = integer()
+                 TimeOut = time_out()
+                 Reason = result_set_does_not_exist |
+                 driver_does_not_support_function |
+                 scrollable_cursors_disabled |
+                 process_not_owner_of_odbc_connection | common_reason()
+
+              Selects _N consecutive rows of the result set. If _P_o_s_i_t_i_o_n is
+              _n_e_x_t it is semantically equivalent of calling _n_e_x_t_/_[_1_,_2_] _N
+              times. If _P_o_s_i_t_i_o_n is _{_r_e_l_a_t_i_v_e_, _P_o_s_}, _P_o_s will be used as an
+              offset from the current cursor position to determine the first
+              selected row. If _P_o_s_i_t_i_o_n is _{_a_b_s_o_l_u_t_e_, _P_o_s_}, _P_o_s will be the
+              number of the first row selected. After this function has
+              returned the cursor is positioned at the last selected row. If
+              there is less then _N rows left of the result set the length of
+              _R_o_w_s will be less than _N. If the first row to select happens to
+              be beyond the last row of the result set, the returned value
+              will be _{_s_e_l_e_c_t_e_d_, _C_o_l_N_a_m_e_s_,_[_]_} e.i. the list of row values is
+              empty indicating that there is no more data to fetch.
+
+RREEFFEERREENNCCEESS
+       [1]: Microsoft ODBC 3.0, Programmer's Reference and SDK Guide
+       See also http://msdn.microsoft.com/
+
+
+
+Ericsson AB                      odbc 2.10.13                          odbc(3)

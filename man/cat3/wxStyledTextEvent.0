@@ -1,0 +1,226 @@
+wxStyledTextEvent(3)       Erlang Module Definition       wxStyledTextEvent(3)
+
+
+
+NNAAMMEE
+       wxStyledTextEvent - See external documentation: wxStyledTextEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxStyledTextEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _s_t_c___c_h_a_n_g_e, _s_t_c___s_t_y_l_e_n_e_e_d_e_d, _s_t_c___c_h_a_r_a_d_d_e_d, _s_t_c___s_a_v_e_p_o_i_n_t_r_e_a_c_h_e_d,
+           _s_t_c___s_a_v_e_p_o_i_n_t_l_e_f_t, _s_t_c___r_o_m_o_d_i_f_y_a_t_t_e_m_p_t, _s_t_c___k_e_y, _s_t_c___d_o_u_b_l_e_c_l_i_c_k,
+           _s_t_c___u_p_d_a_t_e_u_i, _s_t_c___m_o_d_i_f_i_e_d, _s_t_c___m_a_c_r_o_r_e_c_o_r_d, _s_t_c___m_a_r_g_i_n_c_l_i_c_k,
+           _s_t_c___n_e_e_d_s_h_o_w_n, _s_t_c___p_a_i_n_t_e_d, _s_t_c___u_s_e_r_l_i_s_t_s_e_l_e_c_t_i_o_n, _s_t_c___u_r_i_d_r_o_p_p_e_d,
+           _s_t_c___d_w_e_l_l_s_t_a_r_t, _s_t_c___d_w_e_l_l_e_n_d, _s_t_c___s_t_a_r_t___d_r_a_g, _s_t_c___d_r_a_g___o_v_e_r,
+           _s_t_c___d_o___d_r_o_p, _s_t_c___z_o_o_m, _s_t_c___h_o_t_s_p_o_t___c_l_i_c_k, _s_t_c___h_o_t_s_p_o_t___d_c_l_i_c_k,
+           _s_t_c___c_a_l_l_t_i_p___c_l_i_c_k, _s_t_c___a_u_t_o_c_o_m_p___s_e_l_e_c_t_i_o_n
+
+       See also the message variant ##wwxxSSttyylleeddTTeexxtt{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_t_y_l_e_d_T_e_x_t_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettPPoossiittiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettKKeeyy((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettMMooddiiffiieerrss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettMMooddiiffiiccaattiioonnTTyyppee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettLLeennggtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettLLiinneessAAddddeedd((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettLLiinnee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettFFoollddLLeevveellNNooww((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettFFoollddLLeevveellPPrreevv((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettMMaarrggiinn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettMMeessssaaggee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettWWPPaarraamm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettLLPPaarraamm((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettLLiissttTTyyppee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettXX((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettYY((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettDDrraaggTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettDDrraaggAAlllloowwMMoovvee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettDDrraaggRReessuulltt((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+              Res = ?wxDragError | ?wxDragNone | ?wxDragCopy | ?wxDragMove |
+              ?wxDragLink | ?wxDragCancel
+
+       ggeettSShhiifftt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettCCoonnttrrooll((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+       ggeettAAlltt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxStyledTextEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2              wxStyledTextEvent(3)

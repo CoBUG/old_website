@@ -1,0 +1,257 @@
+wxHtmlWindow(3)            Erlang Module Definition            wxHtmlWindow(3)
+
+
+
+NNAAMMEE
+       wxHtmlWindow - See external documentation: wxHtmlWindow.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxHtmlWindow.
+
+       This class is derived (and can use functions) from:
+       wwxxSSccrroolllleeddWWiinnddooww
+       wwxxPPaanneell
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_H_t_m_l_W_i_n_d_o_w_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxHHttmmllWWiinnddooww(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt)) -->> wwxxHHttmmllWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxHHttmmllWWiinnddooww(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {id, integer()} | {pos, {X::integer(),
+                 Y::integer()}} | {size, {W::integer(), H::integer()}} |
+                 {style, integer()}
+
+              See external documentation.
+
+       aappppeennddTTooPPaaggee((TThhiiss,, SSoouurrccee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Source = chardata() (see module unicode)
+
+              See external documentation.
+
+       ggeettOOppeenneeddAAnncchhoorr((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       ggeettOOppeenneeddPPaaggee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       ggeettOOppeenneeddPPaaggeeTTiittllee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       ggeettRReellaatteeddFFrraammee((TThhiiss)) -->> wwxxFFrraammee(()) ((sseeee mmoodduullee wwxxFFrraammee))
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       hhiissttoorryyBBaacckk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       hhiissttoorryyCCaannBBaacckk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       hhiissttoorryyCCaannFFoorrwwaarrdd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       hhiissttoorryyCClleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       hhiissttoorryyFFoorrwwaarrdd((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       llooaaddFFiillee((TThhiiss,, FFiilleennaammee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Filename = chardata() (see module unicode)
+
+              See external documentation.
+
+       llooaaddPPaaggee((TThhiiss,, LLooccaattiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Location = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseelleeccttAAllll((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       sseelleeccttiioonnTTooTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       sseelleeccttLLiinnee((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       sseelleeccttWWoorrdd((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       sseettBBoorrddeerrss((TThhiiss,, BB)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 B = integer()
+
+              See external documentation.
+
+       sseettFFoonnttss((TThhiiss,, NNoorrmmaall__ffaaccee,, FFiixxeedd__ffaaccee)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Normal_face = chardata() (see module unicode)
+                 Fixed_face = chardata() (see module unicode)
+
+              Equivalent to sseettFFoonnttss((TThhiiss,, NNoorrmmaall__ffaaccee,, FFiixxeedd__ffaaccee,, [[]])).
+
+       sseettFFoonnttss((TThhiiss,, NNoorrmmaall__ffaaccee,, FFiixxeedd__ffaaccee,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Normal_face = chardata() (see module unicode)
+                 Fixed_face = chardata() (see module unicode)
+                 Option = {sizes, integer()}
+
+              See external documentation.
+
+       sseettPPaaggee((TThhiiss,, SSoouurrccee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Source = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettRReellaatteeddFFrraammee((TThhiiss,, FFrraammee,, FFoorrmmaatt)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Frame = wxFrame() (see module wxFrame)
+                 Format = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettRReellaatteeddSSttaattuussBBaarr((TThhiiss,, BBaarr)) -->> ookk
+
+              Types:
+
+                 This = wxHtmlWindow()
+                 Bar = integer()
+
+              See external documentation.
+
+       ttooTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxHtmlWindow()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxHHttmmllWWiinnddooww(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxHtmlWindow(3)

@@ -1,0 +1,74 @@
+wxPrintDialog(3)           Erlang Module Definition           wxPrintDialog(3)
+
+
+
+NNAAMMEE
+       wxPrintDialog - See external documentation: wxPrintDialog.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPrintDialog.
+
+       This class is derived (and can use functions) from:
+       wwxxDDiiaalloogg
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_r_i_n_t_D_i_a_l_o_g_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww((PPaarreenntt)) -->> wwxxPPrriinnttDDiiaalloogg(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+
+              Equivalent to nneeww((PPaarreenntt,, [[]])).
+
+       nneeww((PPaarreenntt,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxPPrriinnttDDiiaalloogg(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Option = {data, wxPrintDialogData() (see module
+                 wxPrintDialogData)}
+
+              See external documentation.
+              Also:
+              new(Parent, Data) -> wxPrintDialog() when
+              Parent::wxWindow:wxWindow(), Data::wxPrintData:wxPrintData().
+
+
+       ggeettPPrriinnttDDiiaallooggDDaattaa((TThhiiss)) -->> wwxxPPrriinnttDDiiaallooggDDaattaa(()) ((sseeee mmoodduullee
+       wwxxPPrriinnttDDiiaallooggDDaattaa))
+
+              Types:
+
+                 This = wxPrintDialog()
+
+              See external documentation.
+
+       ggeettPPrriinnttDDCC((TThhiiss)) -->> wwxxDDCC(()) ((sseeee mmoodduullee wwxxDDCC))
+
+              Types:
+
+                 This = wxPrintDialog()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPrriinnttDDiiaalloogg(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                  wxPrintDialog(3)

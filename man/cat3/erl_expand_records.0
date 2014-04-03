@@ -1,0 +1,25 @@
+erl_expand_records(3)      Erlang Module Definition      erl_expand_records(3)
+
+
+
+NNAAMMEE
+       erl_expand_records - Expands Records in a Module
+
+DDEESSCCRRIIPPTTIIOONN
+EEXXPPOORRTTSS
+       mmoodduullee((AAbbssFFoorrmmss,, CCoommppiilleeOOppttiioonnss)) -->> AAbbssFFoorrmmss
+
+              Types:
+
+                 AbsForms = [eerrll__ppaarrssee::aabbssttrraacctt__ffoorrmm(())]
+                 CompileOptions = [ccoommppiillee::ooppttiioonn(())]
+
+              Expands all records in a module. The returned module has no
+              references to records, neither attributes nor code.
+
+SSEEEE AALLSSOO
+       The aabbssttrraacctt ffoorrmmaatt documentation in ERTS User's Guide
+
+
+
+Ericsson AB                      stdlib 1.18.2           erl_expand_records(3)

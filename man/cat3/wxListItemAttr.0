@@ -1,0 +1,118 @@
+wxListItemAttr(3)          Erlang Module Definition          wxListItemAttr(3)
+
+
+
+NNAAMMEE
+       wxListItemAttr - See external documentation: wxListItemAttr.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxListItemAttr.
+
+DDAATTAA TTYYPPEESS
+         _w_x_L_i_s_t_I_t_e_m_A_t_t_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxLLiissttIItteemmAAttttrr(())
+
+              See external documentation.
+
+       nneeww((CCoollTTeexxtt,, CCoollBBaacckk,, FFoonntt)) -->> wwxxLLiissttIItteemmAAttttrr(())
+
+              Types:
+
+                 ColText = wx_colour() (see module wx)
+                 ColBack = wx_colour() (see module wx)
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       ggeettBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListItemAttr()
+
+              See external documentation.
+
+       ggeettFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxListItemAttr()
+
+              See external documentation.
+
+       ggeettTTeexxttCCoolloouurr((TThhiiss)) -->> wwxx__ccoolloouurr44(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxListItemAttr()
+
+              See external documentation.
+
+       hhaassBBaacckkggrroouunnddCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListItemAttr()
+
+              See external documentation.
+
+       hhaassFFoonntt((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListItemAttr()
+
+              See external documentation.
+
+       hhaassTTeexxttCCoolloouurr((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxListItemAttr()
+
+              See external documentation.
+
+       sseettBBaacckkggrroouunnddCCoolloouurr((TThhiiss,, CCoollBBaacckk)) -->> ookk
+
+              Types:
+
+                 This = wxListItemAttr()
+                 ColBack = wx_colour() (see module wx)
+
+              See external documentation.
+
+       sseettFFoonntt((TThhiiss,, FFoonntt)) -->> ookk
+
+              Types:
+
+                 This = wxListItemAttr()
+                 Font = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       sseettTTeexxttCCoolloouurr((TThhiiss,, CCoollTTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxListItemAttr()
+                 ColText = wx_colour() (see module wx)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxLLiissttIItteemmAAttttrr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxListItemAttr(3)

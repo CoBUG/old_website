@@ -1,0 +1,558 @@
+supervisor(3)              Erlang Module Definition              supervisor(3)
+
+
+
+NNAAMMEE
+       supervisor - Generic Supervisor Behaviour
+
+DDEESSCCRRIIPPTTIIOONN
+       A behaviour module for implementing a supervisor, a process which
+       supervises other processes called child processes. A child process can
+       either be another supervisor or a worker process. Worker processes are
+       normally implemented using one of the _g_e_n___e_v_e_n_t, _g_e_n___f_s_m, or _g_e_n___s_e_r_v_e_r
+       behaviours. A supervisor implemented using this module will have a
+       standard set of interface functions and include functionality for
+       tracing and error reporting. Supervisors are used to build an
+       hierarchical process structure called a supervision tree, a nice way to
+       structure a fault tolerant application. Refer to _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s
+       for more information.
+
+       A supervisor assumes the definition of which child processes to
+       supervise to be located in a callback module exporting a pre-defined
+       set of functions.
+
+       Unless otherwise stated, all functions in this module will fail if the
+       specified supervisor does not exist or if bad arguments are given.
+
+SSUUPPEERRVVIISSIIOONN PPRRIINNCCIIPPLLEESS
+       The supervisor is responsible for starting, stopping and monitoring its
+       child processes. The basic idea of a supervisor is that it should keep
+       its child processes alive by restarting them when necessary.
+
+       The children of a supervisor is defined as a list of _c_h_i_l_d
+       _s_p_e_c_i_f_i_c_a_t_i_o_n_s. When the supervisor is started, the child processes are
+       started in order from left to right according to this list. When the
+       supervisor terminates, it first terminates its child processes in
+       reversed start order, from right to left.
+
+       A supervisor can have one of the following _r_e_s_t_a_r_t _s_t_r_a_t_e_g_i_e_s:
+
+         * _o_n_e___f_o_r___o_n_e - if one child process terminates and should be
+           restarted, only that child process is affected.
+
+         * _o_n_e___f_o_r___a_l_l - if one child process terminates and should be
+           restarted, all other child processes are terminated and then all
+           child processes are restarted.
+
+         * _r_e_s_t___f_o_r___o_n_e - if one child process terminates and should be
+           restarted, the 'rest' of the child processes -- i.e. the child
+           processes after the terminated child process in the start order --
+           are terminated. Then the terminated child process and all child
+           processes after it are restarted.
+
+         * _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e - a simplified _o_n_e___f_o_r___o_n_e supervisor, where all
+           child processes are dynamically added instances of the same process
+           type, i.e. running the same code.
+
+           The functions _d_e_l_e_t_e___c_h_i_l_d_/_2 and _r_e_s_t_a_r_t___c_h_i_l_d_/_2 are invalid for
+           _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e supervisors and will return
+           _{_e_r_r_o_r_,_s_i_m_p_l_e___o_n_e___f_o_r___o_n_e_} if the specified supervisor uses this
+           restart strategy.
+
+           The function _t_e_r_m_i_n_a_t_e___c_h_i_l_d_/_2 can be used for children under
+           _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e supervisors by giving the child's _p_i_d_(_) as the
+           second argument. If instead the child specification identifier is
+           used, _t_e_r_m_i_n_a_t_e___c_h_i_l_d_/_2 will return _{_e_r_r_o_r_,_s_i_m_p_l_e___o_n_e___f_o_r___o_n_e_}.
+
+           Because a _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e supervisor could have many children,
+           it shuts them all down at same time. So, order in which they are
+           stopped is not defined. For the same reason, it could have an
+           overhead with regards to the _S_h_u_t_d_o_w_n strategy.
+
+       To prevent a supervisor from getting into an infinite loop of child
+       process terminations and restarts, a _m_a_x_i_m_u_m _r_e_s_t_a_r_t _f_r_e_q_u_e_n_c_y is
+       defined using two integer values _M_a_x_R and _M_a_x_T. If more than _M_a_x_R
+       restarts occur within _M_a_x_T seconds, the supervisor terminates all child
+       processes and then itself.
+
+       This is the type definition of a child specification:
+
+       child_spec() = {Id,StartFunc,Restart,Shutdown,Type,Modules}
+        Id = term()
+        StartFunc = {M,F,A}
+         M = F = atom()
+         A = [term()]
+        Restart = permanent | transient | temporary
+        Shutdown = brutal_kill | int()>0 | infinity
+        Type = worker | supervisor
+        Modules = [Module] | dynamic
+         Module = atom()
+
+         * _I_d is a name that is used to identify the child specification
+           internally by the supervisor.
+
+         * _S_t_a_r_t_F_u_n_c defines the function call used to start the child
+           process. It should be a module-function-arguments tuple _{_M_,_F_,_A_}
+           used as _a_p_p_l_y_(_M_,_F_,_A_).
+
+           The start function _m_u_s_t _c_r_e_a_t_e _a_n_d _l_i_n_k _t_o the child process, and
+           should return _{_o_k_,_C_h_i_l_d_} or _{_o_k_,_C_h_i_l_d_,_I_n_f_o_} where _C_h_i_l_d is the pid
+           of the child process and _I_n_f_o an arbitrary term which is ignored by
+           the supervisor.
+
+           The start function can also return _i_g_n_o_r_e if the child process for
+           some reason cannot be started, in which case the child
+           specification will be kept by the supervisor (unless it is a
+           temporary child) but the non-existing child process will be
+           ignored.
+
+           If something goes wrong, the function may also return an error
+           tuple _{_e_r_r_o_r_,_E_r_r_o_r_}.
+
+           Note that the _s_t_a_r_t___l_i_n_k functions of the different behaviour
+           modules fulfill the above requirements.
+
+         * _R_e_s_t_a_r_t defines when a terminated child process should be
+           restarted. A _p_e_r_m_a_n_e_n_t child process should always be restarted, a
+           _t_e_m_p_o_r_a_r_y child process should never be restarted (even when the
+           supervisor's restart strategy is _r_e_s_t___f_o_r___o_n_e or _o_n_e___f_o_r___a_l_l and a
+           sibling's death causes the temporary process to be terminated) and
+           a _t_r_a_n_s_i_e_n_t child process should be restarted only if it terminates
+           abnormally, i.e. with another exit reason than _n_o_r_m_a_l, _s_h_u_t_d_o_w_n or
+           _{_s_h_u_t_d_o_w_n_,_T_e_r_m_}.
+
+         * _S_h_u_t_d_o_w_n defines how a child process should be terminated.
+           _b_r_u_t_a_l___k_i_l_l means the child process will be unconditionally
+           terminated using _e_x_i_t_(_C_h_i_l_d_,_k_i_l_l_). An integer timeout value means
+           that the supervisor will tell the child process to terminate by
+           calling _e_x_i_t_(_C_h_i_l_d_,_s_h_u_t_d_o_w_n_) and then wait for an exit signal with
+           reason _s_h_u_t_d_o_w_n back from the child process. If no exit signal is
+           received within the specified number of milliseconds, the child
+           process is unconditionally terminated using _e_x_i_t_(_C_h_i_l_d_,_k_i_l_l_).
+
+           If the child process is another supervisor, _S_h_u_t_d_o_w_n should be set
+           to _i_n_f_i_n_i_t_y to give the subtree ample time to shutdown. It is also
+           allowed to set it to _i_n_f_i_n_i_t_y, if the child process is a worker.
+
+     WWaarrnniinngg::
+         Be careful by setting the _S_h_u_t_d_o_w_n strategy to _i_n_f_i_n_i_t_y when the
+         child process is a worker. Because, in this situation, the
+         termination of the supervision tree depends on the child process, it
+         must be implemented in a safe way and its cleanup procedure must
+         always return.
+
+
+           _I_m_p_o_r_t_a_n_t _n_o_t_e _o_n _s_i_m_p_l_e_-_o_n_e_-_f_o_r_-_o_n_e _s_u_p_e_r_v_i_s_o_r_s_: The dynamically
+           created child processes of a simple-one-for-one supervisor are not
+           explicitly killed, regardless of shutdown strategy, but are
+           expected to terminate when the supervisor does (that is, when an
+           exit signal from the parent process is received).
+
+           Note that all child processes implemented using the standard OTP
+           behavior modules automatically adhere to the shutdown protocol.
+
+         * _T_y_p_e specifies if the child process is a supervisor or a worker.
+
+         * _M_o_d_u_l_e_s is used by the release handler during code replacement to
+           determine which processes are using a certain module. As a rule of
+           thumb _M_o_d_u_l_e_s should be a list with one element _[_M_o_d_u_l_e_], where
+           _M_o_d_u_l_e is the callback module, if the child process is a
+           supervisor, gen_server or gen_fsm. If the child process is an event
+           manager (gen_event) with a dynamic set of callback modules, _M_o_d_u_l_e_s
+           should be _d_y_n_a_m_i_c. See _O_T_P _D_e_s_i_g_n _P_r_i_n_c_i_p_l_e_s for more information
+           about release handling.
+
+         * Internally, the supervisor also keeps track of the pid _C_h_i_l_d of the
+           child process, or _u_n_d_e_f_i_n_e_d if no pid exists.
+
+DDAATTAA TTYYPPEESS
+       cchhiilldd(()) = undefined | pid()
+
+       cchhiilldd__iidd(()) = term()
+
+              Not a _p_i_d_(_).
+
+       cchhiilldd__ssppeecc(()) =
+           {Id :: cchhiilldd__iidd(()),
+            StartFunc :: mmffaarrggss(()),
+            Restart :: rreessttaarrtt(()),
+            Shutdown :: sshhuuttddoowwnn(()),
+            Type :: wwoorrkkeerr(()),
+            Modules :: mmoodduulleess(())}
+
+       mmffaarrggss(()) =
+           {M :: module(), F :: atom(), A :: [term()] | undefined}
+
+              _A (the argument list) has the value _u_n_d_e_f_i_n_e_d if _R_e_s_t_a_r_t is
+              _t_e_m_p_o_r_a_r_y.
+
+       mmoodduulleess(()) = [module()] | dynamic
+
+       rreessttaarrtt(()) = permanent | transient | temporary
+
+       sshhuuttddoowwnn(()) = brutal_kill | timeout()
+
+       ssttrraatteeggyy(()) = one_for_all
+                  | one_for_one
+                  | rest_for_one
+                  | simple_one_for_one
+
+       ssuupp__rreeff(()) = (Name :: atom())
+                 | {Name :: atom(), Node :: node()}
+                 | {global, Name :: atom()}
+                 | pid()
+
+       wwoorrkkeerr(()) = worker | supervisor
+
+EEXXPPOORRTTSS
+       ssttaarrtt__lliinnkk((MMoodduullee,, AArrggss)) -->> ssttaarrttlliinnkk__rreett(())
+
+       ssttaarrtt__lliinnkk((SSuuppNNaammee,, MMoodduullee,, AArrggss)) -->> ssttaarrttlliinnkk__rreett(())
+
+              Types:
+
+                 SupName = ssuupp__nnaammee(())
+                 Module = module()
+                 Args = term()
+                 ssttaarrttlliinnkk__rreett(()) = {ok, pid()}
+                                 | ignore
+                                 | {error, ssttaarrttlliinnkk__eerrrr(())}
+                 ssttaarrttlliinnkk__eerrrr(()) = {already_started, pid()} | shutdown | term()
+                 ssuupp__nnaammee(()) = {local, Name :: atom()} | {global, Name :: atom()}
+
+              Creates a supervisor process as part of a supervision tree. The
+              function will, among other things, ensure that the supervisor is
+              linked to the calling process (its supervisor).
+
+              The created supervisor process calls _M_o_d_u_l_e_:_i_n_i_t_/_1 to find out
+              about restart strategy, maximum restart frequency and child
+              processes. To ensure a synchronized start-up procedure,
+              _s_t_a_r_t___l_i_n_k_/_2_,_3 does not return until _M_o_d_u_l_e_:_i_n_i_t_/_1 has returned
+              and all child processes have been started.
+
+              If _S_u_p_N_a_m_e_=_{_l_o_c_a_l_,_N_a_m_e_} the supervisor is registered locally as
+              _N_a_m_e using _r_e_g_i_s_t_e_r_/_2. If _S_u_p_N_a_m_e_=_{_g_l_o_b_a_l_,_N_a_m_e_} the supervisor
+              is registered globally as _N_a_m_e using _g_l_o_b_a_l_:_r_e_g_i_s_t_e_r___n_a_m_e_/_2. If
+              _S_u_p_N_a_m_e_=_{_v_i_a_,_M_o_d_u_l_e_,_N_a_m_e_} the supervisor is registered as _N_a_m_e
+              using the registry represented by _M_o_d_u_l_e. The _M_o_d_u_l_e callback
+              should export the functions _r_e_g_i_s_t_e_r___n_a_m_e_/_2, _u_n_r_e_g_i_s_t_e_r___n_a_m_e_/_1
+              and _s_e_n_d_/_2, which should behave like the corresponding functions
+              in _g_l_o_b_a_l. Thus, _{_v_i_a_,_g_l_o_b_a_l_,_N_a_m_e_} is a valid reference.
+
+              If no name is provided, the supervisor is not registered.
+
+              _M_o_d_u_l_e is the name of the callback module.
+
+              _A_r_g_s is an arbitrary term which is passed as the argument to
+              _M_o_d_u_l_e_:_i_n_i_t_/_1.
+
+              If the supervisor and its child processes are successfully
+              created (i.e. if all child process start functions return
+              _{_o_k_,_C_h_i_l_d_}, _{_o_k_,_C_h_i_l_d_,_I_n_f_o_}, or _i_g_n_o_r_e) the function returns
+              _{_o_k_,_P_i_d_}, where _P_i_d is the pid of the supervisor. If there
+              already exists a process with the specified _S_u_p_N_a_m_e the function
+              returns _{_e_r_r_o_r_,_{_a_l_r_e_a_d_y___s_t_a_r_t_e_d_,_P_i_d_}_}, where _P_i_d is the pid of
+              that process.
+
+              If _M_o_d_u_l_e_:_i_n_i_t_/_1 returns _i_g_n_o_r_e, this function returns _i_g_n_o_r_e as
+              well and the supervisor terminates with reason _n_o_r_m_a_l. If
+              _M_o_d_u_l_e_:_i_n_i_t_/_1 fails or returns an incorrect value, this function
+              returns _{_e_r_r_o_r_,_T_e_r_m_} where _T_e_r_m is a term with information about
+              the error, and the supervisor terminates with reason _T_e_r_m.
+
+              If any child process start function fails or returns an error
+              tuple or an erroneous value, the function returns
+              _{_e_r_r_o_r_,_s_h_u_t_d_o_w_n_} and the supervisor terminates all started child
+              processes and then itself with reason _s_h_u_t_d_o_w_n.
+
+       ssttaarrtt__cchhiilldd((SSuuppRReeff,, CChhiillddSSppeecc)) -->> ssttaarrttcchhiilldd__rreett(())
+
+              Types:
+
+                 SupRef = ssuupp__rreeff(())
+                 ChildSpec = cchhiilldd__ssppeecc(()) | (List :: [term()])
+                 cchhiilldd__ssppeecc(()) =
+                     {Id :: cchhiilldd__iidd(()),
+                      StartFunc :: mmffaarrggss(()),
+                      Restart :: rreessttaarrtt(()),
+                      Shutdown :: sshhuuttddoowwnn(()),
+                      Type :: wwoorrkkeerr(()),
+                      Modules :: mmoodduulleess(())}
+                 ssttaarrttcchhiilldd__rreett(()) = {ok, Child :: cchhiilldd(())}
+                                  | {ok, Child :: cchhiilldd(()), Info :: term()}
+                                  | {error, ssttaarrttcchhiilldd__eerrrr(())}
+                 ssttaarrttcchhiilldd__eerrrr(()) = already_present
+                                  | {already_started, Child :: cchhiilldd(())}
+                                  | term()
+
+              Dynamically adds a child specification to the supervisor _S_u_p_R_e_f
+              which starts the corresponding child process.
+
+              _S_u_p_R_e_f can be:
+
+                * the pid,
+
+                * _N_a_m_e, if the supervisor is locally registered,
+
+                * _{_N_a_m_e_,_N_o_d_e_}, if the supervisor is locally registered at
+                  another node, or
+
+                * _{_g_l_o_b_a_l_,_N_a_m_e_}, if the supervisor is globally registered.
+
+                * _{_v_i_a_,_M_o_d_u_l_e_,_N_a_m_e_}, if the supervisor is registered through
+                  an alternative process registry.
+
+              _C_h_i_l_d_S_p_e_c should be a valid child specification (unless the
+              supervisor is a _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e supervisor, see below). The
+              child process will be started by using the start function as
+              defined in the child specification.
+
+              If the case of a _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e supervisor, the child
+              specification defined in _M_o_d_u_l_e_:_i_n_i_t_/_1 will be used and
+              _C_h_i_l_d_S_p_e_c should instead be an arbitrary list of terms _L_i_s_t. The
+              child process will then be started by appending _L_i_s_t to the
+              existing start function arguments, i.e. by calling _a_p_p_l_y_(_M_, _F_,
+              _A_+_+_L_i_s_t_) where _{_M_,_F_,_A_} is the start function defined in the
+              child specification.
+
+              If there already exists a child specification with the specified
+              _I_d, _C_h_i_l_d_S_p_e_c is discarded and the function returns
+              _{_e_r_r_o_r_,_a_l_r_e_a_d_y___p_r_e_s_e_n_t_} or _{_e_r_r_o_r_,_{_a_l_r_e_a_d_y___s_t_a_r_t_e_d_,_C_h_i_l_d_}_},
+              depending on if the corresponding child process is running or
+              not.
+
+              If the child process start function returns _{_o_k_,_C_h_i_l_d_} or
+              _{_o_k_,_C_h_i_l_d_,_I_n_f_o_}, the child specification and pid is added to the
+              supervisor and the function returns the same value.
+
+              If the child process start function returns _i_g_n_o_r_e, the child
+              specification is added to the supervisor, the pid is set to
+              _u_n_d_e_f_i_n_e_d and the function returns _{_o_k_,_u_n_d_e_f_i_n_e_d_}.
+
+              If the child process start function returns an error tuple or an
+              erroneous value, or if it fails, the child specification is
+              discarded and the function returns _{_e_r_r_o_r_,_E_r_r_o_r_} where _E_r_r_o_r is
+              a term containing information about the error and child
+              specification.
+
+       tteerrmmiinnaattee__cchhiilldd((SSuuppRReeff,, IIdd)) -->> RReessuulltt
+
+              Types:
+
+                 SupRef = ssuupp__rreeff(())
+                 Id = pid() | cchhiilldd__iidd(())
+                 Result = ok | {error, Error}
+                 Error = not_found | simple_one_for_one
+
+              Tells the supervisor _S_u_p_R_e_f to terminate the given child.
+
+              If the supervisor is not _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e, _I_d must be the
+              child specification identifier. The process, if there is one, is
+              terminated and, unless it is a temporary child, the child
+              specification is kept by the supervisor. The child process may
+              later be restarted by the supervisor. The child process can also
+              be restarted explicitly by calling _r_e_s_t_a_r_t___c_h_i_l_d_/_2. Use
+              _d_e_l_e_t_e___c_h_i_l_d_/_2 to remove the child specification.
+
+              If the child is temporary, the child specification is deleted as
+              soon as the process terminates. This means that _d_e_l_e_t_e___c_h_i_l_d_/_2
+              has no meaning and _r_e_s_t_a_r_t___c_h_i_l_d_/_2 can not be used for these
+              children.
+
+              If the supervisor is _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e, _I_d must be the child
+              process' _p_i_d_(_). I the specified process is alive, but is not a
+              child of the given supervisor, the function will return
+              _{_e_r_r_o_r_,_n_o_t___f_o_u_n_d_}. If the child specification identifier is
+              given instead instead of a _p_i_d_(_), the function will return
+              _{_e_r_r_o_r_,_s_i_m_p_l_e___o_n_e___f_o_r___o_n_e_}.
+
+              If successful, the function returns _o_k. If there is no child
+              specification with the specified _I_d, the function returns
+              _{_e_r_r_o_r_,_n_o_t___f_o_u_n_d_}.
+
+              See _s_t_a_r_t___c_h_i_l_d_/_2 for a description of _S_u_p_R_e_f.
+
+       ddeelleettee__cchhiilldd((SSuuppRReeff,, IIdd)) -->> RReessuulltt
+
+              Types:
+
+                 SupRef = ssuupp__rreeff(())
+                 Id = cchhiilldd__iidd(())
+                 Result = ok | {error, Error}
+                 Error = running | restarting | not_found | simple_one_for_one
+
+              Tells the supervisor _S_u_p_R_e_f to delete the child specification
+              identified by _I_d. The corresponding child process must not be
+              running, use _t_e_r_m_i_n_a_t_e___c_h_i_l_d_/_2 to terminate it.
+
+              See _s_t_a_r_t___c_h_i_l_d_/_2 for a description of _S_u_p_R_e_f.
+
+              If successful, the function returns _o_k. If the child
+              specification identified by _I_d exists but the corresponding
+              child process is running or about to be restarted, the function
+              returns _{_e_r_r_o_r_,_r_u_n_n_i_n_g_} or _{_e_r_r_o_r_,_r_e_s_t_a_r_t_i_n_g_} respectively. If
+              the child specification identified by _I_d does not exist, the
+              function returns _{_e_r_r_o_r_,_n_o_t___f_o_u_n_d_}.
+
+       rreessttaarrtt__cchhiilldd((SSuuppRReeff,, IIdd)) -->> RReessuulltt
+
+              Types:
+
+                 SupRef = ssuupp__rreeff(())
+                 Id = cchhiilldd__iidd(())
+                 Result = {ok, Child :: cchhiilldd(())}
+                        | {ok, Child :: cchhiilldd(()), Info :: term()}
+                        | {error, Error}
+                 Error = running
+                       | restarting
+                       | not_found
+                       | simple_one_for_one
+                       | term()
+
+              Tells the supervisor _S_u_p_R_e_f to restart a child process
+              corresponding to the child specification identified by _I_d. The
+              child specification must exist and the corresponding child
+              process must not be running.
+
+              Note that for temporary children, the child specification is
+              automatically deleted when the child terminates, and thus it is
+              not possible to restart such children.
+
+              See _s_t_a_r_t___c_h_i_l_d_/_2 for a description of _S_u_p_R_e_f.
+
+              If the child specification identified by _I_d does not exist, the
+              function returns _{_e_r_r_o_r_,_n_o_t___f_o_u_n_d_}. If the child specification
+              exists but the corresponding process is already running, the
+              function returns _{_e_r_r_o_r_,_r_u_n_n_i_n_g_}.
+
+              If the child process start function returns _{_o_k_,_C_h_i_l_d_} or
+              _{_o_k_,_C_h_i_l_d_,_I_n_f_o_}, the pid is added to the supervisor and the
+              function returns the same value.
+
+              If the child process start function returns _i_g_n_o_r_e, the pid
+              remains set to _u_n_d_e_f_i_n_e_d and the function returns
+              _{_o_k_,_u_n_d_e_f_i_n_e_d_}.
+
+              If the child process start function returns an error tuple or an
+              erroneous value, or if it fails, the function returns
+              _{_e_r_r_o_r_,_E_r_r_o_r_} where _E_r_r_o_r is a term containing information about
+              the error.
+
+       wwhhiicchh__cchhiillddrreenn((SSuuppRReeff)) -->> [[{{IIdd,, CChhiilldd,, TTyyppee,, MMoodduulleess}}]]
+
+              Types:
+
+                 SupRef = ssuupp__rreeff(())
+                 Id = cchhiilldd__iidd(()) | undefined
+                 Child = cchhiilldd(()) | restarting
+                 Type = wwoorrkkeerr(())
+                 Modules = mmoodduulleess(())
+
+              Returns a newly created list with information about all child
+              specifications and child processes belonging to the supervisor
+              _S_u_p_R_e_f.
+
+              Note that calling this function when supervising a large number
+              of children under low memory conditions can cause an out of
+              memory exception.
+
+              See _s_t_a_r_t___c_h_i_l_d_/_2 for a description of _S_u_p_R_e_f.
+
+              The information given for each child specification/process is:
+
+                * _I_d - as defined in the child specification or _u_n_d_e_f_i_n_e_d in
+                  the case of a _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e supervisor.
+
+                * _C_h_i_l_d - the pid of the corresponding child process, the atom
+                  _r_e_s_t_a_r_t_i_n_g if the process is about to be restarted or
+                  _u_n_d_e_f_i_n_e_d if there is no such process.
+
+                * _T_y_p_e - as defined in the child specification.
+
+                * _M_o_d_u_l_e_s - as defined in the child specification.
+
+       ccoouunntt__cchhiillddrreenn((SSuuppRReeff)) -->> PPrrooppLLiissttOOffCCoouunnttss
+
+              Types:
+
+                 SupRef = ssuupp__rreeff(())
+                 PropListOfCounts = [Count]
+                 Count = {specs, ChildSpecCount :: integer() >= 0}
+                       | {active, ActiveProcessCount :: integer() >= 0}
+                       | {supervisors,
+                          ChildSupervisorCount :: integer() >= 0}
+                       | {workers, ChildWorkerCount :: integer() >= 0}
+
+              Returns a property list (see _p_r_o_p_l_i_s_t_s) containing the counts
+              for each of the following elements of the supervisor's child
+              specifications and managed processes:
+
+                * _s_p_e_c_s - the total count of children, dead or alive.
+
+                * _a_c_t_i_v_e - the count of all actively running child processes
+                  managed by this supervisor.
+
+                * _s_u_p_e_r_v_i_s_o_r_s - the count of all children marked as child_type
+                  = supervisor in the spec list, whether or not the child
+                  process is still alive.
+
+                * _w_o_r_k_e_r_s - the count of all children marked as child_type =
+                  worker in the spec list, whether or not the child process is
+                  still alive.
+
+       cchheecckk__cchhiillddssppeeccss((CChhiillddSSppeeccss)) -->> RReessuulltt
+
+              Types:
+
+                 ChildSpecs = [cchhiilldd__ssppeecc(())]
+                 Result = ok | {error, Error :: term()}
+
+              This function takes a list of child specification as argument
+              and returns _o_k if all of them are syntactically correct, or
+              _{_e_r_r_o_r_,_E_r_r_o_r_} otherwise.
+
+CCAALLLLBBAACCKK FFUUNNCCTTIIOONNSS
+       The following functions should be exported from a _s_u_p_e_r_v_i_s_o_r callback
+       module.
+
+EEXXPPOORRTTSS
+       MMoodduullee::iinniitt((AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 Args = term()
+                 Result = {ok,{{RestartStrategy,MaxR,MaxT},[ChildSpec]}} |
+                 ignore
+                  RestartStrategy = ssttrraatteeggyy(())
+                  MaxR = integer()>=0
+                  MaxT = integer()>0
+                  ChildSpec = cchhiilldd__ssppeecc(())
+
+              Whenever a supervisor is started using
+              _s_u_p_e_r_v_i_s_o_r_:_s_t_a_r_t___l_i_n_k_/_2_,_3, this function is called by the new
+              process to find out about restart strategy, maximum restart
+              frequency and child specifications.
+
+              _A_r_g_s is the _A_r_g_s argument provided to the start function.
+
+              _R_e_s_t_a_r_t_S_t_r_a_t_e_g_y is the restart strategy and _M_a_x_R and _M_a_x_T
+              defines the maximum restart frequency of the supervisor.
+              _[_C_h_i_l_d_S_p_e_c_] is a list of valid child specifications defining
+              which child processes the supervisor should start and monitor.
+              See the discussion about Supervision Principles above.
+
+              Note that when the restart strategy is _s_i_m_p_l_e___o_n_e___f_o_r___o_n_e, the
+              list of child specifications must be a list with one child
+              specification only. (The _I_d is ignored). No child process is
+              then started during the initialization phase, but all children
+              are assumed to be started dynamically using
+              _s_u_p_e_r_v_i_s_o_r_:_s_t_a_r_t___c_h_i_l_d_/_2.
+
+              The function may also return _i_g_n_o_r_e.
+
+SSEEEE AALLSSOO
+       ggeenn__eevveenntt((33)), ggeenn__ffssmm((33)), ggeenn__sseerrvveerr((33)), ssyyss((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                   supervisor(3)

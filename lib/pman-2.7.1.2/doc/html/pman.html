@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:fn="http://www.w3.org/2005/02/xpath-functions">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../../../doc/otp_doc.css" type="text/css">
+<title>Erlang -- pman</title>
+</head>
+<body bgcolor="white" text="#000000" link="#0000ff" vlink="#ff00ff" alink="#ff0000"><div id="container">
+<script id="js" type="text/javascript" language="JavaScript" src="../../../../doc/js/flipmenu/flipmenu.js"></script><script id="js2" type="text/javascript" src="../../../../doc/js/erlresolvelinks.js"></script><script language="JavaScript" type="text/javascript">
+            <!--
+              function getWinHeight() {
+                var myHeight = 0;
+                if( typeof( window.innerHeight ) == 'number' ) {
+                  //Non-IE
+                  myHeight = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth ||
+                                                         document.documentElement.clientHeight ) ) {
+                  //IE 6+ in 'standards compliant mode'
+                  myHeight = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                  //IE 4 compatible
+                  myHeight = document.body.clientHeight;
+                }
+                return myHeight;
+              }
+
+              function setscrollpos() {
+                var objf=document.getElementById('loadscrollpos');
+                 document.getElementById("leftnav").scrollTop = objf.offsetTop - getWinHeight()/2;
+              }
+
+              function addEvent(obj, evType, fn){
+                if (obj.addEventListener){
+                obj.addEventListener(evType, fn, true);
+                return true;
+              } else if (obj.attachEvent){
+                var r = obj.attachEvent("on"+evType, fn);
+                return r;
+              } else {
+                return false;
+              }
+             }
+
+             addEvent(window, 'load', setscrollpos);
+
+             //--></script><div id="leftnav"><div class="innertube">
+<img alt="Erlang logo" src="../../../../doc/erlang-logo.png"><br><small><a href="users_guide.html">User's Guide</a><br><a href="index.html">Reference Manual</a><br><a href="release_notes.html">Release Notes</a><br><a href="../pdf/pman-2.7.1.2.pdf">PDF</a><br><a href="../../../../doc/index.html">Top</a></small><p><strong>Pman</strong><br><strong>Reference Manual</strong><br><small>Version 2.7.1.2</small></p>
+<br><a href="javascript:openAllFlips()">Expand All</a><br><a href="javascript:closeAllFlips()">Contract All</a><p><small><strong>Table of Contents</strong></small></p>
+<ul class="flipMenu"><li id="loadscrollpos" title="pman " expanded="true">pman<ul>
+<li><a href="pman.html">
+                  Top of manual page
+                </a></li>
+<li title="start-0"><a href="pman.html#start-0">start/0</a></li>
+<li title="start-1"><a href="pman.html#start-1">start/1</a></li>
+<li title="start_notimeout-0"><a href="pman.html#start_notimeout-0">start_notimeout/0</a></li>
+<li title="start_notimeout-1"><a href="pman.html#start_notimeout-1">start_notimeout/1</a></li>
+<li title="proc-1"><a href="pman.html#proc-1">proc/1</a></li>
+<li title="proc-3"><a href="pman.html#proc-3">proc/3</a></li>
+</ul>
+</li></ul>
+</div></div>
+<div id="content">
+<div class="innertube">
+<!-- refpage --><center><h1>pman</h1></center>
+  
+  <h3>MODULE</h3>
+<div class="REFBODY">pman</div>
+  <h3>MODULE SUMMARY</h3>
+<div class="REFBODY">A graphical process manager.</div>
+  <h3>DESCRIPTION</h3>
+<div class="REFBODY"><p>
+    <div class="warning">
+<div class="label">Warning</div>
+<div class="content"><p>
+      <p>
+	The Pman application has been superseded by the Observer application.
+	Pman will be removed in R16.
+      </p>
+    </p></div>
+</div>
+    <p>A graphical tool used to inspect the Erlang processes executing either
+      locally or on remote nodes. It is also possible to trace events in
+      the individual processes.</p>
+  </p></div>
+  <h3>EXPORTS</h3>
+    <p><a name="start-0"><span class="bold_code">start()</span></a><br><a name="start-1"><span class="bold_code">start(Excluded)</span></a><br><a name="start_notimeout-0"><span class="bold_code">start_notimeout()</span></a><br><a name="start_notimeout-1"><span class="bold_code">start_notimeout(Excluded)</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+        <div class="REFTYPES">
+<span class="bold_code">Excluded = [Module]</span><br>
+</div>
+        <div class="REFTYPES">
+<span class="bold_code"> Module = atom()</span><br>
+</div>
+      </div>
+<div class="REFBODY"><p>
+        <p>Starts Pman. It will use the previously saved trace settings
+          in <span class="code">HOME/.erlang_tools/pman.opts</span>, where <span class="code">HOME</span> is
+          the user's home directory, if such a file exists. Otherwise
+          standard trace settings will be used. The return value should
+          be ignored.</p>
+        <p><span class="code">Excluded</span> is a list of module names. If the argument is
+          present, processes currently executing in any of these modules
+          will not be shown by Pman.</p>
+        <p><span class="code">start/0,1</span> will fail unless the start-up succeeds
+          within 20 seconds, whereas <span class="code">start_notimeout/0,1</span> will
+          wait indefinitely.</p>
+      </p></div>
+    <p><a name="proc-1"><span class="bold_code">proc(Process)</span></a><br><a name="proc-3"><span class="bold_code">proc(A, B, C)</span></a><br></p>
+<div class="REFBODY">
+<p>Types:</p>
+        <div class="REFTYPES">
+<span class="bold_code">Process = pid() | atom()</span><br>
+</div>
+        <div class="REFTYPES">
+<span class="bold_code">A = B = C = integer()</span><br>
+</div>
+      </div>
+<div class="REFBODY"><p>
+        <p>Starts a Pman trace window for the specified process.
+          The return value should be ignored.</p>
+        <p>The process to trace is given either by its pid or by its
+          registered name. It is also possible to use <span class="code">proc/3</span>
+          to trace the pid represented as <span class="code">&lt;A,B,C&gt;</span>.</p>
+      </p></div>
+  
+</div>
+<div class="footer">
+<hr>
+<p>Copyright © 1997-2012 Ericsson AB. All Rights Reserved.</p>
+</div>
+</div>
+</div></body>
+</html>

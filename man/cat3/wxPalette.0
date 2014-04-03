@@ -1,0 +1,92 @@
+wxPalette(3)               Erlang Module Definition               wxPalette(3)
+
+
+
+NNAAMMEE
+       wxPalette - See external documentation: wxPalette.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxPalette.
+
+DDAATTAA TTYYPPEESS
+         _w_x_P_a_l_e_t_t_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxPPaalleettttee(())
+
+              See external documentation.
+
+       nneeww((RReedd,, GGrreeeenn,, BBlluuee)) -->> wwxxPPaalleettttee(())
+
+              Types:
+
+                 Red = binary()
+                 Green = binary()
+                 Blue = binary()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, RReedd,, GGrreeeenn,, BBlluuee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPalette()
+                 Red = binary()
+                 Green = binary()
+                 Blue = binary()
+
+              See external documentation.
+
+       ggeettCCoolloouurrssCCoouunntt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPalette()
+
+              See external documentation.
+
+       ggeettPPiixxeell((TThhiiss,, RReedd,, GGrreeeenn,, BBlluuee)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxPalette()
+                 Red = integer()
+                 Green = integer()
+                 Blue = integer()
+
+              See external documentation.
+
+       ggeettRRGGBB((TThhiiss,, PPiixxeell)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {Res::boolean(), Red::integer(), Green::integer(),
+                 Blue::integer()}
+                 This = wxPalette()
+                 Pixel = integer()
+
+              See external documentation.
+
+       iissOOkk((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxPalette()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxPPaalleettttee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                      wxPalette(3)

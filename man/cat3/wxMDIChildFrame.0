@@ -1,0 +1,118 @@
+wxMDIChildFrame(3)         Erlang Module Definition         wxMDIChildFrame(3)
+
+
+
+NNAAMMEE
+       wxMDIChildFrame - See external documentation: wxMDIChildFrame.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxMDIChildFrame.
+
+       This class is derived (and can use functions) from:
+       wwxxFFrraammee
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_M_D_I_C_h_i_l_d_F_r_a_m_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxMMDDIICChhiillddFFrraammee(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee)) -->> wwxxMMDDIICChhiillddFFrraammee(())
+
+              Types:
+
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxMMDDIICChhiillddFFrraammee(())
+
+              Types:
+
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       aaccttiivvaattee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIChildFrame()
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMDIChildFrame()
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxMDIChildFrame()
+                 Parent = wxMDIParentFrame() (see module wxMDIParentFrame)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       mmaaxxiimmiizzee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIChildFrame()
+
+              Equivalent to mmaaxxiimmiizzee((TThhiiss,, [[]])).
+
+       mmaaxxiimmiizzee((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxMDIChildFrame()
+                 Option = {maximize, boolean()}
+
+              See external documentation.
+
+       rreessttoorree((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxMDIChildFrame()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxMMDDIICChhiillddFFrraammee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxMDIChildFrame(3)

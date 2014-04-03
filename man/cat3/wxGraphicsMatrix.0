@@ -1,0 +1,135 @@
+wxGraphicsMatrix(3)        Erlang Module Definition        wxGraphicsMatrix(3)
+
+
+
+NNAAMMEE
+       wxGraphicsMatrix - See external documentation: wxGraphicsMatrix.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxGraphicsMatrix.
+
+       This class is derived (and can use functions) from:
+       wwxxGGrraapphhiiccssOObbjjeecctt
+
+DDAATTAA TTYYPPEESS
+         _w_x_G_r_a_p_h_i_c_s_M_a_t_r_i_x_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ccoonnccaatt((TThhiiss,, TT)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+                 T = wxGraphicsMatrix()
+
+              See external documentation.
+
+       ggeett((TThhiiss)) -->> RReessuulltt
+
+              Types:
+
+                 Result = {A::number(), B::number(), C::number(), D::number(),
+                 Tx::number(), Ty::number()}
+                 This = wxGraphicsMatrix()
+
+              See external documentation.
+
+       iinnvveerrtt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+
+              See external documentation.
+
+       iissEEqquuaall((TThhiiss,, TT)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+                 T = wxGraphicsMatrix()
+
+              See external documentation.
+
+       iissIIddeennttiittyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+
+              See external documentation.
+
+       rroottaattee((TThhiiss,, AAnnggllee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+                 Angle = number()
+
+              See external documentation.
+
+       ssccaallee((TThhiiss,, XXSSccaallee,, YYSSccaallee)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+                 XScale = number()
+                 YScale = number()
+
+              See external documentation.
+
+       ttrraannssllaattee((TThhiiss,, DDxx,, DDyy)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+                 Dx = number()
+                 Dy = number()
+
+              See external documentation.
+
+       sseett((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+
+              Equivalent to sseett((TThhiiss,, [[]])).
+
+       sseett((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+                 Option = {a, number()} | {b, number()} | {c, number()} | {d,
+                 number()} | {tx, number()} | {ty, number()}
+
+              See external documentation.
+
+       ttrraannssffoorrmmPPooiinntt((TThhiiss)) -->> {{XX::::nnuummbbeerr(()),, YY::::nnuummbbeerr(())}}
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+
+              See external documentation.
+
+       ttrraannssffoorrmmDDiissttaannccee((TThhiiss)) -->> {{DDxx::::nnuummbbeerr(()),, DDyy::::nnuummbbeerr(())}}
+
+              Types:
+
+                 This = wxGraphicsMatrix()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxGraphicsMatrix(3)

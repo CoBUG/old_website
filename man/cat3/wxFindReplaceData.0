@@ -1,0 +1,92 @@
+wxFindReplaceData(3)       Erlang Module Definition       wxFindReplaceData(3)
+
+
+
+NNAAMMEE
+       wxFindReplaceData - See external documentation: wxFindReplaceData.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFindReplaceData.
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_i_n_d_R_e_p_l_a_c_e_D_a_t_a_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxFFiinnddRReeppllaacceeDDaattaa(())
+
+              See external documentation.
+
+       nneeww((FFllaaggss)) -->> wwxxFFiinnddRReeppllaacceeDDaattaa(())
+
+              Types:
+
+                 Flags = integer()
+
+              See external documentation.
+
+       ggeettFFiinnddSSttrriinngg((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxFindReplaceData()
+
+              See external documentation.
+
+       ggeettRReeppllaacceeSSttrriinngg((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxFindReplaceData()
+
+              See external documentation.
+
+       ggeettFFllaaggss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxFindReplaceData()
+
+              See external documentation.
+
+       sseettFFllaaggss((TThhiiss,, FFllaaggss)) -->> ookk
+
+              Types:
+
+                 This = wxFindReplaceData()
+                 Flags = integer()
+
+              See external documentation.
+
+       sseettFFiinnddSSttrriinngg((TThhiiss,, SSttrr)) -->> ookk
+
+              Types:
+
+                 This = wxFindReplaceData()
+                 Str = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettRReeppllaacceeSSttrriinngg((TThhiiss,, SSttrr)) -->> ookk
+
+              Types:
+
+                 This = wxFindReplaceData()
+                 Str = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFiinnddRReeppllaacceeDDaattaa(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2              wxFindReplaceData(3)

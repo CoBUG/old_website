@@ -1,0 +1,94 @@
+wxAuiNotebookEvent(3)      Erlang Module Definition      wxAuiNotebookEvent(3)
+
+
+
+NNAAMMEE
+       wxAuiNotebookEvent - See external documentation: wxAuiNotebookEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxAuiNotebookEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___p_a_g_e___c_l_o_s_e, _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___p_a_g_e___c_h_a_n_g_e_d,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___p_a_g_e___c_h_a_n_g_i_n_g, _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___b_u_t_t_o_n,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___b_e_g_i_n___d_r_a_g, _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___e_n_d___d_r_a_g,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___d_r_a_g___m_o_t_i_o_n, _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___a_l_l_o_w___d_n_d,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___t_a_b___m_i_d_d_l_e___d_o_w_n,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___t_a_b___m_i_d_d_l_e___u_p,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___t_a_b___r_i_g_h_t___d_o_w_n,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___t_a_b___r_i_g_h_t___u_p, _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___p_a_g_e___c_l_o_s_e_d,
+           _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___d_r_a_g___d_o_n_e, _c_o_m_m_a_n_d___a_u_i_n_o_t_e_b_o_o_k___b_g___d_c_l_i_c_k
+
+       See also the message variant ##wwxxAAuuiiNNootteebbooookk{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxNNoottiiffyyEEvveenntt
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_A_u_i_N_o_t_e_b_o_o_k_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       sseettSSeelleeccttiioonn((TThhiiss,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxAuiNotebookEvent()
+                 S = integer()
+
+              See external documentation.
+
+       ggeettSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiNotebookEvent()
+
+              See external documentation.
+
+       sseettOOllddSSeelleeccttiioonn((TThhiiss,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxAuiNotebookEvent()
+                 S = integer()
+
+              See external documentation.
+
+       ggeettOOllddSSeelleeccttiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiNotebookEvent()
+
+              See external documentation.
+
+       sseettDDrraaggSSoouurrccee((TThhiiss,, SS)) -->> ookk
+
+              Types:
+
+                 This = wxAuiNotebookEvent()
+                 S = wxAuiNotebook() (see module wxAuiNotebook)
+
+              See external documentation.
+
+       ggeettDDrraaggSSoouurrccee((TThhiiss)) -->> wwxxAAuuiiNNootteebbooookk(()) ((sseeee mmoodduullee wwxxAAuuiiNNootteebbooookk))
+
+              Types:
+
+                 This = wxAuiNotebookEvent()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2             wxAuiNotebookEvent(3)

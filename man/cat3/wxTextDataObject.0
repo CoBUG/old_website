@@ -1,0 +1,69 @@
+wxTextDataObject(3)        Erlang Module Definition        wxTextDataObject(3)
+
+
+
+NNAAMMEE
+       wxTextDataObject - See external documentation: wxTextDataObject.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxTextDataObject.
+
+       This class is derived (and can use functions) from:
+       wwxxDDaattaaOObbjjeecctt
+
+DDAATTAA TTYYPPEESS
+         _w_x_T_e_x_t_D_a_t_a_O_b_j_e_c_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxTTeexxttDDaattaaOObbjjeecctt(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxTTeexxttDDaattaaOObbjjeecctt(())
+
+              Types:
+
+                 Option = {text, chardata() (see module unicode)}
+
+              See external documentation.
+
+       ggeettTTeexxttLLeennggtthh((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxTextDataObject()
+
+              See external documentation.
+
+       ggeettTTeexxtt((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxTextDataObject()
+
+              See external documentation.
+
+       sseettTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxTextDataObject()
+                 Text = chardata() (see module unicode)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxTTeexxttDDaattaaOObbjjeecctt(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxTextDataObject(3)

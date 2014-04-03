@@ -1,0 +1,301 @@
+digraph_utils(3)           Erlang Module Definition           digraph_utils(3)
+
+
+
+NNAAMMEE
+       digraph_utils - Algorithms for Directed Graphs
+
+DDEESSCCRRIIPPTTIIOONN
+       The _d_i_g_r_a_p_h___u_t_i_l_s module implements some algorithms based on depth-
+       first traversal of directed graphs. See the _d_i_g_r_a_p_h module for basic
+       functions on directed graphs.
+
+       A _d_i_r_e_c_t_e_d _g_r_a_p_h (or just "digraph") is a pair (V, E) of a finite set V
+       of _v_e_r_t_i_c_e_s and a finite set E of _d_i_r_e_c_t_e_d _e_d_g_e_s (or just "edges"). The
+       set of edges E is a subset of V x V (the Cartesian product of V with
+       itself).
+
+       Digraphs can be annotated with additional information. Such information
+       may be attached to the vertices and to the edges of the digraph. A
+       digraph which has been annotated is called a _l_a_b_e_l_e_d _d_i_g_r_a_p_h, and the
+       information attached to a vertex or an edge is called a _l_a_b_e_l.
+
+       An edge e = (v, w) is said to _e_m_a_n_a_t_e from vertex v and to be _i_n_c_i_d_e_n_t
+       on vertex w. If there is an edge emanating from v and incident on w,
+       then w is said to be an _o_u_t_-_n_e_i_g_h_b_o_u_r of v, and v is said to be an _i_n_-
+       _n_e_i_g_h_b_o_u_r of w. A _p_a_t_h P from v[1] to v[k] in a digraph (V, E) is a
+       non-empty sequence v[1], v[2], ..., v[k] of vertices in V such that
+       there is an edge (v[i],v[i+1]) in E for 1 <= i < k. The _l_e_n_g_t_h of the
+       path P is k-1. P is a _c_y_c_l_e if the length of P is not zero and v[1] =
+       v[k]. A _l_o_o_p is a cycle of length one. An _a_c_y_c_l_i_c _d_i_g_r_a_p_h is a digraph
+       that has no cycles.
+
+       A _d_e_p_t_h_-_f_i_r_s_t _t_r_a_v_e_r_s_a_l of a directed digraph can be viewed as a
+       process that visits all vertices of the digraph. Initially, all
+       vertices are marked as unvisited. The traversal starts with an
+       arbitrarily chosen vertex, which is marked as visited, and follows an
+       edge to an unmarked vertex, marking that vertex. The search then
+       proceeds from that vertex in the same fashion, until there is no edge
+       leading to an unvisited vertex. At that point the process backtracks,
+       and the traversal continues as long as there are unexamined edges. If
+       there remain unvisited vertices when all edges from the first vertex
+       have been examined, some hitherto unvisited vertex is chosen, and the
+       process is repeated.
+
+       A _p_a_r_t_i_a_l _o_r_d_e_r_i_n_g of a set S is a transitive, antisymmetric and
+       reflexive relation between the objects of S. The problem of _t_o_p_o_l_o_g_i_c_a_l
+       _s_o_r_t_i_n_g is to find a total ordering of S that is a superset of the
+       partial ordering. A digraph G = (V, E) is equivalent to a relation E on
+       V (we neglect the fact that the version of directed graphs implemented
+       in the _d_i_g_r_a_p_h module allows multiple edges between vertices). If the
+       digraph has no cycles of length two or more, then the reflexive and
+       transitive closure of E is a partial ordering.
+
+       A _s_u_b_g_r_a_p_h G' of G is a digraph whose vertices and edges form subsets
+       of the vertices and edges of G. G' is _m_a_x_i_m_a_l with respect to a
+       property P if all other subgraphs that include the vertices of G' do
+       not have the property P. A _s_t_r_o_n_g_l_y _c_o_n_n_e_c_t_e_d _c_o_m_p_o_n_e_n_t is a maximal
+       subgraph such that there is a path between each pair of vertices. A
+       _c_o_n_n_e_c_t_e_d _c_o_m_p_o_n_e_n_t is a maximal subgraph such that there is a path
+       between each pair of vertices, considering all edges undirected. An
+       _a_r_b_o_r_e_s_c_e_n_c_e is an acyclic digraph with a vertex V, the _r_o_o_t, such that
+       there is a unique path from V to every other vertex of G. A _t_r_e_e is an
+       acyclic non-empty digraph such that there is a unique path between
+       every pair of vertices, considering all edges undirected.
+
+DDAATTAA TTYYPPEESS
+       ddiiggrraapphh(())
+
+              A digraph as returned by _d_i_g_r_a_p_h_:_n_e_w_/_0_,_1.
+
+EEXXPPOORRTTSS
+       aarrbboorreesscceennccee__rroooott((DDiiggrraapphh)) -->> nnoo || {{yyeess,, RRoooott}}
+
+              Types:
+
+                 Digraph = digraph()
+                 Root = ddiiggrraapphh::vveerrtteexx(())
+
+              Returns _{_y_e_s_, _R_o_o_t_} if _R_o_o_t is the rroooott of the arborescence
+              _D_i_g_r_a_p_h, _n_o otherwise.
+
+       ccoommppoonneennttss((DDiiggrraapphh)) -->> [[CCoommppoonneenntt]]
+
+              Types:
+
+                 Digraph = digraph()
+                 Component = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns a list of ccoonnnneecctteedd ccoommppoonneennttss. Each component is
+              represented by its vertices. The order of the vertices and the
+              order of the components are arbitrary. Each vertex of the
+              digraph _D_i_g_r_a_p_h occurs in exactly one component.
+
+       ccoonnddeennssaattiioonn((DDiiggrraapphh)) -->> CCoonnddeennsseeddDDiiggrraapphh
+
+              Types:
+
+                 Digraph = CondensedDigraph = digraph()
+
+              Creates a digraph where the vertices are the ssttrroonnggllyy ccoonnnneecctteedd
+              ccoommppoonneennttss of _D_i_g_r_a_p_h as returned by _s_t_r_o_n_g___c_o_m_p_o_n_e_n_t_s_/_1. If X
+              and Y are two different strongly connected components, and there
+              exist vertices x and y in X and Y respectively such that there
+              is an edge eemmaannaattiinngg from x and iinncciiddeenntt on y, then an edge
+              emanating from X and incident on Y is created.
+
+              The created digraph has the same type as _D_i_g_r_a_p_h. All vertices
+              and edges have the default llaabbeell _[_].
+
+              Each and every ccyyccllee is included in some strongly connected
+              component, which implies that there always exists a ttooppoollooggiiccaall
+              oorrddeerriinngg of the created digraph.
+
+       ccyycclliicc__ssttrroonngg__ccoommppoonneennttss((DDiiggrraapphh)) -->> [[SSttrroonnggCCoommppoonneenntt]]
+
+              Types:
+
+                 Digraph = digraph()
+                 StrongComponent = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns a list of ssttrroonnggllyy ccoonnnneecctteedd ccoommppoonneennttss. Each strongly
+              component is represented by its vertices. The order of the
+              vertices and the order of the components are arbitrary. Only
+              vertices that are included in some ccyyccllee in _D_i_g_r_a_p_h are
+              returned, otherwise the returned list is equal to that returned
+              by _s_t_r_o_n_g___c_o_m_p_o_n_e_n_t_s_/_1.
+
+       iiss__aaccyycclliicc((DDiiggrraapphh)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Digraph = digraph()
+
+              Returns _t_r_u_e if and only if the digraph _D_i_g_r_a_p_h is aaccyycclliicc.
+
+       iiss__aarrbboorreesscceennccee((DDiiggrraapphh)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Digraph = digraph()
+
+              Returns _t_r_u_e if and only if the digraph _D_i_g_r_a_p_h is an
+              aarrbboorreesscceennccee.
+
+       iiss__ttrreeee((DDiiggrraapphh)) -->> bboooolleeaann(())
+
+              Types:
+
+                 Digraph = digraph()
+
+              Returns _t_r_u_e if and only if the digraph _D_i_g_r_a_p_h is a ttrreeee.
+
+       lloooopp__vveerrttiicceess((DDiiggrraapphh)) -->> VVeerrttiicceess
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns a list of all vertices of _D_i_g_r_a_p_h that are included in
+              some lloooopp.
+
+       ppoossttoorrddeerr((DDiiggrraapphh)) -->> VVeerrttiicceess
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns all vertices of the digraph _D_i_g_r_a_p_h. The order is given
+              by a ddeepptthh--ffiirrsstt ttrraavveerrssaall of the digraph, collecting visited
+              vertices in postorder. More precisely, the vertices visited
+              while searching from an arbitrarily chosen vertex are collected
+              in postorder, and all those collected vertices are placed before
+              the subsequently visited vertices.
+
+       pprreeoorrddeerr((DDiiggrraapphh)) -->> VVeerrttiicceess
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns all vertices of the digraph _D_i_g_r_a_p_h. The order is given
+              by a ddeepptthh--ffiirrsstt ttrraavveerrssaall of the digraph, collecting visited
+              vertices in pre-order.
+
+       rreeaacchhaabbllee((VVeerrttiicceess,, DDiiggrraapphh)) -->> RReeaacchhaabbllee
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = Reachable = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns an unsorted list of digraph vertices such that for each
+              vertex in the list, there is a ppaatthh in _D_i_g_r_a_p_h from some vertex
+              of _V_e_r_t_i_c_e_s to the vertex. In particular, since paths may have
+              length zero, the vertices of _V_e_r_t_i_c_e_s are included in the
+              returned list.
+
+       rreeaacchhaabbllee__nneeiigghhbboouurrss((VVeerrttiicceess,, DDiiggrraapphh)) -->> RReeaacchhaabbllee
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = Reachable = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns an unsorted list of digraph vertices such that for each
+              vertex in the list, there is a ppaatthh in _D_i_g_r_a_p_h of length one or
+              more from some vertex of _V_e_r_t_i_c_e_s to the vertex. As a
+              consequence, only those vertices of _V_e_r_t_i_c_e_s that are included
+              in some ccyyccllee are returned.
+
+       rreeaacchhiinngg((VVeerrttiicceess,, DDiiggrraapphh)) -->> RReeaacchhiinngg
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = Reaching = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns an unsorted list of digraph vertices such that for each
+              vertex in the list, there is a ppaatthh from the vertex to some
+              vertex of _V_e_r_t_i_c_e_s. In particular, since paths may have length
+              zero, the vertices of _V_e_r_t_i_c_e_s are included in the returned
+              list.
+
+       rreeaacchhiinngg__nneeiigghhbboouurrss((VVeerrttiicceess,, DDiiggrraapphh)) -->> RReeaacchhiinngg
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = Reaching = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns an unsorted list of digraph vertices such that for each
+              vertex in the list, there is a ppaatthh of length one or more from
+              the vertex to some vertex of _V_e_r_t_i_c_e_s. As a consequence, only
+              those vertices of _V_e_r_t_i_c_e_s that are included in some ccyyccllee are
+              returned.
+
+       ssttrroonngg__ccoommppoonneennttss((DDiiggrraapphh)) -->> [[SSttrroonnggCCoommppoonneenntt]]
+
+              Types:
+
+                 Digraph = digraph()
+                 StrongComponent = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns a list of ssttrroonnggllyy ccoonnnneecctteedd ccoommppoonneennttss. Each strongly
+              component is represented by its vertices. The order of the
+              vertices and the order of the components are arbitrary. Each
+              vertex of the digraph _D_i_g_r_a_p_h occurs in exactly one strong
+              component.
+
+       ssuubbggrraapphh((DDiiggrraapphh,, VVeerrttiicceess)) -->> SSuubbGGrraapphh
+
+       ssuubbggrraapphh((DDiiggrraapphh,, VVeerrttiicceess,, OOppttiioonnss)) -->> SSuubbGGrraapphh
+
+              Types:
+
+                 Digraph = SubGraph = digraph()
+                 Vertices = [ddiiggrraapphh::vveerrtteexx(())]
+                 Options = [{type, SubgraphType} | {keep_labels, boolean()}]
+                 SubgraphType = inherit | [ddiiggrraapphh::dd__ttyyppee(())]
+
+              Creates a maximal ssuubbggrraapphh of _D_i_g_r_a_p_h having as vertices those
+              vertices of _D_i_g_r_a_p_h that are mentioned in _V_e_r_t_i_c_e_s.
+
+              If the value of the option _t_y_p_e is _i_n_h_e_r_i_t, which is the
+              default, then the type of _D_i_g_r_a_p_h is used for the subgraph as
+              well. Otherwise the option value of _t_y_p_e is used as argument to
+              _d_i_g_r_a_p_h_:_n_e_w_/_1.
+
+              If the value of the option _k_e_e_p___l_a_b_e_l_s is _t_r_u_e, which is the
+              default, then the llaabbeellss of vertices and edges of _D_i_g_r_a_p_h are
+              used for the subgraph as well. If the value is _f_a_l_s_e, then the
+              default label, _[_], is used for the subgraph's vertices and
+              edges.
+
+              _s_u_b_g_r_a_p_h_(_D_i_g_r_a_p_h_, _V_e_r_t_i_c_e_s_) is equivalent to _s_u_b_g_r_a_p_h_(_D_i_g_r_a_p_h_,
+              _V_e_r_t_i_c_e_s_, _[_]_).
+
+              There will be a _b_a_d_a_r_g exception if any of the arguments are
+              invalid.
+
+       ttooppssoorrtt((DDiiggrraapphh)) -->> VVeerrttiicceess || ffaallssee
+
+              Types:
+
+                 Digraph = digraph()
+                 Vertices = [ddiiggrraapphh::vveerrtteexx(())]
+
+              Returns a ttooppoollooggiiccaall oorrddeerriinngg of the vertices of the digraph
+              _D_i_g_r_a_p_h if such an ordering exists, _f_a_l_s_e otherwise. For each
+              vertex in the returned list, there are no oouutt--nneeiigghhbboouurrss that
+              occur earlier in the list.
+
+SSEEEE AALLSSOO
+       ddiiggrraapphh((33))
+
+
+
+Ericsson AB                      stdlib 1.18.2                digraph_utils(3)

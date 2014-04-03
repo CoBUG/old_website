@@ -1,0 +1,112 @@
+CosTime_UTO(3)             Erlang Module Definition             CosTime_UTO(3)
+
+
+
+NNAAMMEE
+       CosTime_UTO - This module implements the OMG CosTime::UTO interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_i_m_e_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ''__ggeett__ttiimmee''((UUTTOO)) -->> uulloonngglloonngg(())
+
+              Types:
+
+                 UTO = #objref
+
+              This operation returns the time associated with the target
+              object.
+
+       ''__ggeett__iinnaaccccuurraaccyy''((UUTTOO)) -->> uulloonngglloonngg(())
+
+              Types:
+
+                 UTO = #objref
+
+              This operation returns the inaccuracy associated with the target
+              object.
+
+       ''__ggeett__ttddff''((UUTTOO)) -->> sshhoorrtt(())
+
+              Types:
+
+                 UTO = #objref
+
+              This operation returns the time displacement factor associated
+              with the target object.
+
+       ''__ggeett__uuttcc__ttiimmee''((UUTTOO)) -->> UUttccTT
+
+              Types:
+
+                 UTO = #objref
+                 Utc = #'TimeBase_UtcT'{time, inacclo, inacchi, tdf}
+                 time = ulonglong()
+                 inacclo = ulong()
+                 inacchi = ushort()
+                 tdf = short()
+
+              This operation returns the data associated with the target
+              object in Utc form.
+
+       aabbssoolluuttee__ttiimmee((UUTTOO)) -->> OOtthheerrUUTTOO
+
+              Types:
+
+                 UTO = OtherUTO = #objref
+
+              This operation create a new UTO object representing the time in
+              the target object added to current time (UTC). The time base is
+              _1_5 _o_c_t_o_b_e_r _1_5_8_2 _0_0_:_0_0. Comparing two time objects which use
+              different time base is, by obvious reasons, pointless. Raises
+              DATA_CONVERSION if causes an overflow. This operation is only
+              useful if the target object represents a relative time.
+
+       ccoommppaarree__ttiimmee((UUTTOO,, CCoommppaarriissoonnTTyyppee,, OOtthheerrUUTTOO)) -->> RReeppllyy
+
+              Types:
+
+                 UTO = OtherUTO = #objref
+                 ComparisonType = 'IntervalC' | 'MidC'
+                 Reply = 'TCEqualTo' | 'TCLessThan' | 'TCGreaterThan' |
+                 'TCIndeterminate'
+
+              This operation compares the time associated with the target
+              object and the given UTO object. The different _C_o_m_p_a_r_i_s_o_n_T_y_p_e
+              are:
+
+                * 'MidC' - only compare the time represented by each object.
+                  Furthermore, the target object is always used as the first
+                  parameter in the comparison, i.e., if the target object's
+                  time is larger 'TCGreaterThan' will be returned.
+
+                * 'IntervalC' - also takes the inaccuracy into consideration,
+                  i.e., if the two objects interval overlaps 'TCIndeterminate'
+                  is returned, otherwise the as for 'MidC'.
+
+       ttiimmee__ttoo__iinntteerrvvaall((UUTTOO,, OOtthheerrUUTTOO)) -->> TTIIOO
+
+              Types:
+
+                 UTO = OtherUTO = TIO = #objref
+
+              This operation returns a TIO representing the interval between
+              the target object and the given UTO midpoint times. The
+              inaccuracy in the objects are not taken into consideration.
+
+       iinntteerrvvaall((UUTTOO)) -->> TTIIOO
+
+              Types:
+
+                 UTO = TIO = #objref
+
+              This operation creates a TIO object representing the error
+              interval around the time value represented by the target object,
+              i.e., _T_I_O_._u_p_p_e_r___b_o_u_n_d _= _U_T_O_._t_i_m_e_+_U_T_O_._i_n_a_c_c_u_r_a_c_y and
+              _T_I_O_._l_o_w_e_r___b_o_u_n_d _= _U_T_O_._t_i_m_e_-_U_T_O_._i_n_a_c_c_u_r_a_c_y.
+
+
+
+Ericsson AB                     cosTime 1.1.12                  CosTime_UTO(3)

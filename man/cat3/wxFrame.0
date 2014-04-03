@@ -1,0 +1,242 @@
+wxFrame(3)                 Erlang Module Definition                 wxFrame(3)
+
+
+
+NNAAMMEE
+       wxFrame - See external documentation: wxFrame.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFrame.
+
+       This class is derived (and can use functions) from:
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_r_a_m_e_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxFFrraammee(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee)) -->> wwxxFFrraammee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxFFrraammee(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFrame()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, TTiittllee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFrame()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Title = chardata() (see module unicode)
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ccrreeaatteeSSttaattuussBBaarr((TThhiiss)) -->> wwxxSSttaattuussBBaarr(()) ((sseeee mmoodduullee wwxxSSttaattuussBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+
+              Equivalent to ccrreeaatteeSSttaattuussBBaarr((TThhiiss,, [[]])).
+
+       ccrreeaatteeSSttaattuussBBaarr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxSSttaattuussBBaarr(()) ((sseeee mmoodduullee
+       wwxxSSttaattuussBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+                 Option = {number, integer()} | {style, integer()} | {id,
+                 integer()}
+
+              See external documentation.
+
+       ccrreeaatteeTToooollBBaarr((TThhiiss)) -->> wwxxTToooollBBaarr(()) ((sseeee mmoodduullee wwxxTToooollBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+
+              Equivalent to ccrreeaatteeTToooollBBaarr((TThhiiss,, [[]])).
+
+       ccrreeaatteeTToooollBBaarr((TThhiiss,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxTToooollBBaarr(()) ((sseeee mmoodduullee
+       wwxxTToooollBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+                 Option = {style, integer()} | {id, integer()}
+
+              See external documentation.
+
+       ggeettCClliieennttAArreeaaOOrriiggiinn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxFrame()
+
+              See external documentation.
+
+       ggeettMMeennuuBBaarr((TThhiiss)) -->> wwxxMMeennuuBBaarr(()) ((sseeee mmoodduullee wwxxMMeennuuBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+
+              See external documentation.
+
+       ggeettSSttaattuussBBaarr((TThhiiss)) -->> wwxxSSttaattuussBBaarr(()) ((sseeee mmoodduullee wwxxSSttaattuussBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+
+              See external documentation.
+
+       ggeettSSttaattuussBBaarrPPaannee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxFrame()
+
+              See external documentation.
+
+       ggeettTToooollBBaarr((TThhiiss)) -->> wwxxTToooollBBaarr(()) ((sseeee mmoodduullee wwxxTToooollBBaarr))
+
+              Types:
+
+                 This = wxFrame()
+
+              See external documentation.
+
+       pprroocceessssCCoommmmaanndd((TThhiiss,, WWiinniidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFrame()
+                 Winid = integer()
+
+              See external documentation.
+
+       sseennddSSiizzeeEEvveenntt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+
+              See external documentation.
+
+       sseettMMeennuuBBaarr((TThhiiss,, MMeennuubbaarr)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 Menubar = wxMenuBar() (see module wxMenuBar)
+
+              See external documentation.
+
+       sseettSSttaattuussBBaarr((TThhiiss,, SSttaattbbaarr)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 Statbar = wxStatusBar() (see module wxStatusBar)
+
+              See external documentation.
+
+       sseettSSttaattuussBBaarrPPaannee((TThhiiss,, NN)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 N = integer()
+
+              See external documentation.
+
+       sseettSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 Text = chardata() (see module unicode)
+
+              Equivalent to sseettSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt,, [[]])).
+
+       sseettSSttaattuussTTeexxtt((TThhiiss,, TTeexxtt,, OOppttiioonn::::[[OOppttiioonn]])) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 Text = chardata() (see module unicode)
+                 Option = {number, integer()}
+
+              See external documentation.
+
+       sseettSSttaattuussWWiiddtthhss((TThhiiss,, WWiiddtthhss__ffiieelldd)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 Widths_field = [integer()]
+
+              See external documentation.
+
+       sseettTToooollBBaarr((TThhiiss,, TToooollbbaarr)) -->> ookk
+
+              Types:
+
+                 This = wxFrame()
+                 Toolbar = wxToolBar() (see module wxToolBar)
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFrraammee(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                        wxFrame(3)

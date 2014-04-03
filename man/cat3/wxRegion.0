@@ -1,0 +1,282 @@
+wxRegion(3)                Erlang Module Definition                wxRegion(3)
+
+
+
+NNAAMMEE
+       wxRegion - See external documentation: wxRegion.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxRegion.
+
+DDAATTAA TTYYPPEESS
+         _w_x_R_e_g_i_o_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxRReeggiioonn(())
+
+              See external documentation.
+
+       nneeww((BBmmpp)) -->> wwxxRReeggiioonn(())
+
+              Types:
+
+                 Bmp = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+              Also:
+              new(Rect) -> wxRegion() when
+              Rect::{X::integer(), Y::integer(), W::integer(), H::integer()}.
+
+
+       nneeww((TTooppLLeefftt,, BBoottttoommRRiigghhtt)) -->> wwxxRReeggiioonn(())
+
+              Types:
+
+                 TopLeft = {X::integer(), Y::integer()}
+                 BottomRight = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       nneeww((XX,, YY,, WW,, HH)) -->> wwxxRReeggiioonn(())
+
+              Types:
+
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+
+       cclleeaarr((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxRegion()
+
+              See external documentation.
+
+       ccoonnttaaiinnss((TThhiiss,, PPtt)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxRegion()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+              Also:
+              contains(This, Rect) -> wx:wx_enum() when
+              This::wxRegion(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+              Res = ?wxOutRegion | ?wxPartRegion | ?wxInRegion
+
+       ccoonnttaaiinnss((TThhiiss,, XX,, YY)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+              Res = ?wxOutRegion | ?wxPartRegion | ?wxInRegion
+
+       ccoonnttaaiinnss((TThhiiss,, XX,, YY,, WW,, HH)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+              Res = ?wxOutRegion | ?wxPartRegion | ?wxInRegion
+
+       ccoonnvveerrttTTooBBiittmmaapp((TThhiiss)) -->> wwxxBBiittmmaapp(()) ((sseeee mmoodduullee wwxxBBiittmmaapp))
+
+              Types:
+
+                 This = wxRegion()
+
+              See external documentation.
+
+       ggeettBBooxx((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(()),, WW::::iinntteeggeerr(()),,
+       HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxRegion()
+
+              See external documentation.
+
+       iinntteerrsseecctt((TThhiiss,, RReeggiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Region = wxRegion()
+
+              See external documentation.
+              Also:
+              intersect(This, Rect) -> boolean() when
+              This::wxRegion(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+       iinntteerrsseecctt((TThhiiss,, XX,, YY,, WW,, HH)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+
+       iissEEmmppttyy((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+
+              See external documentation.
+
+       ssuubbttrraacctt((TThhiiss,, RReeggiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Region = wxRegion()
+
+              See external documentation.
+              Also:
+              subtract(This, Rect) -> boolean() when
+              This::wxRegion(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+       ssuubbttrraacctt((TThhiiss,, XX,, YY,, WW,, HH)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+
+       ooffffsseett((TThhiiss,, PPtt)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Pt = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ooffffsseett((TThhiiss,, XX,, YY)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       uunniioonn((TThhiiss,, RReeggiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Region = wxRegion() | wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+              Also:
+              union(This, Rect) -> boolean() when
+              This::wxRegion(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+       uunniioonn((TThhiiss,, BBmmpp,, TTrraannsspp)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Bmp = wxBitmap() (see module wxBitmap)
+                 Transp = wx_colour() (see module wx)
+
+              Equivalent to uunniioonn((TThhiiss,, BBmmpp,, TTrraannsspp,, [[]])).
+
+       uunniioonn((TThhiiss,, BBmmpp,, TTrraannsspp,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Bmp = wxBitmap() (see module wxBitmap)
+                 Transp = wx_colour() (see module wx)
+                 Option = {tolerance, integer()}
+
+              See external documentation.
+
+       uunniioonn((TThhiiss,, XX,, YY,, WW,, HH)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+
+       XXoorr((TThhiiss,, RReeggiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 Region = wxRegion()
+
+              See external documentation.
+              Also:
+              'Xor'(This, Rect) -> boolean() when
+              This::wxRegion(), Rect::{X::integer(), Y::integer(),
+              W::integer(), H::integer()}.
+
+
+       XXoorr((TThhiiss,, XX,, YY,, WW,, HH)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxRegion()
+                 X = integer()
+                 Y = integer()
+                 W = integer()
+                 H = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxRReeggiioonn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                       wxRegion(3)

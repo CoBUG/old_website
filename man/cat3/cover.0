@@ -1,0 +1,431 @@
+cover(3)                   Erlang Module Definition                   cover(3)
+
+
+
+NNAAMMEE
+       cover - A Coverage Analysis Tool for Erlang
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _c_o_v_e_r provides a set of functions for coverage analysis of
+       Erlang programs, counting how many times each _e_x_e_c_u_t_a_b_l_e _l_i_n_e of code
+       is executed when a program is run.
+       An executable line contains an Erlang expression such as a matching or
+       a function call. A blank line or a line containing a comment, function
+       head or pattern in a _c_a_s_e- or _r_e_c_e_i_v_e statement is not executable.
+
+       Coverage analysis can be used to verify test cases, making sure all
+       relevant code is covered, and may also be helpful when looking for
+       bottlenecks in the code.
+
+       Before any analysis can take place, the involved modules must be _C_o_v_e_r
+       _c_o_m_p_i_l_e_d. This means that some extra information is added to the module
+       before it is compiled into a binary which then is loaded. The source
+       file of the module is not affected and no _._b_e_a_m file is created.
+
+       Each time a function in a Cover compiled module is called, information
+       about the call is added to an internal database of Cover. The coverage
+       analysis is performed by examining the contents of the Cover database.
+       The output _A_n_s_w_e_r is determined by two parameters, _L_e_v_e_l and _A_n_a_l_y_s_i_s.
+
+         * _L_e_v_e_l _= _m_o_d_u_l_e
+
+           _A_n_s_w_e_r _= _{_M_o_d_u_l_e_,_V_a_l_u_e_}, where _M_o_d_u_l_e is the module name.
+
+         * _L_e_v_e_l _= _f_u_n_c_t_i_o_n
+
+           _A_n_s_w_e_r _= _[_{_F_u_n_c_t_i_o_n_,_V_a_l_u_e_}_], one tuple for each function in the
+           module. A function is specified by its module name _M, function name
+           _F and arity _A as a tuple _{_M_,_F_,_A_}.
+
+         * _L_e_v_e_l _= _c_l_a_u_s_e
+
+           _A_n_s_w_e_r _= _[_{_C_l_a_u_s_e_,_V_a_l_u_e_}_], one tuple for each clause in the module.
+           A clause is specified by its module name _M, function name _F, arity
+           _A and position in the function definition _C as a tuple _{_M_,_F_,_A_,_C_}.
+
+         * _L_e_v_e_l _= _l_i_n_e
+
+           _A_n_s_w_e_r _= _[_{_L_i_n_e_,_V_a_l_u_e_}_], one tuple for each executable line in the
+           module. A line is specified by its module name _M and line number in
+           the source file _N as a tuple _{_M_,_N_}.
+
+         * _A_n_a_l_y_s_i_s _= _c_o_v_e_r_a_g_e
+
+           _V_a_l_u_e _= _{_C_o_v_,_N_o_t_C_o_v_} where _C_o_v is the number of executable lines in
+           the module, function, clause or line that have been executed at
+           least once and _N_o_t_C_o_v is the number of executable lines that have
+           not been executed.
+
+         * _A_n_a_l_y_s_i_s _= _c_a_l_l_s
+
+           _V_a_l_u_e _= _C_a_l_l_s which is the number of times the module, function, or
+           clause has been called. In the case of line level analysis, _C_a_l_l_s
+           is the number of times the line has been executed.
+
+       _D_i_s_t_r_i_b_u_t_i_o_n
+
+       Cover can be used in a distributed Erlang system. One of the nodes in
+       the system must then be selected as the _m_a_i_n _n_o_d_e, and all Cover
+       commands must be executed from this node. The error reason
+       _n_o_t___m_a_i_n___n_o_d_e is returned if an interface function is called on one of
+       the remote nodes.
+
+       Use _c_o_v_e_r_:_s_t_a_r_t_/_1 and _c_o_v_e_r_:_s_t_o_p_/_1 to add or remove nodes. The same
+       Cover compiled code will be loaded on each node, and analysis will
+       collect and sum up coverage data results from all nodes.
+
+EEXXPPOORRTTSS
+       ssttaarrtt(()) -->> {{ookk,,PPiidd}} || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Pid = pid()
+                 Reason = {already_started,Pid}
+
+              Starts the Cover server which owns the Cover internal database.
+              This function is called automatically by the other functions in
+              the module.
+
+       ssttaarrtt((NNooddeess)) -->> {{ookk,,SSttaarrtteeddNNooddeess}} || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Nodes = StartedNodes = [atom()]
+
+              Starts a Cover server on the each of given nodes, and loads all
+              cover compiled modules.
+
+       ccoommppiillee((MMooddFFiillee)) -->> RReessuulltt
+       ccoommppiillee((MMooddFFiillee,, OOppttiioonnss)) -->> RReessuulltt
+       ccoommppiillee__mmoodduullee((MMooddFFiillee)) -->> RReessuulltt
+       ccoommppiillee__mmoodduullee((MMooddFFiillee,, OOppttiioonnss)) -->> RReessuulltt
+
+              Types:
+
+                 ModFile = Module | File
+                  Module = atom()
+                  File = string()
+                 Options = [Option]
+                  Option = {i,Dir} | {d,Macro} | {d,Macro,Value}
+                   See _c_o_m_p_i_l_e_:_f_i_l_e_/_2_.
+                 Result = {ok,Module} | {error,File} | {error,not_main_node}
+
+              Compiles a module for Cover analysis. The module is given by its
+              module name _M_o_d_u_l_e or by its file name _F_i_l_e. The _._e_r_l extension
+              may be omitted. If the module is located in another directory,
+              the path has to be specified.
+
+              _O_p_t_i_o_n_s is a list of compiler options which defaults to _[_]. Only
+              options defining include file directories and macros are passed
+              to _c_o_m_p_i_l_e_:_f_i_l_e_/_2, everything else is ignored.
+
+              If the module is successfully Cover compiled, the function
+              returns _{_o_k_,_M_o_d_u_l_e_}. Otherwise the function returns
+              _{_e_r_r_o_r_,_F_i_l_e_}. Errors and warnings are printed as they occur.
+
+              Note that the internal database is (re-)initiated during the
+              compilation, meaning any previously collected coverage data for
+              the module will be lost.
+
+       ccoommppiillee__ddiirreeccttoorryy(()) -->> [[RReessuulltt]] || {{eerrrroorr,,RReeaassoonn}}
+       ccoommppiillee__ddiirreeccttoorryy((DDiirr)) -->> [[RReessuulltt]] || {{eerrrroorr,,RReeaassoonn}}
+       ccoommppiillee__ddiirreeccttoorryy((DDiirr,, OOppttiioonnss)) -->> [[RReessuulltt]] || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Dir = string()
+                 Options = [Option]
+                   See _c_o_m_p_i_l_e___m_o_d_u_l_e_/_1_,_2
+                 Result = {ok,Module} | {error,File} | {error,not_main_node}
+                   See _c_o_m_p_i_l_e___m_o_d_u_l_e_/_1_,_2
+                 Reason = eacces | enoent
+
+              Compiles all modules (_._e_r_l files) in a directory _D_i_r for Cover
+              analysis the same way as _c_o_m_p_i_l_e___m_o_d_u_l_e_/_1_,_2 and returns a list
+              with the return values.
+
+              _D_i_r defaults to the current working directory.
+
+              The function returns _{_e_r_r_o_r_,_e_a_c_c_e_s_} if the directory is not
+              readable or _{_e_r_r_o_r_,_e_n_o_e_n_t_} if the directory does not exist.
+
+       ccoommppiillee__bbeeaamm((MMooddFFiillee)) -->> RReessuulltt
+
+              Types:
+
+                 ModFile = Module | BeamFile
+                  Module = atom()
+                  BeamFile = string()
+                 Result = {ok,Module} | {error,BeamFile} | {error,Reason}
+                  Reason = non_existing | {no_abstract_code,BeamFile} |
+                 {encrypted_abstract_code,BeamFile} |
+                 {already_cover_compiled,no_beam_found,Module} | not_main_node
+
+              Does the same as _c_o_m_p_i_l_e_/_1_,_2, but uses an existing _._b_e_a_m file as
+              base, i.e. the module is not compiled from source. Thus
+              _c_o_m_p_i_l_e___b_e_a_m_/_1 is faster than _c_o_m_p_i_l_e_/_1_,_2.
+
+              Note that the existing _._b_e_a_m file must contain _a_b_s_t_r_a_c_t _c_o_d_e,
+              i.e. it must have been compiled with the _d_e_b_u_g___i_n_f_o option. If
+              not, the error reason _{_n_o___a_b_s_t_r_a_c_t___c_o_d_e_,_B_e_a_m_F_i_l_e_} is returned.
+              If the abstract code is encrypted, and no key is available for
+              decrypting it, the error reason
+              _{_e_n_c_r_y_p_t_e_d___a_b_s_t_r_a_c_t___c_o_d_e_,_B_e_a_m_F_i_l_e_} _i_s _r_e_t_u_r_n_e_d_. _<_p_>_I_f _o_n_l_y _t_h_e
+              _m_o_d_u_l_e _n_a_m_e _(_i_._e_. _n_o_t _t_h_e _f_u_l_l _n_a_m_e _o_f _t_h_e _<_c_>_._b_e_a_m file) is
+              given to this function, the _._b_e_a_m file is found by calling
+              _c_o_d_e_:_w_h_i_c_h_(_M_o_d_u_l_e_). If no _._b_e_a_m file is found, the error reason
+              _n_o_n___e_x_i_s_t_i_n_g is returned. If the module is already cover
+              compiled with _c_o_m_p_i_l_e___b_e_a_m_/_1, the _._b_e_a_m file will be picked from
+              the same location as the first time it was compiled. If the
+              module is already cover compiled with _c_o_m_p_i_l_e_/_1_,_2, there is no
+              way to find the correct _._b_e_a_m file, so the error reason
+              _{_a_l_r_e_a_d_y___c_o_v_e_r___c_o_m_p_i_l_e_d_,_n_o___b_e_a_m___f_o_u_n_d_,_M_o_d_u_l_e_} is returned.
+
+              _{_e_r_r_o_r_,_B_e_a_m_F_i_l_e_} is returned if the compiled code can not be
+              loaded on the node.
+
+       ccoommppiillee__bbeeaamm__ddiirreeccttoorryy(()) -->> [[RReessuulltt]] || {{eerrrroorr,,RReeaassoonn}}
+       ccoommppiillee__bbeeaamm__ddiirreeccttoorryy((DDiirr)) -->> [[RReessuulltt]] || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 Dir = string()
+                 Result = See compile_beam/1
+                 Reason = eacces | enoent
+
+              Compiles all modules (_._b_e_a_m files) in a directory _D_i_r for Cover
+              analysis the same way as _c_o_m_p_i_l_e___b_e_a_m_/_1 and returns a list with
+              the return values.
+
+              _D_i_r defaults to the current working directory.
+
+              The function returns _{_e_r_r_o_r_,_e_a_c_c_e_s_} if the directory is not
+              readable or _{_e_r_r_o_r_,_e_n_o_e_n_t_} if the directory does not exist.
+
+       aannaallyyssee((MMoodduullee)) -->> {{ookk,,AAnnsswweerr}} || {{eerrrroorr,,EErrrroorr}}
+       aannaallyyssee((MMoodduullee,, AAnnaallyyssiiss)) -->> {{ookk,,AAnnsswweerr}} || {{eerrrroorr,,EErrrroorr}}
+       aannaallyyssee((MMoodduullee,, LLeevveell)) -->> {{ookk,,AAnnsswweerr}} || {{eerrrroorr,,EErrrroorr}}
+       aannaallyyssee((MMoodduullee,, AAnnaallyyssiiss,, LLeevveell)) -->> {{ookk,,AAnnsswweerr}} || {{eerrrroorr,,EErrrroorr}}
+
+              Types:
+
+                 Module = atom()
+                 Analysis = coverage | calls
+                 Level = line | clause | function | module
+                 Answer = {Module,Value} | [{Item,Value}]
+                  Item = Line | Clause | Function
+                  Line = {M,N}
+                  Clause = {M,F,A,C}
+                  Function = {M,F,A}
+                  M = F = atom()
+                  N = A = C = integer()
+                  Value = {Cov,NotCov} | Calls
+                  Cov = NotCov = Calls = integer()
+                 Error = {not_cover_compiled,Module} | not_main_node
+
+              Performs analysis of a Cover compiled module _M_o_d_u_l_e, as
+              specified by _A_n_a_l_y_s_i_s and _L_e_v_e_l (see above), by examining the
+              contents of the internal database.
+
+              _A_n_a_l_y_s_i_s defaults to _c_o_v_e_r_a_g_e and _L_e_v_e_l defaults to _f_u_n_c_t_i_o_n.
+
+              If _M_o_d_u_l_e is not Cover compiled, the function returns
+              _{_e_r_r_o_r_,_{_n_o_t___c_o_v_e_r___c_o_m_p_i_l_e_d_,_M_o_d_u_l_e_}_}.
+
+              HINT: It is possible to issue multiple analyse_to_file commands
+              at the same time.
+
+       aannaallyyssee__ttoo__ffiillee((MMoodduullee)) -->>
+       aannaallyyssee__ttoo__ffiillee((MMoodduullee,,OOppttiioonnss)) -->>
+       aannaallyyssee__ttoo__ffiillee((MMoodduullee,, OOuuttFFiillee)) -->>
+       aannaallyyssee__ttoo__ffiillee((MMoodduullee,, OOuuttFFiillee,, OOppttiioonnss)) -->> {{ookk,,OOuuttFFiillee}} ||
+       {{eerrrroorr,,EErrrroorr}}
+
+              Types:
+
+                 Module = atom()
+                 OutFile = string()
+                 Options = [Option]
+                 Option = html
+                 Error = {not_cover_compiled,Module} | {file,File,Reason} |
+                 no_source_code_found | not_main_node
+                  File = string()
+                  Reason = term()
+
+              Makes a copy _O_u_t_F_i_l_e of the source file for a module _M_o_d_u_l_e,
+              where it for each executable line is specified how many times it
+              has been executed.
+
+              The output file _O_u_t_F_i_l_e defaults to _M_o_d_u_l_e_._C_O_V_E_R_._o_u_t, or
+              _M_o_d_u_l_e_._C_O_V_E_R_._h_t_m_l if the option _h_t_m_l was used.
+
+              If _M_o_d_u_l_e is not Cover compiled, the function returns
+              _{_e_r_r_o_r_,_{_n_o_t___c_o_v_e_r___c_o_m_p_i_l_e_d_,_M_o_d_u_l_e_}_}.
+
+              If the source file and/or the output file cannot be opened using
+              _f_i_l_e_:_o_p_e_n_/_2, the function returns _{_e_r_r_o_r_,_{_f_i_l_e_,_F_i_l_e_,_R_e_a_s_o_n_}_}
+              where _F_i_l_e is the file name and _R_e_a_s_o_n is the error reason.
+
+              If the module was cover compiled from the _._b_e_a_m file, i.e. using
+              _c_o_m_p_i_l_e___b_e_a_m_/_1 or _c_o_m_p_i_l_e___b_e_a_m___d_i_r_e_c_t_o_r_y_/_0_,_1, it is assumed that
+              the source code can be found in the same directory as the _._b_e_a_m
+              file, or in _._._/_s_r_c relative to that directory. If no source code
+              is found, _,_{_e_r_r_o_r_,_n_o___s_o_u_r_c_e___c_o_d_e___f_o_u_n_d_} is returned.
+
+              HINT: It is possible to issue multiple analyse_to_file commands
+              at the same time.
+
+       aassyynncc__aannaallyyssee__ttoo__ffiillee((MMoodduullee)) -->>
+       aassyynncc__aannaallyyssee__ttoo__ffiillee((MMoodduullee,,OOppttiioonnss)) -->>
+       aassyynncc__aannaallyyssee__ttoo__ffiillee((MMoodduullee,, OOuuttFFiillee)) -->>
+       aassyynncc__aannaallyyssee__ttoo__ffiillee((MMoodduullee,, OOuuttFFiillee,, OOppttiioonnss)) -->> ppiidd(())
+
+              Types:
+
+                 Module = atom()
+                 OutFile = string()
+                 Options = [Option]
+                 Option = html
+                 Error = {not_cover_compiled,Module} | {file,File,Reason} |
+                 no_source_code_found | not_main_node
+                  File = string()
+                  Reason = term()
+
+              This function works exactly the same way as aannaallyyssee__ttoo__ffiillee
+              except that it is asynchronous instead of synchronous. The
+              spawned process will link with the caller when created. If an
+              _E_r_r_o_r occurs while doing the cover analysis the process will
+              crash with the same error reason as aannaallyyssee__ttoo__ffiillee would
+              return.
+
+       mmoodduulleess(()) -->> [[MMoodduullee]] || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Module = atom()
+
+              Returns a list with all modules that are currently Cover
+              compiled.
+
+       iimmppoorrtteedd__mmoodduulleess(()) -->> [[MMoodduullee]] || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Module = atom()
+
+              Returns a list with all modules for which there are imported
+              data.
+
+       iimmppoorrtteedd(()) -->> [[FFiillee]] || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 File = string()
+
+              Returns a list with all imported files.
+
+       wwhhiicchh__nnooddeess(()) -->> [[NNooddee]] || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Node = atom()
+
+              Returns a list with all nodes that are part of the coverage
+              analysis. Note that the current node is not returned. This node
+              is always part of the analysis.
+
+       iiss__ccoommppiilleedd((MMoodduullee)) -->> {{ffiillee,,FFiillee}} || ffaallssee || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Module = atom()
+                 Beam = string()
+
+              Returns _{_f_i_l_e_,_F_i_l_e_} if the module _M_o_d_u_l_e is Cover compiled, or
+              _f_a_l_s_e otherwise. _F_i_l_e is the _._e_r_l file used by
+              _c_o_v_e_r_:_c_o_m_p_i_l_e___m_o_d_u_l_e_/_1_,_2 or the _._b_e_a_m file used by
+              _c_o_m_p_i_l_e___b_e_a_m_/_1.
+
+       rreesseett((MMoodduullee)) -->>
+       rreesseett(()) -->> ookk || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Module = atom()
+
+              Resets all coverage data for a Cover compiled module _M_o_d_u_l_e in
+              the Cover database on all nodes. If the argument is omitted, the
+              coverage data will be reset for all modules known by Cover.
+
+              If _M_o_d_u_l_e is not Cover compiled, the function returns
+              _{_e_r_r_o_r_,_{_n_o_t___c_o_v_e_r___c_o_m_p_i_l_e_d_,_M_o_d_u_l_e_}_}.
+
+       eexxppoorrtt((EExxppoorrttFFiillee))
+       eexxppoorrtt((EExxppoorrttFFiillee,,MMoodduullee)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 ExportFile = string()
+                 Module = atom()
+                 Reason = {not_cover_compiled,Module} |
+                 {cant_open_file,ExportFile,Reason} | not_main_node
+
+              Exports the current coverage data for _M_o_d_u_l_e to the file
+              _E_x_p_o_r_t_F_i_l_e. It is recommended to name the _E_x_p_o_r_t_F_i_l_e with the
+              extension _._c_o_v_e_r_d_a_t_a, since other filenames can not be read by
+              the web based interface to cover.
+
+              If _M_o_d_u_l_e is not given, data for all Cover compiled or earlier
+              imported modules is exported.
+
+              This function is useful if coverage data from different systems
+              is to be merged.
+
+              See also _c_o_v_e_r_:_i_m_p_o_r_t_/_1
+
+       iimmppoorrtt((EExxppoorrttFFiillee)) -->> ookk || {{eerrrroorr,,RReeaassoonn}}
+
+              Types:
+
+                 ExportFile = string()
+                 Reason = {cant_open_file,ExportFile,Reason} | not_main_node
+
+              Imports coverage data from the file _E_x_p_o_r_t_F_i_l_e created with
+              _c_o_v_e_r_:_e_x_p_o_r_t_/_1_,_2. Any analysis performed after this will include
+              the imported data.
+
+              Note that when compiling a module _a_l_l _e_x_i_s_t_i_n_g _c_o_v_e_r_a_g_e _d_a_t_a _i_s
+              _r_e_m_o_v_e_d, including imported data. If a module is already
+              compiled when data is imported, the imported data is _a_d_d_e_d to
+              the existing coverage data.
+
+              Coverage data from several export files can be imported into one
+              system. The coverage data is then added up when analysing.
+
+              Coverage data for a module can not be imported from the same
+              file twice unless the module is first reset or compiled. The
+              check is based on the filename, so you can easily fool the
+              system by renaming your export file.
+
+              See also _c_o_v_e_r_:_e_x_p_o_r_t_/_1_,_2
+
+       ssttoopp(()) -->> ookk || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Stops the Cover server and unloads all Cover compiled code.
+
+       ssttoopp((NNooddeess)) -->> ookk || {{eerrrroorr,,nnoott__mmaaiinn__nnooddee}}
+
+              Types:
+
+                 Nodes = [atom()]
+
+              Stops the Cover server and unloads all Cover compiled code on
+              the given nodes. Data stored in the Cover database on the remote
+              nodes is fetched and stored on the main node.
+
+SSEEEE AALLSSOO
+       code(3), compile(3)
+
+
+
+Ericsson AB                       tools 2.6.8                         cover(3)

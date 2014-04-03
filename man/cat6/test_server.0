@@ -1,0 +1,47 @@
+test_server(7)           Erlang Application Definition          test_server(7)
+
+
+
+NNAAMMEE
+       test_server - Test Server for manual or automatic testing of Erlang
+       code
+
+DDEESSCCRRIIPPTTIIOONN
+       _T_e_s_t _S_e_r_v_e_r is a portable test server for automated application
+       testing. The server can run test suites on local or remote targets and
+       log progress and results to HTML pages. The main purpose of Test Server
+       is to act as engine inside customized test tools. A callback interface
+       for such framework applications is provided.
+
+       In brief the test server supports:
+
+         * Running multiple, concurrent test suites
+
+         * Running tests on remote and even diskless targets
+
+         * Test suites may contain other test suites, in a tree fashion
+
+         * Logging of the events in a test suite, on both suite and case
+           levels
+
+         * HTML presentation of test suite results
+
+         * HTML presentation of test suite code
+
+         * Support for test suite authors, e.g. start/stop slave nodes
+
+         * Call trace on target and slave nodes
+
+       For information about how to write test cases and test suites, please
+       see the Test Server User's Guide and the reference manual for the
+       _t_e_s_t___s_e_r_v_e_r module.
+
+       _C_o_m_m_o_n _T_e_s_t is an existing test tool application based on the OTP Test
+       Server. Please read the Common Test User's Guide for more information.
+
+CCOONNFFIIGGUURRAATTIIOONN
+       There are currently no configuration parameters available for this
+       application.
+
+SSEEEE AALLSSOO
+Ericsson AB                    test_server 3.5.2                test_server(7)

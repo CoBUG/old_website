@@ -1,0 +1,53 @@
+snmpa_error_logger(3)      Erlang Module Definition      snmpa_error_logger(3)
+
+
+
+NNAAMMEE
+       snmpa_error_logger - Functions for Reporting SNMP Errors through the
+       error_logger
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p_a___e_r_r_o_r___l_o_g_g_e_r implements the _s_n_m_p_a___e_r_r_o_r___r_e_p_o_r_t
+       behaviour (see ssnnmmppaa__eerrrroorr__rreeppoorrtt) containing two callback functions
+       which are called in order to report SNMP errors.
+
+       This module provides a simple mechanism for reporting SNMP errors.
+       Errors are sent to the _e_r_r_o_r___l_o_g_g_e_r after a size check. Messages are
+       truncated after 1024 chars. It is provided as an example.
+
+       This module is the default error report module, but can be explicitly
+       configured, see ssnnmmppaa__eerrrroorr and ccoonnffiigguurraattiioonn ppaarraammeetteerrss.
+
+EEXXPPOORRTTSS
+       ccoonnffiigg__eerrrr((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              The function is called if an error occurs during the
+              configuration phase, for example if a syntax error is found in a
+              configuration file.
+
+              _F_o_r_m_a_t and _A_r_g_s are as in _i_o_:_f_o_r_m_a_t_(_F_o_r_m_a_t_, _A_r_g_s_).
+
+       uusseerr__eerrrr((FFoorrmmaatt,, AArrggss)) -->> vvooiidd(())
+
+              Types:
+
+                 Format = string()
+                 Args = list()
+
+              The function is called if a user related error occurs at run-
+              time, for example if a user defined instrumentation function
+              returns erroneous.
+
+              _F_o_r_m_a_t and _A_r_g_s are as in _i_o_:_f_o_r_m_a_t_(_F_o_r_m_a_t_, _A_r_g_s_).
+
+SSEEEE AALLSSOO
+       error_logger(3)
+
+
+
+Ericsson AB                       snmp 4.22.1            snmpa_error_logger(3)

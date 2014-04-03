@@ -1,0 +1,235 @@
+cpu_sup(3)                 Erlang Module Definition                 cpu_sup(3)
+
+
+
+NNAAMMEE
+       cpu_sup - A CPU Load and CPU Utilization Supervisor Process
+
+DDEESSCCRRIIPPTTIIOONN
+       _c_p_u___s_u_p is a process which supervises the CPU load and CPU utilization.
+       It is part of the OS_Mon application, see ooss__mmoonn((66)). Available for
+       Unix, although CPU utilization values (_u_t_i_l_/_0_,_1) are only available for
+       Solaris and Linux.
+
+       The load values are proportional to how long time a runnable Unix
+       process has to spend in the run queue before it is scheduled.
+       Accordingly, higher values mean more system load. The returned value
+       divided by 256 produces the figure displayed by _r_u_p and _t_o_p. What is
+       displayed as 2.00 in _r_u_p, is displayed as load up to the second mark in
+       _x_l_o_a_d.
+
+       For example, _r_u_p displays a load of 128 as 0.50, and 512 as 2.00.
+
+       If the user wants to view load values as percentage of machine
+       capacity, then this way of measuring presents a problem, because the
+       load values are not restricted to a fixed interval. In this case, the
+       following simple mathematical transformation can produce the load value
+       as a percentage:
+
+             PercentLoad = 100 * (1 - D/(D + Load))
+
+
+       _D determines which load value should be associated with which
+       percentage. Choosing _D = 50 means that 128 is 60% load, 256 is 80%, 512
+       is 90%, and so on.
+
+       Another way of measuring system load is to divide the number of busy
+       CPU cycles by the total number of CPU cycles. This produces values in
+       the 0-100 range immediately. However, this method hides the fact that a
+       machine can be more or less saturated. CPU utilization is therefore a
+       better name than system load for this measure.
+
+       A server which receives just enough requests to never become idle will
+       score a CPU utilization of 100%. If the server receives 50% more
+       requests, it will still scores 100%. When the system load is calculated
+       with the percentage formula shown previously, the load will increase
+       from 80% to 87%.
+
+       The _a_v_g_1_/_0, _a_v_g_5_/_0, and _a_v_g_1_5_/_0 functions can be used for retrieving
+       system load values, and the _u_t_i_l_/_0 and _u_t_i_l_/_1 functions can be used for
+       retrieving CPU utilization values.
+
+       When run on Linux, _c_p_u___s_u_p assumes that the _/_p_r_o_c file system is
+       present and accessible by _c_p_u___s_u_p. If it is not, _c_p_u___s_u_p will
+       terminate.
+
+EEXXPPOORRTTSS
+       nnpprrooccss(()) -->> UUnniixxPPrroocceesssseess || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 UnixProcesses = int()
+                 Reason = term()
+
+              Returns the number of UNIX processes running on this machine.
+              This is a crude way of measuring the system load, but it may be
+              of interest in some cases.
+
+              Returns 0 if _c_p_u___s_u_p is not available.
+
+       aavvgg11(()) -->> SSyysstteemmLLooaadd || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SystemLoad = int()
+                 Reason = term()
+
+              Returns the average system load in the last minute, as described
+              above. 0 represents no load, 256 represents the load reported as
+              1.00 by _r_u_p.
+
+              Returns 0 if _c_p_u___s_u_p is not available.
+
+       aavvgg55(()) -->> SSyysstteemmLLooaadd || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SystemLoad = int()
+                 Reason = term()
+
+              Returns the average system load in the last five minutes, as
+              described above. 0 represents no load, 256 represents the load
+              reported as 1.00 by _r_u_p.
+
+              Returns 0 if _c_p_u___s_u_p is not available.
+
+       aavvgg1155(()) -->> SSyysstteemmLLooaadd || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 SystemLoad = int()
+                 Reason = term()
+
+              Returns the average system load in the last 15 minutes, as
+              described above. 0 represents no load, 256 represents the load
+              reported as 1.00 by _r_u_p.
+
+              Returns 0 if _c_p_u___s_u_p is not available.
+
+       uuttiill(()) -->> CCppuuUUttiill || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 CpuUtil = float()
+                 Reason = term()
+
+              Returns CPU utilization since the last call to _u_t_i_l_/_0 or _u_t_i_l_/_1
+              by the calling process.
+
+          NNoottee::
+              The returned value of the first call to _u_t_i_l_/_0 or _u_t_i_l_/_1 by a
+              process will on most systems be the CPU utilization since system
+              boot, but this is not guaranteed and the value should therefore
+              be regarded as garbage. This also applies to the first call
+              after a restart of _c_p_u___s_u_p.
+
+
+              The CPU utilization is defined as the sum of the percentage
+              shares of the CPU cycles spent in all busy processor states (see
+              _u_t_i_l_/_1 below) in average on all CPUs.
+
+              Returns 0 if _c_p_u___s_u_p is not available.
+
+       uuttiill((OOppttss)) -->> UUttiillSSppeecc || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Opts = [detailed | per_cpu]
+                 UtilSpec = UtilDesc | [UtilDesc]
+                  UtilDesc = {Cpus, Busy, NonBusy, Misc}
+                  Cpus = all | int() | [int()]()
+                  Busy = NonBusy = {State, Share} | Share
+                  State = user | nice_user | kernel
+                  | wait | idle | atom()
+                  Share = float()
+                  Misc = []
+                 Reason = term()
+
+              Returns CPU utilization since the last call to _u_t_i_l_/_0 or _u_t_i_l_/_1
+              by the calling process, in more detail than _u_t_i_l_/_0.
+
+          NNoottee::
+              The returned value of the first call to _u_t_i_l_/_0 or _u_t_i_l_/_1 by a
+              process will on most systems be the CPU utilization since system
+              boot, but this is not guaranteed and the value should therefore
+              be regarded as garbage. This also applies to the first call
+              after a restart of _c_p_u___s_u_p.
+
+
+              Currently recognized options:
+
+                _d_e_t_a_i_l_e_d:
+                  The returned _U_t_i_l_D_e_s_c(s) will be even more detailed.
+
+                _p_e_r___c_p_u:
+                  Each CPU will be specified separately (assuming this
+                  information can be retrieved from the operating system),
+                  that is, a list with one _U_t_i_l_D_e_s_c per CPU will be returned.
+
+              Description of _U_t_i_l_D_e_s_c _= _{_C_p_u_s_, _B_u_s_y_, _N_o_n_B_u_s_y_, _M_i_s_c_}:
+
+                _C_p_u_s:
+                  If the _d_e_t_a_i_l_e_d and/or _p_e_r___c_p_u option is given, this is the
+                  CPU number, or a list of the CPU numbers.
+
+                  If not, this is the atom _a_l_l which implies that the _U_t_i_l_D_e_s_c
+                  contains information about all CPUs.
+
+                _B_u_s_y:
+                  If the _d_e_t_a_i_l_e_d option is given, this is a list of _{_S_t_a_t_e_,
+                  _S_h_a_r_e_} tuples, where each tuple contains information about a
+                  processor state that has been identified as a busy processor
+                  state (see below). The atom _S_t_a_t_e is the name of the state,
+                  and the float _S_h_a_r_e represents the percentage share of the
+                  CPU cycles spent in this state since the last call to _u_t_i_l_/_0
+                  or _u_t_i_l_/_1.
+
+                  If not, this is the sum of the percentage shares of the CPU
+                  cycles spent in all states identified as busy.
+
+                  If the _p_e_r___c_p_u is not given, the value(s) presented are the
+                  average of all CPUs.
+
+                _N_o_n_B_u_s_y:
+                  Similar to _B_u_s_y, but for processor states that have been
+                  identified as non-busy (see below).
+
+                _M_i_s_c:
+                  Currently unused; reserved for future use.
+
+              Currently these processor states are identified as busy:
+
+                _u_s_e_r:
+                  Executing code in user mode.
+
+                _n_i_c_e___u_s_e_r:
+                  Executing code in low priority (nice) user mode. This state
+                  is currently only identified on Linux.
+
+                _k_e_r_n_e_l:
+                  Executing code in kernel mode.
+
+              Currently these processor states are identified as non-busy:
+
+                _w_a_i_t:
+                  Waiting. This state is currently only identified on Solaris.
+
+                _i_d_l_e:
+                  Idle.
+
+          NNoottee::
+              Identified processor states may be different on different
+              operating systems and may change between different versions of
+              _c_p_u___s_u_p on the same operating system. The sum of the percentage
+              shares of the CPU cycles spent in all busy and all non-busy
+              processor states will always add up to 100%, though.
+
+
+              Returns _{_a_l_l_,_0_,_0_,_[_]_} if _c_p_u___s_u_p is not available.
+
+SSEEEE AALLSSOO
+       ooss__mmoonn((33))
+
+
+
+Ericsson AB                      os_mon 2.2.10                      cpu_sup(3)

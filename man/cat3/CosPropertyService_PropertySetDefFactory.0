@@ -1,0 +1,74 @@
+CosPropertyService_PropertySEertlDaenfgFaMcoCtdoousrlPyer(o3Dp)eefritnyiSteirovnice_PropertySetDefFactory(3)
+
+
+
+NNAAMMEE
+       CosPropertyService_PropertySetDefFactory - This module implements the
+       OMG CosPropertyService::PropertySetDefFactory interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_P_r_o_p_e_r_t_y_/_i_n_c_l_u_d_e_/_C_o_s_P_r_o_p_e_r_t_y_S_e_r_v_i_c_e_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccrreeaattee__pprrooppeerrttyysseettddeeff((FFaaccttoorryy)) -->>
+
+              Types:
+
+                 Factory = PropertySetDef = #objref
+
+              This operation creates a new _P_r_o_p_e_r_t_y_S_e_t_D_e_f with no predefined
+              settings.
+
+       ccrreeaattee__ccoonnssttrraaiinneedd__pprrooppeerrttyysseettddeeff((FFaaccttoorryy,, PPrrooppeerrttyyTTyyppeess,, PPrrooppeerrttyyDDeeffss))
+       -->> RReeppllyy
+
+              Types:
+
+                 Factory = PropertySetDef = #objref
+                 PropertyTypes = [CORBA::TypeCode]
+                 PropertyDefs =
+                 [#'CosPropertyService_PropertyDef'{property_name = Name,
+                 property_value = Value, property_mode = Mode}]
+                 Name = string()
+                 Value = #any
+                 Mode = normal | read_only | fixed_normal | fixed_readonly |
+                 undefined
+                 Reply = {'EXCEPTION',
+                 #CosPropertyService_ConstraintNotSupported{}} |
+                 PropertySetDef
+                 PropertySetDef = #objref
+
+              This operation creates a new _P_r_o_p_e_r_t_y_S_e_t_D_e_f with specific
+              constraints. PropertyTypes states allowed TypeCode's and
+              PropertyDefs valid _C_o_s_P_r_o_p_e_r_t_y_S_e_r_v_i_c_e_:_:_P_r_o_p_e_r_t_y_D_e_f data.
+
+       ccrreeaattee__iinniittiiaall__pprrooppeerrttyysseettddeeff((FFaaccttoorryy,, PPrrooppeerrttyyDDeeffss)) -->> RReeppllyy
+
+              Types:
+
+                 Factory = PropertySetDef = #objref
+                 PropertyDefs =
+                 [#'CosPropertyService_PropertyDef'{property_name = Name,
+                 property_value = Value, property_mode = Mode}]
+                 Name = string()
+                 Value = #any
+                 Mode = normal | read_only | fixed_normal | fixed_readonly |
+                 undefined
+                 Reply = {'EXCEPTION',
+                 #CosPropertyService_MultipleExceptions{exceptions = Excs}} |
+                 PropertySetDef
+                 Excs = [#'CosPropertyService_PropertyException{reason =
+                 Reason, failing_property_name = Name}]
+                 Reason = invalid_property_name | conflicting_property |
+                 property_not_found | unsupported_type_code |
+                 unsupported_property | unsupported_mode | fixed_property |
+                 read_only_property
+                 PropertySetDef = #objref
+
+              This operation creates a new _P_r_o_p_e_r_t_y_S_e_t_D_e_f with specific
+              initial properties.
+
+
+
+Ericsson AB                   cosProCpoesrPtryop1e.r1t.y1S5ervice_PropertySetDefFactory(3)

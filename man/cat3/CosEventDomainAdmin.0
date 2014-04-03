@@ -1,0 +1,46 @@
+CosEventDomainAdmin(3)     Erlang Module Definition     CosEventDomainAdmin(3)
+
+
+
+NNAAMMEE
+       CosEventDomainAdmin - This module export functions which return QoS and
+       Admin Properties constants.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to all definitions include necessary _h_r_l files by using:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_E_v_e_n_t_D_o_m_a_i_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ''CCyycclleeDDeetteeccttiioonn''(()) -->> ssttrriinngg(())
+
+              This function returns the CycleDetection identifier; required
+              when defining QoS Properties.
+
+       ''AAuutthhoorriizzeeCCyycclleess''(()) -->> sshhoorrtt(())
+
+              This function returns the AuthorizeCycles value; required when
+              defining QoS Properties.
+
+       ''FFoorrbbiiddCCyycclleess''(()) -->> sshhoorrtt(())
+
+              This function returns the ForbidCycles value; required when
+              defining QoS Properties.
+
+       ''DDiiaammoonnddDDeetteeccttiioonn''(()) -->> ssttrriinngg(())
+
+              This function returns the DiamondDetection identifier; required
+              when defining QoS Properties.
+
+       ''AAuutthhoorriizzeeDDiiaammoonnddss''(()) -->> sshhoorrtt(())
+
+              This function returns the AuthorizeDiamonds value; required when
+              defining QoS Properties.
+
+       ''FFoorrbbiiddDDiiaammoonnddss''(()) -->> sshhoorrtt(())
+
+              This function returns the ForbidDiamonds value; required when
+              defining QoS Properties.
+
+
+
+Ericsson AB                  cosEventDomain 1.1.12      CosEventDomainAdmin(3)

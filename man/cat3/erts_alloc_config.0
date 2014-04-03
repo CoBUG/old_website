@@ -1,0 +1,144 @@
+erts_alloc_config(3)       Erlang Module Definition       erts_alloc_config(3)
+
+
+
+NNAAMMEE
+       erts_alloc_config - Configuration tool for erts_alloc
+
+DDEESSCCRRIIPPTTIIOONN
+   NNoottee::
+       _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g is currently an experimental tool and might be
+       subject to backward incompatible changes.
+
+
+       eerrttss__aalllloocc((33)) is an Erlang Run-Time System internal memory allocator
+       library. _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g is intended to be used to aid creation of an
+       eerrttss__aalllloocc((33)) configuration that is suitable for a limited number of
+       runtime scenarios. The configuration that _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g produce is
+       intended as a suggestion, and may need to be adjusted manually.
+
+       The configuration is created based on information about a number of
+       runtime scenarios. It is obviously impossible to foresee every runtime
+       scenario that can occur. The important scenarios are those that cause
+       maximum or minimum load on specific memory allocators. Load in this
+       context is total size of memory blocks allocated.
+
+       The current implementation of _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g concentrate on
+       configuration of multi-block carriers. Information gathered when a
+       runtime scenario is saved is mainly current and maximum use of multi-
+       block carriers. If a parameter that change the use of multi-block
+       carriers is changed, a previously generated configuration is invalid
+       and _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g needs to be run again. It is mainly the single
+       block carrier threshold that effects the use of multi-block carriers,
+       but other single-block carrier parameters might as well. If another
+       value of a single block carrier parameter than the default is desired,
+       use the desired value when running _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g.
+
+       A configuration is created in the following way:
+
+         * Pass the ++MMeeaa ccoonnffiigg command-line flag to the Erlang runtime system
+           you are going to use for creation of the allocator configuration.
+           It will disable features that prevent _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g from doing
+           its job. Note, you should _n_o_t use this flag when using the created
+           configuration. Also note that it is important that you use the same
+           aammoouunntt ooff sscchheedduulleerrss when creating the configuration as you are
+           going the use on the system using the configuration.
+
+         * Run your applications with different scenarios (the more the
+           better) and save information about each scenario by calling
+           ssaavvee__sscceennaarriioo//00. It may be hard to know when the applications are
+           at an (for _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g) important runtime scenario. A good
+           approach may therefore be to call ssaavvee__sscceennaarriioo//00 repeatedly, e.g.
+           once every tenth second. Note that it is important that your
+           applications reach the runtime scenarios that are important for
+           _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g when you are saving scenarios; otherwise, the
+           configuration may perform bad.
+
+         * When you have covered all scenarios, call mmaakkee__ccoonnffiigg//11 in order to
+           create a configuration. The configuration is written to a file that
+           you have chosen. This configuration file can later be read by an
+           Erlang runtime-system at startup. Pass the command line argument
+           --aarrggss__ffiillee FFiilleeNNaammee to the eerrll((11)) command.
+
+         * The configuration produced by _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g may need to be
+           manually adjusted as already stated. Do not modify the file
+           produced by _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g; instead, put your modifications in
+           another file and load this file after the file produced by
+           _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g. That is, put the --aarrggss__ffiillee FFiilleeNNaammee argument
+           that reads your modification file later on the command-line than
+           the --aarrggss__ffiillee FFiilleeNNaammee argument that reads the configuration file
+           produced by _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g. If a memory allocation parameter
+           appear multiple times, the last version of will be used, i.e., you
+           can override parameters in the configuration file produced by
+           _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g. Doing it this way simplifies things when you
+           want to rerun _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g.
+
+   NNoottee::
+       The configuration created by _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g may perform bad, ever
+       horrible, for runtime scenarios that are very different from the ones
+       saved when creating the configuration. You are, therefore, advised to
+       rerun _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g if the applications run when the configuration
+       was made are changed, or if the load on the applications have changed
+       since the configuration was made. You are also advised to rerun
+       _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g if the Erlang runtime system used is changed.
+
+
+       _e_r_t_s___a_l_l_o_c___c_o_n_f_i_g saves information about runtime scenarios and
+       performs computations in a server that is automatically started. The
+       server register itself under the name _'_____e_r_t_s___a_l_l_o_c___c_o_n_f_i_g_____'.
+
+EEXXPPOORRTTSS
+       ssaavvee__sscceennaarriioo(()) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Error = term()
+
+              _s_a_v_e___s_c_e_n_a_r_i_o_/_0 saves information about the current runtime
+              scenario. This information will later be used when
+              mmaakkee__ccoonnffiigg//00, or mmaakkee__ccoonnffiigg//11 is called.
+
+              The first time _s_a_v_e___s_c_e_n_a_r_i_o_/_0 is called a server will be
+              started. This server will save runtime scenarios. All saved
+              scenarios can be removed by calling ssttoopp//00.
+
+       mmaakkee__ccoonnffiigg(()) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Error = term()
+
+              This is the same as calling mmaakkee__ccoonnffiigg((ggrroouupp__lleeaaddeerr(()))).
+
+       mmaakkee__ccoonnffiigg((FFiilleeNNaammeeOOrrIIOODDeevv)) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 FileNameOrIODev = string() | io_device()
+                 Error = term()
+
+              _m_a_k_e___c_o_n_f_i_g_/_1 uses the information previously saved by
+              ssaavvee__sscceennaarriioo//00 in order to produce an _e_r_t_s___a_l_l_o_c configuration.
+              At least one scenario have had to be saved. All scenarios
+              previously saved will be used when creating the configuration.
+
+              If _F_i_l_e_N_a_m_e_O_r_I_O_D_e_v is a _s_t_r_i_n_g_(_), _m_a_k_e___c_o_n_f_i_g_/_1 will use
+              _F_i_l_e_N_a_m_e_O_r_I_O_D_e_v as a filename. A file named _F_i_l_e_N_a_m_e_O_r_I_O_D_e_v is
+              created and the configuration will be written to that file. If
+              _F_i_l_e_N_a_m_e_O_r_I_O_D_e_v is an iioo__ddeevviiccee(()) (see the documentation of the
+              module iioo), the configuration will be written to the io device.
+
+       ssttoopp(()) -->> ookk || {{eerrrroorr,, EErrrroorr}}
+
+              Types:
+
+                 Error = term()
+
+              Stops the server that saves runtime scenarios.
+
+SSEEEE AALLSSOO
+       eerrttss__aalllloocc((33)), eerrll((11)), iioo((33))
+
+
+
+Ericsson AB                   runtime_tools 1.8.9         erts_alloc_config(3)

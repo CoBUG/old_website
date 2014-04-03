@@ -1,0 +1,204 @@
+CosTransactions_Coordinator(E3r)lang Module DefinitiCoonsTransactions_Coordinator(3)
+
+
+
+NNAAMMEE
+       CosTransactions_Coordinator - This module implements the OMG
+       CosTransactions::Coordinator interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_T_r_a_n_s_a_c_t_i_o_n_s_/_i_n_c_l_u_d_e_/_C_o_s_T_r_a_n_s_a_c_t_i_o_n_s_._h_r_l_"_)_.
+
+EEXXPPOORRTTSS
+       ccrreeaattee__ssuubbttrraannssaaccttiioonn((CCoooorrddiinnaattoorr)) -->> CCoonnttrrooll
+
+              Types:
+
+                 Coordinator = #objref
+                 Control = #objref
+
+              A new subtransaction is created whose parent is the Coordinator
+              argument.
+
+              Raises exception:
+
+                * 'SubtransactionsUnavailable' - if nested transactions are
+                  not supported.
+
+                * 'Inactive' - if target transaction has already been
+                  prepared.
+
+       ggeett__ttrraannssaaccttiioonn__nnaammee((CCoooorrddiinnaattoorr)) -->> NNaammee
+
+              Types:
+
+                 Coordinator = #objref
+                 Name = string() of type "oe_name@machine_type_timestamp"
+
+              Returns a printable string, which describe the transaction. The
+              main purpose is to support debugging.
+
+       ggeett__ppaarreenntt__ssttaattuuss((CCoooorrddiinnaattoorr)) -->> SSttaattuuss
+
+              Types:
+
+                 Coordinator = #objref
+                 Status = atom()
+
+              Returns the status of the parent transaction associated with the
+              target object. If the target object is a top-level transaction
+              this operation is equivalent to _g_e_t___s_t_a_t_u_s_/_1 operation.
+
+              Possible Status replies:
+
+                * 'StatusCommitted'
+
+                * 'StatusCommitting'
+
+                * 'StatusMarkedRollback'
+
+                * 'StatusRollingBack'
+
+                * 'StatusRolledBack'
+
+                * 'StatusActive'
+
+                * 'StatusPrepared'
+
+                * 'StatusUnknown'
+
+                * 'StatusNoTransaction'
+
+                * 'StatusPreparing'
+
+       ggeett__ssttaattuuss((CCoooorrddiinnaattoorr)) -->> SSttaattuuss
+
+              Types:
+
+                 Coordinator = #objref
+                 Status = atom()
+
+              Returns the status of the transaction associated with the target
+              object.
+
+       ggeett__ttoopp__lleevveell__ssttaattuuss((CCoooorrddiinnaattoorr)) -->> SSttaattuuss
+
+              Types:
+
+                 Coordinator = #objref
+                 Status = atom()
+
+              Returns the status of the top-level transaction associated with
+              the target object.
+
+       hhaasshh__ttoopp__lleevveell__ttrraann((CCoooorrddiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 Return = integer()
+
+              Returns a hash code for the top-level transaction associated
+              with the target object. Equals the operation _h_a_s_h___t_r_a_n_s_a_c_t_i_o_n_/_1
+              if the target object is a top-level transaction.
+
+       hhaasshh__ttrraannssaaccttiioonn((CCoooorrddiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 Return = integer()
+
+              Returns a hash code for the transaction associated with the
+              target object.
+
+       iiss__ddeesscceennddaanntt__ttrraannssaaccttiioonn((CCoooorrddiinnaattoorr,, OOtthheerrCCoooorrddiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 OtherCoordinator = #objref
+                 Return = Boolean
+
+              Returns true if the transaction associated with the target
+              object is a descendant of the transaction associated with the
+              parameter object.
+
+       iiss__ssaammee__ttrraannssaaccttiioonn((CCoooorrddiinnaattoorr,, OOtthheerrCCoooorrddiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 OtherCoordinator = #objref
+                 Return = Boolean
+
+              Returns true if the transaction associated with the target
+              object is related to the transaction associated with the
+              parameter object.
+
+       iiss__ttoopp__lleevveell__ttrraannssaaccttiioonn((CCoooorrddiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 Return = Boolean
+
+              Returns true if the transaction associated with the target
+              object is a top-level transaction.
+
+       rreeggiisstteerr__rreessoouurrccee((CCoooorrddiinnaattoorr,, RReessoouurrccee)) -->> RReeccoovveerryyCCoooorrddiinnaattoorr
+
+              Types:
+
+                 Coordinator = #objref
+                 Resource = #objref
+                 RecoveryCoordinator = #objref
+
+              This operation registers the parameter _R_e_s_o_u_r_c_e object as a
+              participant in the transaction associated with the target
+              object. The _R_e_c_o_v_e_r_y_C_o_o_r_d_i_n_a_t_o_r returned by this operation can
+              be used by this Resource during recovery.
+
+          NNoottee::
+              The Resources will be called in FIFO-order when preparing or
+              committing. Hence, be sure to register the Resources in the
+              correct order.
+
+
+              Raises exception:
+
+                * 'Inactive' - if target transaction has already been
+                  prepared.
+
+       rreeggiisstteerr__ssuubbttrraann__aawwaarree((CCoooorrddiinnaattoorr,, SSuubbttrraannssaaccttiioonnAAwwaarreeRReessoouurrccee)) -->>
+       RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 Return = ok
+
+              This operation registers the parameter
+              _S_u_b_t_r_a_n_s_a_c_t_i_o_n_A_w_a_r_e_R_e_s_o_u_r_c_e object such that it will be notified
+              when the transaction, associated wit the target object, has
+              committed or rolled back.
+
+          NNoottee::
+              The Resources will be called in FIFO-order. Hence, be sure to
+              register the Resources in the correct order.
+
+
+       rroollllbbaacckk__oonnllyy((CCoooorrddiinnaattoorr)) -->> RReettuurrnn
+
+              Types:
+
+                 Coordinator = #objref
+                 Return = ok
+
+              The transaction associated with the target object is modified so
+              the only possible outcome is to rollback the transaction.
+
+
+
+Ericsson AB                 cosTransactions 1.2.1C2osTransactions_Coordinator(3)

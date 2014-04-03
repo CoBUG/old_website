@@ -1,0 +1,203 @@
+erlc(1)                          User Commands                         erlc(1)
+
+
+
+NNAAMMEE
+       erlc - Compiler
+
+DDEESSCCRRIIPPTTIIOONN
+       The _e_r_l_c program provides a common way to run all compilers in the
+       Erlang system. Depending on the extension of each input file, _e_r_l_c will
+       invoke the appropriate compiler. Regardless of which compiler is used,
+       the same flags are used to provide parameters such as include paths and
+       output directory.
+
+       The current working directory, _"_._", will not be included in the code
+       path when running the compiler (to avoid loading Beam files from the
+       current working directory that could potentially be in conflict with
+       the compiler or Erlang/OTP system used by the compiler).
+
+EEXXPPOORRTTSS
+       eerrllcc ffllaaggss ffiillee11..eexxtt ffiillee22..eexxtt......
+
+              _E_r_l_c compiles one or more files. The files must include the
+              extension, for example _._e_r_l for Erlang source code, or _._y_r_l for
+              Yecc source code. _E_r_l_c uses the extension to invoke the correct
+              compiler.
+
+GGEENNEERRAALLLLYY UUSSEEFFUULL FFLLAAGGSS
+       The following flags are supported:
+
+         --II _d_i_r_e_c_t_o_r_y:
+           Instructs the compiler to search for include files in the specified
+           directory. When encountering an _-_i_n_c_l_u_d_e or _-_i_n_c_l_u_d_e___l_i_b directive,
+           the compiler searches for header files in the following
+           directories:
+
+           * _"_._", the current working directory of the file server;
+
+           * the base name of the compiled file;
+
+           * the directories specified using the _-_I option. The directory
+             specified last is searched first.
+
+         --oo _d_i_r_e_c_t_o_r_y:
+           The directory where the compiler should place the output files. If
+           not specified, output files will be placed in the current working
+           directory.
+
+         --DD_n_a_m_e:
+           Defines a macro.
+
+         --DD_n_a_m_e=_v_a_l_u_e:
+           Defines a macro with the given value. The value can be any Erlang
+           term. Depending on the platform, the value may need to be quoted if
+           the shell itself interprets certain characters. On Unix, terms
+           which contain tuples and list must be quoted. Terms which contain
+           spaces must be quoted on all platforms.
+
+         --WW_e_r_r_o_r:
+           Makes all warnings into errors.
+
+         --WW_n_u_m_b_e_r:
+           Sets warning level to _n_u_m_b_e_r. Default is _1. Use _-_W_0 to turn off
+           warnings.
+
+         --WW::
+           Same as _-_W_1. Default.
+
+         --vv::
+           Enables verbose output.
+
+         --bb _o_u_t_p_u_t_-_t_y_p_e:
+           Specifies the type of output file. Generally, _o_u_t_p_u_t_-_t_y_p_e is the
+           same as the file extension of the output file but without the
+           period. This option will be ignored by compilers that have a a
+           single output format.
+
+         --ssmmpp::
+           Compile using the SMP emulator. This is mainly useful for compiling
+           native code, which needs to be compiled with the same run-time
+           system that it should be run on.
+
+         --MM::
+           Produces a Makefile rule to track headers dependencies. The rule is
+           sent to stdout. No object file is produced.
+
+         --MMFF _M_a_k_e_f_i_l_e:
+           Like the _-_M option above, except that the Makefile is written to
+           _M_a_k_e_f_i_l_e. No object file is produced.
+
+         --MMDD::
+           Same as _-_M _-_M_F _<_F_i_l_e_>_._P_b_e_a_m.
+
+         --MMTT _T_a_r_g_e_t:
+           In conjunction with _-_M or _-_M_F, change the name of the rule emitted
+           to _T_a_r_g_e_t.
+
+         --MMQQ _T_a_r_g_e_t:
+           Like the _-_M_T option above, except that characters special to
+           make(1) are quoted.
+
+         --MMPP::
+           In conjunction with _-_M or _-_M_F, add a phony target for each
+           dependency.
+
+         --MMGG::
+           In conjunction with _-_M or _-_M_F, consider missing headers as
+           generated files and add them to the dependencies.
+
+         ----::
+           Signals that no more options will follow. The rest of the arguments
+           will be treated as file names, even if they start with hyphens.
+
+         ++_t_e_r_m:
+           A flag starting with a plus ('_+') rather than a hyphen will be
+           converted to an Erlang term and passed unchanged to the compiler.
+           For instance, the _e_x_p_o_r_t___a_l_l option for the Erlang compiler can be
+           specified as follows:
+
+         erlc +export_all file.erl
+
+           Depending on the platform, the value may need to be quoted if the
+           shell itself interprets certain characters. On Unix, terms which
+           contain tuples and list must be quoted. Terms which contain spaces
+           must be quoted on all platforms.
+
+SSPPEECCIIAALL FFLLAAGGSS
+       The flags in this section are useful in special situations such as re-
+       building the OTP system.
+
+         --ppaa _d_i_r_e_c_t_o_r_y:
+           Appends _d_i_r_e_c_t_o_r_y to the front of the code path in the invoked
+           Erlang emulator. This can be used to invoke another compiler than
+           the default one.
+
+         --ppzz _d_i_r_e_c_t_o_r_y:
+           Appends _d_i_r_e_c_t_o_r_y to the code path in the invoked Erlang emulator.
+
+SSUUPPPPOORRTTEEDD CCOOMMPPIILLEERRSS
+         ..eerrll::
+           Erlang source code. It generates a _._b_e_a_m file.
+
+           The options -P, -E, and -S are equivalent to +'P', +'E', and +'S',
+           except that it is not necessary to include the single quotes to
+           protect them from the shell.
+
+           Supported options: -I, -o, -D, -v, -W, -b.
+
+         ..yyrrll::
+           Yecc source code. It generates an _._e_r_l file.
+
+           Use the -I option with the name of a file to use that file as a
+           customized prologue file (the _i_n_c_l_u_d_e_f_i_l_e option).
+
+           Supported options: -o, -v, -I, -W (see above).
+
+         ..mmiibb::
+           MIB for SNMP. It generates a _._b_i_n file.
+
+           Supported options: -I, -o, -W.
+
+         ..bbiinn::
+           A compiled MIB for SNMP. It generates a _._h_r_l file.
+
+           Supported options: -o, -v.
+
+         ..rreell::
+           Script file. It generates a boot file.
+
+           Use the -I to name directories to be searched for application files
+           (equivalent to the _p_a_t_h in the option list for
+           _s_y_s_t_o_o_l_s_:_m_a_k_e___s_c_r_i_p_t_/_2).
+
+           Supported options: -o.
+
+         ..aassnn11::
+           ASN1 file.
+
+           Creates an _._e_r_l, _._h_r_l, and _._a_s_n_1_d_b file from an _._a_s_n_1 file. Also
+           compiles the _._e_r_l using the Erlang compiler unless the _+_n_o_o_b_j
+           options is given.
+
+           Supported options: -I, -o, -b, -W.
+
+         ..iiddll::
+           IC file.
+
+           Runs the IDL compiler.
+
+           Supported options: -I, -o.
+
+EENNVVIIRROONNMMEENNTT VVAARRIIAABBLLEESS
+         EERRLLCC__EEMMUULLAATTOORR::
+           The command for starting the emulator. Default is _e_r_l in the same
+           directory as the _e_r_l_c program itself, or if it doesn't exist, _e_r_l
+           in any of the directories given in the _P_A_T_H environment variable.
+
+SSEEEE AALLSSOO
+       eerrll((11)), ccoommppiillee((33)), yyeecccc((33)), ssnnmmpp((33))
+
+
+
+Ericsson AB                       erts 5.9.2                           erlc(1)

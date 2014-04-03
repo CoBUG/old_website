@@ -1,0 +1,71 @@
+percept(3)                 Erlang Module Definition                 percept(3)
+
+
+
+NNAAMMEE
+       percept - Percept - Erlang Concurrency Profiling Tool.
+
+DDEESSCCRRIIPPTTIIOONN
+       Percept - Erlang Concurrency Profiling Tool
+
+       This module provides the user interface for the application.
+
+DDAATTAA TTYYPPEESS
+         _p_e_r_c_e_p_t___o_p_t_i_o_n_(_) _= _p_r_o_c_s _| _p_o_r_t_s _| _e_x_c_l_u_s_i_v_e:
+
+
+EEXXPPOORRTTSS
+       aannaallyyzzee((FFiilleennaammee::::ssttrriinngg(()))) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Analyze file.
+
+       pprrooffiillee((FFiilleennaammee::::ssttrriinngg(()))) -->> {{ookk,, PPoorrtt}} || {{aallrreeaaddyy__ssttaarrtteedd,, PPoorrtt}}
+
+              _S_e_e _a_l_s_o_: ppeerrcceepptt__pprrooffiillee.
+
+       pprrooffiillee((FFiilleennaammee::::ssttrriinngg(()),, OOppttiioonnss::::[[ppeerrcceepptt__ooppttiioonn(())]])) -->> {{ookk,, PPoorrtt}}
+       || {{aallrreeaaddyy__ssttaarrtteedd,, PPoorrtt}}
+
+              _S_e_e _a_l_s_o_: ppeerrcceepptt__pprrooffiillee.
+
+       pprrooffiillee((FFiilleennaammee::::ssttrriinngg(()),, MMFFAA::::mmffaa(()),, OOppttiioonnss::::[[ppeerrcceepptt__ooppttiioonn(())]])) -->>
+       ookk || {{aallrreeaaddyy__ssttaarrtteedd,, PPoorrtt}} || {{eerrrroorr,, nnoott__ssttaarrtteedd}}
+
+              _S_e_e _a_l_s_o_: ppeerrcceepptt__pprrooffiillee.
+
+       ssttaarrtt__wweebbsseerrvveerr(()) -->> {{ssttaarrtteedd,, HHoossttnnaammee,, PPoorrtt}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Hostname = string()
+                 Port = integer()
+                 Reason = term()
+
+              Starts webserver.
+
+       ssttaarrtt__wweebbsseerrvveerr((PPoorrtt::::iinntteeggeerr(()))) -->> {{ssttaarrtteedd,, HHoossttnnaammee,, AAssssiiggnneeddPPoorrtt}} ||
+       {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Hostname = string()
+                 AssignedPort = integer()
+                 Reason = term()
+
+              Starts webserver. If port number is 0, an available port number
+              will be assigned by inets.
+
+       ssttoopp__pprrooffiillee(()) -->> ookk || {{eerrrroorr,, nnoott__ssttaarrtteedd}}
+
+              _S_e_e _a_l_s_o_: ppeerrcceepptt__pprrooffiillee.
+
+       ssttoopp__wweebbsseerrvveerr(()) -->> ookk || {{eerrrroorr,, nnoott__ssttaarrtteedd}}
+
+              Stops webserver.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                percept 0.8.6.1                     percept(3)

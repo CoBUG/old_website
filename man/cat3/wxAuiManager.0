@@ -1,0 +1,291 @@
+wxAuiManager(3)            Erlang Module Definition            wxAuiManager(3)
+
+
+
+NNAAMMEE
+       wxAuiManager - See external documentation: wxAuiManager.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxAuiManager.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_A_u_i_M_a_n_a_g_e_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxAAuuiiMMaannaaggeerr(())
+
+              Equivalent to nneeww(([[]])).
+
+       nneeww((OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxAAuuiiMMaannaaggeerr(())
+
+              Types:
+
+                 Option = {managed_wnd, wxWindow() (see module wxWindow)} |
+                 {flags, integer()}
+
+              See external documentation.
+
+       aaddddPPaannee((TThhiiss,, WWiinnddooww)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Window = wxWindow() (see module wxWindow)
+
+              Equivalent to aaddddPPaannee((TThhiiss,, WWiinnddooww,, [[]])).
+
+       aaddddPPaannee((TThhiiss,, WWiinnddooww,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Window = wxWindow() (see module wxWindow)
+                 Option = {direction, integer()} | {caption, chardata() (see
+                 module unicode)}
+
+              See external documentation.
+              Also:
+              addPane(This, Window, Pane_info) -> boolean() when
+              This::wxAuiManager(), Window::wxWindow:wxWindow(),
+              Pane_info::wxAuiPaneInfo:wxAuiPaneInfo().
+
+
+       aaddddPPaannee((TThhiiss,, WWiinnddooww,, PPaannee__iinnffoo,, DDrroopp__ppooss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Window = wxWindow() (see module wxWindow)
+                 Pane_info = wxAuiPaneInfo() (see module wxAuiPaneInfo)
+                 Drop_pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+       ddeettaacchhPPaannee((TThhiiss,, WWiinnddooww)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ggeettAAllllPPaanneess((TThhiiss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       ggeettAArrttPPrroovviiddeerr((TThhiiss)) -->> wwxxAAuuiiDDoocckkAArrtt(()) ((sseeee mmoodduullee wwxxAAuuiiDDoocckkAArrtt))
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       ggeettDDoocckkSSiizzeeCCoonnssttrraaiinntt((TThhiiss)) -->> {{WWiiddtthh__ppcctt::::nnuummbbeerr(()),,
+       HHeeiigghhtt__ppcctt::::nnuummbbeerr(())}}
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       ggeettFFllaaggss((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       ggeettMMaannaaggeeddWWiinnddooww((TThhiiss)) -->> wwxxWWiinnddooww(()) ((sseeee mmoodduullee wwxxWWiinnddooww))
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       ggeettMMaannaaggeerr((WWiinnddooww)) -->> wwxxAAuuiiMMaannaaggeerr(())
+
+              Types:
+
+                 Window = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       ggeettPPaannee((TThhiiss,, NNaammee)) -->> wwxxAAuuiiPPaanneeIInnffoo(()) ((sseeee mmoodduullee wwxxAAuuiiPPaanneeIInnffoo))
+
+              Types:
+
+                 This = wxAuiManager()
+                 Name = chardata() (see module unicode)
+
+              See external documentation.
+              Also:
+              getPane(This, Window) -> wxAuiPaneInfo:wxAuiPaneInfo() when
+              This::wxAuiManager(), Window::wxWindow:wxWindow().
+
+
+       hhiiddeeHHiinntt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       iinnsseerrttPPaannee((TThhiiss,, WWiinnddooww,, IInnsseerrtt__llooccaattiioonn)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Window = wxWindow() (see module wxWindow)
+                 Insert_location = wxAuiPaneInfo() (see module wxAuiPaneInfo)
+
+              Equivalent to iinnsseerrttPPaannee((TThhiiss,, WWiinnddooww,, IInnsseerrtt__llooccaattiioonn,, [[]])).
+
+       iinnsseerrttPPaannee((TThhiiss,, WWiinnddooww,, IInnsseerrtt__llooccaattiioonn,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Window = wxWindow() (see module wxWindow)
+                 Insert_location = wxAuiPaneInfo() (see module wxAuiPaneInfo)
+                 Option = {insert_level, integer()}
+
+              See external documentation.
+
+       llooaaddPPaanneeIInnffoo((TThhiiss,, PPaannee__ppaarrtt,, PPaannee)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+                 Pane_part = chardata() (see module unicode)
+                 Pane = wxAuiPaneInfo() (see module wxAuiPaneInfo)
+
+              See external documentation.
+
+       llooaaddPPeerrssppeeccttiivvee((TThhiiss,, PPeerrssppeeccttiivvee)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Perspective = chardata() (see module unicode)
+
+              Equivalent to llooaaddPPeerrssppeeccttiivvee((TThhiiss,, PPeerrssppeeccttiivvee,, [[]])).
+
+       llooaaddPPeerrssppeeccttiivvee((TThhiiss,, PPeerrssppeeccttiivvee,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxAuiManager()
+                 Perspective = chardata() (see module unicode)
+                 Option = {update, boolean()}
+
+              See external documentation.
+
+       ssaavveePPaanneeIInnffoo((TThhiiss,, PPaannee)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxAuiManager()
+                 Pane = wxAuiPaneInfo() (see module wxAuiPaneInfo)
+
+              See external documentation.
+
+       ssaavveePPeerrssppeeccttiivvee((TThhiiss)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       sseettAArrttPPrroovviiddeerr((TThhiiss,, AArrtt__pprroovviiddeerr)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+                 Art_provider = wxAuiDockArt() (see module wxAuiDockArt)
+
+              See external documentation.
+
+       sseettDDoocckkSSiizzeeCCoonnssttrraaiinntt((TThhiiss,, WWiiddtthh__ppcctt,, HHeeiigghhtt__ppcctt)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+                 Width_pct = number()
+                 Height_pct = number()
+
+              See external documentation.
+
+       sseettFFllaaggss((TThhiiss,, FFllaaggss)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+                 Flags = integer()
+
+              See external documentation.
+
+       sseettMMaannaaggeeddWWiinnddooww((TThhiiss,, MMaannaaggeedd__wwnndd)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+                 Managed_wnd = wxWindow() (see module wxWindow)
+
+              See external documentation.
+
+       sshhoowwHHiinntt((TThhiiss,, RReecctt)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+                 Rect = {X::integer(), Y::integer(), W::integer(),
+                 H::integer()}
+
+              See external documentation.
+
+       uunnIInniitt((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       uuppddaattee((TThhiiss)) -->> ookk
+
+              Types:
+
+                 This = wxAuiManager()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxAAuuiiMMaannaaggeerr(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                   wxAuiManager(3)

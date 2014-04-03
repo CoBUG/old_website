@@ -1,0 +1,119 @@
+wxFontPickerCtrl(3)        Erlang Module Definition        wxFontPickerCtrl(3)
+
+
+
+NNAAMMEE
+       wxFontPickerCtrl - See external documentation: wxFontPickerCtrl.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxFontPickerCtrl.
+
+       This class is derived (and can use functions) from:
+       wwxxPPiicckkeerrBBaassee
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_F_o_n_t_P_i_c_k_e_r_C_t_r_l_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxFFoonnttPPiicckkeerrCCttrrll(())
+
+              See external documentation.
+
+       nneeww((PPaarreenntt,, IIdd)) -->> wwxxFFoonnttPPiicckkeerrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((PPaarreenntt,, IIdd,, [[]])).
+
+       nneeww((PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> wwxxFFoonnttPPiicckkeerrCCttrrll(())
+
+              Types:
+
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {initial, wxFont() (see module wxFont)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFontPickerCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, [[]])).
+
+       ccrreeaattee((TThhiiss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxFontPickerCtrl()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {initial, wxFont() (see module wxFont)} | {pos,
+                 {X::integer(), Y::integer()}} | {size, {W::integer(),
+                 H::integer()}} | {style, integer()} | {validator, wx_object()
+                 (see module wx)}
+
+              See external documentation.
+
+       ggeettSSeelleecctteeddFFoonntt((TThhiiss)) -->> wwxxFFoonntt(()) ((sseeee mmoodduullee wwxxFFoonntt))
+
+              Types:
+
+                 This = wxFontPickerCtrl()
+
+              See external documentation.
+
+       sseettSSeelleecctteeddFFoonntt((TThhiiss,, FF)) -->> ookk
+
+              Types:
+
+                 This = wxFontPickerCtrl()
+                 F = wxFont() (see module wxFont)
+
+              See external documentation.
+
+       ggeettMMaaxxPPooiinnttSSiizzee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxFontPickerCtrl()
+
+              See external documentation.
+
+       sseettMMaaxxPPooiinnttSSiizzee((TThhiiss,, MMaaxx)) -->> ookk
+
+              Types:
+
+                 This = wxFontPickerCtrl()
+                 Max = integer()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxFFoonnttPPiicckkeerrCCttrrll(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2               wxFontPickerCtrl(3)

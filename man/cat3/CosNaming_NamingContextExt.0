@@ -1,0 +1,72 @@
+CosNaming_NamingContextExt(3E)rlang Module DefinitioCnosNaming_NamingContextExt(3)
+
+
+
+NNAAMMEE
+       CosNaming_NamingContextExt - This interface contains operation for
+       converting a Name sequence to a string and back.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+
+
+               -include_lib("orber/COSS/CosNaming/CosNaming.hrl").
+
+
+       This module also exports the functions described in:
+
+         * CCoossNNaammiinngg__NNaammiinnggCCoonntteexxtt
+
+EEXXPPOORRTTSS
+       ttoo__ssttrriinngg((NNaammiinnggCCoonntteexxtt,, NNaammee)) -->> RReettuurrnn
+
+              Types:
+
+                 NameContext = #objref
+                 Name = [NameComponent]
+                 Return = string() | {'EXCEPTION',
+                 NamingContext::InvalidName{}}
+
+              Stringifies a _N_a_m_e sequence to a string.
+
+       ttoo__nnaammee((NNaammiinnggCCoonntteexxtt,, NNaammeeSSttrriinngg)) -->> RReettuurrnn
+
+              Types:
+
+                 NameContext = #objref
+                 NameString = string()
+                 Return = [NameComponent] | {'EXCEPTION',
+                 NamingContext::InvalidName{}}
+
+              Converts a stringified _N_a_m_e to a _N_a_m_e sequence.
+
+       ttoo__uurrll((NNaammiinnggCCoonntteexxtt,, AAddddrreessssSSttrriinngg,, NNaammeeSSttrriinngg)) -->> RReettuurrnn
+
+              Types:
+
+                 NameContext = #objref
+                 Address = NameString = string()
+                 Return = URLString | {'EXCEPTION',
+                 NamingContext::InvalidName{}} | {'EXCEPTION',
+                 NamingContextExt::InvalidAddress{}}
+
+              This operation takes a _c_o_r_b_a_l_o_c string and a stringified _N_a_m_e
+              sequence as input and returns a fully formed URL string.
+
+       rreessoollvvee__ssttrr((NNaammiinnggCCoonntteexxtt,, NNaammeeSSttrriinngg)) -->> RReettuurrnn
+
+              Types:
+
+                 NameContext = #objref
+                 NameString = string()
+                 Return = #objref | {'EXCEPTION',
+                 NamingContext::InvalidName{}} | {'EXCEPTION',
+                 NamingContext::NotFound{why, rest_of_name}} | {'EXCEPTION',
+                 NamingContext::CannotProceed{cxt, rest_of_name}}
+
+              This operation takes a stringified _N_a_m_e sequence as input and
+              returns the associated, if any, object.
+
+
+
+Ericsson AB                      orber 3.6.24    CosNaming_NamingContextExt(3)

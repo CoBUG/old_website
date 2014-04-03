@@ -1,0 +1,72 @@
+snmp_framework_mib(3)      Erlang Module Definition      snmp_framework_mib(3)
+
+
+
+NNAAMMEE
+       snmp_framework_mib - Instrumentation Functions for SNMP-FRAMEWORK-MIB
+
+DDEESSCCRRIIPPTTIIOONN
+       The module _s_n_m_p___f_r_a_m_e_w_o_r_k___m_i_b implements instrumentation functions for
+       the SNMP-FRAMEWORK-MIB, and functions for initializing and configuring
+       the database.
+
+       The configuration files are described in the SNMP User's Manual.
+
+EEXXPPOORRTTSS
+       ccoonnffiigguurree((CCoonnffDDiirr)) -->> vvooiidd(())
+
+              Types:
+
+                 ConfDir = string()
+
+              This function is called from the supervisor at system start-up.
+
+              Inserts all data in the configuration files into the database
+              and destroys all old data.
+
+              Thus, the data in the SNMP-FRAMEWORK-MIB, after this function
+              has been called, is from the configuration files.
+
+              All _s_n_m_p counters are set to zero.
+
+              If an error is found in the configuration file, it is reported
+              using the function _c_o_n_f_i_g___e_r_r_/_2 of the error report module, and
+              the function fails with reason _c_o_n_f_i_g_u_r_a_t_i_o_n___e_r_r_o_r.
+
+              _C_o_n_f_D_i_r is a string which points to the directory where the
+              configuration files are found.
+
+              The configuration file read is: _c_o_n_t_e_x_t_._c_o_n_f.
+
+       iinniitt(()) -->> vvooiidd(())
+
+              This function is called from the supervisor at system start-up.
+
+              Creates the necessary objects in the database if they do not
+              exist. It does not destroy any old values.
+
+       aadddd__ccoonntteexxtt((CCttxx)) -->> RReett
+
+              Types:
+
+                 Ctx = string()
+                 Ret = {ok, Key} | {error, Reason}
+                 Key = term()
+                 Reason = term()
+
+              Adds a context to the agent config. Equivalent to one line in
+              the _c_o_n_t_e_x_t_._c_o_n_f file.
+
+       ddeelleettee__ccoonntteexxtt((KKeeyy)) -->> RReett
+
+              Types:
+
+                 Key = term()
+                 Ret = ok | {error, Reason}
+                 Reason = term()
+
+              Delete a context from the agent config.
+
+
+
+Ericsson AB                       snmp 4.22.1            snmp_framework_mib(3)

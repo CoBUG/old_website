@@ -1,0 +1,71 @@
+wxHelpEvent(3)             Erlang Module Definition             wxHelpEvent(3)
+
+
+
+NNAAMMEE
+       wxHelpEvent - See external documentation: wxHelpEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxHelpEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _h_e_l_p, _d_e_t_a_i_l_e_d___h_e_l_p
+
+       See also the message variant ##wwxxHHeellpp{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_H_e_l_p_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettOOrriiggiinn((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxHelpEvent()
+
+              See external documentation.
+              Res = ?wxHelpEvent_Origin_Unknown | ?wxHelpEvent_Origin_Keyboard
+              | ?wxHelpEvent_Origin_HelpButton
+
+       ggeettPPoossiittiioonn((TThhiiss)) -->> {{XX::::iinntteeggeerr(()),, YY::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxHelpEvent()
+
+              See external documentation.
+
+       sseettOOrriiggiinn((TThhiiss,, OOrriiggiinn)) -->> ookk
+
+              Types:
+
+                 This = wxHelpEvent()
+                 Origin = wx_enum() (see module wx)
+
+              See external documentation.
+              Origin = ?wxHelpEvent_Origin_Unknown |
+              ?wxHelpEvent_Origin_Keyboard | ?wxHelpEvent_Origin_HelpButton
+
+       sseettPPoossiittiioonn((TThhiiss,, PPooss)) -->> ookk
+
+              Types:
+
+                 This = wxHelpEvent()
+                 Pos = {X::integer(), Y::integer()}
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                    wxHelpEvent(3)

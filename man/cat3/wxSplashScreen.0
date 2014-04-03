@@ -1,0 +1,83 @@
+wxSplashScreen(3)          Erlang Module Definition          wxSplashScreen(3)
+
+
+
+NNAAMMEE
+       wxSplashScreen - See external documentation: wxSplashScreen.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxSplashScreen.
+
+       This class is derived (and can use functions) from:
+       wwxxFFrraammee
+       wwxxTTooppLLeevveellWWiinnddooww
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_S_p_l_a_s_h_S_c_r_e_e_n_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       nneeww(()) -->> wwxxSSppllaasshhSSccrreeeenn(())
+
+              See external documentation.
+
+       nneeww((BBiittmmaapp,, SSppllaasshhSSttyyllee,, MMiilllliisseeccoonnddss,, PPaarreenntt,, IIdd)) -->> wwxxSSppllaasshhSSccrreeeenn(())
+
+              Types:
+
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 SplashStyle = integer()
+                 Milliseconds = integer()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+
+              Equivalent to nneeww((BBiittmmaapp,, SSppllaasshhSSttyyllee,, MMiilllliisseeccoonnddss,, PPaarreenntt,, IIdd,,
+              [[]])).
+
+       nneeww((BBiittmmaapp,, SSppllaasshhSSttyyllee,, MMiilllliisseeccoonnddss,, PPaarreenntt,, IIdd,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxxSSppllaasshhSSccrreeeenn(())
+
+              Types:
+
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 SplashStyle = integer()
+                 Milliseconds = integer()
+                 Parent = wxWindow() (see module wxWindow)
+                 Id = integer()
+                 Option = {pos, {X::integer(), Y::integer()}} | {size,
+                 {W::integer(), H::integer()}} | {style, integer()}
+
+              See external documentation.
+
+       ggeettSSppllaasshhSSttyyllee((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplashScreen()
+
+              See external documentation.
+
+       ggeettTTiimmeeoouutt((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxSplashScreen()
+
+              See external documentation.
+
+       ddeessttrrooyy((TThhiiss::::wwxxSSppllaasshhSSccrreeeenn(()))) -->> ookk
+
+              Destroys this object, do not use object again
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                 wxSplashScreen(3)

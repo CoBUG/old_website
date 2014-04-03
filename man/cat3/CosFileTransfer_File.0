@@ -1,0 +1,56 @@
+CosFileTransfer_File(3)    Erlang Module Definition    CosFileTransfer_File(3)
+
+
+
+NNAAMMEE
+       CosFileTransfer_File - This module implements the OMG
+       CosFileTransfer::File interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_F_i_l_e_T_r_a_n_s_f_e_r_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CosPropertyService_PropertySetDef in the cosProperty application.
+
+EEXXPPOORRTTSS
+       ''__ggeett__nnaammee''((FFiillee)) -->> ssttrriinngg(())
+
+              Types:
+
+                 File = #objref
+
+              This read only attribute represents the target object's
+              associated name.
+
+       ''__ggeett__ccoommpplleettee__ffiillee__nnaammee''((FFiillee)) -->> ssttrriinngg(())
+
+              Types:
+
+                 File = #objref
+
+              This read only attribute represents the target object's
+              associated absolute name.
+
+       ''__ggeett__ppaarreenntt''((FFiillee)) -->> DDiirreeccttoorryy
+
+              Types:
+
+                 File = Directory = #objref
+
+              This read only attribute represents the target object's
+              container. In some cases a _N_I_L object will be returned.
+
+       ''__ggeett__aassssoocciiaatteedd__sseessssiioonn''((FFiillee)) -->> FFiilleeTTrraannssffeerrSSeessssiioonn
+
+              Types:
+
+                 File = FileTransferSession = #objref
+
+              This read only attribute represents the target object's
+              associated _F_i_l_e_T_r_a_n_s_f_e_r_S_e_s_s_i_o_n.
+
+
+
+Ericsson AB                 cosFileTransfer 1.1.13     CosFileTransfer_File(3)

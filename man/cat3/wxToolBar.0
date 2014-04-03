@@ -1,0 +1,534 @@
+wxToolBar(3)               Erlang Module Definition               wxToolBar(3)
+
+
+
+NNAAMMEE
+       wxToolBar - See external documentation: wxToolBar.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxToolBar.
+
+       This class is derived (and can use functions) from:
+       wwxxCCoonnttrrooll
+       wwxxWWiinnddooww
+       wwxxEEvvttHHaannddlleerr
+
+DDAATTAA TTYYPPEESS
+         _w_x_T_o_o_l_B_a_r_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       aaddddCCoonnttrrooll((TThhiiss,, CCoonnttrrooll)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Control = wxControl() (see module wxControl)
+
+              See external documentation.
+
+       aaddddSSeeppaarraattoorr((TThhiiss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       aaddddTTooooll((TThhiiss,, TTooooll)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Tool = wx_object() (see module wx)
+
+              See external documentation.
+
+       aaddddTTooooll((TThhiiss,, TToooolliidd,, BBiittmmaapp)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              Equivalent to aaddddTTooooll((TThhiiss,, TToooolliidd,, BBiittmmaapp,, [[]])).
+
+       aaddddTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+              Also:
+              addTool(This, Toolid, Bitmap, BmpDisabled) -> wx:wx_object()
+              when
+              This::wxToolBar(), Toolid::integer(),
+              Bitmap::wxBitmap:wxBitmap(), BmpDisabled::wxBitmap:wxBitmap();
+              (This, Toolid, Bitmap, [Option]) -> wx:wx_object() when
+              This::wxToolBar(), Toolid::integer(),
+              Bitmap::wxBitmap:wxBitmap(),
+              Option :: {shortHelpString, unicode:chardata()}
+              | {longHelpString, unicode:chardata()}.
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       aaddddTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp,, BBmmppDDiissaabblleedd)) -->> wwxx__oobbjjeecctt(()) ((sseeee
+       mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 BmpDisabled = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+              Also:
+              addTool(This, Toolid, Label, Bitmap, [Option]) -> wx:wx_object()
+              when
+              This::wxToolBar(), Toolid::integer(), Label::unicode:chardata(),
+              Bitmap::wxBitmap:wxBitmap(),
+              Option :: {shortHelp, unicode:chardata()}
+              | {kind, wx:wx_enum()};
+              (This, Toolid, Bitmap, BmpDisabled, [Option]) -> wx:wx_object()
+              when
+              This::wxToolBar(), Toolid::integer(),
+              Bitmap::wxBitmap:wxBitmap(), BmpDisabled::wxBitmap:wxBitmap(),
+              Option :: {toggle, boolean()}
+              | {clientData, wx:wx_object()}
+              | {shortHelpString, unicode:chardata()}
+              | {longHelpString, unicode:chardata()}.
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       aaddddTTooooll((TThhiiss,, TToooolliidd,, BBiittmmaapp,, BBmmppDDiissaabblleedd,, TTooggggllee,, XXPPooss)) -->> wwxx__oobbjjeecctt(())
+       ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 BmpDisabled = wxBitmap() (see module wxBitmap)
+                 Toggle = boolean()
+                 XPos = integer()
+
+              See external documentation.
+              Also:
+              addTool(This, Toolid, Label, Bitmap, BmpDisabled, [Option]) ->
+              wx:wx_object() when
+              This::wxToolBar(), Toolid::integer(), Label::unicode:chardata(),
+              Bitmap::wxBitmap:wxBitmap(), BmpDisabled::wxBitmap:wxBitmap(),
+              Option :: {kind, wx:wx_enum()}
+              | {shortHelp, unicode:chardata()}
+              | {longHelp, unicode:chardata()}
+              | {data, wx:wx_object()}.
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       aaddddTTooooll((TThhiiss,, TToooolliidd,, BBiittmmaapp,, BBmmppDDiissaabblleedd,, TTooggggllee,, XXPPooss,,
+       OOppttiioonn::::[[OOppttiioonn]])) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 BmpDisabled = wxBitmap() (see module wxBitmap)
+                 Toggle = boolean()
+                 XPos = integer()
+                 Option = {yPos, integer()} | {clientData, wx_object() (see
+                 module wx)} | {shortHelp, chardata() (see module unicode)} |
+                 {longHelp, chardata() (see module unicode)}
+
+              See external documentation.
+
+       aaddddCChheecckkTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee
+       wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              Equivalent to aaddddCChheecckkTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp,, [[]])).
+
+       aaddddCChheecckkTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Option = {bmpDisabled, wxBitmap() (see module wxBitmap)} |
+                 {shortHelp, chardata() (see module unicode)} | {longHelp,
+                 chardata() (see module unicode)} | {data, wx_object() (see
+                 module wx)}
+
+              See external documentation.
+
+       aaddddRRaaddiiooTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee
+       wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              Equivalent to aaddddRRaaddiiooTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp,, [[]])).
+
+       aaddddRRaaddiiooTTooooll((TThhiiss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Option = {bmpDisabled, wxBitmap() (see module wxBitmap)} |
+                 {shortHelp, chardata() (see module unicode)} | {longHelp,
+                 chardata() (see module unicode)} | {data, wx_object() (see
+                 module wx)}
+
+              See external documentation.
+
+       ddeelleetteeTTooooll((TThhiiss,, TToooolliidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       ddeelleetteeTToooollBByyPPooss((TThhiiss,, PPooss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+
+              See external documentation.
+
+       eennaabblleeTTooooll((TThhiiss,, TToooolliidd,, EEnnaabbllee)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Enable = boolean()
+
+              See external documentation.
+
+       ffiinnddBByyIIdd((TThhiiss,, TToooolliidd)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       ffiinnddCCoonnttrrooll((TThhiiss,, TToooolliidd)) -->> wwxxCCoonnttrrooll(()) ((sseeee mmoodduullee wwxxCCoonnttrrooll))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       ffiinnddTToooollFFoorrPPoossiittiioonn((TThhiiss,, XX,, YY)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       ggeettTToooollSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       ggeettTToooollBBiittmmaappSSiizzee((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       ggeettMMaarrggiinnss((TThhiiss)) -->> {{WW::::iinntteeggeerr(()),, HH::::iinntteeggeerr(())}}
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       ggeettTToooollEEnnaabblleedd((TThhiiss,, TToooolliidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       ggeettTToooollLLoonnggHHeellpp((TThhiiss,, TToooolliidd)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       ggeettTToooollPPaacckkiinngg((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       ggeettTToooollPPooss((TThhiiss,, IIdd)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxToolBar()
+                 Id = integer()
+
+              See external documentation.
+
+       ggeettTToooollSSeeppaarraattiioonn((TThhiiss)) -->> iinntteeggeerr(())
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       ggeettTToooollSShhoorrttHHeellpp((TThhiiss,, TToooolliidd)) -->> cchhaarrlliisstt(()) ((sseeee mmoodduullee uunniiccooddee))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       ggeettTToooollSSttaattee((TThhiiss,, TToooolliidd)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       iinnsseerrttCCoonnttrrooll((TThhiiss,, PPooss,, CCoonnttrrooll)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+                 Control = wxControl() (see module wxControl)
+
+              See external documentation.
+
+       iinnsseerrttSSeeppaarraattoorr((TThhiiss,, PPooss)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+
+              See external documentation.
+
+       iinnsseerrttTTooooll((TThhiiss,, PPooss,, TTooooll)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+                 Tool = wx_object() (see module wx)
+
+              See external documentation.
+
+       iinnsseerrttTTooooll((TThhiiss,, PPooss,, TToooolliidd,, BBiittmmaapp)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+                 Toolid = integer()
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              Equivalent to iinnsseerrttTTooooll((TThhiiss,, PPooss,, TToooolliidd,, BBiittmmaapp,, [[]])).
+
+       iinnsseerrttTTooooll((TThhiiss,, PPooss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee
+       wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+
+              See external documentation.
+              Also:
+              insertTool(This, Pos, Toolid, Bitmap, [Option]) ->
+              wx:wx_object() when
+              This::wxToolBar(), Pos::integer(), Toolid::integer(),
+              Bitmap::wxBitmap:wxBitmap(),
+              Option :: {bmpDisabled, wxBitmap:wxBitmap()}
+              | {toggle, boolean()}
+              | {clientData, wx:wx_object()}
+              | {shortHelp, unicode:chardata()}
+              | {longHelp, unicode:chardata()}.
+
+
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       iinnsseerrttTTooooll((TThhiiss,, PPooss,, TToooolliidd,, LLaabbeell,, BBiittmmaapp,, OOppttiioonn::::[[OOppttiioonn]])) -->>
+       wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Pos = integer()
+                 Toolid = integer()
+                 Label = chardata() (see module unicode)
+                 Bitmap = wxBitmap() (see module wxBitmap)
+                 Option = {bmpDisabled, wxBitmap() (see module wxBitmap)} |
+                 {kind, wx_enum() (see module wx)} | {shortHelp, chardata()
+                 (see module unicode)} | {longHelp, chardata() (see module
+                 unicode)} | {clientData, wx_object() (see module wx)}
+
+              See external documentation.
+              Kind = ?wxITEM_SEPARATOR | ?wxITEM_NORMAL | ?wxITEM_CHECK |
+              ?wxITEM_RADIO | ?wxITEM_MAX
+
+       rreeaalliizzee((TThhiiss)) -->> bboooolleeaann(())
+
+              Types:
+
+                 This = wxToolBar()
+
+              See external documentation.
+
+       rreemmoovveeTTooooll((TThhiiss,, TToooolliidd)) -->> wwxx__oobbjjeecctt(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+
+              See external documentation.
+
+       sseettMMaarrggiinnss((TThhiiss,, XX,, YY)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 X = integer()
+                 Y = integer()
+
+              See external documentation.
+
+       sseettTToooollBBiittmmaappSSiizzee((TThhiiss,, SSiizzee)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Size = {W::integer(), H::integer()}
+
+              See external documentation.
+
+       sseettTToooollLLoonnggHHeellpp((TThhiiss,, TToooolliidd,, HHeellppSSttrriinngg)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 HelpString = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettTToooollPPaacckkiinngg((TThhiiss,, PPaacckkiinngg)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Packing = integer()
+
+              See external documentation.
+
+       sseettTToooollSShhoorrttHHeellpp((TThhiiss,, IIdd,, HHeellppSSttrriinngg)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Id = integer()
+                 HelpString = chardata() (see module unicode)
+
+              See external documentation.
+
+       sseettTToooollSSeeppaarraattiioonn((TThhiiss,, SSeeppaarraattiioonn)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Separation = integer()
+
+              See external documentation.
+
+       ttoogggglleeTTooooll((TThhiiss,, TToooolliidd,, TTooggggllee)) -->> ookk
+
+              Types:
+
+                 This = wxToolBar()
+                 Toolid = integer()
+                 Toggle = boolean()
+
+              See external documentation.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                      wxToolBar(3)

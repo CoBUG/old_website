@@ -1,0 +1,175 @@
+CosNotifyChannelAdmin_EventCEhralnannegl(M3o)dule DCeofsiNnoittiifoynChannelAdmin_EventChannel(3)
+
+
+
+NNAAMMEE
+       CosNotifyChannelAdmin_EventChannel - This module implements the OMG
+       CosNotifyChannelAdmin::EventChannel interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       To get access to the record definitions for the structures use:
+       _-_i_n_c_l_u_d_e___l_i_b_(_"_c_o_s_N_o_t_i_f_i_c_a_t_i_o_n_/_i_n_c_l_u_d_e_/_*_._h_r_l_"_)_.
+
+       This module also exports the functions described in:
+
+         * CCoossNNoottiiffiiccaattiioonn__QQooSSAAddmmiinn
+
+         * CCoossNNoottiiffiiccaattiioonn__AAddmmiinnPPrrooppeerrttiieessAAddmmiinn
+
+EEXXPPOORRTTSS
+       __ggeett__MMyyFFaaccttoorryy((CChhaannnneell)) -->> CChhaannnneellFFaaccttoorryy
+
+              Types:
+
+                 Channel = #objref
+                 ChannelFactory = #objref
+
+              This readonly attribute maintains the reference of the event
+              channel factory that created the target channel.
+
+       __ggeett__ddeeffaauulltt__ccoonnssuummeerr__aaddmmiinn((CChhaannnneell)) -->> CCoonnssuummeerrAAddmmiinn
+
+              Types:
+
+                 Channel = #objref
+                 ConsumerAdmin = #objref
+
+              This is a readonly attribute which maintains a reference to a
+              default _C_o_n_s_u_m_e_r_A_d_m_i_n object associated with the target object.
+
+       __ggeett__ddeeffaauulltt__ssuupppplliieerr__aaddmmiinn((CChhaannnneell)) -->> SSuupppplliieerrAAddmmiinn
+
+              Types:
+
+                 Channel = #objref
+                 SupplierAdmin = #objref
+
+              This is a readonly attribute which maintains a reference to a
+              default _S_u_p_p_l_i_e_r_A_d_m_i_n object associated with the target object.
+
+       __ggeett__ddeeffaauulltt__ffiilltteerr__ffaaccttoorryy((CChhaannnneell)) -->> FFiilltteerrFFaaccttoorryy
+
+              Types:
+
+                 Channel = #objref
+                 FilterFactory = #objref
+
+              The default _F_i_l_t_e_r_F_a_c_t_o_r_y associated with the target channel is
+              maintained by this readonly attribute.
+
+       nneeww__ffoorr__ccoonnssuummeerrss((CChhaannnneell,, OOppTTyyppee)) -->> RReettuurrnn
+
+              Types:
+
+                 Channel = #objref
+                 OpType = 'AND_OP' | 'OR_OP'
+                 Return = {ConsumerAdmin, AdminID}
+                 ConsumerAdmin = #objref
+                 AdminID = long()
+
+              This operation creates a new instance of a _C_o_n_s_u_m_e_r_A_d_m_i_n and
+              supplies an Id which may be used when invoking other operations
+              exported by this module. The returned object will inherit the
+              Quality of Service properties of the target channel.
+
+       ffoorr__ccoonnssuummeerrss((CChhaannnneell)) -->> CCoonnssuummeerrAAddmmiinn
+
+              Types:
+
+                 Channel = #objref
+                 ConsumerAdmin = #objref
+
+              A new new instance of a _C_o_n_s_u_m_e_r_A_d_m_i_n object is created but no
+              Id is returned. The returned object's operation type, i.e.,
+              _'_A_N_D___O_P_' or _'_O_R___O_P_', will be set to the value of the
+              configuration parameter _f_i_l_t_e_r_O_p. The target object's Quality of
+              Service properties will be inherited by the returned
+              _C_o_n_s_u_m_e_r_A_d_m_i_n.
+
+       nneeww__ffoorr__ssuupppplliieerrss((CChhaannnneell,, OOppTTyyppee)) -->> RReettuurrnn
+
+              Types:
+
+                 Channel = #objref
+                 OpType = 'AND_OP' | 'OR_OP'
+                 Return = {SupplierAdmin, AdminID}
+                 SupplierAdmin = #objref
+                 AdminID = long()
+
+              Enables us to create a new instance of a _S_u_p_p_l_i_e_r_A_d_m_i_n. An Id,
+              which may be used when invoking other operations exported by
+              this module, is also returned. The current Quality of Service
+              settings associated with the target object will be inherited by
+              the _S_u_p_p_l_i_e_r_A_d_m_i_n.
+
+       ffoorr__ssuupppplliieerrss((CChhaannnneell)) -->> SSuupppplliieerrAAddmmiinn
+
+              Types:
+
+                 Channel = #objref
+                 SupplierAdmin = #objref
+
+              To create a new _S_u_p_p_l_i_e_r_A_d_m_i_n with the target object's current
+              Quality of Service settings we can use this function. The
+              returned object's operation type (_'_A_N_D___O_P_' or _'_O_R___O_P_') will be
+              determined by the configuration variable _f_i_l_t_e_r_O_p.
+
+       ggeett__ccoonnssuummeerraaddmmiinn((CChhaannnneell,, AAddmmiinnIIDD)) -->> CCoonnssuummeerrAAddmmiinn
+
+              Types:
+
+                 Channel = #objref
+                 AdminID = long()
+                 ConsumerAdmin = #objref | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_AdminNotFound'{}}
+
+              If the given Id is associated with a _C_o_n_s_u_m_e_r_A_d_m_i_n the object
+              reference is returned. If such association never existed or the
+              _C_o_n_s_u_m_e_r_A_d_m_i_n have terminated an exception is raised.
+
+       ggeett__ssuupppplliieerraaddmmiinn((CChhaannnneell,, AAddmmiinnIIDD)) -->> SSuupppplliieerrAAddmmiinn
+
+              Types:
+
+                 Channel = #objref
+                 AdminID = long()
+                 SupplierAdmin = #objref | {'EXCEPTION',
+                 #'CosNotifyChannelAdmin_AdminNotFound'{}}
+
+              Equal to the operation _g_e_t___c_o_n_s_u_m_e_r_a_d_m_i_n_/_2 but a reference to a
+              _S_u_p_p_l_i_e_r_A_d_m_i_n is returned.
+
+       ggeett__aallll__ccoonnssuummeerraaddmmiinnss((CChhaannnneell)) -->> RReeppllyy
+
+              Types:
+
+                 Channel = #objref
+                 Reply = [AdminID]
+                 AdminID = long()
+
+              To get access to all _C_o_n_s_u_m_e_r_A_d_m_i_n Id's created by the target
+              object, and still alive, this operation could be invoked.
+
+       ggeett__aallll__ssuupppplliieerraaddmmiinnss((CChhaannnneell)) -->> RReeppllyy
+
+              Types:
+
+                 Channel = #objref
+                 Reply = [AdminID]
+                 AdminID = long()
+
+              Equal to the operation _g_e_t___a_l_l___c_o_n_s_u_m_e_r_a_d_m_i_n_s_/_1 but returns a
+              list of all _S_u_p_p_l_i_e_r_A_d_m_i_n object ID's.
+
+       ddeessttrrooyy((CChhaannnneell)) -->> ookk
+
+              Types:
+
+                 Channel = #objref
+
+              The _d_e_s_t_r_o_y operation will terminate the target channel and all
+              associated Admin objects.
+
+
+
+Ericsson AB                 cosNotificatioCnos1N.o1t.i1f8yChannelAdmin_EventChannel(3)

@@ -1,0 +1,255 @@
+erlang.el(3)               Erlang Module Definition               erlang.el(3)
+
+
+
+NNAAMMEE
+       erlang.el - Erlang mode for Emacs
+
+DDEESSCCRRIIPPTTIIOONN
+       Possibly the most important feature of an editor designed for
+       programmers is the ability to indent a line of code in accordance with
+       the structure of the programming language. The Erlang mode does, of
+       course, provide this feature. The layout used is based on the common
+       use of the language. The mode also provides things as syntax
+       highlighting, electric commands, module name verification, comment
+       support including paragraph filling, skeletons, tags support etc.
+
+       In the following descriptions the use of the word _P_o_i_n_t means: "Point
+       can be seen as the position of the cursor. More precisely, the point is
+       the position between two characters while the cursor is drawn over the
+       character following the point".
+
+IINNDDEENNTT
+       The following command are directly available for indentation.
+
+         * _T_A_B (_e_r_l_a_n_g_-_i_n_d_e_n_t_-_c_o_m_m_a_n_d) - Indents the current line of code.
+
+         * _M_-_C_-_\ (_i_n_d_e_n_t_-_r_e_g_i_o_n) - Indents all lines in the region.
+
+         * _M_-_l (_i_n_d_e_n_t_-_f_o_r_-_c_o_m_m_e_n_t) - Insert a comment character to the right
+           of the code on the line (if any).
+
+       Lines containing comment are indented differently depending on the
+       number of %-characters used:
+
+         * Lines with one %-character is indented to the right of the code.
+           The column is specified by the variable _c_o_m_m_e_n_t_-_c_o_l_u_m_n, by default
+           column 48 is used.
+
+         * Lines with two %-characters will be indented to the same depth as
+           code would have been in the same situation.
+
+         * Lines with three of more %-characters are indented to the left
+           margin.
+
+         * _C_-_c _C_-_q (_e_r_l_a_n_g_-_i_n_d_e_n_t_-_f_u_n_c_t_i_o_n) - Indents the current Erlang
+           function.
+
+         * _M_-_x _e_r_l_a_n_g_-_i_n_d_e_n_t_-_c_l_a_u_s_e _R_E_T
+            -Indent the current Erlang clause.
+
+         * _M_-_x _e_r_l_a_n_g_-_i_n_d_e_n_t_-_c_u_r_r_e_n_t_-_b_u_f_f_e_r _R_E_T - Indent the entire buffer.
+
+EEDDIITT -- FFIILLLL CCOOMMMMEENNTT
+       When editing normal text in text mode you can let Emacs reformat the
+       text by the _f_i_l_l_-_p_a_r_a_g_r_a_p_h command. This command will not work for
+       comments since it will treat the comment characters as words.
+
+       The Erlang editing mode provides a command that knows about the Erlang
+       comment structure and can be used to fill text paragraphs in comments.
+       Ex:
+
+             %% This is   just a very simple test to show
+             %% how the Erlang fill
+             %% paragraph   command works.
+
+       Clearly, the text is badly formatted. Instead of formatting this
+       paragraph line by line, let's try _e_r_l_a_n_g_-_f_i_l_l_-_p_a_r_a_g_r_a_p_h by pressing _M_-
+       _q. The result is:
+
+             %% This is just a very simple test to show how the Erlang fill
+             %% paragraph command works.
+
+EEDDIITT -- CCOOMMMMEENNTT//UUNNCCOOMMMMEENNTT RREEGGIIOONN
+       _C_-_c _C_-_c will put comment characters at the beginning of all lines in a
+       marked region. If you want to have two comment characters instead of
+       one you can do _C_-_u _2 _C_-_c _C_-_c
+
+       _C_-_c _C_-_u will undo a comment-region command.
+
+EEDDIITT -- MMOOVVIINNGG TTHHEE MMAARRKKEERR
+         * _C_-_a _M_-_a  (_e_r_l_a_n_g_-_b_e_g_i_n_n_i_n_g_-_o_f_-_f_u_n_c_t_i_o_n) - Move the point to the
+           beginning of the current or preceding Erlang function. With an
+           numeric argument (ex _C_-_u _2 _C_-_a _M_-_a) the function skips backwards
+           over this many Erlang functions. Should the argument be negative
+           the point is moved to the beginning of a function below the current
+           function.
+
+         * _M_-_C_-_a  (_e_r_l_a_n_g_-_b_e_g_i_n_n_i_n_g_-_o_f_-_c_l_a_u_s_e) - As above but move point to
+           the beginning of the current or preceding Erlang clause.
+
+         * _C_-_a _M_-_e  (_e_r_l_a_n_g_-_e_n_d_-_o_f_-_f_u_n_c_t_i_o_n) - Move to the end of the current
+           or following Erlang function. With an numeric argument (ex _C_-_u _2 _C_-
+           _a _M_-_e) the function skips backwards over this many Erlang
+           functions. Should the argument be negative the point is moved to
+           the end of a function below the current function.
+
+         * _M_-_C_-_e  (_e_r_l_a_n_g_-_e_n_d_-_o_f_-_c_l_a_u_s_e) - As above but move point to the end
+           of the current or following Erlang clause.
+
+EEDDIITT -- MMAARRKKIINNGG
+         * _C_-_c _M_-_h (_e_r_l_a_n_g_-_m_a_r_k_-_f_u_n_c_t_i_o_n) - Put the region around the current
+           Erlang function. The point is placed in the beginning and the mark
+           at the end of the function.
+
+         * _M_-_C_-_h  (_e_r_l_a_n_g_-_m_a_r_k_-_c_l_a_u_s_e) Put the region around the current
+           Erlang clause. The point is placed in the beginning and the mark at
+           the end of the function.
+
+EEDDIITT -- FFUUNNCCTTIIOONN HHEEAADDEERR CCOOMMMMAANNDDSS
+         * _C_-_c _C_-_j (_e_r_l_a_n_g_-_g_e_n_e_r_a_t_e_-_n_e_w_-_c_l_a_u_s_e) - Create a new clause in the
+           current Erlang function. The point is placed between the
+           parentheses of the argument list.
+
+         * _C_-_c _C_-_y (_e_r_l_a_n_g_-_c_l_o_n_e_-_a_r_g_u_m_e_n_t_s) - Copy the function arguments of
+           the preceding Erlang clause. This command is useful when defining a
+           new clause with almost the same argument as the preceding.
+
+EEDDIITT -- AARRRROOWWSS
+         * _C_-_c _C_-_a (_e_r_l_a_n_g_-_a_l_i_g_n_-_a_r_r_o_w_s) - aligns arrows after clauses inside
+           a region.
+
+                 Example:
+
+                 sum(L) -> sum(L, 0).
+                 sum([H|T], Sum) -> sum(T, Sum + H);
+                 sum([], Sum) -> Sum.
+
+                 becomes:
+
+                 sum(L)          -> sum(L, 0).
+                 sum([H|T], Sum) -> sum(T, Sum + H);
+                 sum([], Sum)    -> Sum.
+
+SSYYNNTTAAXX HHIIGGHHLLIIGGHHTTIINNGG
+       The syntax highlighting can be activated from the Erlang menu. There
+       are four different alternatives:
+
+         * Off: Normal black and white display.
+
+         * Level 1: Function headers, reserved words, comments, strings,
+           quoted atoms, and character constants will be colored.
+
+         * Level 2: The above, attributes, Erlang bif:s, guards, and words in
+           comments enclosed in single quotes will be colored.
+
+         * Level 3: The above, variables, records, and macros will be colored.
+           (This level is also known as the Christmas tree level.)
+
+TTAAGGSS
+       For the tag commands to work it requires that you have generated a tag
+       file. See EErrllaanngg mmooddee uusseerrss gguuiiddee
+
+         * _M_-_.  (_f_i_n_d_-_t_a_g) - Find a function definition. The default value is
+           the function name under the point.
+
+         * Find Tag (_e_r_l_a_n_g_-_f_i_n_d_-_t_a_g) - Like the Elisp-function `find-tag'.
+           Capable of retrieving Erlang modules. Tags can be given on the
+           forms `tag', `module:', `module:tag'.
+
+         * _M_-_+ (_e_r_l_a_n_g_-_f_i_n_d_-_n_e_x_t_-_t_a_g) - Find the next occurrence of tag.
+
+         * _M_-_T_A_B (_e_r_l_a_n_g_-_c_o_m_p_l_e_t_e_-_t_a_g) - Perform completion on the tag entered
+           in a tag search. Completes to the set of names listed in the
+           current tags table.
+
+         * Tags aprops (_t_a_g_s_-_a_p_r_o_p_o_s) - Display list of all tags in tags table
+           REGEXP matches.
+
+         * _C_-_x _t _s (_t_a_g_s_-_s_e_a_r_c_h) - Search through all files listed in tags
+           table for match for REGEXP. Stops when a match is found.
+
+SSKKEELLEETTOONNSS
+       A skeleton is a piece of pre-written code that can be inserted into the
+       buffer. Erlang mode comes with a set of predefined skeletons. The
+       skeletons can be accessed either from the Erlang menu of from commands
+       named _t_e_m_p_o_-_t_e_m_p_l_a_t_e_-_e_r_l_a_n_g_-_*, as the skeletons is defined using the
+       standard Emacs package "tempo". Here follows a brief description of the
+       available skeletons:
+
+         * Simple skeletons: If, Case, Receive, Receive After, Receive Loop -
+           Basic code constructs.
+
+         * Header elements: Module, Author - These commands insert lines on
+           the form _-_m_o_d_u_l_e_(xxx_)_.  and _-_a_u_t_h_o_r_(_'_m_y_@_h_o_m_e_'_)_.. They can be used
+           directly, but are also used as part of the full headers described
+           below.
+
+         * Full Headers: Small (minimum requirement), Medium (with fields for
+           basic information about the module), and Large Header (medium
+           header with some extra layout structure).
+
+         * Small Server - skeleton for a simple server not using OTP.
+
+         * Application - skeletons for the OTP application behavior
+
+         * Supervisor - skeleton for the OTP supervisor behavior
+
+         * Supervisor Bridge - skeleton for the OTP supervisor bridge behavior
+
+         * gen_server - skeleton for the OTP gen_server behavior
+
+         * gen_event - skeleton for the OTP gen_event behavior
+
+         * gen_fsm - skeleton for the OTP gen_fsm behavior
+
+         * Library module - skeleton for a module that does not implement a
+           process.
+
+         * Corba callback - skeleton for a Corba callback module.
+
+         * Erlang test suite - skeleton for a callback module for the erlang
+           test server.
+
+SSHHEELLLL
+         * New shell (_e_r_l_a_n_g_-_s_h_e_l_l) - Starts a new Erlang shell.
+
+         * _C_-_c _C_-_z_, (_e_r_l_a_n_g_-_s_h_e_l_l_-_d_i_s_p_l_a_y ) - Displays an Erlang shell, or
+           starts a new one if there is no shell started.
+
+CCOOMMPPIILLEE
+         * _C_-_c _C_-_k_, (_e_r_l_a_n_g_-_c_o_m_p_i_l_e) - Compiles the Erlang module in the
+           current buffer. You can also use _C_-_u _C_-_c _C_-_k to debug compile the
+           module with the debug options _d_e_b_u_g___i_n_f_o and _e_x_p_o_r_t___a_l_l.
+
+         * _C_-_c _C_-_l_, (_e_r_l_a_n_g_-_c_o_m_p_i_l_e_-_d_i_s_p_l_a_y) - Display compilation output.
+
+         * _C_-_u _C_-_x_` Start parsing the compiler output from the beginning. This
+           command will place the point on the line where the first error was
+           found.
+
+         * _C_-_x_` (_e_r_l_a_n_g_-_n_e_x_t_-_e_r_r_o_r) - Move the point on to the next error. The
+           buffer displaying the compilation errors will be updated so that
+           the current error will be visible.
+
+MMAANN
+       On unix you can view the manual pages in emacs. In order to find the
+       manual pages, the variable `erlang-root-dir' should be bound to the
+       name of the directory containing the Erlang installation. The name
+       should not include the final slash. Practically, you should add a line
+       on the following form to your ~/.emacs,
+
+             (setq erlang-root-dir "/the/erlang/root/dir/goes/here")
+
+SSTTAARRTTIINNGG IIMMEENNUU
+         * _M_-_x _i_m_e_n_u_-_a_d_d_-_t_o_-_m_e_n_u_b_a_r _R_E_T - This command will create the IMenu
+           menu containing all the functions in the current buffer.The command
+           will ask you for a suitable name for the menu. Not supported by
+           Xemacs.
+
+VVEERRSSIIOONN
+         * _M_-_x _e_r_l_a_n_g_-_v_e_r_s_i_o_n _R_E_T - This command displays the version number
+           of the Erlang editing mode. Remember to always supply the version
+           number when asking questions about the Erlang mode.
+
+Ericsson AB                       tools 2.6.8                     erlang.el(3)

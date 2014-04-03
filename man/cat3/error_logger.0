@@ -1,0 +1,384 @@
+error_logger(3)            Erlang Module Definition            error_logger(3)
+
+
+
+NNAAMMEE
+       error_logger - Erlang Error Logger
+
+DDEESSCCRRIIPPTTIIOONN
+       The Erlang _e_r_r_o_r _l_o_g_g_e_r is an event manager (see OOTTPP DDeessiiggnn PPrriinncciipplleess
+       and ggeenn__eevveenntt((33))), registered as _e_r_r_o_r___l_o_g_g_e_r. Error, warning and info
+       events are sent to the error logger from the Erlang runtime system and
+       the different Erlang/OTP applications. The events are, by default,
+       logged to tty. Note that an event from a process _P is logged at the
+       node of the group leader of _P. This means that log output is directed
+       to the node from which a process was created, which not necessarily is
+       the same node as where it is executing.
+
+       Initially, _e_r_r_o_r___l_o_g_g_e_r only has a primitive event handler, which
+       buffers and prints the raw event messages. During system startup, the
+       application Kernel replaces this with a _s_t_a_n_d_a_r_d _e_v_e_n_t _h_a_n_d_l_e_r, by
+       default one which writes nicely formatted output to tty. Kernel can
+       also be configured so that events are logged to file instead, or not
+       logged at all, see kkeerrnneell((66)).
+
+       Also the SASL application, if started, adds its own event handler,
+       which by default writes supervisor, crash and progress reports to tty.
+       See ssaassll((66)).
+
+       It is recommended that user defined applications should report errors
+       through the error logger, in order to get uniform reports. User defined
+       event handlers can be added to handle application specific events.
+       (_a_d_d___r_e_p_o_r_t___h_a_n_d_l_e_r_/_1_,_2). Also, there is a useful event handler in
+       STDLIB for multi-file logging of events, see _l_o_g___m_f___h_(_3_).
+
+       Warning events was introduced in Erlang/OTP R9C. To retain backwards
+       compatibility, these are by default tagged as errors, thus showing up
+       as error reports in the logs. By using the command line flag _+_W _<_w _|
+       _i_>, they can instead be tagged as warnings or info. Tagging them as
+       warnings may require rewriting existing user defined event handlers.
+
+DDAATTAA TTYYPPEESS
+       rreeppoorrtt(()) = [{Tag :: term(), Data :: term()} | term()]
+                | string()
+                | term()
+
+EEXXPPOORRTTSS
+       eerrrroorr__mmssgg((FFoorrmmaatt)) -->> ookk
+
+       eerrrroorr__mmssgg((FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+       ffoorrmmaatt((FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 Format = string()
+                 Data = list()
+
+              Sends a standard error event to the error logger. The _F_o_r_m_a_t and
+              _D_a_t_a arguments are the same as the arguments of _i_o_:_f_o_r_m_a_t_/_2. The
+              event is handled by the standard event handler.
+
+              1> error_logger:error_msg("An error occurred in ~p~n", [a_module]).
+
+              =ERROR REPORT==== 11-Aug-2005::14:03:19 ===
+              An error occurred in a_module
+              ok
+
+          WWaarrnniinngg::
+              If called with bad arguments, this function can crash the
+              standard event handler, meaning no further events are logged.
+              When in doubt, use _e_r_r_o_r___r_e_p_o_r_t_/_1 instead.
+
+
+       eerrrroorr__rreeppoorrtt((RReeppoorrtt)) -->> ookk
+
+              Types:
+
+                 Report = rreeppoorrtt(())
+
+              Sends a standard error report event to the error logger. The
+              event is handled by the standard event handler.
+
+              2> error_logger:error_report([{tag1,data1},a_term,{tag2,data}]).
+
+              =ERROR REPORT==== 11-Aug-2005::13:45:41 ===
+                  tag1: data1
+                  a_term
+                  tag2: data
+              ok
+              3> error_logger:error_report("Serious error in my module").
+
+              =ERROR REPORT==== 11-Aug-2005::13:45:49 ===
+              Serious error in my module
+              ok
+
+       eerrrroorr__rreeppoorrtt((TTyyppee,, RReeppoorrtt)) -->> ookk
+
+              Types:
+
+                 Type = term()
+                 Report = rreeppoorrtt(())
+
+              Sends a user defined error report event to the error logger. An
+              event handler to handle the event is supposed to have been
+              added. The event is ignored by the standard event handler.
+
+              It is recommended that _R_e_p_o_r_t follows the same structure as for
+              _e_r_r_o_r___r_e_p_o_r_t_/_1.
+
+       wwaarrnniinngg__mmaapp(()) -->> TTaagg
+
+              Types:
+
+                 Tag = error | warning | info
+
+              Returns the current mapping for warning events. Events sent
+              using _w_a_r_n_i_n_g___m_s_g_/_1_,_2 or _w_a_r_n_i_n_g___r_e_p_o_r_t_/_1_,_2 are tagged as errors
+              (default), warnings or info, depending on the value of the
+              command line flag _+_W.
+
+              os$ erl
+              Erlang (BEAM) emulator version 5.4.8 [hipe] [threads:0] [kernel-poll]
+
+              Eshell V5.4.8  (abort with ^G)
+              1> error_logger:warning_map().
+              error
+              2> error_logger:warning_msg("Warnings tagged as: ~p~n", [error]).
+
+              =ERROR REPORT==== 11-Aug-2005::15:31:23 ===
+              Warnings tagged as: error
+              ok
+              3>
+              User switch command
+               --> q
+              os$ erl +W w
+              Erlang (BEAM) emulator version 5.4.8 [hipe] [threads:0] [kernel-poll]
+
+              Eshell V5.4.8  (abort with ^G)
+              1> error_logger:warning_map().
+              warning
+              2> error_logger:warning_msg("Warnings tagged as: ~p~n", [warning]).
+
+              =WARNING REPORT==== 11-Aug-2005::15:31:55 ===
+              Warnings tagged as: warning
+              ok
+
+       wwaarrnniinngg__mmssgg((FFoorrmmaatt)) -->> ookk
+
+       wwaarrnniinngg__mmssgg((FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 Format = string()
+                 Data = list()
+
+              Sends a standard warning event to the error logger. The _F_o_r_m_a_t
+              and _D_a_t_a arguments are the same as the arguments of _i_o_:_f_o_r_m_a_t_/_2.
+              The event is handled by the standard event handler. It is tagged
+              either as an error, warning or info, see wwaarrnniinngg__mmaapp//00.
+
+          WWaarrnniinngg::
+              If called with bad arguments, this function can crash the
+              standard event handler, meaning no further events are logged.
+              When in doubt, use _w_a_r_n_i_n_g___r_e_p_o_r_t_/_1 instead.
+
+
+       wwaarrnniinngg__rreeppoorrtt((RReeppoorrtt)) -->> ookk
+
+              Types:
+
+                 Report = rreeppoorrtt(())
+
+              Sends a standard warning report event to the error logger. The
+              event is handled by the standard event handler. It is tagged
+              either as an error, warning or info, see wwaarrnniinngg__mmaapp//00.
+
+       wwaarrnniinngg__rreeppoorrtt((TTyyppee,, RReeppoorrtt)) -->> ookk
+
+              Types:
+
+                 Type = any()
+                 Report = rreeppoorrtt(())
+
+              Sends a user defined warning report event to the error logger.
+              An event handler to handle the event is supposed to have been
+              added. The event is ignored by the standard event handler. It is
+              tagged either as an error, warning or info, depending on the
+              value of wwaarrnniinngg__mmaapp//00.
+
+       iinnffoo__mmssgg((FFoorrmmaatt)) -->> ookk
+
+       iinnffoo__mmssgg((FFoorrmmaatt,, DDaattaa)) -->> ookk
+
+              Types:
+
+                 Format = string()
+                 Data = list()
+
+              Sends a standard information event to the error logger. The
+              _F_o_r_m_a_t and _D_a_t_a arguments are the same as the arguments of
+              _i_o_:_f_o_r_m_a_t_/_2. The event is handled by the standard event handler.
+
+              1> error_logger:info_msg("Something happened in ~p~n", [a_module]).
+
+              =INFO REPORT==== 11-Aug-2005::14:06:15 ===
+              Something happened in a_module
+              ok
+
+          WWaarrnniinngg::
+              If called with bad arguments, this function can crash the
+              standard event handler, meaning no further events are logged.
+              When in doubt, use _i_n_f_o___r_e_p_o_r_t_/_1 instead.
+
+
+       iinnffoo__rreeppoorrtt((RReeppoorrtt)) -->> ookk
+
+              Types:
+
+                 Report = rreeppoorrtt(())
+
+              Sends a standard information report event to the error logger.
+              The event is handled by the standard event handler.
+
+              2> error_logger:info_report([{tag1,data1},a_term,{tag2,data}]).
+
+              =INFO REPORT==== 11-Aug-2005::13:55:09 ===
+                  tag1: data1
+                  a_term
+                  tag2: data
+              ok
+              3> error_logger:info_report("Something strange happened").
+
+              =INFO REPORT==== 11-Aug-2005::13:55:36 ===
+              Something strange happened
+              ok
+
+       iinnffoo__rreeppoorrtt((TTyyppee,, RReeppoorrtt)) -->> ookk
+
+              Types:
+
+                 Type = any()
+                 Report = rreeppoorrtt(())
+
+              Sends a user defined information report event to the error
+              logger. An event handler to handle the event is supposed to have
+              been added. The event is ignored by the standard event handler.
+
+              It is recommended that _R_e_p_o_r_t follows the same structure as for
+              _i_n_f_o___r_e_p_o_r_t_/_1.
+
+       aadddd__rreeppoorrtt__hhaannddlleerr((HHaannddlleerr)) -->> aannyy(())
+
+       aadddd__rreeppoorrtt__hhaannddlleerr((HHaannddlleerr,, AArrggss)) -->> RReessuulltt
+
+              Types:
+
+                 Handler = module()
+                 Args = ggeenn__eevveenntt::hhaannddlleerr__aarrggss(())
+                 Result = ggeenn__eevveenntt::aadddd__hhaannddlleerr__rreett(())
+
+              Adds a new event handler to the error logger. The event handler
+              must be implemented as a _g_e_n___e_v_e_n_t callback module, see
+              ggeenn__eevveenntt((33)).
+
+              _H_a_n_d_l_e_r is typically the name of the callback module and _A_r_g_s is
+              an optional term (defaults to []) passed to the initialization
+              callback function _H_a_n_d_l_e_r_:_i_n_i_t_/_1. The function returns _o_k if
+              successful.
+
+              The event handler must be able to handle the eevveennttss described
+              below.
+
+       ddeelleettee__rreeppoorrtt__hhaannddlleerr((HHaannddlleerr)) -->> RReessuulltt
+
+              Types:
+
+                 Handler = module()
+                 Result = ggeenn__eevveenntt::ddeell__hhaannddlleerr__rreett(())
+
+              Deletes an event handler from the error logger by calling
+              _g_e_n___e_v_e_n_t_:_d_e_l_e_t_e___h_a_n_d_l_e_r_(_e_r_r_o_r___l_o_g_g_e_r_, _H_a_n_d_l_e_r_, _[_]_), see
+              ggeenn__eevveenntt((33)).
+
+       ttttyy((FFllaagg)) -->> ookk
+
+              Types:
+
+                 Flag = boolean()
+
+              Enables (_F_l_a_g _=_= _t_r_u_e) or disables (_F_l_a_g _=_= _f_a_l_s_e) printout of
+              standard events to the tty.
+
+              This is done by adding or deleting the standard event handler
+              for output to tty, thus calling this function overrides the
+              value of the Kernel _e_r_r_o_r___l_o_g_g_e_r configuration parameter.
+
+       llooggffiillee((RReeqquueesstt :::: {{ooppeenn,, FFiilleennaammee}})) -->> ookk || {{eerrrroorr,, OOppeennRReeaassoonn}}
+
+       llooggffiillee((RReeqquueesstt :::: cclloossee)) -->> ookk || {{eerrrroorr,, CClloosseeRReeaassoonn}}
+
+       llooggffiillee((RReeqquueesstt :::: ffiilleennaammee)) -->> FFiilleennaammee || {{eerrrroorr,, FFiilleennaammeeRReeaassoonn}}
+
+              Types:
+
+                 Filename = ffiillee::nnaammee(())
+                 OpenReason = allready_have_logfile | ooppeenn__eerrrroorr(())
+                 CloseReason = module_not_found
+                 FilenameReason = no_log_file
+                 ooppeenn__eerrrroorr(()) = ffiillee::ppoossiixx(()) | badarg | system_limit
+
+              Enables or disables printout of standard events to a file.
+
+              This is done by adding or deleting the standard event handler
+              for output to file, thus calling this function overrides the
+              value of the Kernel _e_r_r_o_r___l_o_g_g_e_r configuration parameter.
+
+              Enabling file logging can be used in combination with calling
+              _t_t_y_(_f_a_l_s_e_), in order to have a silent system, where all standard
+              events are logged to a file only. There can only be one active
+              log file at a time.
+
+              _R_e_q_u_e_s_t is one of:
+
+                _{_o_p_e_n_, _F_i_l_e_n_a_m_e_}:
+                  Opens the log file _F_i_l_e_n_a_m_e. Returns _o_k if successful, or
+                  _{_e_r_r_o_r_, _a_l_l_r_e_a_d_y___h_a_v_e___l_o_g_f_i_l_e_} if logging to file is already
+                  enabled, or an error tuple if another error occurred. For
+                  example, if _F_i_l_e_n_a_m_e could not be opened.
+
+                _c_l_o_s_e:
+                  Closes the current log file. Returns _o_k, or _{_e_r_r_o_r_,
+                  _m_o_d_u_l_e___n_o_t___f_o_u_n_d_}.
+
+                _f_i_l_e_n_a_m_e:
+                  Returns the name of the log file _F_i_l_e_n_a_m_e, or _{_e_r_r_o_r_,
+                  _n_o___l_o_g___f_i_l_e_} if logging to file is not enabled.
+
+EEVVEENNTTSS
+       All event handlers added to the error logger must handle the following
+       events. _G_l_e_a_d_e_r is the group leader pid of the process which sent the
+       event, and _P_i_d is the process which sent the event.
+
+         _{_e_r_r_o_r_, _G_l_e_a_d_e_r_, _{_P_i_d_, _F_o_r_m_a_t_, _D_a_t_a_}_}:
+           Generated when _e_r_r_o_r___m_s_g_/_1_,_2 or _f_o_r_m_a_t is called.
+
+         _{_e_r_r_o_r___r_e_p_o_r_t_, _G_l_e_a_d_e_r_, _{_P_i_d_, _s_t_d___e_r_r_o_r_, _R_e_p_o_r_t_}_}:
+           Generated when _e_r_r_o_r___r_e_p_o_r_t_/_1 is called.
+
+         _{_e_r_r_o_r___r_e_p_o_r_t_, _G_l_e_a_d_e_r_, _{_P_i_d_, _T_y_p_e_, _R_e_p_o_r_t_}_}:
+           Generated when _e_r_r_o_r___r_e_p_o_r_t_/_2 is called.
+
+         _{_w_a_r_n_i_n_g___m_s_g_, _G_l_e_a_d_e_r_, _{_P_i_d_, _F_o_r_m_a_t_, _D_a_t_a_}_}:
+           Generated when _w_a_r_n_i_n_g___m_s_g_/_1_,_2 is called, provided that warnings
+           are set to be tagged as warnings.
+
+         _{_w_a_r_n_i_n_g___r_e_p_o_r_t_, _G_l_e_a_d_e_r_, _{_P_i_d_, _s_t_d___w_a_r_n_i_n_g_, _R_e_p_o_r_t_}_}:
+           Generated when _w_a_r_n_i_n_g___r_e_p_o_r_t_/_1 is called, provided that warnings
+           are set to be tagged as warnings.
+
+         _{_w_a_r_n_i_n_g___r_e_p_o_r_t_, _G_l_e_a_d_e_r_, _{_P_i_d_, _T_y_p_e_, _R_e_p_o_r_t_}_}:
+           Generated when _w_a_r_n_i_n_g___r_e_p_o_r_t_/_2 is called, provided that warnings
+           are set to be tagged as warnings.
+
+         _{_i_n_f_o___m_s_g_, _G_l_e_a_d_e_r_, _{_P_i_d_, _F_o_r_m_a_t_, _D_a_t_a_}_}:
+           Generated when _i_n_f_o___m_s_g_/_1_,_2 is called.
+
+         _{_i_n_f_o___r_e_p_o_r_t_, _G_l_e_a_d_e_r_, _{_P_i_d_, _s_t_d___i_n_f_o_, _R_e_p_o_r_t_}_}:
+           Generated when _i_n_f_o___r_e_p_o_r_t_/_1 is called.
+
+         _{_i_n_f_o___r_e_p_o_r_t_, _G_l_e_a_d_e_r_, _{_P_i_d_, _T_y_p_e_, _R_e_p_o_r_t_}_}:
+           Generated when _i_n_f_o___r_e_p_o_r_t_/_2 is called.
+
+       Note that also a number of system internal events may be received, a
+       catch-all clause last in the definition of the event handler callback
+       function _M_o_d_u_l_e_:_h_a_n_d_l_e___e_v_e_n_t_/_2 is necessary. This also holds true for
+       _M_o_d_u_l_e_:_h_a_n_d_l_e___i_n_f_o_/_2, as there are a number of system internal messages
+       the event handler must take care of as well.
+
+SSEEEE AALLSSOO
+       gen_event(3), log_mf_h(3), kernel(6), sasl(6)
+
+
+
+Ericsson AB                      kernel 2.15.2                 error_logger(3)

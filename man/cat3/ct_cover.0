@@ -1,0 +1,43 @@
+ct_cover(3)                Erlang Module Definition                ct_cover(3)
+
+
+
+NNAAMMEE
+       ct_cover - Common Test Framework code coverage support module.
+
+DDEESSCCRRIIPPTTIIOONN
+       Common Test Framework code coverage support module.
+
+       This module exports help functions for performing code coverage
+       analysis.
+
+EEXXPPOORRTTSS
+       aadddd__nnooddeess((NNooddeess)) -->> {{ookk,, SSttaarrtteeddNNooddeess}} || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [atom()]
+                 StartedNodes = [atom()]
+                 Reason = cover_not_running | not_main_node
+
+              Add nodes to current cover test (only works if cover support is
+              active!). To have effect, this function should be called from
+              init_per_suite/1 before any actual tests are performed.
+
+       rreemmoovvee__nnooddeess((NNooddeess)) -->> ookk || {{eerrrroorr,, RReeaassoonn}}
+
+              Types:
+
+                 Nodes = [atom()]
+                 Reason = cover_not_running | not_main_node
+
+              Remove nodes from current cover test. Call this function to stop
+              cover test on nodes previously added with add_nodes/1. Results
+              on the remote node are transferred to the Common Test node.
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                               common_test 1.6.2                   ct_cover(3)

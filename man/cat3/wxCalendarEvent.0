@@ -1,0 +1,48 @@
+wxCalendarEvent(3)         Erlang Module Definition         wxCalendarEvent(3)
+
+
+
+NNAAMMEE
+       wxCalendarEvent - See external documentation: wxCalendarEvent.
+
+DDEESSCCRRIIPPTTIIOONN
+       See external documentation: wxCalendarEvent.
+
+         UUssee wwxxEEvvttHHaannddlleerr::ccoonnnneecctt//33 with EventType::
+           _c_a_l_e_n_d_a_r___s_e_l___c_h_a_n_g_e_d, _c_a_l_e_n_d_a_r___d_a_y___c_h_a_n_g_e_d, _c_a_l_e_n_d_a_r___m_o_n_t_h___c_h_a_n_g_e_d,
+           _c_a_l_e_n_d_a_r___y_e_a_r___c_h_a_n_g_e_d, _c_a_l_e_n_d_a_r___d_o_u_b_l_e_c_l_i_c_k_e_d,
+           _c_a_l_e_n_d_a_r___w_e_e_k_d_a_y___c_l_i_c_k_e_d
+
+       See also the message variant ##wwxxCCaalleennddaarr{{} event record type.
+
+       This class is derived (and can use functions) from:
+       wwxxDDaatteeEEvveenntt
+       wwxxCCoommmmaannddEEvveenntt
+       wwxxEEvveenntt
+
+DDAATTAA TTYYPPEESS
+         _w_x_C_a_l_e_n_d_a_r_E_v_e_n_t_(_):
+
+
+           An object reference, The representation is internal and can be
+           changed without notice. It can't be used for comparsion stored on
+           disc or distributed for use on other nodes.
+
+EEXXPPOORRTTSS
+       ggeettWWeeeekkDDaayy((TThhiiss)) -->> wwxx__eennuumm(()) ((sseeee mmoodduullee wwxx))
+
+              Types:
+
+                 This = wxCalendarEvent()
+
+              See external documentation.
+              Res = ?wxDateTime_Sun | ?wxDateTime_Mon | ?wxDateTime_Tue |
+              ?wxDateTime_Wed | ?wxDateTime_Thu | ?wxDateTime_Fri |
+              ?wxDateTime_Sat | ?wxDateTime_Inv_WeekDay
+
+AAUUTTHHOORRSS
+       _<_>
+
+
+
+                                   wx 0.99.2                wxCalendarEvent(3)

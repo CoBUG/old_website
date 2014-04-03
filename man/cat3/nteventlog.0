@@ -1,0 +1,77 @@
+nteventlog(3)              Erlang Module Definition              nteventlog(3)
+
+
+
+NNAAMMEE
+       nteventlog - Interface to Windows Event Log
+
+DDEESSCCRRIIPPTTIIOONN
+       _n_t_e_v_e_n_t_l_o_g provides a generic interface to the Windows event log. It is
+       part of the OS_Mon application, see ooss__mmoonn((66)). Available for Windows
+       versions where the event log is available. That is, not for Windows 98
+       and some other older Windows versions, but for most (all?) newer
+       Windows versions.
+
+       This module is used as the Windows backend for _o_s___s_u_p, see ooss__ssuupp((33)).
+
+       To retain backwards compatibility, this module can also be used to
+       start a standalone _n_t_e_v_e_n_t_l_o_g process which is not part of the OS_Mon
+       supervision tree. When starting such a process, the user has to supply
+       an identifier as well as a callback function to handle the messages.
+
+       The identifier, an arbitrary string, should be reused whenever the same
+       application (or node) wants to start the process. _n_t_e_v_e_n_t_l_o_g is
+       informed about all events that have arrived to the eventlog since the
+       last accepted message for the current identifier. As long as the same
+       identifier is used, the same eventlog record will not be sent to
+       _n_t_e_v_e_n_t_l_o_g more than once (with the exception of when graved system
+       failures arise, in which case the last records written before the
+       failure may be sent to Erlang again after reboot).
+
+       If the event log is configured to wrap around automatically, records
+       that have arrived to the log and been overwritten when _n_t_e_v_e_n_t_l_o_g was
+       not running are lost. It however detects this state and loses no
+       records that are not overwritten.
+
+       The callback function works as described in _o_s___s_u_p_(_3_).
+
+EEXXPPOORRTTSS
+       ssttaarrtt((IIddeennttiiffiieerr,, MMFFAA)) -->> RReessuulltt
+       ssttaarrtt__lliinnkk((IIddeennttiiffiieerr,, MMFFAA)) -->> RReessuulltt
+
+              Types:
+
+                 Identifier = string() | atom()
+                 MFA = {Mod, Func, Args}
+                  Mod = Func = atom()
+                  Args = [term()]
+                 Result = {ok, Pid} | {error, {already_started, Pid}}
+                 Pid = pid()
+
+              This function starts the standalone _n_t_e_v_e_n_t_l_o_g process and, if
+              _s_t_a_r_t___l_i_n_k_/_2 is used, links to it.
+
+              _I_d_e_n_t_i_f_i_e_r is an identifier as described above.
+
+              _M_F_A is the supplied callback function. When _n_t_e_v_e_n_t_l_o_g receives
+              information about a new event, this function will be called as
+              _a_p_p_l_y_(_M_o_d_, _F_u_n_c_, _[_E_v_e_n_t_|_A_r_g_s_]_) where _E_v_e_n_t is a tuple
+
+       ssttoopp(()) -->> ssttooppppeedd
+
+              Types:
+
+                 Result = stopped
+
+              Stops _n_t_e_v_e_n_t_l_o_g. Usually only used during development. The
+              server does not have to be shut down gracefully to maintain its
+              state.
+
+SSEEEE AALLSSOO
+       ooss__mmoonn((66)), ooss__ssuupp((33))
+
+       Windows NT documentation
+
+
+
+Ericsson AB                      os_mon 2.2.10                   nteventlog(3)
