@@ -13,7 +13,7 @@ body() ->
 	header(),
         %% #grid_2 { body=sidebar() },
 	#grid_2 { body= sidebar() },
-        #grid_8 { body=inner_body() }
+        #grid_10 { body=inner_body() }
     ]}.
 
 inner_body() ->
