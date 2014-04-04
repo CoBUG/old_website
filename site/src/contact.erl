@@ -11,8 +11,8 @@ title() -> "CoBUG - Contact".
 
 body() ->
     #container_12 { body=[
-        header(),
-        #grid_2 { body=sidebar() },
+        common:header(),
+        #grid_2 { body=common:sidebar() },
         #grid_10 { body=inner_body() }
     ]}.
 
@@ -21,5 +21,5 @@ inner_body() ->
         #h2 {text="Contact Info"},
         #p {text="The Colorado BSD Users Group"},
         #hr{},
-        footer()
+        common:footer()
     ].

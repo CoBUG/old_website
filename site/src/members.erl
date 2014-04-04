@@ -12,8 +12,8 @@ title() -> "CoBUG - Members".
 body() ->
     form_validator(),
     #container_12 { body=[
-	header(),
-	#grid_2 { body= sidebar() },
+	common:header(),
+	#grid_2 { body=common:sidebar() },
         #grid_10 { body=inner_body() }
     ]}.
 
@@ -43,7 +43,7 @@ inner_body() ->
     #br{},
     #br{},
 	#hr{},
-	footer()
+	common:footer()
     ].
 
 form_validator() ->
@@ -71,8 +71,3 @@ form_validator() ->
     wf:wire(#alert{text="Membership request submitted successfully!"}),
     io:format("User: ~p ~p <~p>~n", [Fname, Lname, Email]),
     ok.
-
-event(goButton) ->
-    [Fname,Lname,Email] = wf:mq([fname,lname,email]),
-    wf:wire(#alert{text="Membership request submitted successfully!"}),
-    io:format("User: ~p ~p <~p>~n", [Fname, Lname, Email]).

@@ -10,9 +10,9 @@ title() -> "CoBUG".
 
 body() ->
     #container_12 { body=[
-	header(),
+	common:header(),
         %% #grid_2 { body=sidebar() },
-	#grid_2 { body= sidebar() },
+	#grid_2 { body=common:sidebar() },
         #grid_10 { body=inner_body() }
     ]}.
 
@@ -25,5 +25,5 @@ inner_body() ->
 	the hopes of facilitating growth, awareness, hacking and use of the \
 	*BSDs  in Colorado." },
 	#hr{},
-	footer()
+	common:footer()
     ].
