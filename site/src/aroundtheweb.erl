@@ -32,7 +32,7 @@ inner_body() ->
             },
         #grid_4 { body= #panel { body=[
                     #image{image="/images/Twitter_logo_blue.png"},
-                    #link { text="twitter/cobsdug", url="https://twitter.com/cobsdug" },
+                    #link { text="Twitter/cobsdug", url="https://twitter.com/cobsdug" },
                     #hr{},
                     "Twitter feed with updates on meetings and other group related events!"
                     ]
