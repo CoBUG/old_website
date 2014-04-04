@@ -11,6 +11,7 @@ title() -> "CoBUG - Around the Web".
 
 body() ->
     #container_12 { body= [ 
+        #literal {html_encode=false, text="<script type=\"text/javascript\" src=\"https://apis.google.com/js/plusone.js\"></script>"},
         header(),
         #grid_2 { body= sidebar() },
         #grid_10 { body=inner_body() }
@@ -54,6 +55,13 @@ inner_body() ->
                     "XMPP service for members!"
                     ]
                 }, class="webitem"
+            }
+    ]},
+    #container_12 { body= [
+        #grid_4 { body= #panel { body=[
+                    #literal{ html_encode=false, text="<g:community href=\"https://plus.google.com/communities/112224531372695972083\"></g:community>" }
+                ]
+                }
             }
     ]},
 
