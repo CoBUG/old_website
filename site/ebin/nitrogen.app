@@ -1,9 +1,10 @@
 {application,nitrogen,
-             [{description,"My Nitrogen Web Project"},
+             [{description,"akb.io blog"},
               {vsn,"1"},
               {registered,[]},
               {applications,[kernel,stdlib]},
               {mod,{nitrogen_app,[]}},
               {env,[]},
-              {modules,[index,mobile,nitrogen_app,nitrogen_inets,
-                        nitrogen_sup]}]}.
+              {modules,[about,aroundtheweb,contact,element_test,index,
+                        mailing_list,members,mobile,nitrogen_app,
+                        nitrogen_inets,nitrogen_sup,tutorials,xmpp]}]}.
