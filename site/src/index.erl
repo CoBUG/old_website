@@ -19,7 +19,11 @@ body() ->
 inner_body() ->
     [
 	#h2 { text="Who We Are" },
-	#p { text="Potato!" },
+	#p { text="Created in 2014, CoBUG is a completely open BSD community, \
+	established with the intention of spreading love for the BSDs." },
+	#p { text="CoBSD offers a number of free community oriented features in \
+	the hopes of facilitating growth, awareness, hacking and use of the \
+	*BSDs  in Colorado." },
 	#hr{},
 	footer()
     ].
