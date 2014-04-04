@@ -25,15 +25,15 @@ inner_body() ->
         to the official CoBUG XMPP server and the chance to win sweet prizes! \
         " },
 	#h3 { text="Membership Form" },
-    #textbox { id=fname, text="First Name", next=lname },
+    #textbox { id=fname, class="form", text="First Name", next=lname },
     #br{},
-    #textbox { id=lname, text="Last Name", next=email },
+    #textbox { id=lname, class="form", text="Last Name", next=email },
     #br{},
-    #textbox { id=nname, text="Nick Name (IRC name?)", next=email },
+    #textbox { id=nname, class="form", text="Nick Name (IRC name?)", next=email },
     #br{},
-    #textbox { id=email, text="Email"},
+    #textbox { id=email, class="form", text="Email"},
     #br{},
-    #textbox { id=emailconf, text="Confirm Email"},
+    #textbox { id=emailconf, class="form", text="Confirm Email"},
     #br{},
     #checkbox { id=createxmpp, text="Create XMPP account?", checked=true },
     #br{},
@@ -47,6 +47,8 @@ inner_body() ->
     ].
 
 form_validator() ->
+  wf:wire(".form", #event { type=click, actions=#script { script="$(this).val('');" } }),
+
   wf:wire(recaptcha_button, fname, #validate{validators=[
         #is_required{text="Required"}
     ]}),
