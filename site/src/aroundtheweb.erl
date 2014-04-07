@@ -12,8 +12,8 @@ title() -> "CoBUG - Around the Web".
 body() ->
     #container_12 { body= [ 
         #literal {html_encode=false, text="<script type=\"text/javascript\" src=\"https://apis.google.com/js/plusone.js\"></script>"},
-        header(),
-        #grid_2 { body= sidebar() },
+        common:header(),
+        #grid_2 { body=common:sidebar() },
         #grid_10 { body=inner_body() }
     ]}.
 
@@ -66,7 +66,7 @@ inner_body() ->
     ]},
 
 	#hr{},
-	footer()
+	common:footer()
 
     ].
 	

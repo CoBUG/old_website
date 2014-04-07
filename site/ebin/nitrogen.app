@@ -5,6 +5,6 @@
               {applications,[kernel,stdlib]},
               {mod,{nitrogen_app,[]}},
               {env,[]},
-              {modules,[about,aroundtheweb,contact,element_test,index,
-                        mailing_list,members,mobile,nitrogen_app,
+              {modules,[about,aroundtheweb,common,contact,element_test,index,
+                        mailing_list,meetings,members,mobile,nitrogen_app,
                         nitrogen_inets,nitrogen_sup,tutorials,xmpp]}]}.
