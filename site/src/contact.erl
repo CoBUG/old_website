@@ -20,7 +20,15 @@ inner_body() ->
     [
         #h2 {text="Contact Info"},
         #hr{},
-        #p {text="The Colorado BSD Users Group"},
+        #h3{ body="Email"},
+        #p {text="Send questions regarding XMPP, mailing lists and other services to: admin@cobug.org"},
+        #p {text=""},
+        #h3{ body="Google+"},
+        #p {body = [
+                "A ",
+                #link{ url="https://plus.google.com/u/0/communities/112224531372695972083", text="Google+ Community" },
+                " exists for general member communication / event planning!"
+            ]},
         #hr{},
         common:footer()
     ].

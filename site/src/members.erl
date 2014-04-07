@@ -25,15 +25,16 @@ inner_body() ->
         to the official CoBUG XMPP server and the chance to win sweet prizes! \
         " },
 	#h3 { text="Membership Form" },
-    #textbox { id=fname, class="form", text="First Name", next=lname },
+    #textbox { id=fname, class="form", placeholder="First Name", next=lname },
     #br{},
-    #textbox { id=lname, class="form", text="Last Name", next=email },
+    #textbox { id=lname, class="form", placeholder="Last Name", next=email },
     #br{},
-    #textbox { id=nname, class="form", text="Nick Name (IRC name?)", next=email },
+    #textbox { id=nname, class="form", placeholder="Nick Name (IRC name?)", next=email },
+    " * This will be your XMPP account name if you choose to create one.",
     #br{},
-    #textbox { id=email, class="form", text="Email"},
+    #textbox { id=email, class="form", placeholder="Email"},
     #br{},
-    #textbox { id=emailconf, class="form", text="Confirm Email"},
+    #textbox { id=emailconf, class="form", placeholder="Confirm Email"},
     #br{},
     #checkbox { id=createxmpp, text="Create XMPP account?", checked=true },
     #br{},
@@ -47,7 +48,11 @@ inner_body() ->
     ].
 
 form_validator() ->
-  wf:wire(".form", #event { type=click, actions=#script { script="$(this).val('');" } }),
+
+    ValidateUser = fun(_Tag, User) ->
+            io:format("User Check: ~p", [User]),
+            false
+    end,
 
   wf:wire(recaptcha_button, fname, #validate{validators=[
         #is_required{text="Required"}
@@ -57,6 +62,11 @@ form_validator() ->
     ]}),
   wf:wire(recaptcha_button, email, #validate{validators=[
         #is_email { text="Not a valid email address." }
+    ]}),
+
+  wf:wire(recaptcha_button, nname, #validate{validators=[
+        #is_required{text="Required"},
+        #custom{tag=ignore,text="Username Taken, please pick another.",function=ValidateUser}
     ]}),
 
   wf:wire(recaptcha_button, emailconf, #validate{validators=[
