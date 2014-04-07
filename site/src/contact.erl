@@ -19,6 +19,7 @@ body() ->
 inner_body() -> 
     [
         #h2 {text="Contact Info"},
+        #hr{},
         #p {text="The Colorado BSD Users Group"},
         #hr{},
         common:footer()

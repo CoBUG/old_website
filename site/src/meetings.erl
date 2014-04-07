@@ -10,9 +10,9 @@ title() -> "CoBUG".
 
 body() ->
     #container_12 { body=[
-	header(),
+	common:header(),
         %% #grid_2 { body=sidebar() },
-	#grid_2 { body= sidebar() },
+	#grid_2 { body=common:sidebar() },
         #grid_10 { body=inner_body() }
     ]}.
 
@@ -20,5 +20,7 @@ inner_body() ->
     [
 	#h2 { text="Meetings" },
 	#hr{},
-	footer()
+	#p{text="More Potato!"},
+	#hr{},
+	common:footer()
     ].

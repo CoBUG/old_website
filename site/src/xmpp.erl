@@ -19,6 +19,7 @@ body() ->
 inner_body() ->
     [
 	#h2 { text="CoBUG XMPP Service" },
+	#hr{},
 	#p { text="Potato!" },
 	#hr{},
 	common:footer()
