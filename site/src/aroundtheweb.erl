@@ -10,7 +10,7 @@ main() -> #template { file="./site/templates/bare.html" }.
 title() -> "CoBUG - Around the Web".
 
 body() ->
-    #container_12 { body= [ 
+    #container_12 { body= [
         #literal {html_encode=false, text="<script type=\"text/javascript\" src=\"https://apis.google.com/js/plusone.js\"></script>"},
         common:header(),
         #grid_2 { body=common:sidebar() },
@@ -19,8 +19,8 @@ body() ->
 
 inner_body() ->
     [
-	#h2 { text="Around the Web" },
-	#hr{},
+    #h2 { text="Around the Web" },
+    #hr{},
     #container_12 { body= [
         #grid_4 { body= #panel { body=[
                     #image{image="/images/GitHub-Mark-32px.png"},
@@ -67,17 +67,17 @@ inner_body() ->
                     #image{image="/images/cobsd_trimmed.png"},
                     #link { text="IRC", url="https://webchat.freenode.net/" },
                     #hr{},
-                    "<i>What the heck is IRC? You still use that?</i> - said some random guy. Heck yes we still use it! IRC FTW! \
-                    Come hang out on #cobug! And GET OFF MY LAWN! "
+                    "<i>What the heck, you still use that?</i> - said some random guy. Heck yes we still use it! IRC FTW! \
+                    Come hang out on chat.freenode.net #cobug! And GET OFF MY LAWN! "
                     ]
                 }, class="webitem"
             }
     ]},
 
-	#hr{},
-	common:footer()
+    #hr{},
+    common:footer()
 
     ].
-	
+
 event(click) ->
     wf:insert_top(placeholder, "<p>You clicked the button!").
