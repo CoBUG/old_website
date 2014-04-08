@@ -62,6 +62,15 @@ inner_body() ->
                     #literal{ html_encode=false, text="<g:community href=\"https://plus.google.com/communities/112224531372695972083\"></g:community>" }
                 ]
                 }
+            },
+        #grid_4 { body= #panel { body=[
+                    #image{image="/images/cobsd_trimmed.png"},
+                    #link { text="IRC", url="https://webchat.freenode.net/" },
+                    #hr{},
+                    "<i>What the heck is IRC? You still use that?</i> - said some random guy. Heck yes we still use it! IRC FTW! \
+                    Come hang out on #cobug! And GET OFF MY LAWN! "
+                    ]
+                }, class="webitem"
             }
     ]},
 
