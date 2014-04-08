@@ -28,6 +28,13 @@ sidebar() ->
 				#listitem { body=[#link{ text="XMPP", url="http://www.akb.io:8000/xmpp"}]}
 			]
 		},
+		#h3 { text="Events", class="co" },
+		%%#list {
+		%%	body= [
+		%%		#listitem { body="2014-04-03"},
+		%%		#listitem { body="OpenBSD"}
+		%%	]
+		%%}
 		#h3 { text="*BSD", class="co" },
 		#list {
 			body= [
@@ -36,12 +43,5 @@ sidebar() ->
 				#listitem { body=[#link{ text="FreeBSD", url="http://www.freebsd.org"}]},
 				#listitem { body=[#link{ text="Bitrig", url="http://www.bitrig.org"}]}
 			]
-		},
-		#h3 { text="Events", class="co" }
-		%%#list {
-		%%	body= [
-		%%		#listitem { body="2014-04-03"},
-		%%		#listitem { body="OpenBSD"}
-		%%	]
-		%%}
+		}
 	].
