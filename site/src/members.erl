@@ -51,7 +51,8 @@ form_validator() ->
 
     ValidateUser = fun(_Tag, User) ->
             io:format("User Check: ~p", [User]),
-            false
+            SQL = "select username from users where username=?",
+            db:exists(SQL, [User])
     end,
 
   wf:wire(recaptcha_button, fname, #validate{validators=[
@@ -72,7 +73,7 @@ form_validator() ->
   wf:wire(recaptcha_button, emailconf, #validate{validators=[
     #confirm_same { text="Emails do not match", confirm_id=email }
     ]}).
- 
+
   recaptcha_event(human_verifier, {error, ErrorMessage}) ->
     wf:wire(#alert{text="Way to fail the human test!" ++ ErrorMessage}),
     ok;
