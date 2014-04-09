@@ -50,9 +50,8 @@ inner_body() ->
 form_validator() ->
 
     ValidateUser = fun(_Tag, User) ->
-            io:format("User Check: ~p", [User]),
-            SQL = "select username from users where username=?",
-            db:exists(SQL, [User])
+            wf:info("Checking for user: ~p~n", [User]),
+            not(db_mgr:username_exists(User))
     end,
 
   wf:wire(recaptcha_button, fname, #validate{validators=[
@@ -78,7 +77,10 @@ form_validator() ->
     wf:wire(#alert{text="Way to fail the human test!" ++ ErrorMessage}),
     ok;
   recaptcha_event(human_verifier, ok) ->
-    [Fname,Lname,Email] = wf:mq([fname,lname,email]),
+    [Fname,Lname,Email,Uname,Hasxmpp,HasRemind] = wf:mq([fname,lname,email,nname,createxmpp,reminders]),
     wf:wire(#alert{text="Membership request submitted successfully!"}),
-    io:format("User: ~p ~p <~p>~n", [Fname, Lname, Email]),
+    wf:wire(#script { script="$('.form').val('');" }),
+    wf:wire(#script { script="$('#recaptcha_response_field').val('');" }),
+    wf:info("Usernfo: ~p ~p <~p>~n", [Fname, Lname, Email]),
+    db_mgr:add_user(Fname,Lname,Uname,Email,Hasxmpp,HasRemind),
     ok.
