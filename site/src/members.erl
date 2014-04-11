@@ -38,7 +38,7 @@ inner_body() ->
     #br{},
     #checkbox { id=createxmpp, text="Create XMPP account?", checked=true },
     #br{},
-    #checkbox { id=createxmpp, text="Do you currently live in Colorado?", checked=true },
+    #checkbox { id=isco, text="Do you currently live in Colorado?", checked=true },
     #br{},
     #checkbox { id=reminders, text="Subscribe me to the 'announce@' mailing list!", checked=false },
     #br{},
@@ -79,10 +79,10 @@ form_validator() ->
     wf:wire(#alert{text="Way to fail the human test!" ++ ErrorMessage}),
     ok;
   recaptcha_event(human_verifier, ok) ->
-    [Fname,Lname,Email,Uname,Hasxmpp,HasRemind] = wf:mq([fname,lname,email,nname,createxmpp,reminders]),
+    [Fname,Lname,Email,Uname,Hasxmpp,HasRemind,IsCo] = wf:mq([fname,lname,email,nname,createxmpp,reminders,isco]),
     wf:wire(#alert{text="Membership request submitted successfully!"}),
     wf:wire(#script { script="$('.form').val('');" }),
     wf:wire(#script { script="$('#recaptcha_response_field').val('');" }),
     wf:info("Usernfo: ~p ~p <~p>~n", [Fname, Lname, Email]),
-    db_mgr:add_user(Fname,Lname,Uname,Email,Hasxmpp,HasRemind),
+    db_mgr:add_user(Fname,Lname,Uname,Email,Hasxmpp,HasRemind,IsCo),
     ok.
