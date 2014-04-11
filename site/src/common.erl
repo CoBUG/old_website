@@ -27,14 +27,15 @@ sidebar() ->
 		#h3 { text="CoBUG", class="co" },
 		#list {
 			body= [
-				#listitem { body=[#link{ text="Home", url="http://www.akb.io:8000"}]},
-				#listitem { body=[#link{ text="Contact", url="http://www.akb.io:8000/contact"}]},
-				#listitem { body=[#link{ text="Meetings", url="http://www.akb.io:8000/meetings"}]},
-				#listitem { body=[#link{ text="Tutorials", url="http://www.akb.io:8000/tutorials"}]},
-				#listitem { body=[#link{ text="Membership", url="http://www.akb.io:8000/members"}]},
-				#listitem { body=[#link{ text="Around the Web", url="http://www.akb.io:8000/aroundtheweb"}]},
-				#listitem { body=[#link{ text="Mailing List", url="http://www.akb.io:8000/mailing/list"}]},
-				#listitem { body=[#link{ text="XMPP", url="http://www.akb.io:8000/xmpp"}]}
+				#listitem { body=[#link{ text="Home", url="/"}]},
+				#listitem { body=[#link{ text="Contact", url="/contact"}]},
+				#listitem { body=[#link{ text="Meetings", url="/meetings"}]},
+				#listitem { body=[#link{ text="Tutorials", url="/tutorials"}]},
+				#listitem { body=[#link{ text="Membership", url="/members"}]},
+				#listitem { body=[#link{ text="Around the Web", url="/aroundtheweb"}]},
+				#listitem { body=[#link{ text="Mailing List", url="/mailing/list"}]},
+				#listitem { body=[#link{ text="XMPP", url="/xmpp"}]},
+				#listitem { body=[#link{ text="Friends", url="/friends"}]}
 			]
 		},
 		#h3 { text="Events", class="co" },
