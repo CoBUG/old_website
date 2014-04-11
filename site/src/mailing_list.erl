@@ -23,7 +23,7 @@ inner_body() ->
 	#p { text="The following mailing lists are available for public use:" },
     #list { body=[
         #listitem{ body="<b>announce@</b> Used for announcements primarily pertaining to CoBUG, but occasionally general BSD announcements as well." },
-        #listitem{ body="<b>misc@</b> General BSD discussion for question." },
+        #listitem{ body="<b>talk@</b> General discussion." },
         #listitem{ body="<b>tech@</b> Technical discussion for various BSD project related topics." }
     ]},
     #h3 { text="Subscribing / Unsubscribing to the list:" },
