@@ -4,7 +4,12 @@
 
 %% Include any application-specific custom elements, actions, or validators below
 -record(bubble, {?ELEMENT_BASE(element_bubble),
-        attr1 :: any(),
-        attr2 :: any()
+        html_encode :: any(),
+        body :: any(),
+        title :: any(),
+        role :: any(),
+        bubble_body :: any(),
+        bubble_title :: any(),
+        text :: any()
     }).
 

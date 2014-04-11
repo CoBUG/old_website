@@ -4,6 +4,15 @@
 -include_lib("nitrogen_core/include/wf.hrl").
 -include("records.hrl").
 
+rand_str() ->
+%% http://blog.teemu.im/2009/11/07/generating-random-strings-in-erlang/
+	lists:foldl(fun(_, Acc) ->
+                        [lists:nth(random:uniform(length("abcdefghijklmnopqrstuvwxyz")),
+                                   "abcdefghijklmnopqrstuvwxyz")]
+                            ++ Acc
+                end, [], lists:seq(1, 5)).
+
+
 header() ->
         #html5_header{ body= [
 	    #image{ image="/images/cobsd_trimmed.png", class="logo" },
@@ -31,7 +40,9 @@ sidebar() ->
 		#h3 { text="Events", class="co" },
 		#list {
 			body= [
-				#listitem { body="2014-04-16" }
+				#listitem { body= [
+						#bubble{ text="2014-04-16", bubble_title="Meeting at The Daily Grind", bubble_body="meeting here" }
+					]}
 			]
 		},
 		#h3 { text="*BSD", class="co" },
