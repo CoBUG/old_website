@@ -40,6 +40,7 @@ sidebar() ->
 				#listitem { body=[#link{ text="OpenBSD", url="http://www.openbsd.org"}]},
 				#listitem { body=[#link{ text="NetBSD", url="http://www.netbsd.org"}]},
 				#listitem { body=[#link{ text="FreeBSD", url="http://www.freebsd.org"}]},
+				#listitem { body=[#link{ text="DragonFlyBSD", url="http://www.dragonflybsd.org"}]},
 				#listitem { body=[#link{ text="Bitrig", url="http://www.bitrig.org"}]}
 			]
 		}
