@@ -20,7 +20,7 @@ inner_body() ->
     [
 	#h2 { text="BSD Tutorials" },
 	#hr{},
-	#p { text="Potato!" },
+	#p { text="No tutorials yet - Check back later tho! I am working on a few!" },
 	#hr{},
 	common:footer()
     ].

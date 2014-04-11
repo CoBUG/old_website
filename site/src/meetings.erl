@@ -20,7 +20,12 @@ inner_body() ->
     [
 	#h2 { text="Meetings" },
 	#hr{},
-	#p{text="More Potato!"},
+	#h3{ text="Regular Meeting" },
+	#p{ body=[ 
+		"First and last Wednsday of the month at ",
+		#link{ url="https://www.facebook.com/thedailygrindpueblo", text="The Daily Grind" },
+		" in Pueblo Colorado!"
+	]},
 	#hr{},
 	common:footer()
     ].

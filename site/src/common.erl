@@ -29,12 +29,11 @@ sidebar() ->
 			]
 		},
 		#h3 { text="Events", class="co" },
-		%%#list {
-		%%	body= [
-		%%		#listitem { body="2014-04-03"},
-		%%		#listitem { body="OpenBSD"}
-		%%	]
-		%%}
+		#list {
+			body= [
+				#listitem { body="2014-04-16" }
+			]
+		},
 		#h3 { text="*BSD", class="co" },
 		#list {
 			body= [

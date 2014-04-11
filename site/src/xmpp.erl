@@ -20,7 +20,21 @@ inner_body() ->
     [
 	#h2 { text="CoBUG XMPP Service" },
 	#hr{},
-	#p { text="Potato!" },
+    #h3{ text="XMPP aka Jabber" },
+	#p { body=[
+            "The xmpp service is availble to \"registered\" members. \
+            These are members that have filled out the form on the ",
+            #link{ url="/members", text="members" },
+            " page.",
+            #p{ text="Once one the xmpp service, come hang out in the 'discussion' chat room!" },
+            #h3{ text="Suggested Clients" },
+            #p{ body= [
+                    "On the *BSDs the most common client seems to be ",
+                    #link{ url="http://pidgin.im", text="Pidgin" },
+                    " or ",
+                    #link{ url="http://www.bitlbee.org/", text="Bitlbee" }
+                ]}
+    ]},
 	#hr{},
 	common:footer()
     ].
