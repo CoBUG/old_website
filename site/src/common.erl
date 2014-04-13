@@ -31,7 +31,7 @@ sidebar() ->
 				#listitem { body=[#link{ text="Contact", url="/contact"}]},
 				#listitem { body=[#link{ text="Meetings", url="/meetings"}]},
 				#listitem { body=[#link{ text="Tutorials", url="/tutorials"}]},
-				#listitem { body=[#link{ text="Membership", url="/members"}]},
+				#listitem { body=[#link{ text="Membership", url="https://cobug.org/members"}]},
 				#listitem { body=[#link{ text="Around the Web", url="/aroundtheweb"}]},
 				#listitem { body=[#link{ text="Mailing List", url="/mailing/list"}]},
 				#listitem { body=[#link{ text="XMPP", url="/xmpp"}]},
