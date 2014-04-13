@@ -13,18 +13,25 @@ reflect() -> record_info(fields, bubble).
 
 -spec render_element(#bubble{}) -> body().
 render_element(Record) ->
-    BubID = common:rand_str(),
-    CliID = common:rand_str(),
+    BubID = "bubble_" ++ common:rand_str(),
+    CliID = "bubble_" ++ common:rand_str(),
     Body = [
         #link { body=Record#bubble.text, html_id=CliID },
-        #panel { style="position: absolute; border: 1px solid black; width: 300px", class="bubble", html_id=BubID, body=[
+        #panel { class="bubble", html_id=BubID, body=[
             #label { text=Record#bubble.bubble_title },
             #value { text=Record#bubble.bubble_body }
         ]}
     ],
-    wf:wire(CliID, #event { type=click, actions=#script { 
-            script=" console.log('showing');"
-          } }),
+
+    Script = wf:f(
+        "$('#~s').click(function() { $('#~s').toggle(); });",
+        [
+            CliID,
+            BubID
+        ]),
+
+    wf:wire(Script),
+
     wf_tags:emit_tag(li, Body, [
             {id, Record#bubble.html_id},
             {class, ["bubble_parent"]},
