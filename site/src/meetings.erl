@@ -22,7 +22,7 @@ inner_body() ->
 	#hr{},
 	#h3{ text="Regular Meeting" },
 	#p{ body=[ 
-		"First and last Wednsday of the month at ",
+		"First and last Wednesday of the month at ",
 		#link{ url="https://www.facebook.com/thedailygrindpueblo", text="The Daily Grind" },
 		" in Pueblo Colorado!"
 	]},
